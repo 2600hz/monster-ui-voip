@@ -75,12 +75,12 @@
 			"urlPlaceholder": "http://votre.serveur.com/endroit/ou/sauvegarder/enregistrements",
 			"timeLimitLabel": "Limite de temps (s):"
 		},
-		"musicOnHold": {
-			"title": "Musique d'attente",
-			"headline": "Options de la musique d'attente du groupe",
-			"dropdownLabel": "Musique d'attente:",
+		"ringback": {
+			"title": "Tonalité d'appel",
+			"headline": "Options de la tonalité d'appel du groupe",
+			"dropdownLabel": "Tonalité d'appel:",
 			"silence": "Silence",
-			"defaultMusic": "Musique par défaut",
+			"defaultRingback": "Tonalité par défaut",
 			"emptyUploadAlert": "Veuillez sélectionner un fichier à uploader"
 		}
 	},

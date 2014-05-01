@@ -654,21 +654,21 @@
 }
 
 /* Music-On-Hold  Feature */
-.feature-popup-container[data-feature="music_on_hold"] .media-dropdown {
+.feature-popup-container[data-feature="ringback"] .media-dropdown {
 	margin-bottom: 0px;
 }
-.feature-popup-container[data-feature="music_on_hold"] .upload-toggle {
+.feature-popup-container[data-feature="ringback"] .upload-toggle {
 	margin-left: 10px;
 }
-.feature-popup-container[data-feature="music_on_hold"] .upload-div {
+.feature-popup-container[data-feature="ringback"] .upload-div {
 	display: none;
 	margin-top: 20px;
 }
-.feature-popup-container[data-feature="music_on_hold"] .upload-div .upload-input {
+.feature-popup-container[data-feature="ringback"] .upload-div .upload-input {
 	margin: 0;
 	width: 330px;
 }
-.feature-popup-container[data-feature="music_on_hold"] .upload-div button {
+.feature-popup-container[data-feature="ringback"] .upload-div button {
 	margin-left: 10px;
 	padding-left: 13px;
 	padding-right: 13px;

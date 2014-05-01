@@ -207,10 +207,10 @@ define(function(require){
 							iconColor: 'icon-blue',
 							title: self.i18n.active().groups.callRecording.title
 						},
-						music_on_hold: {
+						ringback: {
 							icon: 'icon-music',
 							iconColor: 'icon-yellow',
-							title: self.i18n.active().groups.musicOnHold.title
+							title: self.i18n.active().groups.ringback.title
 						}
 					},
 					hasFeatures: false
@@ -218,8 +218,7 @@ define(function(require){
 
 			_.each(result.mapFeatures, function(val, key) {
 				if(('features' in group && group.features.indexOf(key) >= 0) // If data from view
-				|| ('smartpbx' in group && key in group.smartpbx && group.smartpbx[key].enabled) // If data from document
-				|| (key === 'music_on_hold' && key in group && 'media_id' in group[key])){ // special case for music_on_hold since it's an old feature
+				|| ('smartpbx' in group && key in group.smartpbx && group.smartpbx[key].enabled)) { // If data from document
 					val.active = true;
 					result.hasFeatures = true;
 				}
@@ -508,8 +507,8 @@ define(function(require){
 				self.groupsRenderCallRecording(data);
 			});
 
-			template.find('.feature[data-feature="music_on_hold"]').on('click', function() {
-				self.groupsRenderMusicOnHold(data);
+			template.find('.feature[data-feature="ringback"]').on('click', function() {
+				self.groupsRenderRingback(data);
 			});
 		},
 
@@ -594,18 +593,23 @@ define(function(require){
 			});
 		},
 
-		groupsRenderMusicOnHold: function(data) {
+		groupsRenderRingback: function(data) {
 			var self = this,
-				silenceMediaId = 'silence_stream://300000';
+				silenceMediaId = 'silence_stream://300000',
+				ringGroupNode = data.callflow.flow;
+
+			while(ringGroupNode.module !== 'ring_group' && '_' in ringGroupNode.children) {
+				ringGroupNode = ringGroupNode.children['_'];
+			}
 
 			self.groupsListMedias(function(medias) {
 				var templateData = {
 						group: data.group,
 						silenceMedia: silenceMediaId,
 						mediaList: medias,
-						media: 'music_on_hold' in data.group && 'media_id' in data.group.music_on_hold ? data.group.music_on_hold.media_id : silenceMediaId
+						media: ringGroupNode.data.ringback || ''
 					},
-					featureTemplate = $(monster.template(self, 'groups-feature-music_on_hold', templateData)),
+					featureTemplate = $(monster.template(self, 'groups-feature-ringback', templateData)),
 					switchFeature = featureTemplate.find('.switch').bootstrapSwitch(),
 					popup,
 					closeUploadDiv = function(newMedia) {
@@ -691,7 +695,7 @@ define(function(require){
 					if(file) {
 						fileReader.readAsDataURL(file);
 					} else {
-						monster.ui.alert(self.i18n.active().groups.musicOnHold.emptyUploadAlert);
+						monster.ui.alert(self.i18n.active().groups.ringback.emptyUploadAlert);
 					}
 				});
 
@@ -699,30 +703,43 @@ define(function(require){
 					var selectedMedia = featureTemplate.find('.media-dropdown option:selected').val(),
 					    enabled = switchFeature.bootstrapSwitch('status');
 
-					if(!('music_on_hold' in data.group)) {
-						data.group.music_on_hold = {};
+					if(!('smartpbx' in data.group)) {
+						data.group.smartpbx = {};
 					}
 
-					if('media_id' in data.group.music_on_hold || enabled) {
-						if(enabled) {
-							data.group.music_on_hold = {
-								media_id: selectedMedia
-							};
+					if(enabled) {
+						ringGroupNode.data.ringback = selectedMedia;
+						if('ringback' in data.group.smartpbx) {
+							data.group.smartpbx.ringback.enabled = true;
 						} else {
-							data.group.music_on_hold = {};
+							data.group.smartpbx.ringback = {
+								enabled: true
+							};
 						}
-						self.groupsUpdate(data.group, function(updatedGroup) {
-							popup.dialog('close').remove();
-							self.groupsRender({ groupId: data.group.id });
+
+						self.groupsUpdateCallflow(data.callflow, function() {
+							self.groupsUpdate(data.group, function(updatedGroup) {
+								popup.dialog('close').remove();
+								self.groupsRender({ groupId: data.group.id });
+							});
 						});
-					} else {
-						popup.dialog('close').remove();
-						self.groupsRender({ groupId: data.group.id });
+					} else if(ringGroupNode.data.ringback || (data.group.smartpbx.ringback && data.group.smartpbx.ringback.enabled)) {
+						delete ringGroupNode.data.ringback;
+						if('ringback' in data.group.smartpbx) {
+							data.group.smartpbx.ringback.enabled = false;
+						}
+
+						self.groupsUpdateCallflow(data.callflow, function() {
+							self.groupsUpdate(data.group, function(updatedGroup) {
+								popup.dialog('close').remove();
+								self.groupsRender({ groupId: data.group.id });
+							});
+						});
 					}
 				});
 
 				popup = monster.ui.dialog(featureTemplate, {
-					title: data.group.extra.mapFeatures.music_on_hold.title,
+					title: data.group.extra.mapFeatures.ringback.title,
 					position: ['center', 20]
 				});
 			});

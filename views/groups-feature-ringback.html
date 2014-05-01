@@ -1,19 +1,19 @@
-<div class="feature-popup-container" data-feature="music_on_hold">
+<div class="feature-popup-container" data-feature="ringback">
 	<div class="feature-popup-title">
 		<div class="feature-icon-wrapper">
-			<i class="{{group.extra.mapFeatures.music_on_hold.icon}}"></i>
+			<i class="{{group.extra.mapFeatures.ringback.icon}}"></i>
 		</div>
-		{{ i18n.groups.musicOnHold.headline }}
+		{{ i18n.groups.ringback.headline }}
 		<div class="switch" data-on="success" data-off="default" data-on-label="{{i18n.enabled}}" data-off-label="{{i18n.disabled}}">
-			<input type="checkbox"{{#if group.extra.mapFeatures.music_on_hold.active}} checked="checked"{{/if}}></input>
+			<input type="checkbox"{{#if group.extra.mapFeatures.ringback.active}} checked="checked"{{/if}}></input>
 		</div>
 	</div>
 
-	<div class="content{{#unless group.extra.mapFeatures.music_on_hold.active}} disabled{{/unless}}">
+	<div class="content{{#unless group.extra.mapFeatures.ringback.active}} disabled{{/unless}}">
 		<div>
-			<span>{{ i18n.groups.musicOnHold.dropdownLabel }}</span>
+			<span>{{ i18n.groups.ringback.dropdownLabel }}</span>
 			<select name="format" class="media-dropdown">
-				<option value="{{silenceMedia}}" {{#compare media '===' silenceMedia}}selected{{/compare}}>{{ i18n.groups.musicOnHold.silence }}</option>
+				<option value="{{silenceMedia}}" {{#compare media '===' silenceMedia}}selected{{/compare}}>{{ i18n.groups.ringback.silence }}</option>
 				{{#each mediaList}}
 					<option value="{{this.id}}" {{#compare ../media '===' this.id}}selected{{/compare}}>{{this.name}}</option>
 				{{/each}}

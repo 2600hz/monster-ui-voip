@@ -75,12 +75,12 @@
 			"urlPlaceholder": "http://your.server.com/place/to/store/recordings",
 			"timeLimitLabel": "Time Limit (sec):"
 		},
-		"musicOnHold": {
-			"title": "Music-On-Hold",
-			"headline": "Group Music-On-Hold Settings",
-			"dropdownLabel": "Music on Hold:",
+		"ringback": {
+			"title": "Ringback",
+			"headline": "Group Ringback Settings",
+			"dropdownLabel": "Ringback media:",
 			"silence": "Silence",
-			"defaultMusic": "Default Music",
+			"defaultRingback": "Default Ringback",
 			"emptyUploadAlert": "Please select a file to upload"
 		}
 	},
