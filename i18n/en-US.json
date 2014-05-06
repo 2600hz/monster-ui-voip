@@ -48,6 +48,8 @@
 		"ringThisMemberFor": "Ring this member for:",
 		"ringGroupMissing": "No Ring Group are defined for this Group (group_id missing from callflow)",
 		"removeMember": "Remove Member",
+		"distribute": "Distribute",
+		"maxDurationTooltip": "Click this box to change the maximum duration for your ring group. You must enter a number between 30 and 999.",
 		"extraNode": {
 			"label": "If no one answers, forward the call to:",
 			"menu": "Menu",

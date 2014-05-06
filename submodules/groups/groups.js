@@ -88,11 +88,11 @@ define(function(require){
 				url: 'accounts/{accountId}/media/{mediaId}',
 				verb: 'DELETE'
 			},
-            'voip.groups.uploadMedia': {
-                url: 'accounts/{accountId}/media/{mediaId}/raw',
-                verb: 'POST',
-                type: 'application/x-base64'
-            },
+			'voip.groups.uploadMedia': {
+				url: 'accounts/{accountId}/media/{mediaId}/raw',
+				verb: 'POST',
+				type: 'application/x-base64'
+			},
 			'voip.groups.listVMBoxes': {
 				url: 'accounts/{accountId}/vmboxes',
 				verb: 'GET'
@@ -116,7 +116,7 @@ define(function(require){
 
 			self.groupsGetData(function(data) {
 				var dataTemplate = self.groupsFormatListData(data),
-				    template = $(monster.template(self, 'groups-layout', { countGroups: Object.keys(dataTemplate.groups).length })),
+					template = $(monster.template(self, 'groups-layout', { countGroups: Object.keys(dataTemplate.groups).length })),
 					templateGroup;
 
 				_.each(dataTemplate.groups, function(group) {
@@ -338,7 +338,7 @@ define(function(require){
 					});
 
 					groupTemplate.find('#group_user_selector .selected-users, #group_user_selector .available-users').sortable({
-			  			connectWith: '.connectedSortable'
+						connectWith: '.connectedSortable'
 					}).disableSelection();
 
 					var popup = monster.ui.dialog(groupTemplate, {
@@ -493,8 +493,12 @@ define(function(require){
 				var results = self.groupsFormatMembersData(results);
 
 				template = $(monster.template(self, 'groups-members', results));
+				
+				self.groupsRenderMemberSliders(template, results.extra.ringGroup);
 
 				self.groupsBindMembers(template, results);
+
+				template.find('[data-toggle="tooltip"]').tooltip();
 
 				callback && callback(template, results);
 			});
@@ -701,7 +705,7 @@ define(function(require){
 
 				featureTemplate.find('.save').on('click', function() {
 					var selectedMedia = featureTemplate.find('.media-dropdown option:selected').val(),
-					    enabled = switchFeature.bootstrapSwitch('status');
+						enabled = switchFeature.bootstrapSwitch('status');
 
 					if(!('smartpbx' in data.group)) {
 						data.group.smartpbx = {};
@@ -1014,7 +1018,7 @@ define(function(require){
 			template.on('click', '#add_extensions', function() {
 				var renderNewRow = function(lastExtension) {
 					var lastExtension = listExtension[listExtension.length - 1] + 1,
-					    dataTemplate = {
+						dataTemplate = {
 							recommendedExtension: lastExtension
 						},
 						newLineTemplate = $(monster.template(self, 'groups-newExtension', dataTemplate)),
@@ -1051,7 +1055,7 @@ define(function(require){
 
 			template.on('click', '.cancel-extension-link', function() {
 				var extension = parseInt($(this).siblings('input').val()),
-				    index = listExtension.indexOf(extension);
+					index = listExtension.indexOf(extension);
 
 				if(index > -1) {
 					listExtension.splice(index, 1);
@@ -1062,9 +1066,17 @@ define(function(require){
 		},
 
 		groupsBindMembers: function(template, data) {
-			var self = this,
-				scaleSections = 6, //Number of 'sections' in the time scales for the sliders
-				scaleMaxSeconds = 60; //Maximum of seconds, corresponding to the end of the scale
+			var self = this;
+
+			template.find('.distribute-button').on('click', function() {
+				var sliders = template.find('.slider-time')
+					max = sliders.first().slider('option', 'max'),
+					section = Math.floor(max/sliders.length),
+					current = 0;
+				$.each(sliders, function() {
+					$(this).slider('values', [current, current+=section]);
+				});
+			});
 
 			template.find('.save-groups').on('click', function() {
 				var endpoints = [],
@@ -1096,6 +1108,37 @@ define(function(require){
 				});
 			});
 
+			template.on('click', '.group-row.title .scale-max', function() {
+				var $this = $(this),
+					input = $this.siblings('.scale-max-input');
+
+				input.show();
+				input.focus();	
+				$this.hide();
+			});
+
+			template.on('blur', '.group-row.title .scale-max-input', function(e) {
+				var $this = $(this),
+					value = $this.val()
+					intValue = parseInt($this.val());
+				if(value != $this.data('current') && !isNaN(intValue) && intValue >= 30) {
+					self.groupsRenderMemberSliders(template, data.extra.ringGroup, intValue);
+				} else {
+					$this.val($this.data('current')).hide();
+					$this.siblings('.scale-max').show();
+				}
+			});
+
+			template.on('keydown', '.group-row.title .scale-max-input', function(e) {
+				var charCode = (e.which) ? e.which : event.keyCode;
+				if(charCode > 57 && charCode < 96) { return false; }
+				else if(charCode === 13) { $(this).blur(); }
+				else if(charCode === 27) {
+					var $this = $(this);
+					$this.val($this.data('current')).blur();
+				}
+			});
+
 			template.on('click', '.remove-user', function() {
 				var parentRow = $(this).parents('.group-row');
 				template.find('.add-user[data-id="'+parentRow.data('user_id')+'"]').removeClass('in-use');
@@ -1119,6 +1162,20 @@ define(function(require){
 
 				$this.addClass('in-use');
 			});
+		},
+
+		groupsRenderMemberSliders: function(template, ringGroup, maxSeconds) {
+			var self = this,
+				scaleSections = 6, //Number of 'sections' in the time scales for the sliders
+				scaleMaxSeconds = maxSeconds && maxSeconds >= 30 ? maxSeconds : 120; //Maximum of seconds, corresponding to the end of the scale
+
+			if(!maxSeconds) {
+				var currentMax = 0;
+				_.each(ringGroup, function(endpoint) {
+					currentMax = (endpoint.delay+endpoint.timeout > currentMax) ? endpoint.delay+endpoint.timeout : currentMax;
+				});
+				scaleMaxSeconds = currentMax > scaleMaxSeconds ? Math.ceil(currentMax/60)*60 : scaleMaxSeconds;
+			}
 
 			var sliderTooltip = function(event, ui) {
 					var val = ui.value,
@@ -1140,7 +1197,7 @@ define(function(require){
 					groupRow.find('.slider-time').slider({
 						range: true,
 						min: 0,
-						max: 60,
+						max: scaleMaxSeconds,
 						values: [ endpoint.delay, endpoint.delay+endpoint.timeout ],
 						slide: sliderTooltip,
 						change: sliderTooltip,
@@ -1154,9 +1211,16 @@ define(function(require){
 					var scaleContainer = container.find('.scale-container')
 						isHeader = isHeader || false;
 
+					scaleContainer.empty();
+
 					for(var i=1; i<=scaleSections; i++) {
 						var toAppend = '<div class="scale-element" style="width:'+(100/scaleSections)+'%;">'
-									 + (isHeader ? '<span>'+(i*scaleMaxSeconds/scaleSections)+' Sec</span>' : '')
+									 + (isHeader 
+								 		? (i==scaleSections 
+								 			? '<input type="text" value="'+scaleMaxSeconds+'" data-current="'+scaleMaxSeconds+'" class="scale-max-input" maxlength="3"><span class="scale-max">'
+								 			:'<span>')
+								 			+ Math.floor(i*scaleMaxSeconds/scaleSections) + ' Sec</span>' 
+							 			: '')
 									 + '</div>';
 						scaleContainer.append(toAppend);
 					}
@@ -1164,11 +1228,11 @@ define(function(require){
 						scaleContainer.append('<span>0 Sec</span>');
 					}
 				};
-
-			_.each(data.extra.ringGroup, function(endpoint) {
-				createSlider(endpoint);
-			});
-			createSliderScale(template.find('.group-row.title'), true);
+		
+				_.each(ringGroup, function(endpoint) {
+					createSlider(endpoint);
+				});
+				createSliderScale(template.find('.group-row.title'), true);
 		},
 
 		groupsGetCreationData: function(callback) {
@@ -1261,13 +1325,13 @@ define(function(require){
 			monster.pub('common.numbers.getListFeatures', function(features) {
 				_.each(data.numbers.numbers, function(number, id) {
 					/* Formating number */
-                    number.viewFeatures = $.extend(true, {}, features);
-                    /* TODO: Once locality is enabled, we need to remove it */
-                    number.localityEnabled = 'locality' in number ? true : false;
+					number.viewFeatures = $.extend(true, {}, features);
+					/* TODO: Once locality is enabled, we need to remove it */
+					number.localityEnabled = 'locality' in number ? true : false;
 
-                    _.each(number.features, function(feature) {
-                        number.viewFeatures[feature].active = 'active';
-                    });
+					_.each(number.features, function(feature) {
+						number.viewFeatures[feature].active = 'active';
+					});
 
 					if(number.used_by === '') {
 						response.unassignedNumbers[id] = number;

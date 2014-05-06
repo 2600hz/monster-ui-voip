@@ -3,9 +3,13 @@
 	<div class="grid-time">
 		<div class="group-row title">
 			<div class="scale-container"></div>
-			<div class="name"><!--{{ i18n.groups.ringThisMemberFor }}--></div>
+			<div class="name"><!--{{ i18n.groups.ringThisMemberFor }}-->
+				<button type="button" class="distribute-button btn btn-primary btn-small">{{ i18n.groups.distribute }}</button>
+			</div>
 			<div class="times"></div>
-			<div class="remove">{{ i18n.groups.removeMember }}</div>
+			<div class="remove"><!-- {{ i18n.groups.removeMember }} -->
+				<i class="help-popover icon-question-sign icon-large" data-original-title="{{ i18n.groups.maxDurationTooltip }}" data-placement="top" data-toggle="tooltip"></i>
+			</div>
 		</div>
 
 		{{#each extra.ringGroup}}

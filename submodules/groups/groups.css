@@ -284,6 +284,36 @@
 #groups_container .detail-group .grid-time .group-row.title {
 	margin-top: 1px;
 	background-color: transparent;
+	padding: 15px 0px;
+}
+
+#groups_container .detail-group .grid-time .group-row.title .scale-max {
+	border: solid 1px #22ccff;
+	border-radius: 4px;
+	padding: 0px 2px;
+	cursor: pointer;
+}
+
+#groups_container .detail-group .grid-time .group-row.title .scale-max-input {
+	display: none;
+	position: absolute;
+	top: -20px;
+	right: -24px;
+	color: #999;
+	font-size: 12px;
+	width: 42px;
+	height: 12px;
+	text-align: center;
+	margin: 0;
+	padding: 4px;
+}
+
+#groups_container .detail-group .grid-time .group-row.title .remove {
+	text-align: left;
+}
+
+#groups_container .detail-group .grid-time .group-row.title .remove i {
+	margin: 0 0 0 5px;
 }
 
 #groups_container .detail-group .grid-time .group-row .name {
@@ -291,6 +321,7 @@
 	padding-left: 10px;
 	width: 20%;
 	white-space: nowrap;
+	vertical-align: middle;
 }
 #groups_container .detail-group .grid-time .group-row .times {
 	padding-right: 30px;
