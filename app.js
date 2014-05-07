@@ -3,16 +3,6 @@ define(function(require){
 		_ = require('underscore'),
 		monster = require('monster');
 
-	var subModules = {
-			devices: require('./submodules/devices/devices.js'),
-			groups: require('./submodules/groups/groups.js'),
-			myOffice: require('./submodules/myOffice/myOffice.js'),
-			numbers: require('./submodules/numbers/numbers.js'),
-			strategy: require('./submodules/strategy/strategy.js'),
-			users: require('./submodules/users/users.js'),
-			callLogs: require('./submodules/callLogs/callLogs.js')
-		};
-
 	var app = {
 
 		name: 'voip',
@@ -40,6 +30,8 @@ define(function(require){
 
 		subscribe: {
 		},
+
+		subModules: ['devices', 'groups', 'numbers', 'strategy', 'callLogs', 'users', 'myOffice'],
 
 		load: function(callback){
 			var self = this;
@@ -125,10 +117,6 @@ define(function(require){
 			});
 		}
 	};
-
-	$.each(subModules, function(k, subModule) {
-		$.extend(true, app, subModule);
-	});
 
 	return app;
 });
