@@ -357,8 +357,14 @@
 			"requireKeyPress": "Leave voicemails on forwarded numbers",
 			"title": "Call Forwarding"
 		},
-		"call_recording": {
-			"title": "Call Recording"
+		"callRecording": {
+			"title": "Inbound Call Recording",
+			"headline": "User Call Recording Settings",
+			"formatLabel": "Format:",
+			"urlLabel": "URL:",
+			"urlPlaceholder": "http://your.server.com/place/to/store/recordings",
+			"timeLimitLabel": "Time Limit (sec):",
+			"noNumber": "Before configuring the Inbound Call Recording feature for this user, you need to assign him a number or an extension"
 		},
 		"conferencing": {
 			"title": "Conference Bridge",

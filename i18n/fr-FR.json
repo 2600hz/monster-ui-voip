@@ -357,6 +357,14 @@
 			"requireKeyPress": "Laisser message sur le répondeur du numéro transferé",
 			"title": "Transfert d'appels"
 		},
+		"callRecording": {
+			"title": "Enregistrement d'appel entrant",
+			"headline": "Réglages de l'enregistrement d'appel",
+			"formatLabel": "Format:",
+			"urlLabel": "URL:",
+			"urlPlaceholder": "http://votre.serveur.com/vos/enregistrements",
+			"timeLimitLabel": "Durée maximale (Sec):"
+		},
 		"call_recording": {
 			"title": "Enregistrement d'appel"
 		},

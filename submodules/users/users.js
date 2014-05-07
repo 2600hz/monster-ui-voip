@@ -289,6 +289,11 @@ define(function(require){
 							icon: 'icon-music',
 							iconColor: 'icon-pink',
 							title: self.i18n.active().users.music_on_hold.title
+						},
+						call_recording: {
+							icon: 'icon-microphone',
+							iconColor: 'icon-blue',
+							title: self.i18n.active().users.callRecording.title
 						}
 					}
 				};
@@ -1039,6 +1044,28 @@ define(function(require){
 						self.usersRenderFindMeFollowMe($.extend(true, results, { currentUser: currentUser }));
 					}
 				);
+			});
+
+			template.on('click', '.feature[data-feature="call_recording"]', function() {
+				self.usersListCallflowsUser(currentUser.id, function(data) {
+					if(data.length > 0) {
+						monster.request({
+							resource: 'voip.users.getCallflow',
+							data: {
+								accountId: self.accountId,
+								callflowId: data[0].id
+							},
+							success: function(callflow) {
+								self.usersRenderCallRecording({
+									userCallflow: callflow.data,
+									currentUser: currentUser
+								});
+							}
+						});
+					} else {
+						monster.ui.alert('error', self.i18n.active().users.call_recording.noNumber);
+					}
+				});
 			});
 
 			template.on('click', '.feature[data-feature="music_on_hold"]', function() {
@@ -1823,6 +1850,112 @@ define(function(require){
 				});
 				createSliderScale(featureTemplate.find('.device-row.title'), true);
 			}
+		},
+
+		usersRenderCallRecording: function(params) {
+			var self = this,
+				templateData = $.extend(true, {
+												user: params.currentUser
+											},
+											(params.currentUser.extra.mapFeatures.call_recording.active ? {
+												url: params.userCallflow.flow.data.url,
+												format: params.userCallflow.flow.data.format,
+												timeLimit: params.userCallflow.flow.data.time_limit
+											} : {})
+										),
+				featureTemplate = $(monster.template(self, 'users-feature-call_recording', templateData)),
+				switchFeature = featureTemplate.find('.switch').bootstrapSwitch(),
+				featureForm = featureTemplate.find('#call_recording_form'),
+				popup;
+
+			monster.ui.validate(featureForm, {
+				rules: {
+					'time_limit': {
+						digits: true
+					}
+				}
+			});
+
+			featureTemplate.find('.cancel-link').on('click', function() {
+				popup.dialog('close').remove();
+			});
+
+			switchFeature.on('switch-change', function(e, data) {
+				data.value ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+			});
+
+			featureTemplate.find('.save').on('click', function() {
+				if(monster.ui.valid(featureForm)) {
+					var formData = form2object('call_recording_form'),
+						enabled = switchFeature.bootstrapSwitch('status');
+
+					if(!('smartpbx' in params.currentUser)) { params.currentUser.smartpbx = {}; }
+					if(!('call_recording' in params.currentUser.smartpbx)) {
+						params.currentUser.smartpbx.call_recording = {
+							enabled: false
+						};
+					}
+
+					if(params.currentUser.smartpbx.call_recording.enabled || enabled) {
+						params.currentUser.smartpbx.call_recording.enabled = enabled;
+						var newCallflow = $.extend(true, {}, params.userCallflow);
+						if(enabled) {
+							if(newCallflow.flow.module === 'record_call') {
+								newCallflow.flow.data = $.extend(true, { action: "start" }, formData);
+							} else {
+								newCallflow.flow = {
+									children: {
+										"_": $.extend(true, {}, params.userCallflow.flow)
+									},
+									module: "record_call",
+									data: $.extend(true, { action: "start" }, formData)
+								}
+								var flow = newCallflow.flow;
+								while(flow.children && '_' in flow.children) {
+									if(flow.children['_'].module === 'record_call' && flow.children['_'].data.action === 'stop') {
+										break; // If there is already a Stop Record Call
+									} else if(flow.children['_'].module === 'voicemail') {
+										var voicemailNode = $.extend(true, {}, flow.children['_']);
+										flow.children['_'] = {
+											module: 'record_call',
+											data: { action: "stop" },
+											children: { '_': voicemailNode }
+										}
+										break;
+									} else {
+										flow = flow.children['_'];
+									}
+								}
+							}
+						} else {
+							newCallflow.flow = $.extend(true, {}, params.userCallflow.flow.children["_"]);
+							var flow = newCallflow.flow;
+							while(flow.children && '_' in flow.children) {
+								if(flow.children['_'].module === 'record_call') {
+									flow.children = flow.children['_'].children;
+									break;
+								} else {
+									flow = flow.children['_'];
+								}
+							}
+						}
+						self.usersUpdateCallflow(newCallflow, function(updatedCallflow) {
+							self.usersUpdateUser(params.currentUser, function(updatedUser) {
+								popup.dialog('close').remove();
+								self.usersRender({ userId: params.currentUser.id });
+							});
+						});
+					} else {
+						popup.dialog('close').remove();
+						self.usersRender({ groupId: params.currentUser.id });
+					}
+				}
+			});
+
+			popup = monster.ui.dialog(featureTemplate, {
+				title: params.currentUser.extra.mapFeatures.call_recording.title,
+				position: ['center', 20]
+			});
 		},
 
 		usersRenderMusicOnHold: function(currentUser) {
