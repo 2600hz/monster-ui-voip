@@ -302,12 +302,15 @@ define(function(require){
 				dataUser.extra = formattedUser;
 			}
 
+			dataUser.extra.countFeatures = 0;
 			_.each(dataUser.features, function(v) {
-				dataUser.extra.mapFeatures[v].active = true;
+				if(v in dataUser.extra.mapFeatures) {
+					dataUser.extra.countFeatures++;
+					dataUser.extra.mapFeatures[v].active = true;
+				}
 			});
 
-			dataUser.extra.countFeatures = dataUser.features.length;
-			if(dataUser.features.length > 0) {
+			if(dataUser.extra.countFeatures > 0) {
 				dataUser.extra.hasFeatures = true;
 			}
 
