@@ -22,13 +22,6 @@ define(function(require){
 				url: 'accounts/{accountId}/phone_numbers/{phoneNumber}',
 				verb: 'GET'
 			},
-			/* Provisioner */
-			'voip.devices.getProvisionerData': {
-				apiRoot: monster.config.api.provisioner || 'http://p.2600hz.com/',
-				dataType: '*/*',
-				url: 'api/phones/',
-				verb: 'GET'
-			},
 			/* Users */
 			'voip.devices.listUsers': {
 				url: 'accounts/{accountId}/users',
@@ -185,7 +178,7 @@ define(function(require){
 			template.find('.create-device').on('click', function() {
 				var type = $(this).data('type');
 
-				monster.pub('voip.devices.renderAdd', {
+				self.devicesRenderAdd({
 					type: type,
 					callback: function(device) {
 						self.devicesRender({ deviceId: device.id });
@@ -203,16 +196,24 @@ define(function(require){
 				};
 
 			if(type === 'sip_device') {
-				self.devicesGetProvisionerData(function(dataProvisioner) {
-					var listModels = self.devicesFormatProvisionerData(dataProvisioner);
-
-					self.devicesRenderProvisioner(listModels, function(dataProvisioner) {
-						data.provision = dataProvisioner;
-
+				monster.pub('common.chooseModel.render', {
+					callback: function(dataModel) {
+						monster.request({
+							resource: 'voip.devices.createDevice',
+							data: {
+								accountId: self.accountId,
+								data: dataModel
+							},
+							success: function(data, status) {
+								self.devicesRender({ deviceId: data.data.id});
+							}
+						});
+					},
+					callbackMissingBrand: function() {
 						self.devicesGetEditData(data, function(dataDevice) {
 							self.devicesRenderDevice(dataDevice, callback);
 						});
-					});
+					}
 				});
 			}
 			else {
@@ -370,78 +371,6 @@ define(function(require){
 			var popup = monster.ui.dialog(templateDevice, {
 				position: ['center', 20],
 				title: popupTitle
-			});
-		},
-
-		/* Args inclunding: data:list of supported devices from provisioner api */
-		devicesRenderProvisioner: function(listModels, callback) {
-			var self = this,
-				selectedBrand,
-				selectedFamily,
-				selectedModel,
-				templateDevice = $(monster.template(self, 'devices-provisioner', listModels));
-
-			templateDevice.find('.brand-box').on('click', function() {
-				var $this = $(this),
-					brand = $this.data('brand');
-
-				selectedBrand = brand;
-
-				$this.removeClass('unselected').addClass('selected');
-				templateDevice.find('.brand-box:not([data-brand="'+brand+'"])').removeClass('selected').addClass('unselected');
-				templateDevice.find('.devices-brand').hide();
-				templateDevice.find('.devices-brand[data-brand="'+ brand + '"]').show();
-
-				templateDevice.find('.block-device').show();
-			});
-
-			templateDevice.find('.device-box').on('click', function() {
-				var $this = $(this);
-				selectedModel = $this.data('model'),
-				selectedFamily = $this.data('family');
-
-				templateDevice.find('.device-box').removeClass('selected');
-
-				$this.addClass('selected');
-
-				templateDevice.find('.actions .selection').text(monster.template(self, '!' + self.i18n.active().devices.provisionerPopup.deviceSelected, { brand: selectedBrand, model: selectedModel }));
-				templateDevice.find('.actions').show();
-			});
-
-			templateDevice.find('.device-box').dblclick(function() {
-				var $this = $(this),
-					dataProvisioner = {
-					endpoint_brand: selectedBrand,
-					endpoint_family: $this.data('family'),
-					endpoint_model: $this.data('model')
-				};
-
-				popup.dialog('close').remove();
-
-				callback && callback(dataProvisioner);
-			});
-
-			templateDevice.find('.missing-brand').on('click', function() {
-				popup.dialog('close').remove();
-
-				callback && callback();
-			});
-
-			templateDevice.find('.next-step').on('click', function() {
-				var dataProvisioner = {
-					endpoint_brand: selectedBrand,
-					endpoint_family: selectedFamily,
-					endpoint_model: selectedModel
-				};
-
-				popup.dialog('close').remove();
-
-				callback && callback(dataProvisioner);
-			});
-
-			var popup = monster.ui.dialog(templateDevice, {
-				position: ['center', 20],
-				title: self.i18n.active().devices.provisionerPopup.title
 			});
 		},
 
@@ -795,50 +724,7 @@ define(function(require){
 			return formattedData;
 		},
 
-
-		devicesFormatProvisionerData: function(data) {
-			var formattedData = {
-				brands: []
-			};
-
-			_.each(data, function(brand) {
-				var families = [];
-
-				_.each(brand.families, function(family) {
-					var models = [];
-
-					_.each(family.models, function(model) {
-						models.push(model.name);
-					});
-
-					families.push({ name: family.name, models: models });
-				});
-
-				formattedData.brands.push({
-					name: brand.name,
-					families: families
-				});
-			});
-
-			return formattedData;
-		},
-
 		/* Utils */
-		devicesGetProvisionerData: function(callback) {
-			var self = this;
-
-			monster.request({
-				resource: 'voip.devices.getProvisionerData',
-				data: {},
-				success: function(data) {
-					// we had to set the type to */* to get a response from the API. So we have to manually parse the JSON response
-					var jsonResponse = JSON.parse(data.response || {});
-
-					callback(jsonResponse.data);
-				}
-			});
-		},
-
 		devicesDeleteDevice: function(deviceId, callback) {
 			var self = this;
 
