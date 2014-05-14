@@ -2475,15 +2475,16 @@ define(function(require){
 		usersFormatCreationData: function(data, callback) {
 			var self = this,
 				fullName = data.user.first_name + ' ' + data.user.last_name,
+				callerIdName = fullName.substring(0, 15),
 				defaultTimezone = timezone.getLocaleTimezone(),
 				formattedData = {
 					user: $.extend(true, {}, {
 						caller_id: {
 							internal: {
-								name: fullName
+								name: callerIdName
 							},
 							external: {
-								name: fullName
+								name: callerIdName
 							}
 						},
 						email: data.extra.differentEmail ? data.extra.email : data.user.userName,
