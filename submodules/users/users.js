@@ -651,7 +651,7 @@ define(function(require){
 			});
 
 			template.on('click', '#add_extensions', function() {
-				var nextExtension = (parseInt(existingExtensions[existingExtensions.length - 1]) || 2000) + 1 + '',
+				var nextExtension = parseInt(self.usersGetNextInt(existingExtensions)) + '',
 					dataTemplate = {
 						recommendedExtension: nextExtension
 					},
@@ -1243,8 +1243,46 @@ define(function(require){
 			});
 		},
 
+		/* Helper function that takes an array of number in parameter, sorts it, and returns the first number not in the array, greater than the minVal */
+		usersGetNextInt: function(arr) {
+			var orderedArr = arr,
+				prevVal = 0,
+				minVal = 2000,
+				increment = 1;
+
+			orderedArr.sort(function(a,b) {
+				var parsedA = parseInt(a),
+					parsedB = parseInt(b);
+
+				return parsedA > parsedB ? 1 : -1;
+			});
+
+			_.each(orderedArr, function(val) {
+				var curr = parseInt(val);
+
+				/* If we already stored a previous value */
+				if(prevVal) {
+					if(curr - prevVal !== increment) {
+						return prevVal + increment;
+					}
+				}
+				/* Otherwise, if we didn't, and the current value is greater than the minVal, we return the minVal */
+				else if(curr > minVal) {
+					return minVal;
+				}
+
+				/* We don't want to return value lower than our min val, so we only store prevVal that are greater than the minVal */
+				if(curr >= minVal) {
+					prevVal = curr;
+				}
+			});
+
+			return (prevVal) ? prevVal + increment : minVal;
+		},
+
 		usersFormatAddUser: function(data) {
-			var formattedData = {
+			var self = this,
+				formattedData = {
 					sendToSameEmail: true,
 					nextExtension: '',
 					nextVMBox: '',
@@ -1263,24 +1301,15 @@ define(function(require){
 				});
 			});
 
-			arrayExtensions.sort(function(a, b) {
-				return parseInt(a) > parseInt(b);
-			});
-
-			//Set the Next extension to 2001 if there are no extensions in the system, or to the latest extension + 1 if there are
-			formattedData.nextExtension = (parseInt(arrayExtensions[arrayExtensions.length - 1] || 2000) + 1) + '';
+			formattedData.nextExtension = parseInt(self.usersGetNextInt(arrayExtensions)) + '';
 
 			_.each(data.vmboxes, function(vmbox) {
 				formattedData.listVMBoxes[vmbox.mailbox] = vmbox;
 				arrayVMBoxes.push(vmbox.mailbox);
 			});
 
-			arrayVMBoxes.sort(function(a, b) {
-				return parseInt(a) > parseInt(b);
-			});
-
 			//Set the VMBox Number to 2001 if there are no VMBox in the system, or to the latest vmbox number + 1 if there are
-			formattedData.nextVMBox = (parseInt(arrayVMBoxes[arrayVMBoxes.length - 1] || 2000) + 1) + '';
+			formattedData.nextVMBox = parseInt(self.usersGetNextInt(arrayVMBoxes)) + '';
 
 			return formattedData;
 		},
@@ -2487,7 +2516,7 @@ define(function(require){
 								name: callerIdName
 							}
 						},
-						email: data.extra.differentEmail ? data.extra.email : data.user.userName,
+						email: data.extra.differentEmail ? data.extra.email : data.user.username,
 						priv_level: 'user',
 						timezone: defaultTimezone
 					}, data.user),

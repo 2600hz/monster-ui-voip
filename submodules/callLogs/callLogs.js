@@ -100,7 +100,6 @@ define(function(require){
 				// 		toDate: monster.util.dateToGregorian(toDate)
 				// 	},
 				// 	success: function(data, status) {
-				// 		console.log('success');
 				// 	}
 				// });
 			});
@@ -305,8 +304,6 @@ define(function(require){
 					result.push(cdr);
 				}
 			});
-
-			console.log(result);
 
 			result.sort(function(a, b) {
 				return b.timestamp - a.timestamp;

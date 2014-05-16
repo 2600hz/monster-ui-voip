@@ -348,12 +348,10 @@ define(function(require){
 				e.preventDefault();
 				var number = templateDevice.find('.restriction-matcher-input').val(),
 					matched = false;
-				console.log(number);
 				templateDevice.find('.restriction-matcher-label').each(function() {
 					var label = $(this),
 						regex =  new RegExp(data.extra.restrictions[label.data('restriction')].regex);
 
-					console.log(regex)
 					if(regex.test(number)) {
 						label.show();
 						if(matched) {
