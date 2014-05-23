@@ -577,7 +577,6 @@
 			"inboundCall": "Inbound",
 			"outboundCall": "Outbound",
 			"dateTime1": "Date/Time",
-			"dateTime2": "(PST)",
 			"from": "From",
 			"to": "To",
 			"duration1": "Duration",

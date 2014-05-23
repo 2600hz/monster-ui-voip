@@ -579,7 +579,6 @@
 			"inboundCall": "Entrant",
 			"outboundCall": "Sortant",
 			"dateTime1": "Date/Heure",
-			"dateTime2": "(PST)",
 			"from": "Depuis",
 			"to": "À",
 			"duration1": "Durée",

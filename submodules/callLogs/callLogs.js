@@ -34,7 +34,9 @@ define(function(require){
 
 		callLogsRenderContent: function(parent, fromDate, toDate) {
 			var self = this,
-				dataTemplate = {},
+				dataTemplate = {
+					timezone: 'GMT' + jstz.determine_timezone().offset()
+				},
 				template;
 
 			if(!toDate) {
@@ -51,7 +53,6 @@ define(function(require){
 
 			self.callLogsGetCdrs(fromDate, toDate, function(cdrs) {
 				cdrs = self.callLogsFormatCdrs(cdrs);
-
 				dataTemplate.cdrs = cdrs;
 				template = $(monster.template(self, 'callLogs-layout', dataTemplate));
 
