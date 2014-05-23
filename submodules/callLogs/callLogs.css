@@ -114,10 +114,10 @@
 	border-left: solid 1px #e3e3e3;
 }
 #call_logs_container .grid-cell.direction {
-	width: 5%;
+	width: 4%;
 }
 #call_logs_container .grid-cell.datetime {
-	width: 10%;
+	width: 12%;
 }
 #call_logs_container .grid-cell.from {
 	width: 20%;
@@ -126,7 +126,7 @@
 	width: 20%;
 }
 #call_logs_container .grid-cell.duration {
-	width: 10%;
+	width: 9%;
 }
 #call_logs_container .grid-cell.hangup {
 	width: 15%;
