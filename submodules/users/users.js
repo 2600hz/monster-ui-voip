@@ -738,31 +738,33 @@ define(function(require){
 				var formData = form2object('form-'+currentUser.id),
 					form = template.find('#form-'+currentUser.id);
 
-				if(monster.ui.valid(form)) {
-					currentUser.extra.vmbox.mailbox = formData.extra.vmboxNumber;
-					currentUser.extra.vmbox.timezone = formData.timezone;
+				monster.util.checkVersion(currentUser, function() {
+					if(monster.ui.valid(form)) {
+						currentUser.extra.vmbox.mailbox = formData.extra.vmboxNumber;
+						currentUser.extra.vmbox.timezone = formData.timezone;
 
-					var userToSave = $.extend(true, {}, currentUser, formData);
+						var userToSave = $.extend(true, {}, currentUser, formData);
 
-					monster.parallel({
-							vmbox: function(callback) {
-								self.usersSmartUpdateVMBox(userToSave, true, function(vmbox) {
-									callback && callback(null, vmbox);
-								});
+						monster.parallel({
+								vmbox: function(callback) {
+									self.usersSmartUpdateVMBox(userToSave, true, function(vmbox) {
+										callback && callback(null, vmbox);
+									});
+								},
+								user: function(callback) {
+									self.usersUpdateUser(userToSave, function(userData) {
+										callback && callback(null, userData.data);
+									});
+								}
 							},
-							user: function(callback) {
-								self.usersUpdateUser(userToSave, function(userData) {
-									callback && callback(null, userData.data);
-								});
-							}
-						},
-						function(error, results) {
-							toastr.success(monster.template(self, '!' + toastrMessages.userUpdated, { name: results.user.first_name + ' ' + results.user.last_name }));
+							function(error, results) {
+								toastr.success(monster.template(self, '!' + toastrMessages.userUpdated, { name: results.user.first_name + ' ' + results.user.last_name }));
 
-							self.usersRender({ userId: results.user.id });
-						}
-					);
-				}
+								self.usersRender({ userId: results.user.id });
+							}
+						);
+					}
+				});
 			});
 
 			template.on('click', '#change_username', function() {
