@@ -123,7 +123,8 @@
 				"menuTitle": "Miscellaneous",
 				"sectionTitle": "Miscellaneous",
 				"rtp": {
-					"enable": "Audio Encryption Strategy",
+					"enable": "Encrypt the audio",
+					"type": "Type of encryption: ",
 					"srtp": "SRTP",
 					"zrtp": "ZRTP"
 				}

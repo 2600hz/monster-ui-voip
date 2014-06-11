@@ -181,10 +181,14 @@
 						{{ i18n.devices.popupSettings.miscellaneous.rtp.enable }}
 					</label>
 
-					<select id="rtp_method" name="extra.rtpMethod">
-						<option value="srtp"{{#compare extra.rtpMethod "===" "srtp"}} selected{{/compare}}>{{ i18n.devices.popupSettings.miscellaneous.rtp.srtp }}</option>
-						<option value="zrtp"{{#compare extra.rtpMethod "===" "zrtp"}} selected{{/compare}}>{{ i18n.devices.popupSettings.miscellaneous.rtp.zrtp }}</option>
-					</select>
+					<div id="rtp_method">
+						{{ i18n.devices.popupSettings.miscellaneous.rtp.type }}
+
+						<select name="extra.rtpMethod" class="input-small">
+							<option value="srtp"{{#compare extra.rtpMethod "===" "srtp"}} selected{{/compare}}>{{ i18n.devices.popupSettings.miscellaneous.rtp.srtp }}</option>
+							<option value="zrtp"{{#compare extra.rtpMethod "===" "zrtp"}} selected{{/compare}}>{{ i18n.devices.popupSettings.miscellaneous.rtp.zrtp }}</option>
+						</select>
+					</div>
 				</div>
 			</div>
 		</form>
