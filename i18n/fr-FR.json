@@ -83,7 +83,8 @@
 			"dropdownLabel": "Tonalité d'appel:",
 			"silence": "Silence",
 			"defaultRingback": "Tonalité par défaut",
-			"emptyUploadAlert": "Veuillez sélectionner un fichier à uploader"
+			"emptyUploadAlert": "Veuillez sélectionner un fichier à uploader",
+			"fileTooBigAlert": "Vous ne pouvez pas uploader un fichier de taille excédant 5MB"
 		}
 	},
 
@@ -408,7 +409,8 @@
 			"headline": "Réglages de la musique d'attente",
 			"dropdownLabel": "Musique d'attente:",
 			"silence": "Silence",
-			"emptyUploadAlert": "Veuillez sélectionner un fichier à uploader"
+			"emptyUploadAlert": "Veuillez sélectionner un fichier à uploader",
+			"fileTooBigAlert": "Vous ne pouvez pas uploader un fichier de taille excédant 5MB"
 		},
 		"hotdesk": {
 			"label": "Cela requiert-il un PIN?",
@@ -542,6 +544,7 @@
 			"undefinedMenu": "Vous avez sélectionner un réceptionniste virtuel sans le configurer. Veuillez le configurer en cliquant sur le lien, ou choisissez une option différente.",
 			"emptyTtsGreeting": "Vous devez entrer un message afin d'activer le Text to Speech.",
 			"emptyUploadGreeting": "Veuillez sélectionner un fichier à uploader",
+			"fileTooBigAlert": "Vous ne pouvez pas uploader un fichier de taille excédant 5MB",
 			"uniqueMenuNumbers": "Les numéros doivent être uniques et non-vide.",
 			"lastE911Error": "E911 doit être configuré sur au moins un de vos Numéros principaux. Veuillez configurer e911 sur un autre numéro principal avant de supprimer celui-ci."
 		},
@@ -611,7 +614,8 @@
 			"dropdownLabel": "Musique d'attente:",
 			"silence": "Silence",
 			"default": "Musique par défaut",
-			"emptyUploadAlert": "Veuillez sélectionner un fichier à uploader"
+			"emptyUploadAlert": "Veuillez sélectionner un fichier à uploader",
+			"fileTooBigAlert": "Vous ne pouvez pas uploader un fichier de taille excédant 5MB"
 		},
 		"callerId": {
 			"title": "Caller ID d'entreprise",
