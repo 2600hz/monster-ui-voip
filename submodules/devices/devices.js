@@ -196,7 +196,7 @@ define(function(require){
 				};
 
 			if(type === 'sip_device' && monster.config.api.provisioner) {
-				monster.pub('common.chooseModel.render', 
+				monster.pub('common.chooseModel.render', {
 					callback: function(dataModel) {
 						monster.request({
 							resource: 'voip.devices.createDevice',
