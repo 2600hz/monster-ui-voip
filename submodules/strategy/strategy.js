@@ -1629,7 +1629,11 @@ define(function(require){
 				};
 
 				if(file) {
-					fileReader.readAsDataURL(file);
+					if(file.size >= (Math.pow(2,20) * 5)) { //If size bigger than 5MB
+						monster.ui.alert(self.i18n.active().strategy.alertMessages.fileTooBigAlert);
+					} else {
+						fileReader.readAsDataURL(file);
+					}
 				} else {
 					monster.ui.alert(self.i18n.active().strategy.alertMessages.emptyUploadGreeting);
 				}
