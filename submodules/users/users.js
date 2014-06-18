@@ -817,23 +817,23 @@ define(function(require){
 					type: type,
 					callback: function(device) {
 						var rowDevice = monster.template(self, 'users-rowSpareDevice', device),
-							listUnassigned = template.find('.list-unassigned-items'),
-							countSpare = template.find('.unassigned-list-header .count-spare');
+							listAssigned = template.find('.list-assigned-items');
 
-						listUnassigned.find('.empty-row').hide();
+						listAssigned.find('.empty-row').hide();
 
 						/* reset search */
-						listUnassigned.find('.empty-search-row').hide();
+						listAssigned.find('.empty-search-row').hide();
 						template.find('.unassigned-list-header .search-query').val('');
-						listUnassigned.find('.item-row').show();
-
-
-						/* Update count */
-						countSpare.data('count', parseInt(countSpare.data('count')) + 1);
-						template.find('.unassigned-list-header .count-spare').html(countSpare.data('count'));
+						listAssigned.find('.item-row').show();
 
 						/* Add row */
-						listUnassigned.append(rowDevice);
+						listAssigned.append(rowDevice)
+							.find('.item-row[data-id="' + device.id + '"]')
+							.toggleClass('updated')
+							.find('button')
+							.removeClass('add-device btn-primary')
+							.addClass('remove-device btn-danger')
+							.text(self.i18n.active().remove);
 					}
 				});
             });

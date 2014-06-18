@@ -205,7 +205,7 @@ define(function(require){
 								data: dataModel
 							},
 							success: function(data, status) {
-								self.devicesRender({ deviceId: data.data.id});
+								callback(data.data);
 							}
 						});
 					},
