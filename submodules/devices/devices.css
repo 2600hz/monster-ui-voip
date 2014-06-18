@@ -245,6 +245,17 @@
     text-shadow: 1px 0 1px #CCCCCC;
 }
 
+.edit-device .content .tabs-section .helper {
+	position: relative;
+	margin: 0 40px 15px 40px;
+}
+
+.edit-device .content .tabs-section .helper i {
+	position: absolute;
+	top: 0;
+	left: -25px;
+}
+
 .edit-device .content .tabs-section .number-address {
 	display: none;
 }

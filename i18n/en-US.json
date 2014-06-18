@@ -98,6 +98,7 @@
 			"advancedTitle": "Advanced",
 			"basicTitle": "Basic Settings",
 			"basicSectionTitle": "Basic Settings",
+			"dragAndDrop": "To select a codec, drag and drop from the available codecs box to selected codecs box",
 			"options": {
 				"menuTitle": "Options"
 			},
