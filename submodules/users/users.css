@@ -288,11 +288,23 @@
 	margin-left: 7px;
 }
 
-#users_container .detail-user .email-border.open {
+#users_container .detail-user .email-border {
 	margin-bottom: 10px;
-	padding-top: 10px;
-	border: 2px dotted #A6A7A9;
+	border: 2px dotted transparent;
 	border-radius: 4px;
+}
+
+#users_container .detail-user .email-border.open {
+	padding: 10px 0;
+	border-color: #A6A7A9;
+}
+
+#users_container .detail-user .email-checkbox {
+	margin-bottom: 0;
+}
+
+#users_container .detail-user .email-group {
+	margin: 10px 0 0 0;
 }
 
 #users_container .detail-user .icon-wrapper {

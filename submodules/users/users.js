@@ -486,6 +486,8 @@ define(function(require){
 
 							template.find('#user_timezone').chosen({search_contains: true, width: "61%"});
 
+							data.extra.differentEmail ? template.find('.email-group').show() : template.find('.email-group').hide();
+
 							if(data.extra.mainDirectoryId) {
 								mainDirectoryId = data.extra.mainDirectoryId;
 							}
@@ -730,8 +732,13 @@ define(function(require){
 			});
 
 			template.on('ifChanged', '#notification_email', function() {
-				template.find('.email-border').toggleClass('open');
-				template.find('.email-group').toggleClass('hidden');
+				if ( template.find('.email-border').hasClass('open') ) {
+					template.find('.email-border').removeClass('open', 400);
+					template.find('.email-group').slideUp();
+				} else {
+					template.find('.email-group').slideDown();
+					template.find('.email-border').addClass('open', 400);
+				}
 			});
 
 			template.on('click', '.save-user', function() {
