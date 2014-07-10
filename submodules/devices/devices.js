@@ -451,6 +451,8 @@ define(function(require){
 
 		devicesFormatData: function(data) {
 			var self = this,
+				codecsAudioI18n = self.i18n.active().devices.popupSettings.audio.codecs,
+				codecsVideoI18n = self.i18n.active().devices.popupSettings.video.codecs,
 				defaults = {
 					extra: {
 						hasE911Numbers: data.e911Numbers.length > 0,
@@ -467,21 +469,25 @@ define(function(require){
 						},
 						listCodecs: {
 							audio: {
-								'G729': 'G729 - 8kbps (Requires License)',
-								'PCMU': 'G711u / PCMU - 64kbps (NA)',
-								'PCMA': 'G711a / PCMA - 64kbps (Elsewhere)',
-								'GSM': 'GSM',
-								'G722_16': 'G722 (HD) @ 16kHz',
-								'G722_32': 'G722.1 (HD) @ 32kHz',
-								'CELT_48': 'Siren (HD) @ 48kHz',
-								'CELT_64': 'Siren (HD) @ 64kHz',
-								'OPUS': 'OPUS',
-								'Speex': 'Speex'
+								'OPUS': codecsAudioI18n['OPUS'],
+								'CELT@32000h': codecsAudioI18n['CELT@32000h'],
+								'G7221@32000h': codecsAudioI18n['G7221@32000h'],
+								'G7221@16000h': codecsAudioI18n['G7221@16000h'],
+								'G722': codecsAudioI18n['G722'],
+								'speex@32000h':codecsAudioI18n['speex@32000h'],
+								'speex@16000h': codecsAudioI18n['speex@16000h'],
+								'PCMU': codecsAudioI18n['PCMU'],
+								'PCMA': codecsAudioI18n['PCMA'],
+								'G729':codecsAudioI18n['G729'],
+								'GSM': codecsAudioI18n['GSM'],
+								'CELT@48000h': codecsAudioI18n['CELT@48000h'],
+								'CELT@64000h': codecsAudioI18n['CELT@64000h']
 							},
 							video: {
-								'H261': 'H261',
-								'H263': 'H263',
-								'H264': 'H264'
+								'VP8': codecsVideoI18n['VP8'],
+								'H264': codecsVideoI18n['H264'],
+								'H263': codecsVideoI18n['H263'],
+								'H261': codecsVideoI18n['H261']
 							}
 						}
 					},
@@ -598,7 +604,20 @@ define(function(require){
 			/* Audio Codecs*/
 			/* extend doesn't replace the array so we need to do it manually */
 			if(data.device.media && data.device.media.audio && data.device.media.audio.codecs) {
-				formattedData.media.audio.codecs = data.device.media.audio.codecs;
+				var mapMigrateCodec = {
+						'Speex': 'speex@16000h',
+						'G722_16': 'G7221@16000h',
+						'G722_32': 'G7221@32000h',
+						'CELT_48': 'CELT@48000h',
+						'CELT_64': 'CELT@64000h'
+					},
+					newCodecList = [];
+
+				_.each(data.device.media.audio.codecs, function(codec) {
+					mapMigrateCodec.hasOwnProperty(codec) ? newCodecList.push(mapMigrateCodec[codec]) : newCodecList.push(codec);
+				});
+
+				formattedData.media.audio.codecs = newCodecList;
 			}
 
 			_.each(formattedData.media.audio.codecs, function(codec) {
