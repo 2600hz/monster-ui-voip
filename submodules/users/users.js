@@ -341,6 +341,8 @@ define(function(require){
 				dataUser.extra.existingVmboxes = _vmboxes;
 			}
 
+			dataUser.extra.adminId = self.userId;
+
 			return dataUser;
 		},
 
@@ -350,7 +352,7 @@ define(function(require){
 					existingExtensions: [],
 					countUsers: data.users.length
 				},
-			    mapUsers = {};
+				mapUsers = {};
 
 			_.each(data.users, function(user) {
 				mapUsers[user.id] = self.usersFormatUserData(user);
@@ -722,10 +724,11 @@ define(function(require){
 			});
 
 			template.on('click', '#delete_user', function() {
-				var userId = $(this).parents('.grid-row').data('id');
+				var dataUser = $(this).parents('.grid-row').data(),
+					deleteType = dataUser.priv_level === 'admin' ? 'confirmDeleteAdmin' : 'confirmDeleteUser';
 
-				monster.ui.confirm(self.i18n.active().users.confirmDeleteUser, function() {
-					self.usersDelete(userId, function(data) {
+				monster.ui.confirm(self.i18n.active().users[deleteType], function() {
+					self.usersDelete(dataUser.id, function(data) {
 						toastr.success(monster.template(self, '!' + toastrMessages.userDeleted));
 					});
 				});

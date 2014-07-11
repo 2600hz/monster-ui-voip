@@ -274,6 +274,7 @@
 		"buy": "Acheter numéros",
 		"changeUsername": "Changer",
 		"confirmDeleteUser": "Supprimer un utilisateur supprimera également les numéros, téléphones et répondeurs associés à cet utilisateur. Continuer quand même?",
+		"confirmDeleteAdmin": "Vous êtes sur le point de supprimer un ADMINISTRATEUR! Ceci supprimera son utilisateur Kazoo, numéros, téléphones et répondeurs associés, et lui enlevera aussi la permission de gérer cette interface. Continuer quand même?",
 		"dialogChangePassword": {
 			"help": "Vous pouvez mettre à jour votre mot de passe en tapant votre Email et le nouveau mot de passe ci-dessus!",
 			"password": "Mot de passe",

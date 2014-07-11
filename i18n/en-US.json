@@ -295,6 +295,7 @@
 		"addFromSpareDevices": "Add from Spare Devices",
 		"buy": "Buy Numbers",
 		"changeUsername": "Change",
+		"confirmDeleteAdmin": "You're about to delete an ADMIN! Deleting an admin will delete his Kazoo user, as well as his voicemail boxes and numbers, it will also prevent him from managing this UI. Do you want to continue?",
 		"confirmDeleteUser": "Deleting a user will delete this user and his Voicemail Box, and unassign the devices and numbers that were assigned to this user. Do you want to continue?",
 		"dialogChangePassword": {
 			"help": "You can set a new password by just typing any password you want, along with the Email address!",

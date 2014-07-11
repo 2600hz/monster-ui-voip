@@ -78,7 +78,10 @@
 		</div>-->
 	</form>
 	<div class="actions">
-		<a id="delete_user" class="monster-link" href="javascript:void(0);"><i class="icon-trash icon-red"></i>{{ i18n.users.delete }}</a>
+		<!-- We forbid users to delete their own user -->
+		{{#compare id "!==" extra.adminId}}
+			<a id="delete_user" class="monster-link" href="javascript:void(0);"><i class="icon-trash icon-red"></i>{{ i18n.users.delete }}</a>
+		{{/compare}}
 
 		<div class="pull-right">
 			<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
