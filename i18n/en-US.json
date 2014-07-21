@@ -435,6 +435,7 @@
 			"fileTooBigAlert": "You can not upload a file with a size exceeding 5MB"
 		},
 		"hotdesk": {
+			"id": "Hotdesk ID",
 			"label": "Does it require a PIN?",
 			"keep_logged_in_elsewhere": "Allow login at multiple devices",
 			"title": "Hot-Desking",

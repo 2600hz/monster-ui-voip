@@ -1498,7 +1498,7 @@ define(function(require){
 					};
 
 					formData.enabled = switchFeature.bootstrapSwitch('status');
-					//formData.id = currentUser.extra.extension;
+					
 					if(formData.require_pin === false) { delete formData.pin; }
 					delete currentUser.hotdesk;
 
