@@ -1070,7 +1070,8 @@ define(function(require){
 		},
 
 		groupsBindMembers: function(template, data) {
-			var self = this;
+			var self = this,
+				displayedRingGroups = $.extend(true, [], data.extra.ringGroup);
 
 			template.find('.distribute-button').on('click', function() {
 				var sliders = template.find('.slider-time')
@@ -1092,8 +1093,8 @@ define(function(require){
 						userId = $row.data('user_id'),
 						values = $row.find('.slider-time').slider('values'),
 						user = {
-							delay: values[0] + '',
-							timeout: (values[1] - values[0])+ '',
+							delay: values[0],
+							timeout: (values[1] - values[0]),
 							id: userId,
 							endpoint_type: 'user'
 						};
@@ -1126,7 +1127,7 @@ define(function(require){
 					value = $this.val()
 					intValue = parseInt($this.val());
 				if(value != $this.data('current') && !isNaN(intValue) && intValue >= 30) {
-					self.groupsRenderMemberSliders(template, data.extra.ringGroup, intValue);
+					self.groupsRenderMemberSliders(template, displayedRingGroups, intValue);
 				} else {
 					$this.val($this.data('current')).hide();
 					$this.siblings('.scale-max').show();
@@ -1144,25 +1145,32 @@ define(function(require){
 			});
 
 			template.on('click', '.remove-user', function() {
-				var parentRow = $(this).parents('.group-row');
-				template.find('.add-user[data-id="'+parentRow.data('user_id')+'"]').removeClass('in-use');
+				var parentRow = $(this).parents('.group-row'),
+					userId = parentRow.data('user_id');
+				template.find('.add-user[data-id="'+userId+'"]').removeClass('in-use');
 				parentRow.remove();
+				displayedRingGroups = _.filter(displayedRingGroups, function(val) {
+					return val.id !== userId;
+				});
 			});
 
 			template.on('click', '.add-user', function() {
 				var $this = $(this),
 					newEndpoint = {
 						id: $this.data('id'),
-						timeout: '20',
-						delay: '0',
-						endpoint_type: 'user'
+						timeout: 20,
+						delay: 0,
+						endpoint_type: 'user',
+						name: $(this).text()
 					};
 
+				displayedRingGroups.push(newEndpoint);
 				template.find('.grid-time').append(monster.template(self, 'groups-membersRow', {
 					id: newEndpoint.id,
-					name: $(this).text()
+					name: newEndpoint.name
 				}));
-				createSlider(newEndpoint);
+				// createSlider(newEndpoint);
+				self.groupsRenderMemberSliders(template, [newEndpoint], parseInt(template.find('.group-row.title .scale-max-input').val()));
 
 				$this.addClass('in-use');
 			});
