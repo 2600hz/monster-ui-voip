@@ -1750,8 +1750,6 @@ define(function(require){
 						},
 						openedTab: 'features'
 					},
-					scaleSections = 6, //Number of 'sections' in the time scales for the sliders
-					scaleMaxSeconds = 60, //Maximum of seconds, corresponding to the end of the scale
 					selectedDevices = {};
 
 				if(userCallflow.flow.module === 'ring_group') {
@@ -1780,7 +1778,7 @@ define(function(require){
 						userCallflow.flow.module = 'ring_group';
 						userCallflow.flow.data = {
 							strategy: "simultaneous",
-							timeout: scaleMaxSeconds,
+							timeout: 20,
 							endpoints: []
 						}
 						$.each(enabledDevices, function() {
@@ -1794,13 +1792,15 @@ define(function(require){
 								delay: values[0],
 								timeout: (values[1] - values[0])
 							});
+
+							if(values[1] > userCallflow.flow.data.timeout) { userCallflow.flow.data.timeout = values[1]; }
 						});
 					} else {
 						userCallflow.flow.module = 'user';
 						userCallflow.flow.data = {
 							can_call_self: false,
 							id: currentUser.id,
-							timeout: "20"
+							timeout: 20
 						}
 					}
 
@@ -1830,51 +1830,6 @@ define(function(require){
 					position: ['center', 20]
 				});
 
-				var sliderTooltip = function(event, ui) {
-						var val = ui.value,
-							tooltip = '<div class="slider-tooltip"><div class="slider-tooltip-inner">' + val + '</div></div>';
-
-						$(ui.handle).html(tooltip);
-					},
-					createTooltip = function(event, ui, deviceId, sliderObj) {
-						var val1 = sliderObj.slider('values', 0),
-							val2 = sliderObj.slider('values', 1),
-							tooltip1 = '<div class="slider-tooltip"><div class="slider-tooltip-inner">' + val1 + '</div></div>',
-							tooltip2 = '<div class="slider-tooltip"><div class="slider-tooltip-inner">' + val2 + '</div></div>';
-
-						featureTemplate.find('.device-row[data-device_id="'+ deviceId + '"] .slider-time .ui-slider-handle').first().html(tooltip1);
-						featureTemplate.find('.device-row[data-device_id="'+ deviceId + '"] .slider-time .ui-slider-handle').last().html(tooltip2);
-					},
-					createSlider = function(device) {
-						var deviceRow = featureTemplate.find('.device-row[data-device_id="'+ device.id +'"]');
-						deviceRow.find('.slider-time').slider({
-							range: true,
-							min: 0,
-							max: scaleMaxSeconds,
-							values: device.id in selectedDevices ? [ selectedDevices[device.id].delay, selectedDevices[device.id].delay+selectedDevices[device.id].timeout ] : [0,0],
-							slide: sliderTooltip,
-							change: sliderTooltip,
-							create: function(event, ui) {
-								createTooltip(event, ui, device.id, $(this));
-							},
-						});
-						createSliderScale(deviceRow);
-					},
-					createSliderScale = function(container, isHeader) {
-						var scaleContainer = container.find('.scale-container')
-							isHeader = isHeader || false;
-
-						for(var i=1; i<=scaleSections; i++) {
-							var toAppend = '<div class="scale-element" style="width:'+(100/scaleSections)+'%;">'
-										 + (isHeader ? '<span>'+(i*scaleMaxSeconds/scaleSections)+' Sec</span>' : '')
-										 + '</div>';
-							scaleContainer.append(toAppend);
-						}
-						if(isHeader) {
-							scaleContainer.append('<span>0 Sec</span>');
-						}
-					};
-
 				featureTemplate.find('.disable-device').on('ifToggled', function() {
 					var parentRow = $(this).parents('.device-row');
 					if(this.checked) {
@@ -1886,14 +1841,126 @@ define(function(require){
 					}
 				});
 
-				_.each(userDevices, function(device) {
-					createSlider(device);
-					if(currentUser.extra.mapFeatures.find_me_follow_me.active && !(device.id in selectedDevices)) {
-						monster.ui.prettyCheck.action(featureTemplate.find('.device-row[data-device_id="'+device.id+'"] .disable-device'), 'check');
+				featureTemplate.find('.distribute-button').on('click', function() {
+					var sliders = featureTemplate.find('.slider-time')
+						max = sliders.first().slider('option', 'max'),
+						section = Math.floor(max/sliders.length),
+						current = 0;
+
+					monster.ui.prettyCheck.action(featureTemplate.find('.device-row .disable-device'), 'uncheck');
+					$.each(sliders, function() {
+						$(this).slider('values', [current, current+=section]);
+					});
+				});
+
+				featureTemplate.on('click', '.device-row.title .scale-max', function() {
+					var $this = $(this),
+						input = $this.siblings('.scale-max-input');
+
+					input.show();
+					input.focus();	
+					$this.hide();
+				});
+
+				featureTemplate.on('blur', '.device-row.title .scale-max-input', function(e) {
+					var $this = $(this),
+						value = $this.val(),
+						intValue = parseInt($this.val());
+					if(value != $this.data('current') && !isNaN(intValue) && intValue >= 30) {
+						self.usersRenderFindMeFollowMeSliders(featureTemplate, userDevices, selectedDevices, intValue);
+					} else {
+						$this.val($this.data('current')).hide();
+						$this.siblings('.scale-max').show();
 					}
 				});
-				createSliderScale(featureTemplate.find('.device-row.title'), true);
+
+				featureTemplate.on('keydown', '.device-row.title .scale-max-input', function(e) {
+					switch(e.keyCode) {
+						case 27:
+							$(this).val(-1);
+						case 13:
+							e.preventDefault();
+							$(this).blur();
+						break;
+					}
+				});
+
+				self.usersRenderFindMeFollowMeSliders(featureTemplate, userDevices, selectedDevices);
 			}
+		},
+
+		usersRenderFindMeFollowMeSliders: function(template, deviceList, ringGroup, maxSeconds) {
+			var self = this,
+				scaleSections = 6, //Number of 'sections' in the time scales for the sliders
+				scaleMaxSeconds = maxSeconds && maxSeconds >= 30 ? maxSeconds : 120; //Maximum of seconds, corresponding to the end of the scale
+
+			if(!maxSeconds) {
+				var currentMax = 0;
+				_.each(ringGroup, function(endpoint) {
+					currentMax = (endpoint.delay+endpoint.timeout > currentMax) ? endpoint.delay+endpoint.timeout : currentMax;
+				});
+				scaleMaxSeconds = currentMax > scaleMaxSeconds ? Math.ceil(currentMax/60)*60 : scaleMaxSeconds;
+			}
+
+			var sliderTooltip = function(event, ui) {
+					var val = ui.value,
+						tooltip = '<div class="slider-tooltip"><div class="slider-tooltip-inner">' + val + '</div></div>';
+
+					$(ui.handle).html(tooltip);
+				},
+				createTooltip = function(event, ui, deviceId, sliderObj) {
+					var val1 = sliderObj.slider('values', 0),
+						val2 = sliderObj.slider('values', 1),
+						tooltip1 = '<div class="slider-tooltip"><div class="slider-tooltip-inner">' + val1 + '</div></div>',
+						tooltip2 = '<div class="slider-tooltip"><div class="slider-tooltip-inner">' + val2 + '</div></div>';
+
+					template.find('.device-row[data-device_id="'+ deviceId + '"] .slider-time .ui-slider-handle').first().html(tooltip1);
+					template.find('.device-row[data-device_id="'+ deviceId + '"] .slider-time .ui-slider-handle').last().html(tooltip2);
+				},
+				createSlider = function(device) {
+					var deviceRow = template.find('.device-row[data-device_id="'+ device.id +'"]');
+					deviceRow.find('.slider-time').slider({
+						range: true,
+						min: 0,
+						max: scaleMaxSeconds,
+						values: device.id in ringGroup ? [ ringGroup[device.id].delay, ringGroup[device.id].delay+ringGroup[device.id].timeout ] : [0,0],
+						slide: sliderTooltip,
+						change: sliderTooltip,
+						create: function(event, ui) {
+							createTooltip(event, ui, device.id, $(this));
+						},
+					});
+					createSliderScale(deviceRow);
+				},
+				createSliderScale = function(container, isHeader) {
+					var scaleContainer = container.find('.scale-container')
+						isHeader = isHeader || false;
+
+					scaleContainer.empty();
+
+					for(var i=1; i<=scaleSections; i++) {
+						var toAppend = '<div class="scale-element" style="width:'+(100/scaleSections)+'%;">'
+									 + (isHeader 
+								 		? (i==scaleSections 
+								 			? '<input type="text" value="'+scaleMaxSeconds+'" data-current="'+scaleMaxSeconds+'" class="scale-max-input" maxlength="3"><span class="scale-max">'
+								 			:'<span>')
+								 			+ Math.floor(i*scaleMaxSeconds/scaleSections) + ' Sec</span>' 
+							 			: '')
+									 + '</div>';
+						scaleContainer.append(toAppend);
+					}
+					if(isHeader) {
+						scaleContainer.append('<span>0 Sec</span>');
+					}
+				};
+		
+			_.each(deviceList, function(device) {
+				createSlider(device);
+				if(!(device.id in ringGroup)) {
+					monster.ui.prettyCheck.action(template.find('.device-row[data-device_id="'+device.id+'"] .disable-device'), 'check');
+				}
+			});
+			createSliderScale(template.find('.device-row.title'), true);
 		},
 
 		usersRenderCallRecording: function(params) {

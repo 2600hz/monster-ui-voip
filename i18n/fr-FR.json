@@ -398,7 +398,8 @@
 			"disableDevice": "Ne pas faire sonner",
 			"ringThisPhoneFor": "Faire sonner pour",
 			"noDevice": "Vous devez avoir au moins un téléphone configuré pour activer cette fonctionnalité.",
-			"noNumber": "Avant de configurer la fonctionnalité Find-Me Follow-Me pour cet utilisateur, vous devez d'abord lui attribuer un numéro ou une extension."
+			"noNumber": "Avant de configurer la fonctionnalité Find-Me Follow-Me pour cet utilisateur, vous devez d'abord lui attribuer un numéro ou une extension.",
+			"distribute": "Répartir"
 		},
 		"caller_id": {
 			"title": "Numéro de Caller-ID",

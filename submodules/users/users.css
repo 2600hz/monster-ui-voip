@@ -746,6 +746,27 @@
 	line-height: 40px;
 }
 
+#find_me_follow_me_form .grid-time .device-row.title .scale-max {
+	border: solid 1px #22ccff;
+	border-radius: 4px;
+	padding: 0px 2px;
+	cursor: pointer;
+}
+
+#find_me_follow_me_form .grid-time .device-row.title .scale-max-input {
+	display: none;
+	position: absolute;
+	top: -20px;
+	right: -24px;
+	color: #999;
+	font-size: 12px;
+	width: 35px;
+	height: 12px;
+	text-align: center;
+	margin: 0;
+	padding: 4px;
+}
+
 #find_me_follow_me_form .grid-time .device-row .name {
 	width: 25%;
 	vertical-align: bottom;

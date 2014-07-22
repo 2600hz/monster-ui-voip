@@ -418,7 +418,8 @@
 			"disableDevice": "Do not ring",
 			"ringThisPhoneFor": "Ring this phone for",
 			"noDevice": "You need at least one device to enable this feature.",
-			"noNumber": "Before configuring the Find-Me Follow-Me feature for this user, you need to assign him a number or an extension"
+			"noNumber": "Before configuring the Find-Me Follow-Me feature for this user, you need to assign him a number or an extension",
+			"distribute": "Distribute"
 		},
 		"caller_id": {
 			"title": "Caller-ID Number",
