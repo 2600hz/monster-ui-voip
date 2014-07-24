@@ -73,6 +73,17 @@ define(function(require){
 			'voip.myOffice.render': 'myOfficeRender'
 		},
 
+		chartColors: [
+			"#B588B9", // Purple ~ Mauve
+			"#698BF7", // Purple ~ Dark Blue
+			"#009AD6", // Blue
+			"#6CC5E9", // Light Blue
+			"#BDE55F", // Light Green
+			"#F1E87C", // Pale Yellow
+			"#EF8F25", // Orange
+			"#6F7C7D"  // Grey
+		],
+
 		/* My Office */
 		myOfficeRender: function(args) {
 			var self = this,
@@ -93,7 +104,8 @@ define(function(require){
 						topMessage: myOfficeData.topMessage,
 						devicesList: _.toArray(myOfficeData.devicesData).sort(function(a, b) { return b.count - a.count ; }),
 						assignedNumbersList: _.toArray(myOfficeData.assignedNumbersData).sort(function(a, b) { return b.count - a.count ; }),
-						numberTypesList: _.toArray(myOfficeData.numberTypesData).sort(function(a, b) { return b.count - a.count ; })
+						// numberTypesList: _.toArray(myOfficeData.numberTypesData).sort(function(a, b) { return b.count - a.count ; }),
+						classifiedNumbers: myOfficeData.classifiedNumbers
 					},
 					template = $(monster.template(self, 'myOffice-layout', dataTemplate)),
 					chartOptions = {
@@ -123,14 +135,25 @@ define(function(require){
 						chartOptions
 					),
 					numberTypesChart = new Chart(template.find('#dashboard_number_types_chart').get(0).getContext("2d")).Doughnut(
-						$.map(myOfficeData.numberTypesData, function(val) {
+						// $.map(myOfficeData.numberTypesData, function(val) {
+						// 	return {
+						// 		value: val.count,
+						// 		color: val.color
+						// 	};
+						// }).sort(function(a, b) { return b.value - a.value ; }),
+						$.map(myOfficeData.classifiedNumbers, function(val, index) {
 							return {
 								value: val.count,
 								color: val.color
 							};
-						}).sort(function(a, b) { return b.value - a.value ; }),
+						}),
 						chartOptions
 					);
+
+				// Trick to adjust the vertical positioning of the number types legend
+				if(myOfficeData.classifiedNumbers.length <= 3) {
+					template.find('.number-types-legend').addClass('size-'+myOfficeData.classifiedNumbers.length);
+				}
 
 				self.myOfficeBindEvents({
 					parent: parent,
@@ -228,6 +251,17 @@ define(function(require){
 								parallelCallback && parallelCallback(null, data.data);
 							}
 						});
+					},
+					classifiers: function(parallelCallback) {
+						self.callApi({
+							resource: 'numbers.listClassifiers',
+							data: {
+								accountId: self.accountId
+							},
+							success: function(data) {
+								parallelCallback && parallelCallback(null, data.data);
+							}
+						});
 					}
 				},
 				function(error, results) {
@@ -242,75 +276,116 @@ define(function(require){
 					"sip_device": {
 						label: self.i18n.active().devices.types.sip_device,
 						count: 0,
-						color: "#bde55f"
+						color: self.chartColors[4]
 					},
 					"cellphone": {
 						label: self.i18n.active().devices.types.cellphone,
 						count: 0,
-						color: "#6cc5e9"
+						color: self.chartColors[3]
 					},
 					"smartphone": {
 						label: self.i18n.active().devices.types.smartphone,
 						count: 0,
-						color: "#00a1e0"
+						color: self.chartColors[2]
 					},
 					"mobile": {
 						label: self.i18n.active().devices.types.mobile,
 						count: 0,
-						color: "#00a1e0"
+						color: self.chartColors[1]
 					},
 					"softphone": {
 						label: self.i18n.active().devices.types.softphone,
 						count: 0,
-						color: "#b588b9"
+						color: self.chartColors[0]
 					},
 					"landline": {
 						label: self.i18n.active().devices.types.landline,
 						count: 0,
-						color: "#f1e87c"
+						color: self.chartColors[5]
 					},
 					"fax": {
 						label: self.i18n.active().devices.types.fax,
 						count: 0,
-						color: "#ef8f25"
+						color: self.chartColors[6]
 					},
 					"ata": {
 						label: self.i18n.active().devices.types.ata,
 						count: 0,
-						color: "#6f7c7d"
+						color: self.chartColors[7]
 					}
 				},
 				assignedNumbers = {
 					"spare": {
 						label: self.i18n.active().myOffice.numberChartLegend.spare,
 						count: 0,
-						color: "#6f7c7d"
+						color: self.chartColors[7]
 					},
 					"assigned": {
 						label: self.i18n.active().myOffice.numberChartLegend.assigned,
 						count: 0,
-						color: "#6cc5e9"
+						color: self.chartColors[3]
 					}
 				},
-				numberTypes = {
-					"local": {
-						label: self.i18n.active().myOffice.numberChartLegend.local,
-						count: 0,
-						color: "#6cc5e9"
-					},
-					"tollfree": {
-						label: self.i18n.active().myOffice.numberChartLegend.tollfree,
-						count: 0,
-						color: "#bde55f"
-					},
-					"international": {
-						label: self.i18n.active().myOffice.numberChartLegend.international,
-						count: 0,
-						color: "#b588b9"
-					}
-				},
+				// numberTypes = {
+				// 	"local": {
+				// 		label: self.i18n.active().myOffice.numberChartLegend.local,
+				// 		count: 0,
+				// 		color: "#6cc5e9"
+				// 	},
+				// 	"tollfree": {
+				// 		label: self.i18n.active().myOffice.numberChartLegend.tollfree,
+				// 		count: 0,
+				// 		color: "#bde55f"
+				// 	},
+				// 	"international": {
+				// 		label: self.i18n.active().myOffice.numberChartLegend.international,
+				// 		count: 0,
+				// 		color: "#b588b9"
+				// 	}
+				// },
 				totalConferences = 0,
-				channelsArray = [];
+				channelsArray = [],
+				classifierRegexes = {},
+				classifiedNumbers = {};
+
+			_.each(data.numbers, function(numData, num) {
+				_.find(data.classifiers, function(classifier, classifierKey) {
+					if(!(classifierKey in classifierRegexes)) {
+						classifierRegexes[classifierKey] = new RegExp(classifier.regex);
+					}
+					if(classifierRegexes[classifierKey].test(num)) {
+						if(classifierKey in classifiedNumbers) {
+							classifiedNumbers[classifierKey] ++;
+						} else {
+							classifiedNumbers[classifierKey] = 1;
+						}
+						return true;
+					} else {
+						return false;
+					}
+				});
+			});
+
+			data.classifiedNumbers = _.map(classifiedNumbers, function(val, key) {
+				return { 
+					key: key,
+					label: key in data.classifiers ? data.classifiers[key].friendly_name : key,
+					count: val
+				};
+			}).sort(function(a,b) { return b.count - a.count });
+
+			var maxLength = self.chartColors.length;
+			if(data.classifiedNumbers.length > maxLength) {
+				data.classifiedNumbers[maxLength-1].key = 'merged_others';
+				data.classifiedNumbers[maxLength-1].label = 'Others';
+				while(data.classifiedNumbers.length > maxLength) {
+					data.classifiedNumbers[maxLength-1].count += data.classifiedNumbers.pop().count;
+				}
+			}
+
+			_.each(data.classifiedNumbers, function(val, key) {
+				val.color = self.chartColors[key];
+			});
 
 			_.each(data.devices, function(val) {
 				if(val.device_type in devices) {
@@ -328,7 +403,7 @@ define(function(require){
 				}
 
 				//TODO: Find out the number type and increment the right category
-				numberTypes["local"].count++;
+				// numberTypes["local"].count++;
 			});
 
 			_.each(data.users, function(val) {
@@ -389,7 +464,7 @@ define(function(require){
 			data.totalChannels = channelsArray.length;
 			data.devicesData = devices;
 			data.assignedNumbersData = assignedNumbers;
-			data.numberTypesData = numberTypes;
+			// data.numberTypesData = numberTypes;
 			data.totalConferences = totalConferences;
 
 			return data;

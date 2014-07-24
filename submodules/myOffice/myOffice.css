@@ -274,6 +274,14 @@
 }
 #myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-div .chart-container {
 	padding: 10px;
+	position: relative;
+	min-height: 100px;
+}
+#myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-div canvas {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	margin: auto 0;
 }
 #myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-div .chart-legend {
 	margin-left: 110px;
@@ -296,6 +304,25 @@
 }
 #myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-div .number-types-legend ul {
 	margin-top: 5px;
+}
+#myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-div .number-types-legend:not([class*='size-']) .legend-element {
+	line-height: 24px;
+}
+#myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-div .number-types-legend.size-2 {
+	margin-top: 20px;
+}
+#myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-div .number-types-legend.size-1 {
+	margin-top: 35px;
+}
+/*#myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-div .number-types-legend.size .legend-element {
+	line-height: 24px;
+}*/
+#myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-div .number-types-legend .legend-color {
+	margin-right: 10px;
+	font-size: 14px;
+}
+#myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-div .number-types-legend .legend-number {
+	font-size: 16px;
 }
 
 /********** Music-On-Hold Popup **********/
