@@ -687,6 +687,23 @@
 	padding-right: 13px;
 }
 
+.feature-popup-container[data-feature="faxing"] {
+	overflow: hidden;
+}
+
+.feature-popup-container[data-feature="faxing"] #faxbox_form {
+	margin-bottom: 0;
+}
+
+.feature-popup-container[data-feature="faxing"] #printer_link {
+	margin-left: 10px;
+	line-height: 30px;
+}
+
+.feature-popup-container[data-feature="faxing"] #fax_timezone_chosen {
+	margin-left: 10px;
+}
+
 /* Change Password Popup */
 .change-password-popup {
 	width: 430px;

@@ -1149,12 +1149,32 @@ define(function(require){
 
 								callback && callback(null, existingCallflow)
 							});
+						},
+						faxboxes: function(callback) {
+							self.callApi({
+								resource: 'faxbox.list',
+								data: {
+									accountId: self.accountId
+								},
+								success: function(_data) {
+									var userFaxboxes = [];
+
+									_.each(_data.data, function(val){
+										if ( val.owner_id === currentUser.id ) {
+											userFaxboxes.push(val);
+										}
+									});
+
+									callback && callback(null, userFaxboxes);
+								}
+							})
 						}
 					},
 					function(err, results) {
 						results.user = currentUser;
-
-						self.usersRenderFaxing(results);
+console.log(results);
+						self.usersRenderFaxboxes(results);
+						// self.usersRenderFaxing(results);
 					}
 				);
 			});
@@ -1329,15 +1349,20 @@ define(function(require){
 		usersFormatFaxingData: function(data) {
 			var listNumbers = [];
 
-			if(data.callflows) {
-				if(data.callflows.numbers.length > 0) {
-					listNumbers.push(data.callflows.numbers[0]);
-				}
-			}
-
 			_.each(data.numbers, function(value, number) {
 				listNumbers.push(number);
 			});
+
+			listNumbers.sort(function(a, b) {
+				return a < b ? -1 : 1;
+			});
+
+			if(data.callflows) {
+				if(data.callflows.numbers.length > 0) {
+					// listNumbers.push(data.callflows.numbers[0]);
+					listNumbers.unshift(data.callflows.numbers[0]);
+				}
+			}
 
 			data.extra = $.extend(true, {}, data.extra, {
 				listNumbers: listNumbers
@@ -1455,6 +1480,99 @@ define(function(require){
 				monster.ui.alert('error', self.i18n.active().users.errorNumberFaxing);
 			}
 		},
+
+
+
+
+
+		usersRenderFaxboxes: function(data) {
+			var self = this,
+				data = self.usersFormatFaxingData(data),
+				featureTemplate = $(monster.template(self, 'users-feature-faxing', data)),
+				switchFeature = featureTemplate.find('.switch').bootstrapSwitch();
+
+			timezone.populateDropdown(featureTemplate.find('#fax_timezone'));
+
+			featureTemplate.find('#fax_timezone').chosen({search_contains: true, width: "78.48%"});
+
+			monster.ui.prettyCheck.create(featureTemplate.find('.content'));
+
+			if ( data.extra.listNumbers.length > 0 ) {
+				var popup = monster.ui.dialog(featureTemplate, {
+						title: data.user.extra.mapFeatures.faxing.title,
+						position: ['center', 20]
+					});
+			} else {
+				monster.ui.alert('error', self.i18n.active().users.errorNumberFaxing);
+			}
+
+			featureTemplate.find('.cancel-link').on('click', function() {
+				popup.dialog('close').remove();
+			});
+
+			switchFeature.on('switch-change', function(e, data) {
+				data.value ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+			});
+
+			featureTemplate.find('.save').on('click', function() {
+				var faxboxData = form2object('faxbox_form', '.', true),
+					args = {
+						openedTab: 'features',
+						callback: function() {
+							popup.dialog('close').remove();
+						}
+					};
+console.log(data);
+				if ( switchFeature.bootstrapSwitch('status') ) {
+					faxboxData.owner_id = !faxboxData.hasOwnProperty('owner_id') ? data.user.id : faxboxData.owner_id;
+					faxboxData.smtp_permission_list = faxboxData.smtp_permission_list.split(' ');
+
+					if ( data.hasOwnProperty('faxbox') && data.faxbox.hasOwnProperty('id') ) {
+						self.callApi({
+							resource: 'faxbox.update',
+							data: {
+								accountId: self.accountId,
+								faxboxId: faxboxId,
+								data: faxboxData
+							},
+							success: function(_data, status) {
+console.log(_data);
+								// self.usersUpdateFaxing(data, newNumber, function(results) {
+								// 	args.userId = results.callflows.owner_id;
+
+								// 	self.usersRender(args);
+								// });
+							}
+						});
+					} else {
+						self.callApi({
+							resource: 'faxbox.create',
+							data: {
+								accountId: self.accountId,
+								data: faxboxData
+							},
+							success: function(_data, status) {
+console.log(_data);
+								// self.usersUpdateFaxing(data, newNumber, function(results) {
+								// 	args.userId = results.callflows.owner_id;
+
+								// 	self.usersRender(args);
+								// });
+							}
+						})
+					}
+				} else {
+					self.usersDeleteFaxing(data.user.id, function() {
+						args.userId = data.user.id;
+
+						self.usersRender(args);
+					});
+				}
+			});
+		},
+
+
+
 
 
 		usersRenderHotdesk: function(currentUser) {
@@ -3590,9 +3708,11 @@ define(function(require){
 							numbers: [ newNumber ],
 							flow: {
 								data: {
-									owner_id: data.user.id
+									faxbox_id: data.faxbox.id
+									// owner_id: data.user.id
 								},
-								module: 'receive_fax',
+								module: 'faxbox',
+								// module: 'receive_fax',
 								children: {}
 							}
 						};
