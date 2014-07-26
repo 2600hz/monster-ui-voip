@@ -1376,7 +1376,7 @@ define(function(require){
 
 					if(switchFeature.bootstrapSwitch('status')) {
 						self.usersUpdateConferencing(data, function(data) {
-							args.userId = data.user.data.id;
+							args.userId = data.user.id;
 
 							self.usersRender(args);
 						});
@@ -3568,7 +3568,7 @@ define(function(require){
 							data.user.smartpbx.conferencing.enabled = true;
 
 							self.usersUpdateUser(data.user, function(user) {
-								callback && callback(null, user);
+								callback && callback(null, user.data);
 							});
 						}
 					}
