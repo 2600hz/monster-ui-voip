@@ -16,7 +16,7 @@
 	color: #22ccff;
 	display: inline-block;
 	font-size: 28px;
-	font-weight: 500;
+	font-weight: 600;
 	margin-left: 10px;
 	margin-right: 25px;
 	margin-top: -5px;
@@ -36,8 +36,6 @@
 	border: 1px solid #ddd;
 	border-radius: 4px;
 	margin-top: 10px;
-
-	font-family: verdana;
 }
 
 #devices_container .devices-grid i.icon-plus {
