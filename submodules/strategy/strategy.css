@@ -136,7 +136,7 @@
 #strategy_container .element-container .number-element .no-number-error {
 	font-style: italic;
 	color: #ee1212;
-	font-weight: 500;
+	font-weight: 600;
 }
 
 #strategy_container .element-container .number-actions {
@@ -525,7 +525,7 @@
 #strategy_menu_popup .menu-block .title {
 	color: #22ccff;
 	font-size: 22px;
-	font-weight: 500;
+	font-weight: 600;
 	padding: 15px 0;
 }
 #strategy_menu_popup .menu-block .menu-line {

@@ -28,7 +28,7 @@
 	margin-top: -5px;
 	margin-left: 15px;
 	color: #22ccff;
-	font-weight: 500;
+	font-weight: 600;
 	font-size: 28px;
 }
 
@@ -76,7 +76,6 @@
 
 #groups_container .groups-grid {
 	margin-top: 20px;
-	font-family: verdana;
 }
 
 #groups_container .groups-grid i.icon-plus {
