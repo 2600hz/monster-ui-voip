@@ -10,86 +10,35 @@
 	</div>
 
 	<div class="content{{#unless user.extra.mapFeatures.faxing.active}} disabled{{/unless}}">
+		<p>{{replaceVar i18n.users.faxing.text this.user.email }}</p>
 		<form class="form-horizontal" id="faxbox_form">
 			<div class="control-group">
-				<label for="name" class="control-label">Name</label>
-				<div class="controls">
-					<input type="text" name="name" id="name" value="{{faxbox.name}}" placeholder="Faxbox name">
-				</div>
-			</div>
-			<div class="control-group">
-				<label for="notifications_inbound_email" class="control-label">Notification inbound email</label>
-				<div class="controls">
-					<input type="email" name="notifications.inbound.email.send_to" id="notifications_inbound_email" value="{{faxbox.notifications.inbound.email.send_to}}">
-				</div>
-			</div>
-			<div class="control-group">
-				<label for="notifications.outbound.email.send_to" class="control-label">Notifications outbound email</label>
-				<div class="controls">
-					<input type="email" name="notifications.outbound.email.send_to" id="notifications_outbound_email" value="{{faxbox.notifications.outbound.email.send_to}}">
-				</div>
-			</div>
-			<div class="control-group">
-				<label for="caller_name" class="control-label">Caller name</label>
-				<div class="controls">
-					<input type="text" name="caller_name" id="caller_name" value="{{faxbox.caller_name}}">
-				</div>
-			</div>
-			<div class="control-group">
-				<label for="caller_id" class="control-label">Caller ID</label>
+				<label for="caller_id" class="control-label">{{ i18n.users.faxing.form.label.callerId }}</label>
 				<div class="controls">
 					<select name="caller_id" id="caller_id">
 					{{#each extra.listNumbers}}
-						<option value="{{this}}">{{formatPhoneNumber this}}</option>
+						<option value="{{@key}}"{{#compare @key '===' ../faxbox.caller_id }} selected="true"{{/compare}}>{{formatPhoneNumber @key}}</option>
 					{{/each}}
 					</select>
 				</div>
 			</div>
-			<div class="control-group">
-				<label for="fax_header" class="control-label">Fax header</label>
-				<div class="controls">
-					<input type="text" name="fax_header" id="fax_header" value="{{faxbox.fax_header}}">
-				</div>
-			</div>
-			<div class="control-group">
-				<label for="fax_identity" class="control-label">Fax identity</label>
-				<div class="controls">
-					<input type="text" name="fax_identity" id="fax_identity" value="{{faxbox.fax_identity}}">
-				</div>
-			</div>
-			<div class="control-group">
-				<label for="smtp_permission_list" class="control-label">SMTP permission list</label>
-				<div class="controls">
-					<input type="text" name="smtp_permission_list" id="smtp_permission_list" value="{{faxbox.smtp_permission_list}}">
-				</div>
-			</div>
-			<div class="control-group">
-				<label for="custom_smtp_email_address" class="control-label">Custom SMTP address</label>
-				<div class="controls">
-					<input type="email" name="custom_smtp_email_address" id="custom_smtp_email_address" value="{{faxbox.custom_smtp_email_address}}">
-				</div>
-			</div>
 			{{#if faxbox.cloud_connector_claim_url}}
 			<div class="control-group">
-				<label for="printer_link" class="control-label">Link to Google printer</label>
+				<label for="printer_link" class="control-label">{{ i18n.users.faxing.form.label.linkToPrinter }}</label>
 				<div class="controls">
 					<a id="printer_link" href="{{faxbox.cloud_connector_claim_url}}" target="_blank">{{faxbox.cloud_connector_claim_url}}</a>
 				</div>
 			</div>
 			{{/if}}
-			<div class="control-group">
-				<label for="retries" class="control-label">Retries</label>
-				<div class="controls">
-					<input type="text" name="retries" id="retries" value="{{faxbox.retries}}">
-				</div>
-			</div>
-			<div class="control-group">
-				<label for="fax_timezone" class="control-label">Fax timezone</label>
-				<div class="controls">
-					<select id="fax_timezone" name="fax_timezone" data-original_value="{{faxbox.fax_timezone}}"></select>
-				</div>
-			</div>
 		</form>
+		<div class="help-box gray-box">
+			<div class="wrapper-icon">
+				&nbsp;<i class="icon-info-sign2"></i>&nbsp;
+			</div>
+			<div class="text-wrapper">
+				<p>{{ i18n.users.faxing.helpOne }}<a href="https://tools.google.com/dlpage/cloudprintdriver" target="_blank">{{ i18n.users.faxing.helpTwo }}</a></p>
+			</div>
+		</div>
 	</div>
 
 	<div class="actions clearfix">

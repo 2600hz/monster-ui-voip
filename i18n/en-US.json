@@ -400,10 +400,21 @@
 			"noConfNumbers": "You need to add a Main Conference Number (in the Main number section on the left of the SmartPBX) in order to enable the Personnals Conference Bridges"
 		},
 		"faxing": {
-			"title": "Fax to Email",
-			"dropdownLabel": "Personal Fax Number",
-			"headline": "Fax to Email",
-			"help": "This user will receive a fax at {{variable}} as an attachment."
+			"title": "Faxbox",
+			"headline": "Faxbox",
+			"text": "This user will receive faxes at {{variable}} as an attachment.",
+			"helpOne": "For users running Windows, here is a link to the ",
+			"helpTwo": "Cloud Printer Installer",
+			"form": {
+				"label": {
+					"callerId": "Faxbox number",
+					"linkToPrinter": "Link to printer"
+				}
+			},
+			"defaultSettings": {
+				"nameExtension": "'s Faxbox",
+				"headerExtension": " Fax Printer"
+			}
 		},
 		"vm_to_email": {
 			"deleteAfterNotify": "Delete messages from database after sending the notification.",

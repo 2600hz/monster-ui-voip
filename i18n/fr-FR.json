@@ -380,10 +380,21 @@
 			"noConfNumbers": "Vous devez ajouter un Numéro principal de Conférence (Voir \"Numéro principal\" dans le menu de gauche) avant de pouvoir configurer les Conférences personnelles des utilisateurs"
 		},
 		"faxing": {
-			"title": "Fax vers Email",
-			"dropdownLabel": "Numéro de Fax Perso",
-			"help": "Un fax sera envoyé à {{variable}} en tant que pièce jointe.",
-			"headline": "Fax vers Email"
+			"title": "Faxbox",
+			"headline": "Faxbox",
+			"text": "Cet utilisateur recevra les fax à l'adresse mail {{variable}} sous la forme d'une pièce jointe.",
+			"helpOne": "Pour les utilisateurs sur Windows, voici un lien pour ",
+			"helpTwo": "l'installeur de l'imprimante en ligne",
+			"form": {
+				"label": {
+					"callerId": "Numéro de Faxbox",
+					"linkToPrinter": "Lien de l'imprimante"
+				}
+			},
+			"defaultSettings": {
+				"nameExtension": "'s Faxbox",
+				"headerExtension": " Fax Printer"
+			}
 		},
 		"vm_to_email": {
 			"deleteAfterNotify": "Supprimer les messages vocaux de la base de données après l'envoi de la notification.",
