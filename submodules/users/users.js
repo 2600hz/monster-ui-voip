@@ -302,6 +302,8 @@ define(function(require){
 				dataUser.extra = formattedUser;
 			}
 
+			// console.log(_mainCallflow)
+
 			dataUser.extra.countFeatures = 0;
 			_.each(dataUser.features, function(v) {
 				if(v in dataUser.extra.mapFeatures) {
@@ -327,6 +329,21 @@ define(function(require){
 
 			if(_mainCallflow) {
 				dataUser.extra.mainCallflowId = _mainCallflow.id;
+
+				if('flow' in _mainCallflow) {
+					var flow = _mainCallflow.flow,
+						module = 'user';
+
+					if(dataUser.features.indexOf('find_me_follow_me') >= 0) {
+						module = 'ring_group';
+						dataUser.extra.groupTimeout = true;
+					}
+
+					while(flow.module != module && '_' in flow.children) {
+						flow = flow.children['_'];
+					}
+					dataUser.extra.ringingTimeout = flow.data.timeout;
+				}
 			}
 
 			if(_vmbox) {
@@ -439,7 +456,45 @@ define(function(require){
 				toastrMessages = self.i18n.active().users.toastrMessages,
 				mainDirectoryId,
 				mainCallflowId,
-				listUsers = data;
+				listUsers = data,
+				renderFindMeFollowMeFeature = function(featureCallback) {
+					monster.parallel({
+							userDevices: function(callback) {
+								monster.request({
+									resource: 'voip.users.listUserDevices',
+									data: {
+										accountId: self.accountId,
+										userId: currentUser.id
+									},
+									success: function(data) {
+										callback(null, data.data);
+									}
+								});
+							},
+							userCallflow: function(callback) {
+								self.usersListCallflowsUser(currentUser.id, function(data) {
+									if(data.length > 0) {
+										monster.request({
+											resource: 'voip.users.getCallflow',
+											data: {
+												accountId: self.accountId,
+												callflowId: data[0].id
+											},
+											success: function(callflow) {
+												callback(null, callflow.data)
+											}
+										});
+									} else {
+										callback(null, null);
+									}
+								});
+							}
+						},
+						function(error, results) {
+							self.usersRenderFindMeFollowMe($.extend(true, results, { currentUser: currentUser, saveCallback: featureCallback }));
+						}
+					);
+				};
 
 			template.find('.grid-row:not(.title) .grid-cell').on('click', function() {
 				var cell = $(this),
@@ -758,13 +813,33 @@ define(function(require){
 						monster.parallel({
 								vmbox: function(callback) {
 									self.usersSmartUpdateVMBox(userToSave, true, function(vmbox) {
-										callback && callback(null, vmbox);
+										callback(null, vmbox);
 									});
 								},
 								user: function(callback) {
 									self.usersUpdateUser(userToSave, function(userData) {
-										callback && callback(null, userData.data);
+										callback(null, userData.data);
 									});
+								},
+								callflow: function(callback) {
+									if(userToSave.extra.ringingTimeout && userToSave.features.indexOf('find_me_follow_me') < 0) {
+										self.usersGetMainCallflow(userToSave.id, function(mainCallflow) {
+											if('flow' in mainCallflow) {
+												var flow = mainCallflow.flow;
+												while(flow.module != 'user' && '_' in flow.children) {
+													flow = flow.children['_'];
+												}
+												flow.data.timeout = parseInt(userToSave.extra.ringingTimeout);
+												self.usersUpdateCallflow(mainCallflow, function(updatedCallflow) {
+													callback(null, updatedCallflow);
+												});
+											} else {
+												callback(null, null);
+											}
+										});
+									} else {
+										callback(null, null);
+									}
 								}
 							},
 							function(error, results) {
@@ -815,6 +890,17 @@ define(function(require){
 				var popup = monster.ui.dialog(passwordTemplate, {
 					title: self.i18n.active().users.dialogChangePassword.title
 				});
+			});
+
+			template.on('click', '#open_fmfm_link', function() {
+				renderFindMeFollowMeFeature(function(usersRenderArgs) {
+					usersRenderArgs.openedTab = 'name';
+					self.usersRender(usersRenderArgs);
+				});
+			});
+
+			template.on('focus', '.ringing-timeout.disabled #ringing_timeout', function() {
+				$(this).blur();
 			});
 
 			/* Events for Devices in Users */
@@ -1023,42 +1109,7 @@ define(function(require){
 			});
 
 			template.on('click', '.feature[data-feature="find_me_follow_me"]', function() {
-				monster.parallel({
-						userDevices: function(callback) {
-							monster.request({
-								resource: 'voip.users.listUserDevices',
-								data: {
-									accountId: self.accountId,
-									userId: currentUser.id
-								},
-								success: function(data) {
-									callback(null, data.data);
-								}
-							});
-						},
-						userCallflow: function(callback) {
-							self.usersListCallflowsUser(currentUser.id, function(data) {
-								if(data.length > 0) {
-									monster.request({
-										resource: 'voip.users.getCallflow',
-										data: {
-											accountId: self.accountId,
-											callflowId: data[0].id
-										},
-										success: function(callflow) {
-											callback(null, callflow.data)
-										}
-									});
-								} else {
-									callback(null, null);
-								}
-							});
-						}
-					},
-					function(error, results) {
-						self.usersRenderFindMeFollowMe($.extend(true, results, { currentUser: currentUser }));
-					}
-				);
+				renderFindMeFollowMeFeature();
 			});
 
 			template.on('click', '.feature[data-feature="call_recording"]', function() {
@@ -1818,7 +1869,11 @@ define(function(require){
 						},
 						function(err, results) {
 							args.userId = results.user.id;
-							self.usersRender(args);
+							if(typeof params.saveCallback === 'function') {
+								params.saveCallback(args);
+							} else {
+								self.usersRender(args);
+							}
 						}
 					);
 				});
@@ -2360,6 +2415,9 @@ define(function(require){
 						rules: {
 							'extra.vmboxNumber': {
 								checkList: dataTemplate.extra.existingVmboxes
+							},
+							'extra.ringingTimeout': {
+								digits: true
 							}
 						},
 						messages: {
@@ -2373,6 +2431,8 @@ define(function(require){
 					});
 
 					timezone.populateDropdown(template.find('#user_timezone'), dataTemplate.timezone);
+
+					template.find('[data-toggle="tooltip"]').tooltip();
 
 					callbackAfterFormat && callbackAfterFormat(template, dataTemplate);
 				}
@@ -2888,7 +2948,19 @@ define(function(require){
 					callback(null);
 				}
 				else {
-					callback(listCallflows[indexMain]);
+					self.callApi({
+						resource: 'callflow.get',
+						data: {
+							accountId: self.accountId,
+							callflowId: listCallflows[indexMain].id
+						},
+						success: function(data) {
+							callback(data.data);
+						},
+						error: function() {
+							callback(listCallflows[indexMain]);
+						}
+					});
 				}
 			});
 		},

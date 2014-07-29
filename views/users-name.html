@@ -71,6 +71,30 @@
 					<option value="fr-FR"{{#compare language '===' 'fr-FR'}} selected{{/compare}}>{{i18n.languages.frenchFrench}}</option>
 				</select>
 			</div>
+
+			<div class="row-fields">
+				<div class="icon-wrapper"><i class="icon-bell"></i></div>
+				{{#unless extra.ringingTimeout}}
+					<div class="ringing-timeout disabled" data-original-title="{{i18n.users.editionForm.disabledTimeoutHint}}" data-placement="top" data-toggle="tooltip">
+				{{else}}
+					{{#if extra.groupTimeout}}
+					<div class="ringing-timeout disabled" data-original-title="{{i18n.users.editionForm.timeoutEditHint}}" data-placement="top" data-toggle="tooltip">
+					{{else}}
+					<div class="ringing-timeout">
+					{{/if}}
+				{{/unless}}
+					<label for="ringing_timeout">
+						{{ i18n.users.editionForm.timeout }}
+					</label>
+					<input id="ringing_timeout" class="input-mini" type="text" name="extra.ringingTimeout" value="{{extra.ringingTimeout}}"></input>
+					<span>{{ i18n.users.editionForm.timeoutSec }}</span>
+				</div>
+				{{#if extra.groupTimeout}}
+					<div class="timeout-edit">
+						<a id="open_fmfm_link" href="javascript:void(0);" class="monster-link blue">{{ i18n.users.editionForm.timeoutEdit }}</a>
+					</div>
+				{{/if}}
+			</div>
 		</div>
 		<!--<div class="advanced-fields content-centered span3">
 			<a id="resend_instructions" href="javascript:void(0)">{{ i18n.users.resendInstructions }}</a>

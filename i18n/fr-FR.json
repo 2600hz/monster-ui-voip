@@ -302,7 +302,12 @@
 			"lastName": "Nom",
 			"role": "Rôle",
 			"timezone": "Fuseau Horaire",
-			"vmboxNumber": "Num. Répondeur"
+			"vmboxNumber": "Num. Répondeur",
+			"timeout": "Durée de sonnerie",
+			"timeoutSec": "Sec",
+			"timeoutEdit": "Editer dans \"Find-Me-Follow-Me\"",
+			"timeoutEditHint": "La durée de sonnerie est redéfinie dans la fonctionnalité \"Find-Me-Follow-Me\". Cliquez sur le lien ci-dessous pour la modifier.",
+			"disabledTimeoutHint": "Au moins un numéro ou extension est requis avant de pouvoir définir la durée de sonnerie."
 		},
 		"delete": "Supprimer Utilisateur",
 		"errorCallerId": "Avant de configurer le Caller-ID de l'utilisateur, vous devez d'abord lui attribuer un numéro.",

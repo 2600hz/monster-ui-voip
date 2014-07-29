@@ -288,6 +288,33 @@
 	margin-left: 7px;
 }
 
+#users_container .detail-user .row-fields .ringing-timeout {
+	display: inline-block;
+}
+
+#users_container .detail-user .row-fields .ringing-timeout.disabled * {
+	opacity: 0.5;
+	cursor: default !important;
+}
+
+#users_container .detail-user .row-fields .timeout-edit {
+	margin-left: 50px;
+}
+
+#users_container .detail-user .row-fields .timeout-edit a {
+	margin: 0px;
+}
+
+#users_container .detail-user .row-fields #ringing_timeout {
+	margin: 0px 7px;
+	width: 36px;
+}
+
+#users_container .detail-user .row-fields label.monster-invalid[for="ringing_timeout"] {
+	margin: 0px;
+	display: block;
+}
+
 #users_container .detail-user .email-border {
 	margin-bottom: 10px;
 	border: 2px dotted transparent;

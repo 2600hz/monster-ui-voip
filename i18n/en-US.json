@@ -324,7 +324,12 @@
 			"lastName": "Last Name",
 			"role": "Role",
 			"timezone": "Timezone",
-			"vmboxNumber": "VMBox Number"
+			"vmboxNumber": "VMBox Number",
+			"timeout": "Ringing Timeout",
+			"timeoutSec": "Sec",
+			"timeoutEdit": "Edit in Find-Me-Follow-Me feature",
+			"timeoutEditHint": "The ringing timeout is overriden by the Find-Me-Follow-Me feature. Click on the link below to edit it.",
+			"disabledTimeoutHint": "You need at least one number or extension to set up the ringing timeout."
 		},
 		"delete": "Delete User",
 		"errorCallerId": "Before configuring the Caller-ID of this user, you need to assign him a number",
