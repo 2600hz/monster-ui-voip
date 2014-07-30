@@ -1470,7 +1470,7 @@ define(function(require){
 			});
 
 			featureTemplate.find('.save').on('click', function() {
-				var faxboxData = form2object('faxbox_form', '.', true),
+				var newNumber = featureTemplate.find('#caller_id').val(),
 					args = {
 						openedTab: 'features',
 						callback: function() {
@@ -1479,13 +1479,7 @@ define(function(require){
 					};
 
 				if ( switchFeature.bootstrapSwitch('status') ) {
-					faxboxData.owner_id = faxboxData.hasOwnProperty('owner_id') ? faxboxData.owner_id : data.user.id;
-
-					if ( data.hasOwnProperty('faxbox') ) {
-						faxboxData.id = data.faxbox.id;
-					}
-
-					self.usersUpdateFaxing(data, faxboxData, function(results) {
+					self.usersUpdateFaxing(data, newNumber, function(results) {
 						args.userId = results.callflow.owner_id;
 
 						self.usersRender(args);
@@ -3626,7 +3620,7 @@ define(function(require){
 			);
 		},
 
-		usersUpdateFaxing: function(data, faxboxData, globalCallback) {
+		usersUpdateFaxing: function(data, newNumber, globalCallback) {
 			var self = this;
 
 			monster.parallel({
@@ -3642,8 +3636,7 @@ define(function(require){
 								}
 							});
 
-							self.usersUpdateCallflowFaxing(data.user, faxboxData, baseCallflow, function(callflow) {
-console.log(callflow);
+							self.usersUpdateCallflowFaxing(data, newNumber, baseCallflow, function(callflow) {
 								callback && callback(null, callflow);
 							});
 						});
@@ -3670,24 +3663,32 @@ console.log(callflow);
 			);
 		},
 
-		usersUpdateCallflowFaxing: function(user, faxbox, callflow, callback) {
+		usersUpdateCallflowFaxing: function(data, newNumber, callflow, callback) {
 			var self = this,
+				user = data.user,
+				faxbox = data.faxbox,
 				baseCallflow = {
 					type: 'faxing',
-					owner_id: faxbox.owner_id,
-					numbers: [ faxbox.caller_id ],
+					owner_id: user.id,
+					numbers: [ newNumber ],
 					flow: {
 						module: 'faxbox',
 						children: {},
 						data: {
-							faxbox_id: faxbox.id
+							faxbox_id: faxbox ? faxbox.id : ''
 						}
 					}
+				},
+				number = {
+					caller_id: newNumber,
+					fax_identity: monster.util.formatPhoneNumber(newNumber)
 				};
 
 			callflow = $.extend(true, {}, baseCallflow, callflow);
 
-			if(callflow.id) {
+			if( callflow.hasOwnProperty('id') ) {
+				faxbox = $.extend(true, {}, faxbox, number);
+
 				self.callApi({
 					resource: 'faxbox.update',
 					data:{
@@ -3699,21 +3700,17 @@ console.log(callflow);
 						self.usersUpdateCallflow(callflow, function(callflow) {
 							callback && callback(callflow);
 						});
-					},
-					error: function(_data, status) {
-						console.log(_data, status);
 					}
 				});
-			}
-			else {
+			} else {
 				var defaultFaxbox = {
 						name: user.first_name.concat(' ', user.last_name, self.i18n.active().users.faxing.defaultSettings.nameExtension),
 						caller_name: user.first_name.concat(' ', user.last_name),
 						fax_header: monster.config.company.name.concat(self.i18n.active().users.faxing.defaultSettings.headerExtension),
-						fax_identity: monster.util.formatPhoneNumber(faxbox.caller_id),
-						smtp_permission_list: [],
-						retries: 3,
 						fax_timezone: user.timezone,
+						smtp_permission_list: [],
+						owner_id: user.id,
+						retries: 3,
 						notifications: {
 							inbound: {
 								email: {
@@ -3728,12 +3725,13 @@ console.log(callflow);
 						}
 					};
 
-				faxbox = $.extend(true, {}, defaultFaxbox, faxbox);
+				faxbox = $.extend(true, {}, defaultFaxbox, number);
 
 				self.callApi({
 					resource: 'faxbox.create',
 					data: {
 						accountId: self.accountId,
+						userId: user.id,
 						data: faxbox
 					},
 					success: function(_data, status) {
