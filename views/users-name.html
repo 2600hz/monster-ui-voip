@@ -10,7 +10,7 @@
 			<div class="row-fields">
 				<div class="icon-wrapper"><i class="icon-key"></i></div>
 				<span id="username">{{username}}</span>
-				<a href="javascript:void(0);" id="change_username" class="monster-link blue">{{i18n.users.changeUsername}}</a>
+				<a href="javascript:void(0);" id="change_username" class="monster-link blue">{{i18n.users.editionForm.changeUsername}}</a>
 			</div>
 
 			<div class="row-fields vmbox">
@@ -19,6 +19,7 @@
 					{{ i18n.users.editionForm.vmboxNumber }}
 				</label>
 				<input id="vmbox_number" class="input-small" required type="text" name="extra.vmboxNumber" value="{{extra.vmbox.mailbox}}"></input>
+				<a href="javascript:void(0);" id="change_pin" class="monster-link blue">{{i18n.users.editionForm.changePIN}}</a>
 			</div>
 
 			<div class="email-border{{#if extra.differentEmail }} open{{/if}}">

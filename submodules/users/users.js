@@ -850,11 +850,47 @@ define(function(require){
 				});
 			});
 
+			template.on('click', '#change_pin', function() {
+				var pinTemplate = $(monster.template(self, 'users-changePin')),
+					form = pinTemplate.find('#form_new_pin');
+
+				//monster.ui.validate(form);
+
+				monster.ui.validate(form, {
+					rules: {
+						'pin': {
+							number: true,
+							minlength:4,
+							min: 0
+						}
+					}
+				});
+
+				pinTemplate.find('.save-new-pin').on('click', function() {
+					var formData = form2object('form_new_pin'),
+						vmboxData = $.extend(true, currentUser.extra.vmbox, formData);
+
+					if(monster.ui.valid(form)) {
+						self.usersUpdateVMBox(vmboxData, function(data) {
+							popup.dialog('close').remove();
+
+							toastr.success(monster.template(self, '!' + toastrMessages.pinUpdated, { name: currentUser.first_name + ' ' + currentUser.last_name }));
+						});
+					}
+				});
+
+				pinTemplate.find('.cancel-link').on('click', function() {
+					popup.dialog('close').remove();
+				});
+
+				var popup = monster.ui.dialog(pinTemplate, {
+					title: self.i18n.active().users.dialogChangePin.title
+				});
+			});
+
 			template.on('click', '#change_username', function() {
 				var passwordTemplate = $(monster.template(self, 'users-changePassword', currentUser)),
 					form = passwordTemplate.find('#form_new_username');
-
-				monster.ui.validate(form);
 
 				passwordTemplate.find('.save-new-username').on('click', function() {
 					var formData = form2object('form_new_username'),
@@ -2399,27 +2435,32 @@ define(function(require){
 							callback(null, userData);
 						});
 					},
-					vmbox: function(callback) {
-						self.usersListVMBoxesUser(userId, function(vmboxes) {
-							if(vmboxes.length > 0) {
-								self.usersGetVMBox(vmboxes[0].id, function(vmbox) {
-									callback(null, vmbox);
+					vmboxes: function(callback) {
+						self.usersListVMBoxes(function(vmboxes) {
+							var firstVmboxId,
+								results = {
+									listExisting: [],
+									userVM: {}
+								};
+
+							_.each(vmboxes, function(vmbox) {
+								results.listExisting.push(vmbox.mailbox);
+
+								if(vmbox.owner_id === userId && !firstVmboxId) {
+									firstVmboxId = vmbox.id;
+								}
+							});
+
+							if(firstVmboxId) {
+								self.usersGetVMBox(firstVmboxId, function(vmbox) {
+									results.userVM = vmbox;
+
+									callback(null, results);
 								});
 							}
 							else {
-								callback(null, {});
+								callback(null, results);
 							}
-						});
-					},
-					existingVmboxes: function(callback) {
-						self.usersListVMBoxes(function(vmboxes) {
-							var listVMBoxes = [];
-
-							_.each(vmboxes, function(vmbox) {
-								listVMBoxes.push(vmbox.mailbox);
-							});
-
-							callback(null, listVMBoxes);
 						});
 					}
 				},
@@ -2434,7 +2475,7 @@ define(function(require){
 						}
 					});
 
-					var dataTemplate = self.usersFormatUserData(userData, results.mainDirectory, results.mainCallflow, results.vmbox, results.existingVmboxes);
+					var dataTemplate = self.usersFormatUserData(userData, results.mainDirectory, results.mainCallflow, results.vmboxes.userVM, results.vmboxes.listExisting);
 
 					template = $(monster.template(self, 'users-name', dataTemplate));
 

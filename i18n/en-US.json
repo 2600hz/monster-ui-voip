@@ -294,7 +294,6 @@
 		"addFromSpare": "Add from Spare Numbers",
 		"addFromSpareDevices": "Add from Spare Devices",
 		"buy": "Buy Numbers",
-		"changeUsername": "Change",
 		"confirmDeleteAdmin": "You're about to delete an ADMIN! Deleting an admin will delete his Kazoo user, as well as his voicemail boxes and numbers, it will also prevent him from managing this UI. Do you want to continue?",
 		"confirmDeleteUser": "Deleting a user will delete this user and his Voicemail Box, and unassign the devices and numbers that were assigned to this user. Do you want to continue?",
 		"dialogChangePassword": {
@@ -303,6 +302,12 @@
 			"passwordPlaceholder": "Password (Min. 8 characters)",
 			"title": "Update Email and password",
 			"username": "User's Email address"
+		},
+		"dialogChangePin": {
+			"help": "You can use this popup to set a temporary PIN for a user that lost his PIN for example.",
+			"pin": "PIN",
+			"pinPlaceholder": "Min. 4 digits",
+			"title": "Update PIN"
 		},
 		"dialogCreationUser": {
 			"createUser": "Create User",
@@ -317,14 +322,16 @@
 			"sendToDifferentEmail": "Send emails to an alternate address",
 			"title": "Create User",
 			"vmboxAlreadyExist": "VMBox Number is already taken, please choose a different Voicemail Box Number.",
-			"vmboxNumber": "VM Box Number"
+			"vmboxNumber": "VM Box #"
 		},
 		"editionForm": {
+			"changePIN": "Change PIN",
+			"changeUsername": "Change",
 			"firstName": "First Name",
 			"lastName": "Last Name",
 			"role": "Role",
 			"timezone": "Timezone",
-			"vmboxNumber": "VMBox Number",
+			"vmboxNumber": "VMBox #",
 			"timeout": "Ringing Timeout",
 			"timeoutSec": "Sec",
 			"timeoutEdit": "Edit in Find-Me-Follow-Me feature",
@@ -371,7 +378,8 @@
 			"numbersUpdated": "You successfully updated the phone numbers of {{ name }}.",
 			"passwordReseted": "The password has been reset, an e-mail has been sent to {{ email }} with instructions on how to create a new password.",
 			"userDelete": "You successfully deleted {{ name }} from the Smart PBX!",
-			"userUpdated": "You successfully updated {{ name }} settings."
+			"userUpdated": "You successfully updated {{ name }} settings.",
+			"pinUpdated": "You successfully updated the PIN of {{ name }}."
 		},
 		"uploadPicture": "Upload a Picture",
 		"user": "User",

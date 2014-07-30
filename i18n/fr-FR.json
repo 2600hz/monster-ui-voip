@@ -272,7 +272,6 @@
 		"addFromSpare": "Ajouter depuis les numéros disponibles",
 		"addFromSpareDevices": "Ajouter depuis les téléphones disponibles",
 		"buy": "Acheter numéros",
-		"changeUsername": "Changer",
 		"confirmDeleteUser": "Supprimer un utilisateur supprimera également les numéros, téléphones et répondeurs associés à cet utilisateur. Continuer quand même?",
 		"confirmDeleteAdmin": "Vous êtes sur le point de supprimer un ADMINISTRATEUR! Ceci supprimera son utilisateur Kazoo, numéros, téléphones et répondeurs associés, et lui enlevera aussi la permission de gérer cette interface. Continuer quand même?",
 		"dialogChangePassword": {
@@ -281,6 +280,12 @@
 			"passwordPlaceholder": "(Min. 8 caractères)",
 			"title": "Mettre à jour Email / Mot de passe",
 			"username": "Email de l'utilisateur"
+		},
+		"dialogChangePin": {
+			"help": "Vous pouvez mettre à jour le PIN de messagerie d'utilisateur grâce à cette popup. Cela peut vous permettre de réinitialiser son PIN afin qu'il le re-configurer ensuite en appelant lui-même sa messagerie.",
+			"pin": "PIN",
+			"pinPlaceholder": "PIN (Min. 4 numéros)",
+			"title": "Mettre à jour le PIN de Messagerie"
 		},
 		"dialogCreationUser": {
 			"createUser": "Créer utilisateur",
@@ -298,6 +303,8 @@
 			"vmboxNumber": "Numéro Répondeur"
 		},
 		"editionForm": {
+			"changePIN": "Changer PIN",
+			"changeUsername": "Changer",
 			"firstName": "Prénom",
 			"lastName": "Nom",
 			"role": "Rôle",
@@ -349,7 +356,8 @@
 			"numbersUpdated": "Vous avez mis à jour les numéros de {{ name }} avec succès.",
 			"passwordReseted": "Le mot de passe a été réinitialisé, un email a été envoyé à {{email}} avec les instructions pour créer un nouveau mot de passe.",
 			"userDelete": "Vous avez supprimé {{ name }} avec succès!",
-			"userUpdated": "Vous avez mis à jour {{ name }} avec succès!"
+			"userUpdated": "Vous avez mis à jour {{ name }} avec succès!",
+			"pinUpdated": "Vous avez mis à jour le PIN de {{ name }} avec succès!"
 		},
 		"uploadPicture": "Uploader une image",
 		"user": "Utilisateur",
