@@ -302,8 +302,6 @@ define(function(require){
 				dataUser.extra = formattedUser;
 			}
 
-			// console.log(_mainCallflow)
-
 			dataUser.extra.countFeatures = 0;
 			_.each(dataUser.features, function(v) {
 				if(v in dataUser.extra.mapFeatures) {
@@ -1101,7 +1099,23 @@ define(function(require){
 			});
 
 			template.on('click', '.feature[data-feature="call_forward"]', function() {
-				self.usersRenderCallForward(currentUser);
+				if(currentUser.features.indexOf('find_me_follow_me') < 0) {
+					var featureUser = $.extend(true, {}, currentUser);
+					self.usersGetMainCallflow(featureUser.id, function(mainCallflow) {
+						if(mainCallflow && 'flow' in mainCallflow) {
+							var flow = mainCallflow.flow;
+							while(flow.module != 'user' && '_' in flow.children) {
+								flow = flow.children['_'];
+							}
+							if(flow.data.timeout < 30) {
+								featureUser.extra.timeoutTooShort = true;
+							}
+						}
+						self.usersRenderCallForward(featureUser);
+					});
+				} else {
+					self.usersRenderCallForward(currentUser);
+				}
 			});
 
 			template.on('click', '.feature[data-feature="hotdesk"]', function() {
@@ -1724,12 +1738,22 @@ define(function(require){
 				featureForm = featureTemplate.find('#call_forward_form'),
 				args = {
 					callback: function() {
-						popup.dialog('close').remove()
+						popup.dialog('close').remove();
 					},
 					openedTab: 'features'
-				};
+				},
+				timeoutWarningBox = featureTemplate.find('.timeout-warning');
+
+			if(currentUser.call_forward.require_keypress) {
+				timeoutWarningBox.hide();
+			}
 
 			monster.ui.validate(featureForm);
+			monster.ui.prettyCheck.create(featureTemplate.find('.content'));
+
+			featureTemplate.find('input[name="require_keypress"]').on('ifToggled', function() {
+				timeoutWarningBox.toggle();
+			});
 
 			featureTemplate.find('.cancel-link').on('click', function() {
 				popup.dialog('close').remove();
@@ -1750,12 +1774,17 @@ define(function(require){
 			featureTemplate.find('.save').on('click', function() {
 				if(monster.ui.valid(featureForm)) {
 					var formData = form2object('call_forward_form');
+					formData.require_keypress = !formData.require_keypress;
 
 					formData.enabled = switchFeature.bootstrapSwitch('status');
 					formData.number = monster.util.unformatPhoneNumber(formData.number, 'keepPlus');
 					delete formData.phoneType;
 
 					var userToSave = $.extend(true, {}, currentUser, { call_forward: formData});
+
+					if(timeoutWarningBox.is(':visible')) {
+						args.openedTab = 'name';
+					}
 
 					self.usersUpdateUser(userToSave, function(data) {
 						args.userId = data.data.id;
@@ -1764,8 +1793,6 @@ define(function(require){
 					});
 				}
 			});
-
-			monster.ui.prettyCheck.create(featureTemplate.find('.content'));
 
 			if ( currentUser.call_forward.number && /^(\+1)/.test(currentUser.call_forward.number) ) {
 				featureTemplate.find('#phoneType').val('mobile');

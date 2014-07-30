@@ -363,7 +363,8 @@
 			"number": "Ce numéro",
 			"placeholder": "+14157283992",
 			"requireKeyPress": "Laisser message sur le répondeur du numéro transferé",
-			"title": "Transfert d'appels"
+			"title": "Transfert d'appels",
+			"timeoutWarning": "Afin de pouvoir laisser un message sur le répondeur du numéro transferé, la durée de sonnerie de l'utilisateur doit être d'au moins 30sec. En cliquant sur le bouton \"Sauvegarder\", vous serez automatiquement redirigé vers l'édition d'utilisateur où vous pourrez modifier la durée de sonnerie."
 		},
 		"callRecording": {
 			"title": "Enregistrement d'appel entrant",
