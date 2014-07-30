@@ -284,7 +284,9 @@
 }
 
 #users_container .detail-user .row-fields #vmbox_number {
-	margin-left: 7px;
+	margin-bottom: 5px;
+	margin-left: 10px;
+	width: 42px;
 }
 
 #users_container .detail-user .row-fields .ringing-timeout {
@@ -344,7 +346,7 @@
 }
 
 #users_container .detail-user #change_username {
-	margin-left: 5px;
+	margin-left: 10px;
 }
 
 /* Grid add remove */
@@ -714,20 +716,20 @@
 }
 
 /* Change Password Popup */
-.change-password-popup {
+.smart-edit-popup {
 	width: 430px;
 }
 
-.change-password-popup .form-horizontal .control-group .control-label {
+.smart-edit-popup .form-horizontal .control-group .control-label {
 	width: 140px;
 }
 
-.change-password-popup .form-horizontal .control-group .controls {
+.smart-edit-popup .form-horizontal .control-group .controls {
 	margin-left: 160px;
 }
 
-.change-password-popup .change-password-content,
-.change-password-popup .actions {
+.smart-edit-popup .content,
+.smart-edit-popup .actions {
 	padding: 15px 25px;
 	border-top: 1px solid #CCCCCC;
 }

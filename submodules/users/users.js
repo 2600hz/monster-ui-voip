@@ -852,11 +852,47 @@ define(function(require){
 				});
 			});
 
+			template.on('click', '#change_pin', function() {
+				var pinTemplate = $(monster.template(self, 'users-changePin')),
+					form = pinTemplate.find('#form_new_pin');
+
+				//monster.ui.validate(form);
+
+				monster.ui.validate(form, {
+					rules: {
+						'pin': {
+							number: true,
+							minlength:4,
+							min: 0
+						}
+					}
+				});
+
+				pinTemplate.find('.save-new-pin').on('click', function() {
+					var formData = form2object('form_new_pin'),
+						vmboxData = $.extend(true, currentUser.extra.vmbox, formData);
+
+					if(monster.ui.valid(form)) {
+						self.usersUpdateVMBox(vmboxData, function(data) {
+							popup.dialog('close').remove();
+
+							toastr.success(monster.template(self, '!' + toastrMessages.pinUpdated, { name: currentUser.first_name + ' ' + currentUser.last_name }));
+						});
+					}
+				});
+
+				pinTemplate.find('.cancel-link').on('click', function() {
+					popup.dialog('close').remove();
+				});
+
+				var popup = monster.ui.dialog(pinTemplate, {
+					title: self.i18n.active().users.dialogChangePin.title
+				});
+			});
+
 			template.on('click', '#change_username', function() {
 				var passwordTemplate = $(monster.template(self, 'users-changePassword', currentUser)),
 					form = passwordTemplate.find('#form_new_username');
-
-				monster.ui.validate(form);
 
 				passwordTemplate.find('.save-new-username').on('click', function() {
 					var formData = form2object('form_new_username'),
