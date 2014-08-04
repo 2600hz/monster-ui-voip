@@ -216,3 +216,14 @@
 #call_logs_details_popup .details-table tbody tr:last-of-type td:last-of-type {
 	border-bottom-right-radius: 4px;
 }
+
+/********************** COLORBLIND SETTINGS **********************/
+body.colorblind #call_logs_container .grid-row:not(.header-row) .grid-cell.direction {
+	background-color: #999;
+}
+body.colorblind #call_logs_container .grid-cell.direction .icon-green {
+	color: #EEE !important;
+}
+body.colorblind #call_logs_container .grid-cell.direction .icon-orange {
+	color: #222 !important;
+}
