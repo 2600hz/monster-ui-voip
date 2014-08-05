@@ -1780,7 +1780,7 @@ define(function(require){
 				},
 				timeoutWarningBox = featureTemplate.find('.timeout-warning');
 
-			if(currentUser.call_forward.require_keypress) {
+			if(currentUser.hasOwnProperty('call_forward') && currentUser.call_forward.require_keypress) {
 				timeoutWarningBox.hide();
 			}
 
@@ -1830,7 +1830,7 @@ define(function(require){
 				}
 			});
 
-			if ( currentUser.call_forward.number && /^(\+1)/.test(currentUser.call_forward.number) ) {
+			if (currentUser.hasOwnProperty('call_forward') && currentUser.call_forward.number && /^(\+1)/.test(currentUser.call_forward.number)) {
 				featureTemplate.find('#phoneType').val('mobile');
 				featureTemplate.find('#number').mask('+1 (999) 999-9999');
 			} else {
