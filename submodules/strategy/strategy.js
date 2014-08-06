@@ -1751,38 +1751,6 @@ define(function(require){
 						}
 					});
 
-					if(!parallelRequests["MainCallflow"]) {
-						parallelRequests["MainCallflow"] = function(callback) {
-							monster.request({
-								resource: 'strategy.callflows.add',
-								data: {
-									accountId: self.accountId,
-									data: {
-										contact_list: {
-											exclude: false
-										},
-										numbers: ["undefined"],
-										name: "MainCallflow",
-										type: "main",
-										flow: {
-											children: {},
-											data: {
-												timezone: monster.apps["auth"].currentAccount.timezone
-											},
-											module: "temporal_route"
-										}
-									}
-								},
-								success: function(data, status) {
-									/* If they don't have a main callflow, check if the feature codes are enabled, and create them if not */
-									self.strategyCreateFeatureCodes(function() {
-										callback(null, data.data);
-									});
-								}
-							});
-						}
-					}
-
 					if(!parallelRequests["MainConference"]) {
 						parallelRequests["MainConference"] = function(callback) {
 							monster.request({
@@ -1839,7 +1807,46 @@ define(function(require){
 					});
 
 					monster.parallel(parallelRequests, function(err, results) {
-						callback(results);
+						if(!parallelRequests["MainCallflow"]) {
+							monster.request({
+								resource: 'strategy.callflows.add',
+								data: {
+									accountId: self.accountId,
+									data: {
+										contact_list: {
+											exclude: false
+										},
+										numbers: ["undefined"],
+										name: "MainCallflow",
+										type: "main",
+										flow: {
+											children: {
+												'_': {
+													children: {},
+													data: {
+														id: results["MainOpenHours"].id
+													},
+													module:"callflow"
+												}
+											},
+											data: {
+												timezone: monster.apps["auth"].currentAccount.timezone
+											},
+											module: "temporal_route"
+										}
+									}
+								},
+								success: function(data, status) {
+									/* If they don't have a main callflow, check if the feature codes are enabled, and create them if not */
+									self.strategyCreateFeatureCodes(function() {
+										results["MainCallflow"] = data.data;
+										callback(results);
+									});
+								}
+							});
+						} else {
+							callback(results);
+						}
 					});
 				}
 			});
