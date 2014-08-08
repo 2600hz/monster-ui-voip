@@ -10,7 +10,11 @@
 	</div>
 
 	<div class="content{{#unless user.extra.mapFeatures.faxing.active}} disabled{{/unless}}">
+	{{#if faxbox}}
+		<p>{{replaceVar i18n.users.faxing.text this.faxbox.notifications.inbound.email.send_to}}</p>
+	{{else}}
 		<p>{{replaceVar i18n.users.faxing.text this.user.email }}</p>
+	{{/if}}
 		<form class="form-horizontal" id="faxbox_form">
 			<div class="control-group">
 				<label for="caller_id" class="control-label">{{ i18n.users.faxing.form.label.callerId }}</label>

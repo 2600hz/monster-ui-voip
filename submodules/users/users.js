@@ -2279,8 +2279,12 @@ define(function(require){
 					}
 				}
 
-				if('differentEmail' in userData.extra) {
-					userData.email = userData.extra.differentEmail ? userData.extra.email : userData.username;
+				if('differentEmail' in userData.extra && userData.extra.differentEmail) {
+					if ( 'email' in userData.extra ) {
+						userData.email = userData.extra.email
+					}
+				} else {
+					userData.email = userData.username;
 				}
 
 				if('language' in userData.extra) {
@@ -3652,7 +3656,7 @@ define(function(require){
 							data.user.smartpbx.faxing.enabled = true;
 
 							self.usersUpdateUser(data.user, function(user) {
-								callback && callback(null, user);
+								callback && callback(null, user.data);
 							});
 						}
 					}
@@ -3708,9 +3712,7 @@ define(function(require){
 						caller_name: user.first_name.concat(' ', user.last_name),
 						fax_header: monster.config.company.name.concat(self.i18n.active().users.faxing.defaultSettings.headerExtension),
 						fax_timezone: user.timezone,
-						smtp_permission_list: [],
 						owner_id: user.id,
-						retries: 3,
 						notifications: {
 							inbound: {
 								email: {
@@ -3809,9 +3811,15 @@ define(function(require){
 													resource: 'faxbox.delete',
 													data: {
 														accountId: self.accountId,
-														faxboxId: data.data.flow.data.faxbox_id
+														faxboxId: data.data.flow.data.faxbox_id,
+														generateError: false
 													},
 													success: function(_data, status) {
+														self.usersDeleteCallflow(callflow.id, function(results) {
+															subCallback(null, results);
+														});
+													},
+													error: function(_data, error) {
 														self.usersDeleteCallflow(callflow.id, function(results) {
 															subCallback(null, results);
 														});
