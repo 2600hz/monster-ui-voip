@@ -37,18 +37,13 @@ define(function(require){
 				dataTemplate = {
 					timezone: 'GMT' + jstz.determine_timezone().offset()
 				},
-				template;
+				template,
+				rangeCallLogs = 8;
 
-			if(!toDate) {
-				toDate = new Date();
-				if(fromDate) {
-					toDate.setTime(fromDate.getTime());
-					toDate.setDate(toDate.getDate()+7);
-				}
-			}
-			if(!fromDate) {
-				fromDate = new Date();
-				fromDate.setDate(fromDate.getDate()-7);
+			if(!toDate && !fromDate) {
+				var dates = monster.util.getDefaultRangeDates(rangeCallLogs);
+				fromDate = dates.from;
+				toDate = dates.to;
 			}
 
 			self.callLogsGetCdrs(fromDate, toDate, function(cdrs) {
@@ -56,13 +51,21 @@ define(function(require){
 				dataTemplate.cdrs = cdrs;
 				template = $(monster.template(self, 'callLogs-layout', dataTemplate));
 
+				var optionsDatePicker = {
+					container: template,
+					range: rangeCallLogs
+				};
+
+				monster.ui.initRangeDatepicker(optionsDatePicker);
+
+				template.find('#startDate').datepicker('setDate', fromDate);
+				template.find('#endDate').datepicker('setDate', toDate);
+
 				self.callLogsBindEvents(template, cdrs);
 
 				parent
 					.empty()
 					.append(template);
-
-				self.callLogsInitDatepickers(template, fromDate, toDate);
 			});
 		},
 
@@ -72,6 +75,7 @@ define(function(require){
 			template.find('.filter-div .apply-filter').on('click', function(e) {
 				var fromDate = template.find('.filter-div input.filter-from').datepicker("getDate"),
 					toDate = template.find('.filter-div input.filter-to').datepicker("getDate");
+
 				self.callLogsRenderContent(template.parents('.right-content'), fromDate, toDate);
 			});
 
@@ -81,28 +85,6 @@ define(function(require){
 
 			template.find('.filter-div .download-csv').on('click', function(e) {
 				monster.ui.alert('Not implemented yet!');
-				// var fromDate = template.find('.filter-div input.filter-from').datepicker("getDate"),
-				// 	toDate = template.find('.filter-div input.filter-to').datepicker("getDate");
-
-				// fromDate.setHours(0);
-				// fromDate.setMinutes(0);
-				// fromDate.setSeconds(0);
-				// fromDate.setMilliseconds(0);
-				// toDate.setHours(23);
-				// toDate.setMinutes(59);
-				// toDate.setSeconds(59);
-				// toDate.setMilliseconds(999);
-
-				// monster.request({
-				// 	resource: 'voip.callLogs.getCdrsCSV',
-				// 	data: {
-				// 		accountId: self.accountId,
-				// 		fromDate: monster.util.dateToGregorian(fromDate),
-				// 		toDate: monster.util.dateToGregorian(toDate)
-				// 	},
-				// 	success: function(data, status) {
-				// 	}
-				// });
 			});
 
 			template.find('.search-div input.search-query').on('keyup', function(e) {
@@ -168,55 +150,10 @@ define(function(require){
 			});
 		},
 
-		callLogsInitDatepickers: function(template, fromDate, toDate) {
-			var fromDateInput = template.find('.filter-div input.filter-from'),
-				toDateInput = template.find('.filter-div input.filter-to');
-
-			fromDateInput.datepicker({
-				constrainInput: true,
-				showOtherMonths: true,
-				selectOtherMonths: true,
-				onSelect: function(inputDate) {
-					var selectedDate = new Date(inputDate),
-						restrictTo = new Date(selectedDate),
-						toDateTimestamp = toDateInput.datepicker("getDate").getTime();
-
-					restrictTo.setDate(restrictTo.getDate()+7);
-					toDateInput.datepicker("option", "minDate", selectedDate);
-					toDateInput.datepicker("option", "maxDate", restrictTo);
-					if(toDateTimestamp > restrictTo.getTime() || toDateTimestamp < selectedDate.getTime()) {
-						toDateInput.datepicker("setDate", restrictTo);
-					}
-				}
-			});
-			fromDateInput.datepicker("setDate", fromDate);
-
-			toDateInput.datepicker({
-				constrainInput: true,
-				showOtherMonths: true,
-				selectOtherMonths: true,
-				minDate: fromDate,
-				maxDate: toDate
-			});
-			toDateInput.datepicker("setDate", toDate);
-		},
-
 		callLogsGetCdrs: function(fromDate, toDate, callback) {
 			var self = this,
-				fromDateTimestamp,
-				toDateTimestamp;
-
-			fromDate.setHours(0);
-			fromDate.setMinutes(0);
-			fromDate.setSeconds(0);
-			fromDate.setMilliseconds(0);
-			fromDateTimestamp = monster.util.dateToGregorian(fromDate);
-
-			toDate.setHours(23);
-			toDate.setMinutes(59);
-			toDate.setSeconds(59);
-			toDate.setMilliseconds(999);
-			toDateTimestamp = monster.util.dateToGregorian(toDate);
+				fromDateTimestamp = monster.util.dateToBeginningOfGregorianDay(fromDate),
+				toDateTimestamp = monster.util.dateToEndOfGregorianDay(toDate);
 
 			monster.request({
 				resource: 'voip.callLogs.listCdrs',
@@ -226,6 +163,7 @@ define(function(require){
 					toDate: toDateTimestamp
 				},
 				success: function(data, status) {
+					console.log(data);
 					var cdrs = {};
 					_.each(data.data, function(val) {
 						if(val.direction === 'inbound') {
@@ -240,7 +178,7 @@ define(function(require){
 							}
 						}
 					});
-
+					console.log(cdrs);
 					callback(cdrs);
 				}
 			});
