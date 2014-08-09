@@ -542,8 +542,9 @@ define(function(require){
 					},
 					fax: {
 						media: {
-							fax_option: 'auto'
+							fax_option: 'false'
 						},
+						outbound_flags: ['fax'],
 						sip: {
 							password: monster.util.randomString(12),
 							realm: monster.apps['auth'].currentAccount.realm,
