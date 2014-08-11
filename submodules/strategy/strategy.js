@@ -1330,7 +1330,7 @@ define(function(require){
 				}, holiday, {holidayType: holidayType});
 
 			for(var i=1; i<=31; i++) {
-				templateData.resources.days.push(i);
+				templateData.resources.days.push({ value: i });
 			}
 
 			container.append(monster.template(self, 'strategy-holidayLine', templateData));

@@ -23,14 +23,14 @@
 		{{else}}
 			<select class="day from">
 				{{#each resources.days}}
-					<option value="{{this}}" {{#compare this '===' ../fromDay}}selected{{/compare}}>{{this}}</option>
+					<option value="{{this.value}}" {{#compare this.value '===' ../fromDay}}selected{{/compare}}>{{this.value}}</option>
 				{{/each}}
 			</select>
 			{{#compare holidayType '===' 'range'}}
 				<span>to</span>
 				<select class="day to">
 					{{#each resources.days}}
-						<option value="{{this}}" {{#compare this '===' ../toDay}}selected{{/compare}}>{{this}}</option>
+						<option value="{{this.value}}" {{#compare this.value '===' ../toDay}}selected{{/compare}}>{{this.value}}</option>
 					{{/each}}
 				</select>
 			{{/compare}}
