@@ -3,14 +3,17 @@
 	<div class="number-text">{{number}}</div>
 	<input class="number-input" type="text" maxlength="2" value="{{number}}">
 	<div class="text">{{i18n.strategy.popup.for}}</div>
-	<select class="target-select">
-		{{#each callEntities}}
-			<optgroup label="{{groupName}}">
-				{{#each entities}}
-					<option value="{{id}}" data-type="{{module}}" {{#compare id '===' ../../selectedId }}selected{{/compare}}>{{name}}</option>
-				{{/each}}
-			</optgroup>
-		{{/each}}
-	</select>
+	<div class="input-prepend target-input">
+		<span class="add-on"><i class="target-icon"></i></span>
+		<select class="target-select">
+			{{#each callEntities}}
+				<optgroup label="{{groupName}}" data-icon="{{groupIcon}}">
+					{{#each entities}}
+						<option value="{{id}}" data-type="{{module}}" {{#compare id '===' ../../selectedId }}selected{{/compare}}>{{name}}</option>
+					{{/each}}
+				</optgroup>
+			{{/each}}
+		</select>
+	</div>
 	<i class="remove-btn icon-remove icon-lightgrey"></i>
 </div>

@@ -1358,6 +1358,12 @@ define(function(require){
 						}));
 					});
 
+					$.each(menuLineContainer.find('.target-input'), function() {
+						var $this = $(this),
+							icon = $this.find('.target-select option:selected').parents('optgroup').data('icon');
+						$this.find('.target-icon').addClass(icon);
+					});
+
 					self.strategyBindMenuPopupEvents(popup, $.extend({
 						menu: menu,
 						greeting: greeting
@@ -1470,6 +1476,14 @@ define(function(require){
 				}
 			});
 
+			container.on('change', '.target-select', function(e) {
+				var $this = $(this),
+					iconElem = $this.parents('.target-input').find('.target-icon'),
+					icon = $this.find('option:selected').parents('optgroup').data('icon');
+
+				iconElem.attr('class', 'target-icon '+icon);
+			});
+
 			container.on('click', '.remove-btn', function(e) {
 				$(this).parents('.menu-line').remove();
 			});
@@ -1477,8 +1491,11 @@ define(function(require){
 			container.find('.add-menu-line a').on('click', function(e) {
 				e.preventDefault();
 				var popupCallEntities = $.extend(true, {}, strategyData.callEntities, { voicemail: strategyData.voicemails }),
-					menuLine = $(monster.template(self, 'strategy-menuLine', { callEntities: self.strategyGetCallEntitiesDropdownData(popupCallEntities) }));
+					menuLine = $(monster.template(self, 'strategy-menuLine', { callEntities: self.strategyGetCallEntitiesDropdownData(popupCallEntities) })),
+					icon = menuLine.find('.target-select option:selected').parents('optgroup').data('icon');
+
 				container.find('.menu-block .left .content').append(menuLine);
+				menuLine.find('.target-icon').addClass(icon);
 				menuLine.find('.number-input').focus();
 			});
 
@@ -1701,6 +1718,7 @@ define(function(require){
 		strategyGetCallEntitiesDropdownData: function(callEntities) {
 			var self = this,
 				results = [];
+
 			_.each(callEntities, function(value, key) {
 				var group = {
 						groupName: self.i18n.active().strategy.callEntities[key],
@@ -1713,6 +1731,22 @@ define(function(require){
 							};
 						})
 					};
+
+				switch(group.groupType) {
+					case 'user':
+						group.groupIcon = 'icon-user';
+						break;
+					case 'device':
+						group.groupIcon = 'icon-telicon-voip-phone';
+						break;
+					case 'ring_group':
+						group.groupIcon = 'icon-group';
+						break;
+					case 'voicemail':
+						group.groupIcon = 'icon-telicon-voicemail';
+						break;
+				}
+
 				group.entities.sort(function(a,b) { return (a.name.toLowerCase() > b.name.toLowerCase()); });
 				if(group.groupType === "user") {
 					results.splice(0, 0, group);

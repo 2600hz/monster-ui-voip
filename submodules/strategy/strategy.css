@@ -536,7 +536,7 @@
 #strategy_menu_popup .menu-block .menu-line > select {
 	margin: 0 15px 0 0;
 	display: inline-block;
-	vertical-align: initial;
+	vertical-align: middle;
 }
 #strategy_menu_popup .menu-block .menu-line .number-input {
 	width: 18px;
@@ -549,17 +549,21 @@
 	font-weight: bold;
 	cursor: pointer;
 }
-#strategy_menu_popup .menu-block .menu-line .target-select {
-	width: 140px;
+#strategy_menu_popup .menu-block .menu-line .target-input .add-on {
+	width: 20px;
 }
-#strategy_menu_popup .menu-block .menu-line i {
+#strategy_menu_popup .menu-block .menu-line .target-select {
+	width: 150px;
+}
+#strategy_menu_popup .menu-block .menu-line i.remove-btn {
 	cursor: pointer;
 	opacity: 0.8;
+	vertical-align: middle;
 }
-#strategy_menu_popup .menu-block .menu-line i:hover {
+#strategy_menu_popup .menu-block .menu-line i.remove-btn:hover {
 	color: #ff1212 !important;
 }
-#strategy_menu_popup .menu-block .menu-line i:active {
+#strategy_menu_popup .menu-block .menu-line i.remove-btn:active {
 	color: #ff1212 !important;
 	text-shadow: 1px 1px 1px #999;
 }
