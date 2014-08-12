@@ -315,6 +315,11 @@
 	margin: 0 0 0 5px;
 }
 
+#groups_container .detail-group .grid-time .group-row.deleted {
+	color: #999;
+	font-style: italic;
+}
+
 #groups_container .detail-group .grid-time .group-row .name {
 	overflow: hidden;
 	padding-left: 10px;
@@ -446,12 +451,16 @@
 	height: 100%;
 	border-right: solid 1px #ddd;
 }
+#groups_container .scale-element:first-child {
+	border-left: solid 1px #ddd;
+}
 #groups_container .group-row.title .scale-element {
 	top: 65%;
 	height: 35%;
+	border-right: solid 1px #cdcdcd;
 }
-#groups_container .scale-element:first-child {
-	border-left: solid 1px #ddd;
+#groups_container .group-row.title .scale-element:first-child {
+	border-left: solid 1px #cdcdcd;
 }
 #groups_container .scale-element > span {
 	position: absolute;

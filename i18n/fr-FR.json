@@ -47,6 +47,7 @@
 		"port": "Porter Numéros",
 		"ringThisMemberFor": "Faire sonner ce membre pendant:",
 		"ringGroupMissing": "Aucun groupe d'appels n'a été défini pour ce groupe d'utilisatuers (group_id missing from callflow)",
+		"userDeleted": "Utilisateur supprimé",
 		"removeMember": "Supprimer ce membre",
 		"distribute": "Répartir",
 		"maxDurationTooltip": "Cliquez sur le label ci-contre pour changer la durée maximale de ce groupe d'appel. Vous devez saisir un nombre crompris entre 30 et 999.",

@@ -13,7 +13,7 @@
 		</div>
 
 		{{#each extra.ringGroup}}
-			<div class="group-row" data-user_id="{{id}}">
+			<div class="group-row {{#if deleted}}deleted{{/if}}" data-user_id="{{id}}">
 				<div class="scale-container"></div>
 				<div class="name">{{name}}</div>
 				<div class="times">
@@ -50,7 +50,7 @@
 	<div class="actions">
 		<ul class="pull-left add-user-dropdown">
 			<li class="dropdown">
-				<a href="#" class="dropdown-toggle monster-link" data-toggle="dropdown" data-target="#">
+				<a href="javascript:void(0);" class="dropdown-toggle monster-link" data-toggle="dropdown" data-target="#">
 					<i class="icon-plus-sign icon-green"></i>
 					{{ i18n.users.add }}
 				</a>

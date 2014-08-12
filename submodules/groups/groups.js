@@ -1205,18 +1205,21 @@ define(function(require){
 					template.find('.group-row[data-user_id="'+ userId + '"] .slider-time .ui-slider-handle').last().html(tooltip2);
 				},
 				createSlider = function(endpoint) {
-					var groupRow = template.find('.group-row[data-user_id="'+ endpoint.id +'"]');
-					groupRow.find('.slider-time').slider({
-						range: true,
-						min: 0,
-						max: scaleMaxSeconds,
-						values: [ endpoint.delay, endpoint.delay+endpoint.timeout ],
-						slide: sliderTooltip,
-						change: sliderTooltip,
-						create: function(event, ui) {
-							createTooltip(event, ui, endpoint.id, $(this));
-						},
-					});
+					var groupRow = template.find('.group-row[data-user_id="'+ endpoint.id +'"]'),
+						slider = groupRow.find('.slider-time').slider({
+							range: true,
+							min: 0,
+							max: scaleMaxSeconds,
+							values: [ endpoint.delay, endpoint.delay+endpoint.timeout ],
+							slide: sliderTooltip,
+							change: sliderTooltip,
+							create: function(event, ui) {
+								createTooltip(event, ui, endpoint.id, $(this));
+							},
+						});
+					if(groupRow.hasClass('deleted')) {
+						slider.slider('disable');
+					}
 					createSliderScale(groupRow);
 				},
 				createSliderScale = function(container, isHeader) {
@@ -1533,7 +1536,8 @@ define(function(require){
 					endpoint.name = user.first_name + ' ' + user.last_name;
 					mapUsers[endpoint.id].inUse = true;
 				} else {
-					endpoint.name = 'Not a user';
+					endpoint.name = self.i18n.active().groups.userDeleted;
+					endpoint.deleted = true;
 				}
 			});
 
