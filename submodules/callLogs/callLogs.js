@@ -163,7 +163,6 @@ define(function(require){
 					toDate: toDateTimestamp
 				},
 				success: function(data, status) {
-					console.log(data);
 					var cdrs = {};
 					_.each(data.data, function(val) {
 						if(val.direction === 'inbound') {
@@ -178,7 +177,6 @@ define(function(require){
 							}
 						}
 					});
-					console.log(cdrs);
 					callback(cdrs);
 				}
 			});
