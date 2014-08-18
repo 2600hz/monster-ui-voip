@@ -1037,7 +1037,6 @@ define(function(require){
 							holidayRule = {
 								cycle: "yearly",
 								interval: 1,
-								start_date: monster.util.dateToGregorian(new Date()),
 								month: parseInt(month),
 								type: "main_holidays"
 							};
@@ -2087,7 +2086,6 @@ define(function(require){
 											interval: 1,
 											name: val,
 											type: "main_weekdays",
-											start_date: monster.util.dateToGregorian(new Date()),
 											time_window_start: "32400", // 9:00AM
 											time_window_stop: "61200",  // 5:00PM
 											wdays: [val.substring(4).toLowerCase()]
@@ -2112,7 +2110,6 @@ define(function(require){
 										interval: 1,
 										name: "MainLunchHours",
 										type: "main_lunchbreak",
-										start_date: monster.util.dateToGregorian(new Date()),
 										time_window_start: "43200",
 										time_window_stop: "46800",
 										wdays: self.weekdays
