@@ -15,10 +15,6 @@ define(function(require){
 				headers: {
 					'Accept': 'application/octet-stream'
 				}
-			},
-			'voip.callLogs.getCdr': {
-				url: 'accounts/{accountId}/cdrs/{cdrId}',
-				verb: 'GET'
 			}
 		},
 
@@ -46,10 +42,15 @@ define(function(require){
 				toDate = dates.to;
 			}
 
-			self.callLogsGetCdrs(fromDate, toDate, function(cdrs) {
+			self.callLogsGetCdrs(fromDate, toDate, function(cdrs, nextStartKey) {
 				cdrs = self.callLogsFormatCdrs(cdrs);
 				dataTemplate.cdrs = cdrs;
 				template = $(monster.template(self, 'callLogs-layout', dataTemplate));
+
+				if(cdrs && cdrs.length) {
+					var cdrsTemplate = $(monster.template(self, 'callLogs-additionalCdrs', {cdrs: cdrs}));
+					template.find('.call-logs-grid').append(cdrsTemplate);
+				}
 
 				var optionsDatePicker = {
 					container: template,
@@ -61,7 +62,17 @@ define(function(require){
 				template.find('#startDate').datepicker('setDate', fromDate);
 				template.find('#endDate').datepicker('setDate', toDate);
 
-				self.callLogsBindEvents(template, cdrs);
+				if(!nextStartKey) {
+					template.find('.call-logs-loader').hide();
+				}
+
+				self.callLogsBindEvents({
+					template: template,
+					cdrs: cdrs,
+					fromDate: fromDate,
+					toDate: toDate,
+					nextStartKey: nextStartKey
+				});
 
 				parent
 					.empty()
@@ -69,8 +80,13 @@ define(function(require){
 			});
 		},
 
-		callLogsBindEvents: function(template, cdrs) {
-			var self = this;
+		callLogsBindEvents: function(params) {
+			var self = this,
+				template = params.template,
+				cdrs = params.cdrs,
+				fromDate = params.fromDate,
+				toDate = params.toDate,
+				startKey = params.nextStartKey;
 
 			template.find('.filter-div .apply-filter').on('click', function(e) {
 				var fromDate = template.find('.filter-div input.filter-from').datepicker("getDate"),
@@ -126,7 +142,7 @@ define(function(require){
 				}
 			});
 
-			template.find('.a-leg.has-b-legs').on('click', function(e) {
+			template.on('click', '.a-leg.has-b-legs', function(e) {
 				var rowGroup = $(this).parents('.grid-row-group');
 				if(rowGroup.hasClass('open')) {
 					rowGroup.removeClass('open');
@@ -139,28 +155,61 @@ define(function(require){
 				}
 			});
 
-			template.find('.grid-cell.details i').on('click', function(e) {
+			template.on('click', '.grid-cell.details i', function(e) {
 				e.stopPropagation();
 				var cdrId = $(this).parents('.grid-row').data('id');
 				self.callLogsShowDetailsPopup(cdrId);
 			});
 
-			template.find('.grid-cell.report a').on('click', function(e) {
+			template.on('click', '.grid-cell.report a', function(e) {
 				e.stopPropagation();
+			});
+
+			template.find('.call-logs-loader:not(.loading) .loader-message').on('click', function(e) {
+				var loaderDiv = template.find('.call-logs-loader');
+				if(startKey) {
+					loaderDiv.toggleClass('loading');
+					loaderDiv.find('.loading-message > i').toggleClass('icon-spin');
+					self.callLogsGetCdrs(fromDate, toDate, function(cdrs, nextStartKey) {
+						cdrs = self.callLogsFormatCdrs(cdrs);
+						addTemplate = $(monster.template(self, 'callLogs-additionalCdrs', {cdrs: cdrs}));
+
+						startKey = nextStartKey;
+						if(!startKey) {
+							template.find('.call-logs-loader').hide();
+						}
+
+						template.find('.call-logs-grid').append(addTemplate);
+
+						loaderDiv.toggleClass('loading');
+						loaderDiv.find('.loading-message > i').toggleClass('icon-spin');
+
+					}, startKey);
+				} else {
+					loaderDiv.hide();
+				}
 			});
 		},
 
-		callLogsGetCdrs: function(fromDate, toDate, callback) {
+		callLogsGetCdrs: function(fromDate, toDate, callback, pageStartKey) {
 			var self = this,
 				fromDateTimestamp = monster.util.dateToBeginningOfGregorianDay(fromDate),
-				toDateTimestamp = monster.util.dateToEndOfGregorianDay(toDate);
+				toDateTimestamp = monster.util.dateToEndOfGregorianDay(toDate),
+				filters = {
+					'created_from': fromDateTimestamp,
+					'created_to': toDateTimestamp,
+					'page_size': 50
+				};
 
-			monster.request({
-				resource: 'voip.callLogs.listCdrs',
+			if(pageStartKey) {
+				filters['start_key'] = pageStartKey;
+			}
+
+			self.callApi({
+				resource: 'cdrs.list',
 				data: {
 					accountId: self.accountId,
-					fromDate: fromDateTimestamp,
-					toDate: toDateTimestamp
+					filters: filters
 				},
 				success: function(data, status) {
 					var cdrs = {};
@@ -177,7 +226,7 @@ define(function(require){
 							}
 						}
 					});
-					callback(cdrs);
+					callback(cdrs, data['next_start_key']);
 				}
 			});
 		},
@@ -251,8 +300,8 @@ define(function(require){
 
 		callLogsShowDetailsPopup: function(callLogId) {
 			var self = this;
-			monster.request({
-				resource: 'voip.callLogs.getCdr',
+			self.callApi({
+				resource: 'cdrs.get',
 				data: {
 					accountId: self.accountId,
 					cdrId: callLogId

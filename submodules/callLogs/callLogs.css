@@ -156,6 +156,31 @@
 	line-height: 40px;
 }
 
+#call_logs_container .call-logs-loader {
+	margin-top: 10px;
+	padding: 10px;
+	border: solid 1px #999;
+	border-radius: 4px;
+	text-align: center;
+	background-color: #eaeaea;
+}
+
+#call_logs_container .call-logs-loader .loader-message {
+	cursor: pointer;
+}
+
+#call_logs_container .call-logs-loader.loading .loader-message {
+	display: none;
+}
+
+#call_logs_container .call-logs-loader:not(.loading) .loading-message {
+	display: none;
+}
+
+#call_logs_container .call-logs-loader .loading-message i {
+	margin-right: 10px;
+}
+
 /******************** Popup *********************/
 
 #call_logs_details_popup {

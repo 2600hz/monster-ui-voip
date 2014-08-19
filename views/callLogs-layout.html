@@ -65,110 +65,15 @@
 			<div class="grid-row no-match">
 				<div class="grid-cell">{{i18n.callLogs.noSearchMatch}}</div>
 			</div>
-			{{#each cdrs}}
-			<div class="grid-row-group">
-				<div class="grid-row a-leg {{#if this.bLegs.length}}has-b-legs{{/if}}" data-id="{{this.id}}">
-					<div class="grid-cell direction">
-						<div class="sub-cell single-cell">
-							{{#if this.isOutboundCall}}
-							<i class="icon-arrow-left icon-orange"></i>
-							{{else}}
-							<i class="icon-arrow-right icon-green"></i>
-							{{/if}}
-						</div>
-					</div>
-					<div class="grid-cell datetime">
-						<div class="sub-cell cell-top">{{this.date}}</div>
-						<div class="sub-cell cell-bottom">{{this.time}}</div>
-					</div>
-					<div class="grid-cell from">
-						{{#if this.fromName}}
-						<div class="sub-cell cell-top">{{formatPhoneNumber this.fromNumber}}</div>
-						<div class="sub-cell cell-bottom">{{this.fromName}}</div>
-						{{else}}
-						<div class="sub-cell single-cell">{{formatPhoneNumber this.fromNumber}}</div>
-						{{/if}}
-					</div>
-					<div class="grid-cell to">
-						{{#if this.toName}}
-						<div class="sub-cell cell-top">{{formatPhoneNumber this.toNumber}}</div>
-						<div class="sub-cell cell-bottom">{{this.toName}}</div>
-						{{else}}
-						<div class="sub-cell single-cell">{{formatPhoneNumber this.toNumber}}</div>
-						{{/if}}
-					</div>
-					<div class="grid-cell duration">
-						<div class="sub-cell single-cell">
-							{{this.duration}}
-						</div>
-					</div>
-					<div class="grid-cell hangup">
-						<div class="sub-cell single-cell" title="{{this.hangupCause}}">
-							{{this.hangupCause}}
-						</div>
-					</div>
-					<div class="grid-cell details">
-						<div class="sub-cell single-cell">
-							<i class="icon-cog icon-large"></i>
-						</div>
-					</div>
-					<div class="grid-cell report">
-						<div class="sub-cell single-cell">
-							<a href="{{this.mailtoLink}}">{{../i18n.callLogs.reportCall}}</a>
-						</div>
-					</div>
-				</div>
-				{{#each this.bLegs}}
-				<div class="grid-row b-leg" data-id={{this.id}}>
-					<div class="grid-cell direction">
-						<div class="sub-cell single-cell"></div>
-					</div>
-					<div class="grid-cell datetime">
-						<div class="sub-cell cell-top">{{this.date}}</div>
-						<div class="sub-cell cell-bottom">{{this.time}}</div>
-					</div>
-					<div class="grid-cell from">
-						{{#if this.fromName}}
-						<div class="sub-cell cell-top">{{formatPhoneNumber this.fromNumber}}</div>
-						<div class="sub-cell cell-bottom">{{this.fromName}}</div>
-						{{else}}
-						<div class="sub-cell single-cell">{{formatPhoneNumber this.fromNumber}}</div>
-						{{/if}}
-					</div>
-					<div class="grid-cell to">
-						{{#if this.toName}}
-						<div class="sub-cell cell-top">{{formatPhoneNumber this.toNumber}}</div>
-						<div class="sub-cell cell-bottom">{{this.toName}}</div>
-						{{else}}
-						<div class="sub-cell single-cell">{{formatPhoneNumber this.toNumber}}</div>
-						{{/if}}
-					</div>
-					<div class="grid-cell duration">
-						<div class="sub-cell single-cell">
-							{{this.duration}}
-						</div>
-					</div>
-					<div class="grid-cell hangup">
-						<div class="sub-cell single-cell" title="{{this.hangupCause}}">
-							{{this.hangupCause}}
-						</div>
-					</div>
-					<div class="grid-cell details">
-						<div class="sub-cell single-cell">
-							<i class="icon-cog icon-large"></i>
-						</div>
-					</div>
-					<div class="grid-cell report">
-						<div class="sub-cell single-cell"></div>
-					</div>
-				</div>
-				{{/each}}
-			</div>
-			{{else}}
+			{{#unless cdrs}}
 			<div class="grid-row">
 				<div class="grid-cell">{{i18n.table.empty}}</div>
 			</div>
-			{{/each}}
+			{{/unless}}
 		</div>
+	</div>
+	<div class="call-logs-loader">
+		<div class="loader-message">Scroll down or click here to load additional Call Logs.</div>
+		<div class="loading-message"><i class="icon-spinner icon-large"></i><span>Loading additional Call Logs...</span></div>
 	</div>
 </div>
