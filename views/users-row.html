@@ -25,33 +25,33 @@
 		</div>
 		<div class="devices grid-cell" data-type="devices">
 			{{#each extra.devices}}
-				{{#compare this '===' 'softphone'}}
-					<i class="icon-telicon-soft-phone"></i>
+				{{#compare this.type '===' 'softphone'}}
+					<i class="icon-telicon-soft-phone help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ this.name }}"></i>
 				{{/compare}}
-				{{#compare this '===' 'cellphone'}}
-					<i class="icon-phone"></i>
+				{{#compare this.type '===' 'cellphone'}}
+					<i class="icon-phone help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ this.name }}"></i>
 				{{/compare}}
-				{{#compare this '===' 'smartphone'}}
-					<i class="icon-telicon-mobile-phone"></i>
+				{{#compare this.type '===' 'smartphone'}}
+					<i class="icon-telicon-mobile-phone help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ this.name }}"></i>
 				{{/compare}}
-				{{#compare this '===' 'mobile'}}
-					<i class="icon-telicon-sprint-phone"></i>
+				{{#compare this.type '===' 'mobile'}}
+					<i class="icon-telicon-sprint-phone help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ this.name }}"></i>
 				{{/compare}}
-				{{#compare this '===' 'sip_device'}}
-					<i class="icon-telicon-voip-phone"></i>
+				{{#compare this.type '===' 'sip_device'}}
+					<i class="icon-telicon-voip-phone help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ this.name }}"></i>
 				{{/compare}}
-				{{#compare this '===' 'fax'}}
-					<i class="icon-telicon-fax"></i>
+				{{#compare this.type '===' 'fax'}}
+					<i class="icon-telicon-fax help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ this.name }}"></i>
 				{{/compare}}
-				{{#compare this '===' 'landline'}}
-					<i class="icon-telicon-home-phone"></i>
+				{{#compare this.type '===' 'landline'}}
+					<i class="icon-telicon-home-phone help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ this.name }}"></i>
 				{{/compare}}
 			{{else}}
 				{{ i18n.users.noUserDevices }}
 			{{/each}}
 
 			{{#if extra.additionalDevices}}
-				(+{{extra.additionalDevices}})
+				<span class="help-popover" data-toggle="tooltip" data-html="true" data-placement="top" data-original-title="{{ extra.additionalDevices.tooltip }}">(+{{extra.additionalDevices.count}})</span>
 			{{/if}}
 		</div>
 		<div class="features grid-cell right-aligned{{#compare extra.countFeatures ">" 5}} smaller{{/compare}}" data-type="features">

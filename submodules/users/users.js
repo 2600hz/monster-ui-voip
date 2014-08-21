@@ -206,6 +206,8 @@ define(function(require){
 					template.find('.user-rows').append(templateUser);
 				});
 
+				template.find('[data-toggle="tooltip"]').tooltip();
+
 				self.usersBindEvents(template, parent, dataTemplate);
 
 				parent
@@ -422,10 +424,22 @@ define(function(require){
 
 				if(userId in mapUsers) {
 					if(mapUsers[userId].extra.devices.length == 2) {
-						mapUsers[userId].extra.additionalDevices++;
+						if(mapUsers[userId].extra.additionalDevices) {
+							mapUsers[userId].extra.additionalDevices.count++;
+							mapUsers[userId].extra.additionalDevices.tooltip += '<br>'+device.name + ' (' + device.device_type.replace('_', ' ') + ')';
+						} else {
+							mapUsers[userId].extra.additionalDevices = {
+								count: 1,
+								tooltip: device.name + ' (' + device.device_type.replace('_', ' ') + ')'
+							};
+						}
 					}
 					else {
-						mapUsers[userId].extra.devices.push(device.device_type);
+						console.log(device);
+						mapUsers[userId].extra.devices.push({
+							name: device.name + ' (' + device.device_type.replace('_', ' ') + ')',
+							type: device.device_type
+						});
 					}
 				}
 			});
@@ -510,12 +524,12 @@ define(function(require){
 
 					self.usersRemoveOverlay();
 					cell.css({
-						'position': 'inline-block',
+						'position': 'initial',
 						'z-index': '0'
 					});
 
 					cell.parent().siblings('.edit-user').css({
-						'position': 'block',
+						'position': 'initial',
 						'z-index': '0'
 					});
 				}
