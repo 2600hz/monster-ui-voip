@@ -435,7 +435,6 @@ define(function(require){
 						}
 					}
 					else {
-						console.log(device);
 						mapUsers[userId].extra.devices.push({
 							name: device.name + ' (' + device.device_type.replace('_', ' ') + ')',
 							type: device.device_type
