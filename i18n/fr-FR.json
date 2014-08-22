@@ -623,6 +623,8 @@
 			"report2": "Reporter"
 		},
 		"reportCall": "Reporter Appel",
+		"loaderMessage": "Défilez vers le bas ou cliquez ici pour charger plus d'appels.",
+		"loadingMessage": "Chargement d'appels supplémentaires...",
 		"alertMessages": {
 			"getDetailsError": "Une erreur est survenue en essayant de récuperer les détails de l'appel."
 		},

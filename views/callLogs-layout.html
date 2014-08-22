@@ -65,15 +65,17 @@
 			<div class="grid-row no-match">
 				<div class="grid-cell">{{i18n.callLogs.noSearchMatch}}</div>
 			</div>
-			{{#unless cdrs}}
+			{{#if cdrs}}
+			<div class="grid-row-container"></div>
+			{{else}}
 			<div class="grid-row">
 				<div class="grid-cell">{{i18n.table.empty}}</div>
 			</div>
-			{{/unless}}
+			{{/if}}
 		</div>
 	</div>
 	<div class="call-logs-loader">
-		<div class="loader-message">Scroll down or click here to load additional Call Logs.</div>
-		<div class="loading-message"><i class="icon-spinner icon-large"></i><span>Loading additional Call Logs...</span></div>
+		<div class="loader-message">{{i18n.callLogs.loaderMessage}}</div>
+		<div class="loading-message"><i class="icon-spinner icon-large"></i><span>{{i18n.callLogs.loadingMessage}}</span></div>
 	</div>
 </div>

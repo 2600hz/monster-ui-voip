@@ -644,6 +644,8 @@
 			"report2": "Report"
 		},
 		"reportCall": "Report Call",
+		"loaderMessage": "Scroll down or click here to load additional Call Logs.",
+		"loadingMessage": "Loading additional Call Logs...",
 		"alertMessages": {
 			"getDetailsError": "An error occured while retrieving the call log's details."
 		},

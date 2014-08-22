@@ -1,7 +1,8 @@
 define(function(require){
 	var $ = require('jquery'),
 		_ = require('underscore'),
-		monster = require('monster');
+		monster = require('monster'),
+		nicescroll = require('nicescroll');
 
 	var app = {
 		requests: {
@@ -42,14 +43,23 @@ define(function(require){
 				toDate = dates.to;
 			}
 
+			// Reset variables used to link A-Legs & B-Legs sent by different pages in the API
+			delete self.lastALeg;
+			delete self.loneBLegs;
 			self.callLogsGetCdrs(fromDate, toDate, function(cdrs, nextStartKey) {
 				cdrs = self.callLogsFormatCdrs(cdrs);
 				dataTemplate.cdrs = cdrs;
 				template = $(monster.template(self, 'callLogs-layout', dataTemplate));
 
 				if(cdrs && cdrs.length) {
-					var cdrsTemplate = $(monster.template(self, 'callLogs-additionalCdrs', {cdrs: cdrs}));
-					template.find('.call-logs-grid').append(cdrsTemplate);
+					var cdrsTemplate = $(monster.template(self, 'callLogs-cdrsList', {cdrs: cdrs}));
+					template.find('.call-logs-grid .grid-row-container')
+							.append(cdrsTemplate)
+							.niceScroll({
+								cursorcolor:"#333",
+								cursoropacitymin:0.5,
+								hidecursordelay:1000
+							});
 				}
 
 				var optionsDatePicker = {
@@ -172,14 +182,14 @@ define(function(require){
 					loaderDiv.find('.loading-message > i').toggleClass('icon-spin');
 					self.callLogsGetCdrs(fromDate, toDate, function(cdrs, nextStartKey) {
 						cdrs = self.callLogsFormatCdrs(cdrs);
-						addTemplate = $(monster.template(self, 'callLogs-additionalCdrs', {cdrs: cdrs}));
+						cdrsTemplate = $(monster.template(self, 'callLogs-cdrsList', {cdrs: cdrs}));
 
 						startKey = nextStartKey;
 						if(!startKey) {
 							template.find('.call-logs-loader').hide();
 						}
 
-						template.find('.call-logs-grid').append(addTemplate);
+						template.find('.call-logs-grid .grid-row-container').append(cdrsTemplate);
 
 						loaderDiv.toggleClass('loading');
 						loaderDiv.find('.loading-message > i').toggleClass('icon-spin');
@@ -212,20 +222,42 @@ define(function(require){
 					filters: filters
 				},
 				success: function(data, status) {
-					var cdrs = {};
-					_.each(data.data, function(val) {
-						if(val.direction === 'inbound') {
-							var call_id = val.call_id || val.id;
-							if(!(call_id in cdrs)) { cdrs[call_id] = {}; }
-							cdrs[call_id].aLeg = val;
-						} else {
-							if('other_leg_call_id' in val) {
-								if(!(val.other_leg_call_id in cdrs)) { cdrs[val.other_leg_call_id] = {}; }
-								if(!('bLegs' in cdrs[val.other_leg_call_id])) { cdrs[val.other_leg_call_id].bLegs = {}; }
+					var cdrs = {},
+						groupedLegs = _.groupBy(data.data, function(val) { return val.direction === 'inbound' ? 'aLegs' : 'bLegs' });
+
+					if(self.lastALeg) {
+						groupedLegs.aLegs.splice(0, 0, self.lastALeg);
+					}
+					// if(self.loneBLegs && self.loneBLegs.length) {
+					// 	groupedLegs.bLegs = self.loneBLegs.concat(groupedLegs.bLegs);
+					// }
+					if(data['next_start_key']) {
+						self.lastALeg = groupedLegs.aLegs.pop();
+					}
+
+					_.each(groupedLegs.aLegs, function(val) {
+						var call_id = val.call_id || val.id;
+						cdrs[call_id] = { aLeg: val, bLegs: {} };
+					});
+
+					if(self.loneBLegs && self.loneBLegs.length > 0) {
+						_.each(self.loneBLegs, function(val) {
+							if('other_leg_call_id' in val && val.other_leg_call_id in cdrs) {
 								cdrs[val.other_leg_call_id].bLegs[val.id] = val;
+							}
+						});
+					}
+					self.loneBLegs = [];
+					_.each(groupedLegs.bLegs, function(val) {
+						if('other_leg_call_id' in val) {
+							if(val.other_leg_call_id in cdrs) {
+								cdrs[val.other_leg_call_id].bLegs[val.id] = val;
+							} else {
+								self.loneBLegs.push(val);
 							}
 						}
 					});
+
 					callback(cdrs, data['next_start_key']);
 				}
 			});

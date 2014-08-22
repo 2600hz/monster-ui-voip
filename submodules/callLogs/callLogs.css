@@ -47,6 +47,11 @@
 	border-radius: 4px;
 }
 
+#call_logs_container .call-logs-grid .grid-row-container {
+	max-height: 450px;
+	overflow: auto;
+}
+
 #call_logs_container .grid-row-group:not(:last-of-type) {
 	border-bottom: solid 1px #e3e3e3;
 }
