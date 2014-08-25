@@ -10,7 +10,7 @@ define(function(require){
 
 		requests: {
 			'strategy.callflows.listHasType': {
-				url: 'accounts/{accountId}/callflows?has_value=type',
+				url: 'accounts/{accountId}/callflows?has_value=type&key_missing=owner_id',
 				verb: 'GET'
 			},
 			'strategy.callflows.list': {
@@ -30,7 +30,7 @@ define(function(require){
 				verb: 'POST'
 			},
 			'strategy.callflows.listUserCallflows': {
-				url: 'accounts/{accountId}/callflows?has_key=owner_id&key_missing=type',
+				url: 'accounts/{accountId}/callflows?has_key=owner_id',
 				verb: 'GET'
 			},
 			'strategy.callflows.listRingGroups': {
@@ -2137,7 +2137,10 @@ define(function(require){
 								accountId: self.accountId
 							},
 							success: function(data, status) {
-								_callback(null, data.data);
+								var userCallflows = _.filter(data.data, function(callflow) { 
+									return (callflow.type === 'mainUserCallflow' || !('type' in callflow)); 
+								});
+								_callback(null, userCallflows);
 							}
 						});
 					},

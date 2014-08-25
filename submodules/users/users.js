@@ -470,21 +470,8 @@ define(function(require){
 								});
 							},
 							userCallflow: function(callback) {
-								self.usersListCallflowsUser(currentUser.id, function(data) {
-									if(data.length > 0) {
-										monster.request({
-											resource: 'voip.users.getCallflow',
-											data: {
-												accountId: self.accountId,
-												callflowId: data[0].id
-											},
-											success: function(callflow) {
-												callback(null, callflow.data)
-											}
-										});
-									} else {
-										callback(null, null);
-									}
+								self.usersGetMainCallflow(currentUser.id, function(callflow) {
+									callback(null, callflow);
 								});
 							}
 						},
@@ -1163,20 +1150,11 @@ define(function(require){
 			});
 
 			template.on('click', '.feature[data-feature="call_recording"]', function() {
-				self.usersListCallflowsUser(currentUser.id, function(data) {
-					if(data.length > 0) {
-						monster.request({
-							resource: 'voip.users.getCallflow',
-							data: {
-								accountId: self.accountId,
-								callflowId: data[0].id
-							},
-							success: function(callflow) {
-								self.usersRenderCallRecording({
-									userCallflow: callflow.data,
-									currentUser: currentUser
-								});
-							}
+				self.usersGetMainCallflow(currentUser.id, function(callflow) {
+					if(callflow) {
+						self.usersRenderCallRecording({
+							userCallflow: callflow,
+							currentUser: currentUser
 						});
 					} else {
 						monster.ui.alert('error', self.i18n.active().users.call_recording.noNumber);
@@ -2965,6 +2943,7 @@ define(function(require){
 
 					self.usersCreateVMBox(data.vmbox, function(_dataVM) {
 						data.callflow.owner_id = userId;
+						data.callflow.type = 'mainUserCallflow';
 						data.callflow.flow.data.id = userId;
 						data.callflow.flow.children['_'].data.id = _dataVM.id;
 
@@ -3017,7 +2996,8 @@ define(function(require){
 						},
 						name: fullName + ' SmartPBX\'s Callflow',
 						numbers: listExtensions,
-						owner_id: user.id
+						owner_id: user.id,
+						type: 'mainUserCallflow'
 					};
 
 				self.usersSmartUpdateVMBox(user, false, function(_dataVM) {
@@ -3050,7 +3030,7 @@ define(function(require){
 				var indexMain = -1;
 
 				_.each(listCallflows, function(callflow, index) {
-					if(callflow.owner_id === userId) {
+					if(callflow.owner_id === userId && callflow.type === 'mainUserCallflow' || !('type' in callflow)) {
 						indexMain = index;
 						return false;
 					}
@@ -3236,21 +3216,6 @@ define(function(require){
 					accountId: self.accountId,
 					data: vmData,
 					vmboxId: vmData.id
-				},
-				success: function(data) {
-					callback(data.data);
-				}
-			});
-		},
-
-		usersCreateCallflow: function(callflowData, callback) {
-			var self = this;
-
-			monster.request({
-				resource: 'voip.users.createCallflow',
-				data: {
-					accountId: self.accountId,
-					data: callflowData
 				},
 				success: function(data) {
 					callback(data.data);
@@ -3574,21 +3539,8 @@ define(function(require){
 					});
 				};
 
-			self.usersListCallflowsUser(userId, function(data) {
-				if(data.length > 0) {
-					monster.request({
-						resource: 'voip.users.getCallflow',
-						data: {
-							accountId: self.accountId,
-							callflowId: data[0].id
-						},
-						success: function(callflow) {
-							updateDevices(callflow.data);
-						}
-					});
-				} else {
-					updateDevices(null);
-				}
+			self.usersGetMainCallflow(userId, function(callflow) {
+				updateDevices(callflow)
 			});
 		},
 
