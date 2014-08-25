@@ -63,15 +63,15 @@
 				</div>
 			</div>
 			<div class="grid-row no-match">
-				<div class="grid-cell">{{i18n.callLogs.noSearchMatch}}</div>
+				<div class="grid-cell full-width">{{i18n.callLogs.noSearchMatch}}</div>
 			</div>
-			{{#if cdrs}}
-			<div class="grid-row-container"></div>
-			{{else}}
+			<div class="grid-row-container">
+			</div>
+			{{#unless cdrs}}
 			<div class="grid-row">
-				<div class="grid-cell">{{i18n.table.empty}}</div>
+				<div class="grid-cell full-width">{{i18n.table.empty}}</div>
 			</div>
-			{{/if}}
+			{{/unless}}
 		</div>
 	</div>
 	<div class="call-logs-loader">

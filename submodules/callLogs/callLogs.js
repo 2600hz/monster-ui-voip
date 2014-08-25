@@ -1,8 +1,7 @@
 define(function(require){
 	var $ = require('jquery'),
 		_ = require('underscore'),
-		monster = require('monster'),
-		nicescroll = require('nicescroll');
+		monster = require('monster');
 
 	var app = {
 		requests: {
@@ -54,12 +53,7 @@ define(function(require){
 				if(cdrs && cdrs.length) {
 					var cdrsTemplate = $(monster.template(self, 'callLogs-cdrsList', {cdrs: cdrs}));
 					template.find('.call-logs-grid .grid-row-container')
-							.append(cdrsTemplate)
-							.niceScroll({
-								cursorcolor:"#333",
-								cursoropacitymin:0.5,
-								hidecursordelay:1000
-							});
+							.append(cdrsTemplate);
 				}
 
 				var optionsDatePicker = {
@@ -114,41 +108,43 @@ define(function(require){
 			});
 
 			template.find('.search-div input.search-query').on('keyup', function(e) {
-				var searchValue = $(this).val().replace(/\|/g,'').toLowerCase(),
-					matchedResults = false;
-				if(searchValue.length <= 0) {
-					template.find('.grid-row-group').show();
-					matchedResults = true;
-				} else {
-					_.each(cdrs, function(cdr) {
-						var searchString = (cdr.date + "|" + cdr.fromName + "|"
-										 + cdr.fromNumber + "|" + cdr.toName + "|"
-										 + cdr.toNumber + "|" + cdr.hangupCause).toLowerCase(),
-							rowGroup = template.find('.grid-row.a-leg[data-id="'+cdr.id+'"]').parents('.grid-row-group');
-						if(searchString.indexOf(searchValue) >= 0) {
-							matchedResults = true;
-							rowGroup.show();
-						} else {
-							var matched = _.find(cdr.bLegs, function(bLeg) {
-								var searchStr = (bLeg.date + "|" + bLeg.fromName + "|"
-											  + bLeg.fromNumber + "|" + bLeg.toName + "|"
-											  + bLeg.toNumber + "|" + bLeg.hangupCause).toLowerCase();
-								return searchStr.indexOf(searchValue) >= 0;
-							});
-							if(matched) {
+				if(template.find('.grid-row-container .grid-row').length > 0) {
+					var searchValue = $(this).val().replace(/\|/g,'').toLowerCase(),
+						matchedResults = false;
+					if(searchValue.length <= 0) {
+						template.find('.grid-row-group').show();
+						matchedResults = true;
+					} else {
+						_.each(cdrs, function(cdr) {
+							var searchString = (cdr.date + "|" + cdr.fromName + "|"
+											 + cdr.fromNumber + "|" + cdr.toName + "|"
+											 + cdr.toNumber + "|" + cdr.hangupCause).toLowerCase(),
+								rowGroup = template.find('.grid-row.a-leg[data-id="'+cdr.id+'"]').parents('.grid-row-group');
+							if(searchString.indexOf(searchValue) >= 0) {
 								matchedResults = true;
 								rowGroup.show();
 							} else {
-								rowGroup.hide();
+								var matched = _.find(cdr.bLegs, function(bLeg) {
+									var searchStr = (bLeg.date + "|" + bLeg.fromName + "|"
+												  + bLeg.fromNumber + "|" + bLeg.toName + "|"
+												  + bLeg.toNumber + "|" + bLeg.hangupCause).toLowerCase();
+									return searchStr.indexOf(searchValue) >= 0;
+								});
+								if(matched) {
+									matchedResults = true;
+									rowGroup.show();
+								} else {
+									rowGroup.hide();
+								}
 							}
-						}
-					})
-				}
+						})
+					}
 
-				if(matchedResults) {
-					template.find('.grid-row.no-match').hide();
-				} else {
-					template.find('.grid-row.no-match').show();
+					if(matchedResults) {
+						template.find('.grid-row.no-match').hide();
+					} else {
+						template.find('.grid-row.no-match').show();
+					}
 				}
 			});
 
@@ -175,14 +171,14 @@ define(function(require){
 				e.stopPropagation();
 			});
 
-			template.find('.call-logs-loader:not(.loading) .loader-message').on('click', function(e) {
+			function loadMoreCdrs() {
 				var loaderDiv = template.find('.call-logs-loader');
 				if(startKey) {
 					loaderDiv.toggleClass('loading');
 					loaderDiv.find('.loading-message > i').toggleClass('icon-spin');
-					self.callLogsGetCdrs(fromDate, toDate, function(cdrs, nextStartKey) {
-						cdrs = self.callLogsFormatCdrs(cdrs);
-						cdrsTemplate = $(monster.template(self, 'callLogs-cdrsList', {cdrs: cdrs}));
+					self.callLogsGetCdrs(fromDate, toDate, function(newCdrs, nextStartKey) {
+						newCdrs = self.callLogsFormatCdrs(newCdrs);
+						cdrsTemplate = $(monster.template(self, 'callLogs-cdrsList', {cdrs: newCdrs}));
 
 						startKey = nextStartKey;
 						if(!startKey) {
@@ -191,6 +187,12 @@ define(function(require){
 
 						template.find('.call-logs-grid .grid-row-container').append(cdrsTemplate);
 
+						cdrs = cdrs.concat(newCdrs);
+						var searchInput = template.find('.search-div input.search-query');
+						if(searchInput.val()) {
+							searchInput.keyup();
+						}
+
 						loaderDiv.toggleClass('loading');
 						loaderDiv.find('.loading-message > i').toggleClass('icon-spin');
 
@@ -198,6 +200,17 @@ define(function(require){
 				} else {
 					loaderDiv.hide();
 				}
+			}
+
+			template.find('.call-logs-grid').on('scroll', function(e) {
+				var $this = $(this);
+				if($this.scrollTop() === $this[0].scrollHeight - $this.innerHeight()) {
+					loadMoreCdrs();	
+				}
+			});
+
+			template.find('.call-logs-loader:not(.loading) .loader-message').on('click', function(e) {
+				loadMoreCdrs();
 			});
 		},
 

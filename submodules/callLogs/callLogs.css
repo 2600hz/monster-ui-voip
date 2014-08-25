@@ -45,10 +45,7 @@
 	background-color: #f6f6f6;
 	border-bottom: solid 2px #ddd;
 	border-radius: 4px;
-}
-
-#call_logs_container .call-logs-grid .grid-row-container {
-	max-height: 450px;
+	max-height: 500px;
 	overflow: auto;
 }
 
@@ -85,16 +82,20 @@
 }
 #call_logs_container .grid-row:not(.header-row) {
 	font-size: 13px;
+}
+#call_logs_container .grid-row:not(.header-row) > .grid-cell:first-child {
 	border-left: solid 2px #ddd;
+}
+#call_logs_container .grid-row:not(.header-row) > .grid-cell:last-child {
 	border-right: solid 2px #ddd;
 }
 #call_logs_container .grid-row.no-match {
 	display: none;
 }
-#call_logs_container .grid-row-group:not(.open) .grid-row.a-leg.has-b-legs {
+#call_logs_container .grid-row-group:not(.open) .grid-row.a-leg.has-b-legs > .grid-cell:first-child {
 	border-left: solid 2px #22ccff;
 }
-#call_logs_container .grid-row-group.open .grid-row {
+#call_logs_container .grid-row-group.open .grid-row > .grid-cell:first-child {
 	border-left: solid 2px #44cc44;
 }
 #call_logs_container .grid-row.a-leg.has-b-legs:hover {
@@ -135,6 +136,9 @@
 }
 #call_logs_container .grid-cell.hangup {
 	width: 15%;
+}
+#call_logs_container .grid-cell.full-width {
+	width: 100%;
 }
 #call_logs_container .grid-row:not(.header-row) .grid-cell.hangup {
 	text-transform: lowercase;
