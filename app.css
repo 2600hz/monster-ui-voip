@@ -5,3 +5,11 @@
 @import url('submodules/strategy/strategy.css');
 @import url('submodules/callLogs/callLogs.css');
 @import url('submodules/users/users.css');
+
+#voip_container .left-menu #my_office {
+	margin-bottom: 20px;
+}
+
+#voip_container .left-menu > div {
+	margin-top: 10px;
+}
