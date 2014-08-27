@@ -1,0 +1,45 @@
+{
+	"name": "voip",
+	"source_url": "http://webdev/monster-modules/voip",
+	"i18n": {
+		"en-US": {
+			"label": "Smart PBX",
+			"description": "Hosted PBX gives you full control to set up and manage office phone system.",
+			"extended_description": "It's a complete web portal that allows you to visualize and manage your full-featured PBX without an ounce of hardware. Manage your users, departments, numbers, devices, voicemails, conference bridges in just few simple clicks.",
+			"features": [
+				"Call flows",
+				"Unlimited extensions",
+				"Phone auto-provisioner",
+				"Conferencing",
+				"Feature codes",
+				"Manage devices for all users",
+				"Time of Day Routing",
+				"Call History",
+				"All standard call handling features",
+				"Directory",
+				"Voicemail boxes"
+			]
+		}
+	},
+	"tags": [
+		"reseller"
+	],
+	"icon": "HostedPBX_app.png",
+	"api_url": "http://10.26.0.41:8000/v2",
+	"author": "2600Hz",
+	"version": "1.0",
+	"license": "-",
+	"price": 0,
+	"screenshots": [
+		"smartpbx1.png",
+		"smartpbx2.png",
+		"smartpbx3.png",
+		"smartpbx4.png",
+		"smartpbx5.png"
+	],
+	"urls": {
+		"documentation": "{documentation_url}",
+		"howto": "{howto_video_url}"
+	},
+	"pvt_type": "app"
+}
