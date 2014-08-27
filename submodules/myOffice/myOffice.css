@@ -73,10 +73,6 @@
 #myoffice_container .dashboard-content-div.dashboard-left-content {
 	padding-right: 10px;
 }
-#myoffice_container .dashboard-content-div .link-box:hover {
-	cursor: pointer;
-	background: #eeeeee !important;
-}
 #myoffice_container .dashboard-left-content .left-section-header  {
 	height: 50px;
 	line-height: 50px;
@@ -140,14 +136,17 @@
 	font-size: 14px;
 }
 #myoffice_container .devices-section-content .unregistered-devices .value {
-    float: right;
-    color: red;
-    font-weight: bold;
+	float: right;
+	color: red;
+	font-weight: bold;
+}
+#myoffice_container .devices-section-content .unregistered-devices .value.none {
+	color: #22ccff;
 }
 #myoffice_container .devices-section-content .unregistered-devices {
-    margin-top: 25px;
-    padding: 0px 10px;
-    font-size: 16px;
+	margin-top: 25px;
+	padding: 0px 10px;
+	font-size: 16px;
 }
 /*****************/
 
@@ -166,6 +165,23 @@
 	border-bottom-left-radius: 4px;
 	border-bottom-right-radius: 4px;
 }
+#myoffice_container .dashboard-right-content .dashboard-box .dashboard-warning-row {
+	padding: 10px;
+	line-height: 40px;
+	color: #ffffff;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+	background-color: #faa732;
+	background-image: -moz-linear-gradient(top, #fbb450, #f89406);
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#fbb450), to(#f89406));
+	background-image: -webkit-linear-gradient(top, #fbb450, #f89406);
+	background-image: -o-linear-gradient(top, #fbb450, #f89406);
+	background-image: linear-gradient(to bottom, #fbb450, #f89406);
+	opacity: 0.8;
+}
+#myoffice_container .dashboard-right-content .dashboard-box .dashboard-warning-row > i {
+	margin-right: 10px;
+	color: #ffffff;
+}
 #myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-row {
 	padding: 10px;
 	background-color: #f6f6f6;
@@ -177,7 +193,7 @@
 	color: #555;
 }
 #myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-row.fax-number-row {
-    display: none; /*Hiding Fax temporarily*/
+	display: none; /*Hiding Fax temporarily*/
 }
 #myoffice_container .dashboard-right-content .dashboard-box > * {
 	border-bottom: solid 1px #c0c0c0;
@@ -216,10 +232,10 @@
 	margin: 0;
 }
 #myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-row .row-content .number-list li {
-    line-height: 25px;
+	line-height: 25px;
 }
 #myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-row .row-content .number-list li.caller-id {
-    color: #22ccff;
+	color: #22ccff;
 }
 #myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-row .row-content .number-list .features > i {
 	display: none;
@@ -324,6 +340,25 @@
 #myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-div .number-types-legend .legend-number {
 	font-size: 16px;
 }
+#myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-div .number-types-legend .no-number {
+	line-height: 90px;
+	font-style: italic;
+	color: #999;
+}
+
+#myoffice_container .dashboard-content-div .link-box:hover,
+#myoffice_container .dashboard-content-div .div-title.link-box:hover {
+	cursor: pointer;
+	background: #eeeeee;
+}
+#myoffice_container .dashboard-right-content .dashboard-box .dashboard-warning-row.link-box:hover {
+	background-color: #faa732;
+	background-image: -moz-linear-gradient(top, #f89406, #fbb450);
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#f89406), to(#fbb450));
+	background-image: -webkit-linear-gradient(top, #f89406, #fbb450);
+	background-image: -o-linear-gradient(top, #f89406, #fbb450);
+	background-image: linear-gradient(to bottom, #f89406, #fbb450);
+}
 
 /********** Music-On-Hold Popup **********/
 #my_office_music_on_hold_popup .media-dropdown {
@@ -348,23 +383,44 @@
 
 /********** Caller ID Popup **********/
 #my_office_caller_id_popup .emergency-form {
-    margin-top: 15px;
+	margin-top: 15px;
 }
 #my_office_caller_id_popup .emergency-form form {
-    margin: 0px;
+	margin: 0px;
 }
 #my_office_caller_id_popup .emergency-form label {
-    margin: 0;
+	margin: 0;
 }
 #my_office_caller_id_popup .emergency-form label.monster-invalid {
-    margin: 12px 0 0 5px;
-    display: inline-block !important;
-    font-size: 30px;
+	margin: 12px 0 0 5px;
+	display: inline-block !important;
+	font-size: 30px;
 }
 #my_office_caller_id_popup .emergency-form-label {
-    display: inline-block;
-    width: 120px;
+	display: inline-block;
+	width: 120px;
 }
 #my_office_caller_id_popup .caller-id-name {
-    margin-top: 5px;
+	margin-top: 5px;
+}
+
+#myoffice_container .warning-pulse-box {
+	-webkit-animation: "warning-pulse-box" 1s ease-in-out 0 infinite alternate;
+
+	animation-name: warning-pulse-box;
+	animation-duration: 1s;
+	animation-timing-function: ease-in-out;
+	animation-delay: 0;
+	animation-iteration-count: infinite;
+	animation-direction: alternate;
+}
+
+@-webkit-keyframes warning-pulse-box {
+	0% { box-shadow: 0px 0px 5px #fbb450 inset, 0px 0px 5px #f89406; }
+	100% { box-shadow: 0px 0px 30px #fbb450 inset, 0px 0px 10px #f89406; }
+}
+
+@keyframes warning-pulse-box {
+	0% { box-shadow: 0px 0px 5px #fbb450 inset, 0px 0px 5px #f89406; }
+	100% { box-shadow: 0px 0px 30px #fbb450 inset, 0px 0px 10px #f89406; }
 }

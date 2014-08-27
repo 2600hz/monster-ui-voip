@@ -704,7 +704,8 @@
 			"spare": "Spare Numbers",
 			"local": "Local Numbers",
 			"tollfree": "Toll-free Numbers",
-			"international": "International Numbers"
+			"international": "International Numbers",
+			"noNumber": "No number available"
 		}
 	}
 }

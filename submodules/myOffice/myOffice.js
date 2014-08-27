@@ -117,21 +117,25 @@ define(function(require){
 						percentageInnerCutout: 60
 					},
 					devicesChart = new Chart(template.find('#dashboard_devices_chart').get(0).getContext("2d")).Doughnut(
+						myOfficeData.devicesData.totalCount > 0 ?
 						$.map(myOfficeData.devicesData, function(val) {
-							return {
+							return typeof val === 'object' ? {
 								value: val.count,
 								color: val.color
-							};
-						}).sort(function(a, b) { return b.value - a.value ; }),
+							} : null;
+						}).sort(function(a, b) { return b.value - a.value ; }) :
+						[{ value:1, color:"#DDD" }],
 						chartOptions
 					),
 					assignedNumbersChart = new Chart(template.find('#dashboard_assigned_numbers_chart').get(0).getContext("2d")).Doughnut(
+						myOfficeData.assignedNumbersData.totalCount > 0 ?
 						$.map(myOfficeData.assignedNumbersData, function(val) {
-							return {
+							return typeof val === 'object' ? {
 								value: val.count,
 								color: val.color
-							};
-						}).sort(function(a, b) { return b.value - a.value ; }),
+							} : null;
+						}).sort(function(a, b) { return b.value - a.value ; }) :
+						[{ value:1, color:"#DDD" }],
 						chartOptions
 					),
 					numberTypesChart = new Chart(template.find('#dashboard_number_types_chart').get(0).getContext("2d")).Doughnut(
@@ -141,12 +145,14 @@ define(function(require){
 						// 		color: val.color
 						// 	};
 						// }).sort(function(a, b) { return b.value - a.value ; }),
+						myOfficeData.classifiedNumbers.length > 0 ?
 						$.map(myOfficeData.classifiedNumbers, function(val, index) {
-							return {
+							return typeof val === 'object' ? {
 								value: val.count,
 								color: val.color
-							};
-						}),
+							} : null;
+						}) :
+						[{ value:1, color:"#DDD" }],
 						chartOptions
 					);
 
@@ -312,7 +318,8 @@ define(function(require){
 						label: self.i18n.active().devices.types.ata,
 						count: 0,
 						color: self.chartColors[7]
-					}
+					},
+					totalCount: 0
 				},
 				assignedNumbers = {
 					"spare": {
@@ -324,7 +331,8 @@ define(function(require){
 						label: self.i18n.active().myOffice.numberChartLegend.assigned,
 						count: 0,
 						color: self.chartColors[3]
-					}
+					},
+					totalCount: 0
 				},
 				// numberTypes = {
 				// 	"local": {
@@ -390,6 +398,7 @@ define(function(require){
 			_.each(data.devices, function(val) {
 				if(val.device_type in devices) {
 					devices[val.device_type].count++;
+					devices.totalCount++;
 				} else {
 					console.log('Unknown device type: '+val.device_type);
 				}
@@ -401,6 +410,7 @@ define(function(require){
 				} else {
 					assignedNumbers["spare"].count++;
 				}
+				assignedNumbers.totalCount++;
 
 				//TODO: Find out the number type and increment the right category
 				// numberTypes["local"].count++;
@@ -445,16 +455,17 @@ define(function(require){
 				}
 			})
 
-			if(!data.mainNumbers || data.mainNumbers.length === 0) {
-				data.topMessage = {
-					class: 'btn-warning',
-					message: self.i18n.active().myOffice.missingMainNumberMessage
-				}
-			} else if(!('caller_id' in data.account)
-				   || !('emergency' in data.account.caller_id)
-				   || !('number' in data.account.caller_id.emergency)
-				   || !(data.account.caller_id.emergency.number in data.numbers)
-				   || data.numbers[data.account.caller_id.emergency.number].features.indexOf('dash_e911') < 0) {
+			if(
+				data.mainNumbers
+			 && data.mainNumbers.length > 0
+			 && (
+			 	   !('caller_id' in data.account)
+				|| !('emergency' in data.account.caller_id)
+				|| !('number' in data.account.caller_id.emergency)
+				|| !(data.account.caller_id.emergency.number in data.numbers)
+				|| data.numbers[data.account.caller_id.emergency.number].features.indexOf('dash_e911') < 0
+				)
+			) {
 				data.topMessage = {
 					class: 'btn-danger',
 					message: self.i18n.active().myOffice.missingE911Message

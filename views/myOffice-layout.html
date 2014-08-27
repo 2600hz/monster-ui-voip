@@ -48,17 +48,19 @@
 						<div class="devices-chart-legend">
 							<ul>
 								{{#each devicesList}}
+								{{#if label}}
 								<li class="legend-element{{#unless count}} no-device{{/unless}}">
 									<i class="icon-circle legend-color" style="color: {{color}};"></i>
 									<span class="legend-label">{{label}}</span>
 									<span class="legend-number">{{count}}</span>
 								</li>
+								{{/if}}
 								{{/each}}
 							</ul>
 						</div>
 					</div>
 					<div class="unregistered-devices clearfix">
-						<div class="value">{{unregisteredDevices}}</div>
+						<div class="value{{#unless unregisteredDevices}} none{{/unless}}">{{unregisteredDevices}}</div>
 						<div class="title">{{i18n.myOffice.unregisteredDevices}}</div>
 					</div>
 				</div>
@@ -73,6 +75,7 @@
 
 		<div class="dashboard-content-div dashboard-right-content">
 			<div class="dashboard-box">
+				{{#if mainNumbers.length}}
 				<div class="dashboard-box-row main-number-row link-box" data-category="strategy" data-subcategory="main-number">
 					<div class="row-title">
 						<div>{{i18n.myOffice.mainNumberLabel}}</div>
@@ -94,6 +97,11 @@
 						</ul>
 					</div>
 				</div>
+				{{else}}
+				<div class="dashboard-warning-row main-number-row link-box" data-category="strategy" data-subcategory="main-number">
+					<i class="icon-warning-sign"></i>{{../i18n.myOffice.missingMainNumberMessage}}
+				</div>	
+				{{/if}}
 				<div class="dashboard-box-row conf-number-row link-box" data-category="strategy" data-subcategory="strategy-confnum">
 					<div class="row-title">
 						<div>{{i18n.myOffice.confNumberLabel}}</div>
@@ -161,6 +169,8 @@
 									<span class="legend-label">{{label}}</span>
 									<span class="legend-number">{{count}}</span>
 								</li>
+								{{else}}
+								<li class="no-number">{{../i18n.myOffice.numberChartLegend.noNumber}}</li>
 								{{/each}}
 							</ul>
 						</div>
