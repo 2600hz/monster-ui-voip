@@ -73,6 +73,7 @@
 
 		<div class="dashboard-content-div dashboard-right-content">
 			<div class="dashboard-box">
+				{{#if mainNumbers.length}}
 				<div class="dashboard-box-row main-number-row link-box" data-category="strategy" data-subcategory="main-number">
 					<div class="row-title">
 						<div>{{i18n.myOffice.mainNumberLabel}}</div>
@@ -94,6 +95,11 @@
 						</ul>
 					</div>
 				</div>
+				{{else}}
+				<div class="dashboard-warning-row main-number-row link-box" data-category="strategy" data-subcategory="main-number">
+					<i class="icon-warning-sign"></i>{{../i18n.myOffice.missingMainNumberMessage}}
+				</div>	
+				{{/if}}
 				<div class="dashboard-box-row conf-number-row link-box" data-category="strategy" data-subcategory="strategy-confnum">
 					<div class="row-title">
 						<div>{{i18n.myOffice.confNumberLabel}}</div>
@@ -161,6 +167,8 @@
 									<span class="legend-label">{{label}}</span>
 									<span class="legend-number">{{count}}</span>
 								</li>
+								{{else}}
+								<li class="no-number">{{../i18n.myOffice.numberChartLegend.noNumber}}</li>
 								{{/each}}
 							</ul>
 						</div>

@@ -100,7 +100,7 @@
 			"advancedTitle": "Avancés",
 			"basicTitle": "Réglages",
 			"basicSectionTitle": "Réglages basiques",
-			"dragAndDrop": "Pour sélectionner un codec, glisser-déposer depuis la boite des codecs disponilbes jusqu'à celle des codecs sélectionnés",
+			"dragAndDrop": "Pour sélectionner un codec, glisser-déposer depuis la boite des codecs disponibles jusqu'à celle des codecs sélectionnés",
 			"options": {
 				"menuTitle": "Réglages"
 			},
@@ -683,7 +683,8 @@
 			"spare": "Numéros assignés",
 			"local": "Numéros locaux",
 			"tollfree": "Numéros verts",
-			"international": "Numéros internationaux"
+			"international": "Numéros internationaux",
+			"noNumber": "Aucun numéro disponible"
 		}
 	}
 }
