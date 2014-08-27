@@ -1260,15 +1260,19 @@ define(function(require){
 						results.user = currentUser;
 
 						if ( typeof results.callflows !== 'undefined' ) {
+							// Compatibility with old version
+							var faxboxId = results.callflows.flow.data.hasOwnProperty('faxbox_id') ? results.callflows.flow.data.faxbox_id : results.callflows.flow.data.id;
+
 							self.callApi({
 								resource: 'faxbox.get',
 								data: {
 									accountId: self.accountId,
-									faxboxId: results.callflows.flow.data.faxbox_id
+									faxboxId: faxboxId
 								},
 								success: function(_data) {
 									results.faxbox = _data.data;
-									results.faxbox.id = results.callflows.flow.data.faxbox_id;
+
+									results.faxbox.id = faxboxId;
 
 									self.usersRenderFaxboxes(results);
 								},
@@ -1585,10 +1589,6 @@ define(function(require){
 				}
 			});
 		},
-
-
-
-
 
 		usersRenderHotdesk: function(currentUser) {
 			var self = this,
@@ -3784,7 +3784,7 @@ define(function(require){
 						module: 'faxbox',
 						children: {},
 						data: {
-							faxbox_id: faxbox ? faxbox.id : ''
+							id: data.hasOwnProperty('faxbox') ? faxbox.id : ''
 						}
 					}
 				},
@@ -3842,7 +3842,7 @@ define(function(require){
 						data: faxbox
 					},
 					success: function(_data, status) {
-						callflow.flow.data.faxbox_id = _data.data.id;
+						callflow.flow.data.id = _data.data.id;
 
 						self.usersCreateCallflow(callflow, function(callflow) {
 							callback && callback(callflow);
@@ -3916,7 +3916,7 @@ define(function(require){
 													resource: 'faxbox.delete',
 													data: {
 														accountId: self.accountId,
-														faxboxId: data.data.flow.data.faxbox_id,
+														faxboxId: data.data.flow.data.faxbox_id || data.data.flow.data.id,
 														generateError: false
 													},
 													success: function(_data, status) {
