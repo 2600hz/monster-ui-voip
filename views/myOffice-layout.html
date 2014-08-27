@@ -48,17 +48,19 @@
 						<div class="devices-chart-legend">
 							<ul>
 								{{#each devicesList}}
+								{{#if label}}
 								<li class="legend-element{{#unless count}} no-device{{/unless}}">
 									<i class="icon-circle legend-color" style="color: {{color}};"></i>
 									<span class="legend-label">{{label}}</span>
 									<span class="legend-number">{{count}}</span>
 								</li>
+								{{/if}}
 								{{/each}}
 							</ul>
 						</div>
 					</div>
 					<div class="unregistered-devices clearfix">
-						<div class="value">{{unregisteredDevices}}</div>
+						<div class="value{{#unless unregisteredDevices}} none{{/unless}}">{{unregisteredDevices}}</div>
 						<div class="title">{{i18n.myOffice.unregisteredDevices}}</div>
 					</div>
 				</div>

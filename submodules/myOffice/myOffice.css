@@ -136,14 +136,17 @@
 	font-size: 14px;
 }
 #myoffice_container .devices-section-content .unregistered-devices .value {
-    float: right;
-    color: red;
-    font-weight: bold;
+	float: right;
+	color: red;
+	font-weight: bold;
+}
+#myoffice_container .devices-section-content .unregistered-devices .value.none {
+	color: #22ccff;
 }
 #myoffice_container .devices-section-content .unregistered-devices {
-    margin-top: 25px;
-    padding: 0px 10px;
-    font-size: 16px;
+	margin-top: 25px;
+	padding: 0px 10px;
+	font-size: 16px;
 }
 /*****************/
 
@@ -190,7 +193,7 @@
 	color: #555;
 }
 #myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-row.fax-number-row {
-    display: none; /*Hiding Fax temporarily*/
+	display: none; /*Hiding Fax temporarily*/
 }
 #myoffice_container .dashboard-right-content .dashboard-box > * {
 	border-bottom: solid 1px #c0c0c0;
@@ -229,10 +232,10 @@
 	margin: 0;
 }
 #myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-row .row-content .number-list li {
-    line-height: 25px;
+	line-height: 25px;
 }
 #myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-row .row-content .number-list li.caller-id {
-    color: #22ccff;
+	color: #22ccff;
 }
 #myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-row .row-content .number-list .features > i {
 	display: none;
@@ -380,44 +383,44 @@
 
 /********** Caller ID Popup **********/
 #my_office_caller_id_popup .emergency-form {
-    margin-top: 15px;
+	margin-top: 15px;
 }
 #my_office_caller_id_popup .emergency-form form {
-    margin: 0px;
+	margin: 0px;
 }
 #my_office_caller_id_popup .emergency-form label {
-    margin: 0;
+	margin: 0;
 }
 #my_office_caller_id_popup .emergency-form label.monster-invalid {
-    margin: 12px 0 0 5px;
-    display: inline-block !important;
-    font-size: 30px;
+	margin: 12px 0 0 5px;
+	display: inline-block !important;
+	font-size: 30px;
 }
 #my_office_caller_id_popup .emergency-form-label {
-    display: inline-block;
-    width: 120px;
+	display: inline-block;
+	width: 120px;
 }
 #my_office_caller_id_popup .caller-id-name {
-    margin-top: 5px;
+	margin-top: 5px;
 }
 
 #myoffice_container .warning-pulse-box {
-    -webkit-animation: "warning-pulse-box" 1s ease-in-out 0 infinite alternate;
+	-webkit-animation: "warning-pulse-box" 1s ease-in-out 0 infinite alternate;
 
-    animation-name: warning-pulse-box;
-    animation-duration: 1s;
-    animation-timing-function: ease-in-out;
-    animation-delay: 0;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
+	animation-name: warning-pulse-box;
+	animation-duration: 1s;
+	animation-timing-function: ease-in-out;
+	animation-delay: 0;
+	animation-iteration-count: infinite;
+	animation-direction: alternate;
 }
 
 @-webkit-keyframes warning-pulse-box {
-    0% { box-shadow: 0px 0px 5px #fbb450 inset, 0px 0px 5px #f89406; }
-    100% { box-shadow: 0px 0px 30px #fbb450 inset, 0px 0px 10px #f89406; }
+	0% { box-shadow: 0px 0px 5px #fbb450 inset, 0px 0px 5px #f89406; }
+	100% { box-shadow: 0px 0px 30px #fbb450 inset, 0px 0px 10px #f89406; }
 }
 
 @keyframes warning-pulse-box {
-    0% { box-shadow: 0px 0px 5px #fbb450 inset, 0px 0px 5px #f89406; }
-    100% { box-shadow: 0px 0px 30px #fbb450 inset, 0px 0px 10px #f89406; }
+	0% { box-shadow: 0px 0px 5px #fbb450 inset, 0px 0px 5px #f89406; }
+	100% { box-shadow: 0px 0px 30px #fbb450 inset, 0px 0px 10px #f89406; }
 }
