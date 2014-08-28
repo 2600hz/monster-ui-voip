@@ -78,6 +78,7 @@ define(function(require){
 			"#698BF7", // Purple ~ Dark Blue
 			"#009AD6", // Blue
 			"#6CC5E9", // Light Blue
+			"#719B11", // Dark Green
 			"#BDE55F", // Light Green
 			"#F1E87C", // Pale Yellow
 			"#EF8F25", // Orange
@@ -282,7 +283,7 @@ define(function(require){
 					"sip_device": {
 						label: self.i18n.active().devices.types.sip_device,
 						count: 0,
-						color: self.chartColors[4]
+						color: self.chartColors[5]
 					},
 					"cellphone": {
 						label: self.i18n.active().devices.types.cellphone,
@@ -307,17 +308,22 @@ define(function(require){
 					"landline": {
 						label: self.i18n.active().devices.types.landline,
 						count: 0,
-						color: self.chartColors[5]
+						color: self.chartColors[6]
 					},
 					"fax": {
 						label: self.i18n.active().devices.types.fax,
 						count: 0,
-						color: self.chartColors[6]
+						color: self.chartColors[7]
 					},
 					"ata": {
 						label: self.i18n.active().devices.types.ata,
 						count: 0,
-						color: self.chartColors[7]
+						color: self.chartColors[8]
+					},
+					"sip_uri": {
+						label: self.i18n.active().devices.types.sip_uri,
+						count: 0,
+						color: self.chartColors[4]
 					},
 					totalCount: 0
 				},
@@ -325,7 +331,7 @@ define(function(require){
 					"spare": {
 						label: self.i18n.active().myOffice.numberChartLegend.spare,
 						count: 0,
-						color: self.chartColors[7]
+						color: self.chartColors[8]
 					},
 					"assigned": {
 						label: self.i18n.active().myOffice.numberChartLegend.assigned,

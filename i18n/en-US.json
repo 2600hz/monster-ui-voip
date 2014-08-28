@@ -197,6 +197,15 @@
 			"new": "New SIP Device",
 			"deviceName": "Device Name"
 		},
+		"sip_uri": {
+			"addTitle": "Adding a SIP URI",
+			"deviceName": "Name",
+			"editTitle": "Editing SIP URI: {{name}}",
+			"new": "New SIP URI",
+			"uri": "SIP URI",
+			"uriPlaceholder": "sip:device@my.company.com",
+			"hideContactList": "Hide from Contact List"
+		},
 		"landline": {
 			"addTitle": "Adding a Landline",
 			"deviceName": "Device Name",
@@ -282,7 +291,8 @@
 			"softphone": "Soft Phone",
 			"landline": "Landline",
 			"fax": "Fax",
-			"ata": "ATA"
+			"ata": "ATA",
+			"sip_uri": "SIP URI"
 		},
 		"unassignedDevice": "-"
 	},

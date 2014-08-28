@@ -374,7 +374,7 @@ define(function(require){
 
 		devicesMergeData: function(originalData, template) {
 			var self = this,
-				hasCodecs = $.inArray(originalData.device_type, ['sip_device', 'landline', 'fax', 'ata', 'softphone', 'smartphone', 'mobile']) > -1,
+				hasCodecs = $.inArray(originalData.device_type, ['sip_device', 'landline', 'fax', 'ata', 'softphone', 'smartphone', 'mobile', 'sip_uri']) > -1,
 				hasSIP = $.inArray(originalData.device_type, ['fax', 'ata', 'softphone', 'smartphone', 'mobile']) > -1,
 				hasCallForward = $.inArray(originalData.device_type, ['landline', 'cellphone', 'smartphone']) > -1,
 				hasRTP = $.inArray(originalData.device_type, ['sip_device', 'mobile', 'softphone']) > -1,
@@ -578,6 +578,15 @@ define(function(require){
 							realm: monster.apps['auth'].currentAccount.realm,
 							username: 'user_' + monster.util.randomString(10)
 						}
+					},
+					sip_uri: {
+						sip: {
+							password: monster.util.randomString(12),
+							username: 'user_' + monster.util.randomString(10),
+							expire_seconds: 360,
+							invite_format: 'route',
+							method: 'password'
+						}
 					}
 				};
 
@@ -664,6 +673,7 @@ define(function(require){
 					mobile: 'icon-telicon-sprint-phone',
 					softphone: 'icon-telicon-soft-phone',
 					sip_device: 'icon-telicon-voip-phone',
+					sip_uri: 'icon-telicon-voip-phone',
 					fax: 'icon-telicon-fax',
 					ata: 'icon-telicon-fax'
 				};
