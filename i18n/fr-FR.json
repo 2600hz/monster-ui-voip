@@ -461,6 +461,7 @@
 	},
 
 	"strategy": {
+		"noNumberHelp": "Note: Veuillez ajouter un numéro principal avant de passer à la suite. Une fois ce numéro rajouté, vous aurez la possibilité de configurer vos  Horaires d'Ouvertures, vos Vacances ainsi que la Gestion des Appels Entrants pour votre bureau.",
 		"sectionTitles": {
 			"numbers": "Numéro principal de l'entreprise",
 			"confnum": "Numéro principal de conférence",

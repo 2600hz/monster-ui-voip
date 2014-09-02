@@ -482,6 +482,7 @@
 	},
 
 	"strategy": {
+		"noNumberHelp": "Note: Please add a Main Office Number to your account first. Once you add a main number, you will be able to set up Office Hours, Holidays and Incoming Call Handling (Call-Flow) for your office.",
 		"sectionTitles": {
 			"numbers": "Main Company Numbers",
 			"confnum": "Main Conference Number",
