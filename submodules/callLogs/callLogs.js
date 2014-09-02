@@ -116,9 +116,11 @@ define(function(require){
 						matchedResults = true;
 					} else {
 						_.each(cdrs, function(cdr) {
-							var searchString = (cdr.date + "|" + cdr.fromName + "|"
+							var callIds = (cdr.callId || cdr.id) + (cdr.bLegs.length>0 ? "|" + $.map(cdr.bLegs, function(val) { return val.callId || val.id }).join("|") : ""),
+								searchString = (cdr.date + "|" + cdr.fromName + "|"
 											 + cdr.fromNumber + "|" + cdr.toName + "|"
-											 + cdr.toNumber + "|" + cdr.hangupCause).toLowerCase(),
+											 + cdr.toNumber + "|" + cdr.hangupCause + "|"
+											 + callIds).toLowerCase(),
 								rowGroup = template.find('.grid-row.a-leg[data-id="'+cdr.id+'"]').parents('.grid-row-group');
 							if(searchString.indexOf(searchValue) >= 0) {
 								matchedResults = true;
