@@ -148,11 +148,11 @@ define(function(require){
 				url: 'accounts/{accountId}/media/{mediaId}',
 				verb: 'DELETE'
 			},
-            'voip.users.uploadMedia': {
-                url: 'accounts/{accountId}/media/{mediaId}/raw',
-                verb: 'POST',
-                type: 'application/x-base64'
-            },
+			'voip.users.uploadMedia': {
+				url: 'accounts/{accountId}/media/{mediaId}/raw',
+				verb: 'POST',
+				type: 'application/x-base64'
+			},
 			/* Misc */
 			'voip.users.getNumbers': {
 				url: 'accounts/{accountId}/phone_numbers',
@@ -197,7 +197,7 @@ define(function(require){
 
 			self.usersGetData(function(data) {
 				var dataTemplate = self.usersFormatListData(data),
-				    template = $(monster.template(self, 'users-layout', dataTemplate)),
+					template = $(monster.template(self, 'users-layout', dataTemplate)),
 					templateUser;
 
 				_.each(dataTemplate.users, function(user) {
@@ -735,7 +735,7 @@ define(function(require){
 
 			template.on('click', '.cancel-extension-link', function() {
 				var extension = $(this).siblings('input').val(),
-				    index = existingExtensions.indexOf(extension);
+					index = existingExtensions.indexOf(extension);
 
 				if(index > -1) {
 					existingExtensions.splice(index, 1);
@@ -894,7 +894,7 @@ define(function(require){
 
 				passwordTemplate.find('.save-new-username').on('click', function() {
 					var formData = form2object('form_new_username'),
-					    userToSave = $.extend(true, {}, currentUser, formData);
+						userToSave = $.extend(true, {}, currentUser, formData);
 
 					if(monster.ui.valid(form)) {
 						if(!currentUser.extra.differentEmail) {
@@ -966,7 +966,7 @@ define(function(require){
 							.text(self.i18n.active().remove);
 					}
 				});
-            });
+			});
 
 			template.on('click', '.save-devices', function() {
 				var dataDevices = {
@@ -1324,14 +1324,14 @@ define(function(require){
 			});
 
 			template.on('click', '.actions .buy-link', function(e) {
-                e.preventDefault();
-                monster.pub('common.buyNumbers', {
-                    searchType: $(this).data('type'),
-                    callbacks: {
-                        success: function(numbers) {
-                        	var countNew = 0;
+				e.preventDefault();
+				monster.pub('common.buyNumbers', {
+					searchType: $(this).data('type'),
+					callbacks: {
+						success: function(numbers) {
+							var countNew = 0;
 
-                        	monster.pub('common.numbers.getListFeatures', function(features) {
+							monster.pub('common.numbers.getListFeatures', function(features) {
 								_.each(numbers, function(number, k) {
 									countNew++;
 
@@ -1353,12 +1353,12 @@ define(function(require){
 
 								template.find('.spare-link.disabled').removeClass('disabled');
 							});
-                        },
-                        error: function(error) {
-                        }
-                    }
-                });
-            });
+						},
+						error: function(error) {
+						}
+					}
+				});
+			});
 
 			$('body').on('click', '#users_container_overlay', function() {
 				template.find('.edit-user').slideUp("400", function() {
@@ -1384,40 +1384,49 @@ define(function(require){
 		},
 
 		/* Helper function that takes an array of number in parameter, sorts it, and returns the first number not in the array, greater than the minVal */
-		usersGetNextInt: function(arr) {
-			var orderedArr = arr,
-				prevVal = 0,
-				minVal = 2000,
+		usersGetNextInt: function(listNumbers) {
+			var orderedArray = listNumbers,
+				previousIterationNumber,
+				minNumber = 2000,
 				increment = 1;
 
-			orderedArr.sort(function(a,b) {
+			orderedArray.sort(function(a,b) {
 				var parsedA = parseInt(a),
 					parsedB = parseInt(b);
 
-				return parsedA > parsedB ? 1 : -1;
+				if(isNaN(parsedA)) {
+					return -1;
+				}
+				else if(isNaN(parsedB)) {
+					return 1;
+				}
+				else {
+					return parsedA > parsedB ? 1 : -1;
+				}
 			});
 
-			_.each(orderedArr, function(val) {
-				var curr = parseInt(val);
+			_.each(orderedArray, function(number) {
+				var currentNumber = parseInt(number);
 
-				/* If we already stored a previous value */
-				if(prevVal) {
-					if(curr - prevVal !== increment) {
-						return prevVal + increment;
+				// First we make sure it's a valid number, if not we move on to the next number
+				if(!isNaN(currentNumber)) {
+					// If we went through this loop already, previousIterationNumber will be set to the number of the previous iteration
+					if(previousIterationNumber) {
+						if(currentNumber - previousIterationNumber !== increment) {
+							return previousIterationNumber + increment;
+						}
 					}
-				}
-				/* Otherwise, if we didn't, and the current value is greater than the minVal, we return the minVal */
-				else if(curr > minVal) {
-					return minVal;
-				}
+					// else, it's the first iteration, we initialize the minValue to the first number in the ordered array
+					else {
+						minNumber = currentNumber;
+					}
 
-				/* We don't want to return value lower than our min val, so we only store prevVal that are greater than the minVal */
-				if(curr >= minVal) {
-					prevVal = curr;
+					// We store current as the previous number for the next iteration
+					previousIterationNumber = currentNumber;
 				}
 			});
 
-			return (prevVal) ? prevVal + increment : minVal;
+			return (previousIterationNumber) ? previousIterationNumber + increment : minNumber;
 		},
 
 		usersFormatAddUser: function(data) {
@@ -1671,15 +1680,15 @@ define(function(require){
 
 			featureTemplate.find('.save').on('click', function() {
 				var formData = form2object('vm_to_email_form'),
-				    userToSave = $.extend(true, {}, currentUser),
-				    enabled = switchFeature.bootstrapSwitch('status'),
-				    args = {
+					userToSave = $.extend(true, {}, currentUser),
+					enabled = switchFeature.bootstrapSwitch('status'),
+					args = {
 						callback: function() {
 							popup.dialog('close').remove();
 						},
-				    	openedTab: 'features'
-				    },
-				    updateUser = function(user) {
+						openedTab: 'features'
+					},
+					updateUser = function(user) {
 						self.usersUpdateUser(user, function(data) {
 							args.userId = data.data.id;
 
@@ -2091,11 +2100,11 @@ define(function(require){
 					for(var i=1; i<=scaleSections; i++) {
 						var toAppend = '<div class="scale-element" style="width:'+(100/scaleSections)+'%;">'
 									 + (isHeader 
-								 		? (i==scaleSections 
-								 			? '<input type="text" value="'+scaleMaxSeconds+'" data-current="'+scaleMaxSeconds+'" class="scale-max-input" maxlength="3"><span class="scale-max">'
-								 			:'<span>')
-								 			+ Math.floor(i*scaleMaxSeconds/scaleSections) + ' Sec</span>' 
-							 			: '')
+										? (i==scaleSections 
+											? '<input type="text" value="'+scaleMaxSeconds+'" data-current="'+scaleMaxSeconds+'" class="scale-max-input" maxlength="3"><span class="scale-max">'
+											:'<span>')
+											+ Math.floor(i*scaleMaxSeconds/scaleSections) + ' Sec</span>' 
+										: '')
 									 + '</div>';
 						scaleContainer.append(toAppend);
 					}
@@ -2326,7 +2335,7 @@ define(function(require){
 
 				featureTemplate.find('.save').on('click', function() {
 					var selectedMedia = featureTemplate.find('.media-dropdown option:selected').val(),
-					    enabled = switchFeature.bootstrapSwitch('status');
+						enabled = switchFeature.bootstrapSwitch('status');
 
 					if(!('music_on_hold' in currentUser)) {
 						currentUser.music_on_hold = {};
@@ -2361,8 +2370,8 @@ define(function(require){
 			var userData = $.extend(true, {}, userData),
 				fullName = userData.first_name + ' ' + userData.last_name,
 				defaultCallerIdName = fullName.substring(0, 15),
-			    defaults = {
-			    	caller_id: {
+				defaults = {
+					caller_id: {
 						internal: {
 							name: defaultCallerIdName
 						},
