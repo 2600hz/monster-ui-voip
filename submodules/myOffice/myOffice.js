@@ -526,12 +526,16 @@ define(function(require){
 				});
 			});
 
-			template.find('.header-link.caller-id').on('click', function(e) {
+			template.find('.header-link.caller-id:not(.disabled)').on('click', function(e) {
 				e.preventDefault();
 				self.myOfficeRenderCallerIdPopup({
 					parent: parent,
 					myOfficeData: myOfficeData
 				});
+			});
+
+			template.find('.header-link.caller-id.disabled').on('click', function(e) {
+				monster.ui.alert(self.i18n.active().myOffice.missingMainNumberForCallerId);
 			});
 
 			template.find('[data-toggle="tooltip"]').tooltip();

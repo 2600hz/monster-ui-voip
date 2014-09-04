@@ -491,7 +491,7 @@
 			"calls": "Incoming Call Handling"
 		},
 		"noNumberTitle": "Add Main Number",
-		"noNumberMessage": "Please add a main number to continue.",
+		"noNumberMessage": "Please add or buy a number from the links below to continue.",
 		"noConfNumMessage": "Please add a main conference number.",
 		"numberLinks": {
 			"spare": "Add from Spare Numbers",
@@ -697,6 +697,7 @@
 			"emergencyHelp2": "Note: You can set this feature on users' numbers too if they do not share the same location as above.",
 			"mandatoryE911Alert": "You must specify e911 information for your company caller ID number."
 		},
+		"missingMainNumberForCallerId": "You need to add a main number to your office before configuring the Caller-ID!",
 		"missingE911Message": "Please setup your Company Caller ID and e911 on a Main Number.",
 		"missingMainNumberMessage": "Please add a Main Number to your account.",
 		"totalUsers": "Total Users",
