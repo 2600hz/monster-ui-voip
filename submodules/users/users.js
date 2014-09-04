@@ -2415,6 +2415,12 @@ define(function(require){
 				}
 			}
 
+			if(userData.hasOwnProperty('call_forward')) {
+				if(userData.call_forward.number === '') {
+					delete userData.call_forward.number;
+				}
+			}
+
 			delete userData.include_directory;
 			delete userData.features;
 			delete userData.extra;
