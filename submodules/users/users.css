@@ -149,9 +149,13 @@
 	text-align: right;
 }
 
-#users_container .users-grid .grid-row .grid-cell.devices i,
-#users_container .users-grid .grid-row .grid-cell.features i {
+#users_container .users-grid .grid-row .grid-cell.devices i {
 	margin: 0 5px;
+}
+
+#users_container .users-grid .grid-row .grid-cell.features i {
+	margin: 5px 0 0;
+	padding: 0 5px 5px;
 }
 
 #users_container .users-grid .grid-row .grid-cell.features .navbar {
