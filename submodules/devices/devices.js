@@ -282,9 +282,11 @@ define(function(require){
 
 			monster.ui.tabs(templateDevice);
 			monster.ui.prettyCheck.create(templateDevice);
+			monster.ui.protectField(templateDevice.find('#sip_password'), templateDevice);
 			templateDevice.find('[data-toggle="tooltip"]').tooltip();
 			templateDevice.find('.switch').bootstrapSwitch();
 			templateDevice.find('#mac_address').mask("hh:hh:hh:hh:hh:hh", {placeholder:" "});
+
 
 			if(!(data.media.encryption.enforce_security)) {
 				templateDevice.find('#rtp_method').hide();
