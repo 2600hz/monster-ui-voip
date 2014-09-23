@@ -498,6 +498,11 @@ define(function(require){
 
 				self.groupsBindMembers(template, results);
 
+				template.find('.grid-time').sortable({
+					items: '.group-row:not(.title)',
+					placeholder: 'group-row-placeholder'
+				});
+
 				template.find('[data-toggle="tooltip"]').tooltip();
 
 				callback && callback(template, results);
