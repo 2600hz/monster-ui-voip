@@ -282,10 +282,6 @@
 	box-sizing: border-box;
 }
 
-#groups_container .detail-group .grid-time .group-row:not(.title) {
-	cursor: move;
-}
-
 #groups_container .detail-group .grid-time .group-row.title {
 	margin-top: 1px;
 	background-color: transparent;
