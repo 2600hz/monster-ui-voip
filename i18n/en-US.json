@@ -213,7 +213,7 @@
 			"new": "New Landline",
 			"number": "Number",
 			"numberPlaceholder": "+14152231121",
-			"requireKeypress": "Allow use of landline voicemail",
+			"requireKeypress": "Require Key Press",
 			"keepCallerId": "Keep Original Caller-ID",
 			"hideContactList": "Hide from Contact List"
 		},
