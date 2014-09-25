@@ -989,7 +989,25 @@ define(function(require){
 				});
 			});
 
+
+			template.on('click', '.detail-devices .edit-device-link', function() {
+				var row = $(this).parents('.item-row'),
+					id = row.data('id')
+
+				monster.pub('voip.devices.editDevice', { 
+						data: { id: id }, 
+						callbackSave: function(device) {
+							row.find('.edit-device').html(device.name);
+						},
+						callbackDelete: function(device) {
+							row.remove();
+						}
+					}
+				);
+			});
+
 			template.on('click', '.detail-devices .list-unassigned-items .add-device', function() {
+
 				var row = $(this).parents('.item-row'),
 					spare = template.find('.count-spare'),
 					countSpare = spare.data('count') - 1,

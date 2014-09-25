@@ -56,7 +56,8 @@ define(function(require){
 
 		subscribe: {
 			'voip.devices.render': 'devicesRender',
-			'voip.devices.renderAdd': 'devicesRenderAdd'
+			'voip.devices.renderAdd': 'devicesRenderAdd',
+			'voip.devices.editDevice': 'devicesRenderEdit'
 		},
 
 		/* Users */
@@ -167,12 +168,10 @@ define(function(require){
 						id: $this.parents('.grid-row').data('id')
 					};
 
-				//self.devicesGetDevice(deviceId, function(dataDevice) {
-				self.devicesGetEditData(dataDevice, function(dataDevice) {
-					self.devicesRenderDevice(dataDevice, function(device) {
-						self.devicesRender({ deviceId: device.id });
-					});
-				});
+
+				self.devicesRenderEdit({ data: dataDevice, callbackSave: function(dataDevice) {
+					self.devicesRender({ deviceId: dataDevice.id });
+				}});
 			});
 
 			template.find('.create-device').on('click', function() {
@@ -184,6 +183,19 @@ define(function(require){
 						self.devicesRender({ deviceId: device.id });
 					}
 				});
+			});
+		},
+
+		devicesRenderEdit: function(args) {
+			var self = this,
+				data = args.data,
+				callbackSave = args.callbackSave,
+				callbackDelete = args.callbackDelete || function(device) {
+					self.devicesRender();
+				};
+
+			self.devicesGetEditData(data, function(dataDevice) {
+				self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
 			});
 		},
 
@@ -210,20 +222,20 @@ define(function(require){
 						});
 					},
 					callbackMissingBrand: function() {
-						self.devicesGetEditData(data, function(dataDevice) {
-							self.devicesRenderDevice(dataDevice, callback);
-						});
+						self.devicesRenderEdit({ data: data, callbackSave: function(dataDevice) {
+							callback && callback(dataDevice);
+						}});
 					}
 				});
 			}
 			else {
-				self.devicesGetEditData(data, function(dataDevice) {
-					self.devicesRenderDevice(dataDevice, callback);
-				});
+				self.devicesRenderEdit({ data: data, callbackSave: function(dataDevice) {
+					callback && callback(dataDevice);
+				}});
 			}
 		},
 
-		devicesRenderDevice: function(data, callback) {
+		devicesRenderDevice: function(data, callbackSave, callbackDelete) {
 			var self = this
 				mode = data.id ? 'edit' : 'add',
 				type = data.device_type,
@@ -303,7 +315,7 @@ define(function(require){
 					self.devicesSaveDevice(dataToSave, function(data) {
 						popup.dialog('close').remove();
 
-						callback && callback(data);
+						callbackSave && callbackSave(data);
 					});
 				} else {
 					templateDevice.find('.tabs-selector[data-section="basic"]').click();
@@ -315,10 +327,11 @@ define(function(require){
 
 				monster.ui.confirm(self.i18n.active().devices.confirmDeleteDevice, function() {
 					self.devicesDeleteDevice(deviceId, function(device) {
-						self.devicesRender();
 						popup.dialog('close').remove();
 
 						toastr.success(monster.template(self, '!' + self.i18n.active().devices.deletedDevice, { deviceName: device.name }));
+
+						callbackDelete && callbackDelete(device);
 					});
 				});
 			});
@@ -809,7 +822,7 @@ define(function(require){
 
 		devicesGetEditData: function(dataDevice, callback) {
 			var self = this;
-
+			
 			monster.parallel({
 					listClassifiers: function(callback) {
 						self.devicesListClassifiers(function(dataClassifiers) {
