@@ -433,7 +433,8 @@
 			"form": {
 				"label": {
 					"callerId": "Faxbox number",
-					"linkToPrinter": "Link to printer"
+					"linkToPrinter": "Link to printer",
+					"smtpEmailAddress": "SMTP email address"
 				}
 			},
 			"defaultSettings": {

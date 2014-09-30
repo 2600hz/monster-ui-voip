@@ -727,7 +727,8 @@
 	margin-bottom: 0;
 }
 
-.feature-popup-container[data-feature="faxing"] #printer_link {
+.feature-popup-container[data-feature="faxing"] #printer_link,
+.feature-popup-container[data-feature="faxing"] .controls span.text {
 	margin-left: 10px;
 	line-height: 30px;
 }
