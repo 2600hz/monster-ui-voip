@@ -413,7 +413,8 @@
 			"form": {
 				"label": {
 					"callerId": "Numéro de Faxbox",
-					"linkToPrinter": "Lien de l'imprimante"
+					"linkToPrinter": "Lien de l'imprimante",
+					"smtpEmailAddress": "Adresse email SMTP"
 				}
 			},
 			"defaultSettings": {

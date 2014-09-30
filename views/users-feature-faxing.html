@@ -26,11 +26,19 @@
 					</select>
 				</div>
 			</div>
-		{{#if faxbox.cloud_connector_claim_url}}
+		{{#if faxbox.cloud_state}}
 			<div class="control-group">
 				<label for="printer_link" class="control-label">{{ i18n.users.faxing.form.label.linkToPrinter }}</label>
 				<div class="controls">
 					<a id="printer_link" href="{{faxbox.cloud_connector_claim_url}}" target="_blank">{{faxbox.cloud_connector_claim_url}}</a>
+				</div>
+			</div>
+		{{/if}}
+		{{#if faxbox.smtp_email_address}}
+			<div class="control-group">
+				<label for="stmp_email_address" class="control-label">{{ i18n.users.faxing.form.label.smtpEmailAddress }}</label>
+				<div class="controls">
+					<span class="text">{{faxbox.smtp_email_address}}</span>
 				</div>
 			</div>
 		{{/if}}
