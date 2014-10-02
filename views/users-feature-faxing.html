@@ -26,14 +26,14 @@
 					</select>
 				</div>
 			</div>
-		{{#if faxbox.cloud_state}}
+		{{#compare faxbox.cloud_state '===' 'registered'}}
 			<div class="control-group">
 				<label for="printer_link" class="control-label">{{ i18n.users.faxing.form.label.linkToPrinter }}</label>
 				<div class="controls">
 					<a id="printer_link" href="{{faxbox.cloud_connector_claim_url}}" target="_blank">{{faxbox.cloud_connector_claim_url}}</a>
 				</div>
 			</div>
-		{{/if}}
+		{{/compare}}
 		{{#if faxbox.smtp_email_address}}
 			<div class="control-group">
 				<label for="stmp_email_address" class="control-label">{{ i18n.users.faxing.form.label.smtpEmailAddress }}</label>
