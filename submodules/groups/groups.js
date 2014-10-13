@@ -8,95 +8,6 @@ define(function(require){
 	var app = {
 
 		requests: {
-			/* Groups */
-			'voip.groups.listGroups': {
-				url: 'accounts/{accountId}/groups',
-				verb: 'GET'
-			},
-			'voip.groups.getGroup': {
-				url: 'accounts/{accountId}/groups/{groupId}',
-				verb: 'GET'
-			},
-			'voip.groups.createGroup': {
-				url: 'accounts/{accountId}/groups',
-				verb: 'PUT'
-			},
-			'voip.groups.updateGroup': {
-				url: 'accounts/{accountId}/groups/{groupId}',
-				verb: 'POST'
-			},
-			'voip.groups.deleteGroup': {
-				url: 'accounts/{accountId}/groups/{groupId}',
-				verb: 'DELETE'
-			},
-			/* Users */
-			'voip.groups.listUsers': {
-				url: 'accounts/{accountId}/users',
-				verb: 'GET'
-			},
-			/* Callflows */
-			'voip.groups.listRingGroups': {
-				url: 'accounts/{accountId}/callflows?has_key=group_id',
-				verb: 'GET'
-			},
-			'voip.groups.listUserCallflows': {
-				url: 'accounts/{accountId}/callflows?has_key=owner_id&key_missing=type',
-				verb: 'GET'
-			},
-			'voip.groups.listMainCallflows': {
-				url: 'accounts/{accountId}/callflows?filter_type=main',
-				verb: 'GET'
-			},
-			'voip.groups.getCallflows': {
-				url: 'accounts/{accountId}/callflows/',
-				verb: 'GET'
-			},
-			'voip.groups.createCallflow': {
-				url: 'accounts/{accountId}/callflows',
-				verb: 'PUT'
-			},
-			'voip.groups.listGroupCallflows': {
-				url: 'accounts/{accountId}/callflows?filter_group_id={groupId}',
-				verb: 'GET'
-			},
-			'voip.groups.getCallflow': {
-				url: 'accounts/{accountId}/callflows/{callflowId}',
-				verb: 'GET'
-			},
-			'voip.groups.updateCallflow': {
-				url: 'accounts/{accountId}/callflows/{callflowId}',
-				verb: 'POST'
-			},
-			'voip.groups.deleteCallflow': {
-				url: 'accounts/{accountId}/callflows/{callflowId}',
-				verb: 'DELETE'
-			},
-			/* Misc */
-			'voip.groups.getNumbers': {
-				url: 'accounts/{accountId}/phone_numbers/',
-				verb: 'GET'
-			},
-			'voip.groups.listMedia': {
-				url: 'accounts/{accountId}/media?key_missing=type',
-				verb: 'GET'
-			},
-			'voip.groups.createMedia': {
-				url: 'accounts/{accountId}/media',
-				verb: 'PUT'
-			},
-			'voip.groups.deleteMedia': {
-				url: 'accounts/{accountId}/media/{mediaId}',
-				verb: 'DELETE'
-			},
-			'voip.groups.uploadMedia': {
-				url: 'accounts/{accountId}/media/{mediaId}/raw',
-				verb: 'POST',
-				type: 'application/x-base64'
-			},
-			'voip.groups.listVMBoxes': {
-				url: 'accounts/{accountId}/vmboxes',
-				verb: 'GET'
-			}
 		},
 
 		subscribe: {
@@ -163,33 +74,37 @@ define(function(require){
 
 			_.each(data.callflows, function(callflow) {
 				if(callflow.group_id in mapGroups) {
-					var listExtensions = [],
-						listNumbers = [];
+					if(callflow.type === 'userGroup') {
+						var listExtensions = [],
+							listNumbers = [];
 
-					_.each(callflow.numbers, function(number) {
-						number.length < 7 ? listExtensions.push(number) : listNumbers.push(number);
-					});
-
-					mapGroups[callflow.group_id].extra.listCallerId = [];
-
-					if(listExtensions.length > 0) {
-						mapGroups[callflow.group_id].extra.extension = listExtensions[0];
-
-						_.each(listExtensions, function(number) {
-							mapGroups[callflow.group_id].extra.listCallerId.push(number);
+						_.each(callflow.numbers, function(number) {
+							number.length < 7 ? listExtensions.push(number) : listNumbers.push(number);
 						});
-					}
-					mapGroups[callflow.group_id].extra.additionalExtensions = listExtensions.length > 1;
 
-					if(listNumbers.length > 0) {
-						mapGroups[callflow.group_id].extra.mainNumber = listNumbers[0];
+						mapGroups[callflow.group_id].extra.listCallerId = [];
 
-						_.each(listNumbers, function(number) {
-							mapGroups[callflow.group_id].extra.listCallerId.push(number);
-						});
+						if(listExtensions.length > 0) {
+							mapGroups[callflow.group_id].extra.extension = listExtensions[0];
+
+							_.each(listExtensions, function(number) {
+								mapGroups[callflow.group_id].extra.listCallerId.push(number);
+							});
+						}
+						mapGroups[callflow.group_id].extra.additionalExtensions = listExtensions.length > 1;
+
+						if(listNumbers.length > 0) {
+							mapGroups[callflow.group_id].extra.mainNumber = listNumbers[0];
+
+							_.each(listNumbers, function(number) {
+								mapGroups[callflow.group_id].extra.listCallerId.push(number);
+							});
+						}
+						mapGroups[callflow.group_id].extra.additionalNumbers = listNumbers.length > 1;
+						mapGroups[callflow.group_id].extra.callflowId = callflow.id;
+					} else if(callflow.type === 'baseGroup') {
+						mapGroups[callflow.group_id].extra.baseCallflowId = callflow.id;
 					}
-					mapGroups[callflow.group_id].extra.additionalNumbers = listNumbers.length > 1;
-					mapGroups[callflow.group_id].extra.callflowId = callflow.id;
 				}
 			});
 
@@ -325,16 +240,13 @@ define(function(require){
 
 					groupTemplate.find('#create_group').on('click', function() {
 						var formattedData = self.groupsCreationMergeData(data, groupTemplate);
-						// if(formattedData.group.name && formattedData.callflow.numbers[0]) {
 						if(monster.ui.valid(groupForm)) {
 							self.groupsCreate(formattedData, function(data) {
 								popup.dialog('close').remove();
 
 								self.groupsRender({ groupId: data.id });
 							});
-						}/* else {
-							monster.ui.alert('error', self.i18n.active().groups.dialogCreationGroup.missingDataAlert)
-						}*/
+						}
 					});
 
 					groupTemplate.find('#group_user_selector .selected-users, #group_user_selector .available-users').sortable({
@@ -394,19 +306,31 @@ define(function(require){
 					name: formData.name,
 					endpoints: listUserGroup
 				},
-				callflow: {
-					numbers: [ formData.extra.extension ],
-					name: formData.name + ' Ring Group',
+				baseCallflow: {
+					numbers: [ monster.util.randomString(25) ],
+					name: formData.name + ' Base Group',
 					flow: {
 						module: 'ring_group',
 						children: {},
 						data: {
-							name: formData.name + ' Ring Group',
 							strategy: 'simultaneous',
 							timeout: parseInt(fixedTimeout) + parseInt(fixedDelay),
 							endpoints: listUserRingGroup
 						}
-					}
+					},
+					type: 'baseGroup'
+				},
+				callflow: {
+					numbers: [ formData.extra.extension ],
+					name: formData.name + ' Ring Group',
+					flow: {
+						module: 'callflow',
+						children: {},
+						data: {
+							id: ''
+						}
+					},
+					type: 'userGroup'
 				}
 			};
 
@@ -660,8 +584,8 @@ define(function(require){
 						fileReader = new FileReader();
 
 					fileReader.onloadend = function(evt) {
-						monster.request({
-							resource: 'voip.groups.createMedia',
+						self.callApi({
+							resource: 'media.create',
 							data: {
 								accountId: self.accountId,
 								data: {
@@ -673,8 +597,8 @@ define(function(require){
 							},
 							success: function(data, status) {
 								var media = data.data;
-								monster.request({
-									resource: 'voip.groups.uploadMedia',
+								self.callApi({
+									resource: 'media.upload',
 									data: {
 										accountId: self.accountId,
 										mediaId: media.id,
@@ -684,8 +608,8 @@ define(function(require){
 										closeUploadDiv(media);
 									},
 									error: function(data, status) {
-										monster.request({
-											resource: 'voip.groups.deleteMedia',
+										self.callApi({
+											resource: 'media.delete',
 											data: {
 												accountId: self.accountId,
 												mediaId: media.id,
@@ -1090,11 +1014,11 @@ define(function(require){
 
 			template.find('.save-groups').on('click', function() {
 				var endpoints = [],
-					groupId = data.id,
-					selectedEntity = template.find('.extra-node-select option:selected');
+					groupId = data.id/*,
+					selectedEntity = template.find('.extra-node-select option:selected')*/;
 
-				_.each(template.find('.group-row:not(.title)'), function(row) {
-					var $row = $(row),
+				$.each(template.find('.group-row:not(.title)'), function() {
+					var $row = $(this),
 						userId = $row.data('user_id'),
 						values = $row.find('.slider-time').slider('values'),
 						user = {
@@ -1104,16 +1028,15 @@ define(function(require){
 							endpoint_type: 'user'
 						};
 
-
 					endpoints.push(user);
 				});
 
-				endpoints.extraNode = {
-					id: selectedEntity.val(),
-					module: selectedEntity.data('module')
-				};
+				// endpoints.extraNode = {
+				// 	id: selectedEntity.val(),
+				// 	module: selectedEntity.data('module')
+				// };
 
-				self.groupsUpdateRingGroup(groupId, endpoints, function(data) {
+				self.groupsUpdateBaseRingGroup(groupId, endpoints, function(data) {
 					self.groupsRender({ groupId: groupId });
 				});
 			});
@@ -1276,8 +1199,8 @@ define(function(require){
 		groupsListUsers: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.groups.listUsers',
+			self.callApi({
+				resource: 'user.list',
 				data: {
 					accountId: self.accountId
 				},
@@ -1384,48 +1307,30 @@ define(function(require){
 					callflow: function(callbackParallel) {
 						var response = {};
 
-						monster.request({
-							resource: 'voip.groups.getCallflows',
+						self.callApi({
+							resource: 'callflow.list',
 							data: {
-								accountId: self.accountId
-							},
-							success: function(callflows) {
-								response.list = callflows.data;
-
-								var callflowId;
-
-								$.each(callflows.data, function(k, callflowLoop) {
-									/* Find Smart PBX Callflow of this group */
-									if(callflowLoop.group_id === groupId) {
-										callflowId = callflowLoop.id;
-
-										return false;
-									}
-								});
-
-								if(callflowId) {
-									monster.request({
-										resource: 'voip.groups.getCallflow',
-										data: {
-											accountId: self.accountId,
-											callflowId: callflowId
-										},
-										success: function(callflow) {
-											response.groupCallflow = callflow.data;
-
-											callbackParallel && callbackParallel(null, response);
-										}
-									});
+								accountId: self.accountId,
+								filters: { 
+									'filter_group_id': groupId,
+									'filter_type': 'userGroup'
 								}
-								else {
-									callbackParallel && callbackParallel(null, response);
+							},
+							success: function(data) {
+								if(data.data.length > 0) {
+									self.groupsGetCallflow(data.data[0].id, function(callflow) {
+										response.groupCallflow = callflow;
+										callbackParallel && callbackParallel(null, response);
+									});
+								} else {
+									callbackParallel && callbackParallel(null, null);
 								}
 							}
 						});
 					},
 					numbers: function(callbackParallel) {
-						monster.request({
-							resource: 'voip.groups.getNumbers',
+						self.callApi({
+							resource: 'numbers.list',
 							data: {
 								accountId: self.accountId
 							},
@@ -1446,38 +1351,36 @@ define(function(require){
 
 			monster.parallel({
 					users: function(callback) {
-						monster.request({
-							resource: 'voip.groups.listUsers',
-							data: {
-								accountId: self.accountId
-							},
-							success: function(data) {
-								callback(null, data.data);
-							}
+						self.groupsListUsers(function(data) {
+							callback(null, data);
 						});
 					},
 					group: function(callback) {
 						self.groupsGetGroup(groupId, function(data) {
 							callback(null, data);
 						});
-
 					},
-					callflow: function(callback) {
-						self.groupsGetRingGroup(groupId, function(data) {
+					// callflow: function(callback) {
+					// 	self.groupsGetRingGroup(groupId, function(data) {
+					// 		callback(null, data);
+					// 	});
+					// },
+					baseCallflow: function(callback) {
+						self.groupsGetBaseRingGroup(groupId, function(data) {
 							callback(null, data);
 						});
-
-					},
+					}/*,
 					voicemails: function(callback) {
 						self.groupsListVMBoxes(function(data) {
 							callback(null, data);
 						});
 					},
 					mainMenu: function(callback) {
-						monster.request({
-							resource: 'voip.groups.listMainCallflows',
+						self.callApi({
+							resource: 'callflow.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: { 'filter_type':'main' }
 							},
 							success: function(data) {
 								callback(null, data.data && data.data.length > 0 ? _.find(data.data, function(callflow) { return callflow.numbers[0] === "MainOpenHoursMenu" }) : null);
@@ -1485,16 +1388,20 @@ define(function(require){
 						});
 					},
 					userCallflows: function(callback) {
-						monster.request({
-							resource: 'voip.groups.listUserCallflows',
+						self.callApi({
+							resource: 'callflow.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: { 
+									'has_key':'owner_id',
+									'key_missing':'type'
+								}
 							},
 							success: function(data) {
 								callback(null, data.data);
 							}
 						});
-					}
+					}*/
 				},
 				function(err, results) {
 					globalCallback && globalCallback(results);
@@ -1506,39 +1413,33 @@ define(function(require){
 		groupsFormatMembersData: function(data) {
 			var self = this,
 				mapUsers = {},
-				flow = data.callflow.flow,
+				flow = data.baseCallflow.flow/*,
 				callEntities = {
 					mainMenu: data.mainMenu,
 					voicemails: data.voicemails.sort(function(a,b) { return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1; }),
 					userCallflows : []
-				};
+				}*/;
 
 			_.each(data.users, function(user) {
 				mapUsers[user.id] = user;
 
-				var userCallflow = _.find(data.userCallflows, function(callflow) { return callflow.owner_id === user.id });
-				if(userCallflow) {
-					userCallflow.userName = user.first_name + ' ' + user.last_name;
-					callEntities.userCallflows.push(userCallflow);
-				}
+				// var userCallflow = _.find(data.userCallflows, function(callflow) { return callflow.owner_id === user.id });
+				// if(userCallflow) {
+				// 	userCallflow.userName = user.first_name + ' ' + user.last_name;
+				// 	callEntities.userCallflows.push(userCallflow);
+				// }
 			});
 
-			callEntities.userCallflows.sort(function(a,b) { return a.userName.toLowerCase() > b.userName.toLowerCase() ? 1 : -1; });
-
-			while(flow.module !== 'ring_group' && !_.isEmpty(flow.children)) {
-				flow = flow.children['_'];
-			}
+			// callEntities.userCallflows.sort(function(a,b) { return a.userName.toLowerCase() > b.userName.toLowerCase() ? 1 : -1; });
 
 			var endpoints = flow.data.endpoints;
 
 			_.each(endpoints, function(endpoint) {
-				user = mapUsers[endpoint.id];
-
 				endpoint.delay = parseInt(endpoint.delay);
 				endpoint.timeout = parseInt(endpoint.timeout);
 
 				if(endpoint.id in mapUsers) {
-					endpoint.name = user.first_name + ' ' + user.last_name;
+					endpoint.name = mapUsers[endpoint.id].first_name + ' ' + mapUsers[endpoint.id].last_name;
 					mapUsers[endpoint.id].inUse = true;
 				} else {
 					endpoint.name = self.i18n.active().groups.userDeleted;
@@ -1548,12 +1449,12 @@ define(function(require){
 
 			data.group.extra = {
 				ringGroup: endpoints,
-				remainingUsers: mapUsers,
+				remainingUsers: mapUsers/*,
 				callEntities: callEntities,
 				selectedEntity: flow.children['_'] ? {
 					id: flow.children['_'].data.id,
 					module: flow.children['_'].module
-				} : null
+				} : null*/
 			};
 
 			return data.group;
@@ -1631,8 +1532,8 @@ define(function(require){
 		groupsListCallflows: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.groups.getCallflows',
+			self.callApi({
+				resource: 'callflow.list',
 				data: {
 					accountId: self.accountId
 				},
@@ -1645,10 +1546,11 @@ define(function(require){
 		groupsListMedias: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.groups.listMedia',
+			self.callApi({
+				resource: 'media.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: { 'key_missing':'type' }
 				},
 				success: function(medias) {
 					callback && callback(medias.data);
@@ -1659,8 +1561,8 @@ define(function(require){
 		groupsListVMBoxes: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.groups.listVMBoxes',
+			self.callApi({
+				resource: 'voicemail.list',
 				data: {
 					accountId: self.accountId
 				},
@@ -1673,23 +1575,43 @@ define(function(require){
 		groupsCreate: function(data, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.groups.createGroup',
+			self.callApi({
+				resource: 'group.create',
 				data: {
 					accountId: self.accountId,
 					data: data.group
 				},
 				success: function(dataGroup) {
 					data.callflow.group_id = dataGroup.data.id;
+					data.baseCallflow.group_id = dataGroup.data.id;
 
-					monster.request({
-						resource: 'voip.groups.createCallflow',
+					self.callApi({
+						resource: 'callflow.create',
 						data: {
 							accountId: self.accountId,
-							data: data.callflow
+							data: data.baseCallflow
 						},
-						success: function(data) {
-							callback && callback(dataGroup.data);
+						success: function(dataBaseCallflow) {
+							data.callflow.flow.data.id = dataBaseCallflow.data.id;
+							self.callApi({
+								resource: 'callflow.create',
+								data: {
+									accountId: self.accountId,
+									data: data.callflow
+								},
+								success: function(data) {
+									callback && callback(dataGroup.data);
+								}
+							});
+						},
+						error: function() {
+							self.callApi({
+								resource: 'group.delete',
+								data: {
+									accountId: self.accountId,
+									groupId: dataGroup.data.id
+								}
+							});
 						}
 					});
 				}
@@ -1699,23 +1621,49 @@ define(function(require){
 		groupsGetRingGroup: function(groupId, callback, callbackError) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.groups.listGroupCallflows',
+			self.callApi({
+				resource: 'callflow.list',
 				data: {
-					groupId: groupId,
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: { 
+						'filter_group_id': groupId,
+						'filter_type': 'userGroup'
+					}
 				},
 				success: function(data) {
 					if(data.data.length > 0) {
-						monster.request({
-							resource: 'voip.groups.getCallflow',
-							data: {
-								accountId: self.accountId,
-								callflowId: data.data[0].id
-							},
-							success: function(data) {
-								callback && callback(data.data);
-							}
+						self.groupsGetCallflow(data.data[0].id, function(callflow) {
+							callback && callback(callflow);
+						});
+					}
+					else {
+						callbackError && callbackError(data);
+
+						toastr.error(self.i18n.active().groups.ringGroupMissing);
+					}
+				},
+				error: function(data) {
+					callbackError && callbackError(data);
+				}
+			});
+		},
+
+		groupsGetBaseRingGroup: function(groupId, callback, callbackError) {
+			var self = this;
+
+			self.callApi({
+				resource: 'callflow.list',
+				data: {
+					accountId: self.accountId,
+					filters: { 
+						'filter_group_id': groupId,
+						'filter_type': 'baseGroup'
+					}
+				},
+				success: function(data) {
+					if(data.data.length > 0) {
+						self.groupsGetCallflow(data.data[0].id, function(callflow) {
+							callback && callback(callflow);
 						});
 					}
 					else {
@@ -1746,11 +1694,8 @@ define(function(require){
 			return globalTimeout;
 		},
 
-		groupsUpdateRingGroup: function(groupId, endpoints, callback) {
-			var self = this,
-				extraNode = endpoints.extraNode;
-
-			delete endpoints.extraNode;
+		groupsUpdateBaseRingGroup: function(groupId, endpoints, callback) {
+			var self = this;
 
 			monster.parallel({
 					group: function(callback) {
@@ -1788,25 +1733,19 @@ define(function(require){
 						});
 					},
 					callflow: function(callback) {
-						self.groupsGetRingGroup(groupId, function(ringGroup) {
-							var flow = ringGroup.flow;
-							while(flow.module !== 'ring_group' && !_.isEmpty(flow.children)) {
-								flow = flow.children['_'];
-							}
+						self.groupsGetBaseRingGroup(groupId, function(ringGroup) {
+							ringGroup.flow.data.endpoints = endpoints;
+							ringGroup.flow.data.timeout = self.groupsComputeTimeout(endpoints);
 
-							flow.data.endpoints = endpoints;
-
-							flow.data.timeout = self.groupsComputeTimeout(endpoints);
-
-							if(extraNode) {
-								flow.children['_'] = {
-									data: {
-										id: extraNode.id
-									},
-									module: extraNode.module,
-									children: {}
-								}
-							}
+							// if(extraNode) {
+							// 	flow.children['_'] = {
+							// 		data: {
+							// 			id: extraNode.id
+							// 		},
+							// 		module: extraNode.module,
+							// 		children: {}
+							// 	}
+							// }
 
 							self.groupsUpdateCallflow(ringGroup, function(data) {
 								callback && callback(null, data);
@@ -1825,8 +1764,8 @@ define(function(require){
 
 			delete group.extra;
 
-			monster.request({
-				resource: 'voip.groups.updateGroup',
+			self.callApi({
+				resource: 'group.update',
 				data: {
 					accountId: self.accountId,
 					groupId: group.id,
@@ -1843,8 +1782,8 @@ define(function(require){
 
 			delete callflow.metadata;
 
-			monster.request({
-				resource: 'voip.groups.updateCallflow',
+			self.callApi({
+				resource: 'callflow.update',
 				data: {
 					accountId: self.accountId,
 					callflowId: callflow.id,
@@ -1859,8 +1798,8 @@ define(function(require){
 		groupsGetGroup: function(groupId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.groups.getGroup',
+			self.callApi({
+				resource: 'group.get',
 				data: {
 					groupId: groupId,
 					accountId: self.accountId
@@ -1876,12 +1815,11 @@ define(function(require){
 
 			monster.parallel({
 					group: function(callback) {
-						monster.request({
-							resource: 'voip.groups.deleteGroup',
+						self.callApi({
+							resource: 'group.delete',
 							data: {
 								accountId: self.accountId,
-								groupId: groupId,
-								data: {}
+								groupId: groupId
 							},
 							success: function(data) {
 								callback && callback(null, data.data);
@@ -1890,12 +1828,28 @@ define(function(require){
 					},
 					callflow: function(callback) {
 						self.groupsGetRingGroup(groupId, function(data) {
-							monster.request({
-								resource: 'voip.groups.deleteCallflow',
+							self.callApi({
+								resource: 'callflow.delete',
 								data: {
 									accountId: self.accountId,
-									callflowId: data.id,
-									data: {}
+									callflowId: data.id
+								},
+								success: function(data) {
+									callback && callback(null, data);
+								}
+							});
+						},
+						function(data) {
+							callback && callback(null, data);
+						});
+					},
+					baseCallflow: function(callback) {
+						self.groupsGetBaseRingGroup(groupId, function(data) {
+							self.callApi({
+								resource: 'callflow.delete',
+								data: {
+									accountId: self.accountId,
+									callflowId: data.id
 								},
 								success: function(data) {
 									callback && callback(null, data);
@@ -1916,8 +1870,8 @@ define(function(require){
 		groupsGetCallflow: function(callflowId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.groups.getCallflow',
+			self.callApi({
+				resource: 'callflow.get',
 				data: {
 					accountId: self.accountId,
 					callflowId: callflowId
@@ -1933,8 +1887,8 @@ define(function(require){
 
 			monster.parallel({
 					groups: function(callback) {
-						monster.request({
-							resource: 'voip.groups.listGroups',
+						self.callApi({
+							resource: 'group.list',
 							data: {
 								accountId: self.accountId
 							},
@@ -1944,10 +1898,11 @@ define(function(require){
 						});
 					},
 					callflows: function(callback) {
-						monster.request({
-							resource: 'voip.groups.listRingGroups',
+						self.callApi({
+							resource: 'callflow.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {'has_key':'group_id'}
 							},
 							success: function(dataCallflows) {
 								callback(null, dataCallflows.data);
