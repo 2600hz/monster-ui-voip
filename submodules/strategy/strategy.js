@@ -9,119 +9,6 @@ define(function(require){
 	var app = {
 
 		requests: {
-			'strategy.callflows.listHasType': {
-				url: 'accounts/{accountId}/callflows?has_value=type&key_missing=owner_id',
-				verb: 'GET'
-			},
-			'strategy.callflows.list': {
-				url: 'accounts/{accountId}/callflows',
-				verb: 'GET'
-			},
-			'strategy.callflows.get': {
-				url: 'accounts/{accountId}/callflows/{callflowId}',
-				verb: 'GET'
-			},
-			'strategy.callflows.add': {
-				url: 'accounts/{accountId}/callflows',
-				verb: 'PUT'
-			},
-			'strategy.callflows.update': {
-				url: 'accounts/{accountId}/callflows/{callflowId}',
-				verb: 'POST'
-			},
-			'strategy.callflows.listUserCallflows': {
-				url: 'accounts/{accountId}/callflows?has_key=owner_id',
-				verb: 'GET'
-			},
-			'strategy.callflows.listRingGroups': {
-				url: 'accounts/{accountId}/callflows?has_key=group_id',
-				verb: 'GET'
-			},
-			'strategy.temporalRules.list': {
-				url: 'accounts/{accountId}/temporal_rules?has_key=type',
-				verb: 'GET'
-			},
-			'strategy.temporalRules.get': {
-				url: 'accounts/{accountId}/temporal_rules/{ruleId}',
-				verb: 'GET'
-			},
-			'strategy.temporalRules.add': {
-				url: 'accounts/{accountId}/temporal_rules',
-				verb: 'PUT'
-			},
-			'strategy.temporalRules.update': {
-				url: 'accounts/{accountId}/temporal_rules/{ruleId}',
-				verb: 'POST'
-			},
-			'strategy.temporalRules.delete': {
-				url: 'accounts/{accountId}/temporal_rules/{ruleId}',
-				verb: 'DELETE'
-			},
-			'strategy.menus.get': {
-				url: 'accounts/{accountId}/menus/{menuId}',
-				verb: 'GET'
-			},
-			'strategy.menus.add': {
-				url: 'accounts/{accountId}/menus/',
-				verb: 'PUT'
-			},
-			'strategy.menus.update': {
-				url: 'accounts/{accountId}/menus/{menuId}',
-				verb: 'POST'
-			},
-			'strategy.media.get': {
-				url: 'accounts/{accountId}/media/{mediaId}',
-				verb: 'GET'
-			},
-			'strategy.media.create': {
-				url: 'accounts/{accountId}/media',
-				verb: 'PUT'
-			},
-			'strategy.media.update': {
-				url: 'accounts/{accountId}/media/{mediaId}',
-				verb: 'POST'
-			},
-            'strategy.media.upload': {
-                url: 'accounts/{accountId}/media/{mediaId}/raw',
-                verb: 'POST',
-                type: 'application/x-base64'
-            },
-			'strategy.users.list': {
-				url: 'accounts/{accountId}/users',
-				verb: 'GET'
-			},
-			'strategy.groups.list': {
-				url: 'accounts/{accountId}/groups',
-				verb: 'GET'
-			},
-			'strategy.devices.list': {
-				url: 'accounts/{accountId}/devices',
-				verb: 'GET'
-			},
-			'strategy.voicemails.list': {
-				url: 'accounts/{accountId}/vmboxes',
-				verb: 'GET'
-			},
-			'strategy.numbers.list': {
-				url: 'accounts/{accountId}/phone_numbers',
-				verb: 'GET'
-			},
-			'strategy.numbers.get': {
-				url: 'accounts/{accountId}/phone_numbers/{phoneNumber}',
-				verb: 'GET'
-			},
-			'strategy.numbers.update': {
-				url: 'accounts/{accountId}/phone_numbers/{phoneNumber}',
-				verb: 'POST'
-			},
-			'strategy.account.get': {
-				url: 'accounts/{accountId}',
-				verb: 'GET'
-			},
-			'strategy.account.update': {
-				url: 'accounts/{accountId}',
-				verb: 'POST'
-			}
 		},
 
 		subscribe: {
@@ -620,8 +507,8 @@ define(function(require){
 									self.strategyRefreshTemplate(parentContainer, strategyData);
 
 									//Updating Company Caller ID if this was the selected number
-									monster.request({
-										resource: 'strategy.account.get',
+									self.callApi({
+										resource: 'account.get',
 										data: {
 											accountId: self.accountId
 										},
@@ -636,8 +523,8 @@ define(function(require){
 												modified = true;
 											}
 											if(modified) {
-												monster.request({
-													resource: 'strategy.account.update',
+												self.callApi({
+													resource: 'account.update',
 													data: {
 														accountId: self.accountId,
 														data: accountData.data
@@ -918,8 +805,8 @@ define(function(require){
 							lunchbreakRule.time_window_start = monster.util.timeToSeconds(customHours.lunchbreak.from);
 							lunchbreakRule.time_window_stop = monster.util.timeToSeconds(customHours.lunchbreak.to);
 							tmpRulesRequests["lunchbreak"] = function(callback) {
-								monster.request({
-									resource: 'strategy.temporalRules.update',
+								self.callApi({
+									resource: 'temporalRule.update',
 									data: {
 										accountId: self.accountId,
 										ruleId: lunchbreakRule.id,
@@ -939,8 +826,8 @@ define(function(require){
 							temporalRule.time_window_start = monster.util.timeToSeconds(customHours.weekdays[val].from);
 							temporalRule.time_window_stop = monster.util.timeToSeconds(customHours.weekdays[val].to);
 							tmpRulesRequests[val] = function(callback) {
-								monster.request({
-									resource: 'strategy.temporalRules.update',
+								self.callApi({
+									resource: 'temporalRule.update',
 									data: {
 										accountId: self.accountId,
 										ruleId: temporalRule.id,
@@ -996,12 +883,11 @@ define(function(require){
 						self.strategyRebuildMainCallflowRuleArray(strategyData);
 						self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
 							strategyData.callflows["MainCallflow"] = updatedCallflow;
-							monster.request({
-								resource: 'strategy.temporalRules.delete',
+							self.callApi({
+								resource: 'temporalRule.delete',
 								data: {
 									accountId: self.accountId,
-									ruleId: id,
-									data: {}
+									ruleId: id
 								},
 								success: function(data, status) {
 									delete strategyData.temporalRules.holidays[data.data.name];
@@ -1063,8 +949,8 @@ define(function(require){
 
 						if(id) {
 							holidayRulesRequests[name] = function(callback) {
-								monster.request({
-									resource: 'strategy.temporalRules.update',
+								self.callApi({
+									resource: 'temporalRule.update',
 									data: {
 										accountId: self.accountId,
 										ruleId: id,
@@ -1077,8 +963,8 @@ define(function(require){
 							}
 						} else {
 							holidayRulesRequests[name] = function(callback) {
-								monster.request({
-									resource: 'strategy.temporalRules.add',
+								self.callApi({
+									resource: 'temporalRule.create',
 									data: {
 										accountId: self.accountId,
 										data: holidayRule
@@ -1121,12 +1007,11 @@ define(function(require){
 					monster.ui.confirm(self.i18n.active().strategy.confirmMessages.disableHolidays, function() {
 						_.each(strategyData.temporalRules.holidays, function(val, key) {
 							holidayRulesRequests[key] = function(callback) {
-								monster.request({
-									resource: 'strategy.temporalRules.delete',
+								self.callApi({
+									resource: 'temporalRule.delete',
 									data: {
 										accountId: self.accountId,
-										ruleId: val.id,
-										data: {}
+										ruleId: val.id
 									},
 									success: function(data, status) {
 										delete mainCallflow.flow.children[val.id];
@@ -1370,8 +1255,8 @@ define(function(require){
 				};
 
 			if(name in strategyData.callflows) {
-				monster.request({
-					resource: 'strategy.menus.get',
+				self.callApi({
+					resource: 'menu.get',
 					data: {
 						accountId: self.accountId,
 						menuId: strategyData.callflows[name].flow.data.id
@@ -1379,8 +1264,8 @@ define(function(require){
 					success: function(data, status) {
 						menu = data.data;
 						if(menu.media.greeting) {
-							monster.request({
-								resource: 'strategy.media.get',
+							self.callApi({
+								resource: 'media.get',
 								data: {
 									accountId: self.accountId,
 									mediaId: menu.media.greeting
@@ -1396,8 +1281,8 @@ define(function(require){
 					}
 				});
 			} else {
-				monster.request({
-					resource: 'strategy.menus.add',
+				self.callApi({
+					resource: 'menu.create',
 					data: {
 						accountId: self.accountId,
 						data: {
@@ -1415,8 +1300,8 @@ define(function(require){
 					},
 					success: function(data, status) {
 						menu = data.data;
-						monster.request({
-							resource: 'strategy.callflows.add',
+						self.callApi({
+							resource: 'callflow.create',
 							data: {
 								accountId: self.accountId,
 								data: {
@@ -1509,8 +1394,8 @@ define(function(require){
 							voice: "female/en-US",
 							text: text
 						};
-						monster.request({
-							resource: 'strategy.media.update',
+						self.callApi({
+							resource: 'media.update',
 							data: {
 								accountId: self.accountId,
 								mediaId: greeting.id,
@@ -1524,8 +1409,8 @@ define(function(require){
 							}
 						});
 					} else {
-						monster.request({
-							resource: 'strategy.media.create',
+						self.callApi({
+							resource: 'media.create',
 							data: {
 								accountId: self.accountId,
 								data: {
@@ -1543,8 +1428,8 @@ define(function(require){
 							success: function(data, status) {
 								greeting = data.data;
 								menu.media.greeting = data.data.id;
-								monster.request({
-									resource: 'strategy.menus.update',
+								self.callApi({
+									resource: 'menu.update',
 									data: {
 										accountId: self.accountId,
 										menuId: menu.id,
@@ -1570,8 +1455,8 @@ define(function(require){
 				var fileReader = new FileReader(),
 					file = uploadGreeting.find('input[type="file"]')[0].files[0],
 					uploadFile = function(file, greetingId, callback) {
-						monster.request({
-							resource: 'strategy.media.upload',
+						self.callApi({
+							resource: 'media.upload',
 							data: {
 								accountId: self.accountId,
 								mediaId: greetingId,
@@ -1590,8 +1475,8 @@ define(function(require){
 						greeting.media_source = "upload";
 						delete greeting.tts;
 
-						monster.request({
-							resource: 'strategy.media.update',
+						self.callApi({
+							resource: 'media.update',
 							data: {
 								accountId: self.accountId,
 								mediaId: greeting.id,
@@ -1607,8 +1492,8 @@ define(function(require){
 							}
 						});
 					} else {
-						monster.request({
-							resource: 'strategy.media.create',
+						self.callApi({
+							resource: 'media.create',
 							data: {
 								accountId: self.accountId,
 								data: {
@@ -1622,8 +1507,8 @@ define(function(require){
 							success: function(data, status) {
 								greeting = data.data;
 								menu.media.greeting = data.data.id;
-								monster.request({
-									resource: 'strategy.menus.update',
+								self.callApi({
+									resource: 'menu.update',
 									data: {
 										accountId: self.accountId,
 										menuId: menu.id,
@@ -1759,10 +1644,14 @@ define(function(require){
 
 		strategyGetMainCallflows: function(callback) {
 			var self = this;
-			monster.request({
-				resource: 'strategy.callflows.listHasType',
+			self.callApi({
+				resource: 'callflow.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						'has_value':'type',
+						'key_missing':'owner_id'
+					}
 				},
 				success: function(data, status) {
 					var parallelRequests = {};
@@ -1771,8 +1660,8 @@ define(function(require){
 						if(val.type === "main" || val.type === "conference")
 						var name = val.type === "conference" ? "MainConference" : val.name || val.numbers[0];
 						parallelRequests[name] = function(callback) {
-							monster.request({
-								resource: 'strategy.callflows.get',
+							self.callApi({
+								resource: 'callflow.get',
 								data: {
 									accountId: self.accountId,
 									callflowId: val.id
@@ -1786,8 +1675,8 @@ define(function(require){
 
 					if(!parallelRequests["MainConference"]) {
 						parallelRequests["MainConference"] = function(callback) {
-							monster.request({
-								resource: 'strategy.callflows.add',
+							self.callApi({
+								resource: 'callflow.create',
 								data: {
 									accountId: self.accountId,
 									data: {
@@ -1814,8 +1703,8 @@ define(function(require){
 					_.each(self.subCallflowsLabel, function(val) {
 						if(!parallelRequests[val]) {
 							parallelRequests[val] = function(callback) {
-								monster.request({
-									resource: 'strategy.callflows.add',
+								self.callApi({
+									resource: 'callflow.create',
 									data: {
 										accountId: self.accountId,
 										data: {
@@ -1841,8 +1730,8 @@ define(function(require){
 
 					monster.parallel(parallelRequests, function(err, results) {
 						if(!parallelRequests["MainCallflow"]) {
-							monster.request({
-								resource: 'strategy.callflows.add',
+							self.callApi({
+								resource: 'callflow.create',
 								data: {
 									accountId: self.accountId,
 									data: {
@@ -2051,18 +1940,19 @@ define(function(require){
 
 		strategyGetTemporalRules: function(callback) {
 			var self = this;
-			monster.request({
-				resource: 'strategy.temporalRules.list',
+			self.callApi({
+				resource: 'temporalRule.list',
 				data: {
 					accountId: self.accountId,
+					filters: { 'has_key':'type' }
 				},
 				success: function(data, status) {
 					var parallelRequests = {};
 
 					_.each(data.data, function(val, key) {
 						parallelRequests[val.name] = function(callback) {
-							monster.request({
-								resource: 'strategy.temporalRules.get',
+							self.callApi({
+								resource: 'temporalRule.get',
 								data: {
 									accountId: self.accountId,
 									ruleId: val.id
@@ -2077,8 +1967,8 @@ define(function(require){
 					_.each(self.weekdayLabels, function(val) {
 						if(!(val in parallelRequests)) {
 							parallelRequests[val] = function(callback) {
-								monster.request({
-									resource: 'strategy.temporalRules.add',
+								self.callApi({
+									resource: 'temporalRule.create',
 									data: {
 										accountId: self.accountId,
 										data: {
@@ -2101,8 +1991,8 @@ define(function(require){
 
 					if(!("MainLunchHours" in parallelRequests)) {
 						parallelRequests["MainLunchHours"] = function(callback) {
-							monster.request({
-								resource: 'strategy.temporalRules.add',
+							self.callApi({
+								resource: 'temporalRule.create',
 								data: {
 									accountId: self.accountId,
 									data: {
@@ -2154,8 +2044,8 @@ define(function(require){
 			monster.parallel(
 				{
 					users: function(_callback) {
-						monster.request({
-							resource: 'strategy.users.list',
+						self.callApi({
+							resource: 'user.list',
 							data: {
 								accountId: self.accountId
 							},
@@ -2165,10 +2055,11 @@ define(function(require){
 						});
 					},
 					userCallflows: function(_callback) {
-						monster.request({
-							resource: 'strategy.callflows.listUserCallflows',
+						self.callApi({
+							resource: 'callflow.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: { 'has_key':'owner_id' }
 							},
 							success: function(data, status) {
 								var userCallflows = _.filter(data.data, function(callflow) { 
@@ -2179,8 +2070,8 @@ define(function(require){
 						});
 					},
 					groups: function(_callback) {
-						monster.request({
-							resource: 'strategy.groups.list',
+						self.callApi({
+							resource: 'group.list',
 							data: {
 								accountId: self.accountId
 							},
@@ -2190,10 +2081,14 @@ define(function(require){
 						});
 					},
 					ringGroups: function(_callback) {
-						monster.request({
-							resource: 'strategy.callflows.listRingGroups',
+						self.callApi({
+							resource: 'callflow.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									'has_key': 'group_id',
+									'filter_type': 'baseGroup'
+								}
 							},
 							success: function(data, status) {
 								_callback(null, data.data);
@@ -2201,8 +2096,8 @@ define(function(require){
 						});
 					},
 					devices: function(_callback) {
-						monster.request({
-							resource: 'strategy.devices.list',
+						self.callApi({
+							resource: 'device.list',
 							data: {
 								accountId: self.accountId
 							},
@@ -2252,8 +2147,8 @@ define(function(require){
 
 		strategyGetVoicesmailBoxes: function(callback) {
 			var self = this;
-			monster.request({
-				resource: 'strategy.voicemails.list',
+			self.callApi({
+				resource: 'voicemail.list',
 				data: {
 					accountId: self.accountId,
 				},
@@ -2266,8 +2161,8 @@ define(function(require){
 
 		strategyListAccountNumbers: function(callback) {
 			var self = this;
-			monster.request({
-				resource: 'strategy.numbers.list',
+			self.callApi({
+				resource: 'numbers.list',
 				data: {
 					accountId: self.accountId,
 				},
@@ -2280,8 +2175,8 @@ define(function(require){
 		strategyGetNumber: function(phoneNumber, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'strategy.numbers.get',
+			self.callApi({
+				resource: 'numbers.get',
 				data: {
 					accountId: self.accountId,
 					phoneNumber: encodeURIComponent(phoneNumber)
@@ -2295,8 +2190,8 @@ define(function(require){
 		strategyUpdateNumber: function(phoneNumber, data, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'strategy.numbers.update',
+			self.callApi({
+				resource: 'numbers.update',
 				data: {
 					accountId: self.accountId,
 					phoneNumber: encodeURIComponent(phoneNumber),
@@ -2336,8 +2231,8 @@ define(function(require){
 		strategyGetCallflows: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'strategy.callflows.list',
+			self.callApi({
+				resource: 'callflow.list',
 				data: {
 					accountId: self.accountId
 				},
@@ -2350,8 +2245,8 @@ define(function(require){
 		strategyCreateCallflow: function(callflow, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'strategy.callflows.add',
+			self.callApi({
+				resource: 'callflow.create',
 				data: {
 					accountId: self.accountId,
 					data: callflow
@@ -2367,8 +2262,8 @@ define(function(require){
 				callflowId = callflow.id;
 			delete callflow.metadata;
 			delete callflow.id;
-			monster.request({
-				resource: 'strategy.callflows.update',
+			self.callApi({
+				resource: 'callflow.update',
 				data: {
 					accountId: self.accountId,
 					callflowId: callflowId,
