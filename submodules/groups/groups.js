@@ -126,6 +126,11 @@ define(function(require){
 							icon: 'icon-music',
 							iconColor: 'icon-yellow',
 							title: self.i18n.active().groups.ringback.title
+						},
+						next_action: {
+							icon: 'icon-share-alt',
+							iconColor: 'icon-green',
+							title: self.i18n.active().groups.nextAction.title
 						}
 					},
 					hasFeatures: false
@@ -443,6 +448,10 @@ define(function(require){
 			template.find('.feature[data-feature="ringback"]').on('click', function() {
 				self.groupsRenderRingback(data);
 			});
+
+			template.find('.feature[data-feature="next_action"]').on('click', function() {
+				self.groupsRenderNextAction(data);
+			});
 		},
 
 		groupsRenderCallRecording: function(data) {
@@ -679,6 +688,77 @@ define(function(require){
 					title: data.group.extra.mapFeatures.ringback.title,
 					position: ['center', 20]
 				});
+			});
+		},
+
+		groupsRenderNextAction: function(data) {
+			var self = this,
+				flow = data.callflow.flow,
+				selectedEntity = null;
+
+			while(flow.module != 'callflow') {
+				flow = flow.children['_']; 
+			} //Go to the first callflow (i.e. base ring group)
+			if('_' in flow.children) {
+				selectedEntity = flow.children['_'].data.id;
+			} //Find the existing Next Action if there is one
+
+
+			var templateData = $.extend(true, {selectedEntity: selectedEntity}, data),
+				featureTemplate = $(monster.template(self, 'groups-feature-next_action', templateData)),
+				switchFeature = featureTemplate.find('.switch').bootstrapSwitch(),
+				popup;
+
+			featureTemplate.find('.cancel-link').on('click', function() {
+				popup.dialog('close').remove();
+			});
+
+			switchFeature.on('switch-change', function(e, data) {
+				data.value ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+			});
+
+			featureTemplate.find('.save').on('click', function() {
+				var selectedOption = featureTemplate.find('.next-action-select option:selected'),
+					enabled = switchFeature.bootstrapSwitch('status');
+
+				if(!('smartpbx' in data.group)) { data.group.smartpbx = {}; }
+				if(!('next_action' in data.group.smartpbx)) {
+					data.group.smartpbx.next_action = {
+						enabled: false
+					};
+				}
+
+				if(data.group.smartpbx.next_action.enabled || enabled) {
+					data.group.smartpbx.next_action.enabled = enabled;
+					var newCallflow = $.extend(true, {}, data.callflow),
+						newFlow = newCallflow.flow;
+
+					if(newFlow.module === 'record_call') {
+						newFlow = newFlow.children['_'];
+					}
+					newFlow.children = {};
+					if(enabled) {
+						newFlow.children['_'] = {
+							children: {},
+							module: selectedOption.data('module'),
+							data: { id: selectedOption.val() }
+						}
+					}
+					self.groupsUpdateCallflow(newCallflow, function(updatedCallflow) {
+						self.groupsUpdate(data.group, function(updatedGroup) {
+							popup.dialog('close').remove();
+							self.groupsRender({ groupId: data.group.id });
+						});
+					});
+				} else {
+					popup.dialog('close').remove();
+					self.groupsRender({ groupId: data.group.id });
+				}
+			});
+
+			popup = monster.ui.dialog(featureTemplate, {
+				title: data.group.extra.mapFeatures.next_action.title,
+				position: ['center', 20]
 			});
 		},
 
@@ -1014,8 +1094,7 @@ define(function(require){
 
 			template.find('.save-groups').on('click', function() {
 				var endpoints = [],
-					groupId = data.id/*,
-					selectedEntity = template.find('.extra-node-select option:selected')*/;
+					groupId = data.id;
 
 				$.each(template.find('.group-row:not(.title)'), function() {
 					var $row = $(this),
@@ -1030,11 +1109,6 @@ define(function(require){
 
 					endpoints.push(user);
 				});
-
-				// endpoints.extraNode = {
-				// 	id: selectedEntity.val(),
-				// 	module: selectedEntity.data('module')
-				// };
 
 				self.groupsUpdateBaseRingGroup(groupId, endpoints, function(data) {
 					self.groupsRender({ groupId: groupId });
@@ -1210,16 +1284,6 @@ define(function(require){
 			});
 		},
 
-		// groupsGetFeaturesData: function(groupId, callback) {
-		// 	var self = this;
-
-		// 	self.groupsGetGroup(groupId, function(data) {
-		// 		if(!('extra') in data) { data.extra = {}; }
-		// 		$.extend(true, data.extra, self.groupsGetGroupFeatures(data));
-		// 		callback && callback(data);
-		// 	});
-		// },
-
 		groupsGetFeaturesData: function(groupId, callback) {
 			var self = this;
 
@@ -1228,17 +1292,58 @@ define(function(require){
 						self.groupsGetGroup(groupId, function(data) {
 							callback(null, data);
 						});
-
+					},
+					users: function(callback) {
+						self.groupsListUsers(function(data) {
+							callback(null, data);
+						});
 					},
 					callflow: function(callback) {
 						self.groupsGetRingGroup(groupId, function(data) {
 							callback(null, data);
 						});
-
+					},
+					voicemails: function(callback) {
+						self.groupsListVMBoxes(function(data) {
+							callback(null, data);
+						});
+					},
+					mainMenu: function(callback) {
+						self.callApi({
+							resource: 'callflow.list',
+							data: {
+								accountId: self.accountId,
+								filters: { 'filter_type':'main' }
+							},
+							success: function(data) {
+								callback(null, data.data && data.data.length > 0 ? _.find(data.data, function(callflow) { return callflow.numbers[0] === "MainOpenHoursMenu" }) : null);
+							}
+						});
+					},
+					userCallflows: function(callback) {
+						self.callApi({
+							resource: 'callflow.list',
+							data: {
+								accountId: self.accountId,
+								filters: { 
+									'has_key':'owner_id',
+									'filter_type':'mainUserCallflow'
+								}
+							},
+							success: function(data) {
+								callback(null, data.data);
+							}
+						});
 					}
 				},
 				function(err, results) {
 					results.group.extra = self.groupsGetGroupFeatures(results.group);
+					_.each(results.userCallflows, function(userCallflow) {
+						var user = _.find(results.users, function(user) { return userCallflow.owner_id === user.id });
+						if(user) {
+							userCallflow.userName = user.first_name + ' ' + user.last_name;
+						}
+					});
 					callback && callback(results);
 				}
 			);
@@ -1360,48 +1465,11 @@ define(function(require){
 							callback(null, data);
 						});
 					},
-					// callflow: function(callback) {
-					// 	self.groupsGetRingGroup(groupId, function(data) {
-					// 		callback(null, data);
-					// 	});
-					// },
 					baseCallflow: function(callback) {
 						self.groupsGetBaseRingGroup(groupId, function(data) {
 							callback(null, data);
 						});
-					}/*,
-					voicemails: function(callback) {
-						self.groupsListVMBoxes(function(data) {
-							callback(null, data);
-						});
-					},
-					mainMenu: function(callback) {
-						self.callApi({
-							resource: 'callflow.list',
-							data: {
-								accountId: self.accountId,
-								filters: { 'filter_type':'main' }
-							},
-							success: function(data) {
-								callback(null, data.data && data.data.length > 0 ? _.find(data.data, function(callflow) { return callflow.numbers[0] === "MainOpenHoursMenu" }) : null);
-							}
-						});
-					},
-					userCallflows: function(callback) {
-						self.callApi({
-							resource: 'callflow.list',
-							data: {
-								accountId: self.accountId,
-								filters: { 
-									'has_key':'owner_id',
-									'key_missing':'type'
-								}
-							},
-							success: function(data) {
-								callback(null, data.data);
-							}
-						});
-					}*/
+					}
 				},
 				function(err, results) {
 					globalCallback && globalCallback(results);
@@ -1413,24 +1481,11 @@ define(function(require){
 		groupsFormatMembersData: function(data) {
 			var self = this,
 				mapUsers = {},
-				flow = data.baseCallflow.flow/*,
-				callEntities = {
-					mainMenu: data.mainMenu,
-					voicemails: data.voicemails.sort(function(a,b) { return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1; }),
-					userCallflows : []
-				}*/;
+				flow = data.baseCallflow.flow;
 
 			_.each(data.users, function(user) {
 				mapUsers[user.id] = user;
-
-				// var userCallflow = _.find(data.userCallflows, function(callflow) { return callflow.owner_id === user.id });
-				// if(userCallflow) {
-				// 	userCallflow.userName = user.first_name + ' ' + user.last_name;
-				// 	callEntities.userCallflows.push(userCallflow);
-				// }
 			});
-
-			// callEntities.userCallflows.sort(function(a,b) { return a.userName.toLowerCase() > b.userName.toLowerCase() ? 1 : -1; });
 
 			var endpoints = flow.data.endpoints;
 
@@ -1449,12 +1504,7 @@ define(function(require){
 
 			data.group.extra = {
 				ringGroup: endpoints,
-				remainingUsers: mapUsers/*,
-				callEntities: callEntities,
-				selectedEntity: flow.children['_'] ? {
-					id: flow.children['_'].data.id,
-					module: flow.children['_'].module
-				} : null*/
+				remainingUsers: mapUsers
 			};
 
 			return data.group;
