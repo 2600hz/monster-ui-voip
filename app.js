@@ -4,10 +4,14 @@ define(function(require){
 		monster = require('monster');
 
 	var app = {
-
 		name: 'voip',
 
-		i18n: [ 'en-US', 'fr-FR' ],
+		css: [ 'app' ],
+
+		i18n: { 
+			'en-US': { customCss: false },
+			'fr-FR': { customCss: false }
+		},
 
 		requests: {
 			'voip.users.getUsers': {
