@@ -4,10 +4,14 @@ define(function(require){
 		monster = require('monster');
 
 	var app = {
-
 		name: 'voip',
 
-		i18n: [ 'en-US', 'fr-FR' ],
+		css: [ 'app' ],
+
+		i18n: { 
+			'en-US': { customCss: false },
+			'fr-FR': { customCss: false }
+		},
 
 		requests: {
 			'voip.users.getUsers': {
@@ -52,7 +56,7 @@ define(function(require){
 
 		render: function(container){
 			var self = this,
-				parent = container || $('#ws-content'),
+				parent = container || $('#monster-content'),
 				template = $(monster.template(self, 'app'));
 
 			/* On first Load, load my office */
