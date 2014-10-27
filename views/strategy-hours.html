@@ -23,8 +23,11 @@
 
 		<div class="custom-hours-div" {{#unless alwaysOpen}}style="display: block;"{{/unless}}>
 			<div class="custom-hours-header">
-				<span class="pull-right timezone">{{i18n.strategy.hours.timezone}} {{companyTimezone}}</span>
-				<span class="title">{{i18n.strategy.hours.listTitle}}</span>
+				<div class="pull-right timezone-container">
+					{{i18n.strategy.hours.timezone}}
+					<span id="strategy_custom_hours_timezone" class="timezone">{{companyTimezone}}</span>
+				</div>
+				<div class="title">{{i18n.strategy.hours.listTitle}}</div>
 			</div>
 			<div class="custom-days">
 				{{#each days}}

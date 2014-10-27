@@ -125,7 +125,8 @@ define(function(require){
 		},
 
 		subscribe: {
-			'voip.strategy.render': 'strategyRender'
+			'voip.strategy.render': 'strategyRender',
+			'auth.currentAccountUpdated': '_strategyOnCurrentAccountUpdated'
 		},
 
 		weekdays: ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"],
@@ -330,7 +331,7 @@ define(function(require){
 							weekdaysRules = strategyData.temporalRules.weekdays,
 							templateData = {
 								alwaysOpen: true,
-								companyTimezone: timezone.formatTimezone(strategyData.callflows["MainCallflow"].flow.data.timezone),
+								companyTimezone: timezone.formatTimezone(strategyData.callflows["MainCallflow"].flow.data.timezone || monster.apps["auth"].currentAccount.timezone),
 								days: [],
 								lunchbreak: {
 									enabled: (strategyData.temporalRules.lunchbreak.id in strategyData.callflows["MainCallflow"].flow.children),
@@ -1862,9 +1863,7 @@ define(function(require){
 													module:"callflow"
 												}
 											},
-											data: {
-												timezone: monster.apps["auth"].currentAccount.timezone
-											},
+											data: {},
 											module: "temporal_route"
 										}
 									}
@@ -1878,6 +1877,7 @@ define(function(require){
 								}
 							});
 						} else {
+							delete results["MainCallflow"].flow.data.timezone;
 							callback(results);
 						}
 					});
@@ -2378,6 +2378,11 @@ define(function(require){
 					callback(data.data);
 				}
 			});
+		},
+
+		_strategyOnCurrentAccountUpdated: function(accountData) {
+			var self = this;
+			$('#strategy_custom_hours_timezone').text(timezone.formatTimezone(accountData.timezone));
 		}
 	};
 
