@@ -575,7 +575,9 @@ define(function(require){
 						//FancyCheckboxes.
 						monster.ui.prettyCheck.create(template);
 
-						row.find('.edit-user').append(template).slideDown();
+						row.find('.edit-user').append(template).slideDown(400, function() {
+							$('body').animate({ scrollTop: row.offset().top - (window.innerHeight - row.height() - 10) });
+						});
 
 						$('body').append($('<div id="users_container_overlay"></div>'));
 					});
