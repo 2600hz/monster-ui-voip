@@ -206,7 +206,7 @@ define(function(require){
 					template.find('.user-rows').append(templateUser);
 				});
 
-				template.find('[data-toggle="tooltip"]').tooltip();
+				template.find('[data-toggle="tooltip"]').tooltip({ container: 'body'});
 
 				self.usersBindEvents(template, parent, dataTemplate);
 
@@ -2569,7 +2569,7 @@ define(function(require){
 
 					timezone.populateDropdown(template.find('#user_timezone'), dataTemplate.timezone);
 
-					template.find('[data-toggle="tooltip"]').tooltip();
+					template.find('[data-toggle="tooltip"]').tooltip({ container: 'body'});
 
 					callbackAfterFormat && callbackAfterFormat(template, dataTemplate);
 				}
