@@ -26,38 +26,46 @@ define(function(require){
 			self.groupsRemoveOverlay();
 
 			self.groupsGetData(function(data) {
-				var dataTemplate = self.groupsFormatListData(data),
-					template = $(monster.template(self, 'groups-layout', { countGroups: Object.keys(dataTemplate.groups).length })),
-					templateGroup;
-
-				_.each(dataTemplate.groups, function(group) {
-					templateGroup = monster.template(self, 'groups-row', group);
-
-					template.find('.groups-rows').append(templateGroup);
+				var hasOldData = _.find(data.callflows, function(callflow) {
+					return !callflow.hasOwnProperty('type');
 				});
 
-				self.groupsBindEvents(template, parent);
-
-				parent
-					.empty()
-					.append(template);
-
-				if(_groupId) {
-					var cells =  parent.find('.grid-row[data-id=' + _groupId + '] .grid-cell');
-
-					monster.ui.fade(cells);
-				}
-
-				for (var group in dataTemplate.groups) {
-					noGroup = ( typeof dataTemplate.groups[group] === 'undefined' ) ? true : false;
-				}
-
-				if ( noGroup ) {
-					parent.find('.grid-row.title').css('display', 'none');
-					parent.find('.no-groups-row').css('display', 'block');
+				if(hasOldData) {
+					monster.ui.alert('error', self.i18n.active().groups.outdatedGroupsError);
 				} else {
-					parent.find('.grid-row.title').css('display', 'block');
-					parent.find('.no-groups-row').css('display', 'none');
+					var dataTemplate = self.groupsFormatListData(data),
+						template = $(monster.template(self, 'groups-layout', { countGroups: Object.keys(dataTemplate.groups).length })),
+						templateGroup;
+
+					_.each(dataTemplate.groups, function(group) {
+						templateGroup = monster.template(self, 'groups-row', group);
+
+						template.find('.groups-rows').append(templateGroup);
+					});
+
+					self.groupsBindEvents(template, parent);
+
+					parent
+						.empty()
+						.append(template);
+
+					if(_groupId) {
+						var cells =  parent.find('.grid-row[data-id=' + _groupId + '] .grid-cell');
+
+						monster.ui.fade(cells);
+					}
+
+					for (var group in dataTemplate.groups) {
+						noGroup = ( typeof dataTemplate.groups[group] === 'undefined' ) ? true : false;
+					}
+
+					if ( noGroup ) {
+						parent.find('.grid-row.title').css('display', 'none');
+						parent.find('.no-groups-row').css('display', 'block');
+					} else {
+						parent.find('.grid-row.title').css('display', 'block');
+						parent.find('.no-groups-row').css('display', 'none');
+					}
 				}
 			});
 		},

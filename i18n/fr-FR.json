@@ -88,7 +88,9 @@
 			"mainMenu": "Menu principal",
 			"voicemails": "Répondeurs",
 			"users": "Utilisateurs"
-		}
+		},
+		"__comment": "UI-819, v3.19_s1: Showing an error popup when group data is outdated.",
+		"outdatedGroupsError": "Les données de vos Groupes sont obsolètes et ne peuvent être affichées. Veuillez contacter votre administrateur afin de mettre à jour vos données."
 	},
 
 	"devices": {
