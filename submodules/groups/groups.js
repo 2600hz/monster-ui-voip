@@ -1691,6 +1691,19 @@ define(function(require){
 						success: function(data) {
 							callback && callback(dataGroup.data);
 						}
+						error: function(e) {
+							monster.request({
+								resource: 'voip.groups.deleteGroup',
+								data: {
+									accountId: self.accountId,
+									groupId: dataGroup.data.id,
+									data: {}
+								},
+								success: function() {
+									
+								}
+							});
+						}
 					});
 				}
 			});
