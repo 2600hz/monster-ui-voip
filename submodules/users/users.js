@@ -217,7 +217,7 @@ define(function(require){
 				if(_userId) {
 					var cells = parent.find('.grid-row[data-id=' + _userId + '] .grid-cell');
 
-					monster.ui.fade(cells);
+					monster.ui.hightlight(cells);
 				}
 
 				if ( dataTemplate.users.length == 0) {

@@ -90,7 +90,7 @@ define(function(require){
 				if(_deviceId) {
 					var row = parent.find('.grid-row[data-id=' + _deviceId + ']');
 
-					monster.ui.fade(row, {
+					monster.ui.hightlight(row, {
 						endColor: '#FCFCFC'
 					});
 				}
