@@ -48,11 +48,11 @@ define(function(require){
 					parent
 						.empty()
 						.append(template);
-
+						
 					if(_groupId) {
 						var cells =  parent.find('.grid-row[data-id=' + _groupId + '] .grid-cell');
 
-						monster.ui.fade(cells);
+						monster.ui.hightlight(cells);
 					}
 
 					for (var group in dataTemplate.groups) {

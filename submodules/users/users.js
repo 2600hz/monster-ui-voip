@@ -206,7 +206,7 @@ define(function(require){
 					template.find('.user-rows').append(templateUser);
 				});
 
-				template.find('[data-toggle="tooltip"]').tooltip();
+				template.find('[data-toggle="tooltip"]').tooltip({ container: 'body'});
 
 				self.usersBindEvents(template, parent, dataTemplate);
 
@@ -217,7 +217,7 @@ define(function(require){
 				if(_userId) {
 					var cells = parent.find('.grid-row[data-id=' + _userId + '] .grid-cell');
 
-					monster.ui.fade(cells);
+					monster.ui.hightlight(cells);
 				}
 
 				if ( dataTemplate.users.length == 0) {
@@ -575,7 +575,9 @@ define(function(require){
 						//FancyCheckboxes.
 						monster.ui.prettyCheck.create(template);
 
-						row.find('.edit-user').append(template).slideDown();
+						row.find('.edit-user').append(template).slideDown(400, function() {
+							$('body').animate({ scrollTop: row.offset().top - (window.innerHeight - row.height() - 10) });
+						});
 
 						$('body').append($('<div id="users_container_overlay"></div>'));
 					});
@@ -2569,7 +2571,7 @@ define(function(require){
 
 					timezone.populateDropdown(template.find('#user_timezone'), dataTemplate.timezone);
 
-					template.find('[data-toggle="tooltip"]').tooltip();
+					template.find('[data-toggle="tooltip"]').tooltip({ container: 'body'});
 
 					callbackAfterFormat && callbackAfterFormat(template, dataTemplate);
 				}
