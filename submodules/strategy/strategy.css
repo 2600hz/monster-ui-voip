@@ -538,7 +538,7 @@
 #strategy_menu_popup .menu-block .menu-line > div,
 #strategy_menu_popup .menu-block .menu-line > input,
 #strategy_menu_popup .menu-block .menu-line > select {
-	margin: 0 15px 0 0;
+	margin: 0 12px 0 0;
 	display: inline-block;
 	vertical-align: middle;
 }

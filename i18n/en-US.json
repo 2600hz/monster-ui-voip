@@ -51,13 +51,6 @@
 		"removeMember": "Remove Member",
 		"distribute": "Distribute",
 		"maxDurationTooltip": "Click this box to change the maximum duration for your ring group. You must enter a number between 30 and 999.",
-		"extraNode": {
-			"label": "If no one answers, forward the call to:",
-			"menu": "Menu",
-			"mainMenu": "Main Menu (Open hours)",
-			"voicemails": "Voicemail Boxes",
-			"users": "Users"
-		},
 		"title": "Groups",
 		"titleGrid": {
 			"groups": "Group Name",
@@ -86,7 +79,18 @@
 			"defaultRingback": "Default Ringback",
 			"emptyUploadAlert": "Please select a file to upload",
 			"fileTooBigAlert": "You can not upload a file with a size exceeding 5MB"
-		}
+		},
+		"nextAction": {
+			"title": "Next Action",
+			"headline": "Add an action when no one picks up",
+			"label": "If no one answers, forward the call to:",
+			"menu": "Menu",
+			"mainMenu": "Main Menu (Open hours)",
+			"voicemails": "Voicemail Boxes",
+			"users": "Users"
+		},
+		"__comment": "UI-819, v3.19_s1: Showing an error popup when group data is outdated.",
+		"outdatedGroupsError": "Your User Groups data is outdated and can not be rendered. Please contact your administrator to update your data."
 	},
 
 	"devices": {

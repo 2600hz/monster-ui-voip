@@ -51,13 +51,6 @@
 		"removeMember": "Supprimer ce membre",
 		"distribute": "Répartir",
 		"maxDurationTooltip": "Cliquez sur le label ci-contre pour changer la durée maximale de ce groupe d'appel. Vous devez saisir un nombre crompris entre 30 et 999.",
-		"extraNode": {
-			"label": "Si personne ne répond, transférer l'appel vers :",
-			"menu": "Menu",
-			"mainMenu": "Menu principal",
-			"voicemails": "Répondeurs",
-			"users": "Utilisateurs"
-		},
 		"title": "Groupes",
 		"titleGrid": {
 			"groups": "Nom du groupe",
@@ -86,7 +79,18 @@
 			"defaultRingback": "Tonalité par défaut",
 			"emptyUploadAlert": "Veuillez sélectionner un fichier à uploader",
 			"fileTooBigAlert": "Vous ne pouvez pas uploader un fichier de taille excédant 5MB"
-		}
+		},
+		"nextAction": {
+			"title": "Action Finale",
+			"headline": "Sélectionner l'Action Finale",
+			"label": "Si personne ne répond, transférer l'appel vers :",
+			"menu": "Menu",
+			"mainMenu": "Menu principal",
+			"voicemails": "Répondeurs",
+			"users": "Utilisateurs"
+		},
+		"__comment": "UI-819, v3.19_s1: Showing an error popup when group data is outdated.",
+		"outdatedGroupsError": "Les données de vos Groupes sont obsolètes et ne peuvent être affichées. Veuillez contacter votre administrateur afin de mettre à jour vos données."
 	},
 
 	"devices": {
