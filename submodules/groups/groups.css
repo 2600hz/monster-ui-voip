@@ -275,18 +275,19 @@
 #groups_container .detail-group .grid-time .group-row.title .scale-max {
 	border: solid 1px #22ccff;
 	border-radius: 4px;
-	padding: 0px 2px;
+	padding: 0px 4px;
 	cursor: pointer;
+	top: -21px;
 }
 
 #groups_container .detail-group .grid-time .group-row.title .scale-max-input {
 	display: none;
 	position: absolute;
-	top: -20px;
+	top: -21px;
 	right: -24px;
-	color: #999;
+	color: #333;
 	font-size: 12px;
-	width: 42px;
+	width: 35px;
 	height: 12px;
 	text-align: center;
 	margin: 0;

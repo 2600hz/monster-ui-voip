@@ -1127,8 +1127,9 @@ define(function(require){
 				var $this = $(this),
 					input = $this.siblings('.scale-max-input');
 
-				input.show();
-				input.focus();	
+				input.show()
+					 .focus()
+					 .select();
 				$this.hide();
 			});
 
