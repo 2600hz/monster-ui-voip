@@ -483,7 +483,7 @@ define(function(require){
 				var $this = $(this),
 					numberToRemove = $this.data('number'),
 					e911Feature = $this.data('e911'),
-					indexToRemove = strategyData.callflows["MainCallflow"].numbers.indexOf(numberToRemove);
+					indexToRemove = strategyData.callflows["MainCallflow"].numbers.indexOf(numberToRemove.toString());
 
 				if(e911Feature === 'active' && container.find('.number-element .remove-number[data-e911="active"]').length === 1) {
 					monster.ui.alert('error', self.i18n.active().strategy.alertMessages.lastE911Error);
