@@ -1073,6 +1073,22 @@ define(function(require){
 				}
 			});
 
+			template.on('keyup', '.detail-devices .search-query', function() {
+				var searchString = $(this).val().toLowerCase(),
+					rows = template.find('.list-unassigned-items .item-row'),
+					emptySearch = template.find('.list-unassigned-items .empty-search-row');
+
+				_.each(rows, function(row) {
+					var row = $(row);
+
+					row.data('search').toLowerCase().indexOf(searchString) < 0 ? row.hide() : row.show();
+				});
+
+				if(rows.size() > 0) {
+					rows.is(':visible') ? emptySearch.hide() : emptySearch.show();
+				}
+			});
+
 			/* Events for Numbers in Users */
 			template.on('click', '.detail-numbers .list-assigned-items .remove-number', function() {
 				var $this = $(this),
