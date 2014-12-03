@@ -491,6 +491,7 @@ define(function(require){
 								'G722': codecsAudioI18n['G722'],
 								'speex@32000h':codecsAudioI18n['speex@32000h'],
 								'speex@16000h': codecsAudioI18n['speex@16000h'],
+								'speex': codecsAudioI18n['speex'],
 								'PCMU': codecsAudioI18n['PCMU'],
 								'PCMA': codecsAudioI18n['PCMA'],
 								'G729':codecsAudioI18n['G729'],

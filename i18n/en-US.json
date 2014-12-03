@@ -125,6 +125,7 @@
 					"G722": "G722",
 					"speex@32000h": "Speex @ 32khz",
 					"speex@16000h": "Speex @ 16khz",
+					"speex": "Speex",
 					"PCMU": "G711u / PCMU - 64kbps (NA)",
 					"PCMA": "G711a / PCMA - 64kbps (Elsewhere)",
 					"G729":"G729 - 8kbps (Requires License)",
