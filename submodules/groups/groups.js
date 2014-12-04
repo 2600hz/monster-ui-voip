@@ -52,7 +52,7 @@ define(function(require){
 					if(_groupId) {
 						var cells =  parent.find('.grid-row[data-id=' + _groupId + '] .grid-cell');
 
-						monster.ui.hightlight(cells);
+						monster.ui.highlight(cells);
 					}
 
 					for (var group in dataTemplate.groups) {
