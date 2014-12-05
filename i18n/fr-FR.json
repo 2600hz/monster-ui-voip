@@ -141,11 +141,15 @@
 				"inherit": "Hériter",
 				"deny": "Refuser",
 				"matcher": {
-					"help": "Saisissez un numéro et cliquez sur \"Tester\" pour voir à quelle catégorie il appartient.",
+					"help": "Saisissez un numéro et cliquez sur \"Tester\" pour savoir s'il sera autorisé.",
 					"placeholder": "+18554443333",
 					"button": "Tester",
-					"label": "Le numéro ci-dessus appartient à cette catégorie."
-				}
+					"label": "Le numéro ci-dessus appartient à cette catégorie.",
+					"allowMessage": "Ce téléphone sera autorisé à appeler le numéro {{phoneNumber}}",
+					"denyMessage": "Ce téléphone ne sera pas autorisé à appeler le numéro {{phoneNumber}}."
+				},
+				"__comment": "UI-727, v3.19_s2: Updating the way call restrictions are displayed on devices.",
+				"allow": "Autoriser"
 			},
 			"video": {
 				"menuTitle": "Vidéo",

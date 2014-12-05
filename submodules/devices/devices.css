@@ -278,11 +278,28 @@
 	margin-left: 5px;
 }
 
-.edit-device .restriction-matcher-label {
-	line-height: 30px;
-	margin-right: 50px;
-	float: right;
+.edit-device .restriction-matcher-sign {
+	margin-left: 20px;
+	width: 25px;
+	vertical-align: middle;
 	display: none;
+}
+
+.edit-device .restriction-list {
+	display: inline-block;
+}
+
+.edit-device .restriction-message {
+	width: 275px;
+	margin: 0 0 0 20px !important;
+	padding: 10px;
+	vertical-align: top;
+	display: none;
+}
+
+.edit-device .restriction-list .restriction-line.disabled .control-label {
+    opacity: 0.5;
+    cursor: default;
 }
 
 /* Codecs selector */

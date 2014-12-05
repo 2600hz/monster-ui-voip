@@ -359,27 +359,61 @@ define(function(require){
 				}
 			});
 
+			templateDevice.find('.restriction-list .switch').on('switch-change', function() {
+				templateDevice.find('.restriction-matcher-sign').hide();
+				templateDevice.find('.restriction-message').hide();
+			});
+
 			templateDevice.find('.restriction-matcher-button').on('click', function(e) {
 				e.preventDefault();
 				var number = templateDevice.find('.restriction-matcher-input').val(),
 					matched = false;
-				templateDevice.find('.restriction-matcher-label').each(function() {
-					var label = $(this),
-						regex =  new RegExp(data.extra.restrictions[label.data('restriction')].regex);
 
-					if(regex.test(number)) {
-						label.show();
-						if(matched) {
-							label.fadeTo(0, 0.5);
-						} else {
-							label.fadeTo(0, 1);
+				if(number) {
+					self.callApi({
+						resource: 'numbers.matchClassifier',
+						data: {
+							accountId: self.accountId,
+							phoneNumber: encodeURIComponent(number)
+						},
+						success: function(data, status) {
+							var matchedLine = templateDevice.find('.restriction-line[data-restriction="'+data.data.name+'"]'),
+								matchedSign = matchedLine.find('.restriction-matcher-sign'),
+								matchedMsg = templateDevice.find('.restriction-message');
+
+							templateDevice.find('.restriction-matcher-sign').hide();
+							if(matchedLine.find('.switch').bootstrapSwitch('status')) {
+								matchedSign.removeClass('icon-red icon-remove')
+										   .addClass('icon-green icon-ok')
+										   .css('display', 'inline-block');
+
+								matchedMsg.removeClass('red-box')
+										  .addClass('green-box')
+										  .css('display', 'inline-block')
+										  .empty()
+										  .text(
+										  	monster.template(self, '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.allowMessage, { phoneNumber: monster.util.formatPhoneNumber(number) })
+										  );
+							} else {
+								matchedSign.removeClass('icon-green icon-ok')
+										   .addClass('icon-red icon-remove')
+										   .css('display', 'inline-block');
+
+								matchedMsg.removeClass('green-box')
+										  .addClass('red-box')
+										  .css('display', 'inline-block')
+										  .empty()
+										  .text(
+										  	monster.template(self, '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.denyMessage, { phoneNumber: monster.util.formatPhoneNumber(number) })
+										  );
+							}
 						}
-						matched = true;
-					} else {
-						label.hide();
-					}
-				});
-			})
+					});
+				} else {
+					templateDevice.find('.restriction-matcher-sign').hide();
+					templateDevice.find('.restriction-message').hide();
+				}
+			});
 
 			var popup = monster.ui.dialog(templateDevice, {
 				position: ['center', 20],
@@ -441,8 +475,12 @@ define(function(require){
 			}
 
 			if('call_restriction' in formData) {
-				_.each(formData.call_restriction, function(restriction) {
-					restriction.action = restriction.action === true ? 'inherit' : 'deny';
+				_.each(formData.call_restriction, function(restriction, key) {
+					if(key in originalData.extra.restrictions && originalData.extra.restrictions[key].disabled) {
+						restriction.action = originalData.extra.restrictions[key].action
+					} else {
+						restriction.action = restriction.action === true ? 'inherit' : 'deny';
+					}
 				});
 			}
 
@@ -605,9 +643,8 @@ define(function(require){
 						}
 					}
 				};
-
+			
 			_.each(data.listClassifiers, function(restriction, name) {
-				defaults.extra.restrictions[name] = restriction;
 				if(name in self.i18n.active().devices.classifiers) {
 					defaults.extra.restrictions[name].friendly_name = self.i18n.active().devices.classifiers[name].name;
 
@@ -616,9 +653,14 @@ define(function(require){
 					}
 				}
 
+				if('call_restriction' in data.accountLimits 
+				&& name in data.accountLimits.call_restriction
+				&& data.accountLimits.call_restriction[name].action === 'deny') {
+					defaults.extra.restrictions[name].disabled = true;
+				}
+
 				if('call_restriction' in data.device && name in data.device.call_restriction) {
 					defaults.extra.restrictions[name].action = data.device.call_restriction[name].action;
-
 				}
 				else {
 					defaults.extra.restrictions[name].action = 'inherit';
@@ -843,6 +885,17 @@ define(function(require){
 					e911Numbers: function(callback) {
 						self.devicesGetE911Numbers(function(e911Numbers) {
 							callback(null, e911Numbers);
+						});
+					},
+					accountLimits: function(callback) {
+						self.callApi({
+							resource: 'limits.get',
+							data: {
+								accountId: self.accountId
+							},
+							success: function(data, status) {
+								callback(null, data.data);
+							}
 						});
 					}
 				},

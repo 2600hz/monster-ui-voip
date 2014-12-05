@@ -158,11 +158,16 @@
 				"inherit": "Inherit",
 				"deny": "Deny",
 				"matcher": {
-					"help": "Type in a number and click on \"Test\" to see which category it falls in.",
+					"help": "Type in a number and click on \"Test\" to see if the call would be allowed.",
 					"placeholder": "+18554443333",
 					"button": "Test",
-					"label": "The above number matched this rule."
-				}
+					"label": "The above number matched this rule.",
+					"__comment": "UI-727, v3.19_s2: Updating the way call restrictions are displayed on devices.",
+					"allowMessage": "This device will be allowed to place a call to {{phoneNumber}}",
+					"denyMessage": "This device will not be allowed to place a call to {{phoneNumber}}."
+				},
+				"__comment": "UI-727, v3.19_s2: Updating the way call restrictions are displayed on devices.",
+				"allow": "Allow"
 			},
 			"video": {
 				"menuTitle": "Video",
