@@ -149,7 +149,8 @@
 					"denyMessage": "Ce téléphone ne sera pas autorisé à appeler le numéro {{phoneNumber}}."
 				},
 				"__comment": "UI-727, v3.19_s2: Updating the way call restrictions are displayed on devices.",
-				"allow": "Autoriser"
+				"allow": "Autoriser",
+				"disabledRestrictionsInfo": "Certains types d'appels on été bloqués pour votre compte et ne peuvent pas être activés sur vos téléphones."
 			},
 			"video": {
 				"menuTitle": "Vidéo",

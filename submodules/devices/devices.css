@@ -267,8 +267,12 @@
 	font-weight: bold;
 }
 
+.edit-device .restrictions-container {
+	position: relative;
+}
+
 .edit-device .restriction-matcher-div {
-	margin-right: 50px;
+	margin-right: 40px;
 	float: right;
 }
 
@@ -291,10 +295,17 @@
 
 .edit-device .restriction-message {
 	width: 275px;
-	margin: 0 0 0 20px !important;
+	margin: 0 0 0 30px !important;
 	padding: 10px;
 	vertical-align: top;
 	display: none;
+}
+
+.edit-device .disabled-restrictions-info {
+	width: 270px;
+	position: absolute;
+	bottom: 0px;
+	right: 40px;
 }
 
 .edit-device .restriction-list .restriction-line.disabled .control-label {

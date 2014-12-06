@@ -657,6 +657,7 @@ define(function(require){
 				&& name in data.accountLimits.call_restriction
 				&& data.accountLimits.call_restriction[name].action === 'deny') {
 					defaults.extra.restrictions[name].disabled = true;
+					defaults.extra.hasDisabledRestrictions = true;
 				}
 
 				if('call_restriction' in data.device && name in data.device.call_restriction) {

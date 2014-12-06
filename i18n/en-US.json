@@ -167,7 +167,8 @@
 					"denyMessage": "This device will not be allowed to place a call to {{phoneNumber}}."
 				},
 				"__comment": "UI-727, v3.19_s2: Updating the way call restrictions are displayed on devices.",
-				"allow": "Allow"
+				"allow": "Allow",
+				"disabledRestrictionsInfo": "Some types of call have been restricted for your entire account and can not be enabled per-device."
 			},
 			"video": {
 				"menuTitle": "Video",
