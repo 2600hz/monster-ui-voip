@@ -190,9 +190,9 @@
 
 .edit-device .actions {
 	border-top: 1px solid #CCCCCC;
-    height: 30px;
-    line-height: 30px;
-    padding: 15px;
+	height: 30px;
+	line-height: 30px;
+	padding: 15px;
 }
 
 .edit-device .actions button {
@@ -237,10 +237,10 @@
 
 .edit-device .content .tabs-section .title {
 	color: #22CCFF;
-    font-size: 24px;
-    margin-bottom: 30px;
-    margin-left: 40px;
-    text-shadow: 1px 0 1px #CCCCCC;
+	font-size: 24px;
+	margin-bottom: 30px;
+	margin-left: 40px;
+	text-shadow: 1px 0 1px #CCCCCC;
 }
 
 .edit-device .content .tabs-section .helper {
@@ -308,9 +308,10 @@
 	right: 40px;
 }
 
-.edit-device .restriction-list .restriction-line.disabled .control-label {
-    opacity: 0.5;
-    cursor: default;
+.edit-device .restriction-list .restriction-line.disabled .control-label,
+.edit-device .restriction-list .restriction-line.disabled .control-label > i {
+	cursor: default;
+	color: #aaa;
 }
 
 /* Codecs selector */
