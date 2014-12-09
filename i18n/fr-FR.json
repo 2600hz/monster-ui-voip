@@ -708,5 +708,41 @@
 			"international": "Numéros internationaux",
 			"noNumber": "Aucun numéro disponible"
 		}
+	},
+
+	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SmartPBX.",
+	"featureCodes": {
+		"title": "Codes d'appel disponibles",
+		"noFeatureCodeMessage": "Aucun code d'appel n'est actuellement disponible sur votre compte. Les codes d'appel sont crées automatiquement lorsque vous chargez la page \"Numéro principal\".",
+		"mainNumberLink": "Aller à \"Numéro principal\"",
+		"labels": {
+			"call_forward[action=activate]": "Activer le Transfert d'appel",
+			"call_forward[action=deactivate]": "Désactiver le Transfert d'appel",
+			"call_forward[action=toggle]": "Activer/Désactiver le Transfert d'appel",
+			"call_forward[action=update]": "Mettre à jour le Transfert d'appel",
+			"call_forward[action=on_busy_enable]": "Activer le Transfert d'appel quand occupé",
+			"call_forward[action=on_busy_disable]": "Désactiver le Transfert d'appel quand occupé",
+			"call_forward[action=no_answer_enable]": "Activer le Transfert d'appel quand l'appelé ne répond pas",
+			"call_forward[action=no_answer_disable]": "Désactiver le Transfert d'appel quand l'appelé ne répond pas",
+			"hotdesk[action=login]": "Activer le \"Hot-Desking\"",
+			"hotdesk[action=logout]": "Désactiver le \"Hot-Desking\"",
+			"hotdesk[action=toggle]": "Activer/Désactiver le \"Hot-Desking\"",
+			"voicemail[action=check]": "Consulter la boite vocale",
+			"voicemail[action=\"direct\"]": "Rediriger vers la boite vocale",
+			"intercom": "Interphone",
+			"privacy[mode=full]": "Privé",
+			"park_and_retrieve": "Stationner/Récuperer",
+			"valet": "Valet",
+			"retrieve": "Récuperer",
+			"donotdisturb[action=\"enable\"]": "Activer \"Ne pas déranger\"",
+			"donotdisturb[action=\"disable\"]": "Désactiver \"Ne pas déranger\"",
+			"donotdisturb[action=\"toggle\"]": "Activer/Désactiver \"Ne pas déranger\"",
+			"directory": "Répertoire",
+			"time": "Consulter l'horloge",
+			"call_waiting[action=enable]": "Activer le double-appel",
+			"call_waiting[action=disable]": "Désactiver le double-appel",
+			"sound_test_service": "Test Son",
+			"call_recording": "Enregistrement d'appel"
+		}
 	}
 }

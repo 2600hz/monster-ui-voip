@@ -1,0 +1,54 @@
+#feature_codes_container .feature-codes-header {
+	font-size: 24px;
+	line-height: 60px;
+	margin-bottom: 22px;
+}
+
+#feature_codes_container .feature-codes-content {
+	padding: 20px;
+	border: 1px solid #dcdcdc;
+	border-radius: 4px;
+	background-color: #f6f6f6;
+	background-image: -webkit-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+	background-image:    -moz-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+	background-image:     -ms-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+	background-image:      -o-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+	background-image:         linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+	color: #555;
+}
+
+#feature_codes_container .feature-codes-content .feature-code-line:not(:first-child) {
+	margin-top: 10px;
+}
+#feature_codes_container .feature-codes-content .feature-code-line {
+    border-top: solid 1px transparent;
+    border-bottom: solid 1px transparent;
+}
+#feature_codes_container .feature-codes-content .feature-code-line:hover {
+    border-bottom-color: #dcdcdc;
+    border-top-color: #dcdcdc;
+}
+
+#feature_codes_container .feature-codes-content .feature-code-line div {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+#feature_codes_container .feature-codes-content .feature-code-label {
+	width: 160px;
+	text-align: right;
+	margin-right: 20px;
+}
+
+#feature_codes_container .feature-code {
+	font-weight: bold;
+	font-size: 18px;
+	letter-spacing: 2px;
+}
+
+#feature_codes_container .no-feature-codes .message {
+	margin-bottom: 10px;
+}
+#feature_codes_container .no-feature-codes .main-number-link {
+	cursor: pointer;
+}

@@ -35,7 +35,7 @@ define(function(require){
 		subscribe: {
 		},
 
-		subModules: ['devices', 'groups', 'numbers', 'strategy', 'callLogs', 'users', 'myOffice'],
+		subModules: ['devices', 'groups', 'numbers', 'strategy', 'callLogs', 'users', 'myOffice', 'featureCodes'],
 
 		load: function(callback){
 			var self = this;
@@ -118,6 +118,10 @@ define(function(require){
 
 			parent.find('.category#call_logs').on('click', function() {
 				monster.pub('voip.callLogs.render', args);
+			});
+
+			parent.find('.category#feature_codes').on('click', function() {
+				monster.pub('voip.featureCodes.render', args);
 			});
 		}
 	};

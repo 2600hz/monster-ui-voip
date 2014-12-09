@@ -11,7 +11,8 @@
 		"devices": "Devices",
 		"mainNumber": "Main Number",
 		"callLogs": "Call Logs",
-		"quickLinks": "Help Topics"
+		"quickLinks": "Help Topics",
+		"featureCodes": "Feature Codes"
 	},
 
 	"groups": {
@@ -730,6 +731,42 @@
 			"tollfree": "Toll-free Numbers",
 			"international": "International Numbers",
 			"noNumber": "No number available"
+		}
+	},
+
+	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SmartPBX.",
+	"featureCodes": {
+		"title": "Available Feature Codes",
+		"noFeatureCodeMessage": "There are no feature codes enabled on your account yet. Feature codes are automatically created when you load the Main Number page.",
+		"mainNumberLink": "Go to Main Number",
+		"labels": {
+			"call_forward[action=activate]": "Enable Call-Forward",
+			"call_forward[action=deactivate]": "Disable Call-Forward",
+			"call_forward[action=toggle]": "Toggle Call-Forward",
+			"call_forward[action=update]": "Update Call-Forward",
+			"call_forward[action=on_busy_enable]": "Enable Call-Forward on Busy",
+			"call_forward[action=on_busy_disable]": "Disable Call-Forward on Busy",
+			"call_forward[action=no_answer_enable]": "Enable Call-Forward No Answer",
+			"call_forward[action=no_answer_disable]": "Disable Call-Forward No Answer",
+			"hotdesk[action=login]": "Enable Hot Desking",
+			"hotdesk[action=logout]": "Disable Hot Desking",
+			"hotdesk[action=toggle]": "Toggle Hot Desking",
+			"voicemail[action=check]": "Check Voicemail",
+			"voicemail[action=\"direct\"]": "Direct to Voicemail",
+			"intercom": "Intercom",
+			"privacy[mode=full]": "Privacy",
+			"park_and_retrieve": "Park and Retrieve",
+			"valet": "Valet",
+			"retrieve": "Retrieve",
+			"donotdisturb[action=\"enable\"]": "Enable Do not disturb",
+			"donotdisturb[action=\"disable\"]": "Disable Do not disturb",
+			"donotdisturb[action=\"toggle\"]": "Toggle Do not disturb",
+			"directory": "Directory",
+			"time": "Check Time",
+			"call_waiting[action=enable]": "Enable Call-Waiting",
+			"call_waiting[action=disable]": "Disable Call-Waiting",
+			"sound_test_service": "Sound Test Service",
+			"call_recording": "Call Recording"
 		}
 	}
 }
