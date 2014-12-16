@@ -1922,7 +1922,15 @@ define(function(require){
 		},
 
 		usersRenderFindMeFollowMe: function(params) {
-			var self = this;
+			var self = this,
+				deviceIcons = {
+					'softphone': 'icon-telicon-soft-phone',
+					'cellphone': 'icon-telicon-mobile-phone',
+					'smartphone': 'icon-telicon-sprint-phone',
+					'sip_device': 'icon-telicon-voip-phone',
+					'fax': 'icon-telicon-fax',
+					'landline': 'icon-telicon-home-phone'
+				};
 
 			if(!params.userCallflow) {
 				monster.ui.alert('error', self.i18n.active().users.find_me_follow_me.noNumber);
@@ -1930,9 +1938,8 @@ define(function(require){
 				monster.ui.alert('error', self.i18n.active().users.find_me_follow_me.noDevice);
 			} else {
 				var currentUser = params.currentUser,
-					userDevices = monster.util.sort(params.userDevices, 'name'),
 					userCallflow = params.userCallflow,
-					featureTemplate = $(monster.template(self, 'users-feature-find_me_follow_me', { currentUser: currentUser, devices: userDevices })),
+					featureTemplate = $(monster.template(self, 'users-feature-find_me_follow_me', { currentUser: currentUser })),
 					switchFeature = featureTemplate.find('.switch').bootstrapSwitch(),
 					featureForm = featureTemplate.find('#find_me_follow_me_form'),
 					args = {
@@ -1941,13 +1948,44 @@ define(function(require){
 						},
 						openedTab: 'features'
 					},
-					selectedDevices = {};
+					endpoints = (userCallflow.flow.module === 'ring_group' ? userCallflow.flow.data.endpoints : []),
+					userDevices = {};
 
-				if(userCallflow.flow.module === 'ring_group') {
-					_.each(userCallflow.flow.data.endpoints, function(val) {
-						selectedDevices[val.id] = val;
-					});
-				}
+				_.each(params.userDevices, function(val) {
+					userDevices[val.id] = val;
+				});
+
+				endpoints = $.map(endpoints, function(endpoint) {
+					if(userDevices[endpoint.id]) {
+						var device = userDevices[endpoint.id];
+						delete userDevices[endpoint.id];
+						return {
+							id: endpoint.id,
+							delay: endpoint.delay,
+							timeout: endpoint.timeout,
+							name: device.name,
+							icon: deviceIcons[device.device_type],
+							disabled: false
+						}
+					}
+				});
+
+				_.each(userDevices, function(device) {
+					endpoints.push({
+						id: device.id,
+						delay: 0,
+						timeout: 0,
+						name: device.name,
+						icon: deviceIcons[device.device_type],
+						disabled: true
+					})
+				});
+
+				monster.pub('common.ringingDurationControl.render', {
+					container: featureForm,
+					endpoints: endpoints,
+					hasDisableColumn: true
+				});
 
 				featureTemplate.find('.cancel-link').on('click', function() {
 					popup.dialog('close').remove();
@@ -1958,130 +1996,71 @@ define(function(require){
 				});
 
 				featureTemplate.find('.save').on('click', function() {
-					var enabled = switchFeature.bootstrapSwitch('status'),
-						enabledDevices = featureTemplate.find('.device-row[data-device_id]:not(.disabled)');
+					var enabled = switchFeature.bootstrapSwitch('status');
 
-					currentUser.smartpbx = currentUser.smartpbx || {};
-					currentUser.smartpbx.find_me_follow_me = currentUser.smartpbx.find_me_follow_me || {};
-					currentUser.smartpbx.find_me_follow_me.enabled = (enabled && enabledDevices.length > 0);
+					monster.pub('common.ringingDurationControl.getEndpoints', { 
+						container: featureForm,
+						callback: function(endpoints) {
 
-					if(enabled && enabledDevices.length > 0) {
-						userCallflow.flow.module = 'ring_group';
-						userCallflow.flow.data = {
-							strategy: "simultaneous",
-							timeout: 20,
-							endpoints: []
-						}
-						$.each(enabledDevices, function() {
-							var $row = $(this),
-								deviceId = $row.data('device_id'),
-								values = $row.find('.slider-time').slider('values');
+							currentUser.smartpbx = currentUser.smartpbx || {};
+							currentUser.smartpbx.find_me_follow_me = currentUser.smartpbx.find_me_follow_me || {};
+							currentUser.smartpbx.find_me_follow_me.enabled = (enabled && endpoints.length > 0);
 
-							userCallflow.flow.data.endpoints.push({
-								id: deviceId,
-								endpoint_type: "device",
-								delay: values[0],
-								timeout: (values[1] - values[0])
-							});
+							if(enabled && endpoints.length > 0) {
+								userCallflow.flow.module = 'ring_group';
+								userCallflow.flow.data = {
+									strategy: "simultaneous",
+									timeout: 20,
+									endpoints: []
+								}
+								_.each(endpoints, function(endpoint) {
+									userCallflow.flow.data.endpoints.push({
+										id: endpoint.id,
+										endpoint_type: "device",
+										delay: endpoint.delay,
+										timeout: endpoint.timeout
+									});
 
-							if(values[1] > userCallflow.flow.data.timeout) { userCallflow.flow.data.timeout = values[1]; }
-						});
-					} else {
-						userCallflow.flow.module = 'user';
-						userCallflow.flow.data = {
-							can_call_self: false,
-							id: currentUser.id,
-							timeout: 20
-						}
-					}
-
-					monster.parallel({
-							callflow: function(callbackParallel) {
-								self.usersUpdateCallflow(userCallflow, function(data) {
-									callbackParallel && callbackParallel(null, data.data);
+									if((endpoint.delay+endpoint.timeout) > userCallflow.flow.data.timeout) { userCallflow.flow.data.timeout = (endpoint.delay+endpoint.timeout); }
 								});
-							},
-							user: function(callbackParallel) {
-								self.usersUpdateUser(currentUser, function(data) {
-									callbackParallel && callbackParallel(null, data.data);
-								});
-							}
-						},
-						function(err, results) {
-							args.userId = results.user.id;
-							if(typeof params.saveCallback === 'function') {
-								params.saveCallback(args);
 							} else {
-								self.usersRender(args);
+								userCallflow.flow.module = 'user';
+								userCallflow.flow.data = {
+									can_call_self: false,
+									id: currentUser.id,
+									timeout: 20
+								}
 							}
-						}
-					);
-				});
 
-				monster.ui.prettyCheck.create(featureTemplate.find('.disable-device'));
+							monster.parallel({
+									callflow: function(callbackParallel) {
+										self.usersUpdateCallflow(userCallflow, function(data) {
+											callbackParallel && callbackParallel(null, data.data);
+										});
+									},
+									user: function(callbackParallel) {
+										self.usersUpdateUser(currentUser, function(data) {
+											callbackParallel && callbackParallel(null, data.data);
+										});
+									}
+								},
+								function(err, results) {
+									args.userId = results.user.id;
+									if(typeof params.saveCallback === 'function') {
+										params.saveCallback(args);
+									} else {
+										self.usersRender(args);
+									}
+								}
+							);
+						}
+					});
+				});
 
 				var popup = monster.ui.dialog(featureTemplate, {
 					title: currentUser.extra.mapFeatures.find_me_follow_me.title,
 					position: ['center', 20]
 				});
-
-				featureTemplate.find('.disable-device').on('ifToggled', function() {
-					var parentRow = $(this).parents('.device-row');
-					if(this.checked) {
-						parentRow.find('.times').stop().animate({ opacity: 0 });
-						parentRow.addClass('disabled')
-					} else {
-						parentRow.find('.times').stop().animate({ opacity: 1 });
-						parentRow.removeClass('disabled')
-					}
-				});
-
-				featureTemplate.find('.distribute-button').on('click', function() {
-					var sliders = featureTemplate.find('.slider-time')
-						max = sliders.first().slider('option', 'max'),
-						section = Math.floor(max/sliders.length),
-						current = 0;
-
-					monster.ui.prettyCheck.action(featureTemplate.find('.device-row .disable-device'), 'uncheck');
-					$.each(sliders, function() {
-						$(this).slider('values', [current, current+=section]);
-					});
-				});
-
-				featureTemplate.on('click', '.device-row.title .scale-max', function() {
-					var $this = $(this),
-						input = $this.siblings('.scale-max-input');
-
-					input.show()
-						 .focus()
-						 .select();	
-					$this.hide();
-				});
-
-				featureTemplate.on('blur', '.device-row.title .scale-max-input', function(e) {
-					var $this = $(this),
-						value = $this.val(),
-						intValue = parseInt($this.val());
-					if(value != $this.data('current') && !isNaN(intValue) && intValue >= 30) {
-						self.usersRenderFindMeFollowMeSliders(featureTemplate, userDevices, selectedDevices, intValue);
-					} else {
-						$this.val($this.data('current')).hide();
-						$this.siblings('.scale-max').show();
-					}
-				});
-
-				featureTemplate.on('keydown', '.device-row.title .scale-max-input', function(e) {
-					switch(e.keyCode) {
-						case 27:
-							$(this).val(-1);
-						case 13:
-							e.preventDefault();
-							$(this).blur();
-						break;
-					}
-				});
-
-				self.usersRenderFindMeFollowMeSliders(featureTemplate, userDevices, selectedDevices);
 			}
 		},
 
