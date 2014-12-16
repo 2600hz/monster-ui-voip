@@ -430,17 +430,14 @@ define(function(require){
 				var results = self.groupsFormatMembersData(results);
 
 				template = $(monster.template(self, 'groups-members', results));
-				
-				self.groupsRenderMemberSliders(template, results.extra.ringGroup);
 
-				self.groupsBindMembers(template, results);
-
-				template.find('.grid-time').sortable({
-					items: '.group-row:not(.title)',
-					placeholder: 'group-row-placeholder'
+				monster.pub('common.ringingDurationControl.render', {
+					container: template.find('.members-container'),
+					endpoints: results.extra.ringGroup,
+					hasRemoveColumn: true
 				});
 
-				template.find('[data-toggle="tooltip"]').tooltip();
+				self.groupsBindMembers(template, results);
 
 				callback && callback(template, results);
 			});
@@ -1087,81 +1084,23 @@ define(function(require){
 		},
 
 		groupsBindMembers: function(template, data) {
-			var self = this,
-				displayedRingGroups = $.extend(true, [], data.extra.ringGroup);
-
-			template.find('.distribute-button').on('click', function() {
-				var sliders = template.find('.slider-time')
-					max = sliders.first().slider('option', 'max'),
-					section = Math.floor(max/sliders.length),
-					current = 0;
-				$.each(sliders, function() {
-					$(this).slider('values', [current, current+=section]);
-				});
-			});
+			var self = this;
 
 			template.find('.save-groups').on('click', function() {
-				var endpoints = [],
-					groupId = data.id;
+				var groupId = data.id;
 
-				$.each(template.find('.group-row:not(.title)'), function() {
-					var $row = $(this),
-						userId = $row.data('user_id'),
-						values = $row.find('.slider-time').slider('values'),
-						user = {
-							delay: values[0],
-							timeout: (values[1] - values[0]),
-							id: userId,
-							endpoint_type: 'user'
-						};
+				monster.pub('common.ringingDurationControl.getEndpoints', { 
+					container: template,
+					callback: function(endpoints) {
+						_.each(endpoints, function(endpoint) {
+							delete endpoint.name;
+							endpoint.endpoint_type = 'user';
+						});
 
-					endpoints.push(user);
-				});
-
-				self.groupsUpdateBaseRingGroup(groupId, endpoints, function(data) {
-					self.groupsRender({ groupId: groupId });
-				});
-			});
-
-			template.on('click', '.group-row.title .scale-max', function() {
-				var $this = $(this),
-					input = $this.siblings('.scale-max-input');
-
-				input.show()
-					 .focus()
-					 .select();
-				$this.hide();
-			});
-
-			template.on('blur', '.group-row.title .scale-max-input', function(e) {
-				var $this = $(this),
-					value = $this.val()
-					intValue = parseInt($this.val());
-				if(value != $this.data('current') && !isNaN(intValue) && intValue >= 30) {
-					self.groupsRenderMemberSliders(template, displayedRingGroups, intValue);
-				} else {
-					$this.val($this.data('current')).hide();
-					$this.siblings('.scale-max').show();
-				}
-			});
-
-			template.on('keydown', '.group-row.title .scale-max-input', function(e) {
-				var charCode = (e.which) ? e.which : event.keyCode;
-				if(charCode > 57 && charCode < 96) { return false; }
-				else if(charCode === 13) { $(this).blur(); }
-				else if(charCode === 27) {
-					var $this = $(this);
-					$this.val($this.data('current')).blur();
-				}
-			});
-
-			template.on('click', '.remove-user', function() {
-				var parentRow = $(this).parents('.group-row'),
-					userId = parentRow.data('user_id');
-				template.find('.add-user[data-id="'+userId+'"]').removeClass('in-use');
-				parentRow.remove();
-				displayedRingGroups = _.filter(displayedRingGroups, function(val) {
-					return val.id !== userId;
+						self.groupsUpdateBaseRingGroup(groupId, endpoints, function(data) {
+							self.groupsRender({ groupId: groupId });
+						});
+					}
 				});
 			});
 
@@ -1175,90 +1114,14 @@ define(function(require){
 						name: $(this).text()
 					};
 
-				displayedRingGroups.push(newEndpoint);
-				template.find('.grid-time').append(monster.template(self, 'groups-membersRow', {
-					id: newEndpoint.id,
-					name: newEndpoint.name
-				}));
-				// createSlider(newEndpoint);
-				self.groupsRenderMemberSliders(template, [newEndpoint], parseInt(template.find('.group-row.title .scale-max-input').val()));
+				monster.pub('common.ringingDurationControl.addEndpoint', {
+					container: template.find('.members-container'),
+					endpoint: newEndpoint,
+					hasRemoveColumn: true
+				});
 
 				$this.addClass('in-use');
 			});
-		},
-
-		groupsRenderMemberSliders: function(template, ringGroup, maxSeconds) {
-			var self = this,
-				scaleSections = 6, //Number of 'sections' in the time scales for the sliders
-				scaleMaxSeconds = maxSeconds && maxSeconds >= 30 ? maxSeconds : 120; //Maximum of seconds, corresponding to the end of the scale
-
-			if(!maxSeconds) {
-				var currentMax = 0;
-				_.each(ringGroup, function(endpoint) {
-					currentMax = (endpoint.delay+endpoint.timeout > currentMax) ? endpoint.delay+endpoint.timeout : currentMax;
-				});
-				scaleMaxSeconds = currentMax > scaleMaxSeconds ? Math.ceil(currentMax/60)*60 : scaleMaxSeconds;
-			}
-
-			var sliderTooltip = function(event, ui) {
-					var val = ui.value,
-						tooltip = '<div class="slider-tooltip"><div class="slider-tooltip-inner">' + val + '</div></div>';
-
-					$(ui.handle).html(tooltip);
-				},
-				createTooltip = function(event, ui, userId, sliderObj) {
-					var val1 = sliderObj.slider('values', 0),
-						val2 = sliderObj.slider('values', 1),
-						tooltip1 = '<div class="slider-tooltip"><div class="slider-tooltip-inner">' + val1 + '</div></div>',
-						tooltip2 = '<div class="slider-tooltip"><div class="slider-tooltip-inner">' + val2 + '</div></div>';
-
-					template.find('.group-row[data-user_id="'+ userId + '"] .slider-time .ui-slider-handle').first().html(tooltip1);
-					template.find('.group-row[data-user_id="'+ userId + '"] .slider-time .ui-slider-handle').last().html(tooltip2);
-				},
-				createSlider = function(endpoint) {
-					var groupRow = template.find('.group-row[data-user_id="'+ endpoint.id +'"]'),
-						slider = groupRow.find('.slider-time').slider({
-							range: true,
-							min: 0,
-							max: scaleMaxSeconds,
-							values: [ endpoint.delay, endpoint.delay+endpoint.timeout ],
-							slide: sliderTooltip,
-							change: sliderTooltip,
-							create: function(event, ui) {
-								createTooltip(event, ui, endpoint.id, $(this));
-							},
-						});
-					if(groupRow.hasClass('deleted')) {
-						slider.slider('disable');
-					}
-					createSliderScale(groupRow);
-				},
-				createSliderScale = function(container, isHeader) {
-					var scaleContainer = container.find('.scale-container')
-						isHeader = isHeader || false;
-
-					scaleContainer.empty();
-
-					for(var i=1; i<=scaleSections; i++) {
-						var toAppend = '<div class="scale-element" style="width:'+(100/scaleSections)+'%;">'
-									 + (isHeader 
-								 		? (i==scaleSections 
-								 			? '<input type="text" value="'+scaleMaxSeconds+'" data-current="'+scaleMaxSeconds+'" class="scale-max-input" maxlength="3"><span class="scale-max">'
-								 			:'<span>')
-								 			+ Math.floor(i*scaleMaxSeconds/scaleSections) + ' Sec</span>' 
-							 			: '')
-									 + '</div>';
-						scaleContainer.append(toAppend);
-					}
-					if(isHeader) {
-						scaleContainer.append('<span>0 Sec</span>');
-					}
-				};
-		
-				_.each(ringGroup, function(endpoint) {
-					createSlider(endpoint);
-				});
-				createSliderScale(template.find('.group-row.title'), true);
 		},
 
 		groupsGetCreationData: function(callback) {
