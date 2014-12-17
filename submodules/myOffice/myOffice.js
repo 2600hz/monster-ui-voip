@@ -5,69 +5,8 @@ define(function(require){
 		chart = require('chart');
 
 	var app = {
-		requests: {
-			'voip.myOffice.getAccount': {
-				url: 'accounts/{accountId}',
-				verb: 'GET'
-			},
-			'voip.myOffice.updateAccount': {
-				url: 'accounts/{accountId}',
-				verb: 'POST'
-			},
-			'voip.myOffice.listUsers': {
-				url: 'accounts/{accountId}/users',
-				verb: 'GET'
-			},
-			'voip.myOffice.listDevices': {
-				url: 'accounts/{accountId}/devices',
-				verb: 'GET'
-			},
-			'voip.myOffice.getDevicesStatus': {
-				url: 'accounts/{accountId}/devices/status',
-				verb: 'GET'
-			},
-			'voip.myOffice.listNumbers': {
-				url: 'accounts/{accountId}/phone_numbers',
-				verb: 'GET'
-			},
-			'voip.myOffice.getNumber': {
-				url: 'accounts/{accountId}/phone_numbers/{phoneNumber}',
-				verb: 'GET'
-			},
-			'voip.myOffice.updateNumber': {
-				url: 'accounts/{accountId}/phone_numbers/{phoneNumber}',
-				verb: 'POST'
-			},
-			'voip.myOffice.listDirectories': {
-				url: 'accounts/{accountId}/directories',
-				verb: 'GET'
-			},
-			'voip.myOffice.listChannels': {
-				url: 'accounts/{accountId}/channels',
-				verb: 'GET'
-			},
-			'voip.myOffice.listTypedCallflows': {
-				url: 'accounts/{accountId}/callflows?has_value=type',
-				verb: 'GET'
-			},
-			'voip.myOffice.listMedia': {
-				url: 'accounts/{accountId}/media?key_missing=type',
-				verb: 'GET'
-			},
-			'voip.myOffice.createMedia': {
-				url: 'accounts/{accountId}/media',
-				verb: 'PUT'
-			},
-			'voip.myOffice.deleteMedia': {
-				url: 'accounts/{accountId}/media/{mediaId}',
-				verb: 'DELETE'
-			},
-			'voip.myOffice.uploadMedia': {
-				url: 'accounts/{accountId}/media/{mediaId}/raw',
-				verb: 'POST',
-				type: 'application/x-base64'
-			}
-		},
+
+		requests: {},
 
 		subscribe: {
 			'voip.myOffice.render': 'myOfficeRender'
@@ -176,21 +115,22 @@ define(function(require){
 
 		myOfficeLoadData: function(callback) {
 			var self = this;
+
 			monster.parallel({
 					account: function(parallelCallback) {
-						monster.request({
-							resource: 'voip.myOffice.getAccount',
+						self.callApi({
+							resource: 'account.get',
 							data: {
 								accountId: self.accountId
 							},
-							success: function(dataUsers) {
-								parallelCallback && parallelCallback(null, dataUsers.data);
+							success: function(dataAccount) {
+								parallelCallback && parallelCallback(null, dataAccount.data);
 							}
 						});
 					},
 					users: function(parallelCallback) {
-						monster.request({
-							resource: 'voip.myOffice.listUsers',
+						self.callApi({
+							resource: 'user.list',
 							data: {
 								accountId: self.accountId
 							},
@@ -200,8 +140,8 @@ define(function(require){
 						});
 					},
 					devices: function(parallelCallback) {
-						monster.request({
-							resource: 'voip.myOffice.listDevices',
+						self.callApi({
+							resource: 'device.list',
 							data: {
 								accountId: self.accountId
 							},
@@ -211,8 +151,8 @@ define(function(require){
 						});
 					},
 					devicesStatus: function(parallelCallback) {
-						monster.request({
-							resource: 'voip.myOffice.getDevicesStatus',
+						self.callApi({
+							resource: 'device.getStatus',
 							data: {
 								accountId: self.accountId
 							},
@@ -222,8 +162,8 @@ define(function(require){
 						});
 					},
 					numbers: function(parallelCallback) {
-						monster.request({
-							resource: 'voip.myOffice.listNumbers',
+						self.callApi({
+							resource: 'numbers.list',
 							data: {
 								accountId: self.accountId
 							},
@@ -238,8 +178,8 @@ define(function(require){
 						});
 					},
 					channels: function(parallelCallback) {
-						monster.request({
-							resource: 'voip.myOffice.listChannels',
+						self.callApi({
+							resource: 'channel.list',
 							data: {
 								accountId: self.accountId
 							},
@@ -249,9 +189,12 @@ define(function(require){
 						});
 					},
 					callflows: function(parallelCallback) {
-						monster.request({
-							resource: 'voip.myOffice.listTypedCallflows',
+						self.callApi({
+							resource: 'callflow.list',
 							data: {
+								filters: {
+									has_type: 'type',
+								},
 								accountId: self.accountId
 							},
 							success: function(data) {
@@ -546,7 +489,7 @@ define(function(require){
 				account = args.account,
 				silenceMediaId = 'silence_stream://300000';
 
-			self.groupsListMedias(function(medias) {
+			self.myOfficeListMedias(function(medias) {
 				var templateData = {
 						silenceMedia: silenceMediaId,
 						mediaList: medias,
@@ -606,8 +549,8 @@ define(function(require){
 					fileReader = new FileReader();
 
 				fileReader.onloadend = function(evt) {
-					monster.request({
-						resource: 'voip.myOffice.createMedia',
+					self.callApi({
+						resource: 'media.create',
 						data: {
 							accountId: self.accountId,
 							data: {
@@ -619,8 +562,8 @@ define(function(require){
 						},
 						success: function(data, status) {
 							var media = data.data;
-							monster.request({
-								resource: 'voip.myOffice.uploadMedia',
+							self.callApi({
+								resource: 'media.upload',
 								data: {
 									accountId: self.accountId,
 									mediaId: media.id,
@@ -630,8 +573,8 @@ define(function(require){
 									closeUploadDiv(media);
 								},
 								error: function(data, status) {
-									monster.request({
-										resource: 'voip.myOffice.deleteMedia',
+									self.callApi({
+										resource: 'media.delete',
 										data: {
 											accountId: self.accountId,
 											mediaId: media.id,
@@ -841,8 +784,8 @@ define(function(require){
 		myOfficeGetNumber: function(number, success, error) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.myOffice.getNumber',
+			self.callApi({
+				resource: 'numbers.get',
 				data: {
 					accountId: self.accountId,
 					phoneNumber: encodeURIComponent(number)
@@ -859,8 +802,8 @@ define(function(require){
 		myOfficeUpdateNumber: function(numberData, success, error) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.myOffice.updateNumber',
+			self.callApi({
+				resource: 'numbers.update',
 				data: {
 					accountId: self.accountId,
 					phoneNumber: encodeURIComponent(numberData.id),
@@ -878,10 +821,11 @@ define(function(require){
 		myOfficeListMedias: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.myOffice.listMedia',
+			self.callApi({
+				resource: 'media.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: { 'key_missing':'type' }
 				},
 				success: function(medias) {
 					callback && callback(medias.data);
@@ -894,8 +838,8 @@ define(function(require){
 
 			delete account.extra;
 
-			monster.request({
-				resource: 'voip.myOffice.updateAccount',
+			self.callApi({
+				resource: 'account.update',
 				data: {
 					accountId: self.accountId,
 					data: account

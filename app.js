@@ -13,27 +13,8 @@ define(function(require){
 			'fr-FR': { customCss: false }
 		},
 
-		requests: {
-			'voip.users.getUsers': {
-				url: 'accounts/{accountId}/users',
-				verb: 'GET'
-			},
-			'voip.groups.listGroups': {
-				url: 'accounts/{accountId}/groups',
-				verb: 'GET'
-			},
-			'common.numbers.list': {
-				url: 'accounts/{accountId}/phone_numbers',
-				verb: 'GET'
-			},
-			'voip.devices.listDevices': {
-				url: 'accounts/{accountId}/devices',
-				verb: 'GET'
-			},
-		},
-
-		subscribe: {
-		},
+		requests: {},
+		subscribe: {},
 
 		subModules: ['devices', 'groups', 'numbers', 'strategy', 'callLogs', 'users', 'myOffice', 'featureCodes'],
 

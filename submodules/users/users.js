@@ -8,177 +8,7 @@ define(function(require){
 
 	var app = {
 
-		requests: {
-			/* Users */
-			'voip.users.getUsers': {
-				url: 'accounts/{accountId}/users',
-				verb: 'GET'
-			},
-			'voip.users.updateUser': {
-				url: 'accounts/{accountId}/users/{userId}',
-				verb: 'POST'
-			},
-			'voip.users.createUser': {
-				url: 'accounts/{accountId}/users',
-				verb: 'PUT'
-			},
-			'voip.users.getUser': {
-				url: 'accounts/{accountId}/users/{userId}',
-				verb: 'GET'
-			},
-			'voip.users.deleteUser': {
-				url: 'accounts/{accountId}/users/{userId}',
-				verb: 'DELETE'
-			},
-			/* VMBoxes*/
-			'voip.users.listVMBoxes': {
-				url: 'accounts/{accountId}/vmboxes',
-				verb: 'GET'
-			},
-			'voip.users.createVMBox': {
-				url: 'accounts/{accountId}/vmboxes',
-				verb: 'PUT'
-			},
-			'voip.users.getVMBox': {
-				url: 'accounts/{accountId}/vmboxes/{vmboxId}',
-				verb: 'GET'
-			},
-			'voip.users.updateVMBox': {
-				url: 'accounts/{accountId}/vmboxes/{vmboxId}',
-				verb: 'POST'
-			},
-			'voip.users.deleteVMBox': {
-				url: 'accounts/{accountId}/vmboxes/{vmboxId}',
-				verb: 'DELETE'
-			},
-			'voip.users.listUserVMBoxes': {
-				url: 'accounts/{accountId}/vmboxes?filter_owner_id={userId}',
-				verb: 'GET'
-			},
-			/* Callflows */
-			'voip.users.getCallflows': {
-				url: 'accounts/{accountId}/callflows',
-				verb: 'GET'
-			},
-			'voip.users.createCallflow': {
-				url: 'accounts/{accountId}/callflows',
-				verb: 'PUT'
-			},
-			'voip.users.listUserCallflows': {
-				url: 'accounts/{accountId}/callflows?filter_owner_id={userId}',
-				verb: 'GET'
-			},
-			'voip.users.getCallflow': {
-				url: 'accounts/{accountId}/callflows/{callflowId}',
-				verb: 'GET'
-			},
-			'voip.users.updateCallflow': {
-				url: 'accounts/{accountId}/callflows/{callflowId}',
-				verb: 'POST'
-			},
-			'voip.users.deleteCallflow': {
-				url: 'accounts/{accountId}/callflows/{callflowId}',
-				verb: 'DELETE'
-			},
-			'voip.users.listConfNumbers': {
-				url: 'accounts/{accountId}/callflows?filter_type=conference',
-				verb: 'GET'
-			},
-			/* Devices */
-			'voip.users.listDevices': {
-				url: 'accounts/{accountId}/devices',
-				verb: 'GET'
-			},
-			'voip.users.listUserDevices': {
-				url: 'accounts/{accountId}/devices?filter_owner_id={userId}',
-				verb: 'GET'
-			},
-			'voip.users.getDevice': {
-				url: 'accounts/{accountId}/devices/{deviceId}',
-				verb: 'GET'
-			},
-			'voip.users.updateDevice': {
-				url: 'accounts/{accountId}/devices/{deviceId}',
-				verb: 'POST'
-			},
-			'voip.users.deleteDevice': {
-				url: 'accounts/{accountId}/devices/{deviceId}',
-				verb: 'DELETE'
-			},
-			/* Directories */
-			'voip.users.listDirectories': {
-				url: 'accounts/{accountId}/directories',
-				verb: 'GET'
-			},
-			'voip.users.createDirectory': {
-				url: 'accounts/{accountId}/directories',
-				verb: 'PUT'
-			},
-			/* Conferences */
-			'voip.users.createConference': {
-				url: 'accounts/{accountId}/conferences',
-				verb: 'PUT'
-			},
-			'voip.users.getConference': {
-				url: 'accounts/{accountId}/conferences/{conferenceId}',
-				verb: 'GET'
-			},
-			'voip.users.updateConference': {
-				url: 'accounts/{accountId}/conferences/{conferenceId}',
-				verb: 'POST'
-			},
-			'voip.users.deleteConference': {
-				url: 'accounts/{accountId}/conferences/{conferenceId}',
-				verb: 'DELETE'
-			},
-			'voip.users.listUserConferences': {
-				url: 'accounts/{accountId}/conferences?filter_owner_id={userId}',
-				verb: 'GET'
-			},
-			/* Media */
-			'voip.users.listMedia': {
-				url: 'accounts/{accountId}/media?key_missing=type',
-				verb: 'GET'
-			},
-			'voip.users.createMedia': {
-				url: 'accounts/{accountId}/media',
-				verb: 'PUT'
-			},
-			'voip.users.deleteMedia': {
-				url: 'accounts/{accountId}/media/{mediaId}',
-				verb: 'DELETE'
-			},
-			'voip.users.uploadMedia': {
-				url: 'accounts/{accountId}/media/{mediaId}/raw',
-				verb: 'POST',
-				type: 'application/x-base64'
-			},
-			/* Misc */
-			'voip.users.getNumbers': {
-				url: 'accounts/{accountId}/phone_numbers',
-				verb: 'GET'
-			},
-			'voip.users.resendInstructions': {
-				apiRoot: 'apps/voip/submodules/users/fixtures/',
-				url: 'resendInstructions.json',
-				verb: 'POST'
-			},
-			'voip.users.resetPassword': {
-				apiRoot: 'apps/voip/submodules/users/fixtures/',
-				url: 'resetPassword.json',
-				verb: 'POST'
-			}
-			/*,
-			'voip.users.resendInstructions': {
-				url: 'accounts/{accountId}/users/{userId}/resend_instructions',
-				verb: 'POST'
-			},
-			'voip.users.resetPassword': {
-				url: 'accounts/{accountId}/users/{userId}/reset_password',
-				verb: 'POST'
-			},
-			*/
-		},
+		requests: {},
 
 		subscribe: {
 			'voip.users.render': 'usersRender'
@@ -471,15 +301,8 @@ define(function(require){
 				renderFindMeFollowMeFeature = function(featureCallback) {
 					monster.parallel({
 							userDevices: function(callback) {
-								monster.request({
-									resource: 'voip.users.listUserDevices',
-									data: {
-										accountId: self.accountId,
-										userId: currentUser.id
-									},
-									success: function(data) {
-										callback(null, data.data);
-									}
+								self.usersListDeviceUser(currentUser.id, function(devices) {
+									callback(null, devices);
 								});
 							},
 							userCallflow: function(callback) {
@@ -744,38 +567,6 @@ define(function(require){
 				}
 
 				$(this).parents('.item-row').remove();
-			});
-
-
-			/* Events for Users detail */
-			template.on('click', '#resend_instructions', function() {
-				var userId = $(this).parents('.grid-row').data('id');
-
-				monster.request({
-					resource: 'voip.users.resendInstructions',
-					data: {
-						accountId: self.accountId,
-						userId: userId
-					},
-					success: function(data) {
-						toastr.success(monster.template(self, '!' + toastrMessages.instructionsSent, { email: currentUser.email }));
-					}
-				});
-			});
-
-			template.on('click', '#reset_password', function() {
-				var userId = $(this).parents('.grid-row').data('id');
-
-				monster.request({
-					resource: 'voip.users.resetPassword',
-					data: {
-						accountId: self.accountId,
-						userId: userId
-					},
-					success: function(data) {
-						toastr.success(monster.template(self, '!' + toastrMessages.passwordReseted, { email: currentUser.email }));
-					}
-				});
 			});
 
 			template.on('click', '#delete_user', function() {
@@ -2318,8 +2109,8 @@ define(function(require){
 						fileReader = new FileReader();
 
 					fileReader.onloadend = function(evt) {
-						monster.request({
-							resource: 'voip.users.createMedia',
+						self.callApi({
+							resource: 'media.create',
 							data: {
 								accountId: self.accountId,
 								data: {
@@ -2331,8 +2122,8 @@ define(function(require){
 							},
 							success: function(data, status) {
 								var media = data.data;
-								monster.request({
-									resource: 'voip.users.uploadMedia',
+								self.callApi({
+									resource: 'media.upload',
 									data: {
 										accountId: self.accountId,
 										mediaId: media.id,
@@ -2342,15 +2133,14 @@ define(function(require){
 										closeUploadDiv(media);
 									},
 									error: function(data, status) {
-										monster.request({
-											resource: 'voip.users.deleteMedia',
+										self.callApi({
+											resource: 'media.delete',
 											data: {
 												accountId: self.accountId,
 												mediaId: media.id,
 												data: {}
 											},
 											success: function(data, status) {
-
 											}
 										});
 									}
@@ -2598,8 +2388,8 @@ define(function(require){
 		usersGetDevicesData: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.listDevices',
+			self.callApi({
+				resource: 'device.list',
 				data: {
 					accountId: self.accountId
 				},
@@ -2631,8 +2421,8 @@ define(function(require){
 							});
 
 							if(callflowId) {
-								monster.request({
-									resource: 'voip.users.getCallflow',
+								self.callApi({
+									resource: 'callflow.get',
 									data: {
 										accountId: self.accountId,
 										callflowId: callflowId
@@ -2858,15 +2648,8 @@ define(function(require){
 
 			monster.parallel({
 					devices: function(callback) {
-						monster.request({
-							resource: 'voip.users.listUserDevices',
-							data: {
-								accountId: self.accountId,
-								userId: userId
-							},
-							success: function(data) {
-								callback(null, data.data);
-							}
+						self.usersListDeviceUser(userId, function(devices) {
+							callback(null, devices);
 						});
 					},
 					vmbox: function(callback) {
@@ -2921,8 +2704,8 @@ define(function(require){
 		usersDeleteUser: function(userId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.deleteUser',
+			self.callApi({
+				resource: 'user.delete',
 				data: {
 					userId: userId,
 					accountId: self.accountId,
@@ -2933,13 +2716,14 @@ define(function(require){
 				}
 			});
 		},
+
 		usersDeleteVMBox: function(vmboxId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.deleteVMBox',
+			self.callApi({
+				resource: 'voicemail.delete',
 				data: {
-					vmboxId: vmboxId,
+					voicemailId: vmboxId,
 					accountId: self.accountId,
 					data: {}
 				},
@@ -2964,8 +2748,8 @@ define(function(require){
 		usersDeleteDevice: function(deviceId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.deleteDevice',
+			self.callApi({
+				resource: 'device.delete',
 				data: {
 					deviceId: deviceId,
 					accountId: self.accountId,
@@ -2979,8 +2763,8 @@ define(function(require){
 		usersDeleteCallflow: function(callflowId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.deleteCallflow',
+			self.callApi({
+				resource: 'callflow.delete',
 				data: {
 					callflowId: callflowId,
 					accountId: self.accountId,
@@ -2995,8 +2779,8 @@ define(function(require){
 		usersCreate: function(data, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.createUser',
+			self.callApi({
+				resource: 'user.create',
 				data: {
 					accountId: self.accountId,
 					data: data.user
@@ -3151,8 +2935,8 @@ define(function(require){
 		usersListDirectories: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.listDirectories',
+			self.callApi({
+				resource: 'directory.list',
 				data: {
 					accountId: self.accountId
 				},
@@ -3172,8 +2956,8 @@ define(function(require){
 					sort_by: 'last_name'
 				};
 
-			monster.request({
-				resource: 'voip.users.createDirectory',
+			self.callApi({
+				resource: 'directory.create',
 				data: {
 					accountId: self.accountId,
 					data: dataDirectory
@@ -3187,8 +2971,8 @@ define(function(require){
 		usersListCallflows: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.getCallflows',
+			self.callApi({
+				resource: 'callflow.list',
 				data: {
 					accountId: self.accountId
 				},
@@ -3201,11 +2985,13 @@ define(function(require){
 		usersListCallflowsUser: function(userId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.listUserCallflows',
+			self.callApi({
+				resource: 'callflow.list',
 				data: {
 					accountId: self.accountId,
-					userId: userId
+					filters: {
+						filter_owner_id: userId
+					}
 				},
 				success: function(data) {
 					callback(data.data);
@@ -3216,8 +3002,8 @@ define(function(require){
 		usersListVMBoxes: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.listVMBoxes',
+			self.callApi({
+				resource: 'voicemail.list',
 				data: {
 					accountId: self.accountId
 				},
@@ -3230,11 +3016,13 @@ define(function(require){
 		usersListVMBoxesUser: function(userId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.listUserVMBoxes',
+			self.callApi({
+				resource: 'voicemail.list',
 				data: {
 					accountId: self.accountId,
-					userId: userId
+					filters: {
+						filter_owner_id: userId
+					}
 				},
 				success: function(data) {
 					callback(data.data);
@@ -3245,11 +3033,11 @@ define(function(require){
 		usersGetVMBox: function(vmboxId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.getVMBox',
+			self.callApi({
+				resource: 'voicemail.get',
 				data: {
 					accountId: self.accountId,
-					vmboxId: vmboxId
+					voicemailId: vmboxId
 				},
 				success: function(data) {
 					callback(data.data);
@@ -3260,8 +3048,8 @@ define(function(require){
 		usersCreateVMBox: function(vmData, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.createVMBox',
+			self.callApi({
+				resource: 'voicemail.create',
 				data: {
 					accountId: self.accountId,
 					data: vmData
@@ -3275,12 +3063,12 @@ define(function(require){
 		usersUpdateVMBox: function(vmData, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.updateVMBox',
+			self.callApi({
+				resource: 'voicemail.update',
 				data: {
 					accountId: self.accountId,
 					data: vmData,
-					vmboxId: vmData.id
+					voicemailId: vmData.id
 				},
 				success: function(data) {
 					callback(data.data);
@@ -3291,8 +3079,8 @@ define(function(require){
 		usersGetUser: function(userId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.getUser',
+			self.callApi({
+				resource: 'user.get',
 				data: {
 					accountId: self.accountId,
 					userId: userId
@@ -3308,8 +3096,8 @@ define(function(require){
 
 			userData = self.usersCleanUserData(userData);
 
-			monster.request({
-				resource: 'voip.users.updateUser',
+			self.callApi({
+				resource: 'user.update',
 				data: {
 					accountId: self.accountId,
 					userId: userData.id,
@@ -3359,10 +3147,13 @@ define(function(require){
 		usersListConfNumbers: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.listConfNumbers',
+			self.callApi({
+				resource: 'callflow.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						filter_type: 'conference'
+					}
 				},
 				success: function(data) {
 					var numbers = [];
@@ -3383,11 +3174,13 @@ define(function(require){
 		usersListConferences: function(userId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.listUserConferences',
+			self.callApi({
+				resource: 'conference.list',
 				data: {
 					accountId: self.accountId,
-					userId: userId
+					filters: {
+						filter_owner_id: userId
+					}
 				},
 				success: function(data) {
 					callback(data.data);
@@ -3398,8 +3191,8 @@ define(function(require){
 		usersGetConference: function(conferenceId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.getConference',
+			self.callApi({
+				resource: 'conference.get',
 				data: {
 					accountId: self.accountId,
 					conferenceId: conferenceId
@@ -3413,8 +3206,8 @@ define(function(require){
 		usersUpdateConference: function(conference, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.updateConference',
+			self.callApi({
+				resource: 'conference.update',
 				data: {
 					accountId: self.accountId,
 					conferenceId: conference.id,
@@ -3429,8 +3222,8 @@ define(function(require){
 		usersCreateConference: function(conference, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.createConference',
+			self.callApi({
+				resource: 'conference.create',
 				data: {
 					accountId: self.accountId,
 					data: conference
@@ -3444,8 +3237,8 @@ define(function(require){
 		usersDeleteConference: function(conferenceId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.deleteConference',
+			self.callApi({
+				resource: 'conference.delete',
 				data: {
 					accountId: self.accountId,
 					conferenceId: conferenceId,
@@ -3460,8 +3253,8 @@ define(function(require){
 		usersGetDevice: function(deviceId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.getDevice',
+			self.callApi({
+				resource: 'device.get',
 				data: {
 					accountId: self.accountId,
 					deviceId: deviceId
@@ -3475,8 +3268,8 @@ define(function(require){
 		usersUpdateDevice: function(data, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.updateDevice',
+			self.callApi({
+				resource: 'device.update',
 				data: {
 					accountId: self.accountId,
 					data: data,
@@ -3488,11 +3281,28 @@ define(function(require){
 			});
 		},
 
+		usersListDeviceUser: function(userId, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'device.list',
+				data: {
+					accountId: self.accountId,
+					filters: {
+						filter_owner_id: userId
+					}
+				},
+				success: function(data) {
+					callback(data.data);
+				}
+			});
+		},
+
 		usersListMedias: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.listMedia',
+			self.callApi({
+				resource: 'media.list',
 				data: {
 					accountId: self.accountId
 				},
@@ -3507,8 +3317,8 @@ define(function(require){
 
 			monster.parallel({
 					users: function(callback) {
-						monster.request({
-							resource: 'voip.users.getUsers',
+						self.callApi({
+							resource: 'user.list',
 							data: {
 								accountId: self.accountId
 							},
@@ -3523,14 +3333,8 @@ define(function(require){
 						});
 					},
 					devices: function(callback) {
-						monster.request({
-							resource: 'voip.users.listDevices',
-							data: {
-								accountId: self.accountId
-							},
-							success: function(dataDevices) {
-								callback(null, dataDevices.data);
-							}
+						self.usersGetDevicesData(function(devices) {
+							callback(null, devices);
 						});
 					}
 				},
@@ -3614,8 +3418,8 @@ define(function(require){
 
 			if(numbers.length > 0) {
 				if(callflowId) {
-					monster.request({
-						resource: 'voip.users.getCallflow',
+					self.callApi({
+						resource: 'callflow.get',
 						data: {
 							accountId: self.accountId,
 							callflowId: callflowId
@@ -3648,8 +3452,8 @@ define(function(require){
 		usersListNumbers: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.getNumbers',
+			self.callApi({
+				resource: 'numbers.list',
 				data: {
 					accountId: self.accountId
 				},
@@ -3662,8 +3466,8 @@ define(function(require){
 		usersUpdateCallflow: function(callflow, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.updateCallflow',
+			self.callApi({
+				resource: 'callflow.update',
 				data: {
 					accountId: self.accountId,
 					callflowId: callflow.id,
@@ -3678,8 +3482,8 @@ define(function(require){
 		usersCreateCallflow: function(callflow, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.createCallflow',
+			self.callApi({
+				resource: 'callflow.create',
 				data: {
 					accountId: self.accountId,
 					data: callflow

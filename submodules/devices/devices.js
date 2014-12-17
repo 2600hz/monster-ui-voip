@@ -7,52 +7,7 @@ define(function(require){
 
 	var app = {
 
-		requests: {
-			/* Classifiers */
-			'voip.devices.listClassifiers': {
-				url: 'accounts/{accountId}/phone_numbers/classifiers',
-				verb: 'GET'
-			},
-			/* Numbers */
-			'voip.devices.listNumbers': {
-				url: 'accounts/{accountId}/phone_numbers',
-				verb: 'GET'
-			},
-			'common.e911.getNumber': {
-				url: 'accounts/{accountId}/phone_numbers/{phoneNumber}',
-				verb: 'GET'
-			},
-			/* Users */
-			'voip.devices.listUsers': {
-				url: 'accounts/{accountId}/users',
-				verb: 'GET'
-			},
-			/* Devices */
-			'voip.devices.getStatus': {
-				url: 'accounts/{accountId}/devices/status',
-				verb: 'GET'
-			},
-			'voip.devices.listDevices': {
-				url: 'accounts/{accountId}/devices',
-				verb: 'GET'
-			},
-			'voip.devices.createDevice': {
-				url: 'accounts/{accountId}/devices',
-				verb: 'PUT'
-			},
-			'voip.devices.getDevice': {
-				url: 'accounts/{accountId}/devices/{deviceId}',
-				verb: 'GET'
-			},
-			'voip.devices.deleteDevice': {
-				url: 'accounts/{accountId}/devices/{deviceId}',
-				verb: 'DELETE'
-			},
-			'voip.devices.updateDevice': {
-				url: 'accounts/{accountId}/devices/{deviceId}',
-				verb: 'POST'
-			}
-		},
+		requests: {},
 
 		subscribe: {
 			'voip.devices.render': 'devicesRender',
@@ -210,8 +165,8 @@ define(function(require){
 			if(type === 'sip_device' && monster.config.api.provisioner) {
 				monster.pub('common.chooseModel.render', {
 					callback: function(dataModel) {
-						monster.request({
-							resource: 'voip.devices.createDevice',
+						self.callApi({
+							resource: 'device.create',
 							data: {
 								accountId: self.accountId,
 								data: dataModel
@@ -815,8 +770,8 @@ define(function(require){
 		devicesDeleteDevice: function(deviceId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.devices.deleteDevice',
+			self.callApi({
+				resource: 'device.delete',
 				data: {
 					accountId: self.accountId,
 					deviceId: deviceId,
@@ -831,8 +786,8 @@ define(function(require){
 		devicesListClassifiers: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.devices.listClassifiers',
+			self.callApi({
+				resource: 'numbers.listClassifiers',
 				data: {
 					accountId: self.accountId
 				},
@@ -845,8 +800,8 @@ define(function(require){
 		devicesGetE911Numbers: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.devices.listNumbers',
+			self.callApi({
+				resource: 'numbers.list',
 				data: {
 					accountId: self.accountId
 				},
@@ -911,8 +866,8 @@ define(function(require){
 		devicesGetDevice: function(deviceId, callbackSuccess, callbackError) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.devices.getDevice',
+			self.callApi({
+				resource: 'device.get',
 				data: {
 					accountId: self.accountId,
 					deviceId: deviceId
@@ -940,8 +895,8 @@ define(function(require){
 		devicesCreateDevice: function(deviceData, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.devices.createDevice',
+			self.callApi({
+				resource: 'device.create',
 				data: {
 					accountId: self.accountId,
 					data: deviceData
@@ -955,8 +910,8 @@ define(function(require){
 		devicesUpdateDevice: function(deviceData, callbackSuccess, callbackError) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.devices.updateDevice',
+			self.callApi({
+				resource: 'device.update',
 				data: {
 					accountId: self.accountId,
 					data: deviceData,
@@ -976,8 +931,8 @@ define(function(require){
 
 			monster.parallel({
 					users: function(callback) {
-						monster.request({
-							resource: 'voip.devices.listUsers',
+						self.callApi({
+							resource: 'user.list',
 							data: {
 								accountId: self.accountId
 							},
@@ -987,8 +942,8 @@ define(function(require){
 						});
 					},
 					status: function(callback) {
-						monster.request({
-							resource: 'voip.devices.getStatus',
+						self.callApi({
+							resource: 'device.getStatus',
 							data: {
 								accountId: self.accountId
 							},
@@ -998,8 +953,8 @@ define(function(require){
 						});
 					},
 					devices: function(callback) {
-						monster.request({
-							resource: 'voip.devices.listDevices',
+						self.callApi({
+							resource: 'device.list',
 							data: {
 								accountId: self.accountId
 							},
@@ -1018,8 +973,8 @@ define(function(require){
 		devicesGetE911NumberAddress: function(number, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'common.e911.getNumber',
+			self.callApi({
+				resource: 'numbers.get',
 				data: {
 					accountId: self.accountId,
 					phoneNumber: encodeURIComponent(number)
