@@ -1523,6 +1523,22 @@ define(function(require){
 								},
 								success: function(data) {
 									callback && callback(dataGroup.data);
+								},
+								error: function() {
+									self.callApi({
+										resource: 'group.delete',
+										data: {
+											accountId: self.accountId,
+											groupId: dataGroup.data.id
+										}
+									});
+									self.callApi({
+										resource: 'callflow.delete',
+										data: {
+											accountId: self.accountId,
+											callflowId: dataBaseCallflow.data.id
+										}
+									});
 								}
 							});
 						},
