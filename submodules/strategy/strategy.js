@@ -709,7 +709,20 @@ define(function(require){
 			});
 
 			container.on('click', '.action-links .port-link', function(e) {
+				var accountId = $(this).parents('.account-section').data('id');
+
 				e.preventDefault();
+
+				monster.pub('common.port.render', {
+					accountId: accountId,
+					callbacks: {
+						success: function(numbers) {
+							displayNumberList(accountId, function(numbers) {
+								parent.find('.account-section[data-id="'+accountId+'"]').addClass('open');
+							}, true);
+						}
+					}
+				});
 			});
 
 			container.on('click', '.number-element .remove-number', function(e) {
