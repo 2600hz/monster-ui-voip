@@ -708,10 +708,6 @@ define(function(require){
 				});
 			});
 
-			container.on('click', '.action-links .port-link', function(e) {
-				e.preventDefault();
-			});
-
 			container.on('click', '.number-element .remove-number', function(e) {
 				e.preventDefault();
 				var numberToRemove = $(this).data('number'),
