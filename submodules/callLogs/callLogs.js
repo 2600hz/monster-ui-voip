@@ -163,7 +163,58 @@ define(function(require){
 				}
 			});
 
-			template.on('click', '.grid-cell.details i', function(e) {
+			template.on('click', '.grid-cell.play audio', function(e) {
+				e.stopPropagation();
+			});
+
+			template.on('click', '.grid-cell.play i', function(e) {
+
+				function formatTime(seconds) {
+				  	minutes = Math.floor(seconds / 60);
+    				minutes = (minutes >= 10) ? minutes : "0" + minutes;
+    				seconds = Math.floor(seconds % 60);
+    				seconds = (seconds >= 10) ? seconds : "0" + seconds;
+    				return minutes + ":" + seconds;
+  				}
+
+				e.stopPropagation();
+
+				var audio = $(this).children('audio')[0];
+				var duration = $(this).parents('.play').children('.cell-bottom');
+				var i = $(this);
+
+				audio.addEventListener('ended',
+					function (){
+						// Display latest second before resetting
+						duration.text(formatTime(this.currentTime));
+						this.currentTime = 0;
+						this.pause();
+						i.removeClass('icon-pause').addClass('icon-play');
+						duration.text(formatTime(this.currentTime));
+					});
+				audio.addEventListener('timeupdate',
+					function (){
+						duration.text(formatTime(this.currentTime));
+					});
+				if (audio.paused) {
+					// Workaround for mobile devices. They do not preload media until requested
+					audio.play();audio.pause();
+					if (audio.readyState > 0) {
+							audio.play();
+							i.removeClass('icon-play').addClass('icon-pause');
+						}
+				} else {
+					audio.pause();
+					i.removeClass('icon-pause').addClass('icon-play');
+				}
+
+			});
+
+			template.on('click', '.grid-cell.play a', function(e) {
+				e.stopPropagation();
+			});
+
+			template.on('click', '.grid-cell.details i.icon-cog', function(e) {
 				e.stopPropagation();
 				var cdrId = $(this).parents('.grid-row').data('id');
 				self.callLogsShowDetailsPopup(cdrId);
@@ -207,7 +258,7 @@ define(function(require){
 			template.find('.call-logs-grid').on('scroll', function(e) {
 				var $this = $(this);
 				if($this.scrollTop() === $this[0].scrollHeight - $this.innerHeight()) {
-					loadMoreCdrs();	
+					loadMoreCdrs();
 				}
 			});
 
@@ -304,6 +355,8 @@ define(function(require){
 						duration: durationMin + ":" + durationSec,
 						hangupCause: cdr.hangup_cause,
 						isOutboundCall: ("authorizing_id" in cdr),
+						playLink: monster.config.api.default+"accounts/"+self.accountId+"/third_party_couch/call_recordings/"+cdr.id+"/attachment/inline?auth_token="+self.authToken,
+						downloadLink: monster.config.api.default+"accounts/"+self.accountId+"/third_party_couch/call_recordings/"+cdr.id+"/attachment?auth_token="+self.authToken,
 						mailtoLink: "mailto:support@2600hz.com"
 								  + "?subject=Call Report: " + cdr.call_id
 								  + "&body=Please describe the details of the issue:%0D%0A%0D%0A"
@@ -344,7 +397,6 @@ define(function(require){
 
 			return result;
 		},
-
 		callLogsShowDetailsPopup: function(callLogId) {
 			var self = this;
 			self.callApi({

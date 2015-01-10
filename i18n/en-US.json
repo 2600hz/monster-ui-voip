@@ -662,12 +662,17 @@
 			"duration2": "(Min)",
 			"hangup1": "Hangup",
 			"hangup2": "Cause",
+			"play1": "Play",
+			"play2": "Record",
 			"details1": "Call",
 			"details2": "Details",
 			"report1": "Submit",
 			"report2": "Report"
 		},
 		"reportCall": "Report Call",
+		"playCall": "Play Call",
+		"downloadRecord": "Download call record",
+		"audioNotSupported": "Your browser does not support the audio element",
 		"loaderMessage": "Scroll down or click here to load additional Call Logs.",
 		"loadingMessage": "Loading additional Call Logs...",
 		"alertMessages": {
