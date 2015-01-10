@@ -126,10 +126,10 @@
 	width: 12%;
 }
 #call_logs_container .grid-cell.from {
-	width: 20%;
+	width: 15%;
 }
 #call_logs_container .grid-cell.to {
-	width: 20%;
+	width: 15%;
 }
 #call_logs_container .grid-cell.duration {
 	width: 9%;
@@ -149,6 +149,14 @@
 	width: 10%;
 }
 #call_logs_container .grid-cell.details i:hover {
+	color: #22ccff;
+	cursor: pointer;
+}
+#call_logs_container .grid-cell.play {
+	width: 10%;
+}
+
+#call_logs_container .grid-cell.play i:hover {
 	color: #22ccff;
 	cursor: pointer;
 }
