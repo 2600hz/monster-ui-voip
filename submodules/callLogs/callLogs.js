@@ -196,7 +196,6 @@ define(function(require){
 						function (){
 							duration.text(formatTime(this.currentTime));
 						});
-					audio.load();
 					if (audio.paused) {
 						// Workaround for mobile devices. They do not preload media until requested
 						audio.play();audio.pause();
@@ -205,7 +204,7 @@ define(function(require){
 								i.removeClass('icon-play').addClass('icon-pause');
 							}
 						else {
-							monster.ui.alert(self.i18n.active().callLogs.audioNotAvailable);
+							monster.ui.alert('error',self.i18n.active().callLogs.audioNotAvailable);
 						}
 					} else {
 						audio.pause();
