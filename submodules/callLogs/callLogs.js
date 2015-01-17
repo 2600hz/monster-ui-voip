@@ -397,7 +397,6 @@ define(function(require){
 						toName: cdr.callee_id_name,
 						toNumber: cdr.callee_id_number || ("request" in cdr) ? cdr.request.replace(/@.*/, '') : cdr.to.replace(/@.*/, ''),
 						duration: durationMin + ":" + durationSec,
-						isBilledCall: (cdr.billing_seconds >0),
 						hangupCause: cdr.hangup_cause,
 						isOutboundCall: ("authorizing_id" in cdr),
 						playLink: monster.config.api.default+"accounts/"+self.accountId+"/third_party_couch/call_recordings/"+cdr.id+"/attachment/inline?auth_token="+self.authToken,

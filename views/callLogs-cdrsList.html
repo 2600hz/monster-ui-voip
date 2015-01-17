@@ -41,7 +41,6 @@
 			</div>
 		</div>
 		<div class="grid-cell play">
-			{{#if this.isBilledCall}}
 			<div class="sub-cell cell-top">
 			    <i class="icon-play" title="{{../i18n.callLogs.playCall}}">
 			    	<audio src="{{this.playLink}}" preload="auto" type="audio/mpeg">{{../i18n.callLogs.audioNotSupported}}</audio>
@@ -51,9 +50,6 @@
 			    <i class="icon-forward" title="{{../i18n.callLogs.rewindForward}}"></i>
 			</div>
 			<div class="sub-cell cell-bottom">00:00</div>
-			{{else}}
-			<div class="sub-cell single-cell">{{../i18n.callLogs.audioNotAvailable}}</div>
-			{{/if}}
 		</div>
 		<div class="grid-cell details">
 			<div class="sub-cell cell-top">
