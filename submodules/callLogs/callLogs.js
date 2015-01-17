@@ -198,7 +198,7 @@ define(function(require){
 						});
 					if (audio.paused) {
 						// Workaround for Chrome browser
-						audio.load();
+						// audio.load();
 						// Workaround for mobile devices. They do not preload media until requested
 						audio.play();audio.pause();
 						if (audio.readyState > 0) {
