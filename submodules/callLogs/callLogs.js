@@ -186,7 +186,6 @@ define(function(require){
 					var audio = $(this).children('audio')[0];
 					audio.addEventListener('ended',
 						function (){
-							// Display latest second before resetting
 							duration.text(formatTime(this.currentTime));
 							this.currentTime = 0;
 							this.pause();
@@ -211,37 +210,42 @@ define(function(require){
 				}
 				else if (i.hasClass('icon-backward')) {
 					var audio = $(this).siblings('.icon-play, .icon-pause').children('audio')[0];
-					duration.text(formatTime(audio.currentTime));
-					if (audio.currentTime >= 5) {
-						audio.currentTime = audio.currentTime-5;
+					if (audio.readyState > 0) {
 						duration.text(formatTime(audio.currentTime));
-					}
-					else {
-						audio.currentTime=0;
-						duration.text(formatTime(audio.currentTime));
+						if (audio.currentTime >= 5) {
+							audio.currentTime = audio.currentTime-5;
+							duration.text(formatTime(audio.currentTime));
+						}
+						else {
+							audio.currentTime=0;
+							duration.text(formatTime(audio.currentTime));
+						}
 					}
 				}
 				else if (i.hasClass('icon-forward')) {
 					var audio = $(this).siblings('.icon-play, .icon-pause').children('audio')[0];
-					duration.text(formatTime(audio.currentTime));
-					if (audio.duration-audio.currentTime >= 5) {
-						audio.currentTime = audio.currentTime+5;
+					if (audio.readyState > 0) {
 						duration.text(formatTime(audio.currentTime));
-					}
-					else {
-						audio.currentTime=audio.duration;
-						duration.text(formatTime(audio.currentTime));
+						if (audio.duration-audio.currentTime >= 5) {
+							audio.currentTime = audio.currentTime+5;
+							duration.text(formatTime(audio.currentTime));
+						}
+						else {
+							audio.currentTime=audio.duration;
+							duration.text(formatTime(audio.currentTime));
+						}
 					}
 				}
 				else if (i.hasClass('icon-stop')) {
 					var ii = $(this).siblings('.icon-play, .icon-pause');
 					var audio = ii.children('audio')[0];
-					// Display latest second before resetting
-					duration.text(formatTime(audio.currentTime));
-					audio.currentTime = 0;
-					audio.pause();
-					ii.removeClass('icon-pause').addClass('icon-play');
-					duration.text(formatTime(audio.currentTime));
+					if (audio.readyState > 0) {
+						duration.text(formatTime(audio.currentTime));
+						audio.currentTime = 0;
+						audio.pause();
+						ii.removeClass('icon-pause').addClass('icon-play');
+						duration.text(formatTime(audio.currentTime));
+					}
 				}
 
 
