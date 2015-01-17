@@ -676,6 +676,7 @@
 		"rewindForward": "Rewind forward",
 		"downloadRecord": "Download call record",
 		"audioNotSupported": "Your browser does not support the audio element",
+		"audioNotAvailable": "Audio recording is not available",
 		"loaderMessage": "Scroll down or click here to load additional Call Logs.",
 		"loadingMessage": "Loading additional Call Logs...",
 		"alertMessages": {

@@ -204,6 +204,9 @@ define(function(require){
 								audio.play();
 								i.removeClass('icon-play').addClass('icon-pause');
 							}
+						else {
+							monster.ui.alert(self.i18n.active().callLogs.audioNotAvailable);
+						}
 					} else {
 						audio.pause();
 						i.removeClass('icon-pause').addClass('icon-play');
