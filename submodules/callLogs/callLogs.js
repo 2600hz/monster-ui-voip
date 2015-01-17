@@ -199,14 +199,13 @@ define(function(require){
 					if (audio.paused) {
 						// Workaround for mobile devices. They do not preload media until requested
 						audio.play();audio.pause();
-						if (audio.readyState > 0) {
+//						if (audio.readyState > 0) {
 								audio.play();
 								i.removeClass('icon-play').addClass('icon-pause');
-							}
-						else {
-							alert(audio.readyState);
-							monster.ui.alert('error',self.i18n.active().callLogs.audioNotAvailable);
-						}
+//							}
+//						else {
+//							monster.ui.alert('error',self.i18n.active().callLogs.audioNotAvailable);
+//						}
 					} else {
 						audio.pause();
 						i.removeClass('icon-pause').addClass('icon-play');
