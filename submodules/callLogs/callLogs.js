@@ -196,6 +196,7 @@ define(function(require){
 						function (){
 							duration.text(formatTime(this.currentTime));
 						});
+					audio.load();
 					if (audio.paused) {
 						// Workaround for mobile devices. They do not preload media until requested
 						audio.play();audio.pause();
