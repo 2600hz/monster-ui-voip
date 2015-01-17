@@ -200,7 +200,7 @@ define(function(require){
 						// Workaround for Chrome browser
 						audio.load();
 						// Workaround for mobile devices. They do not preload media until requested
-						//audio.play();audio.pause();
+						audio.play();audio.pause();
 						if (audio.readyState > 0) {
 								audio.play();
 								i.removeClass('icon-play').addClass('icon-pause');
