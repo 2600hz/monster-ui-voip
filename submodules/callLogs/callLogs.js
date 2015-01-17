@@ -163,7 +163,104 @@ define(function(require){
 				}
 			});
 
-			template.on('click', '.grid-cell.details i', function(e) {
+			template.on('click', '.grid-cell.play audio', function(e) {
+				e.stopPropagation();
+			});
+
+			template.on('click', '.grid-cell.play i', function(e) {
+
+				function formatTime(seconds) {
+				  	minutes = Math.floor(seconds / 60);
+    				minutes = (minutes >= 10) ? minutes : "0" + minutes;
+    				seconds = Math.floor(seconds % 60);
+    				seconds = (seconds >= 10) ? seconds : "0" + seconds;
+    				return minutes + ":" + seconds;
+  				}
+
+				e.stopPropagation();
+
+				var duration = $(this).parents('.play').children('.cell-bottom');
+				var i = $(this);
+
+				if (i.hasClass('icon-play') || i.hasClass('icon-pause')) {
+					var audio = $(this).children('audio')[0];
+					audio.addEventListener('ended',
+						function (){
+							duration.text(formatTime(this.currentTime));
+							this.currentTime = 0;
+							this.pause();
+							i.removeClass('icon-pause').addClass('icon-play');
+							duration.text(formatTime(this.currentTime));
+						});
+					audio.addEventListener('timeupdate',
+						function (){
+							duration.text(formatTime(this.currentTime));
+						});
+					if (audio.paused) {
+						// Workaround for Chrome browser
+						// audio.load();
+						// Workaround for mobile devices. They do not preload media until requested
+						audio.play();audio.pause();
+						if (audio.readyState > 0) {
+								audio.play();
+								i.removeClass('icon-play').addClass('icon-pause');
+							}
+						else {
+							monster.ui.alert('error',self.i18n.active().callLogs.audioNotAvailable);
+						}
+					} else {
+						audio.pause();
+						i.removeClass('icon-pause').addClass('icon-play');
+					}
+				}
+				else if (i.hasClass('icon-backward')) {
+					var audio = $(this).siblings('.icon-play, .icon-pause').children('audio')[0];
+					if (audio.readyState > 0) {
+						duration.text(formatTime(audio.currentTime));
+						if (audio.currentTime >= 5) {
+							audio.currentTime = audio.currentTime-5;
+							duration.text(formatTime(audio.currentTime));
+						}
+						else {
+							audio.currentTime=0;
+							duration.text(formatTime(audio.currentTime));
+						}
+					}
+				}
+				else if (i.hasClass('icon-forward')) {
+					var audio = $(this).siblings('.icon-play, .icon-pause').children('audio')[0];
+					if (audio.readyState > 0) {
+						duration.text(formatTime(audio.currentTime));
+						if (audio.duration-audio.currentTime >= 5) {
+							audio.currentTime = audio.currentTime+5;
+							duration.text(formatTime(audio.currentTime));
+						}
+						else {
+							audio.currentTime=audio.duration;
+							duration.text(formatTime(audio.currentTime));
+						}
+					}
+				}
+				else if (i.hasClass('icon-stop')) {
+					var ii = $(this).siblings('.icon-play, .icon-pause');
+					var audio = ii.children('audio')[0];
+					if (audio.readyState > 0) {
+						duration.text(formatTime(audio.currentTime));
+						audio.currentTime = 0;
+						audio.pause();
+						ii.removeClass('icon-pause').addClass('icon-play');
+						duration.text(formatTime(audio.currentTime));
+					}
+				}
+
+
+			});
+
+			template.on('click', '.grid-cell.play a', function(e) {
+				e.stopPropagation();
+			});
+
+			template.on('click', '.grid-cell.details i.icon-cog', function(e) {
 				e.stopPropagation();
 				var cdrId = $(this).parents('.grid-row').data('id');
 				self.callLogsShowDetailsPopup(cdrId);
@@ -207,7 +304,7 @@ define(function(require){
 			template.find('.call-logs-grid').on('scroll', function(e) {
 				var $this = $(this);
 				if($this.scrollTop() === $this[0].scrollHeight - $this.innerHeight()) {
-					loadMoreCdrs();	
+					loadMoreCdrs();
 				}
 			});
 
@@ -304,6 +401,8 @@ define(function(require){
 						duration: durationMin + ":" + durationSec,
 						hangupCause: cdr.hangup_cause,
 						isOutboundCall: ("authorizing_id" in cdr),
+						playLink: monster.config.api.default+"accounts/"+self.accountId+"/third_party_couch/call_recordings/"+cdr.id+"/attachment/inline?auth_token="+self.authToken,
+						downloadLink: monster.config.api.default+"accounts/"+self.accountId+"/third_party_couch/call_recordings/"+cdr.id+"/attachment?auth_token="+self.authToken,
 						mailtoLink: "mailto:support@2600hz.com"
 								  + "?subject=Call Report: " + cdr.call_id
 								  + "&body=Please describe the details of the issue:%0D%0A%0D%0A"
@@ -344,7 +443,6 @@ define(function(require){
 
 			return result;
 		},
-
 		callLogsShowDetailsPopup: function(callLogId) {
 			var self = this;
 			self.callApi({

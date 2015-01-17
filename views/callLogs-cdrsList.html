@@ -40,9 +40,25 @@
 				{{this.hangupCause}}
 			</div>
 		</div>
+		<div class="grid-cell play">
+			<div class="sub-cell cell-top">
+			    <i class="icon-play" title="{{../i18n.callLogs.playCall}}">
+			    	<audio src="{{this.playLink}}" preload="auto" type="audio/mpeg">{{../i18n.callLogs.audioNotSupported}}</audio>
+			    </i>
+			    <i class="icon-stop" title="{{../i18n.callLogs.stopPlaying}}"></i>
+			    <i class="icon-backward" title="{{../i18n.callLogs.rewindBackward}}"></i>
+			    <i class="icon-forward" title="{{../i18n.callLogs.rewindForward}}"></i>
+			</div>
+			<div class="sub-cell cell-bottom">00:00</div>
+		</div>
 		<div class="grid-cell details">
-			<div class="sub-cell single-cell">
-				<i class="icon-cog icon-large"></i>
+			<div class="sub-cell cell-top">
+				<i class="icon-cog"></i>
+			</div>
+			<div class="sub-cell cell-bottom">
+			    <a href="{{this.downloadLink}}">
+			    	<i class="icon-download" title="{{../i18n.callLogs.downloadRecord}}"></i>
+			    </a>
 			</div>
 		</div>
 		<div class="grid-cell report">
@@ -84,6 +100,10 @@
 		<div class="grid-cell hangup">
 			<div class="sub-cell single-cell" title="{{this.hangupCause}}">
 				{{this.hangupCause}}
+			</div>
+		</div>
+		<div class="grid-cell play">
+			<div class="sub-cell single-cell">
 			</div>
 		</div>
 		<div class="grid-cell details">
