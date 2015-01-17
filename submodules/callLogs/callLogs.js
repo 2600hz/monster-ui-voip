@@ -184,6 +184,7 @@ define(function(require){
 
 				if (i.hasClass('icon-play') || i.hasClass('icon-pause')) {
 					var audio = $(this).children('audio')[0];
+					audio.load();
 					audio.addEventListener('ended',
 						function (){
 							duration.text(formatTime(this.currentTime));
