@@ -184,7 +184,6 @@ define(function(require){
 
 				if (i.hasClass('icon-play') || i.hasClass('icon-pause')) {
 					var audio = $(this).children('audio')[0];
-					alert("Audio1 is "+audio);
 					audio.addEventListener('ended',
 						function (){
 							// Display latest second before resetting
@@ -200,44 +199,36 @@ define(function(require){
 						});
 					if (audio.paused) {
 						// Workaround for mobile devices. They do not preload media until requested
-						alert("Audio2 is "+audio);
 						audio.play();audio.pause();
 						if (audio.readyState > 0) {
 								audio.play();
 								i.removeClass('icon-play').addClass('icon-pause');
 							}
 					} else {
-						alert("Audio3 is "+audio);
 						audio.pause();
 						i.removeClass('icon-pause').addClass('icon-play');
 					}
 				}
 				else if (i.hasClass('icon-backward')) {
 					var audio = $(this).siblings('.icon-play, .icon-pause').children('audio')[0];
-					alert("Audio4 is "+audio);
 					duration.text(formatTime(audio.currentTime));
 					if (audio.currentTime >= 5) {
-						alert("Audio5 is "+audio);
 						audio.currentTime = audio.currentTime-5;
 						duration.text(formatTime(audio.currentTime));
 					}
 					else {
-						alert("Audio6 is "+audio);
 						audio.currentTime=0;
 						duration.text(formatTime(audio.currentTime));
 					}
 				}
 				else if (i.hasClass('icon-forward')) {
 					var audio = $(this).siblings('.icon-play, .icon-pause').children('audio')[0];
-					alert("Audio7 is "+audio);
 					duration.text(formatTime(audio.currentTime));
 					if (audio.duration-audio.currentTime >= 5) {
-						alert("Audio8 is "+audio);
 						audio.currentTime = audio.currentTime+5;
 						duration.text(formatTime(audio.currentTime));
 					}
 					else {
-						alert("Audio9 is "+audio);
 						audio.currentTime=audio.duration;
 						duration.text(formatTime(audio.currentTime));
 					}
@@ -245,7 +236,6 @@ define(function(require){
 				else if (i.hasClass('icon-stop')) {
 					var ii = $(this).siblings('.icon-play, .icon-pause');
 					var audio = ii.children('audio')[0];
-					alert("Audio10 is "+audio);
 					// Display latest second before resetting
 					duration.text(formatTime(audio.currentTime));
 					audio.currentTime = 0;
