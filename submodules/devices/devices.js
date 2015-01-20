@@ -382,7 +382,7 @@ define(function(require){
 				hasSIP = $.inArray(originalData.device_type, ['fax', 'ata', 'softphone', 'smartphone', 'mobile']) > -1,
 				hasCallForward = $.inArray(originalData.device_type, ['landline', 'cellphone', 'smartphone']) > -1,
 				hasRTP = $.inArray(originalData.device_type, ['sip_device', 'mobile', 'softphone']) > -1,
-				formData = form2object('form_device');
+				formData = monster.ui.getFormData('form_device');
 
 			if('mac_address' in formData) {
 				formData.mac_address = monster.util.formatMacAddress(formData.mac_address);

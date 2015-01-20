@@ -295,7 +295,7 @@ define(function(require){
 		},
 
 		groupsCreationMergeData: function(data, template) {
-			var formData = form2object('form_group_creation'),
+			var formData = monster.ui.getFormData('form_group_creation'),
 				fixedTimeout = '20',
 				fixedDelay = '0',
 				settings = {
@@ -493,7 +493,7 @@ define(function(require){
 
 			featureTemplate.find('.save').on('click', function() {
 				if(monster.ui.valid(featureForm)) {
-					var formData = form2object('call_recording_form'),
+					var formData = monster.ui.getFormData('call_recording_form'),
 						enabled = switchFeature.bootstrapSwitch('status');
 
 					if(!('smartpbx' in data.group)) { data.group.smartpbx = {}; }
@@ -775,7 +775,7 @@ define(function(require){
 
 			template.find('.save-group').on('click', function() {
 				if(monster.ui.valid(nameForm)) {
-					var formData = form2object('form-name');
+					var formData = monster.ui.getFormData('form-name');
 
 					//formData = self.groupsCleanNameData(formData);
 

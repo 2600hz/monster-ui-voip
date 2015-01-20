@@ -773,7 +773,7 @@ define(function(require){
 				
 				if(monster.ui.valid(container.find('#strategy_custom_hours_form'))) {
 					var parent = $(this).parents('.element-container'),
-						customHours = form2object('strategy_custom_hours_form'),
+						customHours = monster.ui.getFormData('strategy_custom_hours_form'),
 						mainCallflow = strategyData.callflows["MainCallflow"],
 						formatChildModule = function(callflowId) {
 							return {
