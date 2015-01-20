@@ -467,7 +467,7 @@ define(function(require){
 
 						userTemplate.find('#create_user').on('click', function() {
 							if(monster.ui.valid(userTemplate.find('#form_user_creation'))) {
-								var dataForm = form2object('form_user_creation'),
+								var dataForm = monster.ui.getFormData('form_user_creation'),
 									formattedData = self.usersFormatCreationData(dataForm);
 
 								self.usersCreate(formattedData, function(data) {
@@ -591,7 +591,7 @@ define(function(require){
 			});
 
 			template.on('click', '.save-user', function() {
-				var formData = form2object('form-'+currentUser.id),
+				var formData = monster.ui.getFormData('form-'+currentUser.id),
 					form = template.find('#form-'+currentUser.id);
 
 				monster.util.checkVersion(currentUser, function() {
@@ -660,7 +660,7 @@ define(function(require){
 				});
 
 				pinTemplate.find('.save-new-pin').on('click', function() {
-					var formData = form2object('form_new_pin'),
+					var formData = monster.ui.getFormData('form_new_pin'),
 						vmboxData = $.extend(true, currentUser.extra.vmbox, formData);
 
 					if(monster.ui.valid(form)) {
@@ -686,7 +686,7 @@ define(function(require){
 					form = passwordTemplate.find('#form_new_username');
 
 				passwordTemplate.find('.save-new-username').on('click', function() {
-					var formData = form2object('form_new_username'),
+					var formData = monster.ui.getFormData('form_new_username'),
 						userToSave = $.extend(true, {}, currentUser, formData);
 
 					if(monster.ui.valid(form)) {
@@ -1345,7 +1345,7 @@ define(function(require){
 				};
 
 				if(monster.ui.valid(featureForm)) {
-					data.conference = form2object('conferencing_form');
+					data.conference = monster.ui.getFormData('conferencing_form');
 
 					if(switchFeature.bootstrapSwitch('status')) {
 						self.usersUpdateConferencing(data, function(data) {
@@ -1458,7 +1458,7 @@ define(function(require){
 
 			featureTemplate.find('.save').on('click', function() {
 				if(monster.ui.valid(featureForm)) {
-					var formData = form2object('hotdesk_form'),
+					var formData = monster.ui.getFormData('hotdesk_form'),
 					args = {
 						openedTab: 'features',
 						callback: function() {
@@ -1506,7 +1506,7 @@ define(function(require){
 			});
 
 			featureTemplate.find('.save').on('click', function() {
-				var formData = form2object('vm_to_email_form'),
+				var formData = monster.ui.getFormData('vm_to_email_form'),
 					userToSave = $.extend(true, {}, currentUser),
 					enabled = switchFeature.bootstrapSwitch('status'),
 					args = {
@@ -1677,7 +1677,7 @@ define(function(require){
 
 			featureTemplate.find('.save').on('click', function() {
 				if(monster.ui.valid(featureForm)) {
-					var formData = form2object('call_forward_form');
+					var formData = monster.ui.getFormData('call_forward_form');
 					formData.require_keypress = !formData.require_keypress;
 
 					formData.enabled = switchFeature.bootstrapSwitch('status');
@@ -1963,7 +1963,7 @@ define(function(require){
 
 			featureTemplate.find('.save').on('click', function() {
 				if(monster.ui.valid(featureForm)) {
-					var formData = form2object('call_recording_form'),
+					var formData = monster.ui.getFormData('call_recording_form'),
 						enabled = switchFeature.bootstrapSwitch('status');
 
 					if(!('smartpbx' in params.currentUser)) { params.currentUser.smartpbx = {}; }

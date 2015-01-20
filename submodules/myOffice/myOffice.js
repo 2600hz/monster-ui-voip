@@ -761,7 +761,7 @@ define(function(require){
 							}
 
 							$.extend(true, numberData, {
-								dash_e911: form2object(e911Form[0])
+								dash_e911: monster.ui.getFormData(e911Form[0])
 							});
 
 							self.myOfficeUpdateNumber(numberData, function(data) {
