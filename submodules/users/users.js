@@ -14,6 +14,18 @@ define(function(require){
 			'voip.users.render': 'usersRender'
 		},
 
+		deviceIcons: {
+			'cellphone': 'icon-phone',
+			'smartphone': 'icon-telicon-mobile-phone',
+			'landline': 'icon-telicon-home-phone',
+			'mobile': 'icon-telicon-sprint-phone',
+			'softphone': 'icon-telicon-soft-phone',
+			'sip_device': 'icon-telicon-voip-phone',
+			'sip_uri': 'icon-telicon-voip-phone',
+			'fax': 'icon-telicon-fax',
+			'ata': 'icon-telicon-fax'
+		},
+
 		/* Users */
 		/* args: parent and userId */
 		usersRender: function(args) {
@@ -37,6 +49,7 @@ define(function(require){
 				});
 
 				template.find('[data-toggle="tooltip"]').tooltip({ container: 'body'});
+				template.find('[data-toggle="popover"]').popover({ container: 'body'});
 
 				self.usersBindEvents(template, parent, dataTemplate);
 
@@ -253,21 +266,27 @@ define(function(require){
 				var userId = device.owner_id;
 
 				if(userId in mapUsers) {
+					var isRegistered = _.find(data.deviceStatus, function(status){ return (status.device_id === device.id && status.registered === true); }) ? true : false;
 					if(mapUsers[userId].extra.devices.length == 2) {
 						if(mapUsers[userId].extra.additionalDevices) {
 							mapUsers[userId].extra.additionalDevices.count++;
-							mapUsers[userId].extra.additionalDevices.tooltip += '<br>'+device.name + ' (' + device.device_type.replace('_', ' ') + ')';
+							mapUsers[userId].extra.additionalDevices.tooltip += '<br><i class=\"device-popover-icon '+self.deviceIcons[device.device_type]+(isRegistered?' icon-green':' icon-red')+'\"></i>'
+							                                                 + device.name + ' (' + device.device_type.replace('_', ' ') + ')';
 						} else {
 							mapUsers[userId].extra.additionalDevices = {
 								count: 1,
-								tooltip: device.name + ' (' + device.device_type.replace('_', ' ') + ')'
+								tooltip: '<i class=\"device-popover-icon '+self.deviceIcons[device.device_type]+(isRegistered?' icon-green':' icon-red')+'\"></i>'
+								         + device.name + ' (' + device.device_type.replace('_', ' ') + ')'
 							};
 						}
 					}
 					else {
 						mapUsers[userId].extra.devices.push({
+							id: device.id,
 							name: device.name + ' (' + device.device_type.replace('_', ' ') + ')',
-							type: device.device_type
+							type: device.device_type,
+							registered: isRegistered,
+							icon: self.deviceIcons[device.device_type]
 						});
 					}
 				}
@@ -438,7 +457,7 @@ define(function(require){
 					},
 					function(err, results) {
 						var originalData = self.usersFormatAddUser(results),
-							userTemplate = $(monster.template(self, 'users-creation', originalData));
+							userTemplate = $(monster.template(self, 'users-crefation', originalData));
 
 						timezone.populateDropdown(userTemplate.find('#user_creation_timezone'));
 						monster.ui.prettyCheck.create(userTemplate);
@@ -1713,15 +1732,7 @@ define(function(require){
 		},
 
 		usersRenderFindMeFollowMe: function(params) {
-			var self = this,
-				deviceIcons = {
-					'softphone': 'icon-telicon-soft-phone',
-					'cellphone': 'icon-telicon-mobile-phone',
-					'smartphone': 'icon-telicon-sprint-phone',
-					'sip_device': 'icon-telicon-voip-phone',
-					'fax': 'icon-telicon-fax',
-					'landline': 'icon-telicon-home-phone'
-				};
+			var self = this;
 
 			if(!params.userCallflow) {
 				monster.ui.alert('error', self.i18n.active().users.find_me_follow_me.noNumber);
@@ -1755,7 +1766,7 @@ define(function(require){
 							delay: endpoint.delay,
 							timeout: endpoint.timeout,
 							name: device.name,
-							icon: deviceIcons[device.device_type],
+							icon: self.deviceIcons[device.device_type],
 							disabled: false
 						}
 					}
@@ -1767,7 +1778,7 @@ define(function(require){
 						delay: 0,
 						timeout: 0,
 						name: device.name,
-						icon: deviceIcons[device.device_type],
+						icon: self.deviceIcons[device.device_type],
 						disabled: true
 					})
 				});
@@ -3314,6 +3325,17 @@ define(function(require){
 					devices: function(callback) {
 						self.usersGetDevicesData(function(devices) {
 							callback(null, devices);
+						});
+					},
+					deviceStatus: function(callback) {
+						self.callApi({
+							resource: 'device.getStatus',
+							data: {
+								accountId: self.accountId
+							},
+							success: function(data, status) {
+								callback(null, data.data);
+							}
 						});
 					}
 				},

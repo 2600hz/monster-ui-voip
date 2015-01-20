@@ -788,3 +788,9 @@
 	height: 52px;
 	background-color: inherit;
 }
+
+/********* CSS for device popovers (appended directly on the body) *********/
+.device-popover-icon {
+	margin-right: 10px;
+	vertical-align: text-bottom;
+}
