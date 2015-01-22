@@ -457,7 +457,7 @@ define(function(require){
 					},
 					function(err, results) {
 						var originalData = self.usersFormatAddUser(results),
-							userTemplate = $(monster.template(self, 'users-crefation', originalData));
+							userTemplate = $(monster.template(self, 'users-creation', originalData));
 
 						timezone.populateDropdown(userTemplate.find('#user_creation_timezone'));
 						monster.ui.prettyCheck.create(userTemplate);

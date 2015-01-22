@@ -6,7 +6,7 @@
 	"menuTitles": {
 		"myOffice": "Dashboard",
 		"users": "Users",
-		"groups": "User Groups",
+		"groups": "Groups",
 		"numbers": "Numbers",
 		"devices": "Devices",
 		"mainNumber": "Main Number",
@@ -52,7 +52,7 @@
 		"removeMember": "Remove Member",
 		"distribute": "Distribute",
 		"maxDurationTooltip": "Click this box to change the maximum duration for your ring group. You must enter a number between 30 and 999.",
-		"title": "Groups",
+		"title": "Total Groups",
 		"titleGrid": {
 			"groups": "Group Name",
 			"members": "Members",
@@ -91,7 +91,7 @@
 			"users": "Users"
 		},
 		"__comment": "UI-819, v3.19_s1: Showing an error popup when group data is outdated.",
-		"outdatedGroupsError": "Your User Groups data is outdated and can not be rendered. Please contact your administrator to update your data."
+		"outdatedGroupsError": "Your Group's data is outdated and can not be rendered. Please contact your administrator to update your data."
 	},
 
 	"devices": {
