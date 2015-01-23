@@ -396,6 +396,7 @@ define(function(require){
 						else if(type === 'numbers') {
 							extensionsToSave = [];
 							currentCallflow = data.callflow;
+							currentUser = data.user;
 
 							_.each(data.extensions, function(number) {
 								extensionsToSave.push(number);
@@ -902,9 +903,9 @@ define(function(require){
 			/* Events for Numbers in Users */
 			template.on('click', '.detail-numbers .list-assigned-items .remove-number', function() {
 				var $this = $(this),
-					userName = $this.parents('.grid-row').find('.grid-cell.name').text(),
+					userName = currentUser.name,
 					dataNumbers = $.extend(true, [], extensionsToSave),
-					userId = $this.parents('.grid-row').data('id'),
+					userId = currentUser.id,
 					row = $this.parents('.item-row');
 
 				row.slideUp(function() {
@@ -919,8 +920,25 @@ define(function(require){
 					});
 
 					self.usersUpdateCallflowNumbers(userId, (currentCallflow || {}).id, dataNumbers, function(callflowData) {
-						toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: userName }));
-						self.usersRender({ userId: callflowData.owner_id });
+						var successCallback = function() {
+							toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: userName }));
+							self.usersRender({ userId: userId });
+						};
+
+						// If we deleted a number that was used as the Caller-ID , disable the Caller-ID feature.
+						var changedCallerID = false;
+
+						if(currentUser.caller_id.hasOwnProperty('internal') && dataNumbers.indexOf(currentUser.caller_id.internal.number) < 0) {
+							delete currentUser.caller_id.internal.number;
+							changedCallerID = true;
+						}
+						if(currentUser.caller_id.hasOwnProperty('external') && dataNumbers.indexOf(currentUser.caller_id.external.number) < 0) {
+							delete currentUser.caller_id.external.number;
+							changedCallerID = true;
+						}
+
+						// If Caller ID change, update the user and then run the successfull callback, otherwise just skip the user update and run the successful callback
+						changedCallerID ? self.usersUpdateUser(currentUser, successCallback) : successCallback();
 					});
 				});
 			});
@@ -1626,8 +1644,12 @@ define(function(require){
 					};
 
 				if(switchCallerId.bootstrapSwitch('status') === false) {
-					if('internal' in userToSave.caller_id) {
+					if(userToSave.caller_id.hasOwnProperty('internal')) {
 						delete userToSave.caller_id.internal.number;
+					}
+
+					if(userToSave.caller_id.hasOwnProperty('external')) {
+						delete userToSave.caller_id.external.number;
 					}
 				}
 				else {
@@ -2393,6 +2415,11 @@ define(function(require){
 			var self = this;
 
 			monster.parallel({
+					user: function(callbackParallel) {
+						self.usersGetUser(userId, function(user) {
+							callbackParallel && callbackParallel(null, user);
+						});
+					},
 					callflow: function(callbackParallel) {
 						var response = {};
 
@@ -2505,7 +2532,8 @@ define(function(require){
 					assignedNumbers: [],
 					unassignedNumbers: {},
 					callflow: data.callflow.userCallflow,
-					extensions: []
+					extensions: [],
+					user: data.user || {}
 				};
 
 			monster.pub('common.numbers.getListFeatures', function(features) {
