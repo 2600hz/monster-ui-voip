@@ -743,6 +743,14 @@
 			"call_waiting[action=disable]": "Désactiver le double-appel",
 			"sound_test_service": "Test Son",
 			"call_recording": "Enregistrement d'appel"
+		},
+		"__comment": "UI-1028, v3.20_s0: Added categories for the feature codes.",
+		"categories": {
+			"call_forward": "Transfert d'appel",
+			"hotdesk": "\"Hot-Desking\"",
+			"parking": "Stationnement",
+			"do_not_disturb": "\"Ne pas déranger\"",
+			"misc": "Divers"
 		}
 	}
 }

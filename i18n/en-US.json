@@ -767,6 +767,14 @@
 			"call_waiting[action=disable]": "Disable Call-Waiting",
 			"sound_test_service": "Sound Test Service",
 			"call_recording": "Call Recording"
+		},
+		"__comment": "UI-1028, v3.20_s0: Added categories for the feature codes.",
+		"categories": {
+			"call_forward": "Call-Forward",
+			"hotdesk": "Hot-Desking",
+			"parking": "Parking",
+			"do_not_disturb": "Do Not Disturb",
+			"misc": "Miscellaneous"
 		}
 	}
 }

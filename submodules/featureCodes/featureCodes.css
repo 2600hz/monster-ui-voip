@@ -17,6 +17,16 @@
 	color: #555;
 }
 
+#feature_codes_container .feature-codes-content .feature-codes-category:not(:first-child) {
+    margin-top: 20px;
+}
+
+#feature_codes_container .feature-codes-content .category-header {
+    font-size: 18px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
 #feature_codes_container .feature-codes-content .feature-code-line:not(:first-child) {
 	margin-top: 10px;
 }
