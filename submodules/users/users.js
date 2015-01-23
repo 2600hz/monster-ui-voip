@@ -2510,7 +2510,10 @@ define(function(require){
 			self.callApi({
 				resource: 'device.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(data) {
 					callback && callback(data.data);
@@ -3196,7 +3199,10 @@ define(function(require){
 			self.callApi({
 				resource: 'directory.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(data) {
 					callback && callback(data.data);
@@ -3232,7 +3238,10 @@ define(function(require){
 			self.callApi({
 				resource: 'callflow.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(data) {
 					callback(data.data);
@@ -3248,7 +3257,8 @@ define(function(require){
 				data: {
 					accountId: self.accountId,
 					filters: {
-						filter_owner_id: userId
+						filter_owner_id: userId,
+						paginate: 'false'
 					}
 				},
 				success: function(data) {
@@ -3263,7 +3273,10 @@ define(function(require){
 			self.callApi({
 				resource: 'voicemail.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(data) {
 					callback(data.data);
@@ -3279,7 +3292,8 @@ define(function(require){
 				data: {
 					accountId: self.accountId,
 					filters: {
-						filter_owner_id: userId
+						filter_owner_id: userId,
+						paginate: 'false'
 					}
 				},
 				success: function(data) {
@@ -3410,7 +3424,8 @@ define(function(require){
 				data: {
 					accountId: self.accountId,
 					filters: {
-						filter_type: 'conference'
+						filter_type: 'conference',
+						paginate: 'false'
 					}
 				},
 				success: function(data) {
@@ -3437,7 +3452,8 @@ define(function(require){
 				data: {
 					accountId: self.accountId,
 					filters: {
-						filter_owner_id: userId
+						filter_owner_id: userId,
+						paginate: 'false'
 					}
 				},
 				success: function(data) {
@@ -3547,7 +3563,8 @@ define(function(require){
 				data: {
 					accountId: self.accountId,
 					filters: {
-						filter_owner_id: userId
+						filter_owner_id: userId,
+						paginate: 'false'
 					}
 				},
 				success: function(data) {
@@ -3578,7 +3595,10 @@ define(function(require){
 						self.callApi({
 							resource: 'user.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(dataUsers) {
 								callback(null, dataUsers.data);
@@ -3593,6 +3613,20 @@ define(function(require){
 					devices: function(callback) {
 						self.usersGetDevicesData(function(devices) {
 							callback(null, devices);
+						});
+					},
+					deviceStatus: function(callback) {
+						self.callApi({
+							resource: 'device.getStatus',
+							data: {
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
+							},
+							success: function(data, status) {
+								callback(null, data.data);
+							}
 						});
 					}
 				},
@@ -3713,7 +3747,10 @@ define(function(require){
 			self.callApi({
 				resource: 'numbers.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(numbers) {
 					callback && callback(numbers.data);

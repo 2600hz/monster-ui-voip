@@ -803,7 +803,10 @@ define(function(require){
 			self.callApi({
 				resource: 'numbers.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(data) {
 					var e911Numbers = [];
@@ -934,7 +937,10 @@ define(function(require){
 						self.callApi({
 							resource: 'user.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(dataUsers) {
 								callback && callback(null, dataUsers.data);
@@ -945,7 +951,10 @@ define(function(require){
 						self.callApi({
 							resource: 'device.getStatus',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(dataStatus) {
 								callback && callback(null, dataStatus.data);
@@ -956,7 +965,10 @@ define(function(require){
 						self.callApi({
 							resource: 'device.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(dataDevices) {
 								callback(null, dataDevices.data);
