@@ -1148,7 +1148,10 @@ define(function(require){
 			self.callApi({
 				resource: 'user.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(data) {
 					callback && callback(data.data);
@@ -1309,7 +1312,10 @@ define(function(require){
 						self.callApi({
 							resource: 'numbers.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(numbers) {
 								callbackParallel && callbackParallel(null, numbers.data);
@@ -1457,7 +1463,10 @@ define(function(require){
 			self.callApi({
 				resource: 'callflow.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(callflows) {
 					callback && callback(callflows.data);
@@ -1472,7 +1481,10 @@ define(function(require){
 				resource: 'media.list',
 				data: {
 					accountId: self.accountId,
-					filters: { 'key_missing':'type' }
+					filters: { 
+						'paginate': 'false',
+						'key_missing':'type' 
+					}
 				},
 				success: function(medias) {
 					callback && callback(medias.data);
@@ -1486,7 +1498,10 @@ define(function(require){
 			self.callApi({
 				resource: 'voicemail.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(medias) {
 					callback && callback(medias.data);
@@ -1828,7 +1843,10 @@ define(function(require){
 						self.callApi({
 							resource: 'group.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(dataGroups) {
 								callback(null, dataGroups.data);
