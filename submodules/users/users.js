@@ -2974,8 +2974,8 @@ define(function(require){
 			var self = this,
 				dataDirectory = {
 					confirm_match: false,
-					max_dtmf: '0',
-					min_dtmf: '3',
+					max_dtmf: 0,
+					min_dtmf: 3,
 					name: 'SmartPBX Directory',
 					sort_by: 'last_name'
 				};
