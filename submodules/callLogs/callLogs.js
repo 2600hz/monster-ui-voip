@@ -34,10 +34,11 @@ define(function(require){
 					timezone: 'GMT' + jstz.determine_timezone().offset()
 				},
 				template,
-				rangeCallLogs = 8;
+				defaultDateRange = 1,
+				maxDateRange = 31;
 
 			if(!toDate && !fromDate) {
-				var dates = monster.util.getDefaultRangeDates(rangeCallLogs);
+				var dates = monster.util.getDefaultRangeDates(defaultDateRange);
 				fromDate = dates.from;
 				toDate = dates.to;
 			}
@@ -58,7 +59,7 @@ define(function(require){
 
 				var optionsDatePicker = {
 					container: template,
-					range: rangeCallLogs
+					range: maxDateRange
 				};
 
 				monster.ui.initRangeDatepicker(optionsDatePicker);
