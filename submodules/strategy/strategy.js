@@ -556,25 +556,17 @@ define(function(require){
 									width: '540px'
 								});
 
-							popup.find('.delete-feature').on('click', function() {
-								$(this).parents('tr').remove();
-
-								if ( popup.find('tbody').is(':empty') ) {
-									popup.dialog('close');
-
-									updateCallflow();
-								}
-							});
+							monster.ui.prettyCheck.create(popup);
 
 							popup.find('.cancel-link').on('click', function() {
 								popup.dialog('close');
-
-								updateCallflow();
 							});
 
 							popup.find('#remove_features').on('click', function() {
 								popup.find('.table td').each(function(idx, elem) {
-									delete dataNumber[$(this).data('name')];
+									if ($(elem).find('input').is(':checked')) {
+										delete dataNumber[$(elem).data('name')];
+									}
 								});
 
 								self.strategyUpdateNumber(numberToRemove, dataNumber, function() {

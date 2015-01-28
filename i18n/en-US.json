@@ -630,14 +630,10 @@
 			"removeNumberSuccess": "Number successfully removed from the main callflow."
 		},
 		"popupRemoveFeatures": {
-			"title": "Remove Features",
-			"questionPartOne": "Do you want to remove features from number",
+			"title": "Features",
+			"questionPartOne": "Do you want to remove features from",
 			"questionPartTwo": "?",
-			"featuresToRemove": "Feature(s) to remove :",
-			"dialogConfirm": {
-				"keep": "Keep",
-				"remove": "Remove"
-			},
+			"featuresToRemove": "Check the feature(s) to remove :",
 			"features": {
 				"cnam": "Caller-ID",
 				"dash_e911": "e911"

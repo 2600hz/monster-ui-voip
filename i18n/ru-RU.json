@@ -634,10 +634,6 @@
 			"questionPartOne": "Вы хотите удалить функции с номера",
 			"questionPartTwo": "?",
 			"featuresToRemove": "Функции для удаления :",
-			"dialogConfirm": {
-				"keep": "Оставить",
-				"remove": "Удалить"
-			},
 			"features": {
 				"cnam": "Caller-ID",
 				"dash_e911": "Экстр.выз.911"

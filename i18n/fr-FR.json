@@ -606,14 +606,10 @@
 			"removeNumberSuccess": "Numéro retiré du callflow principal."
 		},
 		"popupRemoveFeatures": {
-			"title": "Supprimer des fonctionnalités",
-			"questionPartOne": "Voulez-vous supprimer des fonctionnalités du numéro",
+			"title": "Fonctionnalités",
+			"questionPartOne": "Voulez-vous supprimer des fonctionnalités de",
 			"questionPartTwo": "?",
-			"featuresToRemove": "Fonctionnalité(s) à supprimer :",
-			"dialogConfirm": {
-				"keep": "Garder",
-				"remove": "Supprimer"
-			},
+			"featuresToRemove": "Sélectionner les fonctionnalité(s) à supprimer :",
 			"features": {
 				"cnam": "Caller-ID",
 				"dash_e911": "Adresse d'urgence (e911)"
