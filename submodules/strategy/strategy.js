@@ -360,7 +360,7 @@ define(function(require){
 										type: "default"
 									},
 									callflow: callflowName,
-									callEntities: self.strategyGetCallEntitiesDropdownData(strategyData.callEntities),
+									callEntities: self.strategyGetCallEntitiesDropdownData(strategyData.callEntities, true),
 									voicemails: strategyData.voicemails,
 									tabMessage: self.i18n.active().strategy.calls.callTabsMessages[callflowName]
 								};
@@ -1596,11 +1596,18 @@ define(function(require){
 			});
 		},
 
-		strategyGetCallEntitiesDropdownData: function(callEntities) {
+		strategyGetCallEntitiesDropdownData: function(callEntities, useBasicUser) {
 			var self = this,
+				useBasicUser = (useBasicUser === true) || false,
+				entities = $.extend(true, {}, callEntities),
 				results = [];
 
-			_.each(callEntities, function(value, key) {
+			if(!useBasicUser) {
+				entities.user = entities.userCallflows;
+			}
+			delete entities.userCallflows;
+
+			_.each(entities, function(value, key) {
 				var group = {
 						groupName: self.i18n.active().strategy.callEntities[key],
 						groupType: key,
@@ -2106,7 +2113,8 @@ define(function(require){
 				function(err, results) {
 					var callEntities = {
 						device: results.devices,
-						user: [],
+						user: $.extend(true, [], results.users),
+						userCallflows: [],
 						ring_group: []
 					};
 
@@ -2122,7 +2130,7 @@ define(function(require){
 						} else {
 							user.module = 'user';
 						}
-						callEntities.user.push(user);
+						callEntities.userCallflows.push(user);
 					});
 
 					_.each(results.groups, function(group) {
