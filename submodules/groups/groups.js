@@ -543,7 +543,7 @@ define(function(require){
 		groupsRenderRingback: function(data) {
 			var self = this,
 				silenceMediaId = 'silence_stream://300000',
-				ringGroupNode = data.callflow.flow;
+				ringGroupNode = data.baseCallflow.flow;
 
 			while(ringGroupNode.module !== 'ring_group' && '_' in ringGroupNode.children) {
 				ringGroupNode = ringGroupNode.children['_'];
@@ -668,7 +668,7 @@ define(function(require){
 							};
 						}
 
-						self.groupsUpdateCallflow(data.callflow, function() {
+						self.groupsUpdateCallflow(data.baseCallflow, function() {
 							self.groupsUpdate(data.group, function(updatedGroup) {
 								popup.dialog('close').remove();
 								self.groupsRender({ groupId: data.group.id });
@@ -680,7 +680,7 @@ define(function(require){
 							data.group.smartpbx.ringback.enabled = false;
 						}
 
-						self.groupsUpdateCallflow(data.callflow, function() {
+						self.groupsUpdateCallflow(data.baseCallflow, function() {
 							self.groupsUpdate(data.group, function(updatedGroup) {
 								popup.dialog('close').remove();
 								self.groupsRender({ groupId: data.group.id });
@@ -1172,6 +1172,11 @@ define(function(require){
 					},
 					callflow: function(callback) {
 						self.groupsGetRingGroup(groupId, function(data) {
+							callback(null, data);
+						});
+					},
+					baseCallflow: function(callback) {
+						self.groupsGetBaseRingGroup(groupId, function(data) {
 							callback(null, data);
 						});
 					},
