@@ -334,13 +334,12 @@
 }
 
 /* RTP Special CSS */
-.edit-device .content .rtp-line {
-	margin-left: 100px;
-}
-
 .edit-device .content .rtp-line > * {
 	float: left;
-	font-size: 14px;
-	line-height: 28px;
-	margin: 0 10px;
+	margin-right: 10px;
+}
+
+.edit-device .form-horizontal .control-label.checkbox {
+	width: inherit;
+	margin-left: 35px;
 }
