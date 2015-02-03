@@ -133,6 +133,12 @@
 					"enable": "Stratégie d'encryption audio",
 					"srtp": "SRTP",
 					"zrtp": "ZRTP"
+				},
+				"__comment": "UI-1119: Adding ignore_complete_elsewhere",
+				"__version": "3.19",
+				"ignoreCompletedElsewhere": {
+					"label": "Afficher les appels manqués des groupes d'Appels",
+					"help": "Si cette case est cochée, les téléphones ayant accès à cette fonctionnalité afficheront les appels manqués même s'ils viennent d'un Groupe d'Appel et que l'appel a été pris par un collègue"
 				}
 			},
 			"restrictions": {
