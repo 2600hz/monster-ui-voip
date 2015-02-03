@@ -407,8 +407,8 @@ define(function(require){
 							currentCallflow = data.callflow;
 							numbersToSave = [];
 
-							_.each(data.assignedNumbers, function(v, k) {
-								numbersToSave.push(k);
+							_.each(data.assignedNumbers, function(v) {
+								numbersToSave.push(v.phoneNumber);
 							});
 						}
 						else if(type === 'features') {
