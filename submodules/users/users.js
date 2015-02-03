@@ -2176,7 +2176,7 @@ define(function(require){
 			var userData = $.extend(true, {}, userData),
 				fullName = userData.first_name + ' ' + userData.last_name,
 				defaultCallerIdName = fullName.substring(0, 15),
-				defaults = {
+				newCallerIDs = {
 					caller_id: {
 						internal: {
 							name: defaultCallerIdName
@@ -2187,7 +2187,7 @@ define(function(require){
 					}
 				};
 
-			userData = $.extend(true, defaults, userData);
+			userData = $.extend(true, userData, newCallerIDs);
 			/* If the user has been removed from the directory */
 			if(userData.extra) {
 				if(userData.extra.includeInDirectory === false) {
