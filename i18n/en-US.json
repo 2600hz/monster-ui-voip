@@ -151,6 +151,12 @@
 					"type": "Type of encryption: ",
 					"srtp": "SRTP",
 					"zrtp": "ZRTP"
+				},
+				"__comment": "UI-1119: Adding ignore_complete_elsewhere",
+				"__version": "3.19",
+				"ignoreCompletedElsewhere": {
+					"label": "Ignore Completed Elsewhere",
+					"help": "When checked supporting phones will show a call missed if it was part of a ring group answered elsewhere."
 				}
 			},
 			"restrictions": {
