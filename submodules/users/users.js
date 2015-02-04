@@ -2873,9 +2873,141 @@ define(function(require){
 				self.usersSmartUpdateVMBox(user, false, function(_dataVM) {
 					callflow.flow.children['_'].data.id = _dataVM.id;
 
-					self.usersCreateCallflow(callflow, function(_dataCF) {
-						callback && callback(_dataCF);
+					self.usersCreateCallflow(callflow,
+						function(_dataCF) {
+							callback && callback(_dataCF);
+						},
+						function(errorPayload, globalHandler) {
+							var errorCallback = function() {
+								globalHandler && globalHandler(errorPayload, { generateError: true });
+							};
+
+							if(errorPayload.error === '400' && errorPayload.hasOwnProperty('data') && errorPayload.data.hasOwnProperty('numbers') && errorPayload.data.numbers.hasOwnProperty('unique')) {
+								self.usersHasKazooUICallflow(callflow, function(existingCallflow) {
+									self.usersMigrateKazooUIUser(callflow, existingCallflow, callback);
+								}, errorCallback);
+							}
+							else {
+								errorCallback();
+							}
+						},
+						false
+					);
+				});
+			});
+		},
+
+		usersGetCallflowFromNumber: function(number, callback) {
+			var self = this,
+				found = false;
+
+			self.callApi({
+				resource: 'callflow.searchByNumber',
+				data: {
+					accountId: self.accountId,
+					value: number
+				},
+				success: function(results) {
+					if(results.data.length > 0) {
+						_.each(results.data, function(callflow) {
+							_.each(callflow.numbers, function(n) {
+								if(n === number && found === false) {
+									found = true;
+
+									self.callApi({
+										resource: 'callflow.get',
+										data: {
+											accountId: self.accountId,
+											callflowId: callflow.id
+										},
+										success: function(callflow) {
+											callback && callback(callflow.data);
+										}
+									})
+								}
+							});
+						});
+
+						if(found === false) {
+							callback && callback({});
+						}
+					}
+					else {
+						callback && callback({});
+					}
+				}
+			});
+		},
+
+		usersHasKazooUICallflow: function(callflow, success, error) {
+			var self = this,
+				parallelRequests = {},
+				kazooUICallflowFound = 0,
+				kazooUICallflow;
+
+			// Check if we find a number that belong to a Kazoo-UI callflow
+			_.each(callflow.numbers, function(number) {
+				parallelRequests[number] = function(callback) {
+					self.usersGetCallflowFromNumber(number, function(callflow) {
+						if(!(callflow.hasOwnProperty('ui_metadata') && callflow.ui_metadata.hasOwnProperty('ui') && callflow.ui_metadata.ui === 'monster-ui')) {
+							// If we already found a callflow
+							if(typeof kazooUICallflow !== 'undefined') {
+								// If it's not the same Callflow that we found before, we increment the # of callflows found, which will trigger an error later
+								// If it's the same as before we do nothing
+								if(callflow.id !== kazooUICallflow.id) {
+									kazooUICallflowFound++;
+								}
+							}
+							else {
+								kazooUICallflowFound++;
+								kazooUICallflow = callflow;
+							}
+						}
+
+						callback && callback(null, {});
 					});
+				}
+			});
+
+			
+			monster.parallel(parallelRequests, function(err, results) {
+				// If we didn't find a single non-Monster-UI Callflow, then we trigger the error
+				if(kazooUICallflowFound === 0) {
+					error && error();
+				}
+				// If we had more than 1 Kazoo UI callflow, show an error saying the migration is impossible
+				else if(kazooUICallflowFound > 1) {
+					monster.ui.alert(self.i18n.active().users.migration.tooManyCallflows);
+				}
+				// Else, we have found 1 callflow from Kazoo-UI, migration is possible, we continue with the success callback
+				else {
+					success && success(kazooUICallflow);
+				}
+			});
+		},
+
+		usersMigrateKazooUIUser: function(callflowToCreate, existingCallflow, callback) {
+			var self = this,
+				newNumbers = [];
+
+			// copy all the existing callflow numbers to the callflow we're about to create
+			callflowToCreate.numbers = existingCallflow.numbers;
+
+			// Update the numbers of the existing callflow so that we keep a trace of the migration
+			_.each(existingCallflow.numbers, function(number) {
+				newNumbers.push('old_' + number + '_r' + monster.util.randomString(6));
+			});
+			existingCallflow.numbers = newNumbers;
+
+			// Make sure the User knows what's going to happen
+			monster.ui.confirm(self.i18n.active().users.migration.confirmMigration, function() {
+				// First update the existing callflow with its new fake numbers
+				self.usersUpdateCallflow(existingCallflow, function(oldCallflow) {
+					// Now that the numbers have been changed, we can create the new Monster UI Callflow
+					self.usersCreateCallflow(callflowToCreate, function(newCallflow) {
+						// Once all this is done, continue normally to the SmartPBX normal update
+						callback && callback(newCallflow);
+					})
 				});
 			});
 		},
@@ -3534,17 +3666,21 @@ define(function(require){
 			});
 		},
 
-		usersCreateCallflow: function(callflow, callback) {
+		usersCreateCallflow: function(callflow, success, error, generateError) {
 			var self = this;
 
 			self.callApi({
 				resource: 'callflow.create',
 				data: {
 					accountId: self.accountId,
-					data: callflow
+					data: callflow,
+					generateError: generateError === false ? false : true
 				},
 				success: function(callflowData) {
-					callback && callback(callflowData.data);
+					success && success(callflowData.data);
+				},
+				error: function(callflowData, junk, globalHandler) {
+					error && error(callflowData, globalHandler);
 				}
 			});
 		},

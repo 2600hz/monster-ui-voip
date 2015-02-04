@@ -473,6 +473,12 @@
 			"title": "Hot-Desking",
 			"headline": "Réglages du Hot-Desking",
 			"help": "Le Hot-Desking ID est automatiquement défini avec le numéro d'extension assigné."
+		},
+		"__comment": "UI-1129: Migration tool from Kazoo-UI to Monster-UI",
+		"__version": "3.19",
+		"migration": {
+			"confirmMigration": "Un des numéros que vous souhaitez rajouter existe déjà dans Kazoo-UI, nous pouvons migrer le callflow vers SmartPBX pour vous permettre de l'utiliser. Vous ne pourrez plus modifier ce callflow dans Kazoo-UI ou dans l'application Callflows de Monster-UI. Continuez quand même?",
+			"tooManyCallflows": "Vous essayez de rajouter des numéros existant déjà sur plusieurs callflows, nous ne pouvons continuer notre opération automatique de migration. Veuillez contacter votre support pour résoudre ce problème."
 		}
 	},
 
