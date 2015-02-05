@@ -238,11 +238,11 @@ define(function(require){
 			});
 
 			if($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone', 'fax', 'ata']) > -1) {
-				var audioCodecs = monster.ui.linkedColumns(templateDevice.find('#audio_codec_selector'), data.extra.availableCodecs.audio, data.extra.selectedCodecs.audio);
+				var audioCodecs = monster.ui.codecSelector('audio', templateDevice.find('#audio_codec_selector'), data.media.audio.codecs);
 			}
 
 			if($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone']) > -1) {
-				var videoCodecs = monster.ui.linkedColumns(templateDevice.find('#video_codec_selector'), data.extra.availableCodecs.video, data.extra.selectedCodecs.video);
+				var videoCodecs = monster.ui.codecSelector('video', templateDevice.find('#video_codec_selector'), data.media.video.codecs);
 			}
 
 			monster.ui.tabs(templateDevice);
@@ -450,8 +450,6 @@ define(function(require){
 
 		devicesFormatData: function(data) {
 			var self = this,
-				codecsAudioI18n = self.i18n.active().devices.popupSettings.audio.codecs,
-				codecsVideoI18n = self.i18n.active().devices.popupSettings.video.codecs,
 				defaults = {
 					extra: {
 						hasE911Numbers: data.e911Numbers.length > 0,
@@ -465,30 +463,6 @@ define(function(require){
 						availableCodecs: {
 							audio: [],
 							video: []
-						},
-						listCodecs: {
-							audio: {
-								'OPUS': codecsAudioI18n['OPUS'],
-								'CELT@32000h': codecsAudioI18n['CELT@32000h'],
-								'G7221@32000h': codecsAudioI18n['G7221@32000h'],
-								'G7221@16000h': codecsAudioI18n['G7221@16000h'],
-								'G722': codecsAudioI18n['G722'],
-								'speex@32000h':codecsAudioI18n['speex@32000h'],
-								'speex@16000h': codecsAudioI18n['speex@16000h'],
-								'speex': codecsAudioI18n['speex'],
-								'PCMU': codecsAudioI18n['PCMU'],
-								'PCMA': codecsAudioI18n['PCMA'],
-								'G729':codecsAudioI18n['G729'],
-								'GSM': codecsAudioI18n['GSM'],
-								'CELT@48000h': codecsAudioI18n['CELT@48000h'],
-								'CELT@64000h': codecsAudioI18n['CELT@64000h']
-							},
-							video: {
-								'VP8': codecsVideoI18n['VP8'],
-								'H264': codecsVideoI18n['H264'],
-								'H263': codecsVideoI18n['H263'],
-								'H261': codecsVideoI18n['H261']
-							}
 						}
 					},
 					call_restriction: {},
@@ -619,46 +593,13 @@ define(function(require){
 			/* Audio Codecs*/
 			/* extend doesn't replace the array so we need to do it manually */
 			if(data.device.media && data.device.media.audio && data.device.media.audio.codecs) {
-				var mapMigrateCodec = {
-						'Speex': 'speex@16000h',
-						'G722_16': 'G7221@16000h',
-						'G722_32': 'G7221@32000h',
-						'CELT_48': 'CELT@48000h',
-						'CELT_64': 'CELT@64000h'
-					},
-					newCodecList = [];
-
-				_.each(data.device.media.audio.codecs, function(codec) {
-					mapMigrateCodec.hasOwnProperty(codec) ? newCodecList.push(mapMigrateCodec[codec]) : newCodecList.push(codec);
-				});
-
-				formattedData.media.audio.codecs = newCodecList;
+				formattedData.media.audio.codecs = data.device.media.audio.codecs;
 			}
-
-			_.each(formattedData.media.audio.codecs, function(codec) {
-				formattedData.extra.selectedCodecs.audio.push({ key: codec, value: defaults.extra.listCodecs.audio[codec] });
-			});
-
-			_.each(defaults.extra.listCodecs.audio, function(description, codec) {
-				if(formattedData.media.audio.codecs.indexOf(codec) === -1) {
-					formattedData.extra.availableCodecs.audio.push({ key: codec, value: description });
-				}
-			});
 
 			/* Video codecs */
 			if(data.device.media && data.device.media.video && data.device.media.video.codecs) {
 				formattedData.media.video.codecs = data.device.media.video.codecs;
 			}
-
-			_.each(formattedData.media.video.codecs, function(codec) {
-				formattedData.extra.selectedCodecs.video.push({ key: codec, value: defaults.extra.listCodecs.video[codec] });
-			});
-
-			_.each(defaults.extra.listCodecs.video, function(description, codec) {
-				if(formattedData.media.video.codecs.indexOf(codec) === -1) {
-					formattedData.extra.availableCodecs.video.push({ key: codec, value: description });
-				}
-			});
 
 			return formattedData;
 		},
