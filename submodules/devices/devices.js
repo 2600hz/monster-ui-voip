@@ -238,24 +238,20 @@ define(function(require){
 			});
 
 			if($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone', 'fax', 'ata']) > -1) {
-				templateDevice.find('#audio_codec_selector .selected-codecs, #audio_codec_selector .available-codecs').sortable({
-					connectWith: '.connectedSortable'
-				}).disableSelection();
+				var audioCodecs = monster.ui.linkedColumns(templateDevice.find('#audio_codec_selector'), data.extra.availableCodecs.audio, data.extra.selectedCodecs.audio);
 			}
 
 			if($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone']) > -1) {
-				templateDevice.find('#video_codec_selector .selected-codecs, #video_codec_selector .available-codecs').sortable({
-					connectWith: '.connectedSortable'
-				}).disableSelection();
+				var videoCodecs = monster.ui.linkedColumns(templateDevice.find('#video_codec_selector'), data.extra.availableCodecs.video, data.extra.selectedCodecs.video);
 			}
 
 			monster.ui.tabs(templateDevice);
 			monster.ui.prettyCheck.create(templateDevice);
 			monster.ui.protectField(templateDevice.find('#sip_password'), templateDevice);
+
 			templateDevice.find('[data-toggle="tooltip"]').tooltip();
 			templateDevice.find('.switch').bootstrapSwitch();
 			templateDevice.find('#mac_address').mask("hh:hh:hh:hh:hh:hh", {placeholder:" "});
-
 
 			if(!(data.media.encryption.enforce_security)) {
 				templateDevice.find('#rtp_method').hide();
@@ -267,7 +263,7 @@ define(function(require){
 
 			templateDevice.find('.actions .save').on('click', function() {
 				if(monster.ui.valid(deviceForm)) {
-					var dataToSave = self.devicesMergeData(data, templateDevice);
+					var dataToSave = self.devicesMergeData(data, templateDevice, audioCodecs, videoCodecs);
 
 					self.devicesSaveDevice(dataToSave, function(data) {
 						popup.dialog('close').remove();
@@ -378,7 +374,7 @@ define(function(require){
 			});
 		},
 
-		devicesMergeData: function(originalData, template) {
+		devicesMergeData: function(originalData, template, audioCodecs, videoCodecs) {
 			var self = this,
 				hasCodecs = $.inArray(originalData.device_type, ['sip_device', 'landline', 'fax', 'ata', 'softphone', 'smartphone', 'mobile', 'sip_uri']) > -1,
 				hasSIP = $.inArray(originalData.device_type, ['fax', 'ata', 'softphone', 'smartphone', 'mobile']) > -1,
@@ -390,6 +386,14 @@ define(function(require){
 				formData.mac_address = monster.util.formatMacAddress(formData.mac_address);
 			}
 
+			if(hasCallForward) {
+				formData.call_forward = $.extend(true, {
+					enabled: true,
+					require_keypress: true,
+					keep_caller_id: true
+				}, formData.call_forward);
+			}
+
 			if(hasCodecs) {
 				formData.media = $.extend(true, {
 					audio: {
@@ -399,28 +403,6 @@ define(function(require){
 						codecs: []
 					}
 				}, formData.media);
-
-				template.find('#audio_codec_selector .selected-codecs li').each(function() {
-					formData.media.audio.codecs.push($(this).data('codec'));
-				});
-				template.find('#video_codec_selector .selected-codecs li').each(function() {
-					formData.media.video.codecs.push($(this).data('codec'));
-				});
-
-				if(originalData.media && originalData.media.audio && originalData.media.audio.codecs) {
-					originalData.media.audio.codecs = [];
-				}
-				if(originalData.media && originalData.media.video && originalData.media.video.codecs) {
-					originalData.media.video.codecs = [];
-				}
-			}
-
-			if(hasCallForward) {
-				formData.call_forward = $.extend(true, {
-					enabled: true,
-					require_keypress: true,
-					keep_caller_id: true
-				}, formData.call_forward);
 			}
 
 			if(hasSIP) {
@@ -443,7 +425,7 @@ define(function(require){
 
 			var mergedData = $.extend(true, {}, originalData, formData);
 
-			/* The extend doesn't override an array if the new array is empty, so we need to run this snippet after the merge */
+			/* The extend doesn't override an array if the new array is empty, so we need to run these snippet after the merge */
 			if(hasRTP) {
 				mergedData.media.encryption.methods = [];
 
@@ -452,9 +434,16 @@ define(function(require){
 				}
 			}
 
+			if(hasCodecs) {
+				mergedData.media.audio.codecs = audioCodecs.getSelectedItems();
+				mergedData.media.video.codecs = videoCodecs.getSelectedItems();
+			}
+
 			/* Migration clean-up */
 			delete mergedData.media.secure_rtp;
 			delete mergedData.extra;
+
+			console.log(mergedData);
 
 			return mergedData;
 		},
@@ -647,12 +636,12 @@ define(function(require){
 			}
 
 			_.each(formattedData.media.audio.codecs, function(codec) {
-				formattedData.extra.selectedCodecs.audio.push({ codec: codec, description: defaults.extra.listCodecs.audio[codec] });
+				formattedData.extra.selectedCodecs.audio.push({ key: codec, value: defaults.extra.listCodecs.audio[codec] });
 			});
 
 			_.each(defaults.extra.listCodecs.audio, function(description, codec) {
 				if(formattedData.media.audio.codecs.indexOf(codec) === -1) {
-					formattedData.extra.availableCodecs.audio.push({ codec: codec, description: description });
+					formattedData.extra.availableCodecs.audio.push({ key: codec, value: description });
 				}
 			});
 
@@ -662,12 +651,12 @@ define(function(require){
 			}
 
 			_.each(formattedData.media.video.codecs, function(codec) {
-				formattedData.extra.selectedCodecs.video.push({ codec: codec, description: defaults.extra.listCodecs.video[codec] });
+				formattedData.extra.selectedCodecs.video.push({ key: codec, value: defaults.extra.listCodecs.video[codec] });
 			});
 
 			_.each(defaults.extra.listCodecs.video, function(description, codec) {
 				if(formattedData.media.video.codecs.indexOf(codec) === -1) {
-					formattedData.extra.availableCodecs.video.push({ codec: codec, description: description });
+					formattedData.extra.availableCodecs.video.push({ key: codec, value: description });
 				}
 			});
 
