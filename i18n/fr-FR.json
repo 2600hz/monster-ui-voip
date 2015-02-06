@@ -489,7 +489,7 @@
 		"presenceIDPopup": {
 			"title": "Sélectionnez votre Extension Principale",
 			"header": "Vous êtes en train de supprimer l'Extension Principale de cet utilisateur, veuillez en sélectionner une nouvelle dans les options ci-dessous:",
-			"none": "Je ne veux pas d'Extension Principale'"
+			"none": "Je ne veux pas d'Extension Principale"
 		}
 	},
 
