@@ -96,6 +96,18 @@
 					</div>
 				{{/if}}
 			</div>
+
+			<div class="row-fields">
+				<div class="icon-wrapper"><i class="icon-telicon-extension"></i></div>
+				<label>{{ i18n.users.editionForm.presenceId }}</label>
+				<select name="presence_id" class="input-medium presence-id-select">
+					{{#select presence_id}}
+						{{#each extra.presenceIdOptions}}
+							<option value="{{ this.key }}">{{ this.value }}</option>
+						{{/each}}
+					{{/select}}
+				</select>
+			</div>
 		</div>
 		<!--<div class="advanced-fields content-centered span3">
 			<a id="resend_instructions" href="javascript:void(0)">{{ i18n.users.resendInstructions }}</a>

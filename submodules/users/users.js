@@ -190,6 +190,26 @@ define(function(require){
 
 			dataUser.extra.adminId = self.userId;
 
+			dataUser.extra.presenceIdOptions = [{ key: 'unset', value: self.i18n.active().users.editionForm.noPresenceID }];
+
+			var temp,
+				addNumberToPresenceOptions = function(number) {
+					temp = {
+						key: number,
+						value: monster.util.formatPhoneNumber(number)
+					};
+
+					dataUser.extra.presenceIdOptions.push(temp);
+				};
+
+			_.each(dataUser.extra.listExtensions, function(extension) {
+				addNumberToPresenceOptions(extension);
+			})
+
+			_.each(dataUser.extra.listNumbers, function(number) {
+				addNumberToPresenceOptions(number);
+			});
+
 			return dataUser;
 		},
 
@@ -385,6 +405,7 @@ define(function(require){
 						else if(type === 'extensions') {
 							existingExtensions = data.allExtensions;
 							currentCallflow = data.callflow;
+							currentUser = data.user;
 							numbersToSave = [];
 
 							_.each(data.assignedNumbers, function(v) {
@@ -506,8 +527,6 @@ define(function(require){
 
 					template.find('.grid-cell.active').removeClass('active');
 				});
-
-
 			});
 
 			/* Events for Extensions details */
@@ -526,10 +545,29 @@ define(function(require){
 					numbers.push(number);
 				});
 
-				self.usersUpdateCallflowNumbers(userId, (currentCallflow || {}).id, numbers, function(callflowData) {
-					toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: name }));
-					self.usersRender({ userId: callflowData.owner_id });
-				});
+				if(numbers.length > 0) {
+					var updateCallflow = function() {
+						self.usersUpdateCallflowNumbers(userId, (currentCallflow || {}).id, numbers, function(callflowData) {
+							toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: name }));
+
+							self.usersRender({ userId: callflowData.owner_id });
+						});
+					};
+
+					if(self.usersHasProperPresenceId(numbers, currentUser)) {
+						updateCallflow();
+					}
+					else {
+						self.usersUpdatePresenceIDPopup(numbers, currentUser, function(user) {
+							self.usersUpdateUser(user, function() {
+								updateCallflow();
+							});
+						});
+					}
+				}
+				else {
+					monster.ui.alert('warning', self.i18n.active().users.noNumberCallflow);
+				}
 			});
 
 			template.on('click', '#add_extensions', function() {
@@ -899,10 +937,49 @@ define(function(require){
 						dataNumbers.push($(elem).data('id'));
 					});
 
-					self.usersUpdateCallflowNumbers(userId, (currentCallflow || {}).id, dataNumbers, function(callflowData) {
-						toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: userName }));
-						self.usersRender({ userId: callflowData.owner_id });
-					});
+					if(dataNumbers.length > 0) {
+						var updateCallflow = function() {
+								self.usersUpdateCallflowNumbers(userId, (currentCallflow || {}).id, dataNumbers, function(callflowData) {
+									toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: userName }));
+									self.usersRender({ userId: userId });
+								});
+							},
+							updateUserAndCallflow = function(user) {
+								self.usersUpdateUser(user, function() {
+									updateCallflow();
+								});
+							};
+
+						// If we deleted a number that was used as the Caller-ID , disable the Caller-ID feature.
+						var needUpdateUser = false;
+
+						if(currentUser.caller_id.hasOwnProperty('internal') && dataNumbers.indexOf(currentUser.caller_id.internal.number) < 0) {
+							delete currentUser.caller_id.internal.number;
+							needUpdateUser = true;
+						}
+						if(currentUser.caller_id.hasOwnProperty('external') && dataNumbers.indexOf(currentUser.caller_id.external.number) < 0) {
+							delete currentUser.caller_id.external.number;
+							needUpdateUser = true;
+						}
+
+						if(!self.usersHasProperPresenceId(dataNumbers, currentUser)) {
+							self.usersUpdatePresenceIDPopup(dataNumbers, currentUser, function(user) {
+								updateUserAndCallflow(user);
+							});
+						}
+						else {
+							if(needUpdateUser) {
+								updateUserAndCallflow(currentUser);
+							}
+							else {
+								updateCallflow();
+							}
+						}
+					}
+					else {
+						monster.ui.alert('warning', self.i18n.active().users.noNumberCallflow);
+						self.usersRender({ userId: userId });
+					}
 				});
 			});
 
@@ -1208,6 +1285,65 @@ define(function(require){
 				template.find('.grid-row.active').removeClass('active');
 
 			});
+		},
+
+		usersUpdatePresenceIDPopup: function(numbers, user, callback) {
+			var self = this,
+				dataTemplate = {
+					numbers: numbers
+				},
+				template = $(monster.template(self, 'users-changePresenceIDPopup', dataTemplate)),
+				$options = template.find('.presence-id-option');
+
+			$options.on('click', function() {
+				$options.removeClass('active');
+				$(this).addClass('active');
+			});
+
+			template.find('.save-presence-id').on('click', function() {
+				var newPresenceID = template.find('.presence-id-option.active').data('number');
+
+				if(newPresenceID !== 'none') {
+					user.presence_id = newPresenceID;
+				}
+				else {
+					delete user.presence_id;
+				}
+
+				popup.dialog('close').remove();
+
+				callback && callback(user);
+			});
+
+			template.find('.cancel-link').on('click', function() {
+				popup.dialog('close').remove();
+			});
+
+			var popup = monster.ui.dialog(template, {
+				title: self.i18n.active().users.presenceIDPopup.title,
+				position: ['center', 20]
+			});
+		},
+
+		usersHasProperPresenceId: function(listNumbers, user) {
+			var self = this;
+
+			if(user.presence_id) {
+				var found = false,
+					formattedPresenceID = '' + user.presence_id;
+
+				_.each(listNumbers, function(number) {
+					if(number === formattedPresenceID) {
+						found = true;
+					}
+				});
+
+				return found;
+			}
+			else {
+				return true;
+			}
+			
 		},
 
 		/* Helper function that takes an array of number in parameter, sorts it, and returns the first number not in the array, greater than the minVal */
@@ -2227,6 +2363,10 @@ define(function(require){
 				}
 			}
 
+			if(userData.presence_id === 'unset') {
+				delete userData.presence_id;
+			}
+
 			delete userData.include_directory;
 			delete userData.features;
 			delete userData.extra;
@@ -2382,6 +2522,11 @@ define(function(require){
 			var self = this;
 
 			monster.parallel({
+					user: function(callbackParallel) {
+						self.usersGetUser(userId, function(user) {
+							callbackParallel && callbackParallel(null, user);
+						});
+					},
 					callflow: function(callbackParallel) {
 						var response = {};
 
@@ -2456,9 +2601,9 @@ define(function(require){
 		usersGetExtensionsTemplate: function(userId, callback) {
 			var self = this;
 			self.usersGetNumbersData(userId, function(results) {
+
 				self.usersFormatNumbersData(userId, results, function(results) {
 					template = $(monster.template(self, 'users-extensions', results));
-
 					callback && callback(template, results);
 				});
 			});
@@ -2494,7 +2639,8 @@ define(function(require){
 					assignedNumbers: [],
 					unassignedNumbers: {},
 					callflow: data.callflow.userCallflow,
-					extensions: []
+					extensions: [],
+					user: data.user || {}
 				};
 
 			monster.pub('common.numbers.getListFeatures', function(features) {
@@ -2584,6 +2730,7 @@ define(function(require){
 								name: callerIdName
 							}
 						},
+						presence_id: data.callflow.extension,
 						email: data.extra.differentEmail ? data.extra.email : data.user.username,
 						priv_level: 'user',
 						timezone: defaultTimezone

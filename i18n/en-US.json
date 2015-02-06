@@ -365,7 +365,11 @@
 			"timeoutSec": "Sec",
 			"timeoutEdit": "Edit in Find-Me-Follow-Me feature",
 			"timeoutEditHint": "The ringing timeout is overriden by the Find-Me-Follow-Me feature. Click on the link below to edit it.",
-			"disabledTimeoutHint": "You need at least one number or extension to set up the ringing timeout."
+			"disabledTimeoutHint": "You need at least one number or extension to set up the ringing timeout.",
+			"__comment": "UI-1109: Adding the Presence ID setting on the User document",
+			"__version": "3.19",
+			"presenceId": "Main Extension",
+			"noPresenceID": "- Not Set -"
 		},
 		"delete": "Delete User",
 		"errorCallerId": "Before configuring the Caller-ID of this user, you need to assign him a number",
@@ -503,6 +507,13 @@
 		"migration": {
 			"confirmMigration": "We found an existing callflow with the number you're trying to add, it appears we can migrate this callflow to the SmartPBX. Before we proceed, we want to make sure you understand that you won't be allowed to update this Callflow in Kazoo-UI or in the Monster-UI Callflows app after this change. Do you want to continue?",
 			"tooManyCallflows": "It appears the numbers you're trying to add belong to multiple Kazoo-UI Callflows. There is no way to properly migrate these callflows in Monster-UI please contact your support to fix it."
+		},
+		"__commment": "UI-1109: Adding popup for Presence ID change",
+		"__version": "3.19",
+		"presenceIDPopup": {
+			"title": "Select your new Main Extension",
+			"header": "It appears that you want to remove the number you had set as your Main Extension. Please select your new Main Extension from the choices below:",
+			"none": "I don't want to set a new Main Extension"
 		}
 	},
 

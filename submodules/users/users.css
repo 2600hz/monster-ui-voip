@@ -283,7 +283,6 @@
 
 #users_container .detail-user .row-fields {
 	margin-bottom: 10px;
-	height: 40px;
 	line-height: 40px;
 }
 
@@ -300,6 +299,10 @@
 #users_container .detail-user .row-fields .ringing-timeout.disabled * {
 	opacity: 0.5;
 	cursor: default !important;
+}
+
+#users_container .detail-user .row-fields .presence-id-select {
+	margin-left: 10px;
 }
 
 #users_container .detail-user .row-fields .timeout-edit {
@@ -787,4 +790,43 @@
 #find_me_follow_me_form .grid-time .grid-time-row-placeholder {
 	height: 52px;
 	background-color: inherit;
+}
+
+/********* CSS for device popovers (appended directly on the body) *********/
+.device-popover-icon {
+	margin-right: 10px;
+	vertical-align: text-bottom;
+}
+
+/**** CSS For Changing the Presence ID settings *****/
+
+.presence-id-change-wrapper {
+	padding: 15px;
+	width: 400px;
+}
+
+.presence-id-change-wrapper .list-choices {
+	margin-bottom: 20px;
+	margin-top: 20px;
+}
+
+.presence-id-change-wrapper .list-choices .presence-id-option {
+	background: #EEE;
+	padding: 20px;
+	border: 1px solid #CCC;
+	margin-bottom: 5px;
+}
+
+.presence-id-change-wrapper .list-choices .presence-id-option:hover {
+	background: #FFF;
+	cursor: pointer;
+}
+
+.presence-id-change-wrapper .list-choices .presence-id-option.active {
+	background: #FFF;
+	border: 1px solid #22CCFF;
+}
+
+.presence-id-change-wrapper .actions {
+	margin-top: 10px;
 }

@@ -1,0 +1,21 @@
+<div class="presence-id-change-wrapper">
+	<div class="header">
+		{{ i18n.users.presenceIDPopup.header }}
+	</div>
+
+	<div class="list-choices">
+		{{#each numbers}} 
+			<div class="presence-id-option" data-number="{{this}}">{{ formatPhoneNumber this }}</div>
+		{{/each}}
+		<div class="presence-id-option" data-number="none"> 
+			{{ i18n.users.presenceIDPopup.none}}
+		</div>
+	</div>
+
+	<div class="actions clearfix">
+		<div class="pull-right">
+			<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
+			<button type="button" class="btn btn-success save-presence-id">{{ i18n.saveChanges }}</button>
+		</div>
+	</div>
+</div>

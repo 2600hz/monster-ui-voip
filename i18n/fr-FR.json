@@ -340,7 +340,11 @@
 			"timeoutSec": "Sec",
 			"timeoutEdit": "Editer dans \"Find-Me-Follow-Me\"",
 			"timeoutEditHint": "La durée de sonnerie est redéfinie dans la fonctionnalité \"Find-Me-Follow-Me\". Cliquez sur le lien ci-dessous pour la modifier.",
-			"disabledTimeoutHint": "Au moins un numéro ou extension est requis avant de pouvoir définir la durée de sonnerie."
+			"disabledTimeoutHint": "Au moins un numéro ou extension est requis avant de pouvoir définir la durée de sonnerie.",
+			"__comment": "UI-1109: Adding the Presence ID setting on the User document",
+			"__version": "3.19",
+			"presenceId": "Extension Principale",
+			"noPresenceID": "- Aucune -"
 		},
 		"delete": "Supprimer Utilisateur",
 		"errorCallerId": "Avant de configurer le Caller-ID de l'utilisateur, vous devez d'abord lui attribuer un numéro.",
@@ -479,6 +483,13 @@
 		"migration": {
 			"confirmMigration": "Un des numéros que vous souhaitez rajouter existe déjà dans Kazoo-UI, nous pouvons migrer le callflow vers SmartPBX pour vous permettre de l'utiliser. Vous ne pourrez plus modifier ce callflow dans Kazoo-UI ou dans l'application Callflows de Monster-UI. Continuez quand même?",
 			"tooManyCallflows": "Vous essayez de rajouter des numéros existant déjà sur plusieurs callflows, nous ne pouvons continuer notre opération automatique de migration. Veuillez contacter votre support pour résoudre ce problème."
+		},
+		"__commment": "UI-1109: Adding popup for Presence ID change",
+		"__version": "3.19",
+		"presenceIDPopup": {
+			"title": "Sélectionnez votre Extension Principale",
+			"header": "Vous êtes en train de supprimer l'Extension Principale de cet utilisateur, veuillez en sélectionner une nouvelle dans les options ci-dessous:",
+			"none": "Je ne veux pas d'Extension Principale'"
 		}
 	},
 
