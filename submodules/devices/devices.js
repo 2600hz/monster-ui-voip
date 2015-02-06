@@ -443,8 +443,6 @@ define(function(require){
 			delete mergedData.media.secure_rtp;
 			delete mergedData.extra;
 
-			console.log(mergedData);
-
 			return mergedData;
 		},
 
