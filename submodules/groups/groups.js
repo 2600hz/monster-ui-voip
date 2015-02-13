@@ -952,6 +952,7 @@ define(function(require){
 
 						_.each(numberList, function(val, idx) {
 							dataNumbers.push(val.phoneNumber);
+							val.isLocal = val.features.indexOf('local') > -1;
 
 							template
 								.find('.list-assigned-items')
@@ -1273,6 +1274,7 @@ define(function(require){
 							response.extensions.push(number);
 						}
 						else {
+							data.numbers.numbers[number].isLocal = data.numbers.numbers[number].features.indexOf('local') > -1;
 							response.assignedNumbers[number] = data.numbers.numbers[number];
 						}
 					});

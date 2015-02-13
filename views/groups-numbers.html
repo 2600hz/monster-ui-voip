@@ -7,20 +7,22 @@
 			{{#each assignedNumbers}}
 				<div class="item-row" data-id="{{@key}}" data-search="{{formatPhoneNumber @key}} {{@key}} {{locality.city}} {{locality.country}}">
 					<div class="features-block pull-right">
-						<div class="pull-right">
+					{{#unless isLocal}}
+						<div class="edit-features">
 							<div class="navbar">
 								<ul class="nav pull-right">
 									<li class="dropdown">
 										<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-cog"></i></a>
 										<ul class="dropdown-menu">
-											<li><a class="callerId-number" href="#"><i class="icon-user"></i>{{ ../i18n.callerId }}</a></li>
-											<li><a class="e911-number" href="#"><i class="icon-ambulance"></i>{{ ../i18n.e911 }}</a></li>
+											<li><a class="callerId-number" href="#"><i class="icon-user"></i>{{ ../../i18n.callerId }}</a></li>
+											<li><a class="e911-number" href="#"><i class="icon-ambulance"></i>{{ ../../i18n.e911 }}</a></li>
 										</ul>
 									</li>
 								</ul>
 							</div>
 						</div>
-						<div class="features pull-right">
+					{{/unless}}
+						<div class="features">
 							{{#each viewFeatures}}
 								<i class="{{icon}} {{active}} help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ help }}"></i>
 							{{/each}}

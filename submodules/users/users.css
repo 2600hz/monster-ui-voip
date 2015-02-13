@@ -384,6 +384,7 @@
 }
 
 #users_container .list-wrapper .item-row  {
+	position: relative;
 	border-bottom: 1px solid #ccc;
 	white-space: nowrap;
 }
@@ -442,6 +443,15 @@
 
 #users_container .detail-numbers .list-wrapper .features-block .dropdown {
 	margin-top: -4px;
+}
+
+#users_container .detail-numbers .list-wrapper .features-block .edit-features {
+	position: absolute;
+	right: 10px;
+}
+
+#users_container .detail-numbers .list-wrapper .features-block .features {
+	margin-right: 46px;
 }
 
 #users_container .detail-numbers .list-wrapper .navbar .nav li.dropdown.open.active > .dropdown-toggle,
