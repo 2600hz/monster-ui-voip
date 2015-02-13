@@ -1231,6 +1231,7 @@ define(function(require){
 
 						_.each(numberList, function(val, idx) {
 							dataNumbers.push(val.phoneNumber);
+							val.isLocal = val.features.indexOf('local') > -1;
 
 							template
 								.find('.list-assigned-items')
@@ -2690,6 +2691,7 @@ define(function(require){
 						if(number in data.numbers.numbers) {
 							var numberElement = data.numbers.numbers[number];
 							numberElement.phoneNumber = number;
+							numberElement.isLocal = numberElement.features.indexOf('local') > -1;
 
 							response.assignedNumbers.push(numberElement);
 						}

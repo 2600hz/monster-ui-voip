@@ -349,6 +349,7 @@
 }
 
 #groups_container .list-wrapper .item-row  {
+	position: relative;
 	border-bottom: 1px solid #ccc;
 	white-space: nowrap;
 }
@@ -399,6 +400,15 @@
 
 #groups_container .list-wrapper .item-row .locality img {
 	margin-right: 5px;
+}
+
+#groups_container .detail-numbers .list-wrapper .features-block .edit-features {
+	position: absolute;
+	right: 10px;
+}
+
+#groups_container .detail-numbers .list-wrapper .features-block .features {
+	margin-right: 46px;
 }
 
 #groups_container .list-wrapper .list-unassigned-items .features-block {
