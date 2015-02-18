@@ -1219,11 +1219,13 @@ define(function(require){
 				},
 				function(err, results) {
 					results.group.extra = self.groupsGetGroupFeatures(results.group);
-					_.each(results.userCallflows, function(userCallflow) {
+					results.userCallflows = _.filter(results.userCallflows, function(userCallflow) {
 						var user = _.find(results.users, function(user) { return userCallflow.owner_id === user.id });
 						if(user) {
 							userCallflow.userName = user.first_name + ' ' + user.last_name;
+							return true;
 						}
+						return false;
 					});
 					callback && callback(results);
 				}
