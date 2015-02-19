@@ -172,6 +172,7 @@ define(function(require){
 											_.each(accountNumbers[val].features, function(feature) {
 												ret.features[feature].active = 'active';
 											});
+											ret.isLocal = accountNumbers[val].features.indexOf('local') > -1;
 											return ret;
 										}
 									}),
@@ -2050,7 +2051,10 @@ define(function(require){
 						self.callApi({
 							resource: 'user.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(data, status) {
 								_callback(null, data.data);
@@ -2076,7 +2080,10 @@ define(function(require){
 						self.callApi({
 							resource: 'group.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(data, status) {
 								_callback(null, data.data);
@@ -2102,7 +2109,10 @@ define(function(require){
 						self.callApi({
 							resource: 'device.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(data, status) {
 								_callback(null, data.data);
@@ -2155,6 +2165,9 @@ define(function(require){
 				resource: 'voicemail.list',
 				data: {
 					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(data, status) {
 					data.data.sort(function(a,b) { return (a.name.toLowerCase() > b.name.toLowerCase()); });
@@ -2169,6 +2182,9 @@ define(function(require){
 				resource: 'numbers.list',
 				data: {
 					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(data, status) {
 					callback(data.data.numbers);
@@ -2238,7 +2254,10 @@ define(function(require){
 			self.callApi({
 				resource: 'callflow.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(callflowData) {
 					callback && callback(callflowData.data);

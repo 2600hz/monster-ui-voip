@@ -952,6 +952,7 @@ define(function(require){
 
 						_.each(numberList, function(val, idx) {
 							dataNumbers.push(val.phoneNumber);
+							val.isLocal = val.features.indexOf('local') > -1;
 
 							template
 								.find('.list-assigned-items')
@@ -1148,7 +1149,10 @@ define(function(require){
 			self.callApi({
 				resource: 'user.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(data) {
 					callback && callback(data.data);
@@ -1270,6 +1274,7 @@ define(function(require){
 							response.extensions.push(number);
 						}
 						else {
+							data.numbers.numbers[number].isLocal = data.numbers.numbers[number].features.indexOf('local') > -1;
 							response.assignedNumbers[number] = data.numbers.numbers[number];
 						}
 					});
@@ -1314,7 +1319,10 @@ define(function(require){
 						self.callApi({
 							resource: 'numbers.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(numbers) {
 								callbackParallel && callbackParallel(null, numbers.data);
@@ -1462,7 +1470,10 @@ define(function(require){
 			self.callApi({
 				resource: 'callflow.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(callflows) {
 					callback && callback(callflows.data);
@@ -1477,7 +1488,10 @@ define(function(require){
 				resource: 'media.list',
 				data: {
 					accountId: self.accountId,
-					filters: { 'key_missing':'type' }
+					filters: { 
+						'paginate': 'false',
+						'key_missing':'type' 
+					}
 				},
 				success: function(medias) {
 					callback && callback(medias.data);
@@ -1491,7 +1505,10 @@ define(function(require){
 			self.callApi({
 				resource: 'voicemail.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(medias) {
 					callback && callback(medias.data);
@@ -1833,7 +1850,10 @@ define(function(require){
 						self.callApi({
 							resource: 'group.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(dataGroups) {
 								callback(null, dataGroups.data);

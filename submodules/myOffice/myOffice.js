@@ -132,7 +132,10 @@ define(function(require){
 						self.callApi({
 							resource: 'user.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(dataUsers) {
 								parallelCallback && parallelCallback(null, dataUsers.data);
@@ -143,7 +146,10 @@ define(function(require){
 						self.callApi({
 							resource: 'device.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(data) {
 								parallelCallback && parallelCallback(null, data.data);
@@ -154,7 +160,10 @@ define(function(require){
 						self.callApi({
 							resource: 'device.getStatus',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(data) {
 								parallelCallback && parallelCallback(null, data.data);
@@ -165,7 +174,10 @@ define(function(require){
 						self.callApi({
 							resource: 'numbers.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(data) {
 								parallelCallback && parallelCallback(null, data.data.numbers);
@@ -181,7 +193,10 @@ define(function(require){
 						self.callApi({
 							resource: 'channel.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(data) {
 								parallelCallback && parallelCallback(null, data.data);
@@ -194,6 +209,7 @@ define(function(require){
 							data: {
 								filters: {
 									has_type: 'type',
+									paginate: 'false'
 								},
 								accountId: self.accountId
 							},
