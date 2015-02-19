@@ -3856,7 +3856,8 @@ define(function(require){
 							owner_id: data.user.id,
 							play_name_on_join: true,
 							member: {
-								numbers: []
+								numbers: [],
+								join_muted: false
 							}
 						};
 
