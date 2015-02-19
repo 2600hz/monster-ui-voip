@@ -172,6 +172,7 @@ define(function(require){
 											_.each(accountNumbers[val].features, function(feature) {
 												ret.features[feature].active = 'active';
 											});
+											ret.isLocal = accountNumbers[val].features.indexOf('local') > -1;
 											return ret;
 										}
 									}),

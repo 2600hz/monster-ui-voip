@@ -4,8 +4,12 @@
 			{{ i18n.devices.title }}
 			<span class="count-devices">{{countDevices}}</span>
 		</div>
+
 		<div class="dropdown">
-			<a href="#" class="add-device monster-link dropdown-toggle" data-toggle="dropdown"><i class="icon-plus-sign icon-green"></i>{{i18n.devices.add }}</a>
+			<a href="#" class="add-device monster-link dropdown-toggle" data-toggle="dropdown">
+				<i class="icon-plus-sign"></i>
+				{{i18n.devices.add }}
+			</a>
 			<ul class="dropdown-menu">
 				<li><a class="create-device" data-type="sip_device"><i class="icon-telicon-voip-phone"></i>{{ i18n.devices.types.sip_device }}</a></li>
 				<li><a class="create-device" data-type="cellphone"><i class="icon-phone"></i>{{ i18n.devices.types.cellphone }}</a></li>
