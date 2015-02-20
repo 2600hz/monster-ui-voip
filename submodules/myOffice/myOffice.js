@@ -398,7 +398,7 @@ define(function(require){
 				if(numberArrayName.length > 0) {
 					if(!(numberArrayName in data)) { data[numberArrayName] = []; }
 					_.each(val.numbers, function(num) {
-						if(num !== 'undefined' && num !== 'undefinedconf') {
+						if(num !== '0' && num !== 'undefined' && num !== 'undefinedconf') {
 							var number = {
 								number: num,
 								features: $.extend(true, {}, data.numberFeatures)
