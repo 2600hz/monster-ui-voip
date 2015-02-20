@@ -71,10 +71,10 @@ define(function(require){
 					}
 				},
 				function(err, results) {
-					var hasMainNumber = (results.callflows["MainCallflow"].numbers.length > 0 && results.callflows["MainCallflow"].numbers[0] !== "undefined"),
+					var hasMainNumber = (results.callflows["MainCallflow"].numbers.length > 1),
 						hasConfNumber = (results.callflows["MainConference"].numbers.length > 0 && results.callflows["MainConference"].numbers[0] !== "undefinedconf")
 					templateData = {
-						mainNumbers: hasMainNumber ? results.callflows["MainCallflow"].numbers : [self.i18n.active().strategy.noNumberTitle],
+						mainNumbers: hasMainNumber ? results.callflows["MainCallflow"].numbers.slice(1) : [self.i18n.active().strategy.noNumberTitle],
 						confNumbers: hasConfNumber ? results.callflows["MainConference"].numbers : [self.i18n.active().strategy.noNumberTitle]
 					}
 					template = $(monster.template(self, 'strategy-layout', templateData));
@@ -164,7 +164,7 @@ define(function(require){
 								numbers = callflow.numbers,
 								templateData = {
 									numbers: $.map(numbers, function(val, key) {
-										if(val!=="undefined") {
+										if(val!=="0") {
 											var ret = {
 												number: val,
 												features: $.extend(true, {}, strategyData.numberFeatures)
@@ -408,10 +408,6 @@ define(function(require){
 				addNumbersToMainCallflow = function(numbers) {
 					if(numbers.length) {
 						var mainCallflow = strategyData.callflows["MainCallflow"];
-						if(mainCallflow.numbers.length <= 1
-						&& mainCallflow.numbers[0] === "undefined") {
-							mainCallflow.numbers = [];
-						}
 						mainCallflow.numbers = mainCallflow.numbers.concat(numbers);
 						self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
 							var parentContainer = container.parents('.element-container');
@@ -424,12 +420,12 @@ define(function(require){
 				refreshNumbersHeader = function(parentContainer) {
 					var mainCallflow = strategyData.callflows["MainCallflow"],
 						headerSpan = parentContainer.find('.element-header-inner .summary > span');
-					if(mainCallflow.numbers.length > 0 && mainCallflow.numbers[0] !== "undefined") {
-						headerSpan.html(monster.util.formatPhoneNumber(mainCallflow.numbers[0]));
-						if(mainCallflow.numbers.length > 2) {
-							headerSpan.append('<i class="icon-telicon-multiple-items icon-small"></i>')
-						} else if(mainCallflow.numbers.length === 2) {
-							headerSpan.append(", "+monster.util.formatPhoneNumber(mainCallflow.numbers[1]))
+					if(mainCallflow.numbers.length > 1) {
+						headerSpan.html(monster.util.formatPhoneNumber(mainCallflow.numbers[1]));
+						if(mainCallflow.numbers.length > 3) {
+							headerSpan.append('<i class="icon-telicon-multiple-items icon-small"></i>');
+						} else if(mainCallflow.numbers.length === 3) {
+							headerSpan.append(", "+monster.util.formatPhoneNumber(mainCallflow.numbers[2]));
 						}
 						container.parents('#strategy_container').find('.element-container:not(.main-number,.strategy-confnum)').show();
 						container.parents('#strategy_container').find('.element-container.helper').hide();
@@ -496,10 +492,6 @@ define(function(require){
 							popup,
 							updateCallflow = function() {
 								strategyData.callflows["MainCallflow"].numbers.splice(indexToRemove, 1);
-
-								if(strategyData.callflows["MainCallflow"].numbers.length === 0) {
-									strategyData.callflows["MainCallflow"].numbers = ["undefined"];
-								}
 
 								self.strategyUpdateCallflow(strategyData.callflows["MainCallflow"], function(updatedCallflow) {
 									var parentContainer = container.parents('.element-container');
@@ -1743,7 +1735,7 @@ define(function(require){
 										contact_list: {
 											exclude: false
 										},
-										numbers: ["undefined"],
+										numbers: ["0"],
 										name: "MainCallflow",
 										type: "main",
 										flow: {
@@ -1771,7 +1763,19 @@ define(function(require){
 							});
 						} else {
 							delete results["MainCallflow"].flow.data.timezone;
-							callback(results);
+							if(results["MainCallflow"].numbers[0] !== '0') {
+								if(results["MainCallflow"].numbers[0] === 'undefined') {
+									results["MainCallflow"].numbers[0] = '0';
+								} else {
+									results["MainCallflow"].numbers.splice(0, 0, '0');
+								}
+								self.strategyUpdateCallflow(results["MainCallflow"], function(updatedCallflow) {
+									results["MainCallflow"] = updatedCallflow;
+									callback(results);
+								})
+							} else {
+								callback(results);
+							}
 						}
 					});
 				}
