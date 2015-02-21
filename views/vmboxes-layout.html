@@ -1,0 +1,35 @@
+<div id="vmboxes_container">
+	<div class="vmboxes-header">
+		<div class="title">
+			{{ i18n.vmboxes.title }}
+			<span class="count-vmboxes">{{countVMBoxes}}</span>
+		</div>
+
+		<a class="monster-link add-vmbox">
+			<i class="icon-plus-sign"></i>
+			{{i18n.vmboxes.add }}
+		</a>
+
+		<span class="search-box pull-right">
+			<i class="icon-search"></i>
+			<input type="text" class="search-query" placeholder="{{ i18n.search }}..."></input>
+		</span>
+	</div>
+
+	<div class="vmboxes-grid">
+		<div class="grid-row title">
+			<div class="grid-cell number">{{ i18n.vmboxes.titleGrid.number }}</div>
+			<div class="grid-cell name">{{ i18n.vmboxes.titleGrid.name }}</div>
+			<div class="grid-cell owner">{{ i18n.vmboxes.titleGrid.owner }}</div>
+			<div class="grid-cell edit">{{ i18n.vmboxes.titleGrid.edit }}</div>
+		</div>
+		<div class="vmboxes-rows">
+			<div class="empty-search-row">
+				{{ i18n.devices.noMatchingVMBoxes }}
+			</div>
+			<div class="no-devices-row">
+				{{ i18n.devices.noVMBoxesConfigured }}
+			</div>
+		</div>
+	</div>
+</div>
