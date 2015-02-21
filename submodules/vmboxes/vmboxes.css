@@ -1,0 +1,241 @@
+#vmboxes_container .vmboxes-header {
+	font-size: 18px;
+	line-height: 30px;
+}
+
+#vmboxes_container .vmboxes-header > * {
+	display: inline-block;
+}
+
+#vmboxes_container .vmboxes-header .title {
+	padding: 15px;
+	border: 1px solid #dcdcdc;
+	border-radius: 4px 0 0 4px;
+}
+
+#vmboxes_container .vmboxes-header .count-vmboxes {
+	display: inline-block;
+	margin-top: -5px;
+	margin-left: 15px;
+	color: #22ccff;
+	font-weight: 600;
+	font-size: 28px;
+}
+
+#vmboxes_container .vmboxes-header .dropdown {
+	vertical-align: bottom;
+}
+
+#vmboxes_container .vmboxes-header .add-vmbox {
+	margin: 0;
+	padding: 9px 13px;
+	border: 1px solid #dcdcdc;
+	border-left: 0;
+	border-radius: 0 4px 4px 0;
+	background-image: -webkit-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+	background-image:    -moz-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+	background-image:     -ms-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+	background-image:      -o-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+	background-image:         linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+	height: 42px;
+	vertical-align: top;
+	text-align: center;
+	font-size: 12px;
+}
+
+#vmboxes_container .vmboxes-header .add-vmbox:hover {
+	background-image: none;
+	background-color: #eee;
+	text-decoration: none;
+}
+
+#vmboxes_container .vmboxes-header .add-vmbox i {
+	display: block;
+	margin: 0;
+	color: #929799;
+	text-decoration: none;
+}
+
+#vmboxes_container .vmboxes-header .add-vmbox:hover i {
+	color: #22ccff;
+}
+
+#vmboxes_container .vmboxes-header .search-box { margin: 16px 0 16px 15px; }
+
+#vmboxes_container .vmboxes-grid {
+	background: #fcfcfc;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	margin-top: 20px;
+}
+
+#vmboxes_container .vmboxes-grid i.icon-plus {
+	margin-left: 5px;
+}
+
+#vmboxes_container .vmboxes-grid .empty-search-row,
+#vmboxes_container .vmboxes-grid .no-vmboxes-row {
+	display: none;
+	padding: 16px;
+	text-align: center;
+}
+
+#vmboxes_container .vmboxes-grid .grid-row.title:not(:last-child) {
+	border-bottom: 1px solid #ddd;
+}
+
+#vmboxes_container .vmboxes-grid .grid-row.title,
+#vmboxes_container .vmboxes-grid .grid-row .user-cells{
+	height: 50px;
+	line-height: 50px; /* 60 - padding */
+}
+
+#vmboxes_container .vmboxes-grid .grid-row:not(:last-child) {
+	border-bottom: 1px solid #eee;
+}
+
+#vmboxes_container .vmboxes-grid .grid-row.title .grid-cell {
+	text-align: center;
+	padding-left: 0;
+}
+
+#vmboxes_container .vmboxes-grid .grid-row .grid-cell {
+	border-right: 1px solid #eee;
+	display: inline-block;
+	overflow: hidden;
+	padding-left: 10px;
+	width: 20%;
+
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+}
+
+#vmboxes_container .vmboxes-grid .grid-row .grid-cell:first-child {
+	border-left: none !important;
+}
+
+#vmboxes_container .vmboxes-grid .grid-row .grid-cell:last-child {
+	border-right: none !important;
+}
+
+#vmboxes_container .vmboxes-grid .grid-row .grid-cell:not(.features) {
+	white-space: nowrap;
+}
+
+#vmboxes_container .vmboxes-grid .grid-row .grid-cell.centered {
+	padding: 0;
+	text-align: center;
+}
+
+#vmboxes_container .vmboxes-grid .grid-row .grid-cell.right-aligned {
+	padding: 0 5px 0 0;
+	text-align: right;
+}
+
+#vmboxes_container .vmboxes-grid .grid-row .grid-cell.features a.dropdown-toggle {
+	padding: 15px 7px 2px 15px;
+	text-align: left;
+	background: transparent !important;
+}
+
+#vmboxes_container .vmboxes-cells {
+	height: 60px;
+	line-height: 60px;
+}
+
+/* Columns */
+#vmboxes_container .vmboxes-grid .grid-row .grid-cell.number {
+	width: 20%;
+}
+
+#vmboxes_container .vmboxes-grid .grid-row .grid-cell.name {
+	width: 40%;
+}
+
+#vmboxes_container .vmboxes-grid .grid-row .grid-cell.owner {
+	width: 30%;
+}
+
+#vmboxes_container .vmboxes-grid .grid-row .grid-cell.edit {
+	width: 10%;
+}
+
+#vmboxes_container .vmboxes-grid .grid-row .grid-cell.edit .settings {
+	padding: 10px;
+	cursor: pointer;
+}
+#vmboxes_container .vmboxes-grid .grid-row .grid-cell.edit .settings:hover {
+	color: #000;
+}
+
+/* Adding / Edition vmboxes Popups */
+.edit-vmbox {
+	width: 700px;
+}
+
+.edit-vmbox .actions {
+	border-top: 1px solid #CCCCCC;
+	height: 30px;
+	line-height: 30px;
+	padding: 15px;
+}
+
+.edit-vmbox .actions button {
+	margin-left: 5px;
+}
+
+.edit-vmbox .title-bar {
+	border-bottom: 1px solid #ccc;
+	margin-bottom: 20px;
+	padding: 15px 0;
+}
+
+.edit-vmbox .title-bar .vmbox-title > div {
+	display: inline-block;
+	float: left;
+	font-size: 18px;
+	font-weight: bold;
+	height: 80px;
+	line-height: 80px;
+	margin-left: 40px;
+}
+
+.edit-vmbox .title-bar .vmbox-title .vmbox-icon {
+	height: 75px;
+	line-height: 75px;
+}
+
+.edit-vmbox .title-bar .vmbox-title .vmbox-icon > i {
+	font-size: 48px;
+	vertical-align: middle;
+}
+
+.edit-vmbox .title-bar .nav-pills {
+	margin-top: 24px;
+	margin-right: 15px;
+}
+
+.edit-vmbox .content .tabs-section .title {
+	color: #22CCFF;
+	font-size: 24px;
+	margin-bottom: 30px;
+	margin-left: 40px;
+	text-shadow: 1px 0 1px #CCCCCC;
+}
+
+.edit-vmbox .control-input.checkbox {
+	margin-left: 160px;
+}
+
+.edit-vmbox .helper {
+	margin: 0 30px;
+}
+
+.edit-vmbox .helper i {
+	margin-right: 5px;
+}
+
+.edit-vmbox .list-entities.emails-list {
+	padding: 0 20px;
+}

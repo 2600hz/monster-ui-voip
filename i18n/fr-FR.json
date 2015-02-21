@@ -11,7 +11,10 @@
 		"devices": "Téléphones",
 		"mainNumber": "Numéro principal",
 		"callLogs": "Journal d'appels",
-		"quickLinks": "Aide"
+		"quickLinks": "Aide",
+		"__comment": "UI-1220: Added VMBox module",
+		"__version": "3.19",
+		"vmboxes": "Répondeurs"
 	},
 
 	"groups": {
@@ -730,7 +733,10 @@
 			"tollfree": "Numéros verts",
 			"international": "Numéros internationaux",
 			"noNumber": "Aucun numéro disponible"
-		}
+		},
+		"__comment": "UI-1220: Adding a Main VMBox automatically when they first load the SmartPBX if they don't have one",
+		"__version": "3.19",
+		"mainVMBoxName": "Répondeur Principal"
 	},
 
 	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SmartPBX.",

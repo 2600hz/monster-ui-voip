@@ -12,7 +12,10 @@
 		"mainNumber": "Main Number",
 		"callLogs": "Call Logs",
 		"quickLinks": "Help Topics",
-		"featureCodes": "Feature Codes"
+		"featureCodes": "Feature Codes",
+		"__comment": "UI-1220: Added VMBox module",
+		"__version": "3.19",
+		"vmboxes": "Voicemail Boxes"
 	},
 
 	"groups": {
@@ -754,7 +757,10 @@
 			"tollfree": "Toll-free Numbers",
 			"international": "International Numbers",
 			"noNumber": "No number available"
-		}
+		},
+		"__comment": "UI-1220: Adding a Main VMBox automatically when they first load the SmartPBX if they don't have one",
+		"__version": "3.19",
+		"mainVMBoxName": "Main Voicemail Box"
 	},
 
 	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SmartPBX.",
@@ -790,6 +796,92 @@
 			"call_waiting[action=disable]": "Disable Call-Waiting",
 			"sound_test_service": "Sound Test Service",
 			"call_recording": "Call Recording"
+		}
+	},
+
+	"__comment": "UI-1220: Added VMBox module",
+	"__version": "3.19",
+	"vmboxes": {
+		"addTitle": "Adding a Voicemail Box",
+		"editTitle": "Editing a Voicemail Box: {{ name }}",
+		"title": "Total Voicemail Boxes",
+		"add": "Add Voicemail Box",
+		"new": "New Voicemail Box",
+		"createVmbox": "Create new Voicemail Box",
+		"deleteVmbox": "Delete Voicemail Box",
+		"deleteNotAllowed": "You can not delete this Voicemail Box because it belongs to a User",
+		"confirmDeleteVmbox": "This Voicemail Box will be permanently deleted. Continue?",
+		"deletedVmbox": "You successfully deleted the following Voicemail Box \"{{vmboxName}}\".",
+		"titleGrid": {
+			"name": "Name",
+			"number": "Number",
+			"owner": "User",
+			"edit": "Edit"
+		},
+		"noMatchingVMBoxes": "There were no Voicemail Boxes found matching your search",
+		"noVMBoxesConfigured": "There are no Voicemail Boxes configured",
+		"popupSettings": {
+			"advancedTitle": "Advanced",
+			"basicTitle": "Basic Settings",
+			"basicSectionTitle": "Basic Settings",
+			"basic": {
+				"name": {
+					"label": "Name"
+				},
+				"number": {
+					"label": "Voicemail Number"
+				},
+				"pinNumber": {
+					"label": "PIN Number"
+				}
+			},
+			"options": {
+				"menuTitle": "Options",
+				"sectionTitle": "Options",
+				"timezone": {
+					"label": "Timezone"
+				},
+				"unavailableMessage": {
+					"label": "Unavailable Message"
+				},
+				"timezone": {
+					"label": "Timezone"
+				},
+				"alreadySetup": {
+					"label": "Already Setup?",
+					"help": "Is this voicemail box already considered initialized? If not, the first time the user logs in they will be forced to change their PIN and setup a greeting."
+				},
+				"requirePIN": {
+					"label": "Require PIN?",
+					"help": "Check if voicemail requires a PIN."
+				},
+				"autoLogin": {
+					"label": "Auto-Login Enabled?",
+					"help": "Check to enable auto-login for this voicemail box? (If the user call his own voicemail, it goes straight to his messages)"
+				},
+				"skipGreetings": {
+					"label": "Skip Greetings?",
+					"help": "Check to skip greetings by default"
+				},
+				"skipInstructions": {
+					"label": "Skip Instructions?",
+					"help": "Check to skip instructions by default"
+				},
+				"deleteAfterNotify": {
+					"label": "Delete after Notification?",
+					"help": "Delete the voicemail after the notification has been sent"
+				},
+				"configurable": {
+					"label": "Configurable via Menu?",
+					"help": " If unchecked, it will disallow the user to configure voicemail via the menu"
+				}
+			},
+			"recipients": {
+				"menuTitle": "Recipients",
+				"sectionTitle": "Recipients",
+				"header": "This panel lets you manage who will be notified when someones leave a message on this voicemail box. Click on  \"Add New Recipient\" to add an e-mail address to the list",
+				"create": "Add New Recipient"
+			}
 		}
 	}
 }

@@ -1,6 +1,6 @@
 <div id="voip_container" class="clearfix container-menu">
 	<div class="left-menu">
-		<div id="my_office" class="category simple separated">
+		<div id="myOffice" class="category simple separated">
 			<div class="title">
 				<i class="icon-home"></i>
 				<span class="title-text visible-desktop">{{ i18n.menuTitles.myOffice }}</span>
@@ -15,6 +15,13 @@
 		</div>
 
 		<div class="category-group">
+			<div id="numbers" class="category">
+				<div class="title">
+					<i class="icon-th larger-margin"></i>
+					<span class="title-text visible-desktop">{{ i18n.menuTitles.numbers }}</span>
+				</div>
+			</div>
+
 			<div id="users" class="category">
 				<div class="title">
 					<i class="icon-telicon-seats"></i>
@@ -29,6 +36,22 @@
 				</div>
 			</div>
 
+			<div id="strategy" class="category">
+				<div class="title">
+					<i class="icon-telicon-home-phone"></i>
+					<span class="title-text visible-desktop">{{ i18n.menuTitles.mainNumber }}</span>
+				</div>
+			</div>
+		</div>
+
+		<div id="callLogs" class="category simple separated">
+			<div class="title">
+				<i class="icon-telicon-pbx"></i>
+				<span class="title-text visible-desktop">{{ i18n.menuTitles.callLogs }}</span>
+			</div>
+		</div>
+
+		<div class="category-group">
 			<div id="devices" class="category">
 				<div class="title">
 					<i class="icon-telicon-voip-phone larger-margin"></i>
@@ -36,25 +59,18 @@
 				</div>
 			</div>
 
-			<div id="numbers" class="category">
+			<div id="vmboxes" class="category">
 				<div class="title">
-					<i class="icon-th larger-margin"></i>
-					<span class="title-text visible-desktop">{{ i18n.menuTitles.numbers }}</span>
+					<i class="icon-telicon-voicemail larger-margin"></i>
+					<span class="title-text visible-desktop">{{ i18n.menuTitles.vmboxes }}</span>
 				</div>
 			</div>
-		</div>
 
-		<div id="call_logs" class="category simple separated">
-			<div class="title">
-				<i class="icon-telicon-pbx"></i>
-				<span class="title-text visible-desktop">{{ i18n.menuTitles.callLogs }}</span>
-			</div>
-		</div>
-
-		<div id="feature_codes" class="category simple separated">
-			<div class="title">
-				<i class="icon-asterisk"></i>
-				<span class="title-text visible-desktop">{{ i18n.menuTitles.featureCodes }}</span>
+			<div id="featureCodes" class="category">
+				<div class="title">
+					<i class="icon-asterisk"></i>
+					<span class="title-text visible-desktop">{{ i18n.menuTitles.featureCodes }}</span>
+				</div>
 			</div>
 		</div>
 	</div>

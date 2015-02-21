@@ -113,6 +113,64 @@ define(function(require){
 			});
 		},
 
+		myOfficeCreateMainVMBoxIfMissing: function(callback) {
+			var self = this;
+
+			self.myOfficeHasMainVMBox(
+				function(vmbox) {
+					callback(vmbox);
+				},
+				function() {
+					self.myOfficeCreateMainVMBox(function(vmbox) {
+						callback(vmbox);
+					})
+				}
+			);
+		},
+
+		myOfficeCreateMainVMBox: function(callback) {
+			var self = this,
+				vmboxData = {
+					mailbox: '0',
+					type: 'mainVMBox',
+					name: self.i18n.active().myOffice.mainVMBoxName,
+					delete_after_notify: true
+				};
+
+			self.callApi({
+				resource: 'voicemail.create',
+				data: {
+					accountId: self.accountId,
+					data: vmboxData
+				},
+				success: function(vmbox) {
+					callback && callback(vmbox.data);
+				}
+			});
+		},
+
+		myOfficeHasMainVMBox: function(hasVMBoxCallback, noVMBoxCallback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'voicemail.list',
+				data: {
+					accountId: self.accountId,
+					filters: {
+						'filter_type':'mainVMBox'
+					}
+				},
+				success: function(vmboxes) {
+					if(vmboxes.data.length > 0) {
+						hasVMBoxCallback && hasVMBoxCallback(vmboxes[0]);
+					}
+					else {
+						noVMBoxCallback && noVMBoxCallback();
+					}
+				}
+			});
+		},
+
 		myOfficeLoadData: function(callback) {
 			var self = this;
 
@@ -126,6 +184,11 @@ define(function(require){
 							success: function(dataAccount) {
 								parallelCallback && parallelCallback(null, dataAccount.data);
 							}
+						});
+					},
+					mainVoicemailBox: function(parallelCallback) {
+						self.myOfficeCreateMainVMBoxIfMissing(function(vmbox) {
+							parallelCallback(null, vmbox);
 						});
 					},
 					users: function(parallelCallback) {

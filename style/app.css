@@ -6,6 +6,7 @@
 @import url('../submodules/callLogs/callLogs.css');
 @import url('../submodules/users/users.css');
 @import url('../submodules/featureCodes/featureCodes.css');
+@import url('../submodules/vmboxes/vmboxes.css');
 
 #voip_container .left-menu #my_office {
 	margin-bottom: 20px;
