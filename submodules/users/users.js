@@ -190,9 +190,10 @@ define(function(require){
 
 			dataUser.extra.adminId = self.userId;
 
-			dataUser.extra.presenceIdOptions = [{ key: 'unset', value: self.i18n.active().users.editionForm.noPresenceID }];
+			dataUser.extra.presenceIdOptions = [];
 
 			var temp,
+				hasValidPresenceID = false,
 				addNumberToPresenceOptions = function(number) {
 					temp = {
 						key: number,
@@ -203,12 +204,22 @@ define(function(require){
 				};
 
 			_.each(dataUser.extra.listExtensions, function(extension) {
-				addNumberToPresenceOptions(extension);
-			})
+				if(dataUser.hasOwnProperty('presence_id') && dataUser.presence_id === extension) {
+					hasValidPresenceID = true;
+				}
 
-			_.each(dataUser.extra.listNumbers, function(number) {
-				addNumberToPresenceOptions(number);
+				addNumberToPresenceOptions(extension);
 			});
+
+			// Sort it from lower number to greater number
+			dataUser.extra.presenceIdOptions.sort(function(a,b) {
+				return a.key > b.key ? 1 : -1;
+			});
+
+			// If they don't have a valid Presence ID, then we add the "Unset" option
+			if(!hasValidPresenceID) {
+				dataUser.extra.presenceIdOptions.unshift({ key: 'unset', value: self.i18n.active().users.editionForm.noPresenceID });
+			}
 
 			return dataUser;
 		},
@@ -533,7 +544,8 @@ define(function(require){
 				var $this = $(this),
 					numbers = $.extend(true, [], numbersToSave),
 					name = $this.parents('.grid-row').find('.grid-cell.name').text(),
-					userId = $this.parents('.grid-row').data('id');
+					userId = $this.parents('.grid-row').data('id'),
+					extensionsList = [];
 
 				template.find('.extensions .list-assigned-items .item-row').each(function(k, row) {
 					var row = $(row),
@@ -542,6 +554,7 @@ define(function(require){
 					number = (row.data('id') ? row.data('id') : row.find('.input-extension').val()) + '';
 
 					numbers.push(number);
+					extensionsList.push(number);
 				});
 
 				if(numbers.length > 0) {
@@ -553,13 +566,21 @@ define(function(require){
 						});
 					};
 
-					if(self.usersHasProperPresenceId(numbers, currentUser)) {
+					if(self.usersHasProperPresenceId(extensionsList, currentUser)) {
 						updateCallflow();
 					}
 					else {
-						self.usersUpdatePresenceIDPopup(numbers, currentUser, function(user) {
+						var oldPresenceId = currentUser.presence_id;
+						self.usersUpdatePresenceIDPopup(extensionsList, currentUser, function(user) {
+							// Update the user and the vmbox with the new presence_id / main number
 							self.usersUpdateUser(user, function() {
-								updateCallflow();
+								self.usersSmartUpdateVMBox({ 
+									user: user, 
+									callback: function() {
+										updateCallflow();
+									},
+									oldPresenceId: oldPresenceId
+								});
 							});
 						});
 					}
@@ -633,15 +654,19 @@ define(function(require){
 
 				monster.util.checkVersion(currentUser, function() {
 					if(monster.ui.valid(form)) {
-						currentUser.extra.vmbox.mailbox = formData.extra.vmboxNumber;
 						currentUser.extra.vmbox.timezone = formData.timezone;
 
-						var userToSave = $.extend(true, {}, currentUser, formData);
+						var userToSave = $.extend(true, {}, currentUser, formData),
+							oldPresenceId = currentUser.presence_id;
 
 						monster.parallel({
 								vmbox: function(callback) {
-									self.usersSmartUpdateVMBox(userToSave, true, function(vmbox) {
-										callback(null, vmbox);
+									self.usersSmartUpdateVMBox({
+										user: userToSave, 
+										callback: function(vmbox) {
+											callback(null, vmbox);
+										},
+										oldPresenceId: oldPresenceId
 									});
 								},
 								user: function(callback) {
@@ -942,16 +967,10 @@ define(function(require){
 									toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: userName }));
 									self.usersRender({ userId: userId });
 								});
-							},
-							updateUserAndCallflow = function(user) {
-								self.usersUpdateUser(user, function() {
-									updateCallflow();
-								});
 							};
 
 						// If we deleted a number that was used as the Caller-ID , disable the Caller-ID feature.
 						var needUpdateUser = false;
-
 						if(currentUser.caller_id.hasOwnProperty('internal') && dataNumbers.indexOf(currentUser.caller_id.internal.number) < 0) {
 							delete currentUser.caller_id.internal.number;
 							needUpdateUser = true;
@@ -961,18 +980,13 @@ define(function(require){
 							needUpdateUser = true;
 						}
 
-						if(!self.usersHasProperPresenceId(dataNumbers, currentUser)) {
-							self.usersUpdatePresenceIDPopup(dataNumbers, currentUser, function(user) {
-								updateUserAndCallflow(user);
+						if(needUpdateUser) {
+							self.usersUpdateUser(user, function() {
+								updateCallflow();
 							});
 						}
 						else {
-							if(needUpdateUser) {
-								updateUserAndCallflow(currentUser);
-							}
-							else {
-								updateCallflow();
-							}
+							updateCallflow();
 						}
 					}
 					else {
@@ -1325,6 +1339,7 @@ define(function(require){
 			});
 		},
 
+		// Check if a user's presence id is one of its extensions
 		usersHasProperPresenceId: function(listNumbers, user) {
 			var self = this;
 
@@ -1397,12 +1412,12 @@ define(function(require){
 				formattedData = {
 					sendToSameEmail: true,
 					nextExtension: '',
-					nextVMBox: '',
 					listExtensions: {},
 					listVMBoxes:{},
 				},
 				arrayExtensions = [],
-				arrayVMBoxes = [];
+				arrayVMBoxes = [],
+				allNumbers = [];
 
 			_.each(data.callflows, function(callflow) {
 				_.each(callflow.numbers, function(number) {
@@ -1413,15 +1428,15 @@ define(function(require){
 				});
 			});
 
-			formattedData.nextExtension = parseInt(self.usersGetNextInt(arrayExtensions)) + '';
-
 			_.each(data.vmboxes, function(vmbox) {
 				formattedData.listVMBoxes[vmbox.mailbox] = vmbox;
 				arrayVMBoxes.push(vmbox.mailbox);
 			});
 
-			//Set the VMBox Number to 2001 if there are no VMBox in the system, or to the latest vmbox number + 1 if there are
-			formattedData.nextVMBox = parseInt(self.usersGetNextInt(arrayVMBoxes)) + '';
+			// We concat both arrays because we want to create users with the same number for the extension # and the vmbox, 
+			// If for some reason a vmbox number exist without an extension, we still don't want to let them set their extension number to that number.
+			allNumbers = arrayExtensions.concat(arrayVMBoxes);
+			formattedData.nextExtension = parseInt(self.usersGetNextInt(allNumbers)) + '';
 
 			return formattedData;
 		},
@@ -1731,7 +1746,6 @@ define(function(require){
 					userData = currentUser,
 					userToSave = $.extend(true, {}, {
 						caller_id: {
-							internal: {},
 							external: {},
 						}
 					}, currentUser),
@@ -1743,13 +1757,13 @@ define(function(require){
 					};
 
 				if(switchCallerId.bootstrapSwitch('status') === false) {
-					if('internal' in userToSave.caller_id) {
-						delete userToSave.caller_id.internal.number;
+					if(userToSave.caller_id.hasOwnProperty('external')) {
+						delete userToSave.caller_id.external.number;
 					}
 				}
 				else {
 					var callerIdValue = featureTemplate.find('.caller-id-select').val();
-					userToSave.caller_id.internal.number = callerIdValue;
+
 					userToSave.caller_id.external.number = callerIdValue;
 				}
 
@@ -2363,8 +2377,16 @@ define(function(require){
 				}
 			}
 
-			if(userData.presence_id === 'unset') {
+			if(!userData.hasOwnProperty('presence_id') || userData.presence_id === 'unset') {
 				delete userData.presence_id;
+
+				if(userData.caller_id.hasOwnProperty('internal')) {
+					delete userData.caller_id.internal.number;
+				}
+			}
+			else {
+				// Always set the Internal Caller-ID Number to the Main Extension/Presence ID
+				userData.caller_id.internal.number = userData.presence_id + '';
 			}
 
 			delete userData.include_directory;
@@ -2478,9 +2500,6 @@ define(function(require){
 
 					monster.ui.validate(template.find('form.user-fields'), {
 						rules: {
-							'extra.vmboxNumber': {
-								checkList: dataTemplate.extra.existingVmboxes
-							},
 							'extra.ringingTimeout': {
 								digits: true
 							}
@@ -2741,7 +2760,7 @@ define(function(require){
 					}, data.user),
 					vmbox: {
 						//mailbox: (data.callflow || {}).extension,
-						mailbox: data.vmbox.number,
+						mailbox: data.callflow.extension,
 						name: fullName + '\'s VMBox',
 						timezone: defaultTimezone
 					},
@@ -2979,29 +2998,33 @@ define(function(require){
 						type: 'mainUserCallflow'
 					};
 
-				self.usersSmartUpdateVMBox(user, false, function(_dataVM) {
-					callflow.flow.children['_'].data.id = _dataVM.id;
+				self.usersSmartUpdateVMBox({
+					user: user,
+					needVMUpdate: false,
+					callback: function(_dataVM) {
+						callflow.flow.children['_'].data.id = _dataVM.id;
 
-					self.usersCreateCallflow(callflow,
-						function(_dataCF) {
-							callback && callback(_dataCF);
-						},
-						function(errorPayload, globalHandler) {
-							var errorCallback = function() {
-								globalHandler && globalHandler(errorPayload, { generateError: true });
-							};
+						self.usersCreateCallflow(callflow,
+							function(_dataCF) {
+								callback && callback(_dataCF);
+							},
+							function(errorPayload, globalHandler) {
+								var errorCallback = function() {
+									globalHandler && globalHandler(errorPayload, { generateError: true });
+								};
 
-							if(errorPayload.error === '400' && errorPayload.hasOwnProperty('data') && errorPayload.data.hasOwnProperty('numbers') && errorPayload.data.numbers.hasOwnProperty('unique')) {
-								self.usersHasKazooUICallflow(callflow, function(existingCallflow) {
-									self.usersMigrateKazooUIUser(callflow, existingCallflow, callback);
-								}, errorCallback);
-							}
-							else {
-								errorCallback();
-							}
-						},
-						false
-					);
+								if(errorPayload.error === '400' && errorPayload.hasOwnProperty('data') && errorPayload.data.hasOwnProperty('numbers') && errorPayload.data.numbers.hasOwnProperty('unique')) {
+									self.usersHasKazooUICallflow(callflow, function(existingCallflow) {
+										self.usersMigrateKazooUIUser(callflow, existingCallflow, callback);
+									}, errorCallback);
+								}
+								else {
+									errorCallback();
+								}
+							},
+							false
+						);
+					}
 				});
 			});
 		},
@@ -3797,18 +3820,27 @@ define(function(require){
 		/* If user has a vmbox, then only update it if it comes from the user form.
 		If the check comes from the extension page, where we create a callflow,
 		then only update the vmbox if there are no vmbox attached to this user */
-		usersSmartUpdateVMBox: function(user, needVMUpdate, callback) {
-			var self = this;
+		usersSmartUpdateVMBox: function(args) {
+			var self = this,
+				user = args.user,
+				needVMUpdate = args.needVMUpdate || true,
+				callback = args.callback,
+				oldPresenceId = args.oldPresenceId || undefined;
 
 			self.usersListVMBoxesUser(user.id, function(vmboxes) {
 				if(vmboxes.length > 0) {
 					if(needVMUpdate) {
 						self.usersGetVMBox(vmboxes[0].id, function(vmbox) {
-							vmbox = $.extend(true, {}, vmbox, user.extra.vmbox);
 							vmbox.name = user.first_name + ' ' + user.last_name + '\'s VMBox';
+							// We only want to update the vmbox number if it was already synced with the presenceId (and if the presenceId was not already set)
+							// This allows us to support old clients who have mailbox number != than their extension number
+							if(oldPresenceId === vmbox.mailbox) {
+								// If it's synced, then we update the vmbox number as long as the main extension is set to something different than 'unset' in which case we don't update the vmbox number value
+								vmbox.mailbox = (user.presence_id && user.presence_id !== 'unset') ? user.presence_id + '' : vmbox.mailbox;
+							}
 
-							self.usersUpdateVMBox(vmbox, function(vmbox) {
-								callback && callback(vmbox);
+							self.usersUpdateVMBox(vmbox, function(vmboxSaved) {
+								callback && callback(vmboxSaved);
 							});
 						});
 					}
@@ -3819,7 +3851,7 @@ define(function(require){
 				else {
 					var vmbox = {
 						owner_id: user.id,
-						mailbox: user.extra.vmbox.mailbox,
+						mailbox: user.presence_id || user.extra.vmbox.mailbox,
 						name: user.first_name + ' ' + user.last_name + '\'s VMBox',
 						timezone: user.timezone
 					};

@@ -303,6 +303,7 @@
 
 #users_container .detail-user .row-fields .presence-id-select {
 	margin-left: 10px;
+	width: 72px;
 }
 
 #users_container .detail-user .row-fields .timeout-edit {
@@ -573,7 +574,7 @@
 }
 
 #creation_user_dialog label.monster-invalid[for="extension"] {
-	margin-left: 35px;
+	margin-left: 156px;
 }
 
 #creation_user_dialog .control-group.hack-left .control-label{
@@ -614,6 +615,17 @@
 
 #creation_user_dialog .control-group-split input {
 	width: 74px;
+}
+
+#creation_user_dialog #extension {
+	width: 47px;
+	margin-left: 5px;
+}
+
+#creation_user_dialog .extension-label {
+	display: inline-block;
+	white-space: nowrap;
+	width: 153px;
 }
 
 /* Feature Popups */
