@@ -633,6 +633,28 @@ define(function(require){
 					monster.pub('common.e911.renderPopup', args);
 				}
 			});
+
+			container.on('click', '.number-element .prepend-number', function() {
+				var prependCell = $(this).parents('.number-element').first(),
+					phoneNumber = prependCell.find('.remove-number').data('number');
+
+				if(phoneNumber) {
+					var args = {
+						phoneNumber: phoneNumber,
+						callbacks: {
+							success: function(data) {
+								if('prepend' in data.data && data.data.prepend.enabled) {
+									prependCell.find('.features i.feature-prepend').addClass('active');
+								} else {
+									prependCell.find('.features i.feature-prepend').removeClass('active');
+								}
+							}
+						}
+					};
+
+					monster.pub('common.numberPrepend.renderPopup', args);
+				}
+			});
 		},
 
 		strategyConfNumBindEvents: function(container, strategyData) {

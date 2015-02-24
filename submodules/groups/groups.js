@@ -931,6 +931,28 @@ define(function(require){
 				}
 			});
 
+			template.on('click', '.prepend-number', function() {
+				var prependCell = $(this).parents('.item-row').first(),
+					phoneNumber = prependCell.data('id');
+
+				if(phoneNumber) {
+					var args = {
+						phoneNumber: phoneNumber,
+						callbacks: {
+							success: function(data) {
+								if('prepend' in data.data && data.data.prepend.enabled) {
+									prependCell.find('.features i.feature-prepend').addClass('active');
+								} else {
+									prependCell.find('.features i.feature-prepend').removeClass('active');
+								}
+							}
+						}
+					};
+
+					monster.pub('common.numberPrepend.renderPopup', args);
+				}
+			});
+
 			template.on('click', '.actions .spare-link:not(.disabled)', function(e) {
 				e.preventDefault();
 
