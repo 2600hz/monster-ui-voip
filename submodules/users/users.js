@@ -408,6 +408,7 @@ define(function(require){
 						else if(type === 'numbers') {
 							extensionsToSave = [];
 							currentCallflow = data.callflow;
+							currentUser = data.user;
 
 							_.each(data.extensions, function(number) {
 								extensionsToSave.push(number);
