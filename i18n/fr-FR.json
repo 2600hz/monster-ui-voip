@@ -347,7 +347,17 @@
 			"__comment": "UI-1109: Adding the Presence ID setting on the User document",
 			"__version": "3.19",
 			"presenceId": "Extension Principale",
-			"noPresenceID": "- Aucune -"
+			"noPresenceID": "- Aucune -",
+			"__comment": "UI-1066: Adding Help text hover the icons of the user edition form",
+			"__version": "3.19",
+			"nameHelp": "Tapez le Prénom de l'Utilisateur dans le premier champ, et son Nom dans le deuxième",
+			"loginHelp": "Ce champ contient le Login de l'utilisateur, qu'il utilise pour se connecter à cette application",
+			"vmboxHelp": "Ce champ est le numéro de Répondeur de cet utilisateur. Clickez sur \"Changer PIN\" afin de modifier son PIN ou de le réinitialiser",
+			"roleHelp": "Un \"Admin\" pourra ajouter ou modifier les différentes applications utilisables sur le compte général, tandis qu'un \"Utilisateur\" aura seulement accès aux applications qui ont été installé pour lui.",
+			"languageHelp": "Ce champ permet de changer le langage affiché dans cette application",
+			"timezoneHelp": "Ceci changera le Fuseau Horaire utilisé pour les téléphones de cet Utilisateur ainsi que pour son Répondeur",
+			"ringingHelp": "Ceci défini la durée de sonnerie avant de rediriger l'appel entrant vers le répondeur. Par exemple, en rentrant la valeur \"20\" dans ce champ, un appel sera redirigé après 20 seconds sans réponse vers le Répondeur",
+			"mainExtensionHelp": "Ceci défini le Caller-ID de cet utilisateur pour les appels internes au système, ainsi que son Presence ID"
 		},
 		"delete": "Supprimer Utilisateur",
 		"errorCallerId": "Avant de configurer le Caller-ID de l'utilisateur, vous devez d'abord lui attribuer un numéro.",
