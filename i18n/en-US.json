@@ -883,5 +883,9 @@
 				"create": "Add New Recipient"
 			}
 		}
-	}
+	},
+
+	"__comment": "UI-1219: Adding the prepend feature to numbers",
+	"__version": "v3.20_s1",
+	"numberPrepend": "Prepend"
 }
