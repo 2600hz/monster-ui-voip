@@ -18,7 +18,7 @@
 				<label for="vmbox_number">
 					{{ i18n.users.editionForm.vmboxNumber }}
 				</label>
-				<input id="vmbox_number" class="input-small" required type="text" name="extra.vmboxNumber" value="{{extra.vmbox.mailbox}}"></input>
+				{{extra.vmbox.mailbox}}
 				<a href="javascript:void(0);" id="change_pin" class="monster-link blue">{{i18n.users.editionForm.changePIN}}</a>
 			</div>
 
@@ -100,7 +100,7 @@
 			<div class="row-fields">
 				<div class="icon-wrapper"><i class="icon-telicon-extension"></i></div>
 				<label>{{ i18n.users.editionForm.presenceId }}</label>
-				<select name="presence_id" class="input-medium presence-id-select">
+				<select name="presence_id" class="presence-id-select">
 					{{#select presence_id}}
 						{{#each extra.presenceIdOptions}}
 							<option value="{{ this.key }}">{{ this.value }}</option>

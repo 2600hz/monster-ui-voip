@@ -344,7 +344,7 @@
 		"dialogCreationUser": {
 			"createUser": "Create User",
 			"errorOnCreation": "An error occured while trying to create this user:",
-			"extension": "Extension #",
+			"extension": "Main Extension Number",
 			"extensionAlreadyExist": "This Extension is already taken, please choose a different Extension Number.",
 			"firstName": "First Name",
 			"lastName": "Last Name",
@@ -371,8 +371,8 @@
 			"disabledTimeoutHint": "You need at least one number or extension to set up the ringing timeout.",
 			"__comment": "UI-1109: Adding the Presence ID setting on the User document",
 			"__version": "3.19",
-			"presenceId": "Main Extension",
-			"noPresenceID": "- Not Set -"
+			"presenceId": "Main Extension Number",
+			"noPresenceID": "None"
 		},
 		"delete": "Delete User",
 		"errorCallerId": "Before configuring the Caller-ID of this user, you need to assign him a number",
