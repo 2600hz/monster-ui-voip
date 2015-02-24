@@ -972,17 +972,13 @@ define(function(require){
 
 						// If we deleted a number that was used as the Caller-ID , disable the Caller-ID feature.
 						var needUpdateUser = false;
-						if(currentUser.caller_id.hasOwnProperty('internal') && dataNumbers.indexOf(currentUser.caller_id.internal.number) < 0) {
-							delete currentUser.caller_id.internal.number;
-							needUpdateUser = true;
-						}
 						if(currentUser.caller_id.hasOwnProperty('external') && dataNumbers.indexOf(currentUser.caller_id.external.number) < 0) {
 							delete currentUser.caller_id.external.number;
 							needUpdateUser = true;
 						}
 
 						if(needUpdateUser) {
-							self.usersUpdateUser(user, function() {
+							self.usersUpdateUser(currentUser, function() {
 								updateCallflow();
 							});
 						}
