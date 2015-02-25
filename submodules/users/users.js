@@ -1384,7 +1384,8 @@ define(function(require){
 		usersGetNextInt: function(listNumbers) {
 			var orderedArray = listNumbers,
 				previousIterationNumber,
-				minNumber = 2000,
+				minNumber = 1000,
+				lowestNumber = minNumber,
 				increment = 1;
 
 			orderedArray.sort(function(a,b) {
@@ -1402,28 +1403,32 @@ define(function(require){
 				}
 			});
 
+			console.log(orderedArray);
+
 			_.each(orderedArray, function(number) {
 				var currentNumber = parseInt(number);
 
 				// First we make sure it's a valid number, if not we move on to the next number
 				if(!isNaN(currentNumber)) {
 					// If we went through this loop already, previousIterationNumber will be set to the number of the previous iteration
-					if(previousIterationNumber) {
-						if(currentNumber - previousIterationNumber !== increment) {
+					if(typeof previousIterationNumber !== 'undefined') {
+						// If there's a gap for a number between the last number and the current number, we check if it's a valid possible number (ie, greater than minNumber)
+						// And If yes, we return it, if not we just continue
+						if(currentNumber - previousIterationNumber !== increment && previousIterationNumber > minNumber) {
 							return previousIterationNumber + increment;
 						}
 					}
 					// else, it's the first iteration, we initialize the minValue to the first number in the ordered array
-					else {
-						minNumber = currentNumber;
+					// only if it's greater than 1000, because we don't want to recommend lower numbers
+					else if(currentNumber > minNumber) {
+						lowestNumber = currentNumber;
 					}
-
 					// We store current as the previous number for the next iteration
 					previousIterationNumber = currentNumber;
 				}
 			});
 
-			return (previousIterationNumber) ? previousIterationNumber + increment : minNumber;
+			return (previousIterationNumber) ? previousIterationNumber + increment : lowestNumber;
 		},
 
 		usersFormatAddUser: function(data) {
