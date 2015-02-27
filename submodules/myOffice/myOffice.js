@@ -131,7 +131,7 @@ define(function(require){
 		myOfficeCreateMainVMBox: function(callback) {
 			var self = this,
 				vmboxData = {
-					mailbox: '0',
+					mailbox: '00',
 					type: 'mainVMBox',
 					name: self.i18n.active().myOffice.mainVMBoxName,
 					delete_after_notify: true
