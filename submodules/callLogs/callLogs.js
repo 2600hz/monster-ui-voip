@@ -4,19 +4,7 @@ define(function(require){
 		monster = require('monster');
 
 	var app = {
-		requests: {
-			'voip.callLogs.listCdrs': {
-				url: 'accounts/{accountId}/cdrs?created_from={fromDate}&created_to={toDate}',
-				verb: 'GET'
-			},
-			'voip.callLogs.getCdrsCSV': {
-				url: 'accounts/{accountId}/cdrs?created_from={fromDate}&created_to={toDate}',
-				verb: 'GET',
-				headers: {
-					'Accept': 'application/octet-stream'
-				}
-			}
-		},
+		requests: {},
 
 		subscribe: {
 			'voip.callLogs.render': 'callLogsRender'
@@ -34,10 +22,11 @@ define(function(require){
 					timezone: 'GMT' + jstz.determine_timezone().offset()
 				},
 				template,
-				rangeCallLogs = 8;
+				defaultDateRange = 1,
+				maxDateRange = 31;
 
 			if(!toDate && !fromDate) {
-				var dates = monster.util.getDefaultRangeDates(rangeCallLogs);
+				var dates = monster.util.getDefaultRangeDates(defaultDateRange);
 				fromDate = dates.from;
 				toDate = dates.to;
 			}
@@ -58,7 +47,7 @@ define(function(require){
 
 				var optionsDatePicker = {
 					container: template,
-					range: rangeCallLogs
+					range: maxDateRange
 				};
 
 				monster.ui.initRangeDatepicker(optionsDatePicker);
@@ -104,7 +93,14 @@ define(function(require){
 			});
 
 			template.find('.filter-div .download-csv').on('click', function(e) {
-				monster.ui.alert('Not implemented yet!');
+				var fromDate = template.find('.filter-div input.filter-from').datepicker("getDate"),
+					toDate = template.find('.filter-div input.filter-to').datepicker("getDate"),
+					fromDateTimestamp = monster.util.dateToBeginningOfGregorianDay(fromDate),
+					toDateTimestamp = monster.util.dateToEndOfGregorianDay(toDate);
+
+				window.location.href = self.apiUrl + 'accounts/' + self.accountId 
+				                     + '/cdrs?created_from=' + fromDateTimestamp + '&created_to=' + toDateTimestamp 
+				                     + '&accept=text/csv&auth_token=' + self.authToken;
 			});
 
 			template.find('.search-div input.search-query').on('keyup', function(e) {

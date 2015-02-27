@@ -1,0 +1,30 @@
+<div id="feature_codes_container">
+	<div class="feature-codes-header">
+		{{i18n.featureCodes.title}}
+	</div>
+	<div class="feature-codes-content">
+		{{#each featureCodes}}
+			<div class="feature-codes-category">
+				<div class="category-header">{{this.category}}</div>
+				<div class="category-content">
+					{{#each this.codes}}
+					<div class="feature-code-line">
+						<div class="feature-code-label">
+							{{this.name}}
+						</div>
+						<div class="feature-code">
+							<div class="code-prefix">*</div>
+							<div class="code-number">{{this.number}}</div>
+						</div>
+					</div>
+					{{/each}}
+				</div>
+			</div>
+		{{else}}
+		<div class="no-feature-codes">
+			<div class="message">{{i18n.featureCodes.noFeatureCodeMessage}}</div>
+			<a class="main-number-link">{{i18n.featureCodes.mainNumberLink}}</a>
+		</div>
+		{{/each}}
+	</div>
+</div>

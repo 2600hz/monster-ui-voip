@@ -1,51 +1,6 @@
 <div class="detail-group">
 	<div id="form-{{id}}" class="groups-fields row-fluid" data-id="{{id}}">
-	<div class="grid-time">
-		<div class="group-row title">
-			<div class="scale-container"></div>
-			<div class="name"><!--{{ i18n.groups.ringThisMemberFor }}-->
-				<button type="button" class="distribute-button btn btn-primary btn-small">{{ i18n.groups.distribute }}</button>
-			</div>
-			<div class="times"></div>
-			<div class="remove"><!-- {{ i18n.groups.removeMember }} -->
-				<i class="help-popover icon-question-sign icon-large" data-original-title="{{ i18n.groups.maxDurationTooltip }}" data-placement="top" data-toggle="tooltip"></i>
-			</div>
-		</div>
-
-		{{#each extra.ringGroup}}
-			<div class="group-row item-selector{{#if deleted}} deleted{{/if}}" data-user_id="{{id}}">
-				<div class="scale-container"></div>
-				<div class="name">{{name}}</div>
-				<div class="times">
-					<div class="slider-time">
-
-					</div>
-				</div>
-				<div class="remove">
-					<button class="btn btn-danger remove-user">{{ ../i18n.remove }}</button>
-				</div>
-			</div>
-		{{/each}}
-	</div>
-	<div class="extra-node">
-		<span>{{ i18n.groups.extraNode.label }}</span>
-		<select class="extra-node-select">
-			<optgroup label="{{ i18n.groups.extraNode.menu }}">
-				{{#if extra.callEntities.mainMenu}}
-				<option value="{{extra.callEntities.mainMenu.id}}" data-module="callflow" {{#compare extra.selectedEntity.id '===' extra.callEntities.mainMenu.id}}selected{{/compare}}>{{ i18n.groups.extraNode.mainMenu }}</option>
-				{{/if}}
-			</optgroup>
-			<optgroup label="{{ i18n.groups.extraNode.voicemails }}">
-				{{#each extra.callEntities.voicemails}}
-				<option value="{{id}}" data-module="voicemail" {{#compare ../extra.selectedEntity.id '===' id}}selected{{/compare}}>{{name}}</option>
-				{{/each}}
-			</optgroup>
-			<optgroup label="{{ i18n.groups.extraNode.users }}">
-				{{#each extra.callEntities.userCallflows}}
-				<option value="{{id}}" data-module="callflow" {{#compare ../extra.selectedEntity.id '===' id}}selected{{/compare}}>{{userName}}</option>
-				{{/each}}
-			</optgroup>
-		</select>
+	<div class="members-container">
 	</div>
 	<div class="actions">
 		<ul class="pull-left add-user-dropdown">

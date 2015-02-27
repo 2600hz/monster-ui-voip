@@ -106,6 +106,7 @@
 }
 
 #strategy_container .element-container .number-element {
+	position: relative;
 	border-bottom: solid 1px #dedede;
 	height: 70px;
 }
@@ -120,6 +121,14 @@
 #strategy_container .element-container .number-element .features-block .dropdown-toggle {
 	background-color: #ffffff;
 	margin-top: 5px;
+}
+#strategy_container .element-container .number-element .features-block .edit-features {
+	position: absolute;
+	right: 10px;
+
+}
+#strategy_container .element-container .number-element .features-block .features {
+	margin-right: 45px;
 }
 #strategy_container .element-container .number-element .features-block .features > i {
 	display: none;
@@ -538,7 +547,7 @@
 #strategy_menu_popup .menu-block .menu-line > div,
 #strategy_menu_popup .menu-block .menu-line > input,
 #strategy_menu_popup .menu-block .menu-line > select {
-	margin: 0 15px 0 0;
+	margin: 0 12px 0 0;
 	display: inline-block;
 	vertical-align: middle;
 }

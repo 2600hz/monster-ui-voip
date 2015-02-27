@@ -11,9 +11,9 @@ define(function(require){
 			'voip.numbers.render': 'numbersRender'
 		},
 
-		numbersRender: function(container){
+		numbersRender: function(args){
 			var self = this,
-				parent = container || $('#ws_content');
+				parent = args.parent || $('#ws_content');
 
 			monster.pub('common.numbers.render', {
 				container: parent,

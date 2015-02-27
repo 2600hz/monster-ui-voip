@@ -283,7 +283,6 @@
 
 #users_container .detail-user .row-fields {
 	margin-bottom: 10px;
-	height: 40px;
 	line-height: 40px;
 }
 
@@ -300,6 +299,11 @@
 #users_container .detail-user .row-fields .ringing-timeout.disabled * {
 	opacity: 0.5;
 	cursor: default !important;
+}
+
+#users_container .detail-user .row-fields .presence-id-select {
+	margin-left: 10px;
+	width: 72px;
 }
 
 #users_container .detail-user .row-fields .timeout-edit {
@@ -381,6 +385,7 @@
 }
 
 #users_container .list-wrapper .item-row  {
+	position: relative;
 	border-bottom: 1px solid #ccc;
 	white-space: nowrap;
 }
@@ -439,6 +444,15 @@
 
 #users_container .detail-numbers .list-wrapper .features-block .dropdown {
 	margin-top: -4px;
+}
+
+#users_container .detail-numbers .list-wrapper .features-block .edit-features {
+	position: absolute;
+	right: 10px;
+}
+
+#users_container .detail-numbers .list-wrapper .features-block .features {
+	margin-right: 46px;
 }
 
 #users_container .detail-numbers .list-wrapper .navbar .nav li.dropdown.open.active > .dropdown-toggle,
@@ -560,7 +574,7 @@
 }
 
 #creation_user_dialog label.monster-invalid[for="extension"] {
-	margin-left: 35px;
+	margin-left: 156px;
 }
 
 #creation_user_dialog .control-group.hack-left .control-label{
@@ -601,6 +615,17 @@
 
 #creation_user_dialog .control-group-split input {
 	width: 74px;
+}
+
+#creation_user_dialog #extension {
+	width: 47px;
+	margin-left: 5px;
+}
+
+#creation_user_dialog .extension-label {
+	display: inline-block;
+	white-space: nowrap;
+	width: 153px;
 }
 
 /* Feature Popups */
@@ -771,169 +796,59 @@
 	padding: 10px;
 }
 
-#find_me_follow_me_form .grid-time .device-row {
-	position: relative;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	padding: 25px 0 15px;
-	width: 100%;
+#find_me_follow_me_form .grid-time .grid-time-row {
+	background-color: inherit;
 }
-
-#find_me_follow_me_form .grid-time .device-row > div {
-	display: inline-block;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-}
-
-#find_me_follow_me_form .grid-time .device-row.title {
-	padding: 5px 0px;
-}
-
-#find_me_follow_me_form .grid-time .device-row.title .name {
-	height: 40px;
-	line-height: 40px;
-}
-
-#find_me_follow_me_form .grid-time .device-row.title .scale-max {
-	border: solid 1px #22ccff;
-	border-radius: 4px;
-	padding: 0px 2px;
-	cursor: pointer;
-}
-
-#find_me_follow_me_form .grid-time .device-row.title .scale-max-input {
-	display: none;
-	position: absolute;
-	top: -20px;
-	right: -24px;
-	color: #999;
-	font-size: 12px;
-	width: 35px;
-	height: 12px;
-	text-align: center;
-	margin: 0;
-	padding: 4px;
-}
-
-#find_me_follow_me_form .grid-time .device-row .name {
+#find_me_follow_me_form .grid-time .grid-time-row .name {
 	width: 25%;
-	vertical-align: bottom;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
 }
-#find_me_follow_me_form .grid-time .device-row .name i {
-	margin-right: 10px;
-}
-#find_me_follow_me_form .grid-time .device-row.disabled .name {
-	color: #999;
-}
-#find_me_follow_me_form .grid-time .device-row .times {
-	padding-right: 30px;
-	padding-left: 30px;
+#find_me_follow_me_form .grid-time .grid-time-row .times {
 	width: 65%;
 }
-#find_me_follow_me_form .grid-time .device-row .action {
-	width: 10%;
-	text-align: center;
-	vertical-align: bottom;
-	padding-left: 10px;
-}
-
-#find_me_follow_me_form .slider-time.ui-slider {
-	height: 10px;
-	border: none;
-	background: #DDDDDD;
-	cursor: pointer;
-}
-
-#find_me_follow_me_form .slider-time.ui-slider .ui-slider-range {
-	border: 1px solid #333;
-	border-radius: 0;
-	background: #33BB44;
-}
-
-#find_me_follow_me_form .slider-time.ui-slider .ui-slider-handle {
-	margin: -7px 0;
-	padding: 3px;
-	width: 0px;
-	height: 25px;
-	border: 1px solid #333333;
-	background: #33BB44;
-	cursor: pointer;
-}
-
-#find_me_follow_me_form .slider-time.ui-slider .ui-slider-range,
-#find_me_follow_me_form .slider-time.ui-slider .ui-slider-handle {
-	border-color: #73b714 #73b714 hsl(85, 80%, 32.5%);
-	background-color: hsl(85, 80%, 40%) !important;
-	background-image: -khtml-gradient(linear, left top, left bottom, from(#bcef75), to(#73b714));
-	background-image: -moz-linear-gradient(top, #bcef75, #73b714);
-	background-image: -ms-linear-gradient(top, #bcef75, #73b714);
-	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #bcef75), color-stop(100%, #73b714));
-	background-image: -webkit-linear-gradient(top, #bcef75, #73b714);
-	background-image: -o-linear-gradient(top, #bcef75, #73b714);
-	background-image: linear-gradient(#bcef75, #73b714);
-	background-repeat: repeat-x;
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#bcef75", endColorstr="#73b714");
-}
-
-#find_me_follow_me_form .slider-time.ui-slider .slider-tooltip {
-	position: absolute;
-	right: -11px;
-	bottom: 30px;
-	display: block;
-	font-size: 12px;
-}
-#find_me_follow_me_form .slider-time.ui-slider .slider-tooltip .slider-tooltip-inner {
-	max-width: 200px;
-	width: 30px;
-	color: #000000;
-	text-align: center;
-	text-decoration: none;
-}
-
-#find_me_follow_me_form .scale-container {
-	position: absolute;
-	top: 0px;
+#find_me_follow_me_form .grid-time .grid-time-row .scale-container {
 	right: 10%;
 	left: 25%;
-	margin: 0 26px 0 34px;
-	height: 100%;
-	border-bottom: solid 1px #ddd;
 }
-#find_me_follow_me_form .device-row:last-of-type .scale-container {
-	border-bottom: none;
+#find_me_follow_me_form .grid-time .grid-time-row-placeholder {
+	height: 52px;
+	background-color: inherit;
 }
-#find_me_follow_me_form .scale-container > span {
-	position: absolute;
-	bottom: 15%;
-	left: -8px;
-	color: #999;
-	font-size: 11px;
+
+/********* CSS for device popovers (appended directly on the body) *********/
+.device-popover-icon {
+	margin-right: 10px;
+	vertical-align: text-bottom;
 }
-#find_me_follow_me_form .scale-element {
-	position: relative;
-	display: inline-block;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	height: 100%;
-	border-right: solid 1px #ddd;
+
+/**** CSS For Changing the Presence ID settings *****/
+
+.presence-id-change-wrapper {
+	padding: 15px;
+	width: 400px;
 }
-#find_me_follow_me_form .device-row.title .scale-element {
-	top: 85%;
-	height: 15%;
-	vertical-align: top;
+
+.presence-id-change-wrapper .list-choices {
+	margin-bottom: 20px;
+	margin-top: 20px;
 }
-#find_me_follow_me_form .scale-element:first-child {
-	border-left: solid 1px #ddd;
+
+.presence-id-change-wrapper .list-choices .presence-id-option {
+	background: #EEE;
+	padding: 20px;
+	border: 1px solid #CCC;
+	margin-bottom: 5px;
 }
-#find_me_follow_me_form .scale-element > span {
-	position: absolute;
-	top: -20px;
-	right: -24px;
-	color: #999;
-	font-size: 11px;
+
+.presence-id-change-wrapper .list-choices .presence-id-option:hover {
+	background: #FFF;
+	cursor: pointer;
+}
+
+.presence-id-change-wrapper .list-choices .presence-id-option.active {
+	background: #FFF;
+	border: 1px solid #22CCFF;
+}
+
+.presence-id-change-wrapper .actions {
+	margin-top: 10px;
 }

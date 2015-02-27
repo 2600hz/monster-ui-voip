@@ -9,119 +9,6 @@ define(function(require){
 	var app = {
 
 		requests: {
-			'strategy.callflows.listHasType': {
-				url: 'accounts/{accountId}/callflows?has_value=type&key_missing=owner_id',
-				verb: 'GET'
-			},
-			'strategy.callflows.list': {
-				url: 'accounts/{accountId}/callflows',
-				verb: 'GET'
-			},
-			'strategy.callflows.get': {
-				url: 'accounts/{accountId}/callflows/{callflowId}',
-				verb: 'GET'
-			},
-			'strategy.callflows.add': {
-				url: 'accounts/{accountId}/callflows',
-				verb: 'PUT'
-			},
-			'strategy.callflows.update': {
-				url: 'accounts/{accountId}/callflows/{callflowId}',
-				verb: 'POST'
-			},
-			'strategy.callflows.listUserCallflows': {
-				url: 'accounts/{accountId}/callflows?has_key=owner_id',
-				verb: 'GET'
-			},
-			'strategy.callflows.listRingGroups': {
-				url: 'accounts/{accountId}/callflows?has_key=group_id',
-				verb: 'GET'
-			},
-			'strategy.temporalRules.list': {
-				url: 'accounts/{accountId}/temporal_rules?has_key=type',
-				verb: 'GET'
-			},
-			'strategy.temporalRules.get': {
-				url: 'accounts/{accountId}/temporal_rules/{ruleId}',
-				verb: 'GET'
-			},
-			'strategy.temporalRules.add': {
-				url: 'accounts/{accountId}/temporal_rules',
-				verb: 'PUT'
-			},
-			'strategy.temporalRules.update': {
-				url: 'accounts/{accountId}/temporal_rules/{ruleId}',
-				verb: 'POST'
-			},
-			'strategy.temporalRules.delete': {
-				url: 'accounts/{accountId}/temporal_rules/{ruleId}',
-				verb: 'DELETE'
-			},
-			'strategy.menus.get': {
-				url: 'accounts/{accountId}/menus/{menuId}',
-				verb: 'GET'
-			},
-			'strategy.menus.add': {
-				url: 'accounts/{accountId}/menus/',
-				verb: 'PUT'
-			},
-			'strategy.menus.update': {
-				url: 'accounts/{accountId}/menus/{menuId}',
-				verb: 'POST'
-			},
-			'strategy.media.get': {
-				url: 'accounts/{accountId}/media/{mediaId}',
-				verb: 'GET'
-			},
-			'strategy.media.create': {
-				url: 'accounts/{accountId}/media',
-				verb: 'PUT'
-			},
-			'strategy.media.update': {
-				url: 'accounts/{accountId}/media/{mediaId}',
-				verb: 'POST'
-			},
-            'strategy.media.upload': {
-                url: 'accounts/{accountId}/media/{mediaId}/raw',
-                verb: 'POST',
-                type: 'application/x-base64'
-            },
-			'strategy.users.list': {
-				url: 'accounts/{accountId}/users',
-				verb: 'GET'
-			},
-			'strategy.groups.list': {
-				url: 'accounts/{accountId}/groups',
-				verb: 'GET'
-			},
-			'strategy.devices.list': {
-				url: 'accounts/{accountId}/devices',
-				verb: 'GET'
-			},
-			'strategy.voicemails.list': {
-				url: 'accounts/{accountId}/vmboxes',
-				verb: 'GET'
-			},
-			'strategy.numbers.list': {
-				url: 'accounts/{accountId}/phone_numbers',
-				verb: 'GET'
-			},
-			'strategy.numbers.get': {
-				url: 'accounts/{accountId}/phone_numbers/{phoneNumber}',
-				verb: 'GET'
-			},
-			'strategy.numbers.update': {
-				url: 'accounts/{accountId}/phone_numbers/{phoneNumber}',
-				verb: 'POST'
-			},
-			'strategy.account.get': {
-				url: 'accounts/{accountId}',
-				verb: 'GET'
-			},
-			'strategy.account.update': {
-				url: 'accounts/{accountId}',
-				verb: 'POST'
-			}
 		},
 
 		subscribe: {
@@ -184,10 +71,10 @@ define(function(require){
 					}
 				},
 				function(err, results) {
-					var hasMainNumber = (results.callflows["MainCallflow"].numbers.length > 0 && results.callflows["MainCallflow"].numbers[0] !== "undefined"),
+					var hasMainNumber = (results.callflows["MainCallflow"].numbers.length > 1),
 						hasConfNumber = (results.callflows["MainConference"].numbers.length > 0 && results.callflows["MainConference"].numbers[0] !== "undefinedconf")
 					templateData = {
-						mainNumbers: hasMainNumber ? results.callflows["MainCallflow"].numbers : [self.i18n.active().strategy.noNumberTitle],
+						mainNumbers: hasMainNumber ? results.callflows["MainCallflow"].numbers.slice(1) : [self.i18n.active().strategy.noNumberTitle],
 						confNumbers: hasConfNumber ? results.callflows["MainConference"].numbers : [self.i18n.active().strategy.noNumberTitle]
 					}
 					template = $(monster.template(self, 'strategy-layout', templateData));
@@ -277,7 +164,7 @@ define(function(require){
 								numbers = callflow.numbers,
 								templateData = {
 									numbers: $.map(numbers, function(val, key) {
-										if(val!=="undefined") {
+										if(val!=="0") {
 											var ret = {
 												number: val,
 												features: $.extend(true, {}, strategyData.numberFeatures)
@@ -285,6 +172,7 @@ define(function(require){
 											_.each(accountNumbers[val].features, function(feature) {
 												ret.features[feature].active = 'active';
 											});
+											ret.isLocal = accountNumbers[val].features.indexOf('local') > -1;
 											return ret;
 										}
 									}),
@@ -473,7 +361,7 @@ define(function(require){
 										type: "default"
 									},
 									callflow: callflowName,
-									callEntities: self.strategyGetCallEntitiesDropdownData(strategyData.callEntities),
+									callEntities: self.strategyGetCallEntitiesDropdownData(strategyData.callEntities, true),
 									voicemails: strategyData.voicemails,
 									tabMessage: self.i18n.active().strategy.calls.callTabsMessages[callflowName]
 								};
@@ -520,10 +408,6 @@ define(function(require){
 				addNumbersToMainCallflow = function(numbers) {
 					if(numbers.length) {
 						var mainCallflow = strategyData.callflows["MainCallflow"];
-						if(mainCallflow.numbers.length <= 1
-						&& mainCallflow.numbers[0] === "undefined") {
-							mainCallflow.numbers = [];
-						}
 						mainCallflow.numbers = mainCallflow.numbers.concat(numbers);
 						self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
 							var parentContainer = container.parents('.element-container');
@@ -536,12 +420,12 @@ define(function(require){
 				refreshNumbersHeader = function(parentContainer) {
 					var mainCallflow = strategyData.callflows["MainCallflow"],
 						headerSpan = parentContainer.find('.element-header-inner .summary > span');
-					if(mainCallflow.numbers.length > 0 && mainCallflow.numbers[0] !== "undefined") {
-						headerSpan.html(monster.util.formatPhoneNumber(mainCallflow.numbers[0]));
-						if(mainCallflow.numbers.length > 2) {
-							headerSpan.append('<i class="icon-telicon-multiple-items icon-small"></i>')
-						} else if(mainCallflow.numbers.length === 2) {
-							headerSpan.append(", "+monster.util.formatPhoneNumber(mainCallflow.numbers[1]))
+					if(mainCallflow.numbers.length > 1) {
+						headerSpan.html(monster.util.formatPhoneNumber(mainCallflow.numbers[1]));
+						if(mainCallflow.numbers.length > 3) {
+							headerSpan.append('<i class="icon-telicon-multiple-items icon-small"></i>');
+						} else if(mainCallflow.numbers.length === 3) {
+							headerSpan.append(", "+monster.util.formatPhoneNumber(mainCallflow.numbers[2]));
 						}
 						container.parents('#strategy_container').find('.element-container:not(.main-number,.strategy-confnum)').show();
 						container.parents('#strategy_container').find('.element-container.helper').hide();
@@ -596,7 +480,7 @@ define(function(require){
 				var $this = $(this),
 					numberToRemove = $this.data('number'),
 					e911Feature = $this.data('e911'),
-					indexToRemove = strategyData.callflows["MainCallflow"].numbers.indexOf(numberToRemove);
+					indexToRemove = strategyData.callflows["MainCallflow"].numbers.indexOf(numberToRemove.toString());
 
 				if(e911Feature === 'active' && container.find('.number-element .remove-number[data-e911="active"]').length === 1) {
 					monster.ui.alert('error', self.i18n.active().strategy.alertMessages.lastE911Error);
@@ -609,10 +493,6 @@ define(function(require){
 							updateCallflow = function() {
 								strategyData.callflows["MainCallflow"].numbers.splice(indexToRemove, 1);
 
-								if(strategyData.callflows["MainCallflow"].numbers.length === 0) {
-									strategyData.callflows["MainCallflow"].numbers = ["undefined"];
-								}
-
 								self.strategyUpdateCallflow(strategyData.callflows["MainCallflow"], function(updatedCallflow) {
 									var parentContainer = container.parents('.element-container');
 									toastr.success(self.i18n.active().strategy.toastrMessages.removeNumberSuccess);
@@ -621,8 +501,8 @@ define(function(require){
 									self.strategyRefreshTemplate(parentContainer, strategyData);
 
 									//Updating Company Caller ID if this was the selected number
-									monster.request({
-										resource: 'strategy.account.get',
+									self.callApi({
+										resource: 'account.get',
 										data: {
 											accountId: self.accountId
 										},
@@ -637,8 +517,8 @@ define(function(require){
 												modified = true;
 											}
 											if(modified) {
-												monster.request({
-													resource: 'strategy.account.update',
+												self.callApi({
+													resource: 'account.update',
 													data: {
 														accountId: self.accountId,
 														data: accountData.data
@@ -669,25 +549,17 @@ define(function(require){
 									width: '540px'
 								});
 
-							popup.find('.delete-feature').on('click', function() {
-								$(this).parents('tr').remove();
-
-								if ( popup.find('tbody').is(':empty') ) {
-									popup.dialog('close');
-
-									updateCallflow();
-								}
-							});
+							monster.ui.prettyCheck.create(popup);
 
 							popup.find('.cancel-link').on('click', function() {
 								popup.dialog('close');
-
-								updateCallflow();
 							});
 
 							popup.find('#remove_features').on('click', function() {
 								popup.find('.table td').each(function(idx, elem) {
-									delete dataNumber[$(this).data('name')];
+									if ($(elem).find('input').is(':checked')) {
+										delete dataNumber[$(elem).data('name')];
+									}
 								});
 
 								self.strategyUpdateNumber(numberToRemove, dataNumber, function() {
@@ -751,6 +623,28 @@ define(function(require){
 					};
 
 					monster.pub('common.e911.renderPopup', args);
+				}
+			});
+
+			container.on('click', '.number-element .prepend-number', function() {
+				var prependCell = $(this).parents('.number-element').first(),
+					phoneNumber = prependCell.find('.remove-number').data('number');
+
+				if(phoneNumber) {
+					var args = {
+						phoneNumber: phoneNumber,
+						callbacks: {
+							success: function(data) {
+								if('prepend' in data.data && data.data.prepend.enabled) {
+									prependCell.find('.features i.feature-prepend').addClass('active');
+								} else {
+									prependCell.find('.features i.feature-prepend').removeClass('active');
+								}
+							}
+						}
+					};
+
+					monster.pub('common.numberPrepend.renderPopup', args);
 				}
 			});
 		},
@@ -821,10 +715,6 @@ define(function(require){
 				});
 			});
 
-			container.on('click', '.action-links .port-link', function(e) {
-				e.preventDefault();
-			});
-
 			container.on('click', '.number-element .remove-number', function(e) {
 				e.preventDefault();
 				var numberToRemove = $(this).data('number'),
@@ -890,7 +780,7 @@ define(function(require){
 				
 				if(monster.ui.valid(container.find('#strategy_custom_hours_form'))) {
 					var parent = $(this).parents('.element-container'),
-						customHours = form2object('strategy_custom_hours_form'),
+						customHours = monster.ui.getFormData('strategy_custom_hours_form'),
 						mainCallflow = strategyData.callflows["MainCallflow"],
 						formatChildModule = function(callflowId) {
 							return {
@@ -919,8 +809,8 @@ define(function(require){
 							lunchbreakRule.time_window_start = monster.util.timeToSeconds(customHours.lunchbreak.from);
 							lunchbreakRule.time_window_stop = monster.util.timeToSeconds(customHours.lunchbreak.to);
 							tmpRulesRequests["lunchbreak"] = function(callback) {
-								monster.request({
-									resource: 'strategy.temporalRules.update',
+								self.callApi({
+									resource: 'temporalRule.update',
 									data: {
 										accountId: self.accountId,
 										ruleId: lunchbreakRule.id,
@@ -940,8 +830,8 @@ define(function(require){
 							temporalRule.time_window_start = monster.util.timeToSeconds(customHours.weekdays[val].from);
 							temporalRule.time_window_stop = monster.util.timeToSeconds(customHours.weekdays[val].to);
 							tmpRulesRequests[val] = function(callback) {
-								monster.request({
-									resource: 'strategy.temporalRules.update',
+								self.callApi({
+									resource: 'temporalRule.update',
 									data: {
 										accountId: self.accountId,
 										ruleId: temporalRule.id,
@@ -997,12 +887,11 @@ define(function(require){
 						self.strategyRebuildMainCallflowRuleArray(strategyData);
 						self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
 							strategyData.callflows["MainCallflow"] = updatedCallflow;
-							monster.request({
-								resource: 'strategy.temporalRules.delete',
+							self.callApi({
+								resource: 'temporalRule.delete',
 								data: {
 									accountId: self.accountId,
-									ruleId: id,
-									data: {}
+									ruleId: id
 								},
 								success: function(data, status) {
 									delete strategyData.temporalRules.holidays[data.data.name];
@@ -1064,8 +953,8 @@ define(function(require){
 
 						if(id) {
 							holidayRulesRequests[name] = function(callback) {
-								monster.request({
-									resource: 'strategy.temporalRules.update',
+								self.callApi({
+									resource: 'temporalRule.update',
 									data: {
 										accountId: self.accountId,
 										ruleId: id,
@@ -1078,8 +967,8 @@ define(function(require){
 							}
 						} else {
 							holidayRulesRequests[name] = function(callback) {
-								monster.request({
-									resource: 'strategy.temporalRules.add',
+								self.callApi({
+									resource: 'temporalRule.create',
 									data: {
 										accountId: self.accountId,
 										data: holidayRule
@@ -1122,12 +1011,11 @@ define(function(require){
 					monster.ui.confirm(self.i18n.active().strategy.confirmMessages.disableHolidays, function() {
 						_.each(strategyData.temporalRules.holidays, function(val, key) {
 							holidayRulesRequests[key] = function(callback) {
-								monster.request({
-									resource: 'strategy.temporalRules.delete',
+								self.callApi({
+									resource: 'temporalRule.delete',
 									data: {
 										accountId: self.accountId,
-										ruleId: val.id,
-										data: {}
+										ruleId: val.id
 									},
 									success: function(data, status) {
 										delete mainCallflow.flow.children[val.id];
@@ -1371,8 +1259,8 @@ define(function(require){
 				};
 
 			if(name in strategyData.callflows) {
-				monster.request({
-					resource: 'strategy.menus.get',
+				self.callApi({
+					resource: 'menu.get',
 					data: {
 						accountId: self.accountId,
 						menuId: strategyData.callflows[name].flow.data.id
@@ -1380,8 +1268,8 @@ define(function(require){
 					success: function(data, status) {
 						menu = data.data;
 						if(menu.media.greeting) {
-							monster.request({
-								resource: 'strategy.media.get',
+							self.callApi({
+								resource: 'media.get',
 								data: {
 									accountId: self.accountId,
 									mediaId: menu.media.greeting
@@ -1397,8 +1285,8 @@ define(function(require){
 					}
 				});
 			} else {
-				monster.request({
-					resource: 'strategy.menus.add',
+				self.callApi({
+					resource: 'menu.create',
 					data: {
 						accountId: self.accountId,
 						data: {
@@ -1416,8 +1304,8 @@ define(function(require){
 					},
 					success: function(data, status) {
 						menu = data.data;
-						monster.request({
-							resource: 'strategy.callflows.add',
+						self.callApi({
+							resource: 'callflow.create',
 							data: {
 								accountId: self.accountId,
 								data: {
@@ -1510,8 +1398,8 @@ define(function(require){
 							voice: "female/en-US",
 							text: text
 						};
-						monster.request({
-							resource: 'strategy.media.update',
+						self.callApi({
+							resource: 'media.update',
 							data: {
 								accountId: self.accountId,
 								mediaId: greeting.id,
@@ -1525,8 +1413,8 @@ define(function(require){
 							}
 						});
 					} else {
-						monster.request({
-							resource: 'strategy.media.create',
+						self.callApi({
+							resource: 'media.create',
 							data: {
 								accountId: self.accountId,
 								data: {
@@ -1544,8 +1432,8 @@ define(function(require){
 							success: function(data, status) {
 								greeting = data.data;
 								menu.media.greeting = data.data.id;
-								monster.request({
-									resource: 'strategy.menus.update',
+								self.callApi({
+									resource: 'menu.update',
 									data: {
 										accountId: self.accountId,
 										menuId: menu.id,
@@ -1571,8 +1459,8 @@ define(function(require){
 				var fileReader = new FileReader(),
 					file = uploadGreeting.find('input[type="file"]')[0].files[0],
 					uploadFile = function(file, greetingId, callback) {
-						monster.request({
-							resource: 'strategy.media.upload',
+						self.callApi({
+							resource: 'media.upload',
 							data: {
 								accountId: self.accountId,
 								mediaId: greetingId,
@@ -1591,8 +1479,8 @@ define(function(require){
 						greeting.media_source = "upload";
 						delete greeting.tts;
 
-						monster.request({
-							resource: 'strategy.media.update',
+						self.callApi({
+							resource: 'media.update',
 							data: {
 								accountId: self.accountId,
 								mediaId: greeting.id,
@@ -1608,8 +1496,8 @@ define(function(require){
 							}
 						});
 					} else {
-						monster.request({
-							resource: 'strategy.media.create',
+						self.callApi({
+							resource: 'media.create',
 							data: {
 								accountId: self.accountId,
 								data: {
@@ -1623,8 +1511,8 @@ define(function(require){
 							success: function(data, status) {
 								greeting = data.data;
 								menu.media.greeting = data.data.id;
-								monster.request({
-									resource: 'strategy.menus.update',
+								self.callApi({
+									resource: 'menu.update',
 									data: {
 										accountId: self.accountId,
 										menuId: menu.id,
@@ -1715,11 +1603,18 @@ define(function(require){
 			});
 		},
 
-		strategyGetCallEntitiesDropdownData: function(callEntities) {
+		strategyGetCallEntitiesDropdownData: function(callEntities, useBasicUser) {
 			var self = this,
+				useBasicUser = (useBasicUser === true) || false,
+				entities = $.extend(true, {}, callEntities),
 				results = [];
 
-			_.each(callEntities, function(value, key) {
+			if(!useBasicUser) {
+				entities.user = entities.userCallflows;
+			}
+			delete entities.userCallflows;
+
+			_.each(entities, function(value, key) {
 				var group = {
 						groupName: self.i18n.active().strategy.callEntities[key],
 						groupType: key,
@@ -1760,10 +1655,14 @@ define(function(require){
 
 		strategyGetMainCallflows: function(callback) {
 			var self = this;
-			monster.request({
-				resource: 'strategy.callflows.listHasType',
+			self.callApi({
+				resource: 'callflow.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						'has_value':'type',
+						'key_missing':'owner_id'
+					}
 				},
 				success: function(data, status) {
 					var parallelRequests = {};
@@ -1772,8 +1671,8 @@ define(function(require){
 						if(val.type === "main" || val.type === "conference")
 						var name = val.type === "conference" ? "MainConference" : val.name || val.numbers[0];
 						parallelRequests[name] = function(callback) {
-							monster.request({
-								resource: 'strategy.callflows.get',
+							self.callApi({
+								resource: 'callflow.get',
 								data: {
 									accountId: self.accountId,
 									callflowId: val.id
@@ -1787,8 +1686,8 @@ define(function(require){
 
 					if(!parallelRequests["MainConference"]) {
 						parallelRequests["MainConference"] = function(callback) {
-							monster.request({
-								resource: 'strategy.callflows.add',
+							self.callApi({
+								resource: 'callflow.create',
 								data: {
 									accountId: self.accountId,
 									data: {
@@ -1815,8 +1714,8 @@ define(function(require){
 					_.each(self.subCallflowsLabel, function(val) {
 						if(!parallelRequests[val]) {
 							parallelRequests[val] = function(callback) {
-								monster.request({
-									resource: 'strategy.callflows.add',
+								self.callApi({
+									resource: 'callflow.create',
 									data: {
 										accountId: self.accountId,
 										data: {
@@ -1842,15 +1741,15 @@ define(function(require){
 
 					monster.parallel(parallelRequests, function(err, results) {
 						if(!parallelRequests["MainCallflow"]) {
-							monster.request({
-								resource: 'strategy.callflows.add',
+							self.callApi({
+								resource: 'callflow.create',
 								data: {
 									accountId: self.accountId,
 									data: {
 										contact_list: {
 											exclude: false
 										},
-										numbers: ["undefined"],
+										numbers: ["0"],
 										name: "MainCallflow",
 										type: "main",
 										flow: {
@@ -1878,7 +1777,19 @@ define(function(require){
 							});
 						} else {
 							delete results["MainCallflow"].flow.data.timezone;
-							callback(results);
+							if(results["MainCallflow"].numbers[0] !== '0') {
+								if(results["MainCallflow"].numbers[0] === 'undefined') {
+									results["MainCallflow"].numbers[0] = '0';
+								} else {
+									results["MainCallflow"].numbers.splice(0, 0, '0');
+								}
+								self.strategyUpdateCallflow(results["MainCallflow"], function(updatedCallflow) {
+									results["MainCallflow"] = updatedCallflow;
+									callback(results);
+								})
+							} else {
+								callback(results);
+							}
 						}
 					});
 				}
@@ -2051,18 +1962,19 @@ define(function(require){
 
 		strategyGetTemporalRules: function(callback) {
 			var self = this;
-			monster.request({
-				resource: 'strategy.temporalRules.list',
+			self.callApi({
+				resource: 'temporalRule.list',
 				data: {
 					accountId: self.accountId,
+					filters: { 'has_key':'type' }
 				},
 				success: function(data, status) {
 					var parallelRequests = {};
 
 					_.each(data.data, function(val, key) {
 						parallelRequests[val.name] = function(callback) {
-							monster.request({
-								resource: 'strategy.temporalRules.get',
+							self.callApi({
+								resource: 'temporalRule.get',
 								data: {
 									accountId: self.accountId,
 									ruleId: val.id
@@ -2077,8 +1989,8 @@ define(function(require){
 					_.each(self.weekdayLabels, function(val) {
 						if(!(val in parallelRequests)) {
 							parallelRequests[val] = function(callback) {
-								monster.request({
-									resource: 'strategy.temporalRules.add',
+								self.callApi({
+									resource: 'temporalRule.create',
 									data: {
 										accountId: self.accountId,
 										data: {
@@ -2086,8 +1998,8 @@ define(function(require){
 											interval: 1,
 											name: val,
 											type: "main_weekdays",
-											time_window_start: "32400", // 9:00AM
-											time_window_stop: "61200",  // 5:00PM
+											time_window_start: 32400, // 9:00AM
+											time_window_stop: 61200,  // 5:00PM
 											wdays: [val.substring(4).toLowerCase()]
 										}
 									},
@@ -2101,8 +2013,8 @@ define(function(require){
 
 					if(!("MainLunchHours" in parallelRequests)) {
 						parallelRequests["MainLunchHours"] = function(callback) {
-							monster.request({
-								resource: 'strategy.temporalRules.add',
+							self.callApi({
+								resource: 'temporalRule.create',
 								data: {
 									accountId: self.accountId,
 									data: {
@@ -2110,8 +2022,8 @@ define(function(require){
 										interval: 1,
 										name: "MainLunchHours",
 										type: "main_lunchbreak",
-										time_window_start: "43200",
-										time_window_stop: "46800",
+										time_window_start: 43200,
+										time_window_stop: 46800,
 										wdays: self.weekdays
 									}
 								},
@@ -2154,10 +2066,13 @@ define(function(require){
 			monster.parallel(
 				{
 					users: function(_callback) {
-						monster.request({
-							resource: 'strategy.users.list',
+						self.callApi({
+							resource: 'user.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(data, status) {
 								_callback(null, data.data);
@@ -2165,10 +2080,11 @@ define(function(require){
 						});
 					},
 					userCallflows: function(_callback) {
-						monster.request({
-							resource: 'strategy.callflows.listUserCallflows',
+						self.callApi({
+							resource: 'callflow.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: { 'has_key':'owner_id' }
 							},
 							success: function(data, status) {
 								var userCallflows = _.filter(data.data, function(callflow) { 
@@ -2179,10 +2095,13 @@ define(function(require){
 						});
 					},
 					groups: function(_callback) {
-						monster.request({
-							resource: 'strategy.groups.list',
+						self.callApi({
+							resource: 'group.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(data, status) {
 								_callback(null, data.data);
@@ -2190,10 +2109,14 @@ define(function(require){
 						});
 					},
 					ringGroups: function(_callback) {
-						monster.request({
-							resource: 'strategy.callflows.listRingGroups',
+						self.callApi({
+							resource: 'callflow.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									'has_key': 'group_id',
+									'filter_type': 'baseGroup'
+								}
 							},
 							success: function(data, status) {
 								_callback(null, data.data);
@@ -2201,10 +2124,13 @@ define(function(require){
 						});
 					},
 					devices: function(_callback) {
-						monster.request({
-							resource: 'strategy.devices.list',
+						self.callApi({
+							resource: 'device.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(data, status) {
 								_callback(null, data.data);
@@ -2215,7 +2141,8 @@ define(function(require){
 				function(err, results) {
 					var callEntities = {
 						device: results.devices,
-						user: [],
+						user: $.extend(true, [], results.users),
+						userCallflows: [],
 						ring_group: []
 					};
 
@@ -2231,7 +2158,7 @@ define(function(require){
 						} else {
 							user.module = 'user';
 						}
-						callEntities.user.push(user);
+						callEntities.userCallflows.push(user);
 					});
 
 					_.each(results.groups, function(group) {
@@ -2252,10 +2179,13 @@ define(function(require){
 
 		strategyGetVoicesmailBoxes: function(callback) {
 			var self = this;
-			monster.request({
-				resource: 'strategy.voicemails.list',
+			self.callApi({
+				resource: 'voicemail.list',
 				data: {
 					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(data, status) {
 					data.data.sort(function(a,b) { return (a.name.toLowerCase() > b.name.toLowerCase()); });
@@ -2266,10 +2196,13 @@ define(function(require){
 
 		strategyListAccountNumbers: function(callback) {
 			var self = this;
-			monster.request({
-				resource: 'strategy.numbers.list',
+			self.callApi({
+				resource: 'numbers.list',
 				data: {
 					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(data, status) {
 					callback(data.data.numbers);
@@ -2280,8 +2213,8 @@ define(function(require){
 		strategyGetNumber: function(phoneNumber, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'strategy.numbers.get',
+			self.callApi({
+				resource: 'numbers.get',
 				data: {
 					accountId: self.accountId,
 					phoneNumber: encodeURIComponent(phoneNumber)
@@ -2295,8 +2228,8 @@ define(function(require){
 		strategyUpdateNumber: function(phoneNumber, data, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'strategy.numbers.update',
+			self.callApi({
+				resource: 'numbers.update',
 				data: {
 					accountId: self.accountId,
 					phoneNumber: encodeURIComponent(phoneNumber),
@@ -2336,10 +2269,13 @@ define(function(require){
 		strategyGetCallflows: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'strategy.callflows.list',
+			self.callApi({
+				resource: 'callflow.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(callflowData) {
 					callback && callback(callflowData.data);
@@ -2350,8 +2286,8 @@ define(function(require){
 		strategyCreateCallflow: function(callflow, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'strategy.callflows.add',
+			self.callApi({
+				resource: 'callflow.create',
 				data: {
 					accountId: self.accountId,
 					data: callflow
@@ -2367,8 +2303,8 @@ define(function(require){
 				callflowId = callflow.id;
 			delete callflow.metadata;
 			delete callflow.id;
-			monster.request({
-				resource: 'strategy.callflows.update',
+			self.callApi({
+				resource: 'callflow.update',
 				data: {
 					accountId: self.accountId,
 					callflowId: callflowId,

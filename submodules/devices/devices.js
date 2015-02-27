@@ -7,52 +7,7 @@ define(function(require){
 
 	var app = {
 
-		requests: {
-			/* Classifiers */
-			'voip.devices.listClassifiers': {
-				url: 'accounts/{accountId}/phone_numbers/classifiers',
-				verb: 'GET'
-			},
-			/* Numbers */
-			'voip.devices.listNumbers': {
-				url: 'accounts/{accountId}/phone_numbers',
-				verb: 'GET'
-			},
-			'common.e911.getNumber': {
-				url: 'accounts/{accountId}/phone_numbers/{phoneNumber}',
-				verb: 'GET'
-			},
-			/* Users */
-			'voip.devices.listUsers': {
-				url: 'accounts/{accountId}/users',
-				verb: 'GET'
-			},
-			/* Devices */
-			'voip.devices.getStatus': {
-				url: 'accounts/{accountId}/devices/status',
-				verb: 'GET'
-			},
-			'voip.devices.listDevices': {
-				url: 'accounts/{accountId}/devices',
-				verb: 'GET'
-			},
-			'voip.devices.createDevice': {
-				url: 'accounts/{accountId}/devices',
-				verb: 'PUT'
-			},
-			'voip.devices.getDevice': {
-				url: 'accounts/{accountId}/devices/{deviceId}',
-				verb: 'GET'
-			},
-			'voip.devices.deleteDevice': {
-				url: 'accounts/{accountId}/devices/{deviceId}',
-				verb: 'DELETE'
-			},
-			'voip.devices.updateDevice': {
-				url: 'accounts/{accountId}/devices/{deviceId}',
-				verb: 'POST'
-			}
-		},
+		requests: {},
 
 		subscribe: {
 			'voip.devices.render': 'devicesRender',
@@ -90,7 +45,7 @@ define(function(require){
 				if(_deviceId) {
 					var row = parent.find('.grid-row[data-id=' + _deviceId + ']');
 
-					monster.ui.hightlight(row, {
+					monster.ui.highlight(row, {
 						endColor: '#FCFCFC'
 					});
 				}
@@ -209,15 +164,17 @@ define(function(require){
 
 			if(type === 'sip_device' && monster.config.api.provisioner) {
 				monster.pub('common.chooseModel.render', {
-					callback: function(dataModel) {
-						monster.request({
-							resource: 'voip.devices.createDevice',
+					callback: function(dataModel, callbackCommonSuccess) {
+						self.callApi({
+							resource: 'device.create',
 							data: {
 								accountId: self.accountId,
 								data: dataModel
 							},
 							success: function(data, status) {
 								callback(data.data);
+
+								callbackCommonSuccess && callbackCommonSuccess();
 							}
 						});
 					},
@@ -281,24 +238,20 @@ define(function(require){
 			});
 
 			if($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone', 'fax', 'ata']) > -1) {
-				templateDevice.find('#audio_codec_selector .selected-codecs, #audio_codec_selector .available-codecs').sortable({
-					connectWith: '.connectedSortable'
-				}).disableSelection();
+				var audioCodecs = monster.ui.codecSelector('audio', templateDevice.find('#audio_codec_selector'), data.media.audio.codecs);
 			}
 
 			if($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone']) > -1) {
-				templateDevice.find('#video_codec_selector .selected-codecs, #video_codec_selector .available-codecs').sortable({
-					connectWith: '.connectedSortable'
-				}).disableSelection();
+				var videoCodecs = monster.ui.codecSelector('video', templateDevice.find('#video_codec_selector'), data.media.video.codecs);
 			}
 
 			monster.ui.tabs(templateDevice);
 			monster.ui.prettyCheck.create(templateDevice);
 			monster.ui.protectField(templateDevice.find('#sip_password'), templateDevice);
+
 			templateDevice.find('[data-toggle="tooltip"]').tooltip();
 			templateDevice.find('.switch').bootstrapSwitch();
 			templateDevice.find('#mac_address').mask("hh:hh:hh:hh:hh:hh", {placeholder:" "});
-
 
 			if(!(data.media.encryption.enforce_security)) {
 				templateDevice.find('#rtp_method').hide();
@@ -310,7 +263,7 @@ define(function(require){
 
 			templateDevice.find('.actions .save').on('click', function() {
 				if(monster.ui.valid(deviceForm)) {
-					var dataToSave = self.devicesMergeData(data, templateDevice);
+					var dataToSave = self.devicesMergeData(data, templateDevice, audioCodecs, videoCodecs);
 
 					self.devicesSaveDevice(dataToSave, function(data) {
 						popup.dialog('close').remove();
@@ -359,27 +312,61 @@ define(function(require){
 				}
 			});
 
+			templateDevice.find('.restriction-list .switch').on('switch-change', function() {
+				templateDevice.find('.restriction-matcher-sign').hide();
+				templateDevice.find('.restriction-message').hide();
+			});
+
 			templateDevice.find('.restriction-matcher-button').on('click', function(e) {
 				e.preventDefault();
 				var number = templateDevice.find('.restriction-matcher-input').val(),
 					matched = false;
-				templateDevice.find('.restriction-matcher-label').each(function() {
-					var label = $(this),
-						regex =  new RegExp(data.extra.restrictions[label.data('restriction')].regex);
 
-					if(regex.test(number)) {
-						label.show();
-						if(matched) {
-							label.fadeTo(0, 0.5);
-						} else {
-							label.fadeTo(0, 1);
+				if(number) {
+					self.callApi({
+						resource: 'numbers.matchClassifier',
+						data: {
+							accountId: self.accountId,
+							phoneNumber: encodeURIComponent(number)
+						},
+						success: function(data, status) {
+							var matchedLine = templateDevice.find('.restriction-line[data-restriction="'+data.data.name+'"]'),
+								matchedSign = matchedLine.find('.restriction-matcher-sign'),
+								matchedMsg = templateDevice.find('.restriction-message');
+
+							templateDevice.find('.restriction-matcher-sign').hide();
+							if(matchedLine.find('.switch').bootstrapSwitch('status')) {
+								matchedSign.removeClass('icon-red icon-remove')
+										   .addClass('icon-green icon-ok')
+										   .css('display', 'inline-block');
+
+								matchedMsg.removeClass('red-box')
+										  .addClass('green-box')
+										  .css('display', 'inline-block')
+										  .empty()
+										  .text(
+										  	monster.template(self, '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.allowMessage, { phoneNumber: monster.util.formatPhoneNumber(number) })
+										  );
+							} else {
+								matchedSign.removeClass('icon-green icon-ok')
+										   .addClass('icon-red icon-remove')
+										   .css('display', 'inline-block');
+
+								matchedMsg.removeClass('green-box')
+										  .addClass('red-box')
+										  .css('display', 'inline-block')
+										  .empty()
+										  .text(
+										  	monster.template(self, '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.denyMessage, { phoneNumber: monster.util.formatPhoneNumber(number) })
+										  );
+							}
 						}
-						matched = true;
-					} else {
-						label.hide();
-					}
-				});
-			})
+					});
+				} else {
+					templateDevice.find('.restriction-matcher-sign').hide();
+					templateDevice.find('.restriction-message').hide();
+				}
+			});
 
 			var popup = monster.ui.dialog(templateDevice, {
 				position: ['center', 20],
@@ -387,16 +374,24 @@ define(function(require){
 			});
 		},
 
-		devicesMergeData: function(originalData, template) {
+		devicesMergeData: function(originalData, template, audioCodecs, videoCodecs) {
 			var self = this,
 				hasCodecs = $.inArray(originalData.device_type, ['sip_device', 'landline', 'fax', 'ata', 'softphone', 'smartphone', 'mobile', 'sip_uri']) > -1,
 				hasSIP = $.inArray(originalData.device_type, ['fax', 'ata', 'softphone', 'smartphone', 'mobile']) > -1,
 				hasCallForward = $.inArray(originalData.device_type, ['landline', 'cellphone', 'smartphone']) > -1,
 				hasRTP = $.inArray(originalData.device_type, ['sip_device', 'mobile', 'softphone']) > -1,
-				formData = form2object('form_device');
+				formData = monster.ui.getFormData('form_device');
 
 			if('mac_address' in formData) {
 				formData.mac_address = monster.util.formatMacAddress(formData.mac_address);
+			}
+
+			if(hasCallForward) {
+				formData.call_forward = $.extend(true, {
+					enabled: true,
+					require_keypress: true,
+					keep_caller_id: true
+				}, formData.call_forward);
 			}
 
 			if(hasCodecs) {
@@ -408,28 +403,6 @@ define(function(require){
 						codecs: []
 					}
 				}, formData.media);
-
-				template.find('#audio_codec_selector .selected-codecs li').each(function() {
-					formData.media.audio.codecs.push($(this).data('codec'));
-				});
-				template.find('#video_codec_selector .selected-codecs li').each(function() {
-					formData.media.video.codecs.push($(this).data('codec'));
-				});
-
-				if(originalData.media && originalData.media.audio && originalData.media.audio.codecs) {
-					originalData.media.audio.codecs = [];
-				}
-				if(originalData.media && originalData.media.video && originalData.media.video.codecs) {
-					originalData.media.video.codecs = [];
-				}
-			}
-
-			if(hasCallForward) {
-				formData.call_forward = $.extend(true, {
-					enabled: true,
-					require_keypress: true,
-					keep_caller_id: true
-				}, formData.call_forward);
 			}
 
 			if(hasSIP) {
@@ -441,20 +414,29 @@ define(function(require){
 			}
 
 			if('call_restriction' in formData) {
-				_.each(formData.call_restriction, function(restriction) {
-					restriction.action = restriction.action === true ? 'inherit' : 'deny';
+				_.each(formData.call_restriction, function(restriction, key) {
+					if(key in originalData.extra.restrictions && originalData.extra.restrictions[key].disabled) {
+						restriction.action = originalData.extra.restrictions[key].action
+					} else {
+						restriction.action = restriction.action === true ? 'inherit' : 'deny';
+					}
 				});
 			}
 
 			var mergedData = $.extend(true, {}, originalData, formData);
 
-			/* The extend doesn't override an array if the new array is empty, so we need to run this snippet after the merge */
+			/* The extend doesn't override an array if the new array is empty, so we need to run these snippet after the merge */
 			if(hasRTP) {
 				mergedData.media.encryption.methods = [];
 
 				if(mergedData.media.encryption.enforce_security) {
 					mergedData.media.encryption.methods.push(formData.extra.rtpMethod);
 				}
+			}
+
+			if(hasCodecs) {
+				mergedData.media.audio.codecs = audioCodecs.getSelectedItems();
+				mergedData.media.video.codecs = videoCodecs.getSelectedItems();
 			}
 
 			/* Migration clean-up */
@@ -466,8 +448,6 @@ define(function(require){
 
 		devicesFormatData: function(data) {
 			var self = this,
-				codecsAudioI18n = self.i18n.active().devices.popupSettings.audio.codecs,
-				codecsVideoI18n = self.i18n.active().devices.popupSettings.video.codecs,
 				defaults = {
 					extra: {
 						hasE911Numbers: data.e911Numbers.length > 0,
@@ -481,29 +461,6 @@ define(function(require){
 						availableCodecs: {
 							audio: [],
 							video: []
-						},
-						listCodecs: {
-							audio: {
-								'OPUS': codecsAudioI18n['OPUS'],
-								'CELT@32000h': codecsAudioI18n['CELT@32000h'],
-								'G7221@32000h': codecsAudioI18n['G7221@32000h'],
-								'G7221@16000h': codecsAudioI18n['G7221@16000h'],
-								'G722': codecsAudioI18n['G722'],
-								'speex@32000h':codecsAudioI18n['speex@32000h'],
-								'speex@16000h': codecsAudioI18n['speex@16000h'],
-								'PCMU': codecsAudioI18n['PCMU'],
-								'PCMA': codecsAudioI18n['PCMA'],
-								'G729':codecsAudioI18n['G729'],
-								'GSM': codecsAudioI18n['GSM'],
-								'CELT@48000h': codecsAudioI18n['CELT@48000h'],
-								'CELT@64000h': codecsAudioI18n['CELT@64000h']
-							},
-							video: {
-								'VP8': codecsVideoI18n['VP8'],
-								'H264': codecsVideoI18n['H264'],
-								'H263': codecsVideoI18n['H263'],
-								'H261': codecsVideoI18n['H261']
-							}
 						}
 					},
 					call_restriction: {},
@@ -604,9 +561,8 @@ define(function(require){
 						}
 					}
 				};
-
+			
 			_.each(data.listClassifiers, function(restriction, name) {
-				defaults.extra.restrictions[name] = restriction;
 				if(name in self.i18n.active().devices.classifiers) {
 					defaults.extra.restrictions[name].friendly_name = self.i18n.active().devices.classifiers[name].name;
 
@@ -615,9 +571,15 @@ define(function(require){
 					}
 				}
 
+				if('call_restriction' in data.accountLimits 
+				&& name in data.accountLimits.call_restriction
+				&& data.accountLimits.call_restriction[name].action === 'deny') {
+					defaults.extra.restrictions[name].disabled = true;
+					defaults.extra.hasDisabledRestrictions = true;
+				}
+
 				if('call_restriction' in data.device && name in data.device.call_restriction) {
 					defaults.extra.restrictions[name].action = data.device.call_restriction[name].action;
-
 				}
 				else {
 					defaults.extra.restrictions[name].action = 'inherit';
@@ -629,46 +591,13 @@ define(function(require){
 			/* Audio Codecs*/
 			/* extend doesn't replace the array so we need to do it manually */
 			if(data.device.media && data.device.media.audio && data.device.media.audio.codecs) {
-				var mapMigrateCodec = {
-						'Speex': 'speex@16000h',
-						'G722_16': 'G7221@16000h',
-						'G722_32': 'G7221@32000h',
-						'CELT_48': 'CELT@48000h',
-						'CELT_64': 'CELT@64000h'
-					},
-					newCodecList = [];
-
-				_.each(data.device.media.audio.codecs, function(codec) {
-					mapMigrateCodec.hasOwnProperty(codec) ? newCodecList.push(mapMigrateCodec[codec]) : newCodecList.push(codec);
-				});
-
-				formattedData.media.audio.codecs = newCodecList;
+				formattedData.media.audio.codecs = data.device.media.audio.codecs;
 			}
-
-			_.each(formattedData.media.audio.codecs, function(codec) {
-				formattedData.extra.selectedCodecs.audio.push({ codec: codec, description: defaults.extra.listCodecs.audio[codec] });
-			});
-
-			_.each(defaults.extra.listCodecs.audio, function(description, codec) {
-				if(formattedData.media.audio.codecs.indexOf(codec) === -1) {
-					formattedData.extra.availableCodecs.audio.push({ codec: codec, description: description });
-				}
-			});
 
 			/* Video codecs */
 			if(data.device.media && data.device.media.video && data.device.media.video.codecs) {
 				formattedData.media.video.codecs = data.device.media.video.codecs;
 			}
-
-			_.each(formattedData.media.video.codecs, function(codec) {
-				formattedData.extra.selectedCodecs.video.push({ codec: codec, description: defaults.extra.listCodecs.video[codec] });
-			});
-
-			_.each(defaults.extra.listCodecs.video, function(description, codec) {
-				if(formattedData.media.video.codecs.indexOf(codec) === -1) {
-					formattedData.extra.availableCodecs.video.push({ codec: codec, description: description });
-				}
-			});
 
 			return formattedData;
 		},
@@ -771,8 +700,8 @@ define(function(require){
 		devicesDeleteDevice: function(deviceId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.devices.deleteDevice',
+			self.callApi({
+				resource: 'device.delete',
 				data: {
 					accountId: self.accountId,
 					deviceId: deviceId,
@@ -787,8 +716,8 @@ define(function(require){
 		devicesListClassifiers: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.devices.listClassifiers',
+			self.callApi({
+				resource: 'numbers.listClassifiers',
 				data: {
 					accountId: self.accountId
 				},
@@ -801,10 +730,13 @@ define(function(require){
 		devicesGetE911Numbers: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.devices.listNumbers',
+			self.callApi({
+				resource: 'numbers.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(data) {
 					var e911Numbers = [];
@@ -843,6 +775,17 @@ define(function(require){
 						self.devicesGetE911Numbers(function(e911Numbers) {
 							callback(null, e911Numbers);
 						});
+					},
+					accountLimits: function(callback) {
+						self.callApi({
+							resource: 'limits.get',
+							data: {
+								accountId: self.accountId
+							},
+							success: function(data, status) {
+								callback(null, data.data);
+							}
+						});
 					}
 				},
 				function(error, results) {
@@ -856,8 +799,8 @@ define(function(require){
 		devicesGetDevice: function(deviceId, callbackSuccess, callbackError) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.devices.getDevice',
+			self.callApi({
+				resource: 'device.get',
 				data: {
 					accountId: self.accountId,
 					deviceId: deviceId
@@ -885,8 +828,8 @@ define(function(require){
 		devicesCreateDevice: function(deviceData, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.devices.createDevice',
+			self.callApi({
+				resource: 'device.create',
 				data: {
 					accountId: self.accountId,
 					data: deviceData
@@ -900,8 +843,8 @@ define(function(require){
 		devicesUpdateDevice: function(deviceData, callbackSuccess, callbackError) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.devices.updateDevice',
+			self.callApi({
+				resource: 'device.update',
 				data: {
 					accountId: self.accountId,
 					data: deviceData,
@@ -921,10 +864,13 @@ define(function(require){
 
 			monster.parallel({
 					users: function(callback) {
-						monster.request({
-							resource: 'voip.devices.listUsers',
+						self.callApi({
+							resource: 'user.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(dataUsers) {
 								callback && callback(null, dataUsers.data);
@@ -932,10 +878,13 @@ define(function(require){
 						});
 					},
 					status: function(callback) {
-						monster.request({
-							resource: 'voip.devices.getStatus',
+						self.callApi({
+							resource: 'device.getStatus',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(dataStatus) {
 								callback && callback(null, dataStatus.data);
@@ -943,10 +892,13 @@ define(function(require){
 						});
 					},
 					devices: function(callback) {
-						monster.request({
-							resource: 'voip.devices.listDevices',
+						self.callApi({
+							resource: 'device.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(dataDevices) {
 								callback(null, dataDevices.data);
@@ -963,8 +915,8 @@ define(function(require){
 		devicesGetE911NumberAddress: function(number, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'common.e911.getNumber',
+			self.callApi({
+				resource: 'numbers.get',
 				data: {
 					accountId: self.accountId,
 					phoneNumber: encodeURIComponent(number)

@@ -11,7 +11,10 @@
 		"devices": "Téléphones",
 		"mainNumber": "Numéro principal",
 		"callLogs": "Journal d'appels",
-		"quickLinks": "Aide"
+		"quickLinks": "Aide",
+		"__comment": "UI-1220: Added VMBox module",
+		"__version": "3.19",
+		"vmboxes": "Répondeurs"
 	},
 
 	"groups": {
@@ -51,13 +54,6 @@
 		"removeMember": "Supprimer ce membre",
 		"distribute": "Répartir",
 		"maxDurationTooltip": "Cliquez sur le label ci-contre pour changer la durée maximale de ce groupe d'appel. Vous devez saisir un nombre crompris entre 30 et 999.",
-		"extraNode": {
-			"label": "Si personne ne répond, transférer l'appel vers :",
-			"menu": "Menu",
-			"mainMenu": "Menu principal",
-			"voicemails": "Répondeurs",
-			"users": "Utilisateurs"
-		},
 		"title": "Groupes",
 		"titleGrid": {
 			"groups": "Nom du groupe",
@@ -86,7 +82,18 @@
 			"defaultRingback": "Tonalité par défaut",
 			"emptyUploadAlert": "Veuillez sélectionner un fichier à uploader",
 			"fileTooBigAlert": "Vous ne pouvez pas uploader un fichier de taille excédant 5MB"
-		}
+		},
+		"nextAction": {
+			"title": "Action Finale",
+			"headline": "Sélectionner l'Action Finale",
+			"label": "Si personne ne répond, transférer l'appel vers :",
+			"menu": "Menu",
+			"mainMenu": "Menu principal",
+			"voicemails": "Répondeurs",
+			"users": "Utilisateurs"
+		},
+		"__comment": "UI-819, v3.19_s1: Showing an error popup when group data is outdated.",
+		"outdatedGroupsError": "Les données de vos Groupes sont obsolètes et ne peuvent être affichées. Veuillez contacter votre administrateur afin de mettre à jour vos données."
 	},
 
 	"devices": {
@@ -129,6 +136,12 @@
 					"enable": "Stratégie d'encryption audio",
 					"srtp": "SRTP",
 					"zrtp": "ZRTP"
+				},
+				"__comment": "UI-1119: Adding ignore_complete_elsewhere",
+				"__version": "3.19",
+				"ignoreCompletedElsewhere": {
+					"label": "Afficher les appels manqués des groupes d'Appels",
+					"help": "Si cette case est cochée, les téléphones ayant accès à cette fonctionnalité afficheront les appels manqués même s'ils viennent d'un Groupe d'Appel et que l'appel a été pris par un collègue"
 				}
 			},
 			"restrictions": {
@@ -137,11 +150,16 @@
 				"inherit": "Hériter",
 				"deny": "Refuser",
 				"matcher": {
-					"help": "Saisissez un numéro et cliquez sur \"Tester\" pour voir à quelle catégorie il appartient.",
+					"help": "Saisissez un numéro et cliquez sur \"Tester\" pour savoir s'il sera autorisé.",
 					"placeholder": "+18554443333",
 					"button": "Tester",
-					"label": "Le numéro ci-dessus appartient à cette catégorie."
-				}
+					"label": "Le numéro ci-dessus appartient à cette catégorie.",
+					"allowMessage": "Ce téléphone sera autorisé à appeler le numéro {{phoneNumber}}",
+					"denyMessage": "Ce téléphone ne sera pas autorisé à appeler le numéro {{phoneNumber}}."
+				},
+				"__comment": "UI-727, v3.19_s2: Updating the way call restrictions are displayed on devices.",
+				"allow": "Autoriser",
+				"disabledRestrictionsInfo": "Certains types d'appels on été bloqués pour votre compte et ne peuvent pas être activés sur vos téléphones."
 			},
 			"video": {
 				"menuTitle": "Vidéo",
@@ -253,7 +271,7 @@
 			"realm": "Royaume"
 		},
 		"spare": "Disponibles",
-		"title": "Téléphones",
+		"title": " Nombre de Téléphones",
 		"titleGrid": {
 			"edit": "Modifier",
 			"enable": "Activer",
@@ -325,7 +343,21 @@
 			"timeoutSec": "Sec",
 			"timeoutEdit": "Editer dans \"Find-Me-Follow-Me\"",
 			"timeoutEditHint": "La durée de sonnerie est redéfinie dans la fonctionnalité \"Find-Me-Follow-Me\". Cliquez sur le lien ci-dessous pour la modifier.",
-			"disabledTimeoutHint": "Au moins un numéro ou extension est requis avant de pouvoir définir la durée de sonnerie."
+			"disabledTimeoutHint": "Au moins un numéro ou extension est requis avant de pouvoir définir la durée de sonnerie.",
+			"__comment": "UI-1109: Adding the Presence ID setting on the User document",
+			"__version": "3.19",
+			"presenceId": "Extension Principale",
+			"noPresenceID": "- Aucune -",
+			"__comment": "UI-1066: Adding Help text hover the icons of the user edition form",
+			"__version": "3.19",
+			"nameHelp": "Tapez le Prénom de l'Utilisateur dans le premier champ, et son Nom dans le deuxième",
+			"loginHelp": "Ce champ contient le Login de l'utilisateur, qu'il utilise pour se connecter à cette application",
+			"vmboxHelp": "Ce champ est le numéro de Répondeur de cet utilisateur. Clickez sur \"Changer PIN\" afin de modifier son PIN ou de le réinitialiser",
+			"roleHelp": "Un \"Admin\" pourra ajouter ou modifier les différentes applications utilisables sur le compte général, tandis qu'un \"Utilisateur\" aura seulement accès aux applications qui ont été installé pour lui.",
+			"languageHelp": "Ce champ permet de changer le langage affiché dans cette application",
+			"timezoneHelp": "Ceci changera le Fuseau Horaire utilisé pour les téléphones de cet Utilisateur ainsi que pour son Répondeur",
+			"ringingHelp": "Ceci défini la durée de sonnerie avant de rediriger l'appel entrant vers le répondeur. Par exemple, en rentrant la valeur \"20\" dans ce champ, un appel sera redirigé après 20 seconds sans réponse vers le Répondeur",
+			"mainExtensionHelp": "Ceci défini le Caller-ID de cet utilisateur pour les appels internes au système, ainsi que son Presence ID"
 		},
 		"delete": "Supprimer Utilisateur",
 		"errorCallerId": "Avant de configurer le Caller-ID de l'utilisateur, vous devez d'abord lui attribuer un numéro.",
@@ -458,6 +490,19 @@
 			"title": "Hot-Desking",
 			"headline": "Réglages du Hot-Desking",
 			"help": "Le Hot-Desking ID est automatiquement défini avec le numéro d'extension assigné."
+		},
+		"__comment": "UI-1129: Migration tool from Kazoo-UI to Monster-UI",
+		"__version": "3.19",
+		"migration": {
+			"confirmMigration": "Un des numéros que vous souhaitez rajouter existe déjà dans Kazoo-UI, nous pouvons migrer le callflow vers SmartPBX pour vous permettre de l'utiliser. Vous ne pourrez plus modifier ce callflow dans Kazoo-UI ou dans l'application Callflows de Monster-UI. Continuez quand même?",
+			"tooManyCallflows": "Vous essayez de rajouter des numéros existant déjà sur plusieurs callflows, nous ne pouvons continuer notre opération automatique de migration. Veuillez contacter votre support pour résoudre ce problème."
+		},
+		"__commment": "UI-1109: Adding popup for Presence ID change",
+		"__version": "3.19",
+		"presenceIDPopup": {
+			"title": "Sélectionnez votre Extension Principale",
+			"header": "Vous êtes en train de supprimer l'Extension Principale de cet utilisateur, veuillez en sélectionner une nouvelle dans les options ci-dessous:",
+			"none": "Je ne veux pas d'Extension Principale"
 		}
 	},
 
@@ -597,14 +642,10 @@
 			"removeNumberSuccess": "Numéro retiré du callflow principal."
 		},
 		"popupRemoveFeatures": {
-			"title": "Supprimer des fonctionnalités",
-			"questionPartOne": "Voulez-vous supprimer des fonctionnalités du numéro",
+			"title": "Fonctionnalités",
+			"questionPartOne": "Voulez-vous supprimer des fonctionnalités de",
 			"questionPartTwo": "?",
-			"featuresToRemove": "Fonctionnalité(s) à supprimer :",
-			"dialogConfirm": {
-				"keep": "Garder",
-				"remove": "Supprimer"
-			},
+			"featuresToRemove": "Sélectionner les fonctionnalité(s) à supprimer :",
 			"features": {
 				"cnam": "Caller-ID",
 				"dash_e911": "Adresse d'urgence (e911)"
@@ -698,6 +739,53 @@
 			"tollfree": "Numéros verts",
 			"international": "Numéros internationaux",
 			"noNumber": "Aucun numéro disponible"
+		},
+		"__comment": "UI-1220: Adding a Main VMBox automatically when they first load the SmartPBX if they don't have one",
+		"__version": "3.19",
+		"mainVMBoxName": "Répondeur Principal"
+	},
+
+	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SmartPBX.",
+	"featureCodes": {
+		"title": "Codes d'appel disponibles",
+		"noFeatureCodeMessage": "Aucun code d'appel n'est actuellement disponible sur votre compte. Les codes d'appel sont crées automatiquement lorsque vous chargez la page \"Numéro principal\".",
+		"mainNumberLink": "Aller à \"Numéro principal\"",
+		"labels": {
+			"call_forward[action=activate]": "Activer le Transfert d'appel",
+			"call_forward[action=deactivate]": "Désactiver le Transfert d'appel",
+			"call_forward[action=toggle]": "Activer/Désactiver le Transfert d'appel",
+			"call_forward[action=update]": "Mettre à jour le Transfert d'appel",
+			"call_forward[action=on_busy_enable]": "Activer le Transfert d'appel quand occupé",
+			"call_forward[action=on_busy_disable]": "Désactiver le Transfert d'appel quand occupé",
+			"call_forward[action=no_answer_enable]": "Activer le Transfert d'appel quand l'appelé ne répond pas",
+			"call_forward[action=no_answer_disable]": "Désactiver le Transfert d'appel quand l'appelé ne répond pas",
+			"hotdesk[action=login]": "Activer le \"Hot-Desking\"",
+			"hotdesk[action=logout]": "Désactiver le \"Hot-Desking\"",
+			"hotdesk[action=toggle]": "Activer/Désactiver le \"Hot-Desking\"",
+			"voicemail[action=check]": "Consulter la boite vocale",
+			"voicemail[action=\"direct\"]": "Rediriger vers la boite vocale",
+			"intercom": "Interphone",
+			"privacy[mode=full]": "Privé",
+			"park_and_retrieve": "Stationner/Récuperer",
+			"valet": "Valet",
+			"retrieve": "Récuperer",
+			"donotdisturb[action=\"enable\"]": "Activer \"Ne pas déranger\"",
+			"donotdisturb[action=\"disable\"]": "Désactiver \"Ne pas déranger\"",
+			"donotdisturb[action=\"toggle\"]": "Activer/Désactiver \"Ne pas déranger\"",
+			"directory": "Répertoire",
+			"time": "Consulter l'horloge",
+			"call_waiting[action=enable]": "Activer le double-appel",
+			"call_waiting[action=disable]": "Désactiver le double-appel",
+			"sound_test_service": "Test Son",
+			"call_recording": "Enregistrement d'appel"
+		},
+		"__comment": "UI-1028, v3.20_s0: Added categories for the feature codes.",
+		"categories": {
+			"call_forward": "Transfert d'appel",
+			"hotdesk": "\"Hot-Desking\"",
+			"parking": "Stationnement",
+			"do_not_disturb": "\"Ne pas déranger\"",
+			"misc": "Divers"
 		}
 	}
 }

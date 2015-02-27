@@ -10,32 +10,14 @@ define(function(require){
 
 		i18n: { 
 			'en-US': { customCss: false },
-			'fr-FR': { customCss: false }
+			'fr-FR': { customCss: false },
+			'ru-RU': { customCss: false }
 		},
 
-		requests: {
-			'voip.users.getUsers': {
-				url: 'accounts/{accountId}/users',
-				verb: 'GET'
-			},
-			'voip.groups.listGroups': {
-				url: 'accounts/{accountId}/groups',
-				verb: 'GET'
-			},
-			'common.numbers.list': {
-				url: 'accounts/{accountId}/phone_numbers',
-				verb: 'GET'
-			},
-			'voip.devices.listDevices': {
-				url: 'accounts/{accountId}/devices',
-				verb: 'GET'
-			},
-		},
+		requests: {},
+		subscribe: {},
 
-		subscribe: {
-		},
-
-		subModules: ['devices', 'groups', 'numbers', 'strategy', 'callLogs', 'users', 'myOffice'],
+		subModules: ['devices', 'groups', 'numbers', 'strategy', 'callLogs', 'users', 'myOffice', 'featureCodes', 'vmboxes'],
 
 		load: function(callback){
 			var self = this;
@@ -79,45 +61,22 @@ define(function(require){
 				container = parent.find('.right-content');
 
 			parent.find('.category').on('click', function() {
+				// Get the ID of the submodule to render
+				var $this = $(this),
+					args = {
+						parent: container
+					},
+					id = $this.attr('id');
+
+				// Display the category we clicked as active
 				parent
 					.find('.category')
 					.removeClass('active');
+				$this.toggleClass('active');
 
+				// Empty the main container and then render the submodule content
 				container.empty();
-
-				$(this).toggleClass('active');
-			});
-
-			var args = {
-				parent: container
-			};
-
-			parent.find('.category#my_office').on('click', function() {
-				monster.pub('voip.myOffice.render', args);
-			});
-
-			parent.find('.category#users').on('click', function() {
-				monster.pub('voip.users.render', args);
-			});
-
-			parent.find('.category#groups').on('click', function() {
-				monster.pub('voip.groups.render', args);
-			});
-
-			parent.find('.category#numbers').on('click', function() {
-				monster.pub('voip.numbers.render', container);
-			});
-
-			parent.find('.category#devices').on('click', function() {
-				monster.pub('voip.devices.render', args);
-			});
-
-			parent.find('.category#strategy').on('click', function() {
-				monster.pub('voip.strategy.render', args);
-			});
-
-			parent.find('.category#call_logs').on('click', function() {
-				monster.pub('voip.callLogs.render', args);
+				monster.pub('voip.' + id + '.render', args);
 			});
 		}
 	};

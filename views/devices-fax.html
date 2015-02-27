@@ -82,51 +82,49 @@
 					{{ i18n.devices.popupSettings.dragAndDrop }}
 				</div>
 
-				<div class="items-selector codec-selector" id="audio_codec_selector">
-					<div class="box-selector">
-						<div class="box-title">{{ i18n.devices.popupSettings.audio.unselectedCodecs }}</div>
-						<ul class="available-codecs connectedSortable">
-							{{#each extra.availableCodecs.audio}}
-								<li class="item-codec item-selector" data-codec="{{this.codec}}"><div class="item-handle"></div>{{ this.description }}</li>
-							{{/each}}
-						</ul>
-					</div>
-
-					<div class="box-selector">
-						<div class="box-title">{{ i18n.devices.popupSettings.audio.selectedCodecs }}</div>
-						<ul class="selected-codecs connectedSortable">
-							{{#each extra.selectedCodecs.audio}}
-								<li class="item-codec item-selector" data-codec="{{this.codec}}"><div class="item-handle"></div>{{ this.description }}</li>
-							{{/each}}
-						</ul>
-					</div>
-				</div>
+				<div class="items-selector codec-selector" id="audio_codec_selector"></div>
 			</div>
 
 			<div class="tabs-section clearfix" data-section="restrictions">
-				<div class="restriction-matcher-div">
-					<i class="help-popover icon-question-sign icon-large" data-original-title="{{i18n.devices.popupSettings.restrictions.matcher.help}}" data-placement="top" data-toggle="tooltip"></i>
-					<input type="text" class="restriction-matcher-input" placeholder="{{i18n.devices.popupSettings.restrictions.matcher.placeholder}}" />
-					<button type="button"  class="btn btn-primary restriction-matcher-button">{{i18n.devices.popupSettings.restrictions.matcher.button}}</button>
-				</div>
-				<div class="title">
-					{{ i18n.devices.popupSettings.restrictions.sectionTitle }}
-				</div>
-				{{#each extra.restrictions}}
-					<div class="control-group">
-						<label class="control-label">{{this.friendly_name}}
-							{{#if this.help}}
-								<i class="help-popover icon-question-sign" data-original-title="{{this.help}}" data-placement="top" data-toggle="tooltip"></i>
-							{{/if}}
-						</label>
-						<div class="controls">
-							<div class="switch" data-on="primary" data-off="danger" data-on-label="{{../i18n.devices.popupSettings.restrictions.inherit}}" data-off-label="{{../i18n.devices.popupSettings.restrictions.deny}}">
-								<input class="not-pretty" type="checkbox" name="call_restriction.{{@key}}.action" id="checkbox_enabled"{{#compare this.action '===' 'inherit'}} checked{{/compare}}></input>
+				<div class="restrictions-container">
+					<div class="restriction-matcher-div">
+						<i class="help-popover icon-question-sign icon-large" data-original-title="{{i18n.devices.popupSettings.restrictions.matcher.help}}" data-placement="top" data-toggle="tooltip"></i>
+						<input type="text" class="restriction-matcher-input" placeholder="{{i18n.devices.popupSettings.restrictions.matcher.placeholder}}" />
+						<button type="button"  class="btn btn-primary restriction-matcher-button">{{i18n.devices.popupSettings.restrictions.matcher.button}}</button>
+					</div>
+					<div class="title">
+						{{ i18n.devices.popupSettings.restrictions.sectionTitle }}
+					</div>
+					<div class="restriction-list">
+					{{#each extra.restrictions}}
+						<div class="control-group restriction-line{{#if this.disabled}} disabled{{/if}}" data-restriction="{{@key}}">
+							<label class="control-label">{{this.friendly_name}}
+								{{#if this.help}}
+									<i class="help-popover icon-question-sign" data-original-title="{{this.help}}" data-placement="top" data-toggle="tooltip"></i>
+								{{/if}}
+							</label>
+							<div class="controls">
+								<div class="switch" data-on="success" data-off="danger" data-on-label="{{../i18n.devices.popupSettings.restrictions.allow}}" data-off-label="{{../i18n.devices.popupSettings.restrictions.deny}}">
+									<input class="not-pretty" type="checkbox" name="call_restriction.{{@key}}.action" {{#compare this.action '===' 'inherit'}}{{#unless this.disabled}} checked{{/unless}}{{/compare}}{{#if this.disabled}} disabled{{/if}}></input>
+								</div>
+								<i class="restriction-matcher-sign icon-large icon-ok icon-green"></i>
 							</div>
-							<span data-restriction="{{@key}}" class="restriction-matcher-label">{{../i18n.devices.popupSettings.restrictions.matcher.label}}</span>
+						</div>
+					{{/each}}
+					</div>
+					<div class="restriction-message help-box">
+					</div>
+					{{#if extra.hasDisabledRestrictions}}
+					<div class="disabled-restrictions-info help-box gray-box">
+						<div class="wrapper-icon">
+							&nbsp;<i class="icon-info-sign2"></i>&nbsp;
+						</div>
+						<div class="text-wrapper">
+							<p>{{ i18n.devices.popupSettings.restrictions.disabledRestrictionsInfo }}</p>
 						</div>
 					</div>
-				{{/each}}
+					{{/if}}
+				</div>
 			</div>
 
 			<div class="tabs-section clearfix" data-section="callerId">

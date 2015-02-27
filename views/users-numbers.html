@@ -7,20 +7,23 @@
 			{{#each assignedNumbers}}
 				<div class="item-row" data-id="{{this.phoneNumber}}" data-search="{{formatPhoneNumber this.phoneNumber}} {{this.phoneNumber}} {{this.locality.city}} {{this.locality.country}}">
 					<div class="features-block pull-right">
-						<div class="pull-right">
+						<div class="edit-features">
 							<div class="navbar">
 								<ul class="nav pull-right">
 									<li class="dropdown">
 										<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-cog"></i></a>
 										<ul class="dropdown-menu">
-											<li><a class="callerId-number" href="#"><i class="icon-user"></i>{{ ../i18n.callerId }}</a></li>
-											<li><a class="e911-number" href="#"><i class="icon-ambulance"></i>{{ ../i18n.e911 }}</a></li>
+										{{#unless this.isLocal}}
+											<li><a class="callerId-number" href="#"><i class="icon-user"></i>{{ ../../i18n.callerId }}</a></li>
+											<li><a class="e911-number" href="#"><i class="icon-ambulance"></i>{{ ../../i18n.e911 }}</a></li>
+										{{/unless}}
+											<li><a class="prepend-number" href="#"><i class="icon-file-text-alt"></i>{{ ../i18n.numberPrepend }}</a></li>
 										</ul>
 									</li>
 								</ul>
 							</div>
 						</div>
-						<div class="features pull-right">
+						<div class="features">
 							{{#each this.viewFeatures}}
 								<i class="{{icon}} {{active}} help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ help }}"></i>
 							{{/each}}

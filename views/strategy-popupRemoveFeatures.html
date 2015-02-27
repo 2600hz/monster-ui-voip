@@ -1,5 +1,5 @@
 <div id="action_confirmation">
-	<h4>{{i18n.strategy.popupRemoveFeatures.questionPartOne}} <span class="monster-blue">{{phoneNumber}}</span> {{i18n.strategy.popupRemoveFeatures.questionPartTwo}}</h4>
+	<h4>{{i18n.strategy.popupRemoveFeatures.questionPartOne}} <span class="monster-blue">{{formatPhoneNumber phoneNumber}}</span> {{i18n.strategy.popupRemoveFeatures.questionPartTwo}}</h4>
 	<div class="table-wrapper">
 		<table class="table">
 		<thead>
@@ -9,13 +9,20 @@
 		</thead>
 		<tbody>
 			{{#each featureList}}
-			<tr><td data-name="{{name}}">{{friendlyName}}<i class="icon-remove-circle pull-right delete-feature"></i></td></tr>
+			<tr>
+				<td data-name="{{name}}">
+					<label class="checkbox" for="{{name}}">
+						<input type="checkbox" id="{{name}}">
+						{{friendlyName}}
+					</label>
+				</td>
+			</tr>
 			{{/each}}
 		</tbody>
 		</table>
 	</div>
 	<div class="actions pull-right">
-		<a class="cancel-link monster-link blue" href="javascript:void(0);">{{i18n.strategy.popupRemoveFeatures.dialogConfirm.keep}}</a>
-		<button class="btn btn-danger" id="remove_features">{{i18n.strategy.popupRemoveFeatures.dialogConfirm.remove}}</button>
+		<a class="cancel-link monster-link blue" href="javascript:void(0);">{{i18n.cancel}}</a>
+		<button class="btn btn-danger" id="remove_features">{{i18n.remove}}</button>
 	</div>
 </div>

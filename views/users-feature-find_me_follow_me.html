@@ -11,49 +11,6 @@
 
 	<div class="content{{#unless currentUser.extra.mapFeatures.find_me_follow_me.active}} disabled{{/unless}}">
 		<form id="find_me_follow_me_form">
-			{{#if devices.length}}
-			<div class="grid-time">
-				<div class="device-row title">
-					<div class="scale-container"></div>
-					<div class="name"><!-- {{ i18n.users.find_me_follow_me.ringThisPhoneFor }} -->
-						<button type="button" class="distribute-button btn btn-primary btn-small">{{ i18n.users.find_me_follow_me.distribute }}</button>
-					</div>
-					<div class="times"></div>
-					<div class="action">{{ i18n.users.find_me_follow_me.disableDevice }}</div>
-				</div>
-
-				{{#each devices}}
-				<div class="device-row" data-device_id="{{id}}">
-					<div class="scale-container"></div>
-					<div class="name">
-						{{#compare device_type '===' 'softphone'}}
-							<i class="icon-telicon-soft-phone"></i>
-						{{/compare}}
-						{{#compare device_type '===' 'cellphone'}}
-							<i class="icon-telicon-mobile-phone"></i>
-						{{/compare}}
-						{{#compare device_type '===' 'smartphone'}}
-							<i class="icon-telicon-sprint-phone"></i>
-						{{/compare}}
-						{{#compare device_type '===' 'sip_device'}}
-							<i class="icon-telicon-voip-phone"></i>
-						{{/compare}}
-						{{#compare device_type '===' 'fax'}}
-							<i class="icon-telicon-fax"></i>
-						{{/compare}}
-						{{#compare device_type '===' 'landline'}}<i class="icon-telicon-home-phone"></i>{{/compare}}
-						{{name}}
-					</div>
-					<div class="times"><div class="slider-time"></div></div>
-					<div class="action">
-						<input type="checkbox" class="disable-device">
-					</div>
-				</div>
-				{{/each}}
-			</div>
-			{{else}}
-			<div class="no-device">{{ i18n.users.find_me_follow_me.noDevice }}</div>
-			{{/if}}
 		</form>
 	</div>
 

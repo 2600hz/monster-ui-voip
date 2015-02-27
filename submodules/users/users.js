@@ -8,180 +8,22 @@ define(function(require){
 
 	var app = {
 
-		requests: {
-			/* Users */
-			'voip.users.getUsers': {
-				url: 'accounts/{accountId}/users',
-				verb: 'GET'
-			},
-			'voip.users.updateUser': {
-				url: 'accounts/{accountId}/users/{userId}',
-				verb: 'POST'
-			},
-			'voip.users.createUser': {
-				url: 'accounts/{accountId}/users',
-				verb: 'PUT'
-			},
-			'voip.users.getUser': {
-				url: 'accounts/{accountId}/users/{userId}',
-				verb: 'GET'
-			},
-			'voip.users.deleteUser': {
-				url: 'accounts/{accountId}/users/{userId}',
-				verb: 'DELETE'
-			},
-			/* VMBoxes*/
-			'voip.users.listVMBoxes': {
-				url: 'accounts/{accountId}/vmboxes',
-				verb: 'GET'
-			},
-			'voip.users.createVMBox': {
-				url: 'accounts/{accountId}/vmboxes',
-				verb: 'PUT'
-			},
-			'voip.users.getVMBox': {
-				url: 'accounts/{accountId}/vmboxes/{vmboxId}',
-				verb: 'GET'
-			},
-			'voip.users.updateVMBox': {
-				url: 'accounts/{accountId}/vmboxes/{vmboxId}',
-				verb: 'POST'
-			},
-			'voip.users.deleteVMBox': {
-				url: 'accounts/{accountId}/vmboxes/{vmboxId}',
-				verb: 'DELETE'
-			},
-			'voip.users.listUserVMBoxes': {
-				url: 'accounts/{accountId}/vmboxes?filter_owner_id={userId}',
-				verb: 'GET'
-			},
-			/* Callflows */
-			'voip.users.getCallflows': {
-				url: 'accounts/{accountId}/callflows',
-				verb: 'GET'
-			},
-			'voip.users.createCallflow': {
-				url: 'accounts/{accountId}/callflows',
-				verb: 'PUT'
-			},
-			'voip.users.listUserCallflows': {
-				url: 'accounts/{accountId}/callflows?filter_owner_id={userId}',
-				verb: 'GET'
-			},
-			'voip.users.getCallflow': {
-				url: 'accounts/{accountId}/callflows/{callflowId}',
-				verb: 'GET'
-			},
-			'voip.users.updateCallflow': {
-				url: 'accounts/{accountId}/callflows/{callflowId}',
-				verb: 'POST'
-			},
-			'voip.users.deleteCallflow': {
-				url: 'accounts/{accountId}/callflows/{callflowId}',
-				verb: 'DELETE'
-			},
-			'voip.users.listConfNumbers': {
-				url: 'accounts/{accountId}/callflows?filter_type=conference',
-				verb: 'GET'
-			},
-			/* Devices */
-			'voip.users.listDevices': {
-				url: 'accounts/{accountId}/devices',
-				verb: 'GET'
-			},
-			'voip.users.listUserDevices': {
-				url: 'accounts/{accountId}/devices?filter_owner_id={userId}',
-				verb: 'GET'
-			},
-			'voip.users.getDevice': {
-				url: 'accounts/{accountId}/devices/{deviceId}',
-				verb: 'GET'
-			},
-			'voip.users.updateDevice': {
-				url: 'accounts/{accountId}/devices/{deviceId}',
-				verb: 'POST'
-			},
-			'voip.users.deleteDevice': {
-				url: 'accounts/{accountId}/devices/{deviceId}',
-				verb: 'DELETE'
-			},
-			/* Directories */
-			'voip.users.listDirectories': {
-				url: 'accounts/{accountId}/directories',
-				verb: 'GET'
-			},
-			'voip.users.createDirectory': {
-				url: 'accounts/{accountId}/directories',
-				verb: 'PUT'
-			},
-			/* Conferences */
-			'voip.users.createConference': {
-				url: 'accounts/{accountId}/conferences',
-				verb: 'PUT'
-			},
-			'voip.users.getConference': {
-				url: 'accounts/{accountId}/conferences/{conferenceId}',
-				verb: 'GET'
-			},
-			'voip.users.updateConference': {
-				url: 'accounts/{accountId}/conferences/{conferenceId}',
-				verb: 'POST'
-			},
-			'voip.users.deleteConference': {
-				url: 'accounts/{accountId}/conferences/{conferenceId}',
-				verb: 'DELETE'
-			},
-			'voip.users.listUserConferences': {
-				url: 'accounts/{accountId}/conferences?filter_owner_id={userId}',
-				verb: 'GET'
-			},
-			/* Media */
-			'voip.users.listMedia': {
-				url: 'accounts/{accountId}/media?key_missing=type',
-				verb: 'GET'
-			},
-			'voip.users.createMedia': {
-				url: 'accounts/{accountId}/media',
-				verb: 'PUT'
-			},
-			'voip.users.deleteMedia': {
-				url: 'accounts/{accountId}/media/{mediaId}',
-				verb: 'DELETE'
-			},
-			'voip.users.uploadMedia': {
-				url: 'accounts/{accountId}/media/{mediaId}/raw',
-				verb: 'POST',
-				type: 'application/x-base64'
-			},
-			/* Misc */
-			'voip.users.getNumbers': {
-				url: 'accounts/{accountId}/phone_numbers',
-				verb: 'GET'
-			},
-			'voip.users.resendInstructions': {
-				apiRoot: 'apps/voip/submodules/users/fixtures/',
-				url: 'resendInstructions.json',
-				verb: 'POST'
-			},
-			'voip.users.resetPassword': {
-				apiRoot: 'apps/voip/submodules/users/fixtures/',
-				url: 'resetPassword.json',
-				verb: 'POST'
-			}
-			/*,
-			'voip.users.resendInstructions': {
-				url: 'accounts/{accountId}/users/{userId}/resend_instructions',
-				verb: 'POST'
-			},
-			'voip.users.resetPassword': {
-				url: 'accounts/{accountId}/users/{userId}/reset_password',
-				verb: 'POST'
-			},
-			*/
-		},
+		requests: {},
 
 		subscribe: {
 			'voip.users.render': 'usersRender'
+		},
+
+		deviceIcons: {
+			'cellphone': 'icon-phone',
+			'smartphone': 'icon-telicon-mobile-phone',
+			'landline': 'icon-telicon-home-phone',
+			'mobile': 'icon-telicon-sprint-phone',
+			'softphone': 'icon-telicon-soft-phone',
+			'sip_device': 'icon-telicon-voip-phone',
+			'sip_uri': 'icon-telicon-voip-phone',
+			'fax': 'icon-telicon-fax',
+			'ata': 'icon-telicon-fax'
 		},
 
 		/* Users */
@@ -207,6 +49,7 @@ define(function(require){
 				});
 
 				template.find('[data-toggle="tooltip"]').tooltip({ container: 'body'});
+				template.find('[data-toggle="popover"]').popover({ container: 'body'});
 
 				self.usersBindEvents(template, parent, dataTemplate);
 
@@ -217,7 +60,7 @@ define(function(require){
 				if(_userId) {
 					var cells = parent.find('.grid-row[data-id=' + _userId + '] .grid-cell');
 
-					monster.ui.hightlight(cells);
+					monster.ui.highlight(cells);
 				}
 
 				if ( dataTemplate.users.length == 0) {
@@ -360,6 +203,37 @@ define(function(require){
 
 			dataUser.extra.adminId = self.userId;
 
+			dataUser.extra.presenceIdOptions = [];
+
+			var temp,
+				hasValidPresenceID = false,
+				addNumberToPresenceOptions = function(number) {
+					temp = {
+						key: number,
+						value: monster.util.formatPhoneNumber(number)
+					};
+
+					dataUser.extra.presenceIdOptions.push(temp);
+				};
+
+			_.each(dataUser.extra.listExtensions, function(extension) {
+				if(dataUser.hasOwnProperty('presence_id') && dataUser.presence_id === extension) {
+					hasValidPresenceID = true;
+				}
+
+				addNumberToPresenceOptions(extension);
+			});
+
+			// Sort it from lower number to greater number
+			dataUser.extra.presenceIdOptions.sort(function(a,b) {
+				return a.key > b.key ? 1 : -1;
+			});
+
+			// If they don't have a valid Presence ID, then we add the "Unset" option
+			if(!hasValidPresenceID) {
+				dataUser.extra.presenceIdOptions.unshift({ key: 'unset', value: self.i18n.active().users.editionForm.noPresenceID });
+			}
+
 			return dataUser;
 		},
 
@@ -423,21 +297,27 @@ define(function(require){
 				var userId = device.owner_id;
 
 				if(userId in mapUsers) {
+					var isRegistered = _.find(data.deviceStatus, function(status){ return (status.device_id === device.id && status.registered === true); }) ? true : false;
 					if(mapUsers[userId].extra.devices.length == 2) {
 						if(mapUsers[userId].extra.additionalDevices) {
 							mapUsers[userId].extra.additionalDevices.count++;
-							mapUsers[userId].extra.additionalDevices.tooltip += '<br>'+device.name + ' (' + device.device_type.replace('_', ' ') + ')';
+							mapUsers[userId].extra.additionalDevices.tooltip += '<br><i class=\"device-popover-icon '+self.deviceIcons[device.device_type]+(isRegistered?' icon-green':' icon-red')+'\"></i>'
+							                                                 + device.name + ' (' + device.device_type.replace('_', ' ') + ')';
 						} else {
 							mapUsers[userId].extra.additionalDevices = {
 								count: 1,
-								tooltip: device.name + ' (' + device.device_type.replace('_', ' ') + ')'
+								tooltip: '<i class=\"device-popover-icon '+self.deviceIcons[device.device_type]+(isRegistered?' icon-green':' icon-red')+'\"></i>'
+								         + device.name + ' (' + device.device_type.replace('_', ' ') + ')'
 							};
 						}
 					}
 					else {
 						mapUsers[userId].extra.devices.push({
+							id: device.id,
 							name: device.name + ' (' + device.device_type.replace('_', ' ') + ')',
-							type: device.device_type
+							type: device.device_type,
+							registered: isRegistered,
+							icon: self.deviceIcons[device.device_type]
 						});
 					}
 				}
@@ -471,15 +351,8 @@ define(function(require){
 				renderFindMeFollowMeFeature = function(featureCallback) {
 					monster.parallel({
 							userDevices: function(callback) {
-								monster.request({
-									resource: 'voip.users.listUserDevices',
-									data: {
-										accountId: self.accountId,
-										userId: currentUser.id
-									},
-									success: function(data) {
-										callback(null, data.data);
-									}
+								self.usersListDeviceUser(currentUser.id, function(devices) {
+									callback(null, devices);
 								});
 							},
 							userCallflow: function(callback) {
@@ -554,6 +427,7 @@ define(function(require){
 						else if(type === 'numbers') {
 							extensionsToSave = [];
 							currentCallflow = data.callflow;
+							currentUser = data.user;
 
 							_.each(data.extensions, function(number) {
 								extensionsToSave.push(number);
@@ -562,10 +436,11 @@ define(function(require){
 						else if(type === 'extensions') {
 							existingExtensions = data.allExtensions;
 							currentCallflow = data.callflow;
+							currentUser = data.user;
 							numbersToSave = [];
 
-							_.each(data.assignedNumbers, function(v, k) {
-								numbersToSave.push(k);
+							_.each(data.assignedNumbers, function(v) {
+								numbersToSave.push(v.phoneNumber);
 							});
 						}
 						else if(type === 'features') {
@@ -617,7 +492,6 @@ define(function(require){
 						var originalData = self.usersFormatAddUser(results),
 							userTemplate = $(monster.template(self, 'users-creation', originalData));
 
-						timezone.populateDropdown(userTemplate.find('#user_creation_timezone'));
 						monster.ui.prettyCheck.create(userTemplate);
 
 						monster.ui.validate(userTemplate.find('#form_user_creation'), {
@@ -644,7 +518,7 @@ define(function(require){
 
 						userTemplate.find('#create_user').on('click', function() {
 							if(monster.ui.valid(userTemplate.find('#form_user_creation'))) {
-								var dataForm = form2object('form_user_creation'),
+								var dataForm = monster.ui.getFormData('form_user_creation'),
 									formattedData = self.usersFormatCreationData(dataForm);
 
 								self.usersCreate(formattedData, function(data) {
@@ -683,8 +557,6 @@ define(function(require){
 
 					template.find('.grid-cell.active').removeClass('active');
 				});
-
-
 			});
 
 			/* Events for Extensions details */
@@ -692,7 +564,8 @@ define(function(require){
 				var $this = $(this),
 					numbers = $.extend(true, [], numbersToSave),
 					name = $this.parents('.grid-row').find('.grid-cell.name').text(),
-					userId = $this.parents('.grid-row').data('id');
+					userId = $this.parents('.grid-row').data('id'),
+					extensionsList = [];
 
 				template.find('.extensions .list-assigned-items .item-row').each(function(k, row) {
 					var row = $(row),
@@ -701,12 +574,40 @@ define(function(require){
 					number = (row.data('id') ? row.data('id') : row.find('.input-extension').val()) + '';
 
 					numbers.push(number);
+					extensionsList.push(number);
 				});
 
-				self.usersUpdateCallflowNumbers(userId, (currentCallflow || {}).id, numbers, function(callflowData) {
-					toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: name }));
-					self.usersRender({ userId: callflowData.owner_id });
-				});
+				if(numbers.length > 0) {
+					var updateCallflow = function() {
+						self.usersUpdateCallflowNumbers(userId, (currentCallflow || {}).id, numbers, function(callflowData) {
+							toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: name }));
+
+							self.usersRender({ userId: callflowData.owner_id });
+						});
+					};
+
+					if(self.usersHasProperPresenceId(extensionsList, currentUser)) {
+						updateCallflow();
+					}
+					else {
+						var oldPresenceId = currentUser.presence_id;
+						self.usersUpdatePresenceIDPopup(extensionsList, currentUser, function(user) {
+							// Update the user and the vmbox with the new presence_id / main number
+							self.usersUpdateUser(user, function() {
+								self.usersSmartUpdateVMBox({ 
+									user: user, 
+									callback: function() {
+										updateCallflow();
+									},
+									oldPresenceId: oldPresenceId
+								});
+							});
+						});
+					}
+				}
+				else {
+					monster.ui.alert('warning', self.i18n.active().users.noNumberCallflow);
+				}
 			});
 
 			template.on('click', '#add_extensions', function() {
@@ -746,38 +647,6 @@ define(function(require){
 				$(this).parents('.item-row').remove();
 			});
 
-
-			/* Events for Users detail */
-			template.on('click', '#resend_instructions', function() {
-				var userId = $(this).parents('.grid-row').data('id');
-
-				monster.request({
-					resource: 'voip.users.resendInstructions',
-					data: {
-						accountId: self.accountId,
-						userId: userId
-					},
-					success: function(data) {
-						toastr.success(monster.template(self, '!' + toastrMessages.instructionsSent, { email: currentUser.email }));
-					}
-				});
-			});
-
-			template.on('click', '#reset_password', function() {
-				var userId = $(this).parents('.grid-row').data('id');
-
-				monster.request({
-					resource: 'voip.users.resetPassword',
-					data: {
-						accountId: self.accountId,
-						userId: userId
-					},
-					success: function(data) {
-						toastr.success(monster.template(self, '!' + toastrMessages.passwordReseted, { email: currentUser.email }));
-					}
-				});
-			});
-
 			template.on('click', '#delete_user', function() {
 				var dataUser = $(this).parents('.grid-row').data(),
 					deleteType = dataUser.priv_level === 'admin' ? 'confirmDeleteAdmin' : 'confirmDeleteUser';
@@ -800,20 +669,24 @@ define(function(require){
 			});
 
 			template.on('click', '.save-user', function() {
-				var formData = form2object('form-'+currentUser.id),
+				var formData = monster.ui.getFormData('form-'+currentUser.id),
 					form = template.find('#form-'+currentUser.id);
 
 				monster.util.checkVersion(currentUser, function() {
 					if(monster.ui.valid(form)) {
-						currentUser.extra.vmbox.mailbox = formData.extra.vmboxNumber;
 						currentUser.extra.vmbox.timezone = formData.timezone;
 
-						var userToSave = $.extend(true, {}, currentUser, formData);
+						var userToSave = $.extend(true, {}, currentUser, formData),
+							oldPresenceId = currentUser.presence_id;
 
 						monster.parallel({
 								vmbox: function(callback) {
-									self.usersSmartUpdateVMBox(userToSave, true, function(vmbox) {
-										callback(null, vmbox);
+									self.usersSmartUpdateVMBox({
+										user: userToSave, 
+										callback: function(vmbox) {
+											callback(null, vmbox);
+										},
+										oldPresenceId: oldPresenceId
 									});
 								},
 								user: function(callback) {
@@ -869,7 +742,7 @@ define(function(require){
 				});
 
 				pinTemplate.find('.save-new-pin').on('click', function() {
-					var formData = form2object('form_new_pin'),
+					var formData = monster.ui.getFormData('form_new_pin'),
 						vmboxData = $.extend(true, currentUser.extra.vmbox, formData);
 
 					if(monster.ui.valid(form)) {
@@ -895,7 +768,7 @@ define(function(require){
 					form = passwordTemplate.find('#form_new_username');
 
 				passwordTemplate.find('.save-new-username').on('click', function() {
-					var formData = form2object('form_new_username'),
+					var formData = monster.ui.getFormData('form_new_username'),
 						userToSave = $.extend(true, {}, currentUser, formData);
 
 					if(monster.ui.valid(form)) {
@@ -1073,12 +946,28 @@ define(function(require){
 				}
 			});
 
+			template.on('keyup', '.detail-devices .search-query', function() {
+				var searchString = $(this).val().toLowerCase(),
+					rows = template.find('.list-unassigned-items .item-row'),
+					emptySearch = template.find('.list-unassigned-items .empty-search-row');
+
+				_.each(rows, function(row) {
+					var row = $(row);
+
+					row.data('search').toLowerCase().indexOf(searchString) < 0 ? row.hide() : row.show();
+				});
+
+				if(rows.size() > 0) {
+					rows.is(':visible') ? emptySearch.hide() : emptySearch.show();
+				}
+			});
+
 			/* Events for Numbers in Users */
 			template.on('click', '.detail-numbers .list-assigned-items .remove-number', function() {
 				var $this = $(this),
-					userName = $this.parents('.grid-row').find('.grid-cell.name').text(),
+					userName = currentUser.first_name + ' ' + currentUser.last_name,
 					dataNumbers = $.extend(true, [], extensionsToSave),
-					userId = $this.parents('.grid-row').data('id'),
+					userId = currentUser.id,
 					row = $this.parents('.item-row');
 
 				row.slideUp(function() {
@@ -1092,10 +981,34 @@ define(function(require){
 						dataNumbers.push($(elem).data('id'));
 					});
 
-					self.usersUpdateCallflowNumbers(userId, (currentCallflow || {}).id, dataNumbers, function(callflowData) {
-						toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: userName }));
-						self.usersRender({ userId: callflowData.owner_id });
-					});
+					if(dataNumbers.length > 0) {
+						var updateCallflow = function() {
+								self.usersUpdateCallflowNumbers(userId, (currentCallflow || {}).id, dataNumbers, function(callflowData) {
+									toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: userName }));
+									self.usersRender({ userId: userId });
+								});
+							};
+
+						// If we deleted a number that was used as the Caller-ID , disable the Caller-ID feature.
+						var needUpdateUser = false;
+						if(currentUser.caller_id.hasOwnProperty('external') && dataNumbers.indexOf(currentUser.caller_id.external.number) < 0) {
+							delete currentUser.caller_id.external.number;
+							needUpdateUser = true;
+						}
+
+						if(needUpdateUser) {
+							self.usersUpdateUser(currentUser, function() {
+								updateCallflow();
+							});
+						}
+						else {
+							updateCallflow();
+						}
+					}
+					else {
+						monster.ui.alert('warning', self.i18n.active().users.noNumberCallflow);
+						self.usersRender({ userId: userId });
+					}
 				});
 			});
 
@@ -1147,6 +1060,28 @@ define(function(require){
 					};
 
 					monster.pub('common.e911.renderPopup', args);
+				}
+			});
+
+			template.on('click', '.prepend-number', function() {
+				var prependCell = $(this).parents('.item-row').first(),
+					phoneNumber = prependCell.data('id');
+
+				if(phoneNumber) {
+					var args = {
+						phoneNumber: phoneNumber,
+						callbacks: {
+							success: function(data) {
+								if('prepend' in data.data && data.data.prepend.enabled) {
+									prependCell.find('.features i.feature-prepend').addClass('active');
+								} else {
+									prependCell.find('.features i.feature-prepend').removeClass('active');
+								}
+							}
+						}
+					};
+
+					monster.pub('common.numberPrepend.renderPopup', args);
 				}
 			});
 
@@ -1327,6 +1262,7 @@ define(function(require){
 
 						_.each(numberList, function(val, idx) {
 							dataNumbers.push(val.phoneNumber);
+							val.isLocal = val.features.indexOf('local') > -1;
 
 							template
 								.find('.list-assigned-items')
@@ -1403,11 +1339,72 @@ define(function(require){
 			});
 		},
 
+		usersUpdatePresenceIDPopup: function(numbers, user, callback) {
+			var self = this,
+				dataTemplate = {
+					numbers: numbers
+				},
+				template = $(monster.template(self, 'users-changePresenceIDPopup', dataTemplate)),
+				$options = template.find('.presence-id-option');
+
+			$options.on('click', function() {
+				$options.removeClass('active');
+				$(this).addClass('active');
+			});
+
+			template.find('.save-presence-id').on('click', function() {
+				var newPresenceID = template.find('.presence-id-option.active').data('number');
+
+				if(newPresenceID !== 'none') {
+					user.presence_id = newPresenceID;
+				}
+				else {
+					delete user.presence_id;
+				}
+
+				popup.dialog('close').remove();
+
+				callback && callback(user);
+			});
+
+			template.find('.cancel-link').on('click', function() {
+				popup.dialog('close').remove();
+			});
+
+			var popup = monster.ui.dialog(template, {
+				title: self.i18n.active().users.presenceIDPopup.title,
+				position: ['center', 20]
+			});
+		},
+
+		// Check if a user's presence id is one of its extensions
+		usersHasProperPresenceId: function(listNumbers, user) {
+			var self = this;
+
+			if(user.presence_id) {
+				var found = false,
+					formattedPresenceID = '' + user.presence_id;
+
+				_.each(listNumbers, function(number) {
+					if(number === formattedPresenceID) {
+						found = true;
+					}
+				});
+
+				return found;
+			}
+			else {
+				return true;
+			}
+			
+		},
+
 		/* Helper function that takes an array of number in parameter, sorts it, and returns the first number not in the array, greater than the minVal */
 		usersGetNextInt: function(listNumbers) {
 			var orderedArray = listNumbers,
 				previousIterationNumber,
-				minNumber = 2000,
+				minNumber = 1000,
+				lowestNumber = minNumber,
 				increment = 1;
 
 			orderedArray.sort(function(a,b) {
@@ -1425,28 +1422,32 @@ define(function(require){
 				}
 			});
 
+			console.log(orderedArray);
+
 			_.each(orderedArray, function(number) {
 				var currentNumber = parseInt(number);
 
 				// First we make sure it's a valid number, if not we move on to the next number
 				if(!isNaN(currentNumber)) {
 					// If we went through this loop already, previousIterationNumber will be set to the number of the previous iteration
-					if(previousIterationNumber) {
-						if(currentNumber - previousIterationNumber !== increment) {
+					if(typeof previousIterationNumber !== 'undefined') {
+						// If there's a gap for a number between the last number and the current number, we check if it's a valid possible number (ie, greater than minNumber)
+						// And If yes, we return it, if not we just continue
+						if(currentNumber - previousIterationNumber !== increment && previousIterationNumber > minNumber) {
 							return previousIterationNumber + increment;
 						}
 					}
 					// else, it's the first iteration, we initialize the minValue to the first number in the ordered array
-					else {
-						minNumber = currentNumber;
+					// only if it's greater than 1000, because we don't want to recommend lower numbers
+					else if(currentNumber > minNumber) {
+						lowestNumber = currentNumber;
 					}
-
 					// We store current as the previous number for the next iteration
 					previousIterationNumber = currentNumber;
 				}
 			});
 
-			return (previousIterationNumber) ? previousIterationNumber + increment : minNumber;
+			return (previousIterationNumber) ? previousIterationNumber + increment : lowestNumber;
 		},
 
 		usersFormatAddUser: function(data) {
@@ -1454,12 +1455,12 @@ define(function(require){
 				formattedData = {
 					sendToSameEmail: true,
 					nextExtension: '',
-					nextVMBox: '',
 					listExtensions: {},
 					listVMBoxes:{},
 				},
 				arrayExtensions = [],
-				arrayVMBoxes = [];
+				arrayVMBoxes = [],
+				allNumbers = [];
 
 			_.each(data.callflows, function(callflow) {
 				_.each(callflow.numbers, function(number) {
@@ -1470,15 +1471,15 @@ define(function(require){
 				});
 			});
 
-			formattedData.nextExtension = parseInt(self.usersGetNextInt(arrayExtensions)) + '';
-
 			_.each(data.vmboxes, function(vmbox) {
 				formattedData.listVMBoxes[vmbox.mailbox] = vmbox;
 				arrayVMBoxes.push(vmbox.mailbox);
 			});
 
-			//Set the VMBox Number to 2001 if there are no VMBox in the system, or to the latest vmbox number + 1 if there are
-			formattedData.nextVMBox = parseInt(self.usersGetNextInt(arrayVMBoxes)) + '';
+			// We concat both arrays because we want to create users with the same number for the extension # and the vmbox, 
+			// If for some reason a vmbox number exist without an extension, we still don't want to let them set their extension number to that number.
+			allNumbers = arrayExtensions.concat(arrayVMBoxes);
+			formattedData.nextExtension = parseInt(self.usersGetNextInt(allNumbers)) + '';
 
 			return formattedData;
 		},
@@ -1538,7 +1539,7 @@ define(function(require){
 				};
 
 				if(monster.ui.valid(featureForm)) {
-					data.conference = form2object('conferencing_form');
+					data.conference = monster.ui.getFormData('conferencing_form');
 
 					if(switchFeature.bootstrapSwitch('status')) {
 						self.usersUpdateConferencing(data, function(data) {
@@ -1651,7 +1652,7 @@ define(function(require){
 
 			featureTemplate.find('.save').on('click', function() {
 				if(monster.ui.valid(featureForm)) {
-					var formData = form2object('hotdesk_form'),
+					var formData = monster.ui.getFormData('hotdesk_form'),
 					args = {
 						openedTab: 'features',
 						callback: function() {
@@ -1699,7 +1700,7 @@ define(function(require){
 			});
 
 			featureTemplate.find('.save').on('click', function() {
-				var formData = form2object('vm_to_email_form'),
+				var formData = monster.ui.getFormData('vm_to_email_form'),
 					userToSave = $.extend(true, {}, currentUser),
 					enabled = switchFeature.bootstrapSwitch('status'),
 					args = {
@@ -1788,7 +1789,6 @@ define(function(require){
 					userData = currentUser,
 					userToSave = $.extend(true, {}, {
 						caller_id: {
-							internal: {},
 							external: {},
 						}
 					}, currentUser),
@@ -1800,13 +1800,13 @@ define(function(require){
 					};
 
 				if(switchCallerId.bootstrapSwitch('status') === false) {
-					if('internal' in userToSave.caller_id) {
-						delete userToSave.caller_id.internal.number;
+					if(userToSave.caller_id.hasOwnProperty('external')) {
+						delete userToSave.caller_id.external.number;
 					}
 				}
 				else {
 					var callerIdValue = featureTemplate.find('.caller-id-select').val();
-					userToSave.caller_id.internal.number = callerIdValue;
+
 					userToSave.caller_id.external.number = callerIdValue;
 				}
 
@@ -1870,7 +1870,7 @@ define(function(require){
 
 			featureTemplate.find('.save').on('click', function() {
 				if(monster.ui.valid(featureForm)) {
-					var formData = form2object('call_forward_form');
+					var formData = monster.ui.getFormData('call_forward_form');
 					formData.require_keypress = !formData.require_keypress;
 
 					formData.enabled = switchFeature.bootstrapSwitch('status');
@@ -1914,9 +1914,8 @@ define(function(require){
 				monster.ui.alert('error', self.i18n.active().users.find_me_follow_me.noDevice);
 			} else {
 				var currentUser = params.currentUser,
-					userDevices = monster.util.sort(params.userDevices, 'name'),
 					userCallflow = params.userCallflow,
-					featureTemplate = $(monster.template(self, 'users-feature-find_me_follow_me', { currentUser: currentUser, devices: userDevices })),
+					featureTemplate = $(monster.template(self, 'users-feature-find_me_follow_me', { currentUser: currentUser })),
 					switchFeature = featureTemplate.find('.switch').bootstrapSwitch(),
 					featureForm = featureTemplate.find('#find_me_follow_me_form'),
 					args = {
@@ -1925,13 +1924,44 @@ define(function(require){
 						},
 						openedTab: 'features'
 					},
-					selectedDevices = {};
+					endpoints = (userCallflow.flow.module === 'ring_group' ? userCallflow.flow.data.endpoints : []),
+					userDevices = {};
 
-				if(userCallflow.flow.module === 'ring_group') {
-					_.each(userCallflow.flow.data.endpoints, function(val) {
-						selectedDevices[val.id] = val;
-					});
-				}
+				_.each(params.userDevices, function(val) {
+					userDevices[val.id] = val;
+				});
+
+				endpoints = $.map(endpoints, function(endpoint) {
+					if(userDevices[endpoint.id]) {
+						var device = userDevices[endpoint.id];
+						delete userDevices[endpoint.id];
+						return {
+							id: endpoint.id,
+							delay: endpoint.delay,
+							timeout: endpoint.timeout,
+							name: device.name,
+							icon: self.deviceIcons[device.device_type],
+							disabled: false
+						}
+					}
+				});
+
+				_.each(userDevices, function(device) {
+					endpoints.push({
+						id: device.id,
+						delay: 0,
+						timeout: 0,
+						name: device.name,
+						icon: self.deviceIcons[device.device_type],
+						disabled: true
+					})
+				});
+
+				monster.pub('common.ringingDurationControl.render', {
+					container: featureForm,
+					endpoints: endpoints,
+					hasDisableColumn: true
+				});
 
 				featureTemplate.find('.cancel-link').on('click', function() {
 					popup.dialog('close').remove();
@@ -1942,129 +1972,71 @@ define(function(require){
 				});
 
 				featureTemplate.find('.save').on('click', function() {
-					var enabled = switchFeature.bootstrapSwitch('status'),
-						enabledDevices = featureTemplate.find('.device-row[data-device_id]:not(.disabled)');
+					var enabled = switchFeature.bootstrapSwitch('status');
 
-					currentUser.smartpbx = currentUser.smartpbx || {};
-					currentUser.smartpbx.find_me_follow_me = currentUser.smartpbx.find_me_follow_me || {};
-					currentUser.smartpbx.find_me_follow_me.enabled = (enabled && enabledDevices.length > 0);
+					monster.pub('common.ringingDurationControl.getEndpoints', { 
+						container: featureForm,
+						callback: function(endpoints) {
 
-					if(enabled && enabledDevices.length > 0) {
-						userCallflow.flow.module = 'ring_group';
-						userCallflow.flow.data = {
-							strategy: "simultaneous",
-							timeout: 20,
-							endpoints: []
-						}
-						$.each(enabledDevices, function() {
-							var $row = $(this),
-								deviceId = $row.data('device_id'),
-								values = $row.find('.slider-time').slider('values');
+							currentUser.smartpbx = currentUser.smartpbx || {};
+							currentUser.smartpbx.find_me_follow_me = currentUser.smartpbx.find_me_follow_me || {};
+							currentUser.smartpbx.find_me_follow_me.enabled = (enabled && endpoints.length > 0);
 
-							userCallflow.flow.data.endpoints.push({
-								id: deviceId,
-								endpoint_type: "device",
-								delay: values[0],
-								timeout: (values[1] - values[0])
-							});
+							if(enabled && endpoints.length > 0) {
+								userCallflow.flow.module = 'ring_group';
+								userCallflow.flow.data = {
+									strategy: "simultaneous",
+									timeout: 20,
+									endpoints: []
+								}
+								_.each(endpoints, function(endpoint) {
+									userCallflow.flow.data.endpoints.push({
+										id: endpoint.id,
+										endpoint_type: "device",
+										delay: endpoint.delay,
+										timeout: endpoint.timeout
+									});
 
-							if(values[1] > userCallflow.flow.data.timeout) { userCallflow.flow.data.timeout = values[1]; }
-						});
-					} else {
-						userCallflow.flow.module = 'user';
-						userCallflow.flow.data = {
-							can_call_self: false,
-							id: currentUser.id,
-							timeout: 20
-						}
-					}
-
-					monster.parallel({
-							callflow: function(callbackParallel) {
-								self.usersUpdateCallflow(userCallflow, function(data) {
-									callbackParallel && callbackParallel(null, data.data);
+									if((endpoint.delay+endpoint.timeout) > userCallflow.flow.data.timeout) { userCallflow.flow.data.timeout = (endpoint.delay+endpoint.timeout); }
 								});
-							},
-							user: function(callbackParallel) {
-								self.usersUpdateUser(currentUser, function(data) {
-									callbackParallel && callbackParallel(null, data.data);
-								});
-							}
-						},
-						function(err, results) {
-							args.userId = results.user.id;
-							if(typeof params.saveCallback === 'function') {
-								params.saveCallback(args);
 							} else {
-								self.usersRender(args);
+								userCallflow.flow.module = 'user';
+								userCallflow.flow.data = {
+									can_call_self: false,
+									id: currentUser.id,
+									timeout: 20
+								}
 							}
-						}
-					);
-				});
 
-				monster.ui.prettyCheck.create(featureTemplate.find('.disable-device'));
+							monster.parallel({
+									callflow: function(callbackParallel) {
+										self.usersUpdateCallflow(userCallflow, function(data) {
+											callbackParallel && callbackParallel(null, data.data);
+										});
+									},
+									user: function(callbackParallel) {
+										self.usersUpdateUser(currentUser, function(data) {
+											callbackParallel && callbackParallel(null, data.data);
+										});
+									}
+								},
+								function(err, results) {
+									args.userId = results.user.id;
+									if(typeof params.saveCallback === 'function') {
+										params.saveCallback(args);
+									} else {
+										self.usersRender(args);
+									}
+								}
+							);
+						}
+					});
+				});
 
 				var popup = monster.ui.dialog(featureTemplate, {
 					title: currentUser.extra.mapFeatures.find_me_follow_me.title,
 					position: ['center', 20]
 				});
-
-				featureTemplate.find('.disable-device').on('ifToggled', function() {
-					var parentRow = $(this).parents('.device-row');
-					if(this.checked) {
-						parentRow.find('.times').stop().animate({ opacity: 0 });
-						parentRow.addClass('disabled')
-					} else {
-						parentRow.find('.times').stop().animate({ opacity: 1 });
-						parentRow.removeClass('disabled')
-					}
-				});
-
-				featureTemplate.find('.distribute-button').on('click', function() {
-					var sliders = featureTemplate.find('.slider-time')
-						max = sliders.first().slider('option', 'max'),
-						section = Math.floor(max/sliders.length),
-						current = 0;
-
-					monster.ui.prettyCheck.action(featureTemplate.find('.device-row .disable-device'), 'uncheck');
-					$.each(sliders, function() {
-						$(this).slider('values', [current, current+=section]);
-					});
-				});
-
-				featureTemplate.on('click', '.device-row.title .scale-max', function() {
-					var $this = $(this),
-						input = $this.siblings('.scale-max-input');
-
-					input.show();
-					input.focus();	
-					$this.hide();
-				});
-
-				featureTemplate.on('blur', '.device-row.title .scale-max-input', function(e) {
-					var $this = $(this),
-						value = $this.val(),
-						intValue = parseInt($this.val());
-					if(value != $this.data('current') && !isNaN(intValue) && intValue >= 30) {
-						self.usersRenderFindMeFollowMeSliders(featureTemplate, userDevices, selectedDevices, intValue);
-					} else {
-						$this.val($this.data('current')).hide();
-						$this.siblings('.scale-max').show();
-					}
-				});
-
-				featureTemplate.on('keydown', '.device-row.title .scale-max-input', function(e) {
-					switch(e.keyCode) {
-						case 27:
-							$(this).val(-1);
-						case 13:
-							e.preventDefault();
-							$(this).blur();
-						break;
-					}
-				});
-
-				self.usersRenderFindMeFollowMeSliders(featureTemplate, userDevices, selectedDevices);
 			}
 		},
 
@@ -2176,7 +2148,7 @@ define(function(require){
 
 			featureTemplate.find('.save').on('click', function() {
 				if(monster.ui.valid(featureForm)) {
-					var formData = form2object('call_recording_form'),
+					var formData = monster.ui.getFormData('call_recording_form'),
 						enabled = switchFeature.bootstrapSwitch('status');
 
 					if(!('smartpbx' in params.currentUser)) { params.currentUser.smartpbx = {}; }
@@ -2301,8 +2273,8 @@ define(function(require){
 						fileReader = new FileReader();
 
 					fileReader.onloadend = function(evt) {
-						monster.request({
-							resource: 'voip.users.createMedia',
+						self.callApi({
+							resource: 'media.create',
 							data: {
 								accountId: self.accountId,
 								data: {
@@ -2314,8 +2286,8 @@ define(function(require){
 							},
 							success: function(data, status) {
 								var media = data.data;
-								monster.request({
-									resource: 'voip.users.uploadMedia',
+								self.callApi({
+									resource: 'media.upload',
 									data: {
 										accountId: self.accountId,
 										mediaId: media.id,
@@ -2325,15 +2297,14 @@ define(function(require){
 										closeUploadDiv(media);
 									},
 									error: function(data, status) {
-										monster.request({
-											resource: 'voip.users.deleteMedia',
+										self.callApi({
+											resource: 'media.delete',
 											data: {
 												accountId: self.accountId,
 												mediaId: media.id,
 												data: {}
 											},
 											success: function(data, status) {
-
 											}
 										});
 									}
@@ -2390,7 +2361,7 @@ define(function(require){
 			var userData = $.extend(true, {}, userData),
 				fullName = userData.first_name + ' ' + userData.last_name,
 				defaultCallerIdName = fullName.substring(0, 15),
-				defaults = {
+				newCallerIDs = {
 					caller_id: {
 						internal: {
 							name: defaultCallerIdName
@@ -2401,7 +2372,7 @@ define(function(require){
 					}
 				};
 
-			userData = $.extend(true, defaults, userData);
+			userData = $.extend(true, userData, newCallerIDs);
 			/* If the user has been removed from the directory */
 			if(userData.extra) {
 				if(userData.extra.includeInDirectory === false) {
@@ -2439,6 +2410,18 @@ define(function(require){
 				if(userData.call_forward.number === '') {
 					delete userData.call_forward.number;
 				}
+			}
+
+			if(!userData.hasOwnProperty('presence_id') || userData.presence_id === 'unset') {
+				delete userData.presence_id;
+
+				if(userData.caller_id.hasOwnProperty('internal')) {
+					delete userData.caller_id.internal.number;
+				}
+			}
+			else {
+				// Always set the Internal Caller-ID Number to the Main Extension/Presence ID
+				userData.caller_id.internal.number = userData.presence_id + '';
 			}
 
 			delete userData.include_directory;
@@ -2552,9 +2535,6 @@ define(function(require){
 
 					monster.ui.validate(template.find('form.user-fields'), {
 						rules: {
-							'extra.vmboxNumber': {
-								checkList: dataTemplate.extra.existingVmboxes
-							},
 							'extra.ringingTimeout': {
 								digits: true
 							}
@@ -2581,10 +2561,13 @@ define(function(require){
 		usersGetDevicesData: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.listDevices',
+			self.callApi({
+				resource: 'device.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(data) {
 					callback && callback(data.data);
@@ -2596,6 +2579,11 @@ define(function(require){
 			var self = this;
 
 			monster.parallel({
+					user: function(callbackParallel) {
+						self.usersGetUser(userId, function(user) {
+							callbackParallel && callbackParallel(null, user);
+						});
+					},
 					callflow: function(callbackParallel) {
 						var response = {};
 
@@ -2614,8 +2602,8 @@ define(function(require){
 							});
 
 							if(callflowId) {
-								monster.request({
-									resource: 'voip.users.getCallflow',
+								self.callApi({
+									resource: 'callflow.get',
 									data: {
 										accountId: self.accountId,
 										callflowId: callflowId
@@ -2708,7 +2696,8 @@ define(function(require){
 					assignedNumbers: [],
 					unassignedNumbers: {},
 					callflow: data.callflow.userCallflow,
-					extensions: []
+					extensions: [],
+					user: data.user || {}
 				};
 
 			monster.pub('common.numbers.getListFeatures', function(features) {
@@ -2739,6 +2728,7 @@ define(function(require){
 						if(number in data.numbers.numbers) {
 							var numberElement = data.numbers.numbers[number];
 							numberElement.phoneNumber = number;
+							numberElement.isLocal = numberElement.features.indexOf('local') > -1;
 
 							response.assignedNumbers.push(numberElement);
 						}
@@ -2798,13 +2788,14 @@ define(function(require){
 								name: callerIdName
 							}
 						},
+						presence_id: data.callflow.extension,
 						email: data.extra.differentEmail ? data.extra.email : data.user.username,
 						priv_level: 'user',
 						timezone: defaultTimezone
 					}, data.user),
 					vmbox: {
 						//mailbox: (data.callflow || {}).extension,
-						mailbox: data.vmbox.number,
+						mailbox: data.callflow.extension,
 						name: fullName + '\'s VMBox',
 						timezone: defaultTimezone
 					},
@@ -2841,15 +2832,8 @@ define(function(require){
 
 			monster.parallel({
 					devices: function(callback) {
-						monster.request({
-							resource: 'voip.users.listUserDevices',
-							data: {
-								accountId: self.accountId,
-								userId: userId
-							},
-							success: function(data) {
-								callback(null, data.data);
-							}
+						self.usersListDeviceUser(userId, function(devices) {
+							callback(null, devices);
 						});
 					},
 					vmbox: function(callback) {
@@ -2904,8 +2888,8 @@ define(function(require){
 		usersDeleteUser: function(userId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.deleteUser',
+			self.callApi({
+				resource: 'user.delete',
 				data: {
 					userId: userId,
 					accountId: self.accountId,
@@ -2916,13 +2900,14 @@ define(function(require){
 				}
 			});
 		},
+
 		usersDeleteVMBox: function(vmboxId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.deleteVMBox',
+			self.callApi({
+				resource: 'voicemail.delete',
 				data: {
-					vmboxId: vmboxId,
+					voicemailId: vmboxId,
 					accountId: self.accountId,
 					data: {}
 				},
@@ -2947,8 +2932,8 @@ define(function(require){
 		usersDeleteDevice: function(deviceId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.deleteDevice',
+			self.callApi({
+				resource: 'device.delete',
 				data: {
 					deviceId: deviceId,
 					accountId: self.accountId,
@@ -2962,8 +2947,8 @@ define(function(require){
 		usersDeleteCallflow: function(callflowId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.deleteCallflow',
+			self.callApi({
+				resource: 'callflow.delete',
 				data: {
 					callflowId: callflowId,
 					accountId: self.accountId,
@@ -2978,8 +2963,8 @@ define(function(require){
 		usersCreate: function(data, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.createUser',
+			self.callApi({
+				resource: 'user.create',
 				data: {
 					accountId: self.accountId,
 					data: data.user
@@ -3048,12 +3033,148 @@ define(function(require){
 						type: 'mainUserCallflow'
 					};
 
-				self.usersSmartUpdateVMBox(user, false, function(_dataVM) {
-					callflow.flow.children['_'].data.id = _dataVM.id;
+				self.usersSmartUpdateVMBox({
+					user: user,
+					needVMUpdate: false,
+					callback: function(_dataVM) {
+						callflow.flow.children['_'].data.id = _dataVM.id;
 
-					self.usersCreateCallflow(callflow, function(_dataCF) {
-						callback && callback(_dataCF);
+						self.usersCreateCallflow(callflow,
+							function(_dataCF) {
+								callback && callback(_dataCF);
+							},
+							function(errorPayload, globalHandler) {
+								var errorCallback = function() {
+									globalHandler && globalHandler(errorPayload, { generateError: true });
+								};
+
+								if(errorPayload.error === '400' && errorPayload.hasOwnProperty('data') && errorPayload.data.hasOwnProperty('numbers') && errorPayload.data.numbers.hasOwnProperty('unique')) {
+									self.usersHasKazooUICallflow(callflow, function(existingCallflow) {
+										self.usersMigrateKazooUIUser(callflow, existingCallflow, callback);
+									}, errorCallback);
+								}
+								else {
+									errorCallback();
+								}
+							},
+							false
+						);
+					}
+				});
+			});
+		},
+
+		usersGetCallflowFromNumber: function(number, callback) {
+			var self = this,
+				found = false;
+
+			self.callApi({
+				resource: 'callflow.searchByNumber',
+				data: {
+					accountId: self.accountId,
+					value: number
+				},
+				success: function(results) {
+					if(results.data.length > 0) {
+						_.each(results.data, function(callflow) {
+							_.each(callflow.numbers, function(n) {
+								if(n === number && found === false) {
+									found = true;
+
+									self.callApi({
+										resource: 'callflow.get',
+										data: {
+											accountId: self.accountId,
+											callflowId: callflow.id
+										},
+										success: function(callflow) {
+											callback && callback(callflow.data);
+										}
+									})
+								}
+							});
+						});
+
+						if(found === false) {
+							callback && callback({});
+						}
+					}
+					else {
+						callback && callback({});
+					}
+				}
+			});
+		},
+
+		usersHasKazooUICallflow: function(callflow, success, error) {
+			var self = this,
+				parallelRequests = {},
+				kazooUICallflowFound = 0,
+				kazooUICallflow;
+
+			// Check if we find a number that belong to a Kazoo-UI callflow
+			_.each(callflow.numbers, function(number) {
+				parallelRequests[number] = function(callback) {
+					self.usersGetCallflowFromNumber(number, function(callflow) {
+						if(!(callflow.hasOwnProperty('ui_metadata') && callflow.ui_metadata.hasOwnProperty('ui') && callflow.ui_metadata.ui === 'monster-ui')) {
+							// If we already found a callflow
+							if(typeof kazooUICallflow !== 'undefined') {
+								// If it's not the same Callflow that we found before, we increment the # of callflows found, which will trigger an error later
+								// If it's the same as before we do nothing
+								if(callflow.id !== kazooUICallflow.id) {
+									kazooUICallflowFound++;
+								}
+							}
+							else {
+								kazooUICallflowFound++;
+								kazooUICallflow = callflow;
+							}
+						}
+
+						callback && callback(null, {});
 					});
+				}
+			});
+
+			
+			monster.parallel(parallelRequests, function(err, results) {
+				// If we didn't find a single non-Monster-UI Callflow, then we trigger the error
+				if(kazooUICallflowFound === 0) {
+					error && error();
+				}
+				// If we had more than 1 Kazoo UI callflow, show an error saying the migration is impossible
+				else if(kazooUICallflowFound > 1) {
+					monster.ui.alert(self.i18n.active().users.migration.tooManyCallflows);
+				}
+				// Else, we have found 1 callflow from Kazoo-UI, migration is possible, we continue with the success callback
+				else {
+					success && success(kazooUICallflow);
+				}
+			});
+		},
+
+		usersMigrateKazooUIUser: function(callflowToCreate, existingCallflow, callback) {
+			var self = this,
+				newNumbers = [];
+
+			// copy all the existing callflow numbers to the callflow we're about to create
+			callflowToCreate.numbers = existingCallflow.numbers;
+
+			// Update the numbers of the existing callflow so that we keep a trace of the migration
+			_.each(existingCallflow.numbers, function(number) {
+				newNumbers.push('old_' + number + '_r' + monster.util.randomString(6));
+			});
+			existingCallflow.numbers = newNumbers;
+
+			// Make sure the User knows what's going to happen
+			monster.ui.confirm(self.i18n.active().users.migration.confirmMigration, function() {
+				// First update the existing callflow with its new fake numbers
+				self.usersUpdateCallflow(existingCallflow, function(oldCallflow) {
+					// Now that the numbers have been changed, we can create the new Monster UI Callflow
+					self.usersCreateCallflow(callflowToCreate, function(newCallflow) {
+						// Once all this is done, continue normally to the SmartPBX normal update
+						callback && callback(newCallflow);
+					})
 				});
 			});
 		},
@@ -3134,10 +3255,13 @@ define(function(require){
 		usersListDirectories: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.listDirectories',
+			self.callApi({
+				resource: 'directory.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(data) {
 					callback && callback(data.data);
@@ -3149,14 +3273,14 @@ define(function(require){
 			var self = this,
 				dataDirectory = {
 					confirm_match: false,
-					max_dtmf: '0',
-					min_dtmf: '3',
+					max_dtmf: 0,
+					min_dtmf: 3,
 					name: 'SmartPBX Directory',
 					sort_by: 'last_name'
 				};
 
-			monster.request({
-				resource: 'voip.users.createDirectory',
+			self.callApi({
+				resource: 'directory.create',
 				data: {
 					accountId: self.accountId,
 					data: dataDirectory
@@ -3170,10 +3294,13 @@ define(function(require){
 		usersListCallflows: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.getCallflows',
+			self.callApi({
+				resource: 'callflow.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(data) {
 					callback(data.data);
@@ -3184,11 +3311,14 @@ define(function(require){
 		usersListCallflowsUser: function(userId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.listUserCallflows',
+			self.callApi({
+				resource: 'callflow.list',
 				data: {
 					accountId: self.accountId,
-					userId: userId
+					filters: {
+						filter_owner_id: userId,
+						paginate: 'false'
+					}
 				},
 				success: function(data) {
 					callback(data.data);
@@ -3199,10 +3329,13 @@ define(function(require){
 		usersListVMBoxes: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.listVMBoxes',
+			self.callApi({
+				resource: 'voicemail.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(data) {
 					callback(data.data);
@@ -3213,11 +3346,14 @@ define(function(require){
 		usersListVMBoxesUser: function(userId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.listUserVMBoxes',
+			self.callApi({
+				resource: 'voicemail.list',
 				data: {
 					accountId: self.accountId,
-					userId: userId
+					filters: {
+						filter_owner_id: userId,
+						paginate: 'false'
+					}
 				},
 				success: function(data) {
 					callback(data.data);
@@ -3228,11 +3364,11 @@ define(function(require){
 		usersGetVMBox: function(vmboxId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.getVMBox',
+			self.callApi({
+				resource: 'voicemail.get',
 				data: {
 					accountId: self.accountId,
-					vmboxId: vmboxId
+					voicemailId: vmboxId
 				},
 				success: function(data) {
 					callback(data.data);
@@ -3243,8 +3379,8 @@ define(function(require){
 		usersCreateVMBox: function(vmData, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.createVMBox',
+			self.callApi({
+				resource: 'voicemail.create',
 				data: {
 					accountId: self.accountId,
 					data: vmData
@@ -3258,12 +3394,12 @@ define(function(require){
 		usersUpdateVMBox: function(vmData, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.updateVMBox',
+			self.callApi({
+				resource: 'voicemail.update',
 				data: {
 					accountId: self.accountId,
 					data: vmData,
-					vmboxId: vmData.id
+					voicemailId: vmData.id
 				},
 				success: function(data) {
 					callback(data.data);
@@ -3274,8 +3410,8 @@ define(function(require){
 		usersGetUser: function(userId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.getUser',
+			self.callApi({
+				resource: 'user.get',
 				data: {
 					accountId: self.accountId,
 					userId: userId
@@ -3291,8 +3427,8 @@ define(function(require){
 
 			userData = self.usersCleanUserData(userData);
 
-			monster.request({
-				resource: 'voip.users.updateUser',
+			self.callApi({
+				resource: 'user.update',
 				data: {
 					accountId: self.accountId,
 					userId: userData.id,
@@ -3342,10 +3478,14 @@ define(function(require){
 		usersListConfNumbers: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.listConfNumbers',
+			self.callApi({
+				resource: 'callflow.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						filter_type: 'conference',
+						paginate: 'false'
+					}
 				},
 				success: function(data) {
 					var numbers = [];
@@ -3366,11 +3506,14 @@ define(function(require){
 		usersListConferences: function(userId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.listUserConferences',
+			self.callApi({
+				resource: 'conference.list',
 				data: {
 					accountId: self.accountId,
-					userId: userId
+					filters: {
+						filter_owner_id: userId,
+						paginate: 'false'
+					}
 				},
 				success: function(data) {
 					callback(data.data);
@@ -3381,8 +3524,8 @@ define(function(require){
 		usersGetConference: function(conferenceId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.getConference',
+			self.callApi({
+				resource: 'conference.get',
 				data: {
 					accountId: self.accountId,
 					conferenceId: conferenceId
@@ -3396,8 +3539,8 @@ define(function(require){
 		usersUpdateConference: function(conference, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.updateConference',
+			self.callApi({
+				resource: 'conference.update',
 				data: {
 					accountId: self.accountId,
 					conferenceId: conference.id,
@@ -3412,8 +3555,8 @@ define(function(require){
 		usersCreateConference: function(conference, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.createConference',
+			self.callApi({
+				resource: 'conference.create',
 				data: {
 					accountId: self.accountId,
 					data: conference
@@ -3427,8 +3570,8 @@ define(function(require){
 		usersDeleteConference: function(conferenceId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.deleteConference',
+			self.callApi({
+				resource: 'conference.delete',
 				data: {
 					accountId: self.accountId,
 					conferenceId: conferenceId,
@@ -3443,8 +3586,8 @@ define(function(require){
 		usersGetDevice: function(deviceId, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.getDevice',
+			self.callApi({
+				resource: 'device.get',
 				data: {
 					accountId: self.accountId,
 					deviceId: deviceId
@@ -3458,8 +3601,8 @@ define(function(require){
 		usersUpdateDevice: function(data, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.updateDevice',
+			self.callApi({
+				resource: 'device.update',
 				data: {
 					accountId: self.accountId,
 					data: data,
@@ -3471,11 +3614,29 @@ define(function(require){
 			});
 		},
 
+		usersListDeviceUser: function(userId, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'device.list',
+				data: {
+					accountId: self.accountId,
+					filters: {
+						filter_owner_id: userId,
+						paginate: 'false'
+					}
+				},
+				success: function(data) {
+					callback(data.data);
+				}
+			});
+		},
+
 		usersListMedias: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.listMedia',
+			self.callApi({
+				resource: 'media.list',
 				data: {
 					accountId: self.accountId
 				},
@@ -3490,10 +3651,13 @@ define(function(require){
 
 			monster.parallel({
 					users: function(callback) {
-						monster.request({
-							resource: 'voip.users.getUsers',
+						self.callApi({
+							resource: 'user.list',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
 							success: function(dataUsers) {
 								callback(null, dataUsers.data);
@@ -3506,13 +3670,21 @@ define(function(require){
 						});
 					},
 					devices: function(callback) {
-						monster.request({
-							resource: 'voip.users.listDevices',
+						self.usersGetDevicesData(function(devices) {
+							callback(null, devices);
+						});
+					},
+					deviceStatus: function(callback) {
+						self.callApi({
+							resource: 'device.getStatus',
 							data: {
-								accountId: self.accountId
+								accountId: self.accountId,
+								filters: {
+									paginate: 'false'
+								}
 							},
-							success: function(dataDevices) {
-								callback(null, dataDevices.data);
+							success: function(data, status) {
+								callback(null, data.data);
 							}
 						});
 					}
@@ -3597,8 +3769,8 @@ define(function(require){
 
 			if(numbers.length > 0) {
 				if(callflowId) {
-					monster.request({
-						resource: 'voip.users.getCallflow',
+					self.callApi({
+						resource: 'callflow.get',
 						data: {
 							accountId: self.accountId,
 							callflowId: callflowId
@@ -3631,10 +3803,13 @@ define(function(require){
 		usersListNumbers: function(callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.getNumbers',
+			self.callApi({
+				resource: 'numbers.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: function(numbers) {
 					callback && callback(numbers.data);
@@ -3645,8 +3820,8 @@ define(function(require){
 		usersUpdateCallflow: function(callflow, callback) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.updateCallflow',
+			self.callApi({
+				resource: 'callflow.update',
 				data: {
 					accountId: self.accountId,
 					callflowId: callflow.id,
@@ -3658,17 +3833,21 @@ define(function(require){
 			});
 		},
 
-		usersCreateCallflow: function(callflow, callback) {
+		usersCreateCallflow: function(callflow, success, error, generateError) {
 			var self = this;
 
-			monster.request({
-				resource: 'voip.users.createCallflow',
+			self.callApi({
+				resource: 'callflow.create',
 				data: {
 					accountId: self.accountId,
-					data: callflow
+					data: callflow,
+					generateError: generateError === false ? false : true
 				},
 				success: function(callflowData) {
-					callback && callback(callflowData.data);
+					success && success(callflowData.data);
+				},
+				error: function(callflowData, junk, globalHandler) {
+					error && error(callflowData, globalHandler);
 				}
 			});
 		},
@@ -3676,18 +3855,27 @@ define(function(require){
 		/* If user has a vmbox, then only update it if it comes from the user form.
 		If the check comes from the extension page, where we create a callflow,
 		then only update the vmbox if there are no vmbox attached to this user */
-		usersSmartUpdateVMBox: function(user, needVMUpdate, callback) {
-			var self = this;
+		usersSmartUpdateVMBox: function(args) {
+			var self = this,
+				user = args.user,
+				needVMUpdate = args.needVMUpdate || true,
+				callback = args.callback,
+				oldPresenceId = args.oldPresenceId || undefined;
 
 			self.usersListVMBoxesUser(user.id, function(vmboxes) {
 				if(vmboxes.length > 0) {
 					if(needVMUpdate) {
 						self.usersGetVMBox(vmboxes[0].id, function(vmbox) {
-							vmbox = $.extend(true, {}, vmbox, user.extra.vmbox);
 							vmbox.name = user.first_name + ' ' + user.last_name + '\'s VMBox';
+							// We only want to update the vmbox number if it was already synced with the presenceId (and if the presenceId was not already set)
+							// This allows us to support old clients who have mailbox number != than their extension number
+							if(oldPresenceId === vmbox.mailbox) {
+								// If it's synced, then we update the vmbox number as long as the main extension is set to something different than 'unset' in which case we don't update the vmbox number value
+								vmbox.mailbox = (user.presence_id && user.presence_id !== 'unset') ? user.presence_id + '' : vmbox.mailbox;
+							}
 
-							self.usersUpdateVMBox(vmbox, function(vmbox) {
-								callback && callback(vmbox);
+							self.usersUpdateVMBox(vmbox, function(vmboxSaved) {
+								callback && callback(vmboxSaved);
 							});
 						});
 					}
@@ -3698,7 +3886,7 @@ define(function(require){
 				else {
 					var vmbox = {
 						owner_id: user.id,
-						mailbox: user.extra.vmbox.mailbox,
+						mailbox: user.presence_id || user.extra.vmbox.mailbox,
 						name: user.first_name + ' ' + user.last_name + '\'s VMBox',
 						timezone: user.timezone
 					};
@@ -3720,7 +3908,8 @@ define(function(require){
 							owner_id: data.user.id,
 							play_name_on_join: true,
 							member: {
-								numbers: []
+								numbers: [],
+								join_muted: false
 							}
 						};
 
@@ -3850,7 +4039,7 @@ define(function(require){
 				var defaultFaxbox = {
 						name: user.first_name.concat(' ', user.last_name, self.i18n.active().users.faxing.defaultSettings.nameExtension),
 						caller_name: user.first_name.concat(' ', user.last_name),
-						fax_header: monster.config.company.name.concat(self.i18n.active().users.faxing.defaultSettings.headerExtension),
+						fax_header: monster.config.whitelabel.companyName.concat(self.i18n.active().users.faxing.defaultSettings.headerExtension),
 						fax_timezone: user.timezone,
 						owner_id: user.id,
 						notifications: {

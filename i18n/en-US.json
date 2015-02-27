@@ -6,12 +6,16 @@
 	"menuTitles": {
 		"myOffice": "Dashboard",
 		"users": "Users",
-		"groups": "User Groups",
+		"groups": "Groups",
 		"numbers": "Numbers",
 		"devices": "Devices",
 		"mainNumber": "Main Number",
 		"callLogs": "Call Logs",
-		"quickLinks": "Help Topics"
+		"quickLinks": "Help Topics",
+		"featureCodes": "Feature Codes",
+		"__comment": "UI-1220: Added VMBox module",
+		"__version": "3.19",
+		"vmboxes": "Voicemail Boxes"
 	},
 
 	"groups": {
@@ -51,14 +55,7 @@
 		"removeMember": "Remove Member",
 		"distribute": "Distribute",
 		"maxDurationTooltip": "Click this box to change the maximum duration for your ring group. You must enter a number between 30 and 999.",
-		"extraNode": {
-			"label": "If no one answers, forward the call to:",
-			"menu": "Menu",
-			"mainMenu": "Main Menu (Open hours)",
-			"voicemails": "Voicemail Boxes",
-			"users": "Users"
-		},
-		"title": "Groups",
+		"title": "Total Groups",
 		"titleGrid": {
 			"groups": "Group Name",
 			"members": "Members",
@@ -86,7 +83,18 @@
 			"defaultRingback": "Default Ringback",
 			"emptyUploadAlert": "Please select a file to upload",
 			"fileTooBigAlert": "You can not upload a file with a size exceeding 5MB"
-		}
+		},
+		"nextAction": {
+			"title": "Next Action",
+			"headline": "Add an action when no one picks up",
+			"label": "If no one answers, forward the call to:",
+			"menu": "Menu",
+			"mainMenu": "Main Menu (Open hours)",
+			"voicemails": "Voicemail Boxes",
+			"users": "Users"
+		},
+		"__comment": "UI-819, v3.19_s1: Showing an error popup when group data is outdated.",
+		"outdatedGroupsError": "Your Group's data is outdated and can not be rendered. Please contact your administrator to update your data."
 	},
 
 	"devices": {
@@ -121,6 +129,7 @@
 					"G722": "G722",
 					"speex@32000h": "Speex @ 32khz",
 					"speex@16000h": "Speex @ 16khz",
+					"speex": "Speex",
 					"PCMU": "G711u / PCMU - 64kbps (NA)",
 					"PCMA": "G711a / PCMA - 64kbps (Elsewhere)",
 					"G729":"G729 - 8kbps (Requires License)",
@@ -145,6 +154,12 @@
 					"type": "Type of encryption: ",
 					"srtp": "SRTP",
 					"zrtp": "ZRTP"
+				},
+				"__comment": "UI-1119: Adding ignore_complete_elsewhere",
+				"__version": "3.19",
+				"ignoreCompletedElsewhere": {
+					"label": "Ignore Completed Elsewhere",
+					"help": "When checked supporting phones will show a call missed if it was part of a ring group answered elsewhere."
 				}
 			},
 			"restrictions": {
@@ -153,11 +168,17 @@
 				"inherit": "Inherit",
 				"deny": "Deny",
 				"matcher": {
-					"help": "Type in a number and click on \"Test\" to see which category it falls in.",
+					"help": "Type in a number and click on \"Test\" to see if the call would be allowed.",
 					"placeholder": "+18554443333",
 					"button": "Test",
-					"label": "The above number matched this rule."
-				}
+					"label": "The above number matched this rule.",
+					"__comment": "UI-727, v3.19_s2: Updating the way call restrictions are displayed on devices.",
+					"allowMessage": "This device will be allowed to place a call to {{phoneNumber}}",
+					"denyMessage": "This device will not be allowed to place a call to {{phoneNumber}}."
+				},
+				"__comment": "UI-727, v3.19_s2: Updating the way call restrictions are displayed on devices.",
+				"allow": "Allow",
+				"disabledRestrictionsInfo": "Some types of call have been restricted for your entire account and can not be enabled per-device."
 			},
 			"video": {
 				"menuTitle": "Video",
@@ -275,7 +296,7 @@
 			"realm": "Realm"
 		},
 		"spare": "Spare",
-		"title": "Devices",
+		"title": "Total Devices",
 		"titleGrid": {
 			"edit": "Edit",
 			"enable": "Enable",
@@ -323,7 +344,7 @@
 		"dialogCreationUser": {
 			"createUser": "Create User",
 			"errorOnCreation": "An error occured while trying to create this user:",
-			"extension": "Extension #",
+			"extension": "Main Extension Number",
 			"extensionAlreadyExist": "This Extension is already taken, please choose a different Extension Number.",
 			"firstName": "First Name",
 			"lastName": "Last Name",
@@ -347,7 +368,21 @@
 			"timeoutSec": "Sec",
 			"timeoutEdit": "Edit in Find-Me-Follow-Me feature",
 			"timeoutEditHint": "The ringing timeout is overriden by the Find-Me-Follow-Me feature. Click on the link below to edit it.",
-			"disabledTimeoutHint": "You need at least one number or extension to set up the ringing timeout."
+			"disabledTimeoutHint": "You need at least one number or extension to set up the ringing timeout.",
+			"__comment": "UI-1109: Adding the Presence ID setting on the User document",
+			"__version": "3.19",
+			"presenceId": "Main Extension Number",
+			"noPresenceID": "None",
+			"__comment": "UI-1066: Adding Help text hover the icons of the user edition form",
+			"__version": "3.19",
+			"nameHelp": "Type the User's First Name in the first input, and the User's Last Name in the second one",
+			"loginHelp": "This is the Username of this user, used to login to the application",
+			"vmboxHelp": "This is the Voicemail Box Number of this user, click on Change PIN to reset the PIN of the Voicemail box of this user",
+			"roleHelp": "The \"Admin\" will have rights to access the App Exchange and add apps to this accoutn, whereas the \"User\" will only be able to access the apps that are enabled for him",
+			"languageHelp": "This will change the language of the text displayed in the UI",
+			"timezoneHelp": "This will set the Timezone used for this User's devices and Voicemail Box",
+			"ringingHelp": "This will set the Ringing Timeout for this User and his Devices. For example, if you set it to 20, this user will be rung for 20 seconds before the system moves to his Voicemail Box",
+			"mainExtensionHelp": "This will define the Caller-ID used for this User for calls inside the system, as well as setting his Presence ID to that number"
 		},
 		"delete": "Delete User",
 		"errorCallerId": "Before configuring the Caller-ID of this user, you need to assign him a number",
@@ -479,6 +514,19 @@
 			"title": "Hot-Desking",
 			"headline": "User Hot-Desking Settings",
 			"help": "The Hot-Desking ID is automatically set as the user's extensions number."
+		},
+		"__comment": "UI-1129: Migration tool from Kazoo-UI to Monster-UI",
+		"__version": "3.19",
+		"migration": {
+			"confirmMigration": "We found an existing callflow with the number you're trying to add, it appears we can migrate this callflow to the SmartPBX. Before we proceed, we want to make sure you understand that you won't be allowed to update this Callflow in Kazoo-UI or in the Monster-UI Callflows app after this change. Do you want to continue?",
+			"tooManyCallflows": "It appears the numbers you're trying to add belong to multiple Kazoo-UI Callflows. There is no way to properly migrate these callflows in Monster-UI please contact your support to fix it."
+		},
+		"__commment": "UI-1109: Adding popup for Presence ID change",
+		"__version": "3.19",
+		"presenceIDPopup": {
+			"title": "Select your new Main Extension",
+			"header": "It appears that you want to remove the number you had set as your Main Extension. Please select your new Main Extension from the choices below:",
+			"none": "I don't want to set a new Main Extension"
 		}
 	},
 
@@ -618,14 +666,10 @@
 			"removeNumberSuccess": "Number successfully removed from the main callflow."
 		},
 		"popupRemoveFeatures": {
-			"title": "Remove Features",
-			"questionPartOne": "Do you want to remove features from number",
+			"title": "Features",
+			"questionPartOne": "Do you want to remove features from",
 			"questionPartTwo": "?",
-			"featuresToRemove": "Feature(s) to remove :",
-			"dialogConfirm": {
-				"keep": "Keep",
-				"remove": "Remove"
-			},
+			"featuresToRemove": "Check the feature(s) to remove :",
 			"features": {
 				"cnam": "Caller-ID",
 				"dash_e911": "e911"
@@ -719,6 +763,143 @@
 			"tollfree": "Toll-free Numbers",
 			"international": "International Numbers",
 			"noNumber": "No number available"
+		},
+		"__comment": "UI-1220: Adding a Main VMBox automatically when they first load the SmartPBX if they don't have one",
+		"__version": "3.19",
+		"mainVMBoxName": "Main Voicemail Box"
+	},
+
+	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SmartPBX.",
+	"featureCodes": {
+		"title": "Available Feature Codes",
+		"noFeatureCodeMessage": "There are no feature codes enabled on your account yet. Feature codes are automatically created when you load the Main Number page.",
+		"mainNumberLink": "Go to Main Number",
+		"labels": {
+			"call_forward[action=activate]": "Enable Call-Forward",
+			"call_forward[action=deactivate]": "Disable Call-Forward",
+			"call_forward[action=toggle]": "Toggle Call-Forward",
+			"call_forward[action=update]": "Update Call-Forward",
+			"call_forward[action=on_busy_enable]": "Enable Call-Forward on Busy",
+			"call_forward[action=on_busy_disable]": "Disable Call-Forward on Busy",
+			"call_forward[action=no_answer_enable]": "Enable Call-Forward No Answer",
+			"call_forward[action=no_answer_disable]": "Disable Call-Forward No Answer",
+			"hotdesk[action=login]": "Enable Hot Desking",
+			"hotdesk[action=logout]": "Disable Hot Desking",
+			"hotdesk[action=toggle]": "Toggle Hot Desking",
+			"voicemail[action=check]": "Check Voicemail",
+			"voicemail[action=\"direct\"]": "Direct to Voicemail",
+			"intercom": "Intercom",
+			"privacy[mode=full]": "Privacy",
+			"park_and_retrieve": "Park and Retrieve",
+			"valet": "Valet",
+			"retrieve": "Retrieve",
+			"donotdisturb[action=\"enable\"]": "Enable Do not disturb",
+			"donotdisturb[action=\"disable\"]": "Disable Do not disturb",
+			"donotdisturb[action=\"toggle\"]": "Toggle Do not disturb",
+			"directory": "Directory",
+			"time": "Check Time",
+			"call_waiting[action=enable]": "Enable Call-Waiting",
+			"call_waiting[action=disable]": "Disable Call-Waiting",
+			"sound_test_service": "Sound Test Service",
+			"call_recording": "Call Recording"
+		},
+		"__comment": "UI-1028, v3.20_s0: Added categories for the feature codes.",
+		"categories": {
+			"call_forward": "Call-Forward",
+			"hotdesk": "Hot-Desking",
+			"parking": "Parking",
+			"do_not_disturb": "Do Not Disturb",
+			"misc": "Miscellaneous"
 		}
-	}
+	},
+
+	"__comment": "UI-1220: Added VMBox module",
+	"__version": "3.19",
+	"vmboxes": {
+		"addTitle": "Adding a Voicemail Box",
+		"editTitle": "Editing a Voicemail Box: {{ name }}",
+		"title": "Total Voicemail Boxes",
+		"add": "Add Voicemail Box",
+		"new": "New Voicemail Box",
+		"createVmbox": "Create new Voicemail Box",
+		"deleteVmbox": "Delete Voicemail Box",
+		"deleteNotAllowed": "You can not delete this Voicemail Box because it belongs to a User",
+		"confirmDeleteVmbox": "This Voicemail Box will be permanently deleted. Continue?",
+		"deletedVmbox": "You successfully deleted the following Voicemail Box \"{{vmboxName}}\".",
+		"titleGrid": {
+			"name": "Name",
+			"number": "Number",
+			"owner": "User",
+			"edit": "Edit"
+		},
+		"noMatchingVMBoxes": "There were no Voicemail Boxes found matching your search",
+		"noVMBoxesConfigured": "There are no Voicemail Boxes configured",
+		"popupSettings": {
+			"advancedTitle": "Advanced",
+			"basicTitle": "Basic Settings",
+			"basicSectionTitle": "Basic Settings",
+			"basic": {
+				"name": {
+					"label": "Name"
+				},
+				"number": {
+					"label": "Voicemail Number"
+				},
+				"pinNumber": {
+					"label": "PIN Number"
+				}
+			},
+			"options": {
+				"menuTitle": "Options",
+				"sectionTitle": "Options",
+				"timezone": {
+					"label": "Timezone"
+				},
+				"unavailableMessage": {
+					"label": "Unavailable Message"
+				},
+				"timezone": {
+					"label": "Timezone"
+				},
+				"alreadySetup": {
+					"label": "Already Setup?",
+					"help": "Is this voicemail box already considered initialized? If not, the first time the user logs in they will be forced to change their PIN and setup a greeting."
+				},
+				"requirePIN": {
+					"label": "Require PIN?",
+					"help": "Check if voicemail requires a PIN."
+				},
+				"autoLogin": {
+					"label": "Auto-Login Enabled?",
+					"help": "Check to enable auto-login for this voicemail box? (If the user call his own voicemail, it goes straight to his messages)"
+				},
+				"skipGreetings": {
+					"label": "Skip Greetings?",
+					"help": "Check to skip greetings by default"
+				},
+				"skipInstructions": {
+					"label": "Skip Instructions?",
+					"help": "Check to skip instructions by default"
+				},
+				"deleteAfterNotify": {
+					"label": "Delete after Notification?",
+					"help": "Delete the voicemail after the notification has been sent"
+				},
+				"configurable": {
+					"label": "Configurable via Menu?",
+					"help": " If unchecked, it will disallow the user to configure voicemail via the menu"
+				}
+			},
+			"recipients": {
+				"menuTitle": "Recipients",
+				"sectionTitle": "Recipients",
+				"header": "This panel lets you manage who will be notified when someones leave a message on this voicemail box. Click on  \"Add New Recipient\" to add an e-mail address to the list",
+				"create": "Add New Recipient"
+			}
+		}
+	},
+
+	"__comment": "UI-1219: Adding the prepend feature to numbers",
+	"__version": "v3.20_s1",
+	"numberPrepend": "Prepend"
 }
