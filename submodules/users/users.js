@@ -2771,7 +2771,8 @@ define(function(require){
 					user: $.extend(true, {}, {
 						caller_id: {
 							internal: {
-								name: callerIdName
+								name: callerIdName,
+								number: data.callflow.extension
 							},
 							external: {
 								name: callerIdName
@@ -2783,7 +2784,6 @@ define(function(require){
 						timezone: defaultTimezone
 					}, data.user),
 					vmbox: {
-						//mailbox: (data.callflow || {}).extension,
 						mailbox: data.callflow.extension,
 						name: fullName + '\'s VMBox',
 						timezone: defaultTimezone
