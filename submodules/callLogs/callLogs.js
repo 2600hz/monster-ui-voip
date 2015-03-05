@@ -303,7 +303,7 @@ define(function(require){
 						toNumber: cdr.callee_id_number || ("request" in cdr) ? cdr.request.replace(/@.*/, '') : cdr.to.replace(/@.*/, ''),
 						duration: durationMin + ":" + durationSec,
 						hangupCause: cdr.hangup_cause,
-						isOutboundCall: ("authorizing_id" in cdr),
+						isOutboundCall: ("authorizing_id" in cdr && cdr.authorizing_id.length > 0),
 						mailtoLink: "mailto:support@2600hz.com"
 								  + "?subject=Call Report: " + cdr.call_id
 								  + "&body=Please describe the details of the issue:%0D%0A%0D%0A"
