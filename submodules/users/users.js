@@ -344,6 +344,7 @@ define(function(require){
 				existingExtensions = data.existingExtensions,
 				extensionsToSave,
 				numbersToSave,
+				extraSpareNumbers,
 				toastrMessages = self.i18n.active().users.toastrMessages,
 				mainDirectoryId,
 				mainCallflowId,
@@ -426,6 +427,7 @@ define(function(require){
 						}
 						else if(type === 'numbers') {
 							extensionsToSave = [];
+							extraSpareNumbers = [];
 							currentCallflow = data.callflow;
 							currentUser = data.user;
 
@@ -965,10 +967,9 @@ define(function(require){
 			/* Events for Numbers in Users */
 			template.on('click', '.detail-numbers .list-assigned-items .remove-number', function() {
 				var $this = $(this),
-					userName = currentUser.first_name + ' ' + currentUser.last_name,
-					dataNumbers = $.extend(true, [], extensionsToSave),
-					userId = currentUser.id,
 					row = $this.parents('.item-row');
+
+				extraSpareNumbers.push(row.data('id'));
 
 				row.slideUp(function() {
 					row.remove();
@@ -977,39 +978,87 @@ define(function(require){
 						template.find('.list-assigned-items .empty-row').slideDown();
 					}
 
-					template.find('.item-row').each(function(idx, elem) {
-						dataNumbers.push($(elem).data('id'));
-					});
+					template.find('.spare-link').removeClass('disabled');
+				});
+			});
 
-					if(dataNumbers.length > 0) {
-						var updateCallflow = function() {
-								self.usersUpdateCallflowNumbers(userId, (currentCallflow || {}).id, dataNumbers, function(callflowData) {
-									toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: userName }));
-									self.usersRender({ userId: userId });
-								});
-							};
+			template.on('click', '.actions .spare-link:not(.disabled)', function(e) {
+				e.preventDefault();
 
-						// If we deleted a number that was used as the Caller-ID , disable the Caller-ID feature.
-						var needUpdateUser = false;
-						if(currentUser.caller_id.hasOwnProperty('external') && dataNumbers.indexOf(currentUser.caller_id.external.number) < 0) {
-							delete currentUser.caller_id.external.number;
-							needUpdateUser = true;
+				var $this = $(this),
+					args = {
+						accountName: monster.apps['auth'].currentAccount.name,
+						accountId: self.accountId,
+						ignoreNumbers: $.map(template.find('.item-row'), function(row) {
+							return $(row).data('id');
+						}),
+						extraNumbers: extraSpareNumbers,
+						callback: function(numberList, remainingQuantity) {
+							template.find('.empty-row').hide();
+
+							_.each(numberList, function(val, idx) {
+								val.isLocal = val.features.indexOf('local') > -1;
+
+								template
+									.find('.list-assigned-items')
+									.append($(monster.template(self, 'users-numbersItemRow', { number: val })));
+
+								extraSpareNumbers = _.without(extraSpareNumbers, val.phoneNumber);
+							});
+
+							if(remainingQuantity == 0) {
+								template.find('.spare-link').addClass('disabled');
+							}
 						}
+					};
 
-						if(needUpdateUser) {
-							self.usersUpdateUser(currentUser, function() {
-								updateCallflow();
+				monster.pub('common.numbers.dialogSpare', args);
+			});
+
+			template.on('click', '.actions .buy-link', function(e) {
+				e.preventDefault();
+				monster.pub('common.buyNumbers', {
+					searchType: $(this).data('type'),
+					callbacks: {
+						success: function(numbers) {
+							monster.pub('common.numbers.getListFeatures', function(features) {
+								_.each(numbers, function(number, k) {
+									number.viewFeatures = $.extend(true, {}, features);
+
+									var rowTemplate = monster.template(self, 'users-numbersItemRow', { number: number });
+
+									template.find('.list-unassigned-items .empty-row').hide();
+									template.find('.list-unassigned-items').append(rowTemplate);
+								});
 							});
 						}
-						else {
-							updateCallflow();
-						}
-					}
-					else {
-						monster.ui.alert('warning', self.i18n.active().users.noNumberCallflow);
-						self.usersRender({ userId: userId });
 					}
 				});
+			});
+
+			template.on('click', '.save-numbers', function() {
+				var $this = $(this),
+					dataNumbers = $.extend(true, [], extensionsToSave),
+					name = $this.parents('.grid-row').find('.grid-cell.name').text(),
+					userId = $this.parents('.grid-row').data('id');
+
+				template.find('.item-row').each(function(k, row) {
+					var row = $(row),
+						number = row.data('id');
+
+					dataNumbers.push(number);
+				});
+
+				if(dataNumbers.length > 0) {
+					self.usersUpdateCallflowNumbers(userId, (currentCallflow || {}).id, dataNumbers, function(callflowData) {
+						toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: name }));
+
+						self.usersRender({ userId: callflowData.owner_id });
+					});
+				}
+				else {
+					monster.ui.alert('warning', self.i18n.active().users.noNumberCallflow);
+				}
 			});
 
 			template.on('click', '.callerId-number', function() {
@@ -1240,80 +1289,6 @@ define(function(require){
 						}
 					}
 				);
-			});
-
-			template.on('click', '.actions .spare-link:not(.disabled)', function(e) {
-				e.preventDefault();
-
-				var $this = $(this),
-					args = {
-					accountName: monster.apps['auth'].currentAccount.name,
-					accountId: self.accountId,
-					callback: function(numberList) {
-						var name = $this.parents('.grid-row').find('.grid-cell.name').text(),
-							dataNumbers = $.extend(true, [], extensionsToSave),
-							userId = $this.parents('.grid-row').data('id');
-
-						template.find('.empty-row').hide();
-
-						template.find('.item-row').each(function(idx, elem) {
-							dataNumbers.push($(elem).data('id'));
-						});
-
-						_.each(numberList, function(val, idx) {
-							dataNumbers.push(val.phoneNumber);
-							val.isLocal = val.features.indexOf('local') > -1;
-
-							template
-								.find('.list-assigned-items')
-								.append($(monster.template(self, 'users-numbersItemRow', { number: val })));
-						});
-
-						self.usersUpdateCallflowNumbers(userId, (currentCallflow || {}).id, dataNumbers, function(callflowData) {
-							toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: name }));
-							self.usersRender({ userId: callflowData.owner_id });
-						});
-					}
-				}
-
-				monster.pub('common.numbers.dialogSpare', args);
-			});
-
-			template.on('click', '.actions .buy-link', function(e) {
-				e.preventDefault();
-				monster.pub('common.buyNumbers', {
-					searchType: $(this).data('type'),
-					callbacks: {
-						success: function(numbers) {
-							var countNew = 0;
-
-							monster.pub('common.numbers.getListFeatures', function(features) {
-								_.each(numbers, function(number, k) {
-									countNew++;
-
-									/* Formating number */
-									number.viewFeatures = $.extend(true, {}, features);
-
-									var rowTemplate = monster.template(self, 'users-rowSpareNumber', number);
-
-									template.find('.list-unassigned-items .empty-row').hide();
-									template.find('.list-unassigned-items').append(rowTemplate);
-								});
-
-								var previous = parseInt(template.find('.unassigned-list-header .count-spare').data('count')),
-									newTotal = previous + countNew;
-
-								template.find('.unassigned-list-header .count-spare')
-									.data('count', newTotal)
-									.html(newTotal);
-
-								template.find('.spare-link.disabled').removeClass('disabled');
-							});
-						},
-						error: function(error) {
-						}
-					}
-				});
 			});
 
 			$('body').on('click', '#users_container_overlay', function() {

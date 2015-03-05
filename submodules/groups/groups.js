@@ -801,7 +801,8 @@ define(function(require){
 		groupsBindNumbers: function(template, data) {
 			var self = this,
 				toastrMessages = self.i18n.active().groups.toastrMessages,
-				currentNumberSearch = '';
+				currentNumberSearch = '',
+				extraSpareNumbers = [];
 
 			// template.on('click', '.list-assigned-items .remove-number', function() {
 			// 	var row = $(this).parents('.item-row'),
@@ -839,11 +840,9 @@ define(function(require){
 
 			template.on('click', '.list-assigned-items .remove-number', function() {
 				var $this = $(this),
-					parentRow = $this.parents('.grid-row'),
-					callflowId = parentRow.data('callflow_id'),
-					groupName = parentRow.data('name'),
-					row = $this.parents('.item-row'),
-					dataNumbers = [];
+					row = $this.parents('.item-row');
+
+				extraSpareNumbers.push(row.data('id'));
 
 				row.slideUp(function() {
 					row.remove();
@@ -852,14 +851,7 @@ define(function(require){
 						template.find('.list-assigned-items .empty-row').slideDown();
 					}
 
-					template.find('.item-row').each(function(idx, elem) {
-						dataNumbers.push($(elem).data('id'));
-					});
-
-					self.groupsUpdateNumbers(callflowId, dataNumbers, function(callflowData) {
-						toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: groupName }));
-						self.groupsRender({ groupId: callflowData.group_id });
-					});
+					template.find('.spare-link').removeClass('disabled');
 				});
 			});
 
@@ -960,31 +952,26 @@ define(function(require){
 					args = {
 					accountName: monster.apps['auth'].currentAccount.name,
 					accountId: self.accountId,
+					ignoreNumbers: $.map(template.find('.item-row'), function(row) {
+						return $(row).data('id');
+					}),
+					extraNumbers: extraSpareNumbers,
 					callback: function(numberList) {
-						var parentRow = $this.parents('.grid-row'),
-							callflowId = parentRow.data('callflow_id'),
-							name = parentRow.data('name');
-							dataNumbers = [];
-
 						template.find('.empty-row').hide();
 
-						template.find('.item-row').each(function(idx, elem) {
-							dataNumbers.push($(elem).data('id'));
-						});
-
 						_.each(numberList, function(val, idx) {
-							dataNumbers.push(val.phoneNumber);
 							val.isLocal = val.features.indexOf('local') > -1;
 
 							template
 								.find('.list-assigned-items')
 								.append($(monster.template(self, 'groups-numbersItemRow', { number: val })));
+
+							extraSpareNumbers = _.without(extraSpareNumbers, val.phoneNumber);
 						});
 
-						self.groupsUpdateNumbers(callflowId, dataNumbers, function(callflowData) {
-							toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: name }));
-							self.groupsRender({ groupId: callflowData.group_id });
-						});
+						if(remainingQuantity == 0) {
+							template.find('.spare-link').addClass('disabled');
+						}
 					}
 				}
 
@@ -996,36 +983,38 @@ define(function(require){
 
 				monster.pub('common.buyNumbers', {
 					searchType: $(this).data('type'),
-						callbacks: {
+					callbacks: {
 						success: function(numbers) {
-							var countNew = 0;
 
 							monster.pub('common.numbers.getListFeatures', function(features) {
 								_.each(numbers, function(number, k) {
-									countNew++;
-
-									/* Formating number */
 									number.viewFeatures = $.extend(true, {}, features);
 
-									var rowTemplate = monster.template(self, 'users-rowSpareNumber', number);
+									var rowTemplate = monster.template(self, 'groups-numbersItemRow', { number: number });
 
 									template.find('.list-unassigned-items .empty-row').hide();
 									template.find('.list-unassigned-items').append(rowTemplate);
 								});
-
-								var previous = parseInt(template.find('.unassigned-list-header .count-spare').data('count')),
-									newTotal = previous + countNew;
-
-								template.find('.unassigned-list-header .count-spare')
-									.data('count', newTotal)
-									.html(newTotal);
-
-								template.find('.spare-link.disabled').removeClass('disabled');
 							});
-						},
-						error: function(error) {
 						}
 					}
+				});
+			});
+
+			template.on('click', '.save-numbers', function() {
+				var $this = $(this),
+					parentRow = $this.parents('.grid-row'),
+					callflowId = parentRow.data('callflow_id'),
+					name = parentRow.data('name');
+					dataNumbers = [];
+
+				template.find('.item-row').each(function(k, row) {
+					dataNumbers.push($(row).data('id'));
+				});
+
+				self.groupsUpdateNumbers(callflowId, dataNumbers, function(callflowData) {
+					toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: name }));
+					self.groupsRender({ groupId: callflowData.group_id });
 				});
 			});
 		},
