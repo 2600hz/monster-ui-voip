@@ -86,7 +86,7 @@ define(function(require){
 					additionalExtensions: 0,
 					additionalNumbers: 0,
 					devices: [],
-					extension: '',
+					extension: dataUser.hasOwnProperty('presence_id') ? dataUser.presence_id : '',
 					hasFeatures: false,
 					isAdmin: dataUser.priv_level === 'admin',
 					listCallerId: [],
@@ -266,13 +266,6 @@ define(function(require){
 						_.each(callflow.numbers, function(number) {
 							if(number.length < 7) {
 								user.extra.listExtensions.push(number);
-
-								if(user.extra.extension === '') {
-									user.extra.extension = number;
-								}
-								else {
-									user.extra.additionalExtensions++;
-								}
 							}
 							else {
 								user.extra.listCallerId.push(number);
@@ -287,6 +280,15 @@ define(function(require){
 								}
 							}
 						});
+
+						// The additional extensions show how many more extensions than 1 a user has. 
+						// So if the user has at least 1 extension, then we count how many he has minus the one we already display, otherwise we display 0.
+						user.extra.additionalExtensions = user.extra.listExtensions.length >= 1 ? user.extra.listExtensions.length - 1 : 0;
+
+						// If the main extension hasn't been defined because the presence_id isn't set, just pick the first extension
+						if(user.extra.extension === '' && user.extra.listExtensions.length > 0) {
+							user.extra.extension = user.extra.listExtensions[0];
+						}
 					}
 				}
 			});
@@ -1396,8 +1398,6 @@ define(function(require){
 					return parsedA > parsedB ? 1 : -1;
 				}
 			});
-
-			console.log(orderedArray);
 
 			_.each(orderedArray, function(number) {
 				var currentNumber = parseInt(number);
