@@ -1,6 +1,5 @@
 {
 	"name": "voip",
-	"source_url": "http://webdev/monster-modules/voip",
 	"i18n": {
 		"en-US": {
 			"label": "Smart PBX",
