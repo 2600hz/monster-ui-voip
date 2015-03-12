@@ -439,6 +439,16 @@ define(function(require){
 				mergedData.media.video.codecs = videoCodecs.getSelectedItems();
 			}
 
+			// If the key is set to "auto" we remove the key, we don't support this anymore
+			if(mergedData.hasOwnProperty('media') && mergedData.media.hasOwnProperty('fax_option') && mergedData.media.fax_option === 'auto') {
+				delete mergedData.media.fax_option;
+			}
+
+			// The UI mistakenly created this key, so we clean it up
+			if(mergedData.hasOwnProperty('media') && mergedData.media.hasOwnProperty('fax') && mergedData.media.fax.hasOwnProperty('option')) {
+				delete mergedData.media.fax.option;
+			}
+
 			/* Migration clean-up */
 			delete mergedData.media.secure_rtp;
 			delete mergedData.extra;
