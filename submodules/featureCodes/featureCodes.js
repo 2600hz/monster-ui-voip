@@ -93,27 +93,30 @@ define(function(require){
 				featureCodes = {};
 
 			_.each(featureCodeData, function(callflow) {
-				var category = 'misc';
-				_.find(self.categories, function(cat, key) {
-					if(cat.indexOf(callflow.featurecode.name) >= 0) {
-						category = key;
-						return true;
+				// Some old callflows have been created with the feature code key, so we had the check to make sure they also have a name associated
+				if(callflow.featurecode.hasOwnProperty('name')) {
+					var category = 'misc';
+					_.find(self.categories, function(cat, key) {
+						if(cat.indexOf(callflow.featurecode.name) >= 0) {
+							category = key;
+							return true;
+						}
+						return false; 
+					});
+
+					if(!featureCodes.hasOwnProperty(category)) { 
+						featureCodes[category] = {
+							category: self.i18n.active().featureCodes.categories[category],
+							codes: []
+						};
 					}
-					return false; 
-				});
 
-				if(!featureCodes.hasOwnProperty(category)) { 
-					featureCodes[category] = {
-						category: self.i18n.active().featureCodes.categories[category],
-						codes: []
-					};
+					featureCodes[category].codes.push({
+						key: callflow.featurecode.name,
+						name: self.i18n.active().featureCodes.labels[callflow.featurecode.name],
+						number: callflow.featurecode.number ? callflow.featurecode.number.replace(/\\/g,'') : ''
+					});
 				}
-
-				featureCodes[category].codes.push({
-					key: callflow.featurecode.name,
-					name: self.i18n.active().featureCodes.labels[callflow.featurecode.name],
-					number: callflow.featurecode.number.replace(/\\/g,'')
-				});
 			});
 
 			return monster.util.sort($.map(featureCodes, function(category) {
