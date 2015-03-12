@@ -450,13 +450,6 @@ define(function(require){
 				}
 			}
 
-<<<<<<< HEAD
-=======
-			if(hasCodecs) {
-				mergedData.media.audio.codecs = audioCodecs.getSelectedItems();
-				mergedData.media.video.codecs = videoCodecs.getSelectedItems();
-			}
-
 			// If the key is set to "auto" we remove the key, we don't support this anymore
 			if(mergedData.hasOwnProperty('media') && mergedData.media.hasOwnProperty('fax_option') && mergedData.media.fax_option === 'auto') {
 				delete mergedData.media.fax_option;
@@ -467,7 +460,6 @@ define(function(require){
 				delete mergedData.media.fax.option;
 			}
 
->>>>>>> f2e705b... UI-1275: Now properly remove fax_option if the option is set to the outdated auto value
 			/* Migration clean-up */
 			delete mergedData.media.secure_rtp;
 			delete mergedData.extra;
