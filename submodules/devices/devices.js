@@ -435,8 +435,13 @@ define(function(require){
 			}
 
 			if(hasCodecs) {
-				mergedData.media.audio.codecs = audioCodecs.getSelectedItems();
-				mergedData.media.video.codecs = videoCodecs.getSelectedItems();
+				if(audioCodecs) {
+					mergedData.media.audio.codecs = audioCodecs.getSelectedItems();
+				}
+				
+				if(videoCodecs) {
+					mergedData.media.video.codecs = videoCodecs.getSelectedItems();
+				}
 			}
 
 			// If the key is set to "auto" we remove the key, we don't support this anymore
