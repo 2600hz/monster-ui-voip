@@ -1053,9 +1053,27 @@ define(function(require){
 
 				if(dataNumbers.length > 0) {
 					self.usersUpdateCallflowNumbers(userId, (currentCallflow || {}).id, dataNumbers, function(callflowData) {
-						toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: name }));
+						var afterUpdate = function() {
+							toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: name }));
 
-						self.usersRender({ userId: callflowData.owner_id });
+							self.usersRender({ userId: callflowData.owner_id });
+						};
+
+						// If the User has the External Caller ID Number setup to a number that is no longer assigned to this user, then remove the Caller-ID Feature
+						if(currentUser.caller_id.hasOwnProperty('external')
+						&& currentUser.caller_id.external.hasOwnProperty('number')
+						&& callflowData.numbers.indexOf(currentUser.caller_id.external.number) < 0) {
+							delete currentUser.caller_id.external.number;
+
+							self.usersUpdateUser(currentUser, function() {
+								afterUpdate();
+
+								toastr.info(toastrMessages.callerIDDeleted);
+							});
+						}
+						else {
+							afterUpdate();
+						}
 					});
 				}
 				else {
