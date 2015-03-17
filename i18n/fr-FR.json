@@ -400,7 +400,10 @@
 			"passwordReseted": "Le mot de passe a été réinitialisé, un email a été envoyé à {{email}} avec les instructions pour créer un nouveau mot de passe.",
 			"userDelete": "Vous avez supprimé {{ name }} avec succès!",
 			"userUpdated": "Vous avez mis à jour {{ name }} avec succès!",
-			"pinUpdated": "Vous avez mis à jour le PIN de {{ name }} avec succès!"
+			"pinUpdated": "Vous avez mis à jour le PIN de {{ name }} avec succès!",
+			"__comment": "UI-1033: Now properly remove the Caller-ID Feature if we remove a number that was set as that Caller-ID Number",
+			"__version": "3.20",
+			"callerIDDeleted": "Le Numéro de Caller-ID de cet utilisateur n'étant plus assigné, la fonctionnalité Caller-ID a été desactivée."
 		},
 		"uploadPicture": "Uploader une image",
 		"user": "Utilisateur",

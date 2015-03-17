@@ -425,7 +425,10 @@
 			"passwordReseted": "The password has been reset, an e-mail has been sent to {{ email }} with instructions on how to create a new password.",
 			"userDelete": "You successfully deleted {{ name }} from the Smart PBX!",
 			"userUpdated": "You successfully updated {{ name }} settings.",
-			"pinUpdated": "You successfully updated the PIN of {{ name }}."
+			"pinUpdated": "You successfully updated the PIN of {{ name }}.",
+			"__comment": "UI-1033: Now properly remove the Caller-ID Feature if we remove a number that was set as that Caller-ID Number",
+			"__version": "3.20",
+			"callerIDDeleted": "The Caller-ID Number of this user was set to a number that was no longer assigned to him, so we disabled the Caller-ID Feature."
 		},
 		"uploadPicture": "Upload a Picture",
 		"user": "User",
