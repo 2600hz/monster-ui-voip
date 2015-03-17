@@ -67,63 +67,70 @@
 
 				<div class="control-group">
 					<label class="control-input checkbox">
-						<div class="monster-checkbox" data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.alreadySetup.help }}">
-							<input type="checkbox" name="is_setup" id="is_setup" {{#if is_setup }}checked{{/if}} />
-							<label for="is_setup">{{ i18n.vmboxes.popupSettings.options.alreadySetup.label }}</label>
+						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.alreadySetup.help }}">
+							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.alreadySetup.label}}
+								<input type="checkbox" name="is_setup" id="is_setup" {{#if is_setup }}checked{{/if}} />
+							{{/monsterCheckbox}}
 						</div>
 					</label>
 				</div>
 
 				<div class="control-group">
 					<label class="control-input checkbox">
-						<div class="monster-checkbox" data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.requirePIN.help }}">
-							<input type="checkbox" name="require_pin" id="require_pin" {{#if require_pin }}checked{{/if}} />
-							<label for="require_pin">{{ i18n.vmboxes.popupSettings.options.requirePIN.label }}</label>
+						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.requirePIN.help }}">
+							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.requirePIN.label}}
+								<input type="checkbox" name="require_pin" id="require_pin" {{#if require_pin }}checked{{/if}} />
+							{{/monsterCheckbox}}
 						</div>
 					</label>
 				</div>
 
 				<div class="control-group">
 					<label class="control-input checkbox">
-						<div class="monster-checkbox" data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.autoLogin.help }}">
-							<input type="checkbox" name="check_if_owner" id="check_if_owner" {{#if check_if_owner }}checked{{/if}} />
-							<label for="check_if_owner">{{ i18n.vmboxes.popupSettings.options.autoLogin.label }}</label>
+						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.autoLogin.help }}">
+							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.autoLogin.label}}
+								<input type="checkbox" name="check_if_owner" id="check_if_owner" {{#if check_if_owner }}checked{{/if}} />
+							{{/monsterCheckbox}}
 						</div>
 					</label>
 				</div>
 
 				<div class="control-group">
 					<label class="control-input checkbox">
-						<div class="monster-checkbox" data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.skipGreetings.help }}">
-							<input type="checkbox" name="skip_greeting" id="skip_greeting" {{#if skip_greeting }}checked{{/if}} />
-							<label for="skip_greeting">{{ i18n.vmboxes.popupSettings.options.skipGreetings.label }}</label>
+						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.skipGreetings.help }}">
+							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.skipGreetings.label}}
+								<input type="checkbox" name="skip_greeting" id="skip_greeting" {{#if skip_greeting }}checked{{/if}} />
+							{{/monsterCheckbox}}
 						</div>
 					</label>
 				</div>
 
 				<div class="control-group">
 					<label class="control-input checkbox">
-						<div class="monster-checkbox" data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.skipInstructions.help }}">
-							<input type="checkbox" name="skip_instructions" id="skip_instructions" {{#if skip_instructions }}checked{{/if}} />
-							<label for="skip_instructions">{{ i18n.vmboxes.popupSettings.options.skipInstructions.label }}</label>
+						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.skipInstructions.help }}">
+							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.skipInstructions.label}}
+								<input type="checkbox" name="skip_instructions" id="skip_instructions" {{#if skip_instructions }}checked{{/if}} />
+							{{/monsterCheckbox}}
 						</div>
 					</label>
 				</div>
 
 				<div class="control-group">
 					<label class="control-input checkbox">
-						<div class="monster-checkbox" data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.deleteAfterNotify.help }}">
-							<input type="checkbox" name="delete_after_notify" id="delete_after_notify" {{#if delete_after_notify }}checked{{/if}} />
-							<label for="delete_after_notify">{{ i18n.vmboxes.popupSettings.options.deleteAfterNotify.label }}</label>
+						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.deleteAfterNotify.help }}">
+							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.deleteAfterNotify.label}}
+								<input type="checkbox" name="delete_after_notify" id="delete_after_notify" {{#if delete_after_notify }}checked{{/if}} />
+							{{/monsterCheckbox}}
 						</div>
 					</label>
 				</div>
 
 				<div class="control-group">
 					<label class="control-input checkbox">
-						<div class="monster-checkbox" data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.configurable.help }}">
-							<input type="checkbox" name="extra.configurable" id="not_configurable" {{#unless not_configurable }}checked{{/unless}} />
-							<label for="not_configurable">{{ i18n.vmboxes.popupSettings.options.configurable.label }}</label>
+						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.configurable.help }}">
+							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.configurable.label}}
+								<input type="checkbox" name="extra.configurable" id="not_configurable" {{#unless not_configurable }}checked{{/unless}} />
+							{{/monsterCheckbox}}
 						</div>
 					</label>
 				</div>

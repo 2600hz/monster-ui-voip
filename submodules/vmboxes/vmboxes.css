@@ -227,6 +227,9 @@
 .edit-vmbox .control-input.checkbox {
 	margin-left: 160px;
 }
+.edit-vmbox .control-input.checkbox > div {
+	display: inline-block;
+}
 
 .edit-vmbox .helper {
 	margin: 0 30px;
