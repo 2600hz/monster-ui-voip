@@ -1661,11 +1661,12 @@ define(function(require){
 					accountId: self.accountId,
 					filters: {
 						'has_value':'type',
-						'key_missing':'owner_id'
+						'key_missing':['owner_id', 'group_id']
 					}
 				},
 				success: function(data, status) {
-					var parallelRequests = {};
+					var parallelRequests = {},
+						menuRequests = {};
 
 					_.each(data.data, function(val, key) {
 						if(val.type === "main" || val.type === "conference")
@@ -1712,8 +1713,90 @@ define(function(require){
 					}
 
 					_.each(self.subCallflowsLabel, function(val) {
-						if(!parallelRequests[val]) {
-							parallelRequests[val] = function(callback) {
+						var menuName = val+'Menu';
+						if(!parallelRequests[menuName]) {
+							menuRequests[menuName] = function(callback) {
+								self.callApi({
+									resource: 'menu.create',
+									data: {
+										accountId: self.accountId,
+										data: {
+											name: menuName,
+											record_pin: monster.util.randomString(4, '1234567890'),
+											media: {
+												exit_media: true,
+												invalid_media: true,
+												transfer_media: true
+											},
+											retries: 3,
+											max_extension_length: 4,
+											type: "main"
+										}
+									},
+									success: function(menuData, status) {
+										self.callApi({
+											resource: 'callflow.create',
+											data: {
+												accountId: self.accountId,
+												data: {
+													contact_list: {
+														exclude: false
+													},
+													numbers: [menuName],
+													type: "main",
+													flow: {
+														children: {},
+														data: {
+															id: menuData.data.id
+														},
+														module: "menu"
+													}
+												}
+											},
+											success: function(data, status) {
+												callback && callback(null, data.data);
+											}
+										});
+									}
+								});
+							}
+						}
+					});
+
+					monster.parallel(menuRequests, function(err, results) {
+						var mainCallflows = results;
+						_.each(self.subCallflowsLabel, function(val) {
+							if(!parallelRequests[val]) {
+								parallelRequests[val] = function(callback) {
+									self.callApi({
+										resource: 'callflow.create',
+										data: {
+											accountId: self.accountId,
+											data: {
+												contact_list: {
+													exclude: false
+												},
+												numbers: [val],
+												type: "main",
+												flow: {
+													children: {},
+													data: {
+														id: mainCallflows[val+'Menu'].id
+													},
+													module: "callflow"
+												}
+											}
+										},
+										success: function(data, status) {
+											callback(null, data.data);
+										}
+									});
+								}
+							}
+						});
+
+						monster.parallel(parallelRequests, function(err, results) {
+							if(!parallelRequests["MainCallflow"]) {
 								self.callApi({
 									resource: 'callflow.create',
 									data: {
@@ -1722,75 +1805,49 @@ define(function(require){
 											contact_list: {
 												exclude: false
 											},
-											numbers: [val],
+											numbers: ["0"],
+											name: "MainCallflow",
 											type: "main",
 											flow: {
-												children: {},
+												children: {
+													'_': {
+														children: {},
+														data: {
+															id: results["MainOpenHours"].id
+														},
+														module:"callflow"
+													}
+												},
 												data: {},
 												module: "temporal_route"
 											}
 										}
 									},
 									success: function(data, status) {
-										callback(null, data.data);
+										/* If they don't have a main callflow, check if the feature codes are enabled, and create them if not */
+										self.strategyCreateFeatureCodes(function() {
+											results["MainCallflow"] = data.data;
+											callback($.extend(true, mainCallflows, results));
+										});
 									}
 								});
-							}
-						}
-					});
-
-					monster.parallel(parallelRequests, function(err, results) {
-						if(!parallelRequests["MainCallflow"]) {
-							self.callApi({
-								resource: 'callflow.create',
-								data: {
-									accountId: self.accountId,
-									data: {
-										contact_list: {
-											exclude: false
-										},
-										numbers: ["0"],
-										name: "MainCallflow",
-										type: "main",
-										flow: {
-											children: {
-												'_': {
-													children: {},
-													data: {
-														id: results["MainOpenHours"].id
-													},
-													module:"callflow"
-												}
-											},
-											data: {},
-											module: "temporal_route"
-										}
-									}
-								},
-								success: function(data, status) {
-									/* If they don't have a main callflow, check if the feature codes are enabled, and create them if not */
-									self.strategyCreateFeatureCodes(function() {
-										results["MainCallflow"] = data.data;
-										callback(results);
-									});
-								}
-							});
-						} else {
-							delete results["MainCallflow"].flow.data.timezone;
-							if(results["MainCallflow"].numbers[0] !== '0') {
-								if(results["MainCallflow"].numbers[0] === 'undefined') {
-									results["MainCallflow"].numbers[0] = '0';
-								} else {
-									results["MainCallflow"].numbers.splice(0, 0, '0');
-								}
-								self.strategyUpdateCallflow(results["MainCallflow"], function(updatedCallflow) {
-									results["MainCallflow"] = updatedCallflow;
-									callback(results);
-								})
 							} else {
-								callback(results);
+								delete results["MainCallflow"].flow.data.timezone;
+								if(results["MainCallflow"].numbers[0] !== '0') {
+									if(results["MainCallflow"].numbers[0] === 'undefined') {
+										results["MainCallflow"].numbers[0] = '0';
+									} else {
+										results["MainCallflow"].numbers.splice(0, 0, '0');
+									}
+									self.strategyUpdateCallflow(results["MainCallflow"], function(updatedCallflow) {
+										results["MainCallflow"] = updatedCallflow;
+										callback($.extend(true, mainCallflows, results));
+									})
+								} else {
+									callback($.extend(true, mainCallflows, results));
+								}
 							}
-						}
+						});
 					});
 				}
 			});
