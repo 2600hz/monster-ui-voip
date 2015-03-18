@@ -563,14 +563,21 @@
 			"listTitle": "Custom Hours",
 			"timezone": "Company Timezone:",
 			"to": "to",
-			"lunchbreakTitle": "Are you closed for lunch hours?"
+			"lunchbreakTitle": "Are you closed for lunch hours?",
+			"__comment": "UI-1250: Adding help boxes",
+			"__version": "3.20_s2",
+			"helpAfterHours": "Do not forget to set the call routing for when your office is closed for the night! To set it up, go in the \"Incoming Call Handling\" section of this page, and select the \"After Hours\" tab.",
+			"helpLunchHours": "If your office is closed during lunch hours, you also need to choose the call routing for that. You can set it up in the \"Incoming Call Handling\" section as well, under the \"Lunch Hours\" tab."
 		},
 		"holidays": {
 			"enableTitle": "Are you closed for holidays?",
 			"addLink": "Add Holiday",
 			"singleLink": "Single Day",
 			"rangeLink": "Date Range",
-			"advancedLink": "Advanced"
+			"advancedLink": "Advanced",
+			"__comment": "UI-1250: Adding help boxes",
+			"__version": "3.20_s2",
+			"helpHolidays": "Do not forget to set the call routing for when your office is closed for the holidays! To set it up, go in the \"Incoming Call Handling\" section of this page, and select the \"Holidays\" tab."
 		},
 		"calls": {
 			"openHoursTitle": "Open Hours",

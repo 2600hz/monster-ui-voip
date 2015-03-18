@@ -539,14 +539,17 @@
 			"listTitle": "Horaires",
 			"timezone": "Fuseau horaire:",
 			"to": "à",
-			"lunchbreakTitle": "Êtes-vous fermé pendant le déjeuner?"
+			"lunchbreakTitle": "Êtes-vous fermé pendant le déjeuner?",
+			"helpAfterHours": "N'oubliez pas de choisir votre route d'appel à utiliser quand votre bureau est fermé pour la nuit ! Pour la configurer, ouvrez la section \"Gestion des appels entrants\" de cette page, et sélectionnez l'onglet \"Fermé\".",
+			"helpLunchHours": "Si votre bureau ferme aux heures du déjeuner, vous devez aussi choisir votre route d'appel à utiliser pour ces heures là. Vous pouvez la configurer dans la section \"Gestion des appels entrants\" également, sous l'onglet \"Déjeuner\"."
 		},
 		"holidays": {
 			"enableTitle": "Êtes-vous fermé pendant les vacances?",
 			"addLink": "Ajouter vacances",
 			"singleLink": "Jour unique",
 			"rangeLink": "Période",
-			"advancedLink": "Avancé"
+			"advancedLink": "Avancé",
+			"helpHolidays": "N'oubliez pas de choisir votre route d'appel à utiliser quand votre bureau est fermé pour les vacances ! Pour la configurer, ouvrez la section \"Gestion des appels entrants\" de cette page, et sélectionnez l'onglet \"Vacances\" tab."
 		},
 		"calls": {
 			"openHoursTitle": "Ouvert",
