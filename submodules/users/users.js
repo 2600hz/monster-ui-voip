@@ -1853,14 +1853,6 @@ define(function(require){
 				data.value ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
 			});
 
-			featureTemplate.find('#phoneType').on('change', function() {
-				if ( $(this).val() === 'mobile' ) {
-					featureTemplate.find('#number').mask('+1 (999) 999-9999');
-				} else if ( $(this).val() === 'deskphone' ) {
-					featureTemplate.find('#number').mask('(999) 999-9999');
-				}
-			});
-
 			featureTemplate.find('.save').on('click', function() {
 				if(monster.ui.valid(featureForm)) {
 					var formData = monster.ui.getFormData('call_forward_form');
@@ -1886,11 +1878,11 @@ define(function(require){
 
 			if (currentUser.hasOwnProperty('call_forward') && currentUser.call_forward.number && /^(\+1)/.test(currentUser.call_forward.number)) {
 				featureTemplate.find('#phoneType').val('mobile');
-				featureTemplate.find('#number').mask('+1 (999) 999-9999');
 			} else {
 				featureTemplate.find('#phoneType').val('deskphone');
-				featureTemplate.find('#number').mask('(999) 999-9999');
 			}
+
+			featureTemplate.find('#number').mask(self.i18n.active().users.defaultPhoneMask);
 
 			var popup = monster.ui.dialog(featureTemplate, {
 				title: currentUser.extra.mapFeatures.call_forward.title,

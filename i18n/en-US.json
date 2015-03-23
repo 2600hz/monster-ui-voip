@@ -530,7 +530,10 @@
 			"title": "Select your new Main Extension",
 			"header": "It appears that you want to remove the number you had set as your Main Extension. Please select your new Main Extension from the choices below:",
 			"none": "I don't want to set a new Main Extension"
-		}
+		},
+		"__comment": "UI-1289: Masks should be in i18n",
+		"__version": "v3.20_s3",
+		"defaultPhoneMask": "+1 (999) 999-9999"
 	},
 
 	"strategy": {
