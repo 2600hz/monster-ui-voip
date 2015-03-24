@@ -59,6 +59,15 @@
 				<input type="email" name="extra.email" id="email" placeholder="{{i18n.users.dialogCreationUser.notificationEmail}}">
 			</div>
 		</div>
+		<div class="control-group hack-left">
+			<label class="control-label" for="send_email_on_creation"></label>
+			<div class="controls">
+				<label>
+					<input id="send_email_on_creation" type="checkbox" name="user.send_email_on_creation"></input>
+					{{ i18n.users.dialogCreationUser.sendWelcomeEmail }}
+				</label>
+			</div>
+		</div>
 	</div>
 	</form>
 	<div class="dialog-buttons-wrapper">

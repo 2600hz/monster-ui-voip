@@ -329,7 +329,8 @@
 			"sendToDifferentEmail": "Envoyer les emails à une autre adresse",
 			"title": "Créer Utilisateur",
 			"vmboxAlreadyExist": "Le numéro de répondeur existe déjà, veuillez en choisir un autre.",
-			"vmboxNumber": "Numéro Répondeur"
+			"vmboxNumber": "Numéro Répondeur",
+			"sendWelcomeEmail": "Envoyer les informations de connexion à cet utilisateur"
 		},
 		"editionForm": {
 			"changePIN": "Changer PIN",
