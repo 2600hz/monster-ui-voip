@@ -354,7 +354,10 @@
 			"sendToDifferentEmail": "Send emails to an alternate address",
 			"title": "Create User",
 			"vmboxAlreadyExist": "VMBox Number is already taken, please choose a different Voicemail Box Number.",
-			"vmboxNumber": "VM Box #"
+			"vmboxNumber": "VM Box #",
+			"__comment": "UI-814: Adding the option to automatically send email on user creation",
+			"__version": "3.20_s3",
+			"sendWelcomeEmail": "Send credentials to this user"
 		},
 		"editionForm": {
 			"changePIN": "Change PIN",
