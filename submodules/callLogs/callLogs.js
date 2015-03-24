@@ -67,6 +67,8 @@ define(function(require){
 					nextStartKey: nextStartKey
 				});
 
+				template.find('[data-toggle="tooltip"]').tooltip();
+
 				parent
 					.empty()
 					.append(template);
@@ -285,7 +287,17 @@ define(function(require){
 						hours = (date.getHours() < 10 ? "0" : "") + date.getHours(),
 						minutes = (date.getMinutes() < 10 ? "0" : "") + date.getMinutes(),
 						durationMin = parseInt(cdr.duration_seconds/60).toString(),
-						durationSec = (cdr.duration_seconds % 60 < 10 ? "0" : "") + (cdr.duration_seconds % 60);
+						durationSec = (cdr.duration_seconds % 60 < 10 ? "0" : "") + (cdr.duration_seconds % 60),
+						hangupI18n = self.i18n.active().hangupCauses,
+						hangupHelp = '';
+
+					if(hangupI18n.hasOwnProperty(cdr.hangup_cause)) {
+						if(hangupI18n[cdr.hangup_cause].label !== '') {
+							hangupHelp += (hangupI18n[cdr.hangup_cause].label + ': ');
+						}
+
+						hangupHelp += hangupI18n[cdr.hangup_cause].description;
+					}
 
 					return {
 						id: cdr.id,
@@ -299,6 +311,7 @@ define(function(require){
 						toNumber: cdr.callee_id_number || ("request" in cdr) ? cdr.request.replace(/@.*/, '') : cdr.to.replace(/@.*/, ''),
 						duration: durationMin + ":" + durationSec,
 						hangupCause: cdr.hangup_cause,
+						hangupHelp: hangupHelp,
 						isOutboundCall: ("authorizing_id" in cdr && cdr.authorizing_id.length > 0),
 						mailtoLink: "mailto:support@2600hz.com"
 								  + "?subject=Call Report: " + cdr.call_id
