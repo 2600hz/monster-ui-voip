@@ -289,14 +289,17 @@ define(function(require){
 						durationMin = parseInt(cdr.duration_seconds/60).toString(),
 						durationSec = (cdr.duration_seconds % 60 < 10 ? "0" : "") + (cdr.duration_seconds % 60),
 						hangupI18n = self.i18n.active().hangupCauses,
-						hangupHelp = '';
+						hangupHelp = '',
+						isOutboundCall = "authorizing_id" in cdr && cdr.authorizing_id.length > 0;
 
+					// Only display help if it's in the i18n.
 					if(hangupI18n.hasOwnProperty(cdr.hangup_cause)) {
-						if(hangupI18n[cdr.hangup_cause].label !== '') {
-							hangupHelp += (hangupI18n[cdr.hangup_cause].label + ': ');
+						if(isOutboundCall && hangupI18n[cdr.hangup_cause].hasOwnProperty('outbound')) {
+							hangupHelp += hangupI18n[cdr.hangup_cause].outbound;
 						}
-
-						hangupHelp += hangupI18n[cdr.hangup_cause].description;
+						else if(!isOutboundCall && hangupI18n[cdr.hangup_cause].hasOwnProperty('inbound')) {
+							hangupHelp += hangupI18n[cdr.hangup_cause].inbound;
+						}
 					}
 
 					return {
@@ -312,7 +315,7 @@ define(function(require){
 						duration: durationMin + ":" + durationSec,
 						hangupCause: cdr.hangup_cause,
 						hangupHelp: hangupHelp,
-						isOutboundCall: ("authorizing_id" in cdr && cdr.authorizing_id.length > 0),
+						isOutboundCall: isOutboundCall,
 						mailtoLink: "mailto:support@2600hz.com"
 								  + "?subject=Call Report: " + cdr.call_id
 								  + "&body=Please describe the details of the issue:%0D%0A%0D%0A"
