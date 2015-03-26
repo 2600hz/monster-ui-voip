@@ -956,7 +956,7 @@ define(function(require){
 						return $(row).data('id');
 					}),
 					extraNumbers: extraSpareNumbers,
-					callback: function(numberList) {
+					callback: function(numberList, remainingQuantity) {
 						template.find('.empty-row').hide();
 
 						_.each(numberList, function(val, idx) {
@@ -969,7 +969,7 @@ define(function(require){
 							extraSpareNumbers = _.without(extraSpareNumbers, val.phoneNumber);
 						});
 
-						if(remainingQuantity == 0) {
+						if(remainingQuantity === 0) {
 							template.find('.spare-link').addClass('disabled');
 						}
 					}
