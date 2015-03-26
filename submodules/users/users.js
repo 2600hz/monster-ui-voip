@@ -2401,7 +2401,8 @@ define(function(require){
 				}
 			}
 
-			if(!userData.hasOwnProperty('presence_id') || userData.presence_id === 'unset') {
+			// if presence_id doesn't have a proper value, delete it and remove the internal callerId
+			if(!userData.hasOwnProperty('presence_id') || userData.presence_id === 'unset' || !userData.presence_id) {
 				delete userData.presence_id;
 
 				if(userData.caller_id.hasOwnProperty('internal')) {
