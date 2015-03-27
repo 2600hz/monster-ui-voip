@@ -520,7 +520,7 @@ define(function(require){
 					category = $this.data('category'),
 					subcategory = $this.data('subcategory');
 
-				$('.category#my_office').removeClass('active');
+				$('.category').removeClass('active');
 				switch(category) {
 					case "users":
 						$('.category#users').addClass('active');
