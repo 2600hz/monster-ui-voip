@@ -1264,33 +1264,35 @@ define(function(require){
 
 			template.on('click', '.actions .buy-link', function(e) {
 				e.preventDefault();
+
+				var $this = $(this);
+
 				monster.pub('common.buyNumbers', {
 					searchType: $(this).data('type'),
 					callbacks: {
 						success: function(numbers) {
-							var countNew = 0;
+							var name = $this.parents('.grid-row').find('.grid-cell.name').text(),
+								dataNumbers = $.extend(true, [], extensionsToSave),
+								userId = $this.parents('.grid-row').data('id');
 
-							monster.pub('common.numbers.getListFeatures', function(features) {
-								_.each(numbers, function(number, k) {
-									countNew++;
+							template.find('.empty-row').hide();
 
-									/* Formating number */
-									number.viewFeatures = $.extend(true, {}, features);
+							template.find('.item-row').each(function(idx, elem) {
+								dataNumbers.push($(elem).data('id'));
+							});
 
-									var rowTemplate = monster.template(self, 'users-rowSpareNumber', number);
+							_.each(numbers, function(number, index) {
+								number.phoneNumber = number.id;
+								dataNumbers.push(number.phoneNumber);
 
-									template.find('.list-unassigned-items .empty-row').hide();
-									template.find('.list-unassigned-items').append(rowTemplate);
-								});
+								template
+									.find('.list-assigned-items')
+									.append($(monster.template(self, 'users-numbersItemRow', { number: number })));
+							});
 
-								var previous = parseInt(template.find('.unassigned-list-header .count-spare').data('count')),
-									newTotal = previous + countNew;
-
-								template.find('.unassigned-list-header .count-spare')
-									.data('count', newTotal)
-									.html(newTotal);
-
-								template.find('.spare-link.disabled').removeClass('disabled');
+							self.usersUpdateCallflowNumbers(userId, (currentCallflow || {}).id, dataNumbers, function(callflowData) {
+								toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: name }));
+								self.usersRender({ userId: callflowData.owner_id });
 							});
 						},
 						error: function(error) {

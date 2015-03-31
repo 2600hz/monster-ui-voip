@@ -994,33 +994,36 @@ define(function(require){
 			template.on('click', '.actions .buy-link', function(e) {
 				e.preventDefault();
 
+				var $this = $(this);
+
 				monster.pub('common.buyNumbers', {
 					searchType: $(this).data('type'),
 						callbacks: {
 						success: function(numbers) {
-							var countNew = 0;
 
-							monster.pub('common.numbers.getListFeatures', function(features) {
-								_.each(numbers, function(number, k) {
-									countNew++;
+							var parentRow = $this.parents('.grid-row'),
+								callflowId = parentRow.data('callflow_id'),
+								name = parentRow.data('name');
+								dataNumbers = [];
 
-									/* Formating number */
-									number.viewFeatures = $.extend(true, {}, features);
+							template.find('.empty-row').hide();
 
-									var rowTemplate = monster.template(self, 'users-rowSpareNumber', number);
+							template.find('.item-row').each(function(idx, elem) {
+								dataNumbers.push($(elem).data('id'));
+							});
 
-									template.find('.list-unassigned-items .empty-row').hide();
-									template.find('.list-unassigned-items').append(rowTemplate);
-								});
+							_.each(numbers, function(number, idx) {
+								number.phoneNumber = number.id;
+								dataNumbers.push(number.phoneNumber);
 
-								var previous = parseInt(template.find('.unassigned-list-header .count-spare').data('count')),
-									newTotal = previous + countNew;
+								template
+									.find('.list-assigned-items')
+									.append($(monster.template(self, 'groups-numbersItemRow', { number: number })));
+							});
 
-								template.find('.unassigned-list-header .count-spare')
-									.data('count', newTotal)
-									.html(newTotal);
-
-								template.find('.spare-link.disabled').removeClass('disabled');
+							self.groupsUpdateNumbers(callflowId, dataNumbers, function(callflowData) {
+								toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: name }));
+								self.groupsRender({ groupId: callflowData.group_id });
 							});
 						},
 						error: function(error) {
