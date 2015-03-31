@@ -532,7 +532,7 @@ define(function(require){
 						break;
 					case "numbers":
 						$('.category#numbers').addClass('active');
-						monster.pub('voip.numbers.render', parent);
+						monster.pub('voip.numbers.render', { parent: parent });
 						break;
 					case "strategy":
 						$('.category#strategy').addClass('active');
