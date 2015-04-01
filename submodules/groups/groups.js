@@ -995,6 +995,7 @@ define(function(require){
 							monster.pub('common.numbers.getListFeatures', function(features) {
 								_.each(numbers, function(number, k) {
 									number.viewFeatures = $.extend(true, {}, features);
+									number.phoneNumber = number.id;
 
 									var rowTemplate = monster.template(self, 'groups-numbersItemRow', { number: number });
 
@@ -1270,7 +1271,6 @@ define(function(require){
 					countSpare: 0,
 					unassignedNumbers: {}
 				};
-
 
 			monster.pub('common.numbers.getListFeatures', function(features) {
 				_.each(data.numbers.numbers, function(number, id) {
