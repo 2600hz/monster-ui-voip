@@ -17,6 +17,9 @@
 			</div>
 		</div>
 		<div class="features">
+		{{#compare number.state '===' 'port_in'}}
+				<i class="icon-warning-sign icon-red active help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{../i18n.portIconHelp}}"></i>
+		{{/compare}}
 			{{#each number.viewFeatures}}
 				<i class="{{icon}} {{active}} help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ help }}"></i>
 			{{/each}}

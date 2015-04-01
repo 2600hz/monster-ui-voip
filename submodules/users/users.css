@@ -416,6 +416,10 @@
 }
 
 /* Detail Numbers */
+#users_container .detail-numbers .list-wrapper .item-row .features .tooltip-inner {
+	white-space:pre-wrap;
+}
+
 #users_container .detail-numbers .list-wrapper .item-row .features > i {
 	display: none;
 }

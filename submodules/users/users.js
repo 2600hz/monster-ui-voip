@@ -392,7 +392,8 @@ define(function(require){
 
 					cell.parent().siblings('.edit-user').css({
 						'position': 'initial',
-						'z-index': '0'
+						'z-index': '0',
+						'border-top-color': '#a6a7a9'
 					});
 				}
 				else {
@@ -403,12 +404,13 @@ define(function(require){
 
 					cell.css({
 						'position': 'relative',
-						'z-index': '3'
+						'z-index': '2'
 					});
 
 					cell.parent().siblings('.edit-user').css({
 						'position': 'relative',
-						'z-index': '2'
+						'z-index': '2',
+						'border-top-color': 'transparent'
 					});
 
 					self.usersGetTemplate(type, userId, listUsers, function(template, data) {
@@ -432,6 +434,8 @@ define(function(require){
 							extraSpareNumbers = [];
 							currentCallflow = data.callflow;
 							currentUser = data.user;
+
+							template.find('[data-toggle="tooltip"]').tooltip();
 
 							_.each(data.extensions, function(number) {
 								extensionsToSave.push(number);
@@ -1008,6 +1012,8 @@ define(function(require){
 								extraSpareNumbers = _.without(extraSpareNumbers, val.phoneNumber);
 							});
 
+							template.find('[data-toggle="tooltip"]').tooltip();
+
 							if(remainingQuantity == 0) {
 								template.find('.spare-link').addClass('disabled');
 							}
@@ -1028,6 +1034,8 @@ define(function(require){
 									number.viewFeatures = $.extend(true, {}, features);
 
 									var rowTemplate = monster.template(self, 'users-numbersItemRow', { number: number });
+
+									rowTemplate.find('[data-toggle="tooltip"]').tooltip();
 
 									template.find('.list-unassigned-items .empty-row').hide();
 									template.find('.list-unassigned-items').append(rowTemplate);

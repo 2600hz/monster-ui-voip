@@ -796,6 +796,7 @@
 			"parking": "Stationnement",
 			"do_not_disturb": "\"Ne pas déranger\"",
 			"misc": "Divers"
-		}
+		},
+		"portIconHelp": "Ce numéro est en cours de transfert et sera supprimé si celui-ci échoue. Il peut être configuré mais ne sera pas utilisable"
 	}
 }

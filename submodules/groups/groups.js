@@ -180,7 +180,8 @@ define(function(require){
 
 					cell.parent().siblings('.edit-groups').css({
 						'position': 'block',
-						'z-index': '0'
+						'z-index': '0',
+						'border-top-color': '#a6a7a9'
 					});
 				}
 				else {
@@ -191,17 +192,20 @@ define(function(require){
 
 					cell.css({
 						'position': 'relative',
-						'z-index': '3'
+						'z-index': '2'
 					});
 
 					cell.parent().siblings('.edit-groups').css({
 						'position': 'relative',
-						'z-index': '2'
+						'z-index': '2',
+						'border-top-color': 'transparent'
 					});
 
 					self.groupsGetTemplate(type, groupId, function(template, data) {
 						//FancyCheckboxes.
 						monster.ui.prettyCheck.create(template);
+
+						template.find('[data-toggle="tooltip"]').tooltip();
 
 						row.find('.edit-groups').append(template).slideDown();
 
@@ -969,6 +973,8 @@ define(function(require){
 							extraSpareNumbers = _.without(extraSpareNumbers, val.phoneNumber);
 						});
 
+						template.find('[data-toggle="tooltip"]').tooltip();
+
 						if(remainingQuantity === 0) {
 							template.find('.spare-link').addClass('disabled');
 						}
@@ -991,6 +997,8 @@ define(function(require){
 									number.viewFeatures = $.extend(true, {}, features);
 
 									var rowTemplate = monster.template(self, 'groups-numbersItemRow', { number: number });
+
+									rowTemplate.find('[data-toggle="tooltip"]').tooltip();
 
 									template.find('.list-unassigned-items .empty-row').hide();
 									template.find('.list-unassigned-items').append(rowTemplate);
