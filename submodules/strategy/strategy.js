@@ -209,12 +209,17 @@ define(function(require){
 						});
 						break;
 					case "hours":
-						var secondsToTime = function(seconds) {
+						var is12hMode = monster.apps.auth.currentUser.ui_flags && monster.apps.auth.currentUser.ui_flags.twelve_hours_mode ? true : false,
+							secondsToTime = function(seconds) {
 								var h = parseInt(seconds/3600) % 24,
 									m = (parseInt(seconds/60) % 60).toString(),
+									suffix = '';
+
+								if(is12hMode) {
 									suffix = h >= 12 ? 'PM' : 'AM';
-								h = (h > 12 ? h-12 : (h === 0 ? 12 : h)).toString();
-								return h + ":" + (m.length < 2 ? "0"+m : m) + suffix;
+									h = h > 12 ? h-12 : (h === 0 ? 12 : h)
+								}
+								return h.toString() + ":" + (m.length < 2 ? "0"+m : m) + suffix;
 							},
 							weekdaysRules = strategyData.temporalRules.weekdays,
 							templateData = {
@@ -246,10 +251,10 @@ define(function(require){
 						// Setting Monday to Friday enabled by default for 9AM-5PM, when switching from 24hours Open to Custom Hours.
 						if(templateData.alwaysOpen) {
 							_.each(templateData.days, function(val) {
-								if(val.name !== "MainSaturday" && val.name !== "MainSunday") {
+								if(val.name !== 'MainSaturday' && val.name !== 'MainSunday') {
 									val.open = true;
-									val.from = "9:00AM";
-									val.to = "5:00PM";
+									val.from = is12hMode ? '9:00AM' : '9:00';
+									val.to = is12hMode ? '5:00PM' : '17:00';
 								}
 							});
 						}
@@ -258,11 +263,8 @@ define(function(require){
 
 						var validationOptions = {
 							rules: {
-								"lunchbreak.from": {
-									"time12h": true
-								},
+								"lunchbreak.from": {},
 								"lunchbreak.to": {
-									"time12h": true,
 									"greaterDate": template.find('input[name="lunchbreak.from"]')
 								}
 							},
@@ -273,21 +275,36 @@ define(function(require){
 								error.appendTo(element.parent());
 							}
 						};
+
+						if(is12hMode) {
+							validationOptions.rules["lunchbreak.from"].time12h = true;
+							validationOptions.rules["lunchbreak.to"].time12h = true;
+						} else {
+							validationOptions.rules["lunchbreak.from"].time24h = true;
+							validationOptions.rules["lunchbreak.to"].time24h = true;
+						}
+
 						_.each(self.weekdayLabels, function(wday) {
-							validationOptions.rules["weekdays."+wday+".from"] = {
-								"time12h": true
-							};
+							validationOptions.rules["weekdays."+wday+".from"] = {};
 							validationOptions.rules["weekdays."+wday+".to"] = {
-								"time12h": true,
 								"greaterDate": template.find('input[name="weekdays.'+wday+'.from"]')
 							};
+							if(is12hMode) {
+								validationOptions.rules["weekdays."+wday+".from"].time12h = true;
+								validationOptions.rules["weekdays."+wday+".to"].time12h = true;
+							} else {
+								validationOptions.rules["weekdays."+wday+".from"].time24h = true;
+								validationOptions.rules["weekdays."+wday+".to"].time24h = true;
+							}
 							validationOptions.groups[wday] = "weekdays."+wday+".from weekdays."+wday+".to";
 						});
 						monster.ui.validate(template.find('#strategy_custom_hours_form'), validationOptions);
 
 						container.find('.element-content').empty()
 														  .append(template);
-						template.find('.timepicker').timepicker();
+						template.find('.timepicker').timepicker({
+							timeFormat: is12hMode ? 'g:ia' : 'G:i'
+						});
 						monster.ui.prettyCheck.create(template);
 						callback && callback();
 						break;
