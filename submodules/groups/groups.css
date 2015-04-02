@@ -380,6 +380,10 @@
 }
 
 /* Numbers */
+#groups_container .list-wrapper .item-row .features .tooltip-inner {
+	white-space:pre-wrap;
+}
+
 #groups_container .list-wrapper .item-row .features > i {
 	display: none;
 }

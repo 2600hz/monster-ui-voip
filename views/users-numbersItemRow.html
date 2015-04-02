@@ -1,4 +1,4 @@
-<div class="item-row" data-id="{{number.phoneNumber}}" data-search="{{formatPhoneNumber number.phoneNumber}} {{number.phoneNumber}} {{number.locality.city}} {{number.locality.country}}">
+<div class="item-row" data-id="{{number.phoneNumber}}">
 	<div class="features-block pull-right">
 		<div class="edit-features">
 			<div class="navbar">
@@ -17,6 +17,9 @@
 			</div>
 		</div>
 		<div class="features">
+		{{#compare number.state '===' 'port_in'}}
+				<i class="icon-warning-sign icon-red active help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{../i18n.portIconHelp}}"></i>
+		{{/compare}}
 			{{#each number.viewFeatures}}
 				<i class="{{icon}} {{active}} help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ help }}"></i>
 			{{/each}}

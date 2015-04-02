@@ -24,6 +24,9 @@
 							</div>
 						</div>
 						<div class="features">
+						{{#compare this.state '===' 'port_in'}}
+							<i class="icon-warning-sign icon-red active help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{../../i18n.portIconHelp}}"></i>
+						{{/compare}}
 							{{#each viewFeatures}}
 								<i class="{{icon}} {{active}} help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ help }}"></i>
 							{{/each}}
@@ -51,7 +54,7 @@
 
 	<div class="actions">
 		<a href="#" class="spare-link monster-link pull-left{{#if emptySpare}} disabled{{/if}}">
-			<i class="icon-plus icon-green icon-large"></i>Add from Spare Numbers
+			<i class="icon-plus icon-green icon-large"></i>{{ i18n.groups.addFromSpare }}
 		</a>
 		<ul class="nav pull-left">
 			<li class="dropdown">
