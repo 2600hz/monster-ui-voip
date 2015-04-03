@@ -331,11 +331,8 @@ define(function(require){
 				result = [],
 				formatCdr = function(cdr) {
 					var date = monster.util.gregorianToDate(cdr.timestamp),
-						day = (date.getDate() < 10 ? "0" : "") + date.getDate(),
-						month = (date.getMonth() < 9 ? "0" : "") + (date.getMonth()+1),
-						year = date.getFullYear().toString().substr(2),
-						hours = (date.getHours() < 10 ? "0" : "") + date.getHours(),
-						minutes = (date.getMinutes() < 10 ? "0" : "") + date.getMinutes(),
+						shortDate = monster.util.toFriendlyDate(date, 'shortDate'),
+						time = monster.util.toFriendlyDate(date, 'shortTime'),
 						durationMin = parseInt(cdr.duration_seconds/60).toString(),
 						durationSec = (cdr.duration_seconds % 60 < 10 ? "0" : "") + (cdr.duration_seconds % 60),
 						hangupI18n = self.i18n.active().hangupCauses,
@@ -356,8 +353,8 @@ define(function(require){
 						id: cdr.id,
 						callId: cdr.call_id,
 						timestamp: cdr.timestamp,
-						date: month+"/"+day+"/"+year,
-						time: hours+":"+minutes,
+						date: shortDate,
+						time: time,
 						fromName: cdr.caller_id_name,
 						fromNumber: cdr.caller_id_number || cdr.from.replace(/@.*/, ''),
 						toName: cdr.callee_id_name,
@@ -375,7 +372,7 @@ define(function(require){
 								  + "%0D%0AFrom (Number): " + (cdr.caller_id_number || cdr.from.replace(/@.*/, ''))
 								  + "%0D%0ATo (Name): " + (cdr.callee_id_name || "")
 								  + "%0D%0ATo (Number): " + (cdr.callee_id_number || ("request" in cdr) ? cdr.request.replace(/@.*/, '') : cdr.to.replace(/@.*/, ''))
-								  + "%0D%0ADate: " + month+"/"+day+"/"+year
+								  + "%0D%0ADate: " + shortDate
 								  + "%0D%0ADuration: " + durationMin + ":" + durationSec
 								  + "%0D%0AHangup Cause: " + (cdr.hangup_cause || "")
 								  + "%0D%0ACall ID: " + cdr.call_id
