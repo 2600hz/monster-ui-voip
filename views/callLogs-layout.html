@@ -3,25 +3,44 @@
 		<div class="title-div">
 			{{i18n.callLogs.title}}
 		</div>
-		<div class="action-div">
+
+		<div class="fixed-ranges">
+			<div class="btn-toolbar pull-left">
+				<div class="btn-group">
+					<button data-type="today" class="btn{{#compare type "===" "today"}} active{{/compare}}" type="button">{{ i18n.callLogs.thisDay }}</button>
+					<button data-type="thisWeek" class="btn{{#compare type "===" "thisWeek"}} active{{/compare}}" type="button">{{ i18n.callLogs.thisWeek }}</button>
+					<button data-type="thisMonth" class="btn{{#compare type "===" "thisMonth"}} active{{/compare}}" type="button">{{ i18n.callLogs.thisMonth }}</button>
+					<button data-type="custom" class="btn{{#compare type "===" "custom"}} active{{/compare}}" type="button">{{ i18n.callLogs.custom }}</button>
+				</div>
+			</div>
+
 			<div class="search-div pull-right">
 				<span class="search-box">
 					<i class="icon-search"></i>
 					<input type="text" class="search-query" placeholder="{{i18n.table.search}}">
 				</span>
 			</div>
-			<div class="filter-div">
-				<i class="refresh-filter icon-refresh icon-blue" title="{{i18n.callLogs.resetFilter}}"></i>
-				<span>{{i18n.startDate}}:</span>
+		</div>
+
+		<div class="sub-ranges">
+			<div class="custom-range{{#compare type "===" "custom"}} active{{/compare}}">
+				<span>{{i18n.startDate}}</span>
 				<input id="startDate" type="text" class="date-filter filter-from">
-				<span>{{i18n.endDate}}:</span>
+				<span>{{i18n.endDate}}</span>
 				<input id="endDate" type="text" class="date-filter filter-to">
 				<button type="button" class="apply-filter btn btn-primary" title="{{i18n.callLogs.applyFilter}}">{{i18n.filter}}</button>
-				<a href="#" role="button" class="download-csv"><i class="icon-download-alt icon-green"></i>{{i18n.download}}</a>
-				<!-- <i class=" icon-download-alt icon-green" title="Download CSV File"></i> -->
 			</div>
+
+			{{#if showFilteredDates}}
+				<div class="fixed-ranges-date">
+					{{ i18n.callLogs.callsFrom }} <span class="highlight-date">{{ toFriendlyDate fromDate "short"}}</span> {{ i18n.callLogs.callsTo }} <span class="highlight-date">{{ toFriendlyDate toDate "short" }}</span>
+				</div>
+			{{/if}}
+
+			<a href="#" role="button" class="monster-link download-csv"><i class="icon-download-alt icon-green"></i>{{i18n.download}}</a>
 		</div>
 	</div>
+
 	<div class="call-logs-content">
 		<div class="call-logs-grid">
 			<div class="grid-row-group">

@@ -16,11 +16,8 @@ define(function(require){
 			self.callLogsRenderContent(args.parent);
 		},
 
-		callLogsRenderContent: function(parent, fromDate, toDate) {
+		callLogsRenderContent: function(parent, fromDate, toDate, type) {
 			var self = this,
-				dataTemplate = {
-					timezone: 'GMT' + jstz.determine_timezone().offset()
-				},
 				template,
 				defaultDateRange = 1,
 				maxDateRange = 31;
@@ -30,6 +27,14 @@ define(function(require){
 				fromDate = dates.from;
 				toDate = dates.to;
 			}
+
+			var dataTemplate = {
+				timezone: 'GMT' + jstz.determine_timezone().offset(),
+				type: type || 'today',
+				fromDate: fromDate,
+				toDate: toDate,
+				showFilteredDates: ['thisMonth', 'thisWeek'].indexOf(type) >= 0
+			};
 
 			// Reset variables used to link A-Legs & B-Legs sent by different pages in the API
 			delete self.lastALeg;
@@ -83,26 +88,42 @@ define(function(require){
 				toDate = params.toDate,
 				startKey = params.nextStartKey;
 
-			template.find('.filter-div .apply-filter').on('click', function(e) {
-				var fromDate = template.find('.filter-div input.filter-from').datepicker("getDate"),
-					toDate = template.find('.filter-div input.filter-to').datepicker("getDate");
+			template.find('.apply-filter').on('click', function(e) {
+				var fromDate = template.find('input.filter-from').datepicker("getDate"),
+					toDate = template.find('input.filter-to').datepicker("getDate");
 
-				self.callLogsRenderContent(template.parents('.right-content'), fromDate, toDate);
+				self.callLogsRenderContent(template.parents('.right-content'), fromDate, toDate, 'custom');
 			});
 
-			template.find('.filter-div .refresh-filter').on('click', function(e) {
-				self.callLogsRenderContent(template.parents('.right-content'));
+			template.find('.fixed-ranges button').on('click', function(e) {
+				var $this = $(this),
+					type = $this.data('type');
+
+				// We don't really need to do that, but it looks better to the user if we still remove/add the classes instantly.
+				template.find('.fixed-ranges button').removeClass('active');
+				$this.addClass('active');
+
+				if(type !== 'custom') {
+					// Without this, it doesn't look like we're refreshing the data.
+					// GOod way to solve it would be to separate the filters from the call logs view, and only refresh the call logs.
+					template.find('.call-logs-content').empty();
+
+					var dates = self.callLogsGetFixedDatesFromType(type);
+					self.callLogsRenderContent(template.parents('.right-content'), dates.from, dates.to, type);
+				}
+				else {
+					template.find('.fixed-ranges-date').hide();
+					template.find('.custom-range').addClass('active');
+				}
 			});
 
-			template.find('.filter-div .download-csv').on('click', function(e) {
-				var fromDate = template.find('.filter-div input.filter-from').datepicker("getDate"),
-					toDate = template.find('.filter-div input.filter-to').datepicker("getDate"),
-					fromDateTimestamp = monster.util.dateToBeginningOfGregorianDay(fromDate),
+			template.find('.download-csv').on('click', function(e) {
+				var fromDateTimestamp = monster.util.dateToBeginningOfGregorianDay(fromDate),
 					toDateTimestamp = monster.util.dateToEndOfGregorianDay(toDate);
 
 				window.location.href = self.apiUrl + 'accounts/' + self.accountId 
-				                     + '/cdrs?created_from=' + fromDateTimestamp + '&created_to=' + toDateTimestamp 
-				                     + '&accept=text/csv&auth_token=' + self.authToken;
+									 + '/cdrs?created_from=' + fromDateTimestamp + '&created_to=' + toDateTimestamp 
+									 + '&accept=text/csv&auth_token=' + self.authToken;
 			});
 
 			template.find('.search-div input.search-query').on('keyup', function(e) {
@@ -212,6 +233,35 @@ define(function(require){
 			template.find('.call-logs-loader:not(.loading) .loader-message').on('click', function(e) {
 				loadMoreCdrs();
 			});
+		},
+
+		// Function built to return JS Dates for the fixed ranges.
+		callLogsGetFixedDatesFromType: function(type) {
+			var self = this,
+				from = new Date(),
+				to = new Date();
+
+			switch(type) {
+				case 'today':
+					break;
+				case 'thisWeek':
+					// First we need to know how many days separate today and monday.
+					// Since Sunday is 0 and Monday is 1, we do this little substraction to get the result.
+					var countDaysFromMonday = (from.getDay() - 1) % 7;
+					from.setDate(from.getDate() - countDaysFromMonday);
+
+					break;
+				case 'thisMonth':
+					from.setDate(1);
+					break;
+				default:
+					break;
+			}
+
+			return {
+				from: from,
+				to: to
+			};
 		},
 
 		callLogsGetCdrs: function(fromDate, toDate, callback, pageStartKey) {

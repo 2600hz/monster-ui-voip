@@ -692,7 +692,16 @@
 			"getDetailsError": "Une erreur est survenue en essayant de récuperer les détails de l'appel."
 		},
 		"key": "Clé",
-		"value": "Valeur"
+		"value": "Valeur",
+
+		"__comment": "UI-1071: Adding new Range buttons to Call Logs",
+		"__version": "3.20",
+		"thisMonth": "Ce mois",
+		"thisWeek": "Cette semaine",
+		"thisDay": "Aujourd'hui",
+		"custom": "Personnalisé",
+		"callsFrom": "Liste les appels depuis",
+		"callsTo": "jusqu'à"
 	},
 
 	"myOffice": {

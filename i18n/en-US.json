@@ -722,7 +722,15 @@
 			"getDetailsError": "An error occured while retrieving the call log's details."
 		},
 		"key": "Key",
-		"value": "Value"
+		"value": "Value",
+		"__comment": "UI-1071: Adding new Range buttons to Call Logs",
+		"__version": "3.20",
+		"thisMonth": "This Month",
+		"thisWeek": "This Week",
+		"thisDay": "Today",
+		"custom": "Custom",
+		"callsFrom": "Showing calls from",
+		"callsTo": "to"
 	},
 
 	"myOffice": {

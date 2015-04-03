@@ -11,30 +11,54 @@
 #call_logs_container .call-logs-header .search-div input.search-query {
 	width: 140px;
 }
-#call_logs_container .call-logs-header .filter-div {
-	margin-right: 20px;
+
+#call_logs_container .sub-ranges {
+	margin-top: 5px;
 }
-#call_logs_container .call-logs-header .filter-div > * {
+
+#call_logs_container .sub-ranges > * {
+	display: inline-block;
+}
+
+#call_logs_container .fixed-ranges {
+	width: 100%;
+	height: 35px;
+	margin-top: 20px;
+}
+
+#call_logs_container .fixed-ranges .btn-toolbar {
+	margin-top: 0;
+}
+
+#call_logs_container .fixed-ranges-date {
+	margin-top: 10px;
+}
+
+#call_logs_container .fixed-ranges-date .highlight-date {
+	color: #22CCFF;
+	font-weight: bold;
+	margin: 0 5px;
+}
+
+#call_logs_container .custom-range {
+	display: none;
+}
+
+#call_logs_container .custom-range.active {
+	display: inline-block;
+}
+
+#call_logs_container .custom-range > * {
 	margin: 0 10px 0 0;
 	vertical-align: middle;
 }
-#call_logs_container .call-logs-header .filter-div > span {
+
+#call_logs_container .custom-range > span {
 	margin-right: 5px;
 }
-#call_logs_container .call-logs-header .filter-div input.date-filter {
+
+#call_logs_container .custom-range input.date-filter {
 	width: 80px;
-}
-#call_logs_container .call-logs-header .filter-div i.refresh-filter:hover {
-	text-shadow: 1px 1px 0px #999;
-	cursor: pointer;
-}
-#call_logs_container .call-logs-header .filter-div .download-csv i {
-	margin-right: 5px;
-	vertical-align: inherit;
-}
-#call_logs_container .call-logs-header .filter-div .download-csv:hover i {
-	text-shadow: 1px 1px 0px #999;
-	text-decoration: none;
 }
 
 #call_logs_container .call-logs-content {
