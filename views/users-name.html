@@ -24,9 +24,10 @@
 
 			<div class="email-border{{#if extra.differentEmail }} open{{/if}}">
 				<div class="row-fields email-checkbox">
-					<label class="fix-left" for="notification_email">
-						<input id="notification_email" type="checkbox" name="extra.differentEmail"{{#if extra.differentEmail}} checked{{/if}}></input>
-						{{ i18n.users.dialogCreationUser.sendToDifferentEmail }}
+					<label class="fix-left">
+						{{#monsterCheckbox i18n.users.dialogCreationUser.sendToDifferentEmail }}
+							<input id="notification_email" type="checkbox" name="extra.differentEmail"{{#if extra.differentEmail}} checked{{/if}}></input>
+						{{/monsterCheckbox}}
 					</label>
 				</div>
 
@@ -39,8 +40,9 @@
 			{{#if extra.mainCallflowId}}
 			<div class="row-fields">
 				<label class="fix-left">
-					<input id="include_directory" type="checkbox" name="extra.includeInDirectory"{{#if extra.includeInDirectory}} checked="checked"{{/if}}></input>
-					{{ i18n.users.includeInDirectory }}
+					{{#monsterCheckbox i18n.users.includeInDirectory }}
+						<input id="include_directory" type="checkbox" name="extra.includeInDirectory"{{#if extra.includeInDirectory}} checked="checked"{{/if}}></input>
+					{{/monsterCheckbox}}
 				</label>
 			</div>
 			{{/if}}

@@ -17,14 +17,18 @@
 			</div>
 
 			<div class="main-line">
-				{{ i18n.users.hotdesk.label }}
-				<input type="checkbox" name="require_pin"{{#if hotdesk.require_pin}} checked{{/if}}></input>
+
+				{{#monsterCheckbox i18n.users.hotdesk.label}}
+					<input type="checkbox" name="require_pin"{{#if hotdesk.require_pin}} checked{{/if}}></input>
+				{{/monsterCheckbox}}
+
 				<input required minlength="4" id="pin" type="text" name="pin" class="input-small" placeholder="{{ i18n.users.hotdesk.placeholder }}" value="{{hotdesk.pin}}"{{#unless hotdesk.require_pin}}disabled{{/unless}}></input>
 			</div>
 
 			<label class="fix-left">
-				<input type="checkbox" name="keep_logged_in_elsewhere"{{#if hotdesk.keep_logged_in_elsewhere}} checked{{/if}}></input>
-				{{ i18n.users.hotdesk.keep_logged_in_elsewhere }}
+				{{#monsterCheckbox i18n.users.hotdesk.keep_logged_in_elsewhere}}
+					<input type="checkbox" name="keep_logged_in_elsewhere"{{#if hotdesk.keep_logged_in_elsewhere}} checked{{/if}}></input>
+				{{/monsterCheckbox}}
 			</label>
 		</form>
 

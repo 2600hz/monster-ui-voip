@@ -38,19 +38,17 @@
 		<div class="control-group hack-left">
 			<label class="control-label" for="include_directory"></label>
 			<div class="controls">
-				<label>
+				{{#monsterCheckbox i18n.users.includeInDirectory }}
 					<input id="include_directory" type="checkbox" name="extra.includeInDirectory"{{#if includeInDirectory}} checked="checked"{{/if}}></input>
-					{{ i18n.users.includeInDirectory }}
-				</label>
+				{{/monsterCheckbox}}
 			</div>
 		</div>
 		<div class="control-group hack-left">
 			<label class="control-label" for="notification_email"></label>
 			<div class="controls">
-				<label>
+				{{#monsterCheckbox i18n.users.dialogCreationUser.sendToDifferentEmail }}
 					<input id="notification_email" type="checkbox" name="extra.differentEmail"{{#if sendToDifferentEmail}} checked{{/if}}></input>
-					{{ i18n.users.dialogCreationUser.sendToDifferentEmail }}
-				</label>
+				{{/monsterCheckbox}}
 			</div>
 		</div>
 		<div class="control-group email-group{{#unless sendToDifferentEmail}} hidden{{/unless}}">
@@ -62,10 +60,9 @@
 		<div class="control-group hack-left">
 			<label class="control-label" for="send_email_on_creation"></label>
 			<div class="controls">
-				<label>
+				{{#monsterCheckbox i18n.users.dialogCreationUser.sendWelcomeEmail }}
 					<input id="send_email_on_creation" type="checkbox" name="user.send_email_on_creation"></input>
-					{{ i18n.users.dialogCreationUser.sendWelcomeEmail }}
-				</label>
+				{{/monsterCheckbox}}
 			</div>
 		</div>
 	</div>

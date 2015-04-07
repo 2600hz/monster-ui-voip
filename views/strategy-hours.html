@@ -35,8 +35,9 @@
 					<span class="status pull-right">{{#if this.open}}{{../../i18n.strategy.open}}{{else}}{{../../i18n.strategy.closed}}{{/if}}</span>
 					<div>
 						<label class="custom-day-label">
-							<input type="checkbox" name="opendays[]" value="{{this.name}}" {{#if this.open}}checked{{/if}}>
-							{{this.label}}
+							{{#monsterCheckbox this.label}}
+								<input type="checkbox" name="opendays[]" value="{{this.name}}" {{#if this.open}}checked{{/if}}>
+							{{/monsterCheckbox}}
 						</label>
 						<span class="timepickers" {{#unless this.open}}style="display:none;"{{/unless}}>
 							<input required class="from-hour timepicker" type="text" name="weekdays.{{this.name}}.from" value="{{this.from}}">
@@ -49,8 +50,9 @@
 			</div>
 			<div class="custom-hours-lunchbreak">
 				<label>
-					<input type="checkbox" name="lunchbreak.enabled" {{#if lunchbreak.enabled}}checked{{/if}}>
-					{{i18n.strategy.hours.lunchbreakTitle}}
+					{{#monsterCheckbox i18n.strategy.hours.lunchbreakTitle}}
+						<input type="checkbox" name="lunchbreak.enabled" {{#if lunchbreak.enabled}}checked{{/if}}>
+					{{/monsterCheckbox}}
 				</label>
 				<span class="timepickers" {{#unless lunchbreak.enabled}}style="display:none;"{{/unless}}>
 					<input required class="from-hour timepicker" type="text" name="lunchbreak.from" value="{{lunchbreak.from}}">

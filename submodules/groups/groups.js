@@ -202,9 +202,6 @@ define(function(require){
 					});
 
 					self.groupsGetTemplate(type, groupId, function(template, data) {
-						//FancyCheckboxes.
-						monster.ui.prettyCheck.create(template);
-
 						template.find('[data-toggle="tooltip"]').tooltip();
 
 						row.find('.edit-groups').append(template).slideDown();

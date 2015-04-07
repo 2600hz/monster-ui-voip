@@ -46,32 +46,29 @@
 
 			<div class="tabs-section" data-section="options">
 				<div class="control-group">
-            		<label class="control-label" for="require_keypress"></label>
-            		<div class="controls">
-                		<label>
-                    		<input id="require_keypress" type="checkbox" name="call_forward.require_keypress"{{#if call_forward.require_keypress}} checked="checked"{{/if}}></input>
-                    		{{ i18n.devices.cellphone.requireKeypress }}
-                		</label>
-            		</div>
-        		</div>
+					<label class="control-label" for="require_keypress"></label>
+					<div class="controls">
+						{{#monsterCheckbox i18n.devices.cellphone.requireKeypress }}
+							<input id="require_keypress" type="checkbox" name="call_forward.require_keypress"{{#if call_forward.require_keypress}} checked="checked"{{/if}}></input>
+						{{/monsterCheckbox}}
+					</div>
+				</div>
 				<div class="control-group">
-            		<label class="control-label" for="keep_caller_id"></label>
-            		<div class="controls">
-                		<label>
-                    		<input id="keep_caller_id" type="checkbox" name="call_forward.keep_caller_id"{{#if call_forward.keep_caller_id}} checked="checked"{{/if}}></input>
-                    		{{ i18n.devices.cellphone.keepCallerId }}
-                		</label>
-            		</div>
-        		</div>
+					<label class="control-label" for="keep_caller_id"></label>
+					<div class="controls">
+						{{#monsterCheckbox i18n.devices.cellphone.keepCallerId }}
+							<input id="keep_caller_id" type="checkbox" name="call_forward.keep_caller_id"{{#if call_forward.keep_caller_id}} checked="checked"{{/if}}></input>
+						{{/monsterCheckbox}}
+					</div>
+				</div>
 				<div class="control-group">
-            		<label class="control-label" for="hide_contact_list"></label>
-            		<div class="controls">
-                		<label>
-                    		<input id="hide_contact_list" type="checkbox" name="contact_list.exclude"{{#if contact_list.exclude}} checked="checked"{{/if}}></input>
-                    		{{ i18n.devices.cellphone.hideContactList }}
-                		</label>
-            		</div>
-        		</div>
+					<label class="control-label" for="hide_contact_list"></label>
+					<div class="controls">
+						{{#monsterCheckbox i18n.devices.cellphone.hideContactList }}
+							<input id="hide_contact_list" type="checkbox" name="contact_list.exclude"{{#if contact_list.exclude}} checked="checked"{{/if}}></input>
+						{{/monsterCheckbox}}
+					</div>
+				</div>
 			</div>
 		</form>
 	</div>

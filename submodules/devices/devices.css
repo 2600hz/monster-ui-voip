@@ -372,10 +372,12 @@
 /* RTP Special CSS */
 .edit-device .content .rtp-line > * {
 	float: left;
+	font-size: 14px;
 	margin-right: 10px;
 }
 
 .edit-device .form-horizontal .control-label.checkbox {
 	width: inherit;
 	margin-left: 35px;
+	padding-top: 3px;
 }

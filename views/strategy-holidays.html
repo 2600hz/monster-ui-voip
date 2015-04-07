@@ -1,7 +1,8 @@
 <div class="holidays-toggler">
 	<label>
-		<input type="checkbox" name="holidays.enabled" {{#if enabled}}checked{{/if}}>
-		{{i18n.strategy.holidays.enableTitle}}
+		{{#monsterCheckbox i18n.strategy.holidays.enableTitle}}
+			<input type="checkbox" name="holidays.enabled" {{#if enabled}}checked{{/if}}>
+		{{/monsterCheckbox}}
 	</label>
 </div>
 

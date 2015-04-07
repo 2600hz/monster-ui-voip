@@ -246,7 +246,6 @@ define(function(require){
 			}
 
 			monster.ui.tabs(templateDevice);
-			monster.ui.prettyCheck.create(templateDevice);
 			monster.ui.protectField(templateDevice.find('#sip_password'), templateDevice);
 
 			templateDevice.find('[data-toggle="tooltip"]').tooltip();
@@ -257,7 +256,7 @@ define(function(require){
 				templateDevice.find('#rtp_method').hide();
 			}
 
-			templateDevice.find('#secure_rtp').on('ifChanged', function() {
+			templateDevice.find('#secure_rtp').on('change', function() {
 				templateDevice.find('#rtp_method').toggle();
 			});
 

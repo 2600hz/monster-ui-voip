@@ -455,9 +455,6 @@ define(function(require){
 							currentUser = data;
 						}
 
-						//FancyCheckboxes.
-						monster.ui.prettyCheck.create(template);
-
 						row.find('.edit-user').append(template).slideDown(400, function() {
 							$('body').animate({ scrollTop: row.offset().top - (window.innerHeight - row.height() - 10) });
 						});
@@ -500,8 +497,6 @@ define(function(require){
 						var originalData = self.usersFormatAddUser(results),
 							userTemplate = $(monster.template(self, 'users-creation', originalData));
 
-						monster.ui.prettyCheck.create(userTemplate);
-
 						monster.ui.validate(userTemplate.find('#form_user_creation'), {
 							rules: {
 								'callflow.extension': {
@@ -537,7 +532,7 @@ define(function(require){
 							}
 						});
 
-						userTemplate.find('#notification_email').on('ifChanged', function() {
+						userTemplate.find('#notification_email').on('change', function() {
 							userTemplate.find('.email-group').toggleClass('hidden');
 						});
 
@@ -666,7 +661,7 @@ define(function(require){
 				});
 			});
 
-			template.on('ifChanged', '#notification_email', function() {
+			template.on('change', '#notification_email', function() {
 				if ( template.find('.email-border').hasClass('open') ) {
 					template.find('.email-border').removeClass('open', 400);
 					template.find('.email-group').slideUp();
@@ -1560,8 +1555,6 @@ define(function(require){
 				}
 			});
 
-			monster.ui.prettyCheck.create(featureTemplate.find('.content'));
-
 			var popup = monster.ui.dialog(featureTemplate, {
 				title: data.user.extra.mapFeatures.conferencing.title,
 				position: ['center', 20]
@@ -1577,8 +1570,6 @@ define(function(require){
 				data = self.usersFormatFaxingData(data),
 				featureTemplate = $(monster.template(self, 'users-feature-faxing', data)),
 				switchFeature = featureTemplate.find('.switch').bootstrapSwitch();
-
-			monster.ui.prettyCheck.create(featureTemplate.find('.content'));
 
 			if ( !_.isEmpty(data.extra.listNumbers) ) {
 				var popup = monster.ui.dialog(featureTemplate, {
@@ -1639,7 +1630,7 @@ define(function(require){
 				data.value ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
 			});
 
-			requirePin.on('ifChanged', function() {
+			requirePin.on('change', function() {
 				if(requirePin.is(':checked')) {
 					featureTemplate.find('#pin')
 						.removeAttr('disabled', 'disabled')
@@ -1676,8 +1667,6 @@ define(function(require){
 					});
 				}
 			});
-
-			monster.ui.prettyCheck.create(featureTemplate.find('.content'));
 
 			var popup = monster.ui.dialog(featureTemplate, {
 				title: currentUser.extra.mapFeatures.hotdesk.title,
@@ -1765,8 +1754,6 @@ define(function(require){
 				}
 			});
 
-			monster.ui.prettyCheck.create(featureTemplate.find('.content'));
-
 			var popup = monster.ui.dialog(featureTemplate, {
 				title: currentUser.extra.mapFeatures.vm_to_email.title,
 				position: ['center', 20]
@@ -1848,9 +1835,8 @@ define(function(require){
 			}
 
 			monster.ui.validate(featureForm);
-			monster.ui.prettyCheck.create(featureTemplate.find('.content'));
 
-			featureTemplate.find('input[name="require_keypress"]').on('ifToggled', function() {
+			featureTemplate.find('input[name="require_keypress"]').on('change', function() {
 				timeoutWarningBox.toggle();
 			});
 
@@ -2102,7 +2088,7 @@ define(function(require){
 			_.each(deviceList, function(device) {
 				createSlider(device);
 				if(!(device.id in ringGroup)) {
-					monster.ui.prettyCheck.action(template.find('.device-row[data-device_id="'+device.id+'"] .disable-device'), 'check');
+					template.find('.device-row[data-device_id="'+device.id+'"] .disable-device').prop('checked', true);
 				}
 			});
 			createSliderScale(template.find('.device-row.title'), true);
