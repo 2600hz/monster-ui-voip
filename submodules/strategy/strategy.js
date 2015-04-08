@@ -1360,7 +1360,26 @@ define(function(require){
 				greeting = params.greeting,
 				container = popup.find('#strategy_menu_popup'),
 				ttsGreeting = container.find('#strategy_menu_popup_tts_greeting'),
-				uploadGreeting = container.find('#strategy_menu_popup_upload_greeting');
+				uploadGreeting = container.find('#strategy_menu_popup_upload_greeting'),
+				mediaToUpload = undefined;
+
+			container.find('.upload-input').fileUpload({
+				inputOnly: true,
+				wrapperClass: 'upload-container',
+				btnText: self.i18n.active().strategy.popup.fileUploadButton,
+				btnClass: 'monster-button-secondary',
+				maxSize: 5,
+				success: function(results) {
+					mediaToUpload = results[0];
+				},
+				error: function(errors) {
+					if(errors.hasOwnProperty('size') && errors.size.length > 0) {
+						monster.ui.alert(self.i18n.active().strategy.alertMessages.fileTooBigAlert);
+					}
+					container.find('.upload-container input').val('');
+					mediaToUpload = undefined;
+				}
+			});
 
 			container.on('click', '.number-text', function(e) {
 				var $this = $(this);
@@ -1473,9 +1492,7 @@ define(function(require){
 			});
 
 			uploadGreeting.find('.update-greeting').on('click', function(e) {
-				var fileReader = new FileReader(),
-					file = uploadGreeting.find('input[type="file"]')[0].files[0],
-					uploadFile = function(file, greetingId, callback) {
+				var uploadFile = function(file, greetingId, callback) {
 						self.callApi({
 							resource: 'media.upload',
 							data: {
@@ -1489,10 +1506,10 @@ define(function(require){
 						});
 					};
 
-				fileReader.onloadend = function(evt) {
+				if(mediaToUpload) {
 					if(greeting && greeting.id) {
 						greeting.type = 'virtual_receptionist';
-						greeting.description = file.name;
+						greeting.description = mediaToUpload.name;
 						greeting.media_source = "upload";
 						delete greeting.tts;
 
@@ -1505,7 +1522,7 @@ define(function(require){
 							},
 							success: function(data, status) {
 								greeting = data.data;
-								uploadFile(evt.target.result, data.data.id, function() {
+								uploadFile(mediaToUpload.file, greeting.id, function() {
 									container.find('.greeting-option').removeClass('active');
 									uploadGreeting.parents('.greeting-option').addClass('active');
 									uploadGreeting.collapse('hide');
@@ -1522,12 +1539,12 @@ define(function(require){
 									name: callflowName,
 									type: 'virtual_receptionist',
 									media_source: "upload",
-									description: file.name
+									description: mediaToUpload.name
 								}
 							},
 							success: function(data, status) {
 								greeting = data.data;
-								menu.media.greeting = data.data.id;
+								menu.media.greeting = greeting.id;
 								self.callApi({
 									resource: 'menu.update',
 									data: {
@@ -1540,21 +1557,13 @@ define(function(require){
 									}
 								});
 
-								uploadFile(evt.target.result, data.data.id, function() {
+								uploadFile(mediaToUpload.file, greeting.id, function() {
 									container.find('.greeting-option').removeClass('active');
 									uploadGreeting.parents('.greeting-option').addClass('active');
 									uploadGreeting.collapse('hide');
 								});
 							}
 						});
-					}
-				};
-
-				if(file) {
-					if(file.size >= (Math.pow(2,20) * 5)) { //If size bigger than 5MB
-						monster.ui.alert(self.i18n.active().strategy.alertMessages.fileTooBigAlert);
-					} else {
-						fileReader.readAsDataURL(file);
 					}
 				} else {
 					monster.ui.alert(self.i18n.active().strategy.alertMessages.emptyUploadGreeting);

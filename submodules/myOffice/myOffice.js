@@ -594,9 +594,8 @@ define(function(require){
 				popup = args.popup,
 				account = args.account,
 				closeUploadDiv = function(newMedia) {
-					var uploadInput = popupTemplate.find('.upload-input');
-					uploadInput.wrap('<form>').closest('form').get(0).reset();
-					uploadInput.unwrap();
+					mediaToUpload = undefined;
+					popupTemplate.find('.upload-div input').val('');
 					popupTemplate.find('.upload-div').slideUp(function() {
 						popupTemplate.find('.upload-toggle').removeClass('active');
 					});
@@ -606,6 +605,24 @@ define(function(require){
 						mediaSelect.val(newMedia.id);
 					}
 				};
+
+			popupTemplate.find('.upload-input').fileUpload({
+				inputOnly: true,
+				wrapperClass: 'file-upload input-append',
+				btnText: self.i18n.active().myOffice.musicOnHold.audioUploadButton,
+				btnClass: 'btn',
+				maxSize: 5,
+				success: function(results) {
+					mediaToUpload = results[0];
+				},
+				error: function(errors) {
+					if(errors.hasOwnProperty('size') && errors.size.length > 0) {
+						monster.ui.alert(self.i18n.active().myOffice.musicOnHold.fileTooBigAlert);
+					}
+					popupTemplate.find('.upload-div input').val('');
+					mediaToUpload = undefined;
+				}
+			});
 
 			popupTemplate.find('.cancel-link').on('click', function() {
 				popup.dialog('close').remove();
@@ -624,19 +641,16 @@ define(function(require){
 			});
 
 			popupTemplate.find('.upload-submit').on('click', function() {
-				var file = popupTemplate.find('.upload-input')[0].files[0];
-					fileReader = new FileReader();
-
-				fileReader.onloadend = function(evt) {
+				if(mediaToUpload) {
 					self.callApi({
 						resource: 'media.create',
 						data: {
 							accountId: self.accountId,
 							data: {
 								streamable: true,
-								name: file.name,
+								name: mediaToUpload.name,
 								media_source: "upload",
-								description: file.name
+								description: mediaToUpload.name
 							}
 						},
 						success: function(data, status) {
@@ -646,7 +660,7 @@ define(function(require){
 								data: {
 									accountId: self.accountId,
 									mediaId: media.id,
-									data: evt.target.result
+									data: mediaToUpload.file
 								},
 								success: function(data, status) {
 									closeUploadDiv(media);
@@ -659,22 +673,12 @@ define(function(require){
 											mediaId: media.id,
 											data: {}
 										},
-										success: function(data, status) {
-
-										}
+										success: function(data, status) {}
 									});
 								}
 							});
 						}
 					});
-				};
-
-				if(file) {
-					if(file.size >= (Math.pow(2,20) * 5)) { //If size bigger than 5MB
-						monster.ui.alert(self.i18n.active().myOffice.musicOnHold.fileTooBigAlert);
-					} else {
-						fileReader.readAsDataURL(file);
-					}
 				} else {
 					monster.ui.alert(self.i18n.active().myOffice.musicOnHold.emptyUploadAlert);
 				}

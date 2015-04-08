@@ -547,7 +547,8 @@ define(function(require){
 		groupsRenderRingback: function(data) {
 			var self = this,
 				silenceMediaId = 'silence_stream://300000',
-				ringGroupNode = data.baseCallflow.flow;
+				ringGroupNode = data.baseCallflow.flow,
+				mediaToUpload = undefined;
 
 			while(ringGroupNode.module !== 'ring_group' && '_' in ringGroupNode.children) {
 				ringGroupNode = ringGroupNode.children['_'];
@@ -564,9 +565,8 @@ define(function(require){
 					switchFeature = featureTemplate.find('.switch').bootstrapSwitch(),
 					popup,
 					closeUploadDiv = function(newMedia) {
-						var uploadInput = featureTemplate.find('.upload-input');
-						uploadInput.wrap('<form>').closest('form').get(0).reset();
-						uploadInput.unwrap();
+						mediaToUpload = undefined;
+						featureTemplate.find('.upload-div input').val('');
 						featureTemplate.find('.upload-div').slideUp(function() {
 							featureTemplate.find('.upload-toggle').removeClass('active');
 						});
@@ -576,6 +576,24 @@ define(function(require){
 							mediaSelect.val(newMedia.id);
 						}
 					};
+
+				featureTemplate.find('.upload-input').fileUpload({
+					inputOnly: true,
+					wrapperClass: 'file-upload input-append',
+					btnText: self.i18n.active().groups.ringback.audioUploadButton,
+					btnClass: 'btn',
+					maxSize: 5,
+					success: function(results) {
+						mediaToUpload = results[0];
+					},
+					error: function(errors) {
+						if(errors.hasOwnProperty('size') && errors.size.length > 0) {
+							monster.ui.alert(self.i18n.active().groups.ringback.fileTooBigAlert);
+						}
+						featureTemplate.find('.upload-div input').val('');
+						mediaToUpload = undefined;
+					}
+				});
 
 				featureTemplate.find('.cancel-link').on('click', function() {
 					popup.dialog('close').remove();
@@ -598,19 +616,16 @@ define(function(require){
 				});
 
 				featureTemplate.find('.upload-submit').on('click', function() {
-					var file = featureTemplate.find('.upload-input')[0].files[0];
-						fileReader = new FileReader();
-
-					fileReader.onloadend = function(evt) {
+					if(mediaToUpload) {
 						self.callApi({
 							resource: 'media.create',
 							data: {
 								accountId: self.accountId,
 								data: {
 									streamable: true,
-									name: file.name,
+									name: mediaToUpload.name,
 									media_source: "upload",
-									description: file.name
+									description: mediaToUpload.name
 								}
 							},
 							success: function(data, status) {
@@ -620,7 +635,7 @@ define(function(require){
 									data: {
 										accountId: self.accountId,
 										mediaId: media.id,
-										data: evt.target.result
+										data: mediaToUpload.file
 									},
 									success: function(data, status) {
 										closeUploadDiv(media);
@@ -633,22 +648,12 @@ define(function(require){
 												mediaId: media.id,
 												data: {}
 											},
-											success: function(data, status) {
-
-											}
+											success: function(data, status) {}
 										});
 									}
 								});
 							}
 						});
-					};
-
-					if(file) {
-						if(file.size >= (Math.pow(2,20) * 5)) { //If size bigger than 5MB
-							monster.ui.alert(self.i18n.active().groups.ringback.fileTooBigAlert);
-						} else {
-							fileReader.readAsDataURL(file);
-						}
 					} else {
 						monster.ui.alert(self.i18n.active().groups.ringback.emptyUploadAlert);
 					}

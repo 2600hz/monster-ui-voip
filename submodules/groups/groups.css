@@ -523,12 +523,22 @@
 	margin: 0;
 	width: 330px;
 }
-.feature-popup-container[data-feature="ringback"] .upload-div button {
+.feature-popup-container[data-feature="ringback"] .upload-div button.upload-action {
 	margin-left: 10px;
 	padding-left: 13px;
 	padding-right: 13px;
 }
 
+.feature-popup-container[data-feature="ringback"] .upload-div .file-upload {
+	margin: 0;
+}
+.feature-popup-container[data-feature="ringback"] .upload-div .file-upload > input {
+	margin: 0;
+	width: 105px;
+}
+.feature-popup-container[data-feature="ringback"] .upload-div .file-upload > button {
+	width: 220px;
+}
 
 /* Next Action Feature */
 .feature-popup-container[data-feature="next_action"] {

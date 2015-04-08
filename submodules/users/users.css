@@ -742,10 +742,20 @@
 	margin: 0;
 	width: 330px;
 }
-.feature-popup-container[data-feature="music_on_hold"] .upload-div button {
+.feature-popup-container[data-feature="music_on_hold"] .upload-div button.upload-action {
 	margin-left: 10px;
 	padding-left: 13px;
 	padding-right: 13px;
+}
+.feature-popup-container[data-feature="music_on_hold"] .upload-div .file-upload {
+	margin: 0;
+}
+.feature-popup-container[data-feature="music_on_hold"] .upload-div .file-upload > input {
+	margin: 0;
+	width: 92px;
+}
+.feature-popup-container[data-feature="music_on_hold"] .upload-div .file-upload > button {
+	width: 220px;
 }
 
 .feature-popup-container[data-feature="faxing"] {

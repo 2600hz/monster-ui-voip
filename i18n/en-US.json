@@ -82,7 +82,10 @@
 			"silence": "Silence",
 			"defaultRingback": "Default Ringback",
 			"emptyUploadAlert": "Please select a file to upload",
-			"fileTooBigAlert": "You can not upload a file with a size exceeding 5MB"
+			"fileTooBigAlert": "You can not upload a file with a size exceeding 5MB",
+			"__comment": "UI-1025: Updating media file uploads throughout the UI",
+			"__version": "3.20_s3",
+			"audioUploadButton": "Select an audio file"
 		},
 		"nextAction": {
 			"title": "Next Action",
@@ -511,7 +514,10 @@
 			"dropdownLabel": "Music on Hold:",
 			"silence": "Silence",
 			"emptyUploadAlert": "Please select a file to upload",
-			"fileTooBigAlert": "You can not upload a file with a size exceeding 5MB"
+			"fileTooBigAlert": "You can not upload a file with a size exceeding 5MB",
+			"__comment": "UI-1025: Updating media file uploads throughout the UI",
+			"__version": "3.20_s3",
+			"audioUploadButton": "Select an audio file"
 		},
 		"hotdesk": {
 			"id": "Hotdesk ID",
@@ -620,7 +626,10 @@
 				"line4": "Record your greetings / menu."
 			},
 			"pressKey": "Press",
-			"for": "for"
+			"for": "for",
+			"__comment": "UI-1025: Updating media file uploads throughout the UI",
+			"__version": "3.20_s3",
+			"fileUploadButton": "Choose File"
 		},
 		"open": "Open",
 		"closed": "Closed",
@@ -747,7 +756,10 @@
 			"silence": "Silence",
 			"default": "Default Music",
 			"emptyUploadAlert": "Please select a file to upload",
-			"fileTooBigAlert": "You can not upload a file with a size exceeding 5MB"
+			"fileTooBigAlert": "You can not upload a file with a size exceeding 5MB",
+			"__comment": "UI-1025: Updating media file uploads throughout the UI",
+			"__version": "3.20_s3",
+			"audioUploadButton": "Select an audio file"
 		},
 		"callerId": {
 			"title": "Company Caller ID",

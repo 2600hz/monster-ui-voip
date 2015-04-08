@@ -627,8 +627,8 @@
 }
 
 #strategy_menu_popup_accordion .greeting-option-header:not(.collapsed) {
-	border-bottom-left-radius: none;
-	border-bottom-right-radius: none;
+	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0px;
 }
 
 #strategy_menu_popup_accordion .greeting-option-header i {
@@ -655,4 +655,23 @@
 
 #strategy_menu_popup_accordion .greeting-option-actions button:not(:first-of-type) {
 	margin-right: 10px;
+}
+
+#strategy_menu_popup_accordion .greeting-option .upload-container {
+	display: flex;
+}
+#strategy_menu_popup_accordion .greeting-option .upload-container input[type="text"] {
+	margin: 0;
+	width: auto;
+	box-shadow: none;
+	border-radius: 2px 0px 0px 2px;
+	margin-right: -1px;
+	flex-grow: 1;
+}
+#strategy_menu_popup_accordion .greeting-option .upload-container button {
+	border-top-left-radius: 0px;
+	border-bottom-left-radius: 0px;
+	width: 170px;
+	padding-top: 4px;
+	padding-bottom: 4px;
 }

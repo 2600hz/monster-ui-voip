@@ -383,10 +383,20 @@
 	margin: 0;
 	width: 330px;
 }
-#my_office_music_on_hold_popup .upload-div button {
+#my_office_music_on_hold_popup .upload-div button.upload-action {
 	margin-left: 10px;
 	padding-left: 13px;
 	padding-right: 13px;
+}
+#my_office_music_on_hold_popup .upload-div .file-upload {
+	margin: 0;
+}
+#my_office_music_on_hold_popup .upload-div .file-upload > input {
+	margin: 0;
+	width: 92px;
+}
+#my_office_music_on_hold_popup .upload-div .file-upload > button {
+	width: 220px;
 }
 
 /********** Caller ID Popup **********/
