@@ -49,8 +49,9 @@
 					<label class="control-label" for="hide_contact_list"></label>
 					<div class="controls">
 						<label>
-							<input id="hide_contact_list" type="checkbox" name="contact_list.exclude"{{#if contact_list.exclude}} checked="checked"{{/if}}></input>
-							{{ i18n.devices.sip_uri.hideContactList }}
+							{{#monsterCheckbox i18n.devices.sip_uri.hideContactList}}
+								<input id="hide_contact_list" type="checkbox" name="contact_list.exclude"{{#if contact_list.exclude}} checked="checked"{{/if}}></input>
+							{{/monsterCheckbox}}
 						</label>
 					</div>
 				</div>

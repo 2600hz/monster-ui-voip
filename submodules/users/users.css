@@ -278,7 +278,7 @@
 }
 
 #users_container .detail-user .fix-left {
-	margin-left: 12px;
+	margin-left: 16px;
 }
 
 #users_container .detail-user .row-fields {
@@ -585,10 +585,6 @@
 	width: 0px;
 }
 
-#creation_user_dialog .control-group.hack-left .icheckbox_flat {
-	margin-right: 12px;
-}
-
 #creation_user_dialog .control-group.hack-left .controls {
 	margin-left: 0;
 }
@@ -680,10 +676,6 @@
 }
 
 /* Hot Desking User Feature Popup */
-.feature-popup-container[data-feature="hotdesk"] form .main-line .icheckbox_flat {
-	margin-left: 10px;
-}
-
 .feature-popup-container[data-feature="hotdesk"] #pin {
 	margin-top: 10px;
 }

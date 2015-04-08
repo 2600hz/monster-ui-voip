@@ -305,7 +305,6 @@ define(function(require){
 						template.find('.timepicker').timepicker({
 							timeFormat: is12hMode ? 'g:ia' : 'G:i'
 						});
-						monster.ui.prettyCheck.create(template);
 						callback && callback();
 						break;
 					case "holidays":
@@ -347,7 +346,6 @@ define(function(require){
 							}
 						});
 
-						monster.ui.prettyCheck.create(template);
 						callback && callback();
 						break;
 					case "calls":
@@ -411,7 +409,6 @@ define(function(require){
 							$this.siblings('.title').text($this.find('option:selected').closest('optgroup').prop('label'));
 						});
 
-						monster.ui.prettyCheck.create(container, 'radio');
 						callback && callback();
 						break;
 					default:
@@ -562,11 +559,9 @@ define(function(require){
 							popupHtml = $(monster.template(self, 'strategy-popupRemoveFeatures', dataTemplate));
 
 							popup = monster.ui.dialog(popupHtml, {
-									title: self.i18n.active().strategy.popupRemoveFeatures.title,
-									width: '540px'
-								});
-
-							monster.ui.prettyCheck.create(popup);
+								title: self.i18n.active().strategy.popupRemoveFeatures.title,
+								width: '540px'
+							});
 
 							popup.find('.cancel-link').on('click', function() {
 								popup.dialog('close');
@@ -765,11 +760,11 @@ define(function(require){
 				}
 			});
 
-			container.on('ifToggled', '.custom-days input[type="checkbox"]', function(e) {
+			container.on('change', '.custom-days input[type="checkbox"]', function(e) {
 				var parent = $(this).parents('.custom-day'),
 					timepickers = parent.find('.timepickers'),
 					status = parent.find('.status');
-				if(this.checked) {
+				if($(this).prop('checked')) {
 					timepickers.fadeIn(200);
 					status.fadeOut(100, function() {
 						status.html(self.i18n.active().strategy.open);
@@ -784,8 +779,8 @@ define(function(require){
 				}
 			});
 
-			container.on('ifToggled', '.custom-hours-lunchbreak input[type="checkbox"]', function(e) {
-				if(this.checked) {
+			container.on('change', '.custom-hours-lunchbreak input[type="checkbox"]', function(e) {
+				if($(this).prop('checked')) {
 					$(this).parents('.custom-hours-lunchbreak').find('.timepickers').fadeIn(200);
 				} else {
 					$(this).parents('.custom-hours-lunchbreak').find('.timepickers').fadeOut(200);
@@ -879,8 +874,8 @@ define(function(require){
 		strategyHolidaysBindEvents: function(container, strategyData) {
 			var self = this;
 
-			container.on('ifToggled', '.holidays-toggler input[type="checkbox"]', function(e) {
-				if(this.checked) {
+			container.on('change', '.holidays-toggler input[type="checkbox"]', function(e) {
+				if($(this).prop('checked')) {
 					container.find('.holidays-div').slideDown();
 				} else {
 					container.find('.holidays-div').slideUp();
@@ -1065,8 +1060,23 @@ define(function(require){
 				$(this).tab('show');
 			});
 
+			function selectCallOption(container) {
+				container.siblings().removeClass('active');
+				container.addClass('active');
+			};
+
 			container.on('click', '.call-option', function(e) {
-				monster.ui.prettyCheck.action($(this).find('.radio-div input'), 'check');
+				var $this = $(this);
+
+				selectCallOption($this);
+
+				$this.find('.radio-div input[type="radio"]').prop('checked', true);
+			});
+
+			container.on('change', 'input[type="radio"]', function(e) {
+				if($(this).prop('checked')) {
+					selectCallOption($(this).parents('.call-option'));
+				}
 			});
 
 			container.on('click', '.menu-div a', function(e) {
@@ -1077,13 +1087,6 @@ define(function(require){
 					name: parentTab.data('callflow') + 'Menu',
 					label: container.find('a[href="#'+parentTab.prop('id')+'"]').text()
 				});
-			});
-
-			container.on('ifChecked', 'input[type="radio"]', function(e) {
-				var parentCallOption = $(this).parents('.call-option');
-
-				parentCallOption.siblings().removeClass('active');
-				parentCallOption.addClass('active');
 			});
 
 			container.on('change', '.user-select select', function(e) {

@@ -12,8 +12,9 @@
 			<tr>
 				<td data-name="{{name}}">
 					<label class="checkbox" for="{{name}}">
-						<input type="checkbox" id="{{name}}">
-						{{friendlyName}}
+						{{#monsterCheckbox friendlyName}}
+							<input type="checkbox" id="{{name}}">
+						{{/monsterCheckbox}}
 					</label>
 				</td>
 			</tr>

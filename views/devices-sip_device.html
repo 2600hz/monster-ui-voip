@@ -214,21 +214,24 @@
 
 				<div class="control-group">
 					<label class="control-label checkbox">
-						<input type="checkbox" name="ignore_completed_elsewhere"{{#if ignore_completed_elsewhere}} checked="checked"{{/if}}></input>
-						{{ i18n.devices.popupSettings.miscellaneous.ignoreCompletedElsewhere.label }} <i class="help-popover icon-question-sign icon-large" data-original-title="{{i18n.devices.popupSettings.miscellaneous.ignoreCompletedElsewhere.help}}" data-placement="top" data-toggle="tooltip"></i>
+						{{#monsterCheckbox i18n.devices.popupSettings.miscellaneous.ignoreCompletedElsewhere.label }}
+							<input type="checkbox" name="ignore_completed_elsewhere" id="ignore_completed_elsewhere" {{#if ignore_completed_elsewhere }}checked{{/if}} />
+						{{/monsterCheckbox}}
+						<i class="help-popover icon-question-sign icon-large" data-original-title="{{i18n.devices.popupSettings.miscellaneous.ignoreCompletedElsewhere.help}}" data-placement="top" data-toggle="tooltip"></i>
 					</label>
 				</div>
 
 				<div class="rtp-line">
 					<div class="control-group">
 						<label class="control-label checkbox">
-							<input type="checkbox" id="secure_rtp" name="media.encryption.enforce_security"{{#if media.encryption.enforce_security}} checked="checked"{{/if}}></input>
-							{{ i18n.devices.popupSettings.miscellaneous.rtp.enable }}
+							{{#monsterCheckbox i18n.devices.popupSettings.miscellaneous.rtp.enable }}
+								<input type="checkbox" id="secure_rtp" name="media.encryption.enforce_security"{{#if media.encryption.enforce_security}} checked="checked"{{/if}}></input>
+							{{/monsterCheckbox}}
 						</label>
 					</div>
 
 					<div id="rtp_method">
-						{{ i18n.devices.popupSettings.miscellaneous.rtp.type }}
+						<span>{{ i18n.devices.popupSettings.miscellaneous.rtp.type }}</span>
 
 						<select class="input-small" name="extra.rtpMethod">
 							<option value="srtp"{{#compare extra.rtpMethod "===" "srtp"}} selected{{/compare}}>{{ i18n.devices.popupSettings.miscellaneous.rtp.srtp }}</option>
