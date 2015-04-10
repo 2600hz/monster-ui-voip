@@ -127,7 +127,7 @@ define(function(require){
 			});
 		},
 
-		vmboxesEditBindEvents: function(templatVMBox, data, callbacks) {
+		vmboxesEditBindEvents: function(templateVMBox, data, callbacks) {
 			var self = this,
 				vmboxForm = templateVMBox.find('#form_vmbox');
 
