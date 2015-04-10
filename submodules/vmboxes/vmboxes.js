@@ -127,7 +127,7 @@ define(function(require){
 			});
 		},
 
-		vmboxesEditBindEvents: function(templatVMBox, data, callbacks) {
+		vmboxesEditBindEvents: function(templateVMBox, data, callbacks) {
 			var self = this,
 				vmboxForm = templateVMBox.find('#form_vmbox');
 
@@ -145,7 +145,6 @@ define(function(require){
 			templateVMBox.find('#timezone').chosen({search_contains: true, width: "40%"});
 
 			templateVMBox.find('[data-toggle="tooltip"]').tooltip();
-			templateVMBox.find('.switch').bootstrapSwitch();
 
 			templateVMBox.find('.actions .save').on('click', function() {
 				if(monster.ui.valid(vmboxForm)) {

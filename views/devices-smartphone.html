@@ -145,8 +145,10 @@
 								{{/if}}
 							</label>
 							<div class="controls">
-								<div class="switch" data-on="success" data-off="danger" data-on-label="{{../i18n.devices.popupSettings.restrictions.allow}}" data-off-label="{{../i18n.devices.popupSettings.restrictions.deny}}">
-									<input class="not-pretty" type="checkbox" name="call_restriction.{{@key}}.action" {{#compare this.action '===' 'inherit'}}{{#unless this.disabled}} checked{{/unless}}{{/compare}}{{#if this.disabled}} disabled{{/if}}></input>
+								<div class="switch">
+								{{#monsterSwitch}}
+									<input class="restrictions-switch" type="checkbox" name="call_restriction.{{@key}}.action" data-on="{{../i18n.devices.popupSettings.restrictions.allow}}" data-off="{{../i18n.devices.popupSettings.restrictions.deny}}" {{#compare this.action '===' 'inherit'}}{{#unless this.disabled}} checked{{/unless}}{{/compare}}{{#if this.disabled}} disabled{{/if}}></input>
+								{{/monsterSwitch}}
 								</div>
 								<i class="restriction-matcher-sign icon-large icon-ok icon-green"></i>
 							</div>

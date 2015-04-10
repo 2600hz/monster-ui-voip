@@ -640,6 +640,7 @@
 }
 
 .feature-popup-container .switch {
+	display: inline-block;
 	margin-left: 15px;
 }
 

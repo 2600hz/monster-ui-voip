@@ -16,8 +16,10 @@
 			{{userName}}
 		</div>
 		<div class="enable grid-cell centered">
-			<div class="switch" data-on="success" data-off="danger" data-on-label="{{i18n.on}}" data-off-label="{{i18n.off}}">
-			    <input type="checkbox"{{#if enabled}} checked="checked"{{/if}}></input>
+			<div class="switch">
+			{{#monsterSwitch}}
+				<input class="switch-state" type="checkbox"{{#if enabled}} checked="checked"{{/if}}></input>
+			{{/monsterSwitch}}
 			</div>
 		</div>
 		<div class="edit grid-cell centered">

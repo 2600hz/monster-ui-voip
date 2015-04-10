@@ -4,8 +4,10 @@
 			<i class="{{currentUser.extra.mapFeatures.find_me_follow_me.icon}}"></i>
 		</div>
 		{{ i18n.users.find_me_follow_me.headline }}
-		<div class="switch" data-on="success" data-off="default" data-on-label="{{i18n.enabled}}" data-off-label="{{i18n.disabled}}">
-			<input type="checkbox" id="checkbox_find_me_follow_me"{{#if currentUser.extra.mapFeatures.find_me_follow_me.active}} checked="checked"{{/if}}></input>
+		<div class="switch">
+		{{#monsterSwitch}}
+			<input class="switch-state" type="checkbox" id="checkbox_find_me_follow_me" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if currentUser.extra.mapFeatures.find_me_follow_me.active}} checked="checked"{{/if}}></input>
+		{{/monsterSwitch}}
 		</div>
 	</div>
 

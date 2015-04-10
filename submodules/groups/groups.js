@@ -472,7 +472,7 @@ define(function(require){
 											} : {})
 										),
 				featureTemplate = $(monster.template(self, 'groups-feature-call_recording', templateData)),
-				switchFeature = featureTemplate.find('.switch').bootstrapSwitch(),
+				switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#call_recording_form'),
 				popup;
 
@@ -488,14 +488,14 @@ define(function(require){
 				popup.dialog('close').remove();
 			});
 
-			switchFeature.on('switch-change', function(e, data) {
-				data.value ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+			switchFeature.on('change', function() {
+				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
 			});
 
 			featureTemplate.find('.save').on('click', function() {
 				if(monster.ui.valid(featureForm)) {
 					var formData = monster.ui.getFormData('call_recording_form'),
-						enabled = switchFeature.bootstrapSwitch('status');
+						enabled = switchFeature.prop('checked');
 
 					if(!('smartpbx' in data.group)) { data.group.smartpbx = {}; }
 					if(!('call_recording' in data.group.smartpbx)) {
@@ -559,7 +559,7 @@ define(function(require){
 						media: ringGroupNode.data.ringback || ''
 					},
 					featureTemplate = $(monster.template(self, 'groups-feature-ringback', templateData)),
-					switchFeature = featureTemplate.find('.switch').bootstrapSwitch(),
+					switchFeature = featureTemplate.find('.switch-state'),
 					popup,
 					closeUploadDiv = function(newMedia) {
 						mediaToUpload = undefined;
@@ -596,8 +596,8 @@ define(function(require){
 					popup.dialog('close').remove();
 				});
 
-				switchFeature.on('switch-change', function(e, data) {
-					data.value ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+				switchFeature.on('change', function() {
+					$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
 				});
 
 				featureTemplate.find('.upload-toggle').on('click', function() {
@@ -658,7 +658,7 @@ define(function(require){
 
 				featureTemplate.find('.save').on('click', function() {
 					var selectedMedia = featureTemplate.find('.media-dropdown option:selected').val(),
-						enabled = switchFeature.bootstrapSwitch('status');
+						enabled = switchFeature.prop('checked');
 
 					if(!('smartpbx' in data.group)) {
 						data.group.smartpbx = {};
@@ -717,20 +717,20 @@ define(function(require){
 
 			var templateData = $.extend(true, {selectedEntity: selectedEntity}, data),
 				featureTemplate = $(monster.template(self, 'groups-feature-next_action', templateData)),
-				switchFeature = featureTemplate.find('.switch').bootstrapSwitch(),
+				switchFeature = featureTemplate.find('.switch-state'),
 				popup;
 
 			featureTemplate.find('.cancel-link').on('click', function() {
 				popup.dialog('close').remove();
 			});
 
-			switchFeature.on('switch-change', function(e, data) {
-				data.value ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+			switchFeature.on('change', function() {
+				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
 			});
 
 			featureTemplate.find('.save').on('click', function() {
 				var selectedOption = featureTemplate.find('.next-action-select option:selected'),
-					enabled = switchFeature.bootstrapSwitch('status');
+					enabled = switchFeature.prop('checked');
 
 				if(!('smartpbx' in data.group)) { data.group.smartpbx = {}; }
 				if(!('next_action' in data.group.smartpbx)) {
