@@ -4,8 +4,10 @@
 			<i class="{{user.extra.mapFeatures.call_recording.icon}}"></i>
 		</div>
 		{{ i18n.users.callRecording.headline }}
-		<div class="switch" data-on="success" data-off="default" data-on-label="{{i18n.enabled}}" data-off-label="{{i18n.disabled}}">
-			<input type="checkbox"{{#if user.extra.mapFeatures.call_recording.active}} checked="checked"{{/if}}></input>
+		<div class="switch">
+		{{#monsterSwitch}}
+			<input class="switch-state" type="checkbox" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if user.extra.mapFeatures.call_recording.active}} checked="checked"{{/if}}></input>
+		{{/monsterSwitch}}
 		</div>
 	</div>
 

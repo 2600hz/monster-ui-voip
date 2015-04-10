@@ -4,9 +4,11 @@
             <i class="{{extra.mapFeatures.caller_id.icon}}"></i>
         </div>
         {{ i18n.users.caller_id.headline }}
-        <div class="switch" data-on="success" data-off="default" data-on-label="{{i18n.enabled}}" data-off-label="{{i18n.disabled}}">
-			<input type="checkbox" id="checkbox_caller_id"{{#if extra.mapFeatures.caller_id.active}} checked="checked"{{/if}}></input>
-        </div>
+		<div class="switch">
+		{{#monsterSwitch}}
+			<input class="switch-state" type="checkbox" id="checkbox_caller_id" data-on-label="{{i18n.enabled}}" data-off-label="{{i18n.disabled}}"{{#if extra.mapFeatures.caller_id.active}} checked="checked"{{/if}}></input>
+		{{/monsterSwitch}}
+		</div>
 	</div>
 
 	<div class="content{{#unless extra.mapFeatures.caller_id.active}} disabled{{/unless}}">

@@ -4,9 +4,11 @@
             <i class="{{extra.mapFeatures.hotdesk.icon}}"></i>
         </div>
         {{ i18n.users.hotdesk.headline }}
-        <div class="switch" data-on="success" data-off="default" data-on-label="{{i18n.enabled}}" data-off-label="{{i18n.disabled}}">
-			<input type="checkbox" name="enabled" id="checkbox_hotdesk"{{#if extra.mapFeatures.hotdesk.active}} checked="checked"{{/if}}></input>
-        </div>
+		<div class="switch">
+		{{#monsterSwitch}}
+			<input class="switch-state" type="checkbox" name="enabled" id="checkbox_hotdesk" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if extra.mapFeatures.hotdesk.active}} checked="checked"{{/if}}></input>
+		{{/monsterSwitch}}
+		</div>
 	</div>
 
 	<div class="content{{#unless extra.mapFeatures.hotdesk.active}} disabled{{/unless}}">

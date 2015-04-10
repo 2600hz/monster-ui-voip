@@ -1514,7 +1514,7 @@ define(function(require){
 			var self = this,
 				data = self.usersFormatConferencingData(data),
 				featureTemplate = $(monster.template(self, 'users-feature-conferencing', data)),
-				switchFeature = featureTemplate.find('.switch').bootstrapSwitch(),
+				switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#conferencing_form');
 
 			monster.ui.validate(featureForm);
@@ -1523,8 +1523,8 @@ define(function(require){
 				popup.dialog('close').remove();
 			});
 
-			switchFeature.on('switch-change', function(e, data) {
-				data.value ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+			switchFeature.on('change', function() {
+				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
 			});
 
 			featureTemplate.find('.save').on('click', function() {
@@ -1538,7 +1538,7 @@ define(function(require){
 				if(monster.ui.valid(featureForm)) {
 					data.conference = monster.ui.getFormData('conferencing_form');
 
-					if(switchFeature.bootstrapSwitch('status')) {
+					if(switchFeature.prop('checked')) {
 						self.usersUpdateConferencing(data, function(data) {
 							args.userId = data.user.id;
 
@@ -1569,7 +1569,7 @@ define(function(require){
 			var self = this,
 				data = self.usersFormatFaxingData(data),
 				featureTemplate = $(monster.template(self, 'users-feature-faxing', data)),
-				switchFeature = featureTemplate.find('.switch').bootstrapSwitch();
+				switchFeature = featureTemplate.find('.switch-state');
 
 			if ( !_.isEmpty(data.extra.listNumbers) ) {
 				var popup = monster.ui.dialog(featureTemplate, {
@@ -1584,8 +1584,8 @@ define(function(require){
 				popup.dialog('close').remove();
 			});
 
-			switchFeature.on('switch-change', function(e, data) {
-				data.value ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+			switchFeature.on('change', function() {
+				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
 			});
 
 			featureTemplate.find('.save').on('click', function() {
@@ -1597,7 +1597,7 @@ define(function(require){
 						}
 					};
 
-				if ( switchFeature.bootstrapSwitch('status') ) {
+				if ( switchFeature.prop('checked') ) {
 					self.usersUpdateFaxing(data, newNumber, function(results) {
 						args.userId = results.callflow.owner_id;
 
@@ -1616,7 +1616,7 @@ define(function(require){
 		usersRenderHotdesk: function(currentUser) {
 			var self = this,
 				featureTemplate = $(monster.template(self, 'users-feature-hotdesk', currentUser)),
-				switchFeature = featureTemplate.find('.switch').bootstrapSwitch(),
+				switchFeature = featureTemplate.find('.switch-state'),
 				requirePin = featureTemplate.find('[name="require_pin"]'),
 				featureForm = featureTemplate.find('#hotdesk_form');
 
@@ -1626,8 +1626,8 @@ define(function(require){
 				popup.dialog('close').remove();
 			});
 
-			switchFeature.on('switch-change', function(e, data) {
-				data.value ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+			switchFeature.on('change', function() {
+				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
 			});
 
 			requirePin.on('change', function() {
@@ -1653,7 +1653,7 @@ define(function(require){
 						}
 					};
 
-					formData.enabled = switchFeature.bootstrapSwitch('status');
+					formData.enabled = switchFeature.prop('checked');
 					
 					if(formData.require_pin === false) { delete formData.pin; }
 					delete currentUser.hotdesk;
@@ -1677,7 +1677,7 @@ define(function(require){
 		usersRenderVMToEmail: function(currentUser) {
 			var self = this,
 				featureTemplate = $(monster.template(self, 'users-feature-vm_to_email', currentUser)),
-				switchFeature = featureTemplate.find('.switch').bootstrapSwitch(),
+				switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#vm_to_email_form');
 
 			monster.ui.validate(featureForm);
@@ -1686,14 +1686,14 @@ define(function(require){
 				popup.dialog('close').remove();
 			});
 
-			switchFeature.on('switch-change', function(e, data) {
-				data.value ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+			switchFeature.on('change', function() {
+				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
 			});
 
 			featureTemplate.find('.save').on('click', function() {
 				var formData = monster.ui.getFormData('vm_to_email_form'),
 					userToSave = $.extend(true, {}, currentUser),
-					enabled = switchFeature.bootstrapSwitch('status'),
+					enabled = switchFeature.prop('checked'),
 					args = {
 						callback: function() {
 							popup.dialog('close').remove();
@@ -1763,18 +1763,18 @@ define(function(require){
 		usersRenderCallerId: function(currentUser) {
 			var self = this,
 				featureTemplate = $(monster.template(self, 'users-feature-caller_id', currentUser)),
-				switchFeature = featureTemplate.find('.switch').bootstrapSwitch();
+				switchFeature = featureTemplate.find('.switch-state');
 
 			featureTemplate.find('.cancel-link').on('click', function() {
 				popup.dialog('close').remove();
 			});
 
-			switchFeature.on('switch-change', function(e, data) {
-				data.value ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+			switchFeature.on('change', function() {
+				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
 			});
 
 			featureTemplate.find('.save').on('click', function() {
-				var switchCallerId = featureTemplate.find('.switch'),
+				var switchCallerId = featureTemplate.find('.switch-state'),
 					userData = currentUser,
 					userToSave = $.extend(true, {}, {
 						caller_id: {
@@ -1788,15 +1788,15 @@ define(function(require){
 						}
 					};
 
-				if(switchCallerId.bootstrapSwitch('status') === false) {
-					if(userToSave.caller_id.hasOwnProperty('external')) {
-						delete userToSave.caller_id.external.number;
-					}
-				}
-				else {
+				if (switchCallerId.prop('checked')) {
 					var callerIdValue = featureTemplate.find('.caller-id-select').val();
 
 					userToSave.caller_id.external.number = callerIdValue;
+				}
+				else {
+					if(userToSave.caller_id.hasOwnProperty('external')) {
+						delete userToSave.caller_id.external.number;
+					}
 				}
 
 				self.usersUpdateUser(userToSave, function(data) {
@@ -1820,7 +1820,7 @@ define(function(require){
 		usersRenderCallForward: function(currentUser) {
 			var self = this,
 				featureTemplate = $(monster.template(self, 'users-feature-call_forward', currentUser)),
-				switchFeature = featureTemplate.find('.switch').bootstrapSwitch(),
+				switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#call_forward_form'),
 				args = {
 					callback: function() {
@@ -1844,8 +1844,8 @@ define(function(require){
 				popup.dialog('close').remove();
 			});
 
-			switchFeature.on('switch-change', function(e, data) {
-				data.value ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+			switchFeature.on('change', function() {
+				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
 			});
 
 			featureTemplate.find('.save').on('click', function() {
@@ -1853,7 +1853,7 @@ define(function(require){
 					var formData = monster.ui.getFormData('call_forward_form');
 					formData.require_keypress = !formData.require_keypress;
 
-					formData.enabled = switchFeature.bootstrapSwitch('status');
+					formData.enabled = switchFeature.prop('checked');
 					formData.number = monster.util.unformatPhoneNumber(formData.number, 'keepPlus');
 					delete formData.phoneType;
 
@@ -1896,7 +1896,7 @@ define(function(require){
 				var currentUser = params.currentUser,
 					userCallflow = params.userCallflow,
 					featureTemplate = $(monster.template(self, 'users-feature-find_me_follow_me', { currentUser: currentUser })),
-					switchFeature = featureTemplate.find('.switch').bootstrapSwitch(),
+					switchFeature = featureTemplate.find('.switch-state'),
 					featureForm = featureTemplate.find('#find_me_follow_me_form'),
 					args = {
 						callback: function() {
@@ -1947,12 +1947,12 @@ define(function(require){
 					popup.dialog('close').remove();
 				});
 
-				switchFeature.on('switch-change', function(e, data) {
-					data.value ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+				switchFeature.on('change', function() {
+					$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
 				});
 
 				featureTemplate.find('.save').on('click', function() {
-					var enabled = switchFeature.bootstrapSwitch('status');
+					var enabled = switchFeature.prop('checked');
 
 					monster.pub('common.ringingDurationControl.getEndpoints', { 
 						container: featureForm,
@@ -2106,7 +2106,7 @@ define(function(require){
 											} : {})
 										),
 				featureTemplate = $(monster.template(self, 'users-feature-call_recording', templateData)),
-				switchFeature = featureTemplate.find('.switch').bootstrapSwitch(),
+				switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#call_recording_form'),
 				popup;
 
@@ -2122,14 +2122,14 @@ define(function(require){
 				popup.dialog('close').remove();
 			});
 
-			switchFeature.on('switch-change', function(e, data) {
-				data.value ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+			switchFeature.on('change', function() {
+				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
 			});
 
 			featureTemplate.find('.save').on('click', function() {
 				if(monster.ui.valid(featureForm)) {
 					var formData = monster.ui.getFormData('call_recording_form'),
-						enabled = switchFeature.bootstrapSwitch('status');
+						enabled = switchFeature.prop('checked');
 
 					if(!('smartpbx' in params.currentUser)) { params.currentUser.smartpbx = {}; }
 					if(!('call_recording' in params.currentUser.smartpbx)) {
@@ -2212,7 +2212,7 @@ define(function(require){
 						media: 'music_on_hold' in currentUser && 'media_id' in currentUser.music_on_hold ? currentUser.music_on_hold.media_id : silenceMediaId
 					},
 					featureTemplate = $(monster.template(self, 'users-feature-music_on_hold', templateData)),
-					switchFeature = featureTemplate.find('.switch').bootstrapSwitch(),
+					switchFeature = featureTemplate.find('.switch-state'),
 					popup,
 					closeUploadDiv = function(newMedia) {
 						var uploadInput = featureTemplate.find('.upload-input');
@@ -2232,8 +2232,8 @@ define(function(require){
 					popup.dialog('close').remove();
 				});
 
-				switchFeature.on('switch-change', function(e, data) {
-					data.value ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+				switchFeature.on('change', function() {
+					$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
 				});
 
 				featureTemplate.find('.upload-toggle').on('click', function() {
@@ -2306,7 +2306,7 @@ define(function(require){
 
 				featureTemplate.find('.save').on('click', function() {
 					var selectedMedia = featureTemplate.find('.media-dropdown option:selected').val(),
-						enabled = switchFeature.bootstrapSwitch('status');
+						enabled = switchFeature.prop('checked');
 
 					if(!('music_on_hold' in currentUser)) {
 						currentUser.music_on_hold = {};

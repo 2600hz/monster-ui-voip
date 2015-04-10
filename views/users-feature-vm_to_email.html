@@ -4,8 +4,10 @@
 			<i class="{{extra.mapFeatures.vm_to_email.icon}}"></i>
 		</div>
 		{{ i18n.users.vm_to_email.headline }}
-		<div class="switch" data-on="success" data-off="default" data-on-label="{{i18n.enabled}}" data-off-label="{{i18n.disabled}}">
-			<input type="checkbox" id="checkbox_vm_to_email"{{#if extra.mapFeatures.vm_to_email.active}} checked="checked"{{/if}}></input>
+		<div class="switch">
+		{{#monsterSwitch}}
+			<input class="switch-state" type="checkbox" id="checkbox_vm_to_email" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if extra.mapFeatures.vm_to_email.active}} checked="checked"{{/if}}></input>
+		{{/monsterSwitch}}
 		</div>
 	</div>
 

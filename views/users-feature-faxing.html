@@ -4,9 +4,11 @@
             <i class="{{user.extra.mapFeatures.faxing.icon}}"></i>
         </div>
         {{ i18n.users.faxing.headline }}
-        <div class="switch" data-on="success" data-off="default" data-on-label="{{i18n.enabled}}" data-off-label="{{i18n.disabled}}">
-			<input type="checkbox" id="checkbox_caller_id"{{#if user.extra.mapFeatures.faxing.active}} checked="checked"{{/if}}></input>
-        </div>
+		<div class="switch">
+		{{#monsterSwitch}}
+			<input class="switch-state" type="checkbox" id="checkbox_caller_id" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if user.extra.mapFeatures.faxing.active}} checked="checked"{{/if}}></input>
+		{{/monsterSwitch}}
+		</div>
 	</div>
 
 	<div class="content{{#unless user.extra.mapFeatures.faxing.active}} disabled{{/unless}}">
