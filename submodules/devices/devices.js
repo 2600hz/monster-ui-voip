@@ -34,8 +34,6 @@ define(function(require){
 					template.find('.devices-rows').append(templateDevice);
 				});
 
-				template.find('.switch').bootstrapSwitch();
-
 				self.devicesBindEvents(template, parent, dataTemplate);
 
 				parent
@@ -77,11 +75,11 @@ define(function(require){
 				}
 			});
 
-			template.find('.switch').on('change', function() {
+			template.find('.switch-state').on('change', function() {
 				var toggle = $(this),
 					row = toggle.parents('.grid-row'),
 					deviceId = row.data('id'),
-					enable = toggle.bootstrapSwitch('status');
+					enable = toggle.prop('checked');
 
 				self.devicesGetDevice(deviceId, function(dataDevice) {
 					dataDevice.enabled = enable;
@@ -109,11 +107,11 @@ define(function(require){
 						//We could display a success message but that could spam the user so for now we don't display anything
 					},
 					function() {
-						toggle.bootstrapSwitch('toggleState');
+						toggle.prop('checked', !enable);
 					});
 				},
 				function() {
-					toggle.bootstrapSwitch('toggleState');
+					toggle.prop('checked', !enable);
 				});
 			});
 
@@ -249,7 +247,6 @@ define(function(require){
 			monster.ui.protectField(templateDevice.find('#sip_password'), templateDevice);
 
 			templateDevice.find('[data-toggle="tooltip"]').tooltip();
-			templateDevice.find('.switch').bootstrapSwitch();
 			templateDevice.find('#mac_address').mask("hh:hh:hh:hh:hh:hh", {placeholder:" "});
 
 			if(!(data.media.encryption.enforce_security)) {
@@ -311,7 +308,7 @@ define(function(require){
 				}
 			});
 
-			templateDevice.find('.restriction-list .switch').on('switch-change', function() {
+			templateDevice.find('.restrictions-switch').on('change', function() {
 				templateDevice.find('.restriction-matcher-sign').hide();
 				templateDevice.find('.restriction-message').hide();
 			});
@@ -334,7 +331,7 @@ define(function(require){
 								matchedMsg = templateDevice.find('.restriction-message');
 
 							templateDevice.find('.restriction-matcher-sign').hide();
-							if(matchedLine.find('.switch').bootstrapSwitch('status')) {
+							if(matchedLine.find('.restrictions-switch').prop('checked')) {
 								matchedSign.removeClass('icon-red icon-remove')
 										   .addClass('icon-green icon-ok')
 										   .css('display', 'inline-block');
