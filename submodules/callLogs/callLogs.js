@@ -332,7 +332,7 @@ define(function(require){
 				formatCdr = function(cdr) {
 					var date = monster.util.gregorianToDate(cdr.timestamp),
 						shortDate = monster.util.toFriendlyDate(date, 'shortDate'),
-						time = monster.util.toFriendlyDate(date, 'shortTime'),
+						time = monster.util.toFriendlyDate(date, 'time'),
 						durationMin = parseInt(cdr.duration_seconds/60).toString(),
 						durationSec = (cdr.duration_seconds % 60 < 10 ? "0" : "") + (cdr.duration_seconds % 60),
 						hangupI18n = self.i18n.active().hangupCauses,
