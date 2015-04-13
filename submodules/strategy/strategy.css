@@ -268,7 +268,7 @@
 }
 
 #strategy_container .element-container.strategy-holidays .holidays-div .holidays-add {
-	padding: 0px 60px;
+	padding: 0px 20px;
 	margin: 0;
 }
 
@@ -286,7 +286,7 @@
 }
 
 #strategy_container .element-container.strategy-holidays .holidays-div .holidays-element {
-	padding: 5px 40px;
+	padding: 5px 0px;
 }
 
 #strategy_container .element-container.strategy-holidays .holidays-div .holidays-element:not(:last-of-type) {
@@ -294,9 +294,11 @@
 }
 
 #strategy_container .element-container.strategy-holidays .holidays-div .holidays-element input,
-#strategy_container .element-container.strategy-holidays .holidays-div .holidays-element span,
 #strategy_container .element-container.strategy-holidays .holidays-div .holidays-element select {
 	margin: 5px 20px 5px 0px;
+}
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-element span {
+	margin: 10px 20px 0px 0px;
 }
 
 #strategy_container .element-container.strategy-holidays .holidays-div .holidays-element .month {
@@ -317,7 +319,8 @@
 }
 
 #strategy_container .element-container.strategy-holidays .holidays-div .holidays-element .name {
-	width: 180px;
+	width: 380px;
+	min-width: 0px;
 }
 
 #strategy_container .element-container.strategy-holidays .holidays-div .holidays-element .date {
@@ -328,6 +331,14 @@
 	float: right;
 	line-height: 40px;
 	cursor: pointer;
+}
+
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-element .holiday-inputs {
+	display: flex;
+}
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-element .holiday-inputs select,
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-element .holiday-inputs span {
+	flex-shrink: 0;
 }
 
 /********** Strategy Calls ***********/
