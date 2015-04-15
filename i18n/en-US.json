@@ -194,6 +194,36 @@
 					"H263": "H263",
 					"H261": "H261"
 				}
+			},
+			"__comment": "UI-1351: Add ability to configure feature keys for SIP devices in SmartPBX",
+			"__version": "v3.20_s4",
+			"featureKeys": {
+				"menuTitle": "Feature Keys",
+				"description": "Feature key",
+				"labels": {
+					"user": "User",
+					"parkingSpot": "Parking Spot",
+					"value": "Value"
+				},
+				"info": {
+					"link": {
+						"showInfo": "Show Info",
+						"hideInfo": "Hide Info"
+					},
+					"types": {
+						"presence": "Indicate when a user has an incoming call or is on the phone. The indicator can be used to pick up ringing calls or speed dial that user.",
+						"parking": "Indicate when a call is placed on a parking slot available to the entire company. The indicator can be used to transfer a call to the parking slot or retrieve a parked call.",
+						"personal_parking": "Indicate when a call is placed on a parking slot dedicated to the selected user. The indicator can be used to transfer a call to the parking slot or retrieve a parked call.",
+						"speed_dial": "Does not indicate for any calls event but can be used to rapidly call the configured number."
+					}
+				},
+				"types": {
+					"none": "None",
+					"presence": "Presence",
+					"parking": "Parking",
+					"personal_parking": "Personal Parking",
+					"speed_dial": "Speed Dial"
+				}
 			}
 		},
 		"buy": "Buy Device",
