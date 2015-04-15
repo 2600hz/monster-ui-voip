@@ -1,16 +1,16 @@
-<div class="edit-device" data-id="{{device.id}}">
+<div class="edit-device" data-id="{{id}}">
 	<div class="title-bar clearfix">
 		<div class="device-title pull-left">
-			{{#if device.provision}}
-			<div class="device-image model-image {{toLowerCase device.provision.endpoint_brand}}-{{toLowerCase device.provision.endpoint_family}}-{{toLowerCase device.provision.endpoint_model}}"></div>
-			<div class="device-model">{{device.provision.endpoint_brand}} - {{device.provision.endpoint_model}}</div>
+			{{#if provision}}
+			<div class="device-image model-image {{toLowerCase provision.endpoint_brand}}-{{toLowerCase provision.endpoint_family}}-{{toLowerCase provision.endpoint_model}}"></div>
+			<div class="device-model">{{provision.endpoint_brand}} - {{provision.endpoint_model}}</div>
 			{{else}}
 				<div class="device-icon">
 					<i class="icon-telicon-voip-phone"></i>
 				</div>
 
-				{{#if device.id}}
-					<div class="device-model">{{device.name}}</div>
+				{{#if id}}
+					<div class="device-model">{{name}}</div>
 				{{else}}
 					<div class="device-model">{{i18n.devices.sip_device.new}}</div>
 				{{/if}}
@@ -26,7 +26,7 @@
 					<b class="caret"></b>
 				</a>
 				<ul class="dropdown-menu pull-right">
-					{{#if device.provision}}
+					{{#if provision}}
 					<li><a class="tabs-selector change-section" data-section="sip" href="javascript:void(0)"><i class="icon-user"></i>{{ i18n.devices.popupSettings.sip.menuTitle }}</a></li>
 					{{/if}}
 					<li><a class="tabs-selector change-section" data-section="audio" href="javascript:void(0)"><i class="icon-music"></i>{{ i18n.devices.popupSettings.audio.menuTitle }}</a></li>
@@ -34,7 +34,7 @@
 					<li><a class="tabs-selector change-section" data-section="restrictions" href="javascript:void(0)"><i class="icon-ban-circle"></i>{{ i18n.devices.popupSettings.restrictions.menuTitle }}</a></li>
 					<li><a class="tabs-selector change-section" data-section="callerId" href="javascript:void(0)"><i class="icon-ambulance"></i>{{ i18n.devices.popupSettings.callerId.menuTitle }}</a></li>
 					<li><a class="tabs-selector change-section" data-section="miscellaneous" href="javascript:void(0)"><i class="icon-cogs"></i>{{ i18n.devices.popupSettings.miscellaneous.menuTitle }}</a></li>
-				{{#if device.provision.feature_keys}}
+				{{#if provision.feature_keys}}
 					<li><a class="tabs-selector change-section" data-section="featureKeys" href="javascript:void(0);"><i class="icon-lightbulb"></i>{{ i18n.devices.popupSettings.featureKeys.menuTitle }}</a></li>
 				{{/if}}
 				</ul>
@@ -48,41 +48,41 @@
 				<div class="control-group">
 					<label class="control-label" for="name">{{ i18n.devices.sip_device.deviceName }}</label>
 					<div class="controls">
-						<input type="text" id="name" name="name" value="{{device.name}}">
+						<input type="text" id="name" name="name" value="{{name}}">
 					</div>
 				</div>
-				{{#if device.provision}}
+				{{#if provision}}
 				<div class="control-group">
 					<label class="control-label" for="mac_address">{{ i18n.devices.sip_device.macAddress }}</label>
 					<div class="controls">
-						<input id="mac_address" type="text" name="mac_address" placeholder="{{ i18n.devices.sip_device.macAddressPlaceholder }}" value="{{device.mac_address}}">
+						<input id="mac_address" type="text" name="mac_address" placeholder="{{ i18n.devices.sip_device.macAddressPlaceholder }}" value="{{mac_address}}">
 					</div>
 				</div>
 				{{else}}
 				<div class="control-group">
 					<label class="control-label" for="sip_username">{{ i18n.devices.sip.username }}</label>
 					<div class="controls">
-						<input type="text" id="sip_username" name="sip.username" value="{{device.sip.username}}">
+						<input type="text" id="sip_username" name="sip.username" value="{{sip.username}}">
 					</div>
 				</div>
 
 				<div class="control-group">
 					<label class="control-label" for="sip_password">{{ i18n.devices.sip.password }}</label>
 					<div class="controls">
-						<input type="password" id="sip_password" name="sip.password" value="{{device.sip.password}}">
+						<input type="password" id="sip_password" name="sip.password" value="{{sip.password}}">
 					</div>
 				</div>
 
 				<div class="control-group">
 					<label class="control-label">{{ i18n.devices.sip.realm }}</label>
 					<div class="controls">
-						<span class="displayed-realm">{{ device.sip.realm }}</span>
+						<span class="displayed-realm">{{ sip.realm }}</span>
 					</div>
 				</div>
 				{{/if}}
 			</div>
 
-			{{#if device.provision}}
+			{{#if provision}}
 				<div class="tabs-section clearfix" data-section="sip">
 					<div class="title">
 						{{ i18n.devices.popupSettings.sip.sectionTitle }}
@@ -90,21 +90,21 @@
 					<div class="control-group">
 						<label class="control-label" for="sip_username">{{ i18n.devices.sip.username }}</label>
 						<div class="controls">
-							<input type="text" id="sip_username" name="sip.username" value="{{device.sip.username}}">
+							<input type="text" id="sip_username" name="sip.username" value="{{sip.username}}">
 						</div>
 					</div>
 
 					<div class="control-group">
 						<label class="control-label" for="sip_password">{{ i18n.devices.sip.password }}</label>
 						<div class="controls">
-							<input type="password" id="sip_password" name="sip.password" value="{{device.sip.password}}">
+							<input type="password" id="sip_password" name="sip.password" value="{{sip.password}}">
 						</div>
 					</div>
 
 					<div class="control-group">
 						<label class="control-label">{{ i18n.devices.sip.realm }}</label>
 						<div class="controls">
-							<span class="displayed-realm">{{ device.sip.realm }}</span>
+							<span class="displayed-realm">{{ sip.realm }}</span>
 						</div>
 					</div>
 				</div>
@@ -144,7 +144,7 @@
 						{{ i18n.devices.popupSettings.restrictions.sectionTitle }}
 					</div>
 					<div class="restriction-list">
-					{{#each device.extra.restrictions}}
+					{{#each extra.restrictions}}
 						<div class="control-group restriction-line{{#if this.disabled}} disabled{{/if}}" data-restriction="{{@key}}">
 							<label class="control-label">{{this.friendly_name}}
 								{{#if this.help}}
@@ -164,7 +164,7 @@
 					</div>
 					<div class="restriction-message help-box">
 					</div>
-					{{#if device.extra.hasDisabledRestrictions}}
+					{{#if extra.hasDisabledRestrictions}}
 					<div class="disabled-restrictions-info help-box gray-box">
 						<div class="wrapper-icon">
 							&nbsp;<i class="icon-info-sign2"></i>&nbsp;
@@ -182,14 +182,14 @@
 					{{ i18n.devices.popupSettings.callerId.sectionTitle }}
 				</div>
 
-				{{#if device.extra.hasE911Numbers}}
+				{{#if extra.hasE911Numbers}}
 					<div class="control-group">
 						<label class="control-label">{{ i18n.devices.popupSettings.callerId.emergency }}</label>
 						<div class="controls">
 							<select name="caller_id.emergency.number" class="caller-id-select">
 								<option value="">{{i18n.devices.popupSettings.callerId.notSet}}</option>
-								{{#each device.extra.e911Numbers}}
-									<option {{#compare ../device.caller_id.emergency.number "===" this}} selected{{/compare}} value="{{this}}">{{this}}</option>
+								{{#each extra.e911Numbers}}
+									<option {{#compare ../this.caller_id.emergency.number "===" this}} selected{{/compare}} value="{{this}}">{{this}}</option>
 								{{/each}}
 							</select>
 						</div>
@@ -220,7 +220,7 @@
 				<div class="control-group">
 					<label class="control-label checkbox">
 						{{#monsterCheckbox i18n.devices.popupSettings.miscellaneous.ignoreCompletedElsewhere.label }}
-							<input type="checkbox" name="ignore_completed_elsewhere" id="ignore_completed_elsewhere" {{#if device.ignore_completed_elsewhere }}checked{{/if}} />
+							<input type="checkbox" name="ignore_completed_elsewhere" id="ignore_completed_elsewhere" {{#if ignore_completed_elsewhere }}checked{{/if}} />
 						{{/monsterCheckbox}}
 						<i class="help-popover icon-question-sign icon-large" data-original-title="{{i18n.devices.popupSettings.miscellaneous.ignoreCompletedElsewhere.help}}" data-placement="top" data-toggle="tooltip"></i>
 					</label>
@@ -230,7 +230,7 @@
 					<div class="control-group">
 						<label class="control-label checkbox">
 							{{#monsterCheckbox i18n.devices.popupSettings.miscellaneous.rtp.enable }}
-								<input type="checkbox" id="secure_rtp" name="media.encryption.enforce_security"{{#if device.media.encryption.enforce_security}} checked="checked"{{/if}}></input>
+								<input type="checkbox" id="secure_rtp" name="media.encryption.enforce_security"{{#if media.encryption.enforce_security}} checked="checked"{{/if}}></input>
 							{{/monsterCheckbox}}
 						</label>
 					</div>
@@ -239,14 +239,14 @@
 						<span>{{ i18n.devices.popupSettings.miscellaneous.rtp.type }}</span>
 
 						<select class="input-small" name="extra.rtpMethod">
-							<option value="srtp"{{#compare device.extra.rtpMethod "===" "srtp"}} selected{{/compare}}>{{ i18n.devices.popupSettings.miscellaneous.rtp.srtp }}</option>
-							<option value="zrtp"{{#compare device.extra.rtpMethod "===" "zrtp"}} selected{{/compare}}>{{ i18n.devices.popupSettings.miscellaneous.rtp.zrtp }}</option>
+							<option value="srtp"{{#compare extra.rtpMethod "===" "srtp"}} selected{{/compare}}>{{ i18n.devices.popupSettings.miscellaneous.rtp.srtp }}</option>
+							<option value="zrtp"{{#compare extra.rtpMethod "===" "zrtp"}} selected{{/compare}}>{{ i18n.devices.popupSettings.miscellaneous.rtp.zrtp }}</option>
 						</select>
 					</div>
 				</div>
 			</div>
 
-		{{#if device.provision.feature_keys}}
+		{{#if provision.feature_keys}}
 			<div class="tabs-section clearfix" data-section="featureKeys">
 				<div class="title">
 					{{ i18n.devices.popupSettings.featureKeys.menuTitle }}
@@ -254,12 +254,12 @@
 				<div class="type-info helper">
 					<a href="javascript:void(0);" data-toggle="collapse" data-target="#info_content"><i class="icon-question-sign"></i><span class="text">{{ i18n.devices.popupSettings.featureKeys.info.link.showInfo }}</span></a>
 					<div id="info_content" class="collapse">
-						{{#each featureKeys.types}}
+						{{#each extra.featureKeys.types}}
 							<p>{{#if info}}<strong>{{text}}</strong>: {{info}}{{/if}}</p>
 						{{/each}}
 					</div>
 				</div>
-			{{#each device.provision.feature_keys}}
+			{{#each provision.feature_keys}}
 				<div class="control-group" data-id="{{@key}}">
 					<label for="provision.feature_keys[{{@key}}].type" class="control-label">
 						{{ ../i18n.devices.popupSettings.featureKeys.description }} <span class="feature-key-index">{{@key}}</span>
@@ -267,7 +267,7 @@
 					<div class="controls">
 						<select name="provision.feature_keys[{{@key}}].type" class="feature-key-type span2">
 						{{#select type}}
-							{{#each ../../featureKeys.types}}
+							{{#each ../../extra.featureKeys.types}}
 								<option value="{{id}}">{{text}}</option>
 							{{/each}}
 						{{/select}}
@@ -275,7 +275,7 @@
 						<div class="feature-key-value" data-type="presence">
 							<label for="provision.feature_keys[{{@key}}].value">{{ ../i18n.devices.popupSettings.featureKeys.labels.user }}</label>
 							<select name="provision.feature_keys[{{@key}}].value">
-							{{#each ../../users}}
+							{{#each ../../extra.users}}
 								<option value="{{id}}">{{first_name}} {{last_name}}</option>
 							{{/each}}
 							</select>
@@ -283,7 +283,7 @@
 						<div class="feature-key-value" data-type="parking">
 							<label for="provision.feature_keys[{{@key}}].value">{{ ../i18n.devices.popupSettings.featureKeys.labels.parkingSpot }}</label>
 							<select class="span1" name="provision.feature_keys[{{@key}}].value">
-							{{#each ../../featureKeys.parkingSpots}}
+							{{#each ../../extra.featureKeys.parkingSpots}}
 								<option value="{{this}}">{{this}}</option>
 							{{/each}}
 							</select>
@@ -291,7 +291,7 @@
 						<div class="feature-key-value" data-type="personal_parking">
 							<label for="provision.feature_keys[{{@key}}].value">{{ ../i18n.devices.popupSettings.featureKeys.labels.user }}</label>
 							<select name="provision.feature_keys[{{@key}}].value">
-							{{#each ../../users}}
+							{{#each ../../extra.users}}
 								<option value="{{id}}">{{first_name}} {{last_name}}</option>
 							{{/each}}
 							</select>
@@ -309,14 +309,14 @@
 	</div>
 
 	<div class="actions clearfix">
-		{{#if device.id}}
+		{{#if id}}
 			<a id="delete_device" class="monster-link"><i class="icon-trash icon-red"></i>{{ i18n.devices.deleteDevice }}</a>
 		{{/if}}
 
 		<div class="pull-right">
 			<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
 			<button type="button" class="btn btn-success save">
-			{{#if device.id}}
+			{{#if id}}
 				{{ i18n.saveChanges }}
 			{{else}}
 				{{ i18n.devices.createDevice }}
