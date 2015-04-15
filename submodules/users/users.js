@@ -370,6 +370,8 @@ define(function(require){
 					);
 				};
 
+			setTimeout(function() { template.find('.search-query').focus() });
+
 			template.find('.grid-row:not(.title) .grid-cell').on('click', function() {
 				var cell = $(this),
 					type = cell.data('type'),
@@ -453,6 +455,9 @@ define(function(require){
 						}
 						else if(type === 'features') {
 							currentUser = data;
+						}
+						else if (type === 'devices') {
+							setTimeout(function() { template.find('.search-query').focus(); });
 						}
 
 						row.find('.edit-user').append(template).slideDown(400, function() {

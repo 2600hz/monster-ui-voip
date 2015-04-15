@@ -88,6 +88,8 @@ define(function(require){
 				toDate = params.toDate,
 				startKey = params.nextStartKey;
 
+			setTimeout(function() { template.find('.search-query').focus() });
+
 			template.find('.apply-filter').on('click', function(e) {
 				var fromDate = template.find('input.filter-from').datepicker("getDate"),
 					toDate = template.find('input.filter-to').datepicker("getDate");

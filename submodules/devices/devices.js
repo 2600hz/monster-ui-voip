@@ -59,6 +59,8 @@ define(function(require){
 		devicesBindEvents: function(template, parent, data) {
 			var self = this;
 
+			setTimeout(function() { template.find('.search-query').focus(); });
+
 			template.find('.devices-header .search-query').on('keyup', function() {
 				var searchString = $(this).val().toLowerCase(),
 					rows = template.find('.devices-rows .grid-row:not(.title)'),

@@ -60,6 +60,8 @@ define(function(require){
 					self.vmboxesRender({ voicemailId: vmbox.id });
 				};
 
+			setTimeout(function() { template.find('.search-query').focus(); });
+
 			template.find('.settings').on('click', function() {
 				self.vmboxesRenderEdit($(this).parents('.grid-row').data('id'), callbackSave);
 			});
