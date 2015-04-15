@@ -350,6 +350,20 @@
 	color: #aaa;
 }
 
+.edit-device .feature-key-value {
+	display: none;
+	margin-left: 20px;
+}
+
+.edit-device .feature-key-value.active {
+	display: inline-block;
+}
+
+.edit-device .feature-key-value label {
+	display: inline-block;
+	margin-right: 10px;
+}
+
 /* Codecs selector */
 .edit-device .content .codec-selector .box-selector {
 	float: left;

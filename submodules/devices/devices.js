@@ -7,7 +7,14 @@ define(function(require){
 
 	var app = {
 
-		requests: {},
+		requests: {
+			'provisioner.ui.getModel': {
+				'apiRoot': monster.config.api.provisioner,
+				'url': 'ui/{brand}/{family}/{model}',
+				'verb': 'GET',
+				generateError: false
+			}
+		},
 
 		subscribe: {
 			'voip.devices.render': 'devicesRender',
@@ -150,7 +157,70 @@ define(function(require){
 				};
 
 			self.devicesGetEditData(data, function(dataDevice) {
-				self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
+				var args = {
+						device: dataDevice
+					};
+
+				if (args.device.hasOwnProperty('provision')) {
+					self.devicesGetIterator(args.device.provision, function(template) {
+						if (template.hasOwnProperty('feature_keys')) {
+							if (!args.device.provision.hasOwnProperty('feature_keys')) {
+								args.device.provision.feature_keys = {};
+							}
+
+							for (var i = 0, len = template.feature_keys.iterate - 1; i < len; i++) {
+								if (!args.device.provision.feature_keys.hasOwnProperty(i)) {
+									args.device.provision.feature_keys[i] = { type: 'none' };
+								}
+							}
+
+							self.callApi({
+								resource: 'user.list',
+								data: {
+									accountId: self.accountId
+								},
+								success: function(data, status) {
+									var keyTypes = [ 'none', 'presence', 'parking', 'personal_parking', 'speed_dial' ],
+										parkingSpots = [];
+
+									data.data.sort(function(a, b) {
+										return a.last_name.toLowerCase() > b.last_name.toLowerCase() ? 1 : -1;
+									});
+
+									for (var i = 0; i < 10; i++) {
+										parkingSpots[i] = i + 1;
+									}
+
+									keyTypes.forEach(function(val, idx, arr) {
+										arr[idx] = { id: val, text: self.i18n.active().devices.popupSettings.featureKeys.types[val] };
+
+										if (val !== 'none') {
+											arr[idx].info = self.i18n.active().devices.popupSettings.featureKeys.info.types[val];
+										}
+									});
+
+									$.extend(true, args, {
+										users: data.data,
+										featureKeys:{
+											parkingSpots: parkingSpots,
+											types: keyTypes
+										}
+									});
+
+									self.devicesRenderDevice(args, callbackSave, callbackDelete);
+								}
+							});
+						}
+						else {
+							self.devicesRenderDevice(args, callbackSave, callbackDelete);
+						}
+					}, function() {
+						self.devicesRenderDevice(args, callbackSave, callbackDelete);
+					});
+				}
+				else {
+					self.devicesRenderDevice(args, callbackSave, callbackDelete);
+				}
 			});
 		},
 
@@ -192,13 +262,33 @@ define(function(require){
 			}
 		},
 
-		devicesRenderDevice: function(data, callbackSave, callbackDelete) {
-			var self = this
+		devicesRenderDevice: function(args, callbackSave, callbackDelete) {
+			var self = this,
+				data = args.device,
 				mode = data.id ? 'edit' : 'add',
 				type = data.device_type,
 				popupTitle = mode === 'edit' ? monster.template(self, '!' + self.i18n.active().devices[type].editTitle, { name: data.name }) : self.i18n.active().devices[type].addTitle;
-				templateDevice = $(monster.template(self, 'devices-'+type, data)),
+				templateDevice = $(monster.template(self, 'devices-'+type, args)),
 				deviceForm = templateDevice.find('#form_device');
+
+			if (data.hasOwnProperty('provision') && data.provision.hasOwnProperty('feature_keys')) {
+				var section = '.tabs-section[data-section="featureKeys"] ';
+
+				_.each(data.provision.feature_keys, function(val, key){
+					var group = '.control-group[data-id="' + key + '"] ',
+						value = '.feature-key-value[data-type="' + val.type + '"]';
+
+					templateDevice
+						.find(section.concat(group, value))
+							.addClass('active')
+						.find('[name="provision.feature_keys[' + key + '].value"]')
+							.val(val.value);
+				});
+
+				$.each(templateDevice.find('.feature-key-index'), function(idx, val) {
+					$(val).text(parseInt($(val).text(), 10) + 2);
+				});
+			}
 
 			if ( data.extra.hasE911Numbers ) {
 				if(data.caller_id && data.caller_id.emergency && data.caller_id.emergency.number) {
@@ -261,6 +351,8 @@ define(function(require){
 
 			templateDevice.find('.actions .save').on('click', function() {
 				if(monster.ui.valid(deviceForm)) {
+					templateDevice.find('.feature-key-value:not(.active)').remove();
+
 					var dataToSave = self.devicesMergeData(data, templateDevice, audioCodecs, videoCodecs);
 
 					self.devicesSaveDevice(dataToSave, function(data) {
@@ -366,6 +458,23 @@ define(function(require){
 				}
 			});
 
+			templateDevice.find('.feature-key-type').on('change', function() {
+				var type = $(this).val();
+
+				$(this).siblings('.feature-key-value.active').removeClass('active');
+				$(this).siblings('.feature-key-value[data-type="' + type + '"]').addClass('active');
+			});
+
+			templateDevice.find('.tabs-section[data-section="featureKeys"] .type-info a').on('click', function() {
+				var $this = $(this);
+
+				setTimeout(function() {
+					var action = ($this.hasClass('collapsed') ? 'show' : 'hide').concat('Info');
+
+					$this.find('.text').text(self.i18n.active().devices.popupSettings.featureKeys.info.link[action]);
+				});
+			});
+
 			var popup = monster.ui.dialog(templateDevice, {
 				position: ['center', 20],
 				title: popupTitle
@@ -450,6 +559,22 @@ define(function(require){
 			// The UI mistakenly created this key, so we clean it up
 			if(mergedData.hasOwnProperty('media') && mergedData.media.hasOwnProperty('fax') && mergedData.media.fax.hasOwnProperty('option')) {
 				delete mergedData.media.fax.option;
+			}
+
+			if (mergedData.hasOwnProperty('provision') && mergedData.provision.hasOwnProperty('feature_keys')) {
+				var tmp = mergedData.provision.feature_keys;
+
+				mergedData.provision.feature_keys = {};
+
+				for (var i = 0, len = tmp.length; i < len; i++) {
+					if (tmp[i].type !== 'none') {
+						mergedData.provision.feature_keys[i] = tmp[i];
+					}
+				}
+
+				if (_.isEmpty(mergedData.provision.feature_keys)) {
+					delete mergedData.provision.feature_keys;
+				}
 			}
 
 			/* Migration clean-up */
@@ -945,6 +1070,25 @@ define(function(require){
 					} else {
 						callback(street_address + ', ' + '<br>' + locality + ', ' + region + ' ' + postal_code);
 					}
+				}
+			});
+		},
+
+		devicesGetIterator: function(args, callbackSuccess, callbackError) {
+			var self = this;
+
+			monster.request({
+				resource: 'provisioner.ui.getModel',
+				data: {
+					brand: args.endpoint_brand,
+					family: args.endpoint_family,
+					model: args.endpoint_model
+				},
+				success: function(data, status) {
+					callbackSuccess && callbackSuccess(data.data.template);
+				},
+				error: function(data, status) {
+					callbackError && callbackError();
 				}
 			});
 		}
