@@ -158,6 +158,8 @@ define(function(require){
 		groupsBindEvents: function(template, parent) {
 			var self = this;
 
+			setTimeout(function() { template.find('.search-query').focus(); });
+
 			template.find('.grid-row:not(.title) .grid-cell').on('click', function() {
 				var cell = $(this),
 					type = cell.data('type'),

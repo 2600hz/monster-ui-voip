@@ -88,6 +88,8 @@ define(function(require){
 				toDate = params.toDate,
 				startKey = params.nextStartKey;
 
+			setTimeout(function() { template.find('.search-query').focus() });
+
 			template.find('.apply-filter').on('click', function(e) {
 				var fromDate = template.find('input.filter-from').datepicker("getDate"),
 					toDate = template.find('input.filter-to').datepicker("getDate");
@@ -332,7 +334,7 @@ define(function(require){
 				formatCdr = function(cdr) {
 					var date = monster.util.gregorianToDate(cdr.timestamp),
 						shortDate = monster.util.toFriendlyDate(date, 'shortDate'),
-						time = monster.util.toFriendlyDate(date, 'shortTime'),
+						time = monster.util.toFriendlyDate(date, 'time'),
 						durationMin = parseInt(cdr.duration_seconds/60).toString(),
 						durationSec = (cdr.duration_seconds % 60 < 10 ? "0" : "") + (cdr.duration_seconds % 60),
 						hangupI18n = self.i18n.active().hangupCauses,
