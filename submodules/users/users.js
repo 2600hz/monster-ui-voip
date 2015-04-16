@@ -1580,6 +1580,12 @@ define(function(require){
 				monster.ui.alert('error', self.i18n.active().users.errorNumberFaxing);
 			}
 
+			monster.pub('common.numberSelector.render', {
+				container: featureTemplate.find('.number-select'),
+				inputName: 'caller_id',
+				number: data.hasOwnProperty('faxbox') ? data.faxbox.caller_id : undefined
+			});
+
 			featureTemplate.find('.cancel-link').on('click', function() {
 				popup.dialog('close').remove();
 			});
@@ -1589,7 +1595,7 @@ define(function(require){
 			});
 
 			featureTemplate.find('.save').on('click', function() {
-				var newNumber = featureTemplate.find('#caller_id').val(),
+				var newNumber = featureTemplate.find('input[name="caller_id"]').val(),
 					args = {
 						openedTab: 'features',
 						callback: function() {
@@ -1597,7 +1603,7 @@ define(function(require){
 						}
 					};
 
-				if ( switchFeature.prop('checked') ) {
+				if ( switchFeature.prop('checked') && newNumber ) {
 					self.usersUpdateFaxing(data, newNumber, function(results) {
 						args.userId = results.callflow.owner_id;
 
