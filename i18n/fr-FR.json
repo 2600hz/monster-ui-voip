@@ -657,7 +657,8 @@
 			"user": "Utilisateurs",
 			"device": "Téléphones",
 			"ring_group": "Groupes",
-			"voicemail": "Répondeurs"
+			"voicemail": "Répondeurs",
+			"directory": "Annuaire"
 		},
 		"confirmMessages": {
 			"deleteHoliday": "Ces vacances seront supprimées. Continuer?",
