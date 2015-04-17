@@ -442,7 +442,7 @@
 	-moz-box-sizing: border-box;
 
 	box-sizing: border-box;
-	width: 33.33%;
+	width: 25%;
 	height: 150px;
 	border: 1px solid #FFF;
 	text-align: center;
@@ -552,4 +552,10 @@
 
 .feature-popup-container[data-feature="next_action"] .next-action > *:not(:first-child) {
 	margin-left: 10px;
+}
+
+
+/* Next Action Feature */
+.feature-popup-container[data-feature="forward"] .help-box {
+	margin: 5px 20px 20px
 }

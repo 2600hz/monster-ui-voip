@@ -93,7 +93,15 @@
 			"users": "Utilisateurs"
 		},
 		"__comment": "UI-819, v3.19_s1: Showing an error popup when group data is outdated.",
-		"outdatedGroupsError": "Les données de vos Groupes sont obsolètes et ne peuvent être affichées. Veuillez contacter votre administrateur afin de mettre à jour vos données."
+		"outdatedGroupsError": "Les données de vos Groupes sont obsolètes et ne peuvent être affichées. Veuillez contacter votre administrateur afin de mettre à jour vos données.",
+
+		"__comment": "UI-1352: Adding an option to enable/disable call forwarding on ring group",
+		"__version": "3.20",
+		"forward": {
+			"title": "Redirection d'appel",
+			"headline": "Autoriser la Redirection d'Appels",
+			"description": "Si cette option est activée, les utilisateurs de ce group pourront presser le bouton \"Redirection\" de leur téléphone afin de rediriger un appel de ce groupe. Si cette option est desactivée, ce groupe ignorera les commandes de redirections."
+		}
 	},
 
 	"devices": {

@@ -136,9 +136,14 @@ define(function(require){
 							title: self.i18n.active().groups.ringback.title
 						},
 						next_action: {
-							icon: 'icon-share-alt',
+							icon: 'icon-arrow-right',
 							iconColor: 'icon-green',
 							title: self.i18n.active().groups.nextAction.title
+						},
+						forward: {
+							icon: 'icon-mail-forward',
+							iconColor: 'icon-orange',
+							title: self.i18n.active().groups.forward.title
 						}
 					},
 					hasFeatures: false
@@ -460,6 +465,10 @@ define(function(require){
 			template.find('.feature[data-feature="next_action"]').on('click', function() {
 				self.groupsRenderNextAction(data);
 			});
+
+			template.find('.feature[data-feature="forward"]').on('click', function() {
+				self.groupsRenderForward(data);
+			});
 		},
 
 		groupsRenderCallRecording: function(data) {
@@ -771,6 +780,37 @@ define(function(require){
 
 			popup = monster.ui.dialog(featureTemplate, {
 				title: data.group.extra.mapFeatures.next_action.title,
+				position: ['center', 20]
+			});
+		},
+
+
+		groupsRenderForward: function(data) {
+			var self = this,
+				featureTemplate = $(monster.template(self, 'groups-feature-forward', data)),
+				switchFeature = featureTemplate.find('.switch-state'),
+				popup;
+
+			featureTemplate.find('.cancel-link').on('click', function() {
+				popup.dialog('close').remove();
+			});
+
+			featureTemplate.find('.save').on('click', function() {
+				var enabled = switchFeature.prop('checked');
+
+				data.group.smartpbx = data.group.smartpbx || {};
+				data.group.smartpbx.forward = data.group.smartpbx.forward || {};
+				data.group.smartpbx.forward.enabled = enabled;
+				data.group.allow_forward = enabled;
+
+				self.groupsUpdate(data.group, function(updatedGroup) {
+					popup.dialog('close').remove();
+					self.groupsRender({ groupId: data.group.id });
+				});
+			});
+
+			popup = monster.ui.dialog(featureTemplate, {
+				title: data.group.extra.mapFeatures.forward.title,
 				position: ['center', 20]
 			});
 		},

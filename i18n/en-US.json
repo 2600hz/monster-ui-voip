@@ -97,7 +97,15 @@
 			"users": "Users"
 		},
 		"__comment": "UI-819, v3.19_s1: Showing an error popup when group data is outdated.",
-		"outdatedGroupsError": "Your Group's data is outdated and can not be rendered. Please contact your administrator to update your data."
+		"outdatedGroupsError": "Your Group's data is outdated and can not be rendered. Please contact your administrator to update your data.",
+
+		"__comment": "UI-1352: Adding an option to enable/disable call forwarding on ring group",
+		"__version": "3.20",
+		"forward": {
+			"title": "Allow Call-Forward",
+			"headline": "Allow Call-Forward",
+			"description": "Enable this option if you want to allow this group's users to press their device \"Forward\" button to forward a call from this ring group. If this option is disabled, it will ignore the user's command."
+		}
 	},
 
 	"devices": {
