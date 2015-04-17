@@ -157,20 +157,16 @@ define(function(require){
 				};
 
 			self.devicesGetEditData(data, function(dataDevice) {
-				var args = {
-						device: dataDevice
-					};
-
-				if (args.device.hasOwnProperty('provision')) {
-					self.devicesGetIterator(args.device.provision, function(template) {
+				if (dataDevice.hasOwnProperty('provision')) {
+					self.devicesGetIterator(dataDevice.provision, function(template) {
 						if (template.hasOwnProperty('feature_keys')) {
-							if (!args.device.provision.hasOwnProperty('feature_keys')) {
-								args.device.provision.feature_keys = {};
+							if (!dataDevice.provision.hasOwnProperty('feature_keys')) {
+								dataDevice.provision.feature_keys = {};
 							}
 
 							for (var i = 0, len = template.feature_keys.iterate - 1; i < len; i++) {
-								if (!args.device.provision.feature_keys.hasOwnProperty(i)) {
-									args.device.provision.feature_keys[i] = { type: 'none' };
+								if (!dataDevice.provision.feature_keys.hasOwnProperty(i)) {
+									dataDevice.provision.feature_keys[i] = { type: 'none' };
 								}
 							}
 
@@ -181,7 +177,8 @@ define(function(require){
 								},
 								success: function(data, status) {
 									var keyTypes = [ 'none', 'presence', 'parking', 'personal_parking', 'speed_dial' ],
-										parkingSpots = [];
+										parkingSpots = [],
+										extra;
 
 									data.data.sort(function(a, b) {
 										return a.last_name.toLowerCase() > b.last_name.toLowerCase() ? 1 : -1;
@@ -199,27 +196,29 @@ define(function(require){
 										}
 									});
 
-									$.extend(true, args, {
+									extra = {
 										users: data.data,
 										featureKeys:{
 											parkingSpots: parkingSpots,
 											types: keyTypes
 										}
-									});
+									};
 
-									self.devicesRenderDevice(args, callbackSave, callbackDelete);
+									dataDevice.extra = dataDevice.hasOwnProperty(extra) ? $.extend(true, {}, dataDevice.extra, extra) : extra;
+
+									self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
 								}
 							});
 						}
 						else {
-							self.devicesRenderDevice(args, callbackSave, callbackDelete);
+							self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
 						}
 					}, function() {
-						self.devicesRenderDevice(args, callbackSave, callbackDelete);
+						self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
 					});
 				}
 				else {
-					self.devicesRenderDevice(args, callbackSave, callbackDelete);
+					self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
 				}
 			});
 		},
@@ -262,13 +261,12 @@ define(function(require){
 			}
 		},
 
-		devicesRenderDevice: function(args, callbackSave, callbackDelete) {
+		devicesRenderDevice: function(data, callbackSave, callbackDelete) {
 			var self = this,
-				data = args.device,
 				mode = data.id ? 'edit' : 'add',
 				type = data.device_type,
 				popupTitle = mode === 'edit' ? monster.template(self, '!' + self.i18n.active().devices[type].editTitle, { name: data.name }) : self.i18n.active().devices[type].addTitle;
-				templateDevice = $(monster.template(self, 'devices-'+type, args)),
+				templateDevice = $(monster.template(self, 'devices-'+type, data)),
 				deviceForm = templateDevice.find('#form_device');
 
 			if (data.hasOwnProperty('provision') && data.provision.hasOwnProperty('feature_keys')) {

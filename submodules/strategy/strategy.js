@@ -68,6 +68,11 @@ define(function(require){
 						monster.pub('common.numbers.getListFeatures', function(features) {
 							callback(null, features);
 						});
+					},
+					directories: function (callback) {
+						self.strategyListDirectories(function (directories) {
+							callback(null, directories);
+						});
 					}
 				},
 				function(err, results) {
@@ -1256,7 +1261,7 @@ define(function(require){
 					popup = monster.ui.dialog(template, { title: self.i18n.active().strategy.popup.title+" - "+label});
 
 					var menuLineContainer = template.find('.menu-block .left .content'),
-						popupCallEntities = $.extend(true, {}, strategyData.callEntities, { voicemail: strategyData.voicemails });
+						popupCallEntities = $.extend(true, {}, strategyData.callEntities, { voicemail: strategyData.voicemails }, { directory: strategyData.directories });
 
 					_.each(strategyData.callflows[name].flow.children, function(val, key) {
 						menuLineContainer.append(monster.template(self, 'strategy-menuLine', {
@@ -1417,7 +1422,7 @@ define(function(require){
 
 			container.find('.add-menu-line a').on('click', function(e) {
 				e.preventDefault();
-				var popupCallEntities = $.extend(true, {}, strategyData.callEntities, { voicemail: strategyData.voicemails }),
+				var popupCallEntities = $.extend(true, {}, strategyData.callEntities, { voicemail: strategyData.voicemails }, { directory: strategyData.directories }),
 					menuLine = $(monster.template(self, 'strategy-menuLine', { callEntities: self.strategyGetCallEntitiesDropdownData(popupCallEntities) })),
 					icon = menuLine.find('.target-select option:selected').parents('optgroup').data('icon');
 
@@ -1605,6 +1610,7 @@ define(function(require){
 					}
 
 					switch(entityType) {
+						case 'directory':
 						case 'user':
 						case 'device':
 						case 'voicemail':
@@ -1657,6 +1663,9 @@ define(function(require){
 					};
 
 				switch(group.groupType) {
+					case 'directory':
+						group.groupIcon = 'icon-book';
+						break;
 					case 'user':
 						group.groupIcon = 'icon-user';
 						break;
@@ -1672,9 +1681,18 @@ define(function(require){
 				}
 
 				group.entities.sort(function(a,b) { return (a.name.toLowerCase() > b.name.toLowerCase()); });
-				if(group.groupType === "user") {
-					results.splice(0, 0, group);
-				} else {
+				if(group.groupType === 'directory') {
+					results.unshift(group);
+				}
+				else if (group.groupType === 'user') {
+					if (results[0].groupType === 'directory') {
+						results.splice(1, 0, group);
+					}
+					else {
+						results.unshift(group);
+					}
+				}
+				else {
 					results.push(group);
 				}
 			});
@@ -2398,6 +2416,23 @@ define(function(require){
 				},
 				success: function(data, status) {
 					callback(data.data);
+				}
+			});
+		},
+
+		strategyListDirectories: function(callbackSuccess, callbackError) {
+			var self = this;
+
+			self.callApi({
+				resource: 'directory.list',
+				data: {
+					accountId: self.accountId
+				},
+				success: function(data, status) {
+					callbackSuccess && callbackSuccess(data.data);
+				},
+				error: function(data, status) {
+					callbackError && callbackError();
 				}
 			});
 		},

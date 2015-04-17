@@ -1,9 +1,9 @@
 <div class="feature-popup-container" data-feature="faxing">
 	<div class="feature-popup-title">
-        <div class="feature-icon-wrapper">
-            <i class="{{user.extra.mapFeatures.faxing.icon}}"></i>
-        </div>
-        {{ i18n.users.faxing.headline }}
+		<div class="feature-icon-wrapper">
+			<i class="{{user.extra.mapFeatures.faxing.icon}}"></i>
+		</div>
+		{{ i18n.users.faxing.headline }}
 		<div class="switch">
 		{{#monsterSwitch}}
 			<input class="switch-state" type="checkbox" id="checkbox_caller_id" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if user.extra.mapFeatures.faxing.active}} checked="checked"{{/if}}></input>
@@ -20,13 +20,7 @@
 		<form class="form-horizontal" id="faxbox_form">
 			<div class="control-group">
 				<label for="caller_id" class="control-label">{{ i18n.users.faxing.form.label.callerId }}</label>
-				<div class="controls">
-					<select name="caller_id" id="caller_id">
-					{{#each extra.listNumbers}}
-						<option value="{{@key}}"{{#compare @key '===' ../faxbox.caller_id }} selected="true"{{/compare}}>{{formatPhoneNumber @key}}</option>
-					{{/each}}
-					</select>
-				</div>
+				<div class="controls number-select"></div>
 			</div>
 		{{#compare faxbox.cloud_state '===' 'registered'}}
 			<div class="control-group">
@@ -56,9 +50,9 @@
 	</div>
 
 	<div class="actions clearfix">
-        <div class="pull-right">
-            <a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
-            <button type="button" class="btn btn-success save">{{ i18n.saveChanges }}</button>
-        </div>
-    </div>
+		<div class="pull-right">
+			<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
+			<button type="button" class="btn btn-success save">{{ i18n.saveChanges }}</button>
+		</div>
+	</div>
 </div>

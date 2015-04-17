@@ -706,7 +706,10 @@
 			"user": "Users",
 			"device": "Devices",
 			"ring_group": "Groups",
-			"voicemail": "Voicemail Boxes"
+			"voicemail": "Voicemail Boxes",
+			"__comment": "UI-1353: Add directory support for the virtual receptionist",
+			"__version": "v3.20_s4",
+			"directory": "Directory"
 		},
 		"confirmMessages": {
 			"deleteHoliday": "This holiday will be permanently deleted. Continue?",
