@@ -147,14 +147,7 @@
 						</div>
 					</div>
 				{{else}}
-					<div class="help-box red-box">
-						<div class="wrapper-icon">
-							<i class="icon-remove icon-red"></i>
-						</div>
-						<div class="text-wrapper">
-							{{ i18n.devices.popupSettings.callerId.noE911Numbers }}
-						</div>
-					</div>
+					{{helpBlock i18n.devices.popupSettings.callerId.noE911Numbers 'error'}}
 				{{/if}}
 			</div>
 		</form>

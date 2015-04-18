@@ -17,14 +17,7 @@
 			</select>
 		</div>
 
-		<div class="help-box gray-box">
-			<div class="wrapper-icon">
-				&nbsp;<i class="icon-info-sign2"></i>&nbsp;
-			</div>
-			<div class="text-wrapper">
-				<p>{{ i18n.myOffice.callerId.numberHelp }}</p>
-			</div>
-		</div>
+		{{helpBlock i18n.myOffice.callerId.numberHelp}}
 	</div>
 
 	<div class="content number-feature" {{#compare selectedMainNumber '===' 'none'}}style="display:none;"{{/compare}}>
@@ -33,14 +26,7 @@
 			<input type="text" class="caller-id-name">
 		</div>
 
-		<div class="help-box gray-box">
-			<div class="wrapper-icon">
-				&nbsp;<i class="icon-info-sign2"></i>&nbsp;
-			</div>
-			<div class="text-wrapper">
-				<p>{{ i18n.myOffice.callerId.nameHelp }}</p>
-			</div>
-		</div>
+		{{helpBlock i18n.myOffice.callerId.nameHelp}}
 	</div>
 
 	<div class="content number-feature" {{#compare selectedMainNumber '===' 'none'}}style="display:none;"{{/compare}}>

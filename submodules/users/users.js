@@ -1839,7 +1839,7 @@ define(function(require){
 					},
 					openedTab: 'features'
 				},
-				timeoutWarningBox = featureTemplate.find('.timeout-warning');
+				timeoutWarningBox = featureTemplate.find('.help-box.red-box');
 
 			if(currentUser.hasOwnProperty('call_forward') && currentUser.call_forward.require_keypress) {
 				timeoutWarningBox.hide();
