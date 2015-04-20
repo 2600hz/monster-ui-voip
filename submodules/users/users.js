@@ -524,6 +524,8 @@ define(function(require){
 							}
 						});
 
+						monster.ui.showPasswordStrength(userTemplate.find('#password'));
+
 						userTemplate.find('#create_user').on('click', function() {
 							if(monster.ui.valid(userTemplate.find('#form_user_creation'))) {
 								var dataForm = monster.ui.getFormData('form_user_creation'),
@@ -774,6 +776,8 @@ define(function(require){
 			template.on('click', '#change_username', function() {
 				var passwordTemplate = $(monster.template(self, 'users-changePassword', currentUser)),
 					form = passwordTemplate.find('#form_new_username');
+
+				monster.ui.showPasswordStrength(passwordTemplate.find('#inputPassword'));
 
 				passwordTemplate.find('.save-new-username').on('click', function() {
 					var formData = monster.ui.getFormData('form_new_username'),
