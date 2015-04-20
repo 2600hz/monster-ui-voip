@@ -39,14 +39,10 @@
 			</div>
 		{{/if}}
 		</form>
-		<div class="help-box gray-box">
-			<div class="wrapper-icon">
-				&nbsp;<i class="icon-info-sign2"></i>&nbsp;
-			</div>
-			<div class="text-wrapper">
-				<p>{{ i18n.users.faxing.helpOne }}<a href="https://tools.google.com/dlpage/cloudprintdriver" target="_blank">{{ i18n.users.faxing.helpTwo }}</a></p>
-			</div>
-		</div>
+
+		{{#monsterText}}
+			<p>{{ i18n.users.faxing.helpOne }}<a href="https://tools.google.com/dlpage/cloudprintdriver" target="_blank">{{ i18n.users.faxing.helpTwo }}</a></p>
+		{{/monsterText}}
 	</div>
 
 	<div class="actions clearfix">

@@ -158,14 +158,9 @@
 					<div class="restriction-message help-box">
 					</div>
 					{{#if extra.hasDisabledRestrictions}}
-					<div class="disabled-restrictions-info help-box gray-box">
-						<div class="wrapper-icon">
-							&nbsp;<i class="icon-info-sign2"></i>&nbsp;
-						</div>
-						<div class="text-wrapper">
+						{{#monsterText 'info' 'disabled-restrictions-info'}}
 							<p>{{ i18n.devices.popupSettings.restrictions.disabledRestrictionsInfo }}</p>
-						</div>
-					</div>
+						{{/monsterText}}
 					{{/if}}
 				</div>
 			</div>
@@ -188,7 +183,9 @@
 						</div>
 					</div>
 				{{else}}
-					{{helpBlock i18n.devices.popupSettings.callerId.noE911Numbers 'error'}}
+					{{#monsterText 'error'}}
+						{{ i18n.devices.popupSettings.callerId.noE911Numbers }}
+					{{/monsterText}}
 				{{/if}}
 			</div>
 		</form>

@@ -1,9 +1,9 @@
 <div class="feature-popup-container" data-feature="call_forward">
 	<div class="feature-popup-title">
-        <div class="feature-icon-wrapper">
-            <i class="{{extra.mapFeatures.call_forward.icon}}"></i>
-        </div>
-        {{ i18n.users.call_forward.headline }}
+		<div class="feature-icon-wrapper">
+			<i class="{{extra.mapFeatures.call_forward.icon}}"></i>
+		</div>
+		{{ i18n.users.call_forward.headline }}
 		<div class="switch">
 		{{#monsterSwitch}}
 			<input class="switch-state" type="checkbox" id="checkbox_call_forward" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if extra.mapFeatures.call_forward.active}} checked="checked"{{/if}}></input>
@@ -53,23 +53,16 @@
 		</form>
 
 		{{#if extra.timeoutTooShort}}
-			{{helpBlock i18n.users.call_forward.timeoutWarning 'error'}}
+			{{#monsterText 'error'}}
+				{{ i18n.users.call_forward.timeoutWarning }}
+			{{/monsterText}}
 		{{/if}}
-
-		<!--<div class="help-box gray-box">
-        	<div class="wrapper-icon">
-            	&nbsp;<i class="icon-info-sign2"></i>&nbsp;
-        	</div>
-        	<div class="text-wrapper">
-            	<p>{{ i18n.users.call_forward.help }}</p>
-        	</div>
-    	</div>-->
 	</div>
 
 	<div class="actions clearfix">
-        <div class="pull-right">
-            <a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
-            <button type="button" class="btn btn-success save">{{ i18n.saveChanges }}</button>
-        </div>
-    </div>
+		<div class="pull-right">
+			<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
+			<button type="button" class="btn btn-success save">{{ i18n.saveChanges }}</button>
+		</div>
+	</div>
 </div>

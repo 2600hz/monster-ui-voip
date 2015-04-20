@@ -17,7 +17,9 @@
 			</select>
 		</div>
 
-		{{helpBlock i18n.myOffice.callerId.numberHelp}}
+		{{#monsterText}}
+			{{ i18n.myOffice.callerId.numberHelp }}
+		{{/monsterText}}
 	</div>
 
 	<div class="content number-feature" {{#compare selectedMainNumber '===' 'none'}}style="display:none;"{{/compare}}>
@@ -26,7 +28,9 @@
 			<input type="text" class="caller-id-name">
 		</div>
 
-		{{helpBlock i18n.myOffice.callerId.nameHelp}}
+		{{#monsterText}}
+			{{ i18n.myOffice.callerId.nameHelp }}
+		{{/monsterText}}
 	</div>
 
 	<div class="content number-feature" {{#compare selectedMainNumber '===' 'none'}}style="display:none;"{{/compare}}>
@@ -58,15 +62,10 @@
 			</div>
 		</div>
 
-		<div class="help-box gray-box">
-			<div class="wrapper-icon">
-				&nbsp;<i class="icon-info-sign2"></i>&nbsp;
-			</div>
-			<div class="text-wrapper">
-				<p>{{ i18n.myOffice.callerId.emergencyHelp1 }}</p>
-				<p>{{ i18n.myOffice.callerId.emergencyHelp2 }}</p>
-			</div>
-		</div>
+		{{#monsterText}}
+			<p>{{ i18n.myOffice.callerId.emergencyHelp1 }}</p>
+			<p>{{ i18n.myOffice.callerId.emergencyHelp2 }}</p>
+		{{/monsterText}}
 	</div>
 
 	<div class="actions clearfix">
