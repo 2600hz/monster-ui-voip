@@ -2035,80 +2035,6 @@ define(function(require){
 			}
 		},
 
-		usersRenderFindMeFollowMeSliders: function(template, deviceList, ringGroup, maxSeconds) {
-			var self = this,
-				scaleSections = 6, //Number of 'sections' in the time scales for the sliders
-				scaleMaxSeconds = maxSeconds && maxSeconds >= 30 ? maxSeconds : 120; //Maximum of seconds, corresponding to the end of the scale
-
-			if(!maxSeconds) {
-				var currentMax = 0;
-				_.each(ringGroup, function(endpoint) {
-					currentMax = (endpoint.delay+endpoint.timeout > currentMax) ? endpoint.delay+endpoint.timeout : currentMax;
-				});
-				scaleMaxSeconds = currentMax > scaleMaxSeconds ? Math.ceil(currentMax/60)*60 : scaleMaxSeconds;
-			}
-
-			var sliderTooltip = function(event, ui) {
-					var val = ui.value,
-						tooltip = '<div class="slider-tooltip"><div class="slider-tooltip-inner">' + val + '</div></div>';
-
-					$(ui.handle).html(tooltip);
-				},
-				createTooltip = function(event, ui, deviceId, sliderObj) {
-					var val1 = sliderObj.slider('values', 0),
-						val2 = sliderObj.slider('values', 1),
-						tooltip1 = '<div class="slider-tooltip"><div class="slider-tooltip-inner">' + val1 + '</div></div>',
-						tooltip2 = '<div class="slider-tooltip"><div class="slider-tooltip-inner">' + val2 + '</div></div>';
-
-					template.find('.device-row[data-device_id="'+ deviceId + '"] .slider-time .ui-slider-handle').first().html(tooltip1);
-					template.find('.device-row[data-device_id="'+ deviceId + '"] .slider-time .ui-slider-handle').last().html(tooltip2);
-				},
-				createSlider = function(device) {
-					var deviceRow = template.find('.device-row[data-device_id="'+ device.id +'"]');
-					deviceRow.find('.slider-time').slider({
-						range: true,
-						min: 0,
-						max: scaleMaxSeconds,
-						values: device.id in ringGroup ? [ ringGroup[device.id].delay, ringGroup[device.id].delay+ringGroup[device.id].timeout ] : [0,0],
-						slide: sliderTooltip,
-						change: sliderTooltip,
-						create: function(event, ui) {
-							createTooltip(event, ui, device.id, $(this));
-						},
-					});
-					createSliderScale(deviceRow);
-				},
-				createSliderScale = function(container, isHeader) {
-					var scaleContainer = container.find('.scale-container')
-						isHeader = isHeader || false;
-
-					scaleContainer.empty();
-
-					for(var i=1; i<=scaleSections; i++) {
-						var toAppend = '<div class="scale-element" style="width:'+(100/scaleSections)+'%;">'
-									 + (isHeader 
-										? (i==scaleSections 
-											? '<input type="text" value="'+scaleMaxSeconds+'" data-current="'+scaleMaxSeconds+'" class="scale-max-input" maxlength="3"><span class="scale-max">'
-											:'<span>')
-											+ Math.floor(i*scaleMaxSeconds/scaleSections) + ' Sec</span>' 
-										: '')
-									 + '</div>';
-						scaleContainer.append(toAppend);
-					}
-					if(isHeader) {
-						scaleContainer.append('<span>0 Sec</span>');
-					}
-				};
-		
-			_.each(deviceList, function(device) {
-				createSlider(device);
-				if(!(device.id in ringGroup)) {
-					template.find('.device-row[data-device_id="'+device.id+'"] .disable-device').prop('checked', true);
-				}
-			});
-			createSliderScale(template.find('.device-row.title'), true);
-		},
-
 		usersRenderCallRecording: function(params) {
 			var self = this,
 				templateData = $.extend(true, {
@@ -2199,12 +2125,18 @@ define(function(require){
 						self.usersUpdateCallflow(newCallflow, function(updatedCallflow) {
 							self.usersUpdateUser(params.currentUser, function(updatedUser) {
 								popup.dialog('close').remove();
-								self.usersRender({ userId: params.currentUser.id });
+									self.usersRender({
+										userId: params.currentUser.id,
+										openedTab: 'features'
+									});
 							});
 						});
 					} else {
 						popup.dialog('close').remove();
-						self.usersRender({ groupId: params.currentUser.id });
+						self.usersRender({
+							userId: params.currentUser.id,
+							openedTab: 'features'
+						});
 					}
 				}
 			});
@@ -2343,11 +2275,17 @@ define(function(require){
 						}
 						self.usersUpdateUser(currentUser, function(updatedUser) {
 							popup.dialog('close').remove();
-							self.usersRender({ userId: currentUser.id });
+							self.usersRender({
+								userId: currentUser.id,
+								openedTab: 'features'
+							});
 						});
 					} else {
 						popup.dialog('close').remove();
-						self.usersRender({ userId: currentUser.id });
+						self.usersRender({
+							userId: currentUser.id,
+							openedTab: 'features'
+						});
 					}
 				});
 
