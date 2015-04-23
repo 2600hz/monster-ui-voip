@@ -801,7 +801,7 @@ define(function(require){
 				data.group.smartpbx = data.group.smartpbx || {};
 				data.group.smartpbx.forward = data.group.smartpbx.forward || {};
 				data.group.smartpbx.forward.enabled = enabled;
-				data.group.allow_forward = enabled;
+				data.group.ignore_forward = !enabled;
 
 				self.groupsUpdate(data.group, function(updatedGroup) {
 					popup.dialog('close').remove();
