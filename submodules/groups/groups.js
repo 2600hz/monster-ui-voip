@@ -784,7 +784,6 @@ define(function(require){
 			});
 		},
 
-
 		groupsRenderForward: function(data) {
 			var self = this,
 				featureTemplate = $(monster.template(self, 'groups-feature-forward', data)),
@@ -796,17 +795,32 @@ define(function(require){
 			});
 
 			featureTemplate.find('.save').on('click', function() {
-				var enabled = switchFeature.prop('checked');
+				var enabled = switchFeature.prop('checked'),
+					ignore_forward = !enabled;
 
 				data.group.smartpbx = data.group.smartpbx || {};
 				data.group.smartpbx.forward = data.group.smartpbx.forward || {};
 				data.group.smartpbx.forward.enabled = enabled;
-				data.group.ignore_forward = !enabled;
+				data.group.ignore_forward = ignore_forward;
+				data.baseCallflow.flow.data.ignore_forward = ignore_forward;
 
-				self.groupsUpdate(data.group, function(updatedGroup) {
-					popup.dialog('close').remove();
-					self.groupsRender({ groupId: data.group.id });
-				});
+				monster.parallel({
+						groups: function(callback) {
+							self.groupsUpdate(data.group, function(updatedGroup) {
+								callback(null, updatedGroup);
+							});
+						},
+						ringGroup: function(callback) {
+							self.groupsUpdateCallflow(data.baseCallflow, function(callflow) {
+								callback(null, callflow);
+							});
+						}
+					},
+					function(err, results) {
+						popup.dialog('close').remove();
+						self.groupsRender({ groupId: results.groups.id });
+					}
+				);
 			});
 
 			popup = monster.ui.dialog(featureTemplate, {
