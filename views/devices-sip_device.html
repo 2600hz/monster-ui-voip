@@ -2,7 +2,7 @@
 	<div class="title-bar clearfix">
 		<div class="device-title pull-left">
 			{{#if provision}}
-			<div class="device-image model-image {{toLowerCase provision.endpoint_brand}}-{{toLowerCase provision.endpoint_family}}-{{toLowerCase provision.endpoint_model}}"></div>
+			<div class="device-image model-image" style="background-image: url('css/assets/models/{{toLowerCase provision.endpoint_brand}}_{{toLowerCase provision.endpoint_family}}_{{toLowerCase provision.endpoint_model}}.jpg');"></div>
 			<div class="device-model">{{provision.endpoint_brand}} - {{provision.endpoint_model}}</div>
 			{{else}}
 				<div class="device-icon">
