@@ -135,7 +135,11 @@
 				"emergency": "Numéro",
 				"notSet": "- Valeur du compte par défaut -",
 				"noE911Numbers": "L'E911 n'a été configuré sur aucun numéro, veuillez utiliser l'application de gestion des numéros pour le configurer sur un de vos numéros avant de définir votre Caller-ID d'urgence.",
-				"address": "Adresse"
+				"address": "Adresse",
+				"__comment": "UI-1386: Updating devices to use the numberSelector common control",
+				"__version": "v3.20_s4",
+				"selectNumber": "Sélectionnez un numéro E911",
+				"useDefault": "Utiliser la valeur du compte par défaut"
 			},
 			"miscellaneous": {
 				"menuTitle": "Divers",

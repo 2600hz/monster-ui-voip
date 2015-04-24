@@ -289,7 +289,10 @@ define(function(require){
 			}
 
 			if ( data.extra.hasE911Numbers ) {
+				var currentNumber = undefined;
+
 				if(data.caller_id && data.caller_id.emergency && data.caller_id.emergency.number) {
+					currentNumber = data.caller_id.emergency.number;
 					self.devicesGetE911NumberAddress(data.caller_id.emergency.number, function(address) {
 						templateDevice
 									.find('.number-address')
@@ -298,6 +301,20 @@ define(function(require){
 									.html(address);
 					});
 				}
+
+				monster.pub('common.numberSelector.render', {
+					container: templateDevice.find('.emergency-number'),
+					inputName: 'caller_id.emergency.number',
+					number: currentNumber,
+					customNumbers: data.extra.e911Numbers,
+					noBuy: true,
+					labels: {
+						empty: self.i18n.active().devices.popupSettings.callerId.notSet,
+						remove: self.i18n.active().devices.popupSettings.callerId.useDefault,
+						spare: self.i18n.active().devices.popupSettings.callerId.selectNumber,
+						hideNumber: true
+					}
+				});
 			}
 
 			monster.ui.validate(deviceForm, {
@@ -586,7 +603,7 @@ define(function(require){
 			var self = this,
 				defaults = {
 					extra: {
-						hasE911Numbers: data.e911Numbers.length > 0,
+						hasE911Numbers: !_.isEmpty(data.e911Numbers),
 						e911Numbers: data.e911Numbers,
 						restrictions: data.listClassifiers,
 						rtpMethod: data.device.media && data.device.media.encryption && data.device.media.encryption.enforce_security ? data.device.media.encryption.methods[0] : '',
@@ -875,17 +892,36 @@ define(function(require){
 					}
 				},
 				success: function(data) {
-					var e911Numbers = [];
+					monster.pub('common.numbers.getListFeatures', function(viewFeatures) {
+						var e911Numbers = {};
+						_.each(data.data.numbers, function(val, key) {
+							if(val.features.indexOf('dash_e911') >= 0) {
+								e911Numbers[key] = self.devicesFormatNumber(val, viewFeatures);
+							}
+						});
 
-					_.each(data.data.numbers, function(number, value) {
-						if(number.features.indexOf('dash_e911') >= 0) {
-							e911Numbers.push(value);
-						}
+						callback(e911Numbers);
 					});
-
-					callback(e911Numbers);
 				}
 			});
+		},
+
+		devicesFormatNumber: function(value, viewFeatures) {
+			var self = this;
+
+			value.viewFeatures = $.extend(true, {}, viewFeatures);
+			if('locality' in value) {
+				value.isoCountry = value.locality.country || '';
+				value.friendlyLocality = 'city' in value.locality ? value.locality.city + ('state' in value.locality ? ', ' + value.locality.state : '') : '';
+			}
+
+			_.each(value.features, function(feature) {
+				if(feature in value.viewFeatures) {
+					value.viewFeatures[feature].active = 'active';
+				}
+			});
+
+			return value;
 		},
 
 		devicesGetEditData: function(dataDevice, callback) {

@@ -155,7 +155,11 @@
 				"emergency": "Number",
 				"notSet": "- Account Default -",
 				"noE911Numbers": "You didn't set E911 on any of your numbers, please set it up via the Number Manager and come back on this screen once it's done",
-				"address": "Address"
+				"address": "Address",
+				"__comment": "UI-1386: Updating devices to use the numberSelector common control",
+				"__version": "v3.20_s4",
+				"selectNumber": "Select an e911 number",
+				"useDefault": "Use account default"
 			},
 			"miscellaneous": {
 				"menuTitle": "Miscellaneous",
