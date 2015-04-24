@@ -159,7 +159,7 @@ define(function(require){
 			self.devicesGetEditData(data, function(dataDevice) {
 				if (dataDevice.hasOwnProperty('provision')) {
 					self.devicesGetIterator(dataDevice.provision, function(template) {
-						if (template.hasOwnProperty('feature_keys')) {
+						if (template.hasOwnProperty('feature_keys') && template.feature_keys.iterate > 0) {
 							if (!dataDevice.provision.hasOwnProperty('feature_keys')) {
 								dataDevice.provision.feature_keys = {};
 							}
