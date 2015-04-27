@@ -671,7 +671,10 @@
 			"for": "for",
 			"__comment": "UI-1025: Updating media file uploads throughout the UI",
 			"__version": "3.20_s3",
-			"fileUploadButton": "Choose File"
+			"fileUploadButton": "Choose File",
+			"__comment": "UI-1185: Adding a help message to the greetings",
+			"__version": "3.20_s4",
+			"greetingsHelp": "You need to click the \"Update\" button in order to save your changes for the greeting message."
 		},
 		"open": "Open",
 		"closed": "Closed",

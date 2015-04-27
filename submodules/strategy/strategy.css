@@ -564,6 +564,7 @@
 }
 #strategy_menu_popup .menu-block .menu-line .number-input {
 	width: 18px;
+	text-align: center;
 }
 #strategy_menu_popup .menu-block .menu-line .number-text {
 	width: 32px;
