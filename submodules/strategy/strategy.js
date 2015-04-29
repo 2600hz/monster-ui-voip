@@ -1258,7 +1258,10 @@ define(function(require){
 				showPopup = function() {
 					template = $(monster.template(self, 'strategy-menuPopup', { menu: menu, greeting: greeting }));
 
-					popup = monster.ui.dialog(template, { title: self.i18n.active().strategy.popup.title+" - "+label});
+					popup = monster.ui.dialog(template, {
+						title: self.i18n.active().strategy.popup.title+" - "+label,
+						dialogClass: 'overflow-visible'
+					});
 
 					var menuLineContainer = template.find('.menu-block .left .content'),
 						popupCallEntities = $.extend(true, {}, strategyData.callEntities, { voicemail: strategyData.voicemails }, { directory: strategyData.directories });
@@ -1370,6 +1373,8 @@ define(function(require){
 				ttsGreeting = container.find('#strategy_menu_popup_tts_greeting'),
 				uploadGreeting = container.find('#strategy_menu_popup_upload_greeting'),
 				mediaToUpload = undefined;
+
+			container.find('.target-select').chosen({ search_contains: true, width: '150px' });
 
 			container.find('.upload-input').fileUpload({
 				inputOnly: true,

@@ -532,6 +532,10 @@
 
 /******************* Menu Popup *******************/
 
+.overflow-visible .ui-dialog-content {
+	overflow: visible;
+}
+
 #strategy_menu_popup {
 	width: 700px;
 	padding: 20px;
