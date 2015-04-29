@@ -751,22 +751,35 @@
 	width: 220px;
 }
 
-.feature-popup-container[data-feature="faxing"] {
+/* Faxing Feature Popup */
+.feature-popup-container[data-feature='faxing'] {
 	overflow: hidden;
 }
 
-.feature-popup-container[data-feature="faxing"] #faxbox_form {
+.feature-popup-container[data-feature='faxing'] #faxbox_form {
 	margin-bottom: 0;
 }
 
-.feature-popup-container[data-feature="faxing"] #printer_link,
-.feature-popup-container[data-feature="faxing"] .controls span.text {
-	margin-left: 10px;
-	line-height: 30px;
+.feature-popup-container[data-feature='faxing'] #faxbox_form a {
+	color: #22a5ff;
+	text-decoration: underline;
 }
 
-.feature-popup-container[data-feature="faxing"] #fax_timezone_chosen {
-	margin-left: 10px;
+.feature-popup-container[data-feature='faxing'] #faxbox_form a:hover {
+	text-decoration: none;
+}
+
+.feature-popup-container[data-feature='faxing'] #faxbox_form p {
+	line-height: 40px;
+}
+
+.feature-popup-container[data-feature='faxing'] #faxbox_form strong {
+	color: #22a5ff;
+}
+
+.feature-popup-container[data-feature='faxing'] #faxbox_form .number-selector {
+	display: inline-block;
+	margin: 0 10px;
 }
 
 /* Change Password Popup */

@@ -1291,6 +1291,17 @@ define(function(require){
 									callback && callback(null, existingCallflow);
 								}
 							});
+						},
+						account: function(callback) {
+							self.callApi({
+								resource: 'account.get',
+								data: {
+									accountId: self.accountId
+								},
+								success: function(data, status) {
+									callback(null, data.data);
+								}
+							});
 						}
 					},
 					function(err, results) {
@@ -1578,6 +1589,7 @@ define(function(require){
 			var self = this,
 				data = self.usersFormatFaxingData(data),
 				featureTemplate = $(monster.template(self, 'users-feature-faxing', data)),
+				numberMirror = featureTemplate.find('.number-mirror'),
 				switchFeature = featureTemplate.find('.switch-state');
 
 			if ( !_.isEmpty(data.extra.listNumbers) ) {
@@ -1592,7 +1604,16 @@ define(function(require){
 			monster.pub('common.numberSelector.render', {
 				container: featureTemplate.find('.number-select'),
 				inputName: 'caller_id',
-				number: data.hasOwnProperty('faxbox') ? data.faxbox.caller_id : undefined
+				number: data.hasOwnProperty('faxbox') ? data.faxbox.caller_id : undefined,
+				removeCallback: function () {
+					numberMirror.text(self.i18n.active().users.faxing.emailToFax.default);
+				},
+				spareCallback: function (number) {
+					numberMirror.text(number);
+				},
+				buyCallback: function (number) {
+					numberMirror.text(number);
+				}
 			});
 
 			featureTemplate.find('.cancel-link').on('click', function() {
@@ -1612,12 +1633,18 @@ define(function(require){
 						}
 					};
 
-				if ( switchFeature.prop('checked') && newNumber ) {
-					self.usersUpdateFaxing(data, newNumber, function(results) {
-						args.userId = results.callflow.owner_id;
+				if ( switchFeature.prop('checked')) {
+					if (newNumber !== '') {
+						console.log('not empty');
+						// self.usersUpdateFaxing(data, newNumber, function(results) {
+						// 	args.userId = results.callflow.owner_id;
 
-						self.usersRender(args);
-					});
+						// 	self.usersRender(args);
+						// });
+					}
+					else {
+						console.log('is empty');
+					}
 				} else {
 					self.usersDeleteFaxing(data.user.id, function() {
 						args.userId = data.user.id;

@@ -483,19 +483,24 @@
 		"faxing": {
 			"title": "Faxbox",
 			"headline": "Faxbox",
-			"text": "Cet utilisateur recevra les fax à l'adresse mail {{variable}} sous la forme d'une pièce jointe.",
-			"helpOne": "Pour les utilisateurs sur Windows, voici un lien pour ",
-			"helpTwo": "l'installeur de l'imprimante en ligne",
-			"form": {
-				"label": {
-					"callerId": "Numéro de Faxbox",
-					"linkToPrinter": "Lien de l'imprimante",
-					"smtpEmailAddress": "Adresse email SMTP"
-				}
+			"faxToEmail": {
+				"title": "Fax to Email",
+				"text1": "Les fax envoyés à",
+				"text2": "seront convertis en email et transférés à l'adresse"
 			},
-			"defaultSettings": {
-				"nameExtension": "'s Faxbox",
-				"headerExtension": " Fax Printer"
+			"emailToFax": {
+				"title": "Email to Fax",
+				"text1": "Les emails envoyés depuis",
+				"text2": "à",
+				"text3": " avec un pdf seront faxés au numéro spécifié dans le champ 'destinataire' de l'email.",
+				"default": "- Sélectionner un numéro -"
+			},
+
+			"googlePrinter": {
+				"title": "Google Imprimante",
+				"text1": "Cliquez ",
+				"text2": " pour activer l'imprimante Google Cloud. Récupérez l'intalleur de l'imprimante ",
+				"link": "ici"
 			}
 		},
 		"vm_to_email": {

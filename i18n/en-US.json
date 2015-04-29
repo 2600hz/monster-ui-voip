@@ -513,19 +513,26 @@
 		"faxing": {
 			"title": "Faxbox",
 			"headline": "Faxbox",
-			"text": "This user will receive faxes at {{variable}} as an attachment.",
-			"helpOne": "For users running Windows, here is a link to the ",
-			"helpTwo": "Cloud Printer Installer",
-			"form": {
-				"label": {
-					"callerId": "Faxbox number",
-					"linkToPrinter": "Link to printer",
-					"smtpEmailAddress": "SMTP email address"
-				}
+			"__comment": "UI-1354: Add better explanation to faxbox feature",
+			"__version": "v3.20_s4",
+			"faxToEmail": {
+				"title": "Fax to Email",
+				"text1": "Faxes to",
+				"text2": "will be converted to email and sent to"
 			},
-			"defaultSettings": {
-				"nameExtension": "'s Faxbox",
-				"headerExtension": " Fax Printer"
+			"emailToFax": {
+				"title": "Email to Fax",
+				"text1": "Emails sent from",
+				"text2": "to",
+				"text3": "with a pdf will fax the number in the 'to' address.",
+				"default": "- Select a number -"
+			},
+
+			"googlePrinter": {
+				"title": "Google Printer",
+				"text1": "Click ",
+				"text2": " to activate the Google Cloud Printer. Get the printer installer from ",
+				"link": "here"
 			}
 		},
 		"vm_to_email": {

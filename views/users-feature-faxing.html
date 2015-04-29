@@ -12,37 +12,34 @@
 	</div>
 
 	<div class="content{{#unless user.extra.mapFeatures.faxing.active}} disabled{{/unless}}">
-	{{#if faxbox}}
-		<p>{{replaceVar i18n.users.faxing.text this.faxbox.notifications.inbound.email.send_to}}</p>
-	{{else}}
-		<p>{{replaceVar i18n.users.faxing.text this.user.email }}</p>
-	{{/if}}
 		<form class="form-horizontal" id="faxbox_form">
-			<div class="control-group">
-				<label for="caller_id" class="control-label">{{ i18n.users.faxing.form.label.callerId }}</label>
-				<div class="controls number-select"></div>
-			</div>
-		{{#compare faxbox.cloud_state '===' 'registered'}}
-			<div class="control-group">
-				<label for="printer_link" class="control-label">{{ i18n.users.faxing.form.label.linkToPrinter }}</label>
-				<div class="controls">
-					<a id="printer_link" href="{{faxbox.cloud_connector_claim_url}}" target="_blank">{{faxbox.cloud_connector_claim_url}}</a>
-				</div>
-			</div>
-		{{/compare}}
-		{{#if faxbox.smtp_email_address}}
-			<div class="control-group">
-				<label for="stmp_email_address" class="control-label">{{ i18n.users.faxing.form.label.smtpEmailAddress }}</label>
-				<div class="controls">
-					<span class="text">{{faxbox.smtp_email_address}}</span>
-				</div>
-			</div>
-		{{/if}}
+			<fieldset>
+				<legend>{{i18n.users.faxing.faxToEmail.title}}</legend>
+				<p>
+					{{i18n.users.faxing.faxToEmail.text1}}
+					<span class="number-select"></span>
+					{{i18n.users.faxing.faxToEmail.text2}} <strong>{{user.email}}</strong>.
+				</p>
+			</fieldset>
+			<fieldset>
+				<legend>{{i18n.users.faxing.emailToFax.title}}</legend>
+				<p>
+					{{i18n.users.faxing.emailToFax.text1}} <strong>{{user.email}}</strong> {{i18n.users.faxing.emailToFax.text2}} 
+					<strong><span class="number-mirror">{{#if faxbox.caller_id}}{{faxbox.caller_id}}{{else}}{{i18n.users.faxing.emailToFax.default}}{{/if}}</span>@{{account.realm}}</strong> {{i18n.users.faxing.emailToFax.text3}}
+				</p>
+			</fieldset>
+			<fieldset>
+			{{#compare faxbox.cloud_state '===' 'registered'}}
+				<legend>{{i18n.users.faxing.googlePrinter.title}}</legend>
+				<p>
+					{{i18n.users.faxing.googlePrinter.text1}}
+					<a href="{{faxbox.caller_id}}" target="_blank">{{i18n.users.faxing.googlePrinter.link}}</a>
+					{{i18n.users.faxing.googlePrinter.text2}}
+					<a href="https://tools.google.com/dlpage/cloudprintdriver" target="_blank">{{i18n.users.faxing.googlePrinter.link}}</a>.
+				</p>
+			{{/compare}}
+			</fieldset>
 		</form>
-
-		{{#monsterText}}
-			<p>{{ i18n.users.faxing.helpOne }}<a href="https://tools.google.com/dlpage/cloudprintdriver" target="_blank">{{ i18n.users.faxing.helpTwo }}</a></p>
-		{{/monsterText}}
 	</div>
 
 	<div class="actions clearfix">
