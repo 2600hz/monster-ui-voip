@@ -18,15 +18,53 @@
 				<p>
 					{{i18n.users.faxing.faxToEmail.text1}}
 					<span class="number-select"></span>
-					{{i18n.users.faxing.faxToEmail.text2}} <strong>{{user.email}}</strong>.
+					{{i18n.users.faxing.faxToEmail.text2}} <strong class="monster-primary-color">{{user.email}}</strong>.
 				</p>
 			</fieldset>
 			<fieldset>
 				<legend>{{i18n.users.faxing.emailToFax.title}}</legend>
 				<p>
-					{{i18n.users.faxing.emailToFax.text1}} <strong>{{user.email}}</strong> {{i18n.users.faxing.emailToFax.text2}} 
-					<strong><span class="number-mirror">{{#if faxbox.caller_id}}{{faxbox.caller_id}}{{else}}{{i18n.users.faxing.emailToFax.default}}{{/if}}</span>@{{account.realm}}</strong> {{i18n.users.faxing.emailToFax.text3}}
+					{{i18n.users.faxing.emailToFax.text1}}
+					<strong>
+						<em>
+							<span class="number-mirror">
+							{{#if faxbox.caller_id}}
+								{{faxbox.caller_id}}
+							{{else}}
+								{{i18n.users.faxing.emailToFax.default}}
+							{{/if}}
+							</span>
+						</em>
+					</strong>
+					<strong class="monster-primary-color">@{{account.realm}}</strong>
+					{{i18n.users.faxing.emailToFax.text2}}
+					<strong>
+						<em>
+							<span class="number-mirror">
+							{{#if faxbox.caller_id}}
+								{{faxbox.caller_id}}
+							{{else}}
+								{{i18n.users.faxing.emailToFax.default}}
+							{{/if}}
+							</span>
+						</em>
+					</strong>.
+					<br>
+					{{i18n.users.faxing.emailToFax.text3}}
+					<strong class="monster-primary-color">{{user.email}}</strong>.
 				</p>
+				<div class="helper">
+					<a href="javascript:void(0);" id="helper_link" data-toggle="collapse" data-target="#helper_content">
+						<span class="text">{{i18n.users.faxing.emailToFax.help.showHelp}}</span>
+					</a>
+					<div id="helper_content" class="collapse">
+						<div class="control-group">
+							<label for="destination_number" class="control-label">{{i18n.users.faxing.emailToFax.help.question}}</label>
+							<div class="controls">
+								<input type="text" id="destination_number" maxlength="16" placeholder="{{i18n.users.faxing.emailToFax.help.placeholder}}">
+							</div>
+						</div>
+					</div>
 			</fieldset>
 			<fieldset>
 			{{#compare faxbox.cloud_state '===' 'registered'}}

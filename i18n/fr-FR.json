@@ -497,7 +497,13 @@
 				"text1": "Les emails envoyés depuis",
 				"text2": "à",
 				"text3": " avec un pdf seront faxés au numéro spécifié dans le champ 'destinataire' de l'email.",
-				"default": "- Sélectionner un numéro -"
+				"default": "{ numéro de destination }",
+				"help": {
+					"showHelp": "Montrer l'aide",
+					"hideHelp": "Cacher l'aider",
+					"question": "À quel numéro voulez-vous envoyer le fax ?",
+					"placeholder": "numéro de destination"
+				}
 			},
 
 			"googlePrinter": {

@@ -770,16 +770,20 @@
 }
 
 .feature-popup-container[data-feature='faxing'] #faxbox_form p {
-	line-height: 40px;
+	line-height: 30px;
 }
 
-.feature-popup-container[data-feature='faxing'] #faxbox_form strong {
+.feature-popup-container[data-feature='faxing'] #faxbox_form .monster-primary-color {
 	color: #22a5ff;
 }
 
 .feature-popup-container[data-feature='faxing'] #faxbox_form .number-selector {
 	display: inline-block;
 	margin: 0 10px;
+}
+
+.feature-popup-container[data-feature='faxing'] #faxbox_form #helper_content {
+	margin-top: 10px;
 }
 
 /* Change Password Popup */

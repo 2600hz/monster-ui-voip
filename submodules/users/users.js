@@ -1601,27 +1601,36 @@ define(function(require){
 				monster.ui.alert('error', self.i18n.active().users.errorNumberFaxing);
 			}
 
+			switchFeature.on('change', function() {
+				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+			});
+
 			monster.pub('common.numberSelector.render', {
 				container: featureTemplate.find('.number-select'),
 				inputName: 'caller_id',
-				number: data.hasOwnProperty('faxbox') ? data.faxbox.caller_id : undefined,
-				removeCallback: function () {
-					numberMirror.text(self.i18n.active().users.faxing.emailToFax.default);
-				},
-				spareCallback: function (number) {
-					numberMirror.text(number);
-				},
-				buyCallback: function (number) {
-					numberMirror.text(number);
+				number: data.hasOwnProperty('faxbox') ? data.faxbox.caller_id : undefined
+			});
+
+			featureTemplate.find('#destination_number').on('keyup', function() {
+				if ($(this).val() === '') {
+					featureTemplate.find('.number-mirror').text(self.i18n.active().users.faxing.emailToFax.default);
 				}
+				else {
+					featureTemplate.find('.number-mirror').text($(this).val());
+				}
+			});
+
+			featureTemplate.find('#helper_content').on('shown', function() {
+				$(this).siblings('a').find('.text').text(self.i18n.active().users.faxing.emailToFax.help.hideHelp);
+				$(this).find('#destination_number').focus();
+			});
+
+			featureTemplate.find('#helper_content').on('hidden', function() {
+				$(this).siblings('a').find('.text').text(self.i18n.active().users.faxing.emailToFax.help.showHelp);
 			});
 
 			featureTemplate.find('.cancel-link').on('click', function() {
 				popup.dialog('close').remove();
-			});
-
-			switchFeature.on('change', function() {
-				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
 			});
 
 			featureTemplate.find('.save').on('click', function() {

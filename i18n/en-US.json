@@ -521,15 +521,21 @@
 			"__version": "v3.20_s4",
 			"faxToEmail": {
 				"title": "Fax to Email",
-				"text1": "Faxes to",
-				"text2": "will be converted to email and sent to"
+				"text1": "Faxes sent to",
+				"text2": "will be converted to emails and sent to"
 			},
 			"emailToFax": {
 				"title": "Email to Fax",
-				"text1": "Emails sent from",
-				"text2": "to",
-				"text3": "with a pdf will fax the number in the 'to' address.",
-				"default": "- Select a number -"
+				"text1": "Emails sent to ",
+				"text2": " with a PDF (or TIFF) attachment will fax the attachment to ",
+				"text3": "The email must come from ",
+				"default": "{ destination number }",
+				"help": {
+					"showHelp": "Show help",
+					"hideHelp": "Hide help",
+					"question": "What number do you want to fax to?",
+					"placeholder": "destination number"
+				}
 			},
 
 			"googlePrinter": {
