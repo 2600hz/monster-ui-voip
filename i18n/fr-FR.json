@@ -483,6 +483,10 @@
 		"faxing": {
 			"title": "Faxbox",
 			"headline": "Faxbox",
+			"defaultSettings": {
+				"nameExtension": "'s Faxbox",
+				"headerExtension": " Fax Printer"
+			},
 			"faxToEmail": {
 				"title": "Fax to Email",
 				"text1": "Les fax envoyés à",
@@ -501,6 +505,11 @@
 				"text1": "Cliquez ",
 				"text2": " pour activer l'imprimante Google Cloud. Récupérez l'intalleur de l'imprimante ",
 				"link": "ici"
+			},
+			"toastr": {
+				"error": {
+					"numberMissing": "Veuillez sélectionner un numéro"
+				}
 			}
 		},
 		"vm_to_email": {

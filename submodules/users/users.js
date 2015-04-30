@@ -1635,15 +1635,14 @@ define(function(require){
 
 				if ( switchFeature.prop('checked')) {
 					if (newNumber !== '') {
-						console.log('not empty');
-						// self.usersUpdateFaxing(data, newNumber, function(results) {
-						// 	args.userId = results.callflow.owner_id;
+						self.usersUpdateFaxing(data, newNumber, function(results) {
+							args.userId = results.callflow.owner_id;
 
-						// 	self.usersRender(args);
-						// });
+							self.usersRender(args);
+						});
 					}
 					else {
-						console.log('is empty');
+						monster.ui.alert('error', self.i18n.active().users.faxing.toastr.error.numberMissing);
 					}
 				} else {
 					self.usersDeleteFaxing(data.user.id, function() {

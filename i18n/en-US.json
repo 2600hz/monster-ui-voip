@@ -513,6 +513,10 @@
 		"faxing": {
 			"title": "Faxbox",
 			"headline": "Faxbox",
+			"defaultSettings": {
+				"nameExtension": "'s Faxbox",
+				"headerExtension": " Fax Printer"
+			},
 			"__comment": "UI-1354: Add better explanation to faxbox feature",
 			"__version": "v3.20_s4",
 			"faxToEmail": {
@@ -533,6 +537,11 @@
 				"text1": "Click ",
 				"text2": " to activate the Google Cloud Printer. Get the printer installer from ",
 				"link": "here"
+			},
+			"toastr": {
+				"error": {
+					"numberMissing": "Please select a number"
+				}
 			}
 		},
 		"vm_to_email": {
