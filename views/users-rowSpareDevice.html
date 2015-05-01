@@ -1,6 +1,6 @@
-<div class="item-row" data-id="{{this.id}}" data-search="{{this.name}}">
+<div class="item-row{{#if this.owner_id}} assigned{{/if}}" data-id="{{this.id}}">
 	<div class="device">
-		<button type="button" class="btn btn-primary add-device">{{ i18n.add }}</button>
+		<button type="button" class="btn btn-danger remove-device">{{ i18n.unassign }}</button>
 		<a href="javascript:void(0);" class="edit-device-link monster-link">{{ this.name }}</a>
 	</div>
 </div>

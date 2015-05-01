@@ -347,6 +347,7 @@ define(function(require){
 				extensionsToSave,
 				numbersToSave,
 				extraSpareNumbers,
+				unassignedDevices,
 				toastrMessages = self.i18n.active().users.toastrMessages,
 				mainDirectoryId,
 				mainCallflowId,
@@ -458,6 +459,8 @@ define(function(require){
 						}
 						else if (type === 'devices') {
 							setTimeout(function() { template.find('.search-query').focus(); });
+							currentUser = userId;
+							unassignedDevices = {};
 						}
 
 						row.find('.edit-user').append(template).slideDown(400, function() {
@@ -837,21 +840,38 @@ define(function(require){
 							listAssigned = template.find('.list-assigned-items');
 
 						listAssigned.find('.empty-row').hide();
-
-						/* reset search */
-						listAssigned.find('.empty-search-row').hide();
-						template.find('.unassigned-list-header .search-query').val('');
-						listAssigned.find('.item-row').show();
-
-						/* Add row */
-						listAssigned.append(rowDevice)
-							.find('.item-row[data-id="' + device.id + '"]')
-							.toggleClass('updated')
-							.find('button')
-							.removeClass('add-device btn-primary')
-							.addClass('remove-device btn-danger')
-							.text(self.i18n.active().remove);
+						listAssigned.append(rowDevice);
 					}
+				});
+			});
+
+			template.on('click', '.spare-devices:not(.disabled)', function() {
+				var currentlySelected = $.map(template.find('.device-list.list-assigned-items .item-row'), function(val) { return $(val).data('id') });
+				self.usersGetDevicesData(function(devicesData) {
+					var spareDevices = {};
+					_.each(devicesData, function(device) {
+						if( (!('owner_id' in device) || device.owner_id === '' || device.owner_id === currentUser) && currentlySelected.indexOf(device.id) === -1 ) {
+							spareDevices[device.id] = device;
+						}
+					});
+
+					monster.pub('common.monsterListing.render', {
+						dataList: spareDevices,
+						dataType: 'devices',
+						okCallback: function(devices) {
+							_.each(devices, function(device) {
+								var rowDevice = monster.template(self, 'users-rowSpareDevice', device),
+									listAssigned = template.find('.list-assigned-items');
+
+								listAssigned.find('.empty-row').hide();
+								listAssigned.append(rowDevice);
+
+								if(device.owner_id) {
+									delete unassignedDevices[device.id];
+								}
+							});
+						}
+					});
 				});
 			});
 
@@ -863,12 +883,10 @@ define(function(require){
 					name = $(this).parents('.grid-row').find('.grid-cell.name').text(),
 					userId = $(this).parents('.grid-row').data('id');
 
-				template.find('.detail-devices .list-assigned-items .item-row.updated').each(function(k, row) {
+				template.find('.detail-devices .list-assigned-items .item-row:not(.assigned)').each(function(k, row) {
 					dataDevices.new.push($(row).data('id'));
 				});
-				template.find('.detail-devices .list-unassigned-items .item-row.updated').each(function(k, row) {
-					dataDevices.old.push($(row).data('id'));
-				});
+				dataDevices.old = Object.keys(unassignedDevices);
 
 				self.usersUpdateDevices(dataDevices, userId, function() {
 					toastr.success(monster.template(self, '!' + toastrMessages.devicesUpdated, { name: name }));
@@ -893,84 +911,16 @@ define(function(require){
 				);
 			});
 
-			template.on('click', '.detail-devices .list-unassigned-items .add-device', function() {
-
-				var row = $(this).parents('.item-row'),
-					spare = template.find('.count-spare'),
-					countSpare = spare.data('count') - 1,
-					assignedList = template.find('.detail-devices .list-assigned-items');
-
-				spare
-					.html(countSpare)
-					.data('count', countSpare);
-
-				row.toggleClass('updated')
-					.find('button')
-					.removeClass('add-device btn-primary')
-					.addClass('remove-device btn-danger')
-					.text(self.i18n.active().remove);
-
-				assignedList.find('.empty-row').hide();
-				assignedList.append(row);
-
-				var rows = template.find('.list-unassigned-items .item-row');
-
-				if(rows.size() === 0) {
-					template.find('.detail-devices .list-unassigned-items .empty-row').show();
-				}
-				else if(rows.is(':visible') === false) {
-					template.find('.detail-devices .list-unassigned-items .empty-search-row').show();
-				}
-			});
-
 			template.on('click', '.detail-devices .list-assigned-items .remove-device', function() {
-				var row = $(this).parents('.item-row'),
-					spare = template.find('.count-spare'),
-					countSpare = spare.data('count') + 1,
-					unassignedList = template.find('.detail-devices .list-unassigned-items');
+				var row = $(this).parents('.item-row');
 
-				/* Alter the html */
-				row.hide();
-
-				row.toggleClass('updated')
-					.find('button')
-					.removeClass('remove-device btn-danger')
-					.addClass('add-device btn-primary')
-					.text(self.i18n.active().add);
-
-				unassignedList.append(row);
-				unassignedList.find('.empty-row').hide();
-
-				spare
-					.html(countSpare)
-					.data('count', countSpare);
-
+				if(row.hasClass('assigned')) {
+					unassignedDevices[row.data('id')] = true;
+				}
+				row.remove();
 				var rows = template.find('.detail-devices .list-assigned-items .item-row');
-				/* If no rows beside the clicked one, display empty row */
 				if(rows.is(':visible') === false) {
 					template.find('.detail-devices .list-assigned-items .empty-row').show();
-				}
-
-				/* If it matches the search string, show it */
-				if(row.data('search').indexOf(currentNumberSearch) >= 0) {
-					row.show();
-					unassignedList.find('.empty-search-row').hide();
-				}
-			});
-
-			template.on('keyup', '.detail-devices .search-query', function() {
-				var searchString = $(this).val().toLowerCase(),
-					rows = template.find('.list-unassigned-items .item-row'),
-					emptySearch = template.find('.list-unassigned-items .empty-search-row');
-
-				_.each(rows, function(row) {
-					var row = $(row);
-
-					row.data('search').toLowerCase().indexOf(searchString) < 0 ? row.hide() : row.show();
-				});
-
-				if(rows.size() > 0) {
-					rows.is(':visible') ? emptySearch.hide() : emptySearch.show();
 				}
 			});
 
