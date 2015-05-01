@@ -793,7 +793,7 @@
 			"title": "Caller ID d'entreprise",
 			"headline": "Sélectionner un numéro de Caller ID Number pour ce compte",
 			"numberLabel": "Numéro de Caller ID de l'entreprise",
-			"numberHelp": "Ce numéro sera affiché lors des appels sortants.",
+			"numberHelp": "Ce numéro sera affiché lors des appels sortants. 15 caractères maximum (espaces inclus).",
 			"nameLabel": "Nom du Caller-ID de l'entreprise",
 			"nameHelp": "Ce nom sera affiché si possible lors des appels sortants.",
 			"emergencyLabel": "Adresse d'urgence de l'entreprise",
