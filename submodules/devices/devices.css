@@ -220,6 +220,10 @@
 }
 
 /* Adding / Edition Devices Popups */
+.overflow-visible .ui-dialog-content {
+	overflow: visible;
+}
+
 .edit-device {
 	width: 700px;
 }
