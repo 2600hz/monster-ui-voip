@@ -361,7 +361,7 @@ define(function(require){
 										type: "default"
 									},
 									callflow: callflowName,
-									callEntities: self.strategyGetCallEntitiesDropdownData(strategyData.callEntities, true),
+									callEntities: self.strategyGetCallEntitiesDropdownData(strategyData.callEntities, true, true),
 									voicemails: strategyData.voicemails,
 									tabMessage: self.i18n.active().strategy.calls.callTabsMessages[callflowName]
 								};
@@ -1244,12 +1244,13 @@ define(function(require){
 					popup = monster.ui.dialog(template, { title: self.i18n.active().strategy.popup.title+" - "+label});
 
 					var menuLineContainer = template.find('.menu-block .left .content'),
-						popupCallEntities = $.extend(true, {}, strategyData.callEntities, { voicemail: strategyData.voicemails });
+						popupCallEntities = $.extend(true, {}, strategyData.callEntities, { voicemail: strategyData.voicemails }),
+						dropdownCallEntities = self.strategyGetCallEntitiesDropdownData(popupCallEntities);
 
 					_.each(strategyData.callflows[name].flow.children, function(val, key) {
 						menuLineContainer.append(monster.template(self, 'strategy-menuLine', {
 							number: key,
-							callEntities: self.strategyGetCallEntitiesDropdownData(popupCallEntities),
+							callEntities: dropdownCallEntities,
 							selectedId: val.data.id || val.data.endpoints[0].id
 						}));
 					});
@@ -1611,9 +1612,10 @@ define(function(require){
 			});
 		},
 
-		strategyGetCallEntitiesDropdownData: function(callEntities, useBasicUser) {
+		strategyGetCallEntitiesDropdownData: function(callEntities, useBasicUser, useBaseGroup) {
 			var self = this,
 				useBasicUser = (useBasicUser === true) || false,
+				useBaseGroup = (useBaseGroup === true) || false,
 				entities = $.extend(true, {}, callEntities),
 				results = [];
 
@@ -1621,6 +1623,10 @@ define(function(require){
 				entities.user = entities.userCallflows;
 			}
 			delete entities.userCallflows;
+			if(!useBaseGroup) {
+				entities.ring_group = entities.userGroups;
+			}
+			delete entities.userGroups;
 
 			_.each(entities, function(value, key) {
 				var group = {
@@ -2188,6 +2194,21 @@ define(function(require){
 							}
 						});
 					},
+					userGroups: function(_callback) {
+						self.callApi({
+							resource: 'callflow.list',
+							data: {
+								accountId: self.accountId,
+								filters: {
+									'has_key': 'group_id',
+									'filter_type': 'userGroup'
+								}
+							},
+							success: function(data, status) {
+								_callback(null, data.data);
+							}
+						});
+					},
 					devices: function(_callback) {
 						self.callApi({
 							resource: 'device.list',
@@ -2208,7 +2229,13 @@ define(function(require){
 						device: results.devices,
 						user: $.extend(true, [], results.users),
 						userCallflows: [],
-						ring_group: []
+						ring_group: [],
+						userGroups: $.map(results.userGroups, function(val) {
+							var group = _.find(results.groups, function(group) { return val.group_id === group.id });
+							val.name = group && group.name || val.name;
+							val.module = 'callflow';
+							return val;
+						})
 					};
 
 					_.each(callEntities.device, function(device) {
