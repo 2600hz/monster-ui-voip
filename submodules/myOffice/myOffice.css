@@ -1,7 +1,7 @@
 /********** Header **********/
 #myoffice_container .dashboard-header {
 	height: 60px;
-	background-color: #22ccff;
+	background-color: #22a5ff;
 	color: #fff;
 	border: 1px solid #dcdcdc;  border-radius: 4px;
 	margin-bottom: 20px;
@@ -105,7 +105,7 @@
 }
 #myoffice_container .dashboard-left-content .left-section-header .number {
 	font-size: 24px;
-	color: #22ccff;
+	color: #22a5ff;
 	float: right;
 }
 #myoffice_container .dashboard-left-content .left-section-content {
@@ -149,7 +149,7 @@
 	font-weight: bold;
 }
 #myoffice_container .devices-section-content .unregistered-devices .value.none {
-	color: #22ccff;
+	color: #22a5ff;
 }
 #myoffice_container .devices-section-content .unregistered-devices {
 	margin-top: 25px;
@@ -243,7 +243,7 @@
 	line-height: 25px;
 }
 #myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-row .row-content .number-list li.caller-id {
-	color: #22ccff;
+	color: #22a5ff;
 }
 #myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-row .row-content .number-list .features > i {
 	display: none;
@@ -291,7 +291,7 @@
 #myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-div .div-title .number {
 	float: right;
 	margin-right: 10px;
-	color: #22ccff;
+	color: #22a5ff;
 }
 #myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-div > :not(:last-child) {
 	border-bottom: solid 1px #dcdcdc

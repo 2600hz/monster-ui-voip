@@ -78,7 +78,7 @@
 	-moz-transform: rotate(90deg);
 	-ms-transform: rotate(90deg);
 	-o-transform: rotate(90deg);
-	color: #22ccff;
+	color: #22a5ff;
 }
 
 #strategy_container .element-container .basic-actions {
@@ -94,7 +94,7 @@
 }
 
 #strategy_container .element-container:not(.strategy-confnum) .title .icon-phone {
-	color: #22ccff;
+	color: #22a5ff;
 }
 
 /************** Main Numbers **************/
@@ -281,7 +281,7 @@
 }
 
 #strategy_container .element-container.strategy-holidays .holidays-div .holidays-add .dropdown-toggle {
-	color: #22ccff;
+	color: #22a5ff;
 	background-color: transparent;
 }
 
@@ -503,7 +503,7 @@
 }
 
 #strategy_container .element-container.strategy-calls .callflow-tabs .call-option.active .menu-div.has-menu .menu-icon i {
-	color: #22ccff;
+	color: #22a5ff;
 }
 
 /********** Strategy Conference ***********/

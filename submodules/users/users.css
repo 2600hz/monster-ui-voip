@@ -27,7 +27,7 @@
 	display: inline-block;
 	margin-top: -5px;
 	margin-left: 15px;
-	color: #22ccff;
+	color: #22a5ff;
 	font-weight: 600;
 	font-size: 28px;
 }
@@ -63,7 +63,7 @@
 }
 
 #users_container .users-header .add-user:hover i {
-	color: #22ccff;
+	color: #22a5ff;
 }
 
 #users_container .users-header .search-box { margin: 16px 0 16px 15px; }
@@ -870,7 +870,7 @@
 
 .presence-id-change-wrapper .list-choices .presence-id-option.active {
 	background: #FFF;
-	border: 1px solid #22CCFF;
+	border: 1px solid #22a5ff;
 }
 
 .presence-id-change-wrapper .actions {
