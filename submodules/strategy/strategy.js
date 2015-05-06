@@ -411,8 +411,11 @@ define(function(require){
 
 						$.each(template.find('.user-select select'), function() {
 							var $this = $(this);
+							$this.chosen({ search_contains: true, width: '160px' });
 							$this.siblings('.title').text($this.find('option:selected').closest('optgroup').prop('label'));
 						});
+
+						template.find('.voicemail-select select').chosen({ search_contains: true, width: '160px' });
 
 						callback && callback();
 						break;
