@@ -35,7 +35,7 @@
 }
 
 #call_logs_container .fixed-ranges-date .highlight-date {
-	color: #22CCFF;
+	color: #22a5ff;
 	font-weight: bold;
 	margin: 0 5px;
 }
@@ -91,13 +91,7 @@
 	border-bottom-right-radius: 4px;
 }
 #call_logs_container .grid-row.header-row {
-	background-color: #22ccff;
-	background-image: linear-gradient(to bottom,#22ccff,#22a5ff);
-	background-image: -moz-linear-gradient(top,#22ccff,#22a5ff);
-	background-image: -webkit-gradient(linear,0 0,0 100%,from(#22ccff),to(#22a5ff));
-	background-image: -webkit-linear-gradient(top,#22ccff,#22a5ff);
-	background-image: -o-linear-gradient(top,#22ccff,#22a5ff);
-	filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff22ccff',endColorstr='#ff22a5ff',GradientType=0);
+	background-color: #22a5ff;
 	color: #fff;
 	text-shadow: 1px 1px 1px #666666;
 	font-weight: 600;
@@ -117,7 +111,7 @@
 	display: none;
 }
 #call_logs_container .grid-row-group:not(.open) .grid-row.a-leg.has-b-legs > .grid-cell:first-child {
-	border-left: solid 2px #22ccff;
+	border-left: solid 2px #22a5ff;
 }
 #call_logs_container .grid-row-group.open .grid-row > .grid-cell:first-child {
 	border-left: solid 2px #44cc44;
@@ -173,7 +167,7 @@
 	width: 10%;
 }
 #call_logs_container .grid-cell.details i:hover {
-	color: #22ccff;
+	color: #22a5ff;
 	cursor: pointer;
 }
 #call_logs_container .grid-cell.report {

@@ -17,7 +17,7 @@
 	display: inline-block;
 	margin-top: -5px;
 	margin-left: 15px;
-	color: #22ccff;
+	color: #22a5ff;
 	font-weight: 600;
 	font-size: 28px;
 }
@@ -57,7 +57,7 @@
 }
 
 #vmboxes_container .vmboxes-header .add-vmbox:hover i {
-	color: #22ccff;
+	color: #22a5ff;
 }
 
 #vmboxes_container .vmboxes-header .search-box { margin: 16px 0 16px 15px; }
@@ -217,7 +217,7 @@
 }
 
 .edit-vmbox .content .tabs-section .title {
-	color: #22CCFF;
+	color: #22a5ff;
 	font-size: 24px;
 	margin-bottom: 30px;
 	margin-left: 40px;

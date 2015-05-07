@@ -164,7 +164,7 @@ define(function(require){
 								dataDevice.provision.feature_keys = {};
 							}
 
-							for (var i = 0, len = template.feature_keys.iterate - 1; i < len; i++) {
+							for (var i = 1, len = template.feature_keys.iterate; i < len; i++) {
 								if (!dataDevice.provision.feature_keys.hasOwnProperty(i)) {
 									dataDevice.provision.feature_keys[i] = { type: 'none' };
 								}
@@ -284,7 +284,7 @@ define(function(require){
 				});
 
 				$.each(templateDevice.find('.feature-key-index'), function(idx, val) {
-					$(val).text(parseInt($(val).text(), 10) + 2);
+					$(val).text(parseInt($(val).text(), 10) + 1);
 				});
 			}
 
@@ -493,7 +493,8 @@ define(function(require){
 
 			var popup = monster.ui.dialog(templateDevice, {
 				position: ['center', 20],
-				title: popupTitle
+				title: popupTitle,
+				dialogClass: 'overflow-visible'
 			});
 		},
 
@@ -546,6 +547,20 @@ define(function(require){
 				});
 			}
 
+			/**
+			 * form2object sends feature_keys back as an array even if the first key is 1
+			 * feature_key needs to be coerced into an object to match the datatype in originalData
+			 */
+			if (formData.hasOwnProperty('provision') && formData.provision.hasOwnProperty('feature_keys')) {
+				var featureKeys = {};
+
+				formData.provision.feature_keys.forEach(function(val, idx) {
+					featureKeys[idx + 1] = val;
+				});
+
+				formData.provision.feature_keys = featureKeys;
+			}
+
 			var mergedData = $.extend(true, {}, originalData, formData);
 
 			/* The extend doesn't override an array if the new array is empty, so we need to run these snippet after the merge */
@@ -577,14 +592,11 @@ define(function(require){
 				delete mergedData.media.fax.option;
 			}
 
+			// Remove feature keys that are not defined
 			if (mergedData.hasOwnProperty('provision') && mergedData.provision.hasOwnProperty('feature_keys')) {
-				var tmp = mergedData.provision.feature_keys;
-
-				mergedData.provision.feature_keys = {};
-
-				for (var i = 0, len = tmp.length; i < len; i++) {
-					if (tmp[i].type !== 'none') {
-						mergedData.provision.feature_keys[i] = tmp[i];
+				for (var key in mergedData.provision.feature_keys) {
+					if (mergedData.provision.feature_keys[key].type === 'none') {
+						delete mergedData.provision.feature_keys[key];
 					}
 				}
 
