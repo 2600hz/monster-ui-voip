@@ -288,7 +288,7 @@ define(function(require){
 				},
 				success: function(data, status) {
 					var cdrs = {},
-						groupedLegs = _.groupBy(data.data, function(val) { return val.direction === 'inbound' ? 'aLegs' : 'bLegs' });
+						groupedLegs = _.groupBy(data.data, function(val) { return (val.direction === 'inbound' || !val.bridge_id) ? 'aLegs' : 'bLegs' });
 
 					if(self.lastALeg) {
 						groupedLegs.aLegs.splice(0, 0, self.lastALeg);
