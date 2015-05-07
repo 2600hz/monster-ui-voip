@@ -433,6 +433,7 @@
 }
 
 #strategy_container .element-container.strategy-calls .callflow-tabs {
+	overflow: visible;
 	padding: 20px;
 	border: none;
 	background: transparent;
@@ -470,6 +471,10 @@
 
 #strategy_container .element-container.strategy-calls .callflow-tabs .call-option > div:not(:first-of-type) {
 	margin-top: 10px;
+}
+
+#strategy_container .element-container.strategy-calls .callflow-tabs .call-option .chosen-container {
+	text-align: left;
 }
 
 #strategy_container .element-container.strategy-calls .callflow-tabs .call-option .menu-div .link-icon i {
