@@ -91,8 +91,20 @@ define(function(require){
 			var self = this;
 
 			self.vmboxesGetEditData(id, function(data) {
+				data = self.vmboxesMigrateData(data);
+
 				self.vmboxesRenderVmbox(data, callback);
 			});
+		},
+
+		vmboxesMigrateData: function(data) {
+			var self = this;
+
+			if(data.hasOwnProperty('notify_email_address')) {
+				data.notify_email_addresses = data.notify_email_address;
+			}
+
+			return data;
 		},
 		
 		vmboxesRenderVmbox: function(data, callback) {
@@ -116,7 +128,7 @@ define(function(require){
 					}
 				};
 
-			_.each(data.notify_email_address, function(recipient) {
+			_.each(data.notify_email_addresses, function(recipient) {
 				templateVMBox.find('.saved-entities')
 							  .append(monster.template(self, 'vmboxes-emailRow', { name: recipient }));
 			});
@@ -227,15 +239,20 @@ define(function(require){
 				mergedData = $.extend(true, {}, originalData, formData);
 
 			// Rebuild list of recipients from UI
-			mergedData.notify_email_address = [];
+			mergedData.notify_email_addresses = [];
 			template.find('.saved-entities .entity-wrapper').each(function() {
-				mergedData.notify_email_address.push($(this).data('name'));
+				mergedData.notify_email_addresses.push($(this).data('name'));
 			});
 
 			mergedData.not_configurable = !formData.extra.configurable;
 
 			if(mergedData.pin === '') {
 				delete mergedData.pin;
+			}
+
+			// Delete data that is obsolete (migrated to notify_email_addresses)
+			if(mergedData.hasOwnProperty('notify_email_address')) {
+				delete mergedData.notify_email_address;
 			}
 
 			delete mergedData.extra;
