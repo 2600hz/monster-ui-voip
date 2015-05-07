@@ -385,10 +385,22 @@
 	background-color: #49afcd;
 }
 
-#strategy_container .element-container.strategy-calls .calls-tabs .active a:hover,
-#strategy_container .element-container.strategy-calls .calls-tabs .active a:focus,
-#strategy_container .element-container.strategy-calls .calls-tabs .active a:hover i,
-#strategy_container .element-container.strategy-calls .calls-tabs .active a:focus i, {
+#strategy_container .element-container.strategy-calls .calls-tabs .open-hours-tab.active a:hover,
+#strategy_container .element-container.strategy-calls .calls-tabs .open-hours-tab.active a:focus,
+#strategy_container .element-container.strategy-calls .calls-tabs .open-hours-tab.active a:hover i,
+#strategy_container .element-container.strategy-calls .calls-tabs .open-hours-tab.active a:focus i,
+#strategy_container .element-container.strategy-calls .calls-tabs .lunch-hours-tab.active a:hover,
+#strategy_container .element-container.strategy-calls .calls-tabs .lunch-hours-tab.active a:focus,
+#strategy_container .element-container.strategy-calls .calls-tabs .lunch-hours-tab.active a:hover i,
+#strategy_container .element-container.strategy-calls .calls-tabs .lunch-hours-tab.active a:focus i,
+#strategy_container .element-container.strategy-calls .calls-tabs .after-hours-tab.active a:hover,
+#strategy_container .element-container.strategy-calls .calls-tabs .after-hours-tab.active a:focus,
+#strategy_container .element-container.strategy-calls .calls-tabs .after-hours-tab.active a:hover i,
+#strategy_container .element-container.strategy-calls .calls-tabs .after-hours-tab.active a:focus i,
+#strategy_container .element-container.strategy-calls .calls-tabs .holidays-tab.active a:hover,
+#strategy_container .element-container.strategy-calls .calls-tabs .holidays-tab.active a:focus,
+#strategy_container .element-container.strategy-calls .calls-tabs .holidays-tab.active a:hover i,
+#strategy_container .element-container.strategy-calls .calls-tabs .holidays-tab.active a:focus i {
 	color: #fff;
 }
 
