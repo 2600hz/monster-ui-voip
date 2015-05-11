@@ -18,25 +18,25 @@
 }
 
 #feature_codes_container .feature-codes-content .feature-codes-category:not(:first-child) {
-    margin-top: 20px;
+	margin-top: 20px;
 }
 
 #feature_codes_container .feature-codes-content .category-header {
-    font-size: 18px;
-    margin-bottom: 10px;
-    font-weight: 600;
+	font-size: 18px;
+	margin: 10px;
+	font-weight: 600;
 }
 
 #feature_codes_container .feature-codes-content .feature-code-line:not(:first-child) {
 	margin-top: 10px;
 }
 #feature_codes_container .feature-codes-content .feature-code-line {
-    border-top: solid 1px transparent;
-    border-bottom: solid 1px transparent;
+	border-top: solid 1px transparent;
+	border-bottom: solid 1px transparent;
 }
 #feature_codes_container .feature-codes-content .feature-code-line:hover {
-    border-bottom-color: #dcdcdc;
-    border-top-color: #dcdcdc;
+	border-bottom-color: #dcdcdc;
+	border-top-color: #dcdcdc;
 }
 
 #feature_codes_container .feature-codes-content .feature-code-line div {
@@ -45,7 +45,7 @@
 }
 
 #feature_codes_container .feature-codes-content .feature-code-label {
-	width: 160px;
+	width: 200px;
 	text-align: right;
 	margin-right: 20px;
 }

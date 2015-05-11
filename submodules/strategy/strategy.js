@@ -35,6 +35,117 @@ define(function(require){
 			"MainHolidays"
 		],
 
+		featureCodes: [
+			{
+				name: 'call_forward[action=deactivate]',
+				number: '73',
+				callflowNumber: '*73',
+				moduleName: 'call_forward',
+				actionName: 'deactivate'
+			},
+			{
+				name: 'call_forward[action=activate]',
+				number: '72',
+				callflowNumber: '*72',
+				moduleName: 'call_forward',
+				actionName: 'activate'
+			},
+			{
+				name: 'call_forward[action=toggle]',
+				number: '74',
+				pattern: '^\\*74([0-9]*)$',
+				moduleName: 'call_forward',
+				actionName: 'toggle'
+			},
+			{
+				name: 'call_forward[action=update]',
+				number: '56',
+				callflowNumber: '*56',
+				moduleName: 'call_forward',
+				actionName: 'update'
+			},
+			{
+				name: 'hotdesk[action=login]',
+				number: '11',
+				callflowNumber: '*11',
+				moduleName: 'hotdesk',
+				actionName: 'login'
+			},
+			{
+				name: 'hotdesk[action=logout]',
+				number: '12',
+				callflowNumber: '*12',
+				moduleName: 'hotdesk',
+				actionName: 'logout'
+			},
+			{
+				name: 'hotdesk[action=toggle]',
+				number: '13',
+				callflowNumber: '*13',
+				moduleName: 'hotdesk',
+				actionName: 'toggle'
+			},
+			{
+				name: 'voicemail[action=check]',
+				number: '97',
+				callflowNumber: '*97',
+				moduleName: 'voicemail',
+				actionName: 'check'
+			},
+			{
+				name: 'voicemail[single_mailbox_login]',
+				number: '98',
+				callflowNumber: '*98',
+				moduleName: 'voicemail',
+				actionName: 'check',
+				extraData: {
+					single_mailbox_login: true
+				}
+			},
+			{
+				name: 'voicemail[action="direct"]',
+				number: '*',
+				pattern: '^\\*\\*([0-9]*)$',
+				moduleName: 'voicemail',
+				actionName: 'compose'
+			},
+			{
+				name: 'intercom',
+				number: '0',
+				pattern: '^\\*0([0-9]*)$',
+				moduleName: 'intercom',
+				actionName: 'compose'
+			},
+			{
+				name: 'privacy[mode=full]',
+				number: '67',
+				pattern: '^\\*67([0-9]*)$',
+				moduleName: 'privacy',
+				actionName: 'full'
+			},
+			{
+				name: 'park_and_retrieve',
+				number: '3',
+				pattern: '^\\*3([0-9]*)$',
+				moduleName: 'park',
+				actionName: 'auto'
+			},
+			{
+				name: 'valet',
+				number: '4',
+				callflowNumber: '*4',
+				moduleName: 'park',
+				actionName: 'park'
+			},
+			{
+				name: 'retrieve',
+				number: '5',
+				pattern: '^\\*5([0-9]*)$',
+				moduleName: 'park',
+				actionName: 'retrieve'
+			}
+		],
+
 		strategyRender: function(args){
 			var self = this,
 				args = args || {},
@@ -109,6 +220,8 @@ define(function(require){
 					}
 				}
 			);
+
+			self.strategyCreateFeatureCodes();
 		},
 
 		strategyBindEvents: function(template, strategyData) {
@@ -1885,11 +1998,8 @@ define(function(require){
 										}
 									},
 									success: function(data, status) {
-										/* If they don't have a main callflow, check if the feature codes are enabled, and create them if not */
-										self.strategyCreateFeatureCodes(function() {
-											results["MainCallflow"] = data.data;
-											callback($.extend(true, mainCallflows, results));
-										});
+										results["MainCallflow"] = data.data;
+										callback($.extend(true, mainCallflows, results));
 									}
 								});
 							} else {
@@ -1919,120 +2029,17 @@ define(function(require){
 
 			/* To complete with all feature codes */
 			self.strategyGetFeatureCodes(function(listFeatureCodes) {
-				//Check if feature codes are created
-				if(listFeatureCodes.length > 0) {
-					callback && callback();
-				}
-				else {
-					var listRequests = [],
-					    featureCodes = [
-							{
-								name: 'call_forward[action=deactivate]',
-								number: '73',
-								callflowNumber: '*73',
-								moduleName: 'call_forward',
-								actionName: 'deactivate'
-							},
-							{
-								name: 'call_forward[action=activate]',
-								number: '72',
-								callflowNumber: '*72',
-								moduleName: 'call_forward',
-								actionName: 'activate'
-							},
-							{
-								name: 'call_forward[action=toggle]',
-								number: '74',
-								pattern: '^\\*74([0-9]*)$',
-								moduleName: 'call_forward',
-								actionName: 'toggle'
-							},
-							{
-								name: 'call_forward[action=update]',
-								number: '56',
-								callflowNumber: '*56',
-								moduleName: 'call_forward',
-								actionName: 'update'
-							},
-							{
-								name: 'hotdesk[action=login]',
-								number: '11',
-								callflowNumber: '*11',
-								moduleName: 'hotdesk',
-								actionName: 'login'
-							},
-							{
-								name: 'hotdesk[action=logout]',
-								number: '12',
-								callflowNumber: '*12',
-								moduleName: 'hotdesk',
-								actionName: 'logout'
-							},
-							{
-								name: 'hotdesk[action=toggle]',
-								number: '13',
-								callflowNumber: '*13',
-								moduleName: 'hotdesk',
-								actionName: 'toggle'
-							},
-							{
-								name: 'voicemail[action=check]',
-								number: '97',
-								callflowNumber: '*97',
-								moduleName: 'voicemail',
-								actionName: 'check'
-							},
-							{
-								name: 'voicemail[action="direct"]',
-								number: '*',
-								pattern: '^\\*\\*([0-9]*)$',
-								moduleName: 'voicemail',
-								actionName: 'compose'
-							},
-							{
-								name: 'intercom',
-								number: '0',
-								pattern: '^\\*0([0-9]*)$',
-								moduleName: 'intercom',
-								actionName: 'compose'
-							},
-							{
-								name: 'privacy[mode=full]',
-								number: '67',
-								pattern: '^\\*67([0-9]*)$',
-								moduleName: 'privacy',
-								actionName: 'full'
-							},
-							{
-								name: 'park_and_retrieve',
-								number: '3',
-								pattern: '^\\*3([0-9]*)$',
-								moduleName: 'park',
-								actionName: 'auto'
-							},
-							{
-								name: 'valet',
-								number: '4',
-								callflowNumber: '*4',
-								moduleName: 'park',
-								actionName: 'park'
-							},
-							{
-								name: 'retrieve',
-								number: '5',
-								pattern: '^\\*5([0-9]*)$',
-								moduleName: 'park',
-								actionName: 'retrieve'
-							}
-						];
+				var existingFeatureCodes = $.map(listFeatureCodes, function(val) { return val.featurecode.name }),
+					listRequests = [];
 
-					_.each(featureCodes, function(featureCode) {
+				_.each(self.featureCodes, function(featureCode) {
+					if(existingFeatureCodes.indexOf(featureCode.name) == -1) {
 						var callflow = {
 							flow: {
 								children: {},
-								data: {
+								data: $.extend(true, (featureCode.extraData || {}), {
 									action: featureCode.actionName
-								},
+								}),
 								module: featureCode.moduleName
 							},
 							featurecode: {
@@ -2053,29 +2060,29 @@ define(function(require){
 								localCallback && localCallback(null, data);
 							});
 						});
-					});
+					}
+				});
 
+				if(listRequests.length > 0) {
 					monster.parallel(listRequests, function(err, results) {
 						callback && callback();
 					});
+				} else {
+					callback && callback();
 				}
 			});
 		},
 
 		strategyGetFeatureCodes: function(callback) {
-			var self = this;
+			var self = this,
+				filters = {
+					paginate: 'false',
+					has_key: 'featurecode'
+				};
 
-			self.strategyGetCallflows(function(listCallflows) {
-				var listFeatureCodes = [];
-
-				_.each(listCallflows, function(callflow) {
-					if('featurecode' in callflow && callflow.featurecode !== false) {
-						listFeatureCodes.push(callflow);
-					}
-				});
-
+			self.strategyGetCallflows(function(listFeatureCodes) {
 				callback && callback(listFeatureCodes);
-			});
+			}, filters);
 		},
 
 		strategyGetTemporalRules: function(callback) {
@@ -2405,16 +2412,14 @@ define(function(require){
 			mainCallflow.flow.data.rules = ruleArray;
 		},
 
-		strategyGetCallflows: function(callback) {
+		strategyGetCallflows: function(callback, filters) {
 			var self = this;
 
 			self.callApi({
 				resource: 'callflow.list',
 				data: {
 					accountId: self.accountId,
-					filters: {
-						paginate: 'false'
-					}
+					filters: filters || {}
 				},
 				success: function(callflowData) {
 					callback && callback(callflowData.data);

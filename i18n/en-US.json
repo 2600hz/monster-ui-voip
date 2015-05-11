@@ -913,7 +913,10 @@
 			"call_waiting[action=enable]": "Enable Call-Waiting",
 			"call_waiting[action=disable]": "Disable Call-Waiting",
 			"sound_test_service": "Sound Test Service",
-			"call_recording": "Call Recording"
+			"call_recording": "Call Recording",
+			"__comment": "UI-1395: Added voicemail[single_mailbox_login] feature code",
+			"__version": "3.20",
+			"voicemail[single_mailbox_login]": "Check Voicemail (auto login)"
 		},
 		"__comment": "UI-1028, v3.20_s0: Added categories for the feature codes.",
 		"categories": {
