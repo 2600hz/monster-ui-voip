@@ -1540,16 +1540,11 @@ define(function(require){
 				data = self.usersFormatFaxingData(data),
 				featureTemplate = $(monster.template(self, 'users-feature-faxing', data)),
 				numberMirror = featureTemplate.find('.number-mirror'),
-				switchFeature = featureTemplate.find('.switch-state');
-
-			if ( !_.isEmpty(data.extra.listNumbers) ) {
-				var popup = monster.ui.dialog(featureTemplate, {
-						title: data.user.extra.mapFeatures.faxing.title,
-						position: ['center', 20]
-					});
-			} else {
-				monster.ui.alert('error', self.i18n.active().users.errorNumberFaxing);
-			}
+				switchFeature = featureTemplate.find('.switch-state'),
+				popup = monster.ui.dialog(featureTemplate, {
+					title: data.user.extra.mapFeatures.faxing.title,
+					position: ['center', 20]
+				});
 
 			switchFeature.on('change', function() {
 				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
