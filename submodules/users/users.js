@@ -48,7 +48,11 @@ define(function(require){
 					template.find('.user-rows').append(templateUser);
 				});
 
-				template.find('[data-toggle="tooltip"]').tooltip({ container: 'body'});
+				monster.ui.tooltips(template, {
+					options: {
+						container: 'body'
+					}
+				});
 				template.find('[data-toggle="popover"]').popover({ container: 'body'});
 
 				self.usersBindEvents(template, parent, dataTemplate);
@@ -438,7 +442,7 @@ define(function(require){
 							currentCallflow = data.callflow;
 							currentUser = data.user;
 
-							template.find('[data-toggle="tooltip"]').tooltip();
+							monster.ui.tooltips(template);
 
 							_.each(data.extensions, function(number) {
 								extensionsToSave.push(number);
@@ -966,7 +970,7 @@ define(function(require){
 								extraSpareNumbers = _.without(extraSpareNumbers, val.phoneNumber);
 							});
 
-							template.find('[data-toggle="tooltip"]').tooltip();
+							monster.ui.tooltips(template);
 
 							if(remainingQuantity == 0) {
 								template.find('.spare-link').addClass('disabled');
@@ -990,7 +994,7 @@ define(function(require){
 
 									var rowTemplate = monster.template(self, 'users-numbersItemRow', { number: number });
 
-									rowTemplate.find('[data-toggle="tooltip"]').tooltip();
+									monster.ui.tooltips(rowTemplate);
 
 									template.find('.list-unassigned-items .empty-row').hide();
 									template.find('.list-unassigned-items').append(rowTemplate);
@@ -2471,7 +2475,11 @@ define(function(require){
 
 					timezone.populateDropdown(template.find('#user_timezone'), dataTemplate.timezone);
 
-					template.find('[data-toggle="tooltip"]').tooltip({ container: 'body'});
+					monster.ui.tooltips(template, {
+						options: {
+							container: 'body'
+						}
+					});
 
 					callbackAfterFormat && callbackAfterFormat(template, dataTemplate);
 				}

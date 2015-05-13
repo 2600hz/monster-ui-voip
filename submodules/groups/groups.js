@@ -209,7 +209,7 @@ define(function(require){
 					});
 
 					self.groupsGetTemplate(type, groupId, function(template, data) {
-						template.find('[data-toggle="tooltip"]').tooltip();
+						monster.ui.tooltips(template);
 
 						row.find('.edit-groups').append(template).slideDown();
 
@@ -1031,7 +1031,7 @@ define(function(require){
 							extraSpareNumbers = _.without(extraSpareNumbers, val.phoneNumber);
 						});
 
-						template.find('[data-toggle="tooltip"]').tooltip();
+						monster.ui.tooltips(template);
 
 						if(remainingQuantity === 0) {
 							template.find('.spare-link').addClass('disabled');
@@ -1057,7 +1057,7 @@ define(function(require){
 
 									var rowTemplate = monster.template(self, 'groups-numbersItemRow', { number: number });
 
-									rowTemplate.find('[data-toggle="tooltip"]').tooltip();
+									monster.ui.tooltips(rowTemplate);
 
 									template.find('.list-unassigned-items .empty-row').hide();
 									template.find('.list-unassigned-items').append(rowTemplate);

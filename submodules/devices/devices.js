@@ -353,7 +353,7 @@ define(function(require){
 			monster.ui.tabs(templateDevice);
 			monster.ui.protectField(templateDevice.find('#sip_password'), templateDevice);
 
-			templateDevice.find('[data-toggle="tooltip"]').tooltip();
+			monster.ui.tooltips(templateDevice);
 			templateDevice.find('#mac_address').mask("hh:hh:hh:hh:hh:hh", { placeholder:" " });
 			templateDevice.find('.chosen-feature-key-user').chosen({ search_contains: true, width: 'inherit' });
 

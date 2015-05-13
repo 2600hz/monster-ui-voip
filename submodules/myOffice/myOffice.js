@@ -560,7 +560,7 @@ define(function(require){
 				monster.ui.alert(self.i18n.active().myOffice.missingMainNumberForCallerId);
 			});
 
-			template.find('[data-toggle="tooltip"]').tooltip();
+			monster.ui.tooltips(template);
 		},
 
 		myOfficeRenderMusicOnHoldPopup: function(args) {

@@ -158,7 +158,7 @@ define(function(require){
 			timezone.populateDropdown(templateVMBox.find('#timezone'), data.timezone);
 			templateVMBox.find('#timezone').chosen({search_contains: true, width: "40%"});
 
-			templateVMBox.find('[data-toggle="tooltip"]').tooltip();
+			monster.ui.tooltips(templateVMBox);
 
 			templateVMBox.find('.actions .save').on('click', function() {
 				if(monster.ui.valid(vmboxForm)) {

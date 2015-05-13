@@ -72,7 +72,7 @@ define(function(require){
 					nextStartKey: nextStartKey
 				});
 
-				template.find('[data-toggle="tooltip"]').tooltip();
+				monster.ui.tooltips(template);
 
 				parent
 					.empty()

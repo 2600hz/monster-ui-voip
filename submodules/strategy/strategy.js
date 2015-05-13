@@ -298,7 +298,7 @@ define(function(require){
 								},
 								template = $(monster.template(self, 'strategy-'+templateName, templateData));
 
-							template.find('[data-toggle="tooltip"]').tooltip();
+							monster.ui.tooltips(template);
 
 							container.find('.element-content').empty()
 															  .append(template);
