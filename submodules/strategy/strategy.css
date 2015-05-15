@@ -178,8 +178,10 @@
 }
 
 #strategy_container .element-container.strategy-hours .custom-hours-toggler .title {
-	font-size: 18px;
 	line-height: 30px;
+}
+#strategy_container .element-container.strategy-hours .custom-hours-toggler .title span {
+	font-size: 18px;
 }
 
 #strategy_container .element-container.strategy-hours .custom-hours-toggler > label:first-of-type {

@@ -3,8 +3,7 @@
 		<div class="custom-hours-toggler">
 			<label>
 				<div class="title">
-					<input type="radio" name="enabled" value="false" {{#if alwaysOpen}}checked{{/if}}>
-					{{i18n.strategy.hours.alwaysOpenTitle}}
+					{{#monsterRadio i18n.strategy.hours.alwaysOpenTitle}}<input type="radio" name="enabled" value="false" {{#if alwaysOpen}}checked{{/if}}>{{/monsterRadio}}
 				</div>
 				<div class="description">
 					{{i18n.strategy.hours.alwaysOpenDescription}}
@@ -12,8 +11,7 @@
 			</label>
 			<label>
 				<div class="title">
-					<input type="radio" name="enabled" value="true" {{#unless alwaysOpen}}checked{{/unless}}>
-					{{i18n.strategy.hours.customHoursTitle}}
+					{{#monsterRadio i18n.strategy.hours.customHoursTitle}}<input type="radio" name="enabled" value="true" {{#unless alwaysOpen}}checked{{/unless}}>{{/monsterRadio}}
 				</div>
 				<div class="description">
 					{{i18n.strategy.hours.customHoursDescription}}
