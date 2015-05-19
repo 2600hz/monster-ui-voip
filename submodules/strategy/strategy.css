@@ -89,7 +89,7 @@
 }
 
 #strategy_container .element-container .basic-actions .cancel-link {
-	margin-right: 40px;
+	margin-right: 10px;
 	vertical-align: middle;
 }
 
@@ -150,8 +150,11 @@
 
 #strategy_container .element-container .number-actions {
 	padding: 25px 20px;
-	line-height: 30px;
 	background-color: #f3f3f3;
+}
+
+#strategy_container .element-container .number-actions .action-links a {
+	margin-right: 10px;
 }
 
 #strategy_container .element-container .number-actions .action-links a i {
@@ -582,18 +585,13 @@
 	display: none;
 }
 
-#strategy_menu_popup .menu-block .add-menu-line a {
-	color: #22a5ff;
-	text-decoration: underline;
-}
-
 #strategy_menu_popup .menu-block .add-menu-line {
 	margin-top: 10px;
 }
 
 #strategy_menu_popup .action-block .cancel-link {
 	line-height: 30px;
-	margin-right: 40px;
+	margin-right: 10px;
 	color: #22a5ff;
 }
 

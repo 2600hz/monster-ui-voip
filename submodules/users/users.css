@@ -233,6 +233,10 @@
 	line-height: 30px;
 }
 
+#users_container .actions .cancel-link {
+	margin-right: 10px;
+}
+
 #users_container .actions:before {
 	position: absolute;
 	top: -2px;
@@ -241,6 +245,10 @@
 	width: 100%;
 	border-top: 1px solid #a6a7a9;
 	content: "";
+}
+
+#users_container .actions .spare-link {
+	margin-right: 10px;
 }
 
 /* Detail User */
@@ -354,6 +362,10 @@
 }
 
 #users_container .detail-user #change_username {
+	margin-left: 10px;
+}
+
+#users_container .detail-user #change_pin {
 	margin-left: 10px;
 }
 
@@ -628,45 +640,6 @@
 	width: 153px;
 }
 
-/* Feature Popups */
-.feature-popup-container {
-	width: 510px;
-}
-
-.feature-popup-container .actions,
-.feature-popup-container .content {
-	padding: 15px 25px;
-	border-top: 1px solid #ccc;
-}
-
-.feature-popup-container .switch {
-	display: inline-block;
-	margin-left: 15px;
-}
-
-.feature-popup-container .content.disabled {
-	display: none;
-}
-
-.feature-popup-container form {
-	margin-bottom: 40px;
-}
-
-.feature-popup-container form .main-line {
-	position: relative;
-	height: 70px; /* Adding extra space for validation messages */
-	line-height: 60px;
-}
-
-.feature-popup-container form .main-line label.monster-invalid {
-	top: 45px;
-}
-
-.feature-popup-container input,
-.feature-popup-container select {
-	margin-left: 10px;
-}
-
 /* Caller-ID User Feature Popup */
 .feature-popup-container[data-feature="caller_id"] {
 	width: 525px;
@@ -803,6 +776,10 @@
 .smart-edit-popup .actions {
 	padding: 15px 25px;
 	border-top: 1px solid #CCCCCC;
+}
+
+.smart-edit-popup .actions .cancel-link {
+	margin-right: 10px;
 }
 
 /* Find me Follow me feature popup */
