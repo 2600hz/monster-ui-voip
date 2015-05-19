@@ -225,6 +225,10 @@
 	line-height: 30px;
 }
 
+#groups_container .actions .cancel-link {
+	margin-right: 10px;
+}
+
 #groups_container .actions:before {
 	position: absolute;
 	top: -2px;
