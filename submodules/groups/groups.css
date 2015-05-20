@@ -248,33 +248,6 @@
 #groups_container .detail-group .groups-fields:after {
 	clear: right;
 }
-#groups_container .detail-group .add-user-dropdown {
-	margin: 0;
-	list-style: none;
-}
-#groups_container .detail-group .add-user-dropdown .dropdown {
-	height: 30px;
-	line-height: 30px;
-}
-#groups_container .detail-group .add-user-dropdown .dropdown-menu {
-	padding: 0;
-	border-radius: 0;
-}
-#groups_container .detail-group .add-user-dropdown .add-user {
-	padding: 0px 15px;
-	height: 40px;
-	background: #FFF;
-	white-space: nowrap;
-	font-size: 14px;
-	line-height: 40px;
-	cursor: pointer;
-}
-#groups_container .detail-group .add-user-dropdown .add-user.in-use {
-	display: none;
-}
-#groups_container .detail-group .add-user-dropdown .add-user:hover {
-	background: #FCFCFC;
-}
 
 /* Name */
 .detail-group #form-name {

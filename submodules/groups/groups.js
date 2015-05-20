@@ -1183,23 +1183,35 @@ define(function(require){
 				});
 			});
 
-			template.on('click', '.add-user', function() {
-				var $this = $(this),
-					newEndpoint = {
-						id: $this.data('id'),
-						timeout: 20,
-						delay: 0,
-						endpoint_type: 'user',
-						name: $(this).text()
-					};
+			template.on('click', '.add-user-link', function() {
+				var usersInUse = $.map(template.find('.grid-time-row[data-id]'), function(val) {
+						return $(val).data('id');
+					}),
+					remainingUsers = _.filter(data.users, function(val) {
+						return usersInUse.indexOf(val.id) === -1;
+					});
 
-				monster.pub('common.ringingDurationControl.addEndpoint', {
-					container: template.find('.members-container'),
-					endpoint: newEndpoint,
-					hasRemoveColumn: true
+				monster.pub('common.monsterListing.render', {
+					dataList: remainingUsers,
+					dataType: 'users',
+					okCallback: function(users) {
+						_.each(users, function(user) {
+							var newEndpoint = {
+									id: user.id,
+									timeout: 20,
+									delay: 0,
+									endpoint_type: 'user',
+									name: user.name
+								};
+
+							monster.pub('common.ringingDurationControl.addEndpoint', {
+								container: template.find('.members-container'),
+								endpoint: newEndpoint,
+								hasRemoveColumn: true
+							});
+						});
+					}
 				});
-
-				$this.addClass('in-use');
 			});
 		},
 
