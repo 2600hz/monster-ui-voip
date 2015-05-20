@@ -127,22 +127,22 @@ define(function(require){
 					mapFeatures: {
 						call_recording: {
 							icon: 'icon-microphone',
-							iconColor: 'icon-blue',
+							iconColor: 'monster-blue',
 							title: self.i18n.active().groups.callRecording.title
 						},
 						ringback: {
 							icon: 'icon-music',
-							iconColor: 'icon-yellow',
+							iconColor: 'monster-yellow',
 							title: self.i18n.active().groups.ringback.title
 						},
 						next_action: {
 							icon: 'icon-arrow-right',
-							iconColor: 'icon-green',
+							iconColor: 'monster-green',
 							title: self.i18n.active().groups.nextAction.title
 						},
 						forward: {
 							icon: 'icon-mail-forward',
-							iconColor: 'icon-orange',
+							iconColor: 'monster-orange',
 							title: self.i18n.active().groups.forward.title
 						}
 					},

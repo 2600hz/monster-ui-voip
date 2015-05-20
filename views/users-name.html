@@ -122,7 +122,7 @@
 	<div class="actions">
 		<!-- We forbid users to delete their own user -->
 		{{#compare id "!==" extra.adminId}}
-			<a id="delete_user" class="monster-link" href="javascript:void(0);"><i class="icon-trash icon-red"></i>{{ i18n.users.delete }}</a>
+			<a id="delete_user" class="monster-link" href="javascript:void(0);"><i class="icon-trash monster-red"></i>{{ i18n.users.delete }}</a>
 		{{/compare}}
 
 		<div class="pull-right">

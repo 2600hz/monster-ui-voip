@@ -120,7 +120,7 @@
 									<input class="restrictions-switch" type="checkbox" name="call_restriction.{{@key}}.action" data-on="{{../i18n.devices.popupSettings.restrictions.allow}}" data-off="{{../i18n.devices.popupSettings.restrictions.deny}}" {{#compare this.action '===' 'inherit'}}{{#unless this.disabled}} checked{{/unless}}{{/compare}}{{#if this.disabled}} disabled{{/if}}></input>
 								{{/monsterSwitch}}
 								</div>
-								<i class="restriction-matcher-sign icon-large icon-ok icon-green"></i>
+								<i class="restriction-matcher-sign icon-large icon-ok monster-green"></i>
 							</div>
 						</div>
 					{{/each}}
@@ -190,7 +190,7 @@
 
 	<div class="actions clearfix">
 		{{#if id}}
-			<a id="delete_device" class="monster-link"><i class="icon-trash icon-red"></i>{{ i18n.devices.deleteDevice }}</a>
+			<a id="delete_device" class="monster-link"><i class="icon-trash monster-red"></i>{{ i18n.devices.deleteDevice }}</a>
 		{{/if}}
 
 		<div class="pull-right">

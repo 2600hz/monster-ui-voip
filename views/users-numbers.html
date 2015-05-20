@@ -25,7 +25,7 @@
 						</div>
 						<div class="features">
 						{{#compare this.state '===' 'port_in'}}
-							<i class="icon-warning-sign icon-red active help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{../../i18n.portIconHelp}}"></i>
+							<i class="icon-warning-sign monster-red active help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{../../i18n.portIconHelp}}"></i>
 						{{/compare}}
 							{{#each this.viewFeatures}}
 								<i class="{{icon}} {{active}} help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ help }}"></i>
@@ -54,11 +54,11 @@
 
 	<div class="actions">
 		<a href="#" class="spare-link monster-link pull-left{{#if emptySpare}} disabled{{/if}}">
-			<i class="icon-plus icon-green icon-large"></i>{{ i18n.users.addFromSpare }}
+			<i class="icon-plus monster-green icon-large"></i>{{ i18n.users.addFromSpare }}
 		</a>
 		<ul class="nav pull-left">
 			<li class="dropdown">
-				<a href="#" class="dropdown-toggle buy-dropdown monster-link" data-toggle="dropdown" data-target="#"><i class="icon-shopping-cart icon-green icon-large"></i>{{ i18n.strategy.numberLinks.buy.link }}</a>
+				<a href="#" class="dropdown-toggle buy-dropdown monster-link" data-toggle="dropdown" data-target="#"><i class="icon-shopping-cart monster-green icon-large"></i>{{ i18n.strategy.numberLinks.buy.link }}</a>
 				<ul class="dropdown-menu" role="menu">
 					<li><a class="buy-link" data-type="regular" href="#">{{i18n.strategy.numberLinks.buy.regular}}</a></li>
 					<li><a class="buy-link" data-type="tollfree" href="#">{{i18n.strategy.numberLinks.buy.tollfree}}</a></li>

@@ -1,6 +1,6 @@
 <div class="grid-row" data-id="{{id}}" data-priv_level="{{priv_level}}" data-search="{{first_name}} {{last_name}}{{#each extra.listCallerId}} {{formatPhoneNumber this}} {{this}}{{/each}}">
 	<div class="user-cells">
-		<div class="name grid-cell" data-type="name"><i class="{{#if extra.isAdmin}}icon-telicon-moderator icon-blue{{else}}icon-telicon-user icon-lightgrey{{/if}}"></i> {{ first_name }} {{ last_name }}</div>
+		<div class="name grid-cell" data-type="name"><i class="{{#if extra.isAdmin}}icon-telicon-moderator monster-blue{{else}}icon-telicon-user monster-lightgrey{{/if}}"></i> {{ first_name }} {{ last_name }}</div>
 		<div class="extension grid-cell" data-type="extensions">
 			{{#if extra.extension}}
 				{{ extra.extension }}
@@ -25,7 +25,7 @@
 		</div>
 		<div class="devices grid-cell" data-type="devices">
 			{{#each extra.devices}}
-				<i class="{{this.icon}} {{#if this.registered}}icon-green{{else}}icon-red{{/if}} help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ this.name }}"></i>
+				<i class="{{this.icon}} {{#if this.registered}}monster-green{{else}}monster-red{{/if}} help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ this.name }}"></i>
 			{{else}}
 				{{ i18n.users.noUserDevices }}
 			{{/each}}
