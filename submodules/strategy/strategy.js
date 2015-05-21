@@ -1800,7 +1800,7 @@ define(function(require){
 						group.groupIcon = 'icon-telicon-voip-phone';
 						break;
 					case 'ring_group':
-						group.groupIcon = 'icon-group';
+						group.groupIcon = 'fa fa-users';
 						break;
 					case 'voicemail':
 						group.groupIcon = 'icon-telicon-voicemail';

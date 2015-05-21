@@ -503,7 +503,7 @@
 	/*display: none;*/
 }
 
-#strategy_container .element-container.helper .icon-info-sign {
+#strategy_container .element-container.helper .fa-info-circle {
 	float: left;
 	margin-right: 10px;
 }

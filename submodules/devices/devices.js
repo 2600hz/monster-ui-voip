@@ -442,8 +442,8 @@ define(function(require){
 
 							templateDevice.find('.restriction-matcher-sign').hide();
 							if(matchedLine.find('.restrictions-switch').prop('checked')) {
-								matchedSign.removeClass('monster-red icon-remove')
-										   .addClass('monster-green icon-ok')
+								matchedSign.removeClass('monster-red fa-times')
+										   .addClass('monster-green fa-check')
 										   .css('display', 'inline-block');
 
 								matchedMsg.removeClass('red-box')
@@ -454,8 +454,8 @@ define(function(require){
 										  	monster.template(self, '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.allowMessage, { phoneNumber: monster.util.formatPhoneNumber(number) })
 										  );
 							} else {
-								matchedSign.removeClass('monster-green icon-ok')
-										   .addClass('monster-red icon-remove')
+								matchedSign.removeClass('monster-green fa-check')
+										   .addClass('monster-red fa-times')
 										   .css('display', 'inline-block');
 
 								matchedMsg.removeClass('green-box')

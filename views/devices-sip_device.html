@@ -31,11 +31,11 @@
 					{{/if}}
 					<li><a class="tabs-selector change-section" data-section="audio" href="javascript:void(0)"><i class="icon-music"></i>{{ i18n.devices.popupSettings.audio.menuTitle }}</a></li>
 					<li><a class="tabs-selector change-section" data-section="video" href="javascript:void(0)"><i class="icon-facetime-video"></i>{{ i18n.devices.popupSettings.video.menuTitle }}</a></li>
-					<li><a class="tabs-selector change-section" data-section="restrictions" href="javascript:void(0)"><i class="icon-ban-circle"></i>{{ i18n.devices.popupSettings.restrictions.menuTitle }}</a></li>
+					<li><a class="tabs-selector change-section" data-section="restrictions" href="javascript:void(0)"><i class="fa fa-ban"></i>{{ i18n.devices.popupSettings.restrictions.menuTitle }}</a></li>
 					<li><a class="tabs-selector change-section" data-section="callerId" href="javascript:void(0)"><i class="icon-ambulance"></i>{{ i18n.devices.popupSettings.callerId.menuTitle }}</a></li>
 					<li><a class="tabs-selector change-section" data-section="miscellaneous" href="javascript:void(0)"><i class="icon-cogs"></i>{{ i18n.devices.popupSettings.miscellaneous.menuTitle }}</a></li>
 				{{#if provision.feature_keys}}
-					<li><a class="tabs-selector change-section" data-section="featureKeys" href="javascript:void(0);"><i class="icon-lightbulb"></i>{{ i18n.devices.popupSettings.featureKeys.menuTitle }}</a></li>
+					<li><a class="tabs-selector change-section" data-section="featureKeys" href="javascript:void(0);"><i class="fa fa-lightbulb-o"></i>{{ i18n.devices.popupSettings.featureKeys.menuTitle }}</a></li>
 				{{/if}}
 				</ul>
 			</li>
@@ -115,7 +115,7 @@
 				</div>
 
 				<div class="helper">
-					<i class="icon-info-sign"></i>
+					<i class="fa fa-info-circle"></i>
 					{{ i18n.devices.popupSettings.dragAndDrop }}
 				</div>
 
@@ -127,7 +127,7 @@
 					{{ i18n.devices.popupSettings.video.sectionTitle }}
 				</div>
 				<div class="helper">
-					<i class="icon-info-sign"></i>
+					<i class="fa fa-info-circle"></i>
 					{{ i18n.devices.popupSettings.dragAndDrop }}
 				</div>
 				<div class="items-selector codec-selector" id="video_codec_selector"></div>
@@ -136,7 +136,7 @@
 			<div class="tabs-section clearfix" data-section="restrictions">
 				<div class="restrictions-container">
 					<div class="restriction-matcher-div">
-						<i class="help-popover icon-question-sign icon-large" data-original-title="{{i18n.devices.popupSettings.restrictions.matcher.help}}" data-placement="top" data-toggle="tooltip"></i>
+						<i class="help-popover fa fa-question-circle fa-lg" data-original-title="{{i18n.devices.popupSettings.restrictions.matcher.help}}" data-placement="top" data-toggle="tooltip"></i>
 						<input type="text" class="restriction-matcher-input" placeholder="{{i18n.devices.popupSettings.restrictions.matcher.placeholder}}" />
 						<button type="button"  class="btn btn-primary restriction-matcher-button">{{i18n.devices.popupSettings.restrictions.matcher.button}}</button>
 					</div>
@@ -148,7 +148,7 @@
 						<div class="control-group restriction-line{{#if this.disabled}} disabled{{/if}}" data-restriction="{{@key}}">
 							<label class="control-label">{{this.friendly_name}}
 								{{#if this.help}}
-									<i class="help-popover icon-question-sign" data-original-title="{{this.help}}" data-placement="top" data-toggle="tooltip"></i>
+									<i class="help-popover fa fa-question-circle" data-original-title="{{this.help}}" data-placement="top" data-toggle="tooltip"></i>
 								{{/if}}
 							</label>
 							<div class="controls">
@@ -157,7 +157,7 @@
 									<input class="restrictions-switch" type="checkbox" name="call_restriction.{{@key}}.action" data-on="{{../i18n.devices.popupSettings.restrictions.allow}}" data-off="{{../i18n.devices.popupSettings.restrictions.deny}}" {{#compare this.action '===' 'inherit'}}{{#unless this.disabled}} checked{{/unless}}{{/compare}}{{#if this.disabled}} disabled{{/if}}></input>
 								{{/monsterSwitch}}
 								</div>
-								<i class="restriction-matcher-sign icon-large icon-ok monster-green"></i>
+								<i class="restriction-matcher-sign fa-lg fa fa-check monster-green"></i>
 							</div>
 						</div>
 					{{/each}}
@@ -205,7 +205,7 @@
 						{{#monsterCheckbox i18n.devices.popupSettings.miscellaneous.ignoreCompletedElsewhere.label }}
 							<input type="checkbox" name="ignore_completed_elsewhere" id="ignore_completed_elsewhere" {{#if ignore_completed_elsewhere }}checked{{/if}} />
 						{{/monsterCheckbox}}
-						<i class="help-popover icon-question-sign icon-large" data-original-title="{{i18n.devices.popupSettings.miscellaneous.ignoreCompletedElsewhere.help}}" data-placement="top" data-toggle="tooltip"></i>
+						<i class="help-popover fa fa-question-circle fa-lg" data-original-title="{{i18n.devices.popupSettings.miscellaneous.ignoreCompletedElsewhere.help}}" data-placement="top" data-toggle="tooltip"></i>
 					</label>
 				</div>
 
@@ -235,7 +235,7 @@
 					{{ i18n.devices.popupSettings.featureKeys.menuTitle }}
 				</div>
 				<div class="type-info helper">
-					<a href="javascript:void(0);" data-toggle="collapse" data-target="#info_content"><i class="icon-question-sign"></i><span class="text">{{ i18n.devices.popupSettings.featureKeys.info.link.showInfo }}</span></a>
+					<a href="javascript:void(0);" data-toggle="collapse" data-target="#info_content"><i class="fa fa-question-circle"></i><span class="text">{{ i18n.devices.popupSettings.featureKeys.info.link.showInfo }}</span></a>
 					<div id="info_content" class="collapse">
 						{{#each extra.featureKeys.types}}
 							<p>{{#if info}}<strong>{{text}}</strong>: {{info}}{{/if}}</p>
@@ -293,7 +293,7 @@
 
 	<div class="actions clearfix">
 		{{#if id}}
-			<a id="delete_device" class="monster-link"><i class="icon-trash monster-red"></i>{{ i18n.devices.deleteDevice }}</a>
+			<a id="delete_device" class="monster-link"><i class="fa fa-trash-o monster-red"></i>{{ i18n.devices.deleteDevice }}</a>
 		{{/if}}
 
 		<div class="pull-right">

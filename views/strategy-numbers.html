@@ -17,7 +17,7 @@
 							<li><a class="callerId-number" href="#"><i class="icon-user"></i>{{ ../../i18n.callerId }}</a></li>
 							<li><a class="e911-number" href="#"><i class="icon-ambulance"></i>{{ ../../i18n.e911 }}</a></li>
 						{{/unless}}
-							<li><a class="prepend-number" href="#"><i class="icon-file-text-alt"></i>{{ ../i18n.numberPrepend }}</a></li>
+							<li><a class="prepend-number" href="#"><i class="fa fa-file-text-o"></i>{{ ../i18n.numberPrepend }}</a></li>
 						</ul>
 					</li>
 				</ul>
@@ -38,10 +38,10 @@
 <div class="number-actions">
 	<a href="#" class="cancel-link pull-right monster-link blue">{{ i18n.close }}</a>
 	<div class="action-links nav-bar clearfix">
-		<a href="#" class="spare-link monster-link pull-left{{#unless spareLinkEnabled}} disabled{{/unless}}"><i class="icon-file-text-alt monster-orange icon-large"></i>{{ i18n.strategy.numberLinks.spare }}</a>
+		<a href="#" class="spare-link monster-link pull-left{{#unless spareLinkEnabled}} disabled{{/unless}}"><i class="fa fa-file-text-o monster-orange fa-lg"></i>{{ i18n.strategy.numberLinks.spare }}</a>
 		<ul class="nav pull-left">
 			<li class="dropdown">
-				<a href="#" class="dropdown-toggle buy-dropdown monster-link" data-toggle="dropdown" data-target="#"><i class="icon-shopping-cart monster-green icon-large"></i>{{ i18n.strategy.numberLinks.buy.link }}</a>
+				<a href="#" class="dropdown-toggle buy-dropdown monster-link" data-toggle="dropdown" data-target="#"><i class="icon-shopping-cart monster-green fa-lg"></i>{{ i18n.strategy.numberLinks.buy.link }}</a>
 				<ul class="dropdown-menu" role="menu">
 					<li><a class="buy-link" data-type="regular" href="#">{{i18n.strategy.numberLinks.buy.regular}}</a></li>
 					<li><a class="buy-link" data-type="tollfree" href="#">{{i18n.strategy.numberLinks.buy.tollfree}}</a></li>

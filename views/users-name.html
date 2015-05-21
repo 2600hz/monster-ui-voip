@@ -62,7 +62,7 @@
 			</div>
 
 			<div class="row-fields">
-				<div class="icon-wrapper" data-original-title="{{i18n.users.editionForm.timezoneHelp}}" data-placement="top" data-toggle="tooltip"><i class="icon-time"></i></div>
+				<div class="icon-wrapper" data-original-title="{{i18n.users.editionForm.timezoneHelp}}" data-placement="top" data-toggle="tooltip"><i class="fa fa-clock-o"></i></div>
 				<select id="user_timezone" name="timezone" data-original_value="{{timezone}}"></select>
 			</div>
 
@@ -79,7 +79,7 @@
 			</div>
 
 			<div class="row-fields">
-				<div class="icon-wrapper" data-original-title="{{i18n.users.editionForm.ringingHelp}}" data-placement="top" data-toggle="tooltip"><i class="icon-bell"></i></div>
+				<div class="icon-wrapper" data-original-title="{{i18n.users.editionForm.ringingHelp}}" data-placement="top" data-toggle="tooltip"><i class="fa fa-bell-o"></i></div>
 				{{#unless extra.ringingTimeout}}
 					<div class="ringing-timeout disabled" data-original-title="{{i18n.users.editionForm.disabledTimeoutHint}}" data-placement="top" data-toggle="tooltip">
 				{{else}}
@@ -122,7 +122,7 @@
 	<div class="actions">
 		<!-- We forbid users to delete their own user -->
 		{{#compare id "!==" extra.adminId}}
-			<a id="delete_user" class="monster-link" href="javascript:void(0);"><i class="icon-trash monster-red"></i>{{ i18n.users.delete }}</a>
+			<a id="delete_user" class="monster-link" href="javascript:void(0);"><i class="fa fa-trash-o monster-red"></i>{{ i18n.users.delete }}</a>
 		{{/compare}}
 
 		<div class="pull-right">
