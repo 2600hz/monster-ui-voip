@@ -1187,7 +1187,7 @@ define(function(require){
 				var usersInUse = $.map(template.find('.grid-time-row[data-id]'), function(val) {
 						return $(val).data('id');
 					}),
-					remainingUsers = _.filter(data.users, function(val) {
+					remainingUsers = _.filter(data.extra.remainingUsers, function(val) {
 						return usersInUse.indexOf(val.id) === -1;
 					});
 
@@ -1471,7 +1471,6 @@ define(function(require){
 
 				if(endpoint.id in mapUsers) {
 					endpoint.name = mapUsers[endpoint.id].first_name + ' ' + mapUsers[endpoint.id].last_name;
-					mapUsers[endpoint.id].inUse = true;
 				} else {
 					endpoint.name = self.i18n.active().groups.userDeleted;
 					endpoint.deleted = true;
