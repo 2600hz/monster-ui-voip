@@ -15,7 +15,7 @@ define(function(require){
 		},
 
 		deviceIcons: {
-			'cellphone': 'icon-phone',
+			'cellphone': 'fa fa-phone',
 			'smartphone': 'icon-telicon-mobile-phone',
 			'landline': 'icon-telicon-home-phone',
 			'mobile': 'icon-telicon-sprint-phone',
@@ -100,48 +100,48 @@ define(function(require){
 					differentEmail: dataUser.email !== dataUser.username,
 					mapFeatures: {
 						caller_id: {
-							icon: 'icon-user',
-							iconColor: 'icon-blue',
+							icon: 'fa fa-user',
+							iconColor: 'monster-blue',
 							title: self.i18n.active().users.caller_id.title
 						},
 						call_forward: {
-							icon: 'icon-mail-forward',
-							iconColor: 'icon-yellow',
+							icon: 'fa fa-share',
+							iconColor: 'monster-yellow',
 							title: self.i18n.active().users.call_forward.title
 						},
 						hotdesk: {
-							icon: 'icon-fire',
-							iconColor: 'icon-orange',
+							icon: 'fa fa-fire',
+							iconColor: 'monster-orange',
 							title: self.i18n.active().users.hotdesk.title
 						},
 						vm_to_email: {
 							icon: 'icon-telicon-voicemail',
-							iconColor: 'icon-green',
+							iconColor: 'monster-green',
 							title: self.i18n.active().users.vm_to_email.title
 						},
 						faxing: {
 							icon: 'icon-telicon-fax',
-							iconColor: 'icon-red',
+							iconColor: 'monster-red',
 							title: self.i18n.active().users.faxing.title
 						},
 						conferencing: {
-							icon: 'icon-comments',
-							iconColor: 'icon-gray',
+							icon: 'fa fa-comments',
+							iconColor: 'monster-grey',
 							title: self.i18n.active().users.conferencing.title
 						},
 						find_me_follow_me: {
-							icon: 'icon-sitemap',
-							iconColor: 'icon-purple',
+							icon: 'fa fa-sitemap',
+							iconColor: 'monster-purple',
 							title: self.i18n.active().users.find_me_follow_me.title
 						},
 						music_on_hold: {
-							icon: 'icon-music',
-							iconColor: 'icon-pink',
+							icon: 'fa fa-music',
+							iconColor: 'monster-pink',
 							title: self.i18n.active().users.music_on_hold.title
 						},
 						call_recording: {
-							icon: 'icon-microphone',
-							iconColor: 'icon-blue',
+							icon: 'fa fa-microphone',
+							iconColor: 'monster-blue',
 							title: self.i18n.active().users.callRecording.title
 						}
 					}
@@ -307,12 +307,12 @@ define(function(require){
 					if(mapUsers[userId].extra.devices.length == 2) {
 						if(mapUsers[userId].extra.additionalDevices) {
 							mapUsers[userId].extra.additionalDevices.count++;
-							mapUsers[userId].extra.additionalDevices.tooltip += '<br><i class=\"device-popover-icon '+self.deviceIcons[device.device_type]+(isRegistered?' icon-green':' icon-red')+'\"></i>'
+							mapUsers[userId].extra.additionalDevices.tooltip += '<br><i class=\"device-popover-icon '+self.deviceIcons[device.device_type]+(isRegistered?' monster-green':' monster-red')+'\"></i>'
 							                                                 + device.name + ' (' + device.device_type.replace('_', ' ') + ')';
 						} else {
 							mapUsers[userId].extra.additionalDevices = {
 								count: 1,
-								tooltip: '<i class=\"device-popover-icon '+self.deviceIcons[device.device_type]+(isRegistered?' icon-green':' icon-red')+'\"></i>'
+								tooltip: '<i class=\"device-popover-icon '+self.deviceIcons[device.device_type]+(isRegistered?' monster-green':' monster-red')+'\"></i>'
 								         + device.name + ' (' + device.device_type.replace('_', ' ') + ')'
 							};
 						}

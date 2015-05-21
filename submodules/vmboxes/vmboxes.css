@@ -50,6 +50,7 @@
 }
 
 #vmboxes_container .vmboxes-header .add-vmbox i {
+	font-size: 16px;
 	display: block;
 	margin: 0;
 	color: #929799;
@@ -69,7 +70,7 @@
 	margin-top: 20px;
 }
 
-#vmboxes_container .vmboxes-grid i.icon-plus {
+#vmboxes_container .vmboxes-grid i.fa-plus {
 	margin-left: 5px;
 }
 

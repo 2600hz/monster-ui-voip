@@ -221,9 +221,9 @@
 body.colorblind #call_logs_container .grid-row:not(.header-row) .grid-cell.direction {
 	background-color: #999;
 }
-body.colorblind #call_logs_container .grid-cell.direction .icon-green {
+body.colorblind #call_logs_container .grid-cell.direction .monster-green {
 	color: #EEE !important;
 }
-body.colorblind #call_logs_container .grid-cell.direction .icon-orange {
+body.colorblind #call_logs_container .grid-cell.direction .monster-orange {
 	color: #222 !important;
 }

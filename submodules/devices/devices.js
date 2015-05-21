@@ -442,8 +442,8 @@ define(function(require){
 
 							templateDevice.find('.restriction-matcher-sign').hide();
 							if(matchedLine.find('.restrictions-switch').prop('checked')) {
-								matchedSign.removeClass('icon-red icon-remove')
-										   .addClass('icon-green icon-ok')
+								matchedSign.removeClass('monster-red fa-times')
+										   .addClass('monster-green fa-check')
 										   .css('display', 'inline-block');
 
 								matchedMsg.removeClass('red-box')
@@ -454,8 +454,8 @@ define(function(require){
 										  	monster.template(self, '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.allowMessage, { phoneNumber: monster.util.formatPhoneNumber(number) })
 										  );
 							} else {
-								matchedSign.removeClass('icon-green icon-ok')
-										   .addClass('icon-red icon-remove')
+								matchedSign.removeClass('monster-green fa-check')
+										   .addClass('monster-red fa-times')
 										   .css('display', 'inline-block');
 
 								matchedMsg.removeClass('green-box')
@@ -777,7 +777,7 @@ define(function(require){
 				mapUsers = {},
 				unassignedString = self.i18n.active().devices.unassignedDevice,
 				mapIconClass = {
-					cellphone: 'icon-phone',
+					cellphone: 'fa fa-phone',
 					smartphone: 'icon-telicon-mobile-phone',
 					landline: 'icon-telicon-home-phone',
 					mobile: 'icon-telicon-sprint-phone',

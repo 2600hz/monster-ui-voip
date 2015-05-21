@@ -2,15 +2,15 @@
 <div class="call-option menu-call {{#compare callOption.type '===' 'default'}}active{{/compare}}">
 	<div class="radio-div">{{#monsterRadio "radio-large"}}<input type="radio" {{#compare callOption.type '===' 'default'}}checked{{/compare}} name="calls.{{callflow}}" value="menu">{{/monsterRadio}}</div>
 	<div class="title">{{i18n.strategy.calls.incomingCall}}</div>
-	<div class="arrow-icon"><i class="icon-arrow-down icon-large"></i></div>
+	<div class="arrow-icon"><i class="fa fa-arrow-down fa-lg"></i></div>
 	<div class="menu-div {{#if menu}}has-menu" data-callflow="{{menu}}{{/if}}">
 		<div class="link">
 			<a href="#">
 				<div class="menu-icon">
-					<i class="icon-user icon-3x"></i>
+					<i class="fa fa-user fa-3x"></i>
 				</div>
 				<div class="link-icon">
-					<i class="icon-cog icon-small"></i>
+					<i class="fa fa-cog icon-small"></i>
 					<span>{{i18n.strategy.calls.virtualReceptionist}}</span>
 				</div>
 			</a>
@@ -20,7 +20,7 @@
 <div class="call-option user-menu-call {{#compare callOption.type '===' 'user-menu'}}active{{/compare}}">
 	<div class="radio-div">{{#monsterRadio "radio-large"}}<input type="radio" {{#compare callOption.type '===' 'user-menu'}}checked{{/compare}} name="calls.{{callflow}}" value="user-menu">{{/monsterRadio}}</div>
 	<div class="title">{{i18n.strategy.calls.incomingCall}}</div>
-	<div class="arrow-icon"><i class="icon-arrow-down icon-large"></i></div>
+	<div class="arrow-icon"><i class="fa fa-arrow-down fa-lg"></i></div>
 	<div class="user-select">
 		<div class="title">N/A</div>
 		<select>
@@ -33,15 +33,15 @@
 			{{/each}}
 		</select>
 	</div>
-	<div class="arrow-icon"><i class="icon-arrow-down icon-large"></i></div>
+	<div class="arrow-icon"><i class="fa fa-arrow-down fa-lg"></i></div>
 	<div class="menu-div {{#if menu}}has-menu" data-callflow="{{menu}}{{/if}}">
 		<div class="link">
 			<a href="#">
 				<div class="menu-icon">
-					<i class="icon-user icon-3x"></i>
+					<i class="fa fa-user fa-3x"></i>
 				</div>
 				<div class="link-icon">
-					<i class="icon-cog icon-small"></i>
+					<i class="fa fa-cog icon-small"></i>
 					<span>{{i18n.strategy.calls.virtualReceptionist}}</span>
 				</div>
 			</a>
@@ -51,7 +51,7 @@
 <div class="call-option user-voicemail-call {{#compare callOption.type '===' 'user-voicemail'}}active{{/compare}}">
 	<div class="radio-div">{{#monsterRadio "radio-large"}}<input type="radio" {{#compare callOption.type '===' 'user-voicemail'}}checked{{/compare}} name="calls.{{callflow}}" value="user-voicemail">{{/monsterRadio}}</div>
 	<div class="title">{{i18n.strategy.calls.incomingCall}}</div>
-	<div class="arrow-icon"><i class="icon-arrow-down icon-large"></i></div>
+	<div class="arrow-icon"><i class="fa fa-arrow-down fa-lg"></i></div>
 	<div class="user-select">
 		<div class="title">N/A</div>
 		<select>
@@ -67,7 +67,7 @@
 			</optgroup>
 		</select>
 	</div>
-	<div class="arrow-icon"><i class="icon-arrow-down icon-large"></i></div>
+	<div class="arrow-icon"><i class="fa fa-arrow-down fa-lg"></i></div>
 	<div class="voicemail-select">
 		<div class="title">{{i18n.strategy.calls.voicemail}}</div>
 		<select>

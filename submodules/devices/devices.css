@@ -51,6 +51,7 @@
 }
 
 #devices_container .devices-header .add-device i {
+	font-size: 16px;
 	display: block;
 	margin: 0;
 	color: #929799;
@@ -74,7 +75,7 @@
 	margin-top: 20px;
 }
 
-#devices_container .devices-grid i.icon-plus {
+#devices_container .devices-grid i.fa-plus {
 	margin-left: 5px;
 }
 

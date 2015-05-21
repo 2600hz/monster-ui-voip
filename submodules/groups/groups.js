@@ -126,23 +126,23 @@ define(function(require){
 				result = {
 					mapFeatures: {
 						call_recording: {
-							icon: 'icon-microphone',
-							iconColor: 'icon-blue',
+							icon: 'fa fa-microphone',
+							iconColor: 'monster-blue',
 							title: self.i18n.active().groups.callRecording.title
 						},
 						ringback: {
-							icon: 'icon-music',
-							iconColor: 'icon-yellow',
+							icon: 'fa fa-music',
+							iconColor: 'monster-yellow',
 							title: self.i18n.active().groups.ringback.title
 						},
 						next_action: {
-							icon: 'icon-arrow-right',
-							iconColor: 'icon-green',
+							icon: 'fa fa-arrow-right',
+							iconColor: 'monster-green',
 							title: self.i18n.active().groups.nextAction.title
 						},
 						forward: {
-							icon: 'icon-mail-forward',
-							iconColor: 'icon-orange',
+							icon: 'fa fa-mail-forward',
+							iconColor: 'monster-orange',
 							title: self.i18n.active().groups.forward.title
 						}
 					},
