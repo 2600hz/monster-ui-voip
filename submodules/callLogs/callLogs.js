@@ -198,7 +198,7 @@ define(function(require){
 				var loaderDiv = template.find('.call-logs-loader');
 				if(startKey) {
 					loaderDiv.toggleClass('loading');
-					loaderDiv.find('.loading-message > i').toggleClass('icon-spinning');
+					loaderDiv.find('.loading-message > i').toggleClass('fa-spin');
 					self.callLogsGetCdrs(fromDate, toDate, function(newCdrs, nextStartKey) {
 						newCdrs = self.callLogsFormatCdrs(newCdrs);
 						cdrsTemplate = $(monster.template(self, 'callLogs-cdrsList', {cdrs: newCdrs}));
@@ -217,7 +217,7 @@ define(function(require){
 						}
 
 						loaderDiv.toggleClass('loading');
-						loaderDiv.find('.loading-message > i').toggleClass('icon-spinning');
+						loaderDiv.find('.loading-message > i').toggleClass('fa-spin');
 
 					}, startKey);
 				} else {
