@@ -11,11 +11,11 @@
 							<div class="navbar">
 								<ul class="nav pull-right">
 									<li class="dropdown">
-										<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-cog"></i></a>
+										<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cog"></i></a>
 										<ul class="dropdown-menu">
 										{{#unless this.isLocal}}
-											<li><a class="callerId-number" href="#"><i class="icon-user"></i>{{ ../../i18n.callerId }}</a></li>
-											<li><a class="e911-number" href="#"><i class="icon-ambulance"></i>{{ ../../i18n.e911 }}</a></li>
+											<li><a class="callerId-number" href="#"><i class="fa fa-user"></i>{{ ../../i18n.callerId }}</a></li>
+											<li><a class="e911-number" href="#"><i class="fa fa-ambulance"></i>{{ ../../i18n.e911 }}</a></li>
 										{{/unless}}
 											<li><a class="prepend-number" href="#"><i class="fa fa-file-text-o"></i>{{ ../i18n.numberPrepend }}</a></li>
 										</ul>
@@ -54,11 +54,11 @@
 
 	<div class="actions">
 		<a href="#" class="spare-link monster-link pull-left{{#if emptySpare}} disabled{{/if}}">
-			<i class="icon-plus monster-green fa-lg"></i>{{ i18n.users.addFromSpare }}
+			<i class="fa fa-plus monster-green fa-lg"></i>{{ i18n.users.addFromSpare }}
 		</a>
 		<ul class="nav pull-left">
 			<li class="dropdown">
-				<a href="#" class="dropdown-toggle buy-dropdown monster-link" data-toggle="dropdown" data-target="#"><i class="icon-shopping-cart monster-green fa-lg"></i>{{ i18n.strategy.numberLinks.buy.link }}</a>
+				<a href="#" class="dropdown-toggle buy-dropdown monster-link" data-toggle="dropdown" data-target="#"><i class="fa fa-shopping-cart monster-green fa-lg"></i>{{ i18n.strategy.numberLinks.buy.link }}</a>
 				<ul class="dropdown-menu" role="menu">
 					<li><a class="buy-link" data-type="regular" href="#">{{i18n.strategy.numberLinks.buy.regular}}</a></li>
 					<li><a class="buy-link" data-type="tollfree" href="#">{{i18n.strategy.numberLinks.buy.tollfree}}</a></li>

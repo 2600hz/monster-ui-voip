@@ -1791,10 +1791,10 @@ define(function(require){
 
 				switch(group.groupType) {
 					case 'directory':
-						group.groupIcon = 'icon-book';
+						group.groupIcon = 'fa fa-book';
 						break;
 					case 'user':
-						group.groupIcon = 'icon-user';
+						group.groupIcon = 'fa fa-user';
 						break;
 					case 'device':
 						group.groupIcon = 'icon-telicon-voip-phone';

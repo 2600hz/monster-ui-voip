@@ -93,13 +93,13 @@
 	vertical-align: middle;
 }
 
-#strategy_container .element-container:not(.strategy-confnum) .title .icon-phone {
+#strategy_container .element-container:not(.strategy-confnum) .title .fa-phone {
 	color: #22a5ff;
 }
 
 /************** Main Numbers **************/
 
-#strategy_container .element-container.main-number .title .icon-phone {
+#strategy_container .element-container.main-number .title .fa-phone {
 	position: relative;
 	top: 3px;
 	font-size: 28px;

@@ -2,15 +2,15 @@
 	<div class="dashboard-header">
 		<div class="header-title">{{account.name}}</div>
 		<a href="#" class="header-link caller-id{{#compare mainNumbers.length "===" 0}} disabled{{/compare}}">
-			<div class="header-link-icon"><i class="monster-white fa-lg icon-user"></i></div>
+			<div class="header-link-icon"><i class="monster-white fa-lg fa fa-user"></i></div>
 			<div class="header-link-title">{{i18n.myOffice.topBarLinks.callerID}}</div>
 		</a>
 		<a href="#" class="header-link music-on-hold">
-			<div class="header-link-icon"><i class="monster-white fa-lg icon-music"></i></div>
+			<div class="header-link-icon"><i class="monster-white fa-lg fa fa-music"></i></div>
 			<div class="header-link-title">{{i18n.myOffice.topBarLinks.musicOnHold}}</div>
 		</a>
 		<!-- <a href="#" class="header-link call-recording">
-			<div class="header-link-icon"><i class="monster-white fa-lg icon-microphone"></i></div>
+			<div class="header-link-icon"><i class="monster-white fa-lg fa fa-microphone"></i></div>
 			<div class="header-link-title">{{i18n.myOffice.topBarLinks.callRecording}}</div>
 		</a> -->
 		<a href="#" class="header-link strategy-hours link-box" data-category="strategy" data-subcategory="strategy-hours">
@@ -33,7 +33,7 @@
 				</div>
 				<div class="left-section-content users-section-content">
 					{{#times totalUsers}}
-					<div class="users-element"><i class="fa-2x icon-male{{#compare this '<' ../totalChannels}} monster-blue{{/compare}}"></i></div>
+					<div class="users-element"><i class="fa-2x fa fa-male{{#compare this '<' ../totalChannels}} monster-blue{{/compare}}"></i></div>
 					{{/times}}
 				</div>
 			</div>
@@ -50,7 +50,7 @@
 								{{#each devicesList}}
 								{{#if label}}
 								<li class="legend-element{{#unless count}} no-device{{/unless}}">
-									<i class="icon-circle legend-color" style="color: {{color}};"></i>
+									<i class="fa fa-circle legend-color" style="color: {{color}};"></i>
 									<span class="legend-label">{{label}}</span>
 									<span class="legend-number">{{count}}</span>
 								</li>
@@ -131,8 +131,8 @@
 						<ul class="number-list">
 							{{#each faxNumbers}}
 							<li>
-								<i class="icon-ambulance monster-red pull-right{{#if e911}} enabled{{/if}}"></i>
-								<i class="icon-user monster-green pull-right{{#if callerId}} enabled{{/if}}"></i>
+								<i class="fa fa-ambulance monster-red pull-right{{#if e911}} enabled{{/if}}"></i>
+								<i class="fa fa-user monster-green pull-right{{#if callerId}} enabled{{/if}}"></i>
 								<div class="number-div">{{formatPhoneNumber number}}</div>
 							</li>
 							{{else}}
@@ -165,7 +165,7 @@
 							<ul>
 								{{#each classifiedNumbers}}
 								<li class="legend-element">
-									<i class="icon-circle legend-color" style="color: {{color}};"></i>
+									<i class="fa fa-circle legend-color" style="color: {{color}};"></i>
 									<span class="legend-label">{{label}}</span>
 									<span class="legend-number">{{count}}</span>
 								</li>

@@ -3,18 +3,18 @@
 		<div class="basic-fields span6">
 
 			<div class="row-fields">
-				<div class="icon-wrapper" data-original-title="{{i18n.users.editionForm.nameHelp}}" data-placement="top" data-toggle="tooltip"><i class="icon-user"></i></div>
+				<div class="fa fa-wrapper" data-original-title="{{i18n.users.editionForm.nameHelp}}" data-placement="top" data-toggle="tooltip"><i class="fa fa-user"></i></div>
 				<input required type="text" class="input-small" name="first_name" value="{{first_name}}" placeholder="{{i18n.users.editionForm.firstName}}"></input><input required class="input-small fix-left" type="text" name="last_name" value="{{last_name}}" placeholder="{{i18n.users.editionForm.lastName}}"></input>
 			</div>
 
 			<div class="row-fields">
-				<div class="icon-wrapper" data-original-title="{{i18n.users.editionForm.loginHelp}}" data-placement="top" data-toggle="tooltip"><i class="icon-key"></i></div>
+				<div class="fa fa-wrapper" data-original-title="{{i18n.users.editionForm.loginHelp}}" data-placement="top" data-toggle="tooltip"><i class="fa fa-key"></i></div>
 				<span id="username">{{username}}</span>
 				<a href="javascript:void(0);" id="change_username" class="monster-link blue">{{i18n.users.editionForm.changeUsername}}</a>
 			</div>
 
 			<div class="row-fields vmbox">
-				<div class="icon-wrapper" data-original-title="{{i18n.users.editionForm.vmboxHelp}}" data-placement="top" data-toggle="tooltip"><i class="icon-telicon-voicemail"></i></div>
+				<div class="fa fa-wrapper" data-original-title="{{i18n.users.editionForm.vmboxHelp}}" data-placement="top" data-toggle="tooltip"><i class="icon-telicon-voicemail"></i></div>
 				<label for="vmbox_number">
 					{{ i18n.users.editionForm.vmboxNumber }}
 				</label>
@@ -32,7 +32,7 @@
 				</div>
 
 				<div class="row-fields email-group">
-					<div class="icon-wrapper"><i class="icon-envelope"></i></div>
+					<div class="fa fa-wrapper"><i class="fa fa-envelope"></i></div>
 					<input type="email" name="extra.email" id="email" placeholder="{{i18n.users.dialogCreationUser.notificationEmail}}"{{#if extra.differentEmail}} value="{{email}}"{{/if}}>
 				</div>
 			</div>
@@ -49,7 +49,7 @@
 		</div>
 		<div class="basic-fields span6">
 			<div class="row-fields">
-				<div class="icon-wrapper" data-original-title="{{i18n.users.editionForm.roleHelp}}" data-placement="top" data-toggle="tooltip"><i class="icon-telicon-moderator"></i></div>
+				<div class="fa fa-wrapper" data-original-title="{{i18n.users.editionForm.roleHelp}}" data-placement="top" data-toggle="tooltip"><i class="icon-telicon-moderator"></i></div>
 				<select id="priv_level" name="priv_level">
 					{{#compare priv_level '===' 'admin'}}
 						<option value="admin" selected>{{ i18n.users.admin }}</option>
@@ -62,12 +62,12 @@
 			</div>
 
 			<div class="row-fields">
-				<div class="icon-wrapper" data-original-title="{{i18n.users.editionForm.timezoneHelp}}" data-placement="top" data-toggle="tooltip"><i class="fa fa-clock-o"></i></div>
+				<div class="fa fa-wrapper" data-original-title="{{i18n.users.editionForm.timezoneHelp}}" data-placement="top" data-toggle="tooltip"><i class="fa fa-clock-o"></i></div>
 				<select id="user_timezone" name="timezone" data-original_value="{{timezone}}"></select>
 			</div>
 
 			<div class="row-fields">
-            	<div class="icon-wrapper" data-original-title="{{i18n.users.editionForm.languageHelp}}" data-placement="top" data-toggle="tooltip"><i class="icon-flag"></i></div>
+            	<div class="fa fa-wrapper" data-original-title="{{i18n.users.editionForm.languageHelp}}" data-placement="top" data-toggle="tooltip"><i class="fa fa-flag"></i></div>
 				<select id="user_language" name="extra.language">
 					{{#select language}}
 						<option value="auto">{{i18n.languages.auto}}</option>
@@ -79,7 +79,7 @@
 			</div>
 
 			<div class="row-fields">
-				<div class="icon-wrapper" data-original-title="{{i18n.users.editionForm.ringingHelp}}" data-placement="top" data-toggle="tooltip"><i class="fa fa-bell-o"></i></div>
+				<div class="fa fa-wrapper" data-original-title="{{i18n.users.editionForm.ringingHelp}}" data-placement="top" data-toggle="tooltip"><i class="fa fa-bell-o"></i></div>
 				{{#unless extra.ringingTimeout}}
 					<div class="ringing-timeout disabled" data-original-title="{{i18n.users.editionForm.disabledTimeoutHint}}" data-placement="top" data-toggle="tooltip">
 				{{else}}
@@ -103,7 +103,7 @@
 			</div>
 
 			<div class="row-fields">
-				<div class="icon-wrapper" data-original-title="{{i18n.users.editionForm.mainExtensionHelp}}" data-placement="top" data-toggle="tooltip"><i class="icon-telicon-extension"></i></div>
+				<div class="fa fa-wrapper" data-original-title="{{i18n.users.editionForm.mainExtensionHelp}}" data-placement="top" data-toggle="tooltip"><i class="icon-telicon-extension"></i></div>
 				<label>{{ i18n.users.editionForm.presenceId }}</label>
 				<select name="presence_id" class="presence-id-select">
 					{{#select presence_id}}

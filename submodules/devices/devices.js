@@ -777,7 +777,7 @@ define(function(require){
 				mapUsers = {},
 				unassignedString = self.i18n.active().devices.unassignedDevice,
 				mapIconClass = {
-					cellphone: 'icon-phone',
+					cellphone: 'fa fa-phone',
 					smartphone: 'icon-telicon-mobile-phone',
 					landline: 'icon-telicon-home-phone',
 					mobile: 'icon-telicon-sprint-phone',

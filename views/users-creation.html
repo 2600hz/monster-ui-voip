@@ -2,7 +2,7 @@
 	<form class="form-horizontal small-labels" id="form_user_creation">
 	<div>
 		<div class="control-group">
-			<label class="control-label" for="first_name"><i class="icon-user"></i></label>
+			<label class="control-label" for="first_name"><i class="fa fa-user"></i></label>
 			<div class="controls">
 				<input required class="input-small" type="text" id="first_name" name="user.first_name" placeholder="{{i18n.users.dialogCreationUser.firstName}}"></input>
 				<input required class="same-line input-small" type="text" name="user.last_name" placeholder="{{i18n.users.dialogCreationUser.lastName}}"></input>
@@ -10,14 +10,14 @@
 		</div>
 
 		<div class="control-group">
-			<label class="control-label" for="email"><i class="icon-key"></i></label>
+			<label class="control-label" for="email"><i class="fa fa-key"></i></label>
 			<div class="controls">
 				<input required type="email" name="user.username" id="username" placeholder="{{i18n.users.dialogCreationUser.loginEmail}}"/>
 			</div>
 		</div>
 
 		<div class="control-group">
-			<label class="control-label" for="password"><i class="icon-unlock"></i></label>
+			<label class="control-label" for="password"><i class="fa fa-unlock"></i></label>
 			<div class="controls">
 				<input type="password" name="user.password" id="password" placeholder="{{i18n.users.dialogCreationUser.password}}"/>
 			</div>
@@ -52,7 +52,7 @@
 			</div>
 		</div>
 		<div class="control-group email-group{{#unless sendToDifferentEmail}} hidden{{/unless}}">
-			<label class="control-label" for="email"><i class="icon-envelope"></i></label>
+			<label class="control-label" for="email"><i class="fa fa-envelope"></i></label>
 			<div class="controls">
 				<input type="email" name="extra.email" id="email" placeholder="{{i18n.users.dialogCreationUser.notificationEmail}}">
 			</div>
