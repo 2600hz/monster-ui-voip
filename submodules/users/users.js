@@ -424,7 +424,7 @@ define(function(require){
 						if(type === 'name') {
 							currentUser = data;
 
-							template.find('#user_timezone').chosen({search_contains: true, width: "61%"});
+							template.find('#user_timezone').chosen({search_contains: true, width: "220px"});
 
 							data.extra.differentEmail ? template.find('.email-group').show() : template.find('.email-group').hide();
 
@@ -2473,7 +2473,7 @@ define(function(require){
 						}
 					});
 
-					timezone.populateDropdown(template.find('#user_timezone'), dataTemplate.timezone);
+					timezone.populateDropdown(template.find('#user_timezone'), dataTemplate.timezone||'inherit', {inherit: self.i18n.active().defaultTimezone});
 
 					monster.ui.tooltips(template, {
 						options: {
@@ -2705,7 +2705,7 @@ define(function(require){
 			var self = this,
 				fullName = data.user.first_name + ' ' + data.user.last_name,
 				callerIdName = fullName.substring(0, 15),
-				defaultTimezone = timezone.getLocaleTimezone(),
+				defaultTimezone = 'inherit',
 				formattedData = {
 					user: $.extend(true, {}, {
 						caller_id: {
