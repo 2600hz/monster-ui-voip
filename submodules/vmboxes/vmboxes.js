@@ -155,8 +155,8 @@ define(function(require){
 
 			monster.ui.tabs(templateVMBox);
 
-			timezone.populateDropdown(templateVMBox.find('#timezone'), data.timezone);
-			templateVMBox.find('#timezone').chosen({search_contains: true, width: "40%"});
+			timezone.populateDropdown(templateVMBox.find('#timezone'), data.timezone||'inherit', {inherit: self.i18n.active().defaultTimezone});
+			templateVMBox.find('#timezone').chosen({search_contains: true, width: "220px"});
 
 			templateVMBox.find('[data-toggle="tooltip"]').tooltip();
 
@@ -253,6 +253,10 @@ define(function(require){
 			// Delete data that is obsolete (migrated to notify_email_addresses)
 			if(mergedData.hasOwnProperty('notify_email_address')) {
 				delete mergedData.notify_email_address;
+			}
+
+			if(mergedData.timezone && mergedData.timezone === 'inherit') {
+				delete mergedData.timezone;
 			}
 
 			delete mergedData.extra;
