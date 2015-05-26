@@ -33,7 +33,8 @@ define(function(require){
 				type: type || 'today',
 				fromDate: fromDate,
 				toDate: toDate,
-				showFilteredDates: ['thisMonth', 'thisWeek'].indexOf(type) >= 0
+				showFilteredDates: ['thisMonth', 'thisWeek'].indexOf(type) >= 0,
+				showReport: monster.config.whitelabel.callReportEmail ? true : false
 			};
 
 			// Reset variables used to link A-Legs & B-Legs sent by different pages in the API
@@ -45,7 +46,7 @@ define(function(require){
 				template = $(monster.template(self, 'callLogs-layout', dataTemplate));
 
 				if(cdrs && cdrs.length) {
-					var cdrsTemplate = $(monster.template(self, 'callLogs-cdrsList', {cdrs: cdrs}));
+					var cdrsTemplate = $(monster.template(self, 'callLogs-cdrsList', {cdrs: cdrs, showReport: monster.config.whitelabel.callReportEmail ? true : false}));
 					template.find('.call-logs-grid .grid-row-container')
 							.append(cdrsTemplate);
 				}
@@ -201,7 +202,7 @@ define(function(require){
 					loaderDiv.find('.loading-message > i').toggleClass('icon-spin');
 					self.callLogsGetCdrs(fromDate, toDate, function(newCdrs, nextStartKey) {
 						newCdrs = self.callLogsFormatCdrs(newCdrs);
-						cdrsTemplate = $(monster.template(self, 'callLogs-cdrsList', {cdrs: newCdrs}));
+						cdrsTemplate = $(monster.template(self, 'callLogs-cdrsList', {cdrs: newCdrs, showReport: monster.config.whitelabel.callReportEmail ? true : false}));
 
 						startKey = nextStartKey;
 						if(!startKey) {
@@ -365,7 +366,7 @@ define(function(require){
 						hangupCause: cdr.hangup_cause,
 						hangupHelp: hangupHelp,
 						isOutboundCall: isOutboundCall,
-						mailtoLink: "mailto:support@2600hz.com"
+						mailtoLink: "mailto:" + monster.config.whitelabel.callReportEmail
 								  + "?subject=Call Report: " + cdr.call_id
 								  + "&body=Please describe the details of the issue:%0D%0A%0D%0A"
 								  + "%0D%0A____________________________________________________________%0D%0A"
