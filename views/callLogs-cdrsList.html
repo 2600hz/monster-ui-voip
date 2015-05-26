@@ -45,11 +45,13 @@
 				<i class="fa fa-cog fa-lg"></i>
 			</div>
 		</div>
+		{{#if ../showReport}}
 		<div class="grid-cell report">
 			<div class="sub-cell single-cell">
-				<a class="monster-link" href="{{this.mailtoLink}}">{{../i18n.callLogs.reportCall}}</a>
+				<a class="monster-link" href="{{this.mailtoLink}}">{{../../i18n.callLogs.reportCall}}</a>
 			</div>
 		</div>
+		{{/if}}
 	</div>
 	{{#each this.bLegs}}
 	<div class="grid-row b-leg" data-id={{this.id}}>
@@ -91,9 +93,11 @@
 				<i class="fa fa-cog fa-lg"></i>
 			</div>
 		</div>
+		{{#if ../../showReport}}
 		<div class="grid-cell report">
 			<div class="sub-cell single-cell"></div>
 		</div>
+		{{/if}}
 	</div>
 	{{/each}}
 </div>

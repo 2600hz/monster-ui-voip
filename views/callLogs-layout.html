@@ -42,7 +42,7 @@
 	</div>
 
 	<div class="call-logs-content">
-		<div class="call-logs-grid">
+		<div class="call-logs-grid{{#unless showReport}} no-report-link{{/unless}}">
 			<div class="grid-row-group">
 				<div class="grid-row header-row">
 					<div class="grid-cell direction">
@@ -75,10 +75,12 @@
 						<div class="sub-cell cell-top">{{i18n.callLogs.gridHeaders.details1}}</div>
 						<div class="sub-cell cell-bottom">{{i18n.callLogs.gridHeaders.details2}}</div>
 					</div>
+					{{#if showReport}}
 					<div class="grid-cell report">
 						<div class="sub-cell cell-top">{{i18n.callLogs.gridHeaders.report1}}</div>
 						<div class="sub-cell cell-bottom">{{i18n.callLogs.gridHeaders.report2}}</div>
 					</div>
+					{{/if}}
 				</div>
 			</div>
 			<div class="grid-row no-match">
