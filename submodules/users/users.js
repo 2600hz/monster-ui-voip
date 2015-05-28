@@ -1404,7 +1404,7 @@ define(function(require){
 					if(typeof previousIterationNumber !== 'undefined') {
 						// If there's a gap for a number between the last number and the current number, we check if it's a valid possible number (ie, greater than minNumber)
 						// And If yes, we return it, if not we just continue
-						if(currentNumber - previousIterationNumber !== increment && previousIterationNumber > minNumber) {
+						if(currentNumber - previousIterationNumber !== increment && previousIterationNumber >= minNumber) {
 							return previousIterationNumber + increment;
 						}
 					}
