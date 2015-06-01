@@ -251,6 +251,15 @@
 	margin-right: 10px;
 }
 
+#users_container .actions .spare-devices {
+	line-height: 30px;
+	margin-left: 10px;
+}
+
+#users_container .actions .buy-dropdown {
+	margin-top: 2px;
+}
+
 /* Detail User */
 #users_container .detail-user .user-fields {
 	-webkit-box-sizing: border-box;
