@@ -7,7 +7,7 @@
 			{{#each assignedDevices}}
 				<div class="item-row assigned" data-id="{{this.id}}">
 					<div class="device">
-						<button type="button" class="btn btn-danger remove-device">{{ ../i18n.unassign }}</button>
+						<button type="button" class="monster-button monster-button-danger remove-device">{{ ../i18n.unassign }}</button>
 						<a href="javascript:void(0);" class="edit-device-link monster-link">{{ this.name }}</a>
 					</div>
 				</div>
@@ -35,7 +35,7 @@
 
 		<div class="pull-right">
 			<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
-			<button type="button" class="btn btn-success save-devices">{{ i18n.saveChanges }}</button>
+			<button type="button" class="monster-button monster-button-success save-devices">{{ i18n.saveChanges }}</button>
 		</div>
 	</div>
 </div>

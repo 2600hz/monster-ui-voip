@@ -7,7 +7,7 @@
 			{{#each extensions}}
 				<div class="item-row" data-id="{{this}}" data-search="{{this}}">
 					<div class="number">
-						<button type="button" class="btn btn-danger remove-extension">{{ ../i18n.unassign }}</button>
+						<button type="button" class="monster-button monster-button-danger remove-extension">{{ ../i18n.unassign }}</button>
 						{{ this }}
 					</div>
 				</div>
@@ -19,7 +19,7 @@
 		<a id="add_extensions" class="monster-link" href="javascript:void(0);"><i class="fa fa-plus monster-green"></i>{{ i18n.users.addExtension }}</a>
 		<div class="pull-right">
 			<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
-			<button type="button" class="btn btn-success save-extensions">{{ i18n.saveChanges }}</button>
+			<button type="button" class="monster-button monster-button-success save-extensions">{{ i18n.saveChanges }}</button>
 		</div>
 	</div>
 </div>

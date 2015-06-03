@@ -85,7 +85,7 @@
 			"fileTooBigAlert": "You can not upload a file with a size exceeding 5MB",
 			"__comment": "UI-1025: Updating media file uploads throughout the UI",
 			"__version": "3.20_s3",
-			"audioUploadButton": "Select an audio file"
+			"audioUploadButton": "Browse ..."
 		},
 		"nextAction": {
 			"title": "Next Action",
@@ -581,7 +581,7 @@
 			"fileTooBigAlert": "You can not upload a file with a size exceeding 5MB",
 			"__comment": "UI-1025: Updating media file uploads throughout the UI",
 			"__version": "3.20_s3",
-			"audioUploadButton": "Select an audio file"
+			"audioUploadButton": "Browse ..."
 		},
 		"hotdesk": {
 			"id": "Hotdesk ID",
@@ -835,7 +835,7 @@
 			"fileTooBigAlert": "You can not upload a file with a size exceeding 5MB",
 			"__comment": "UI-1025: Updating media file uploads throughout the UI",
 			"__version": "3.20_s3",
-			"audioUploadButton": "Select an audio file"
+			"audioUploadButton": "Browse ..."
 		},
 		"callerId": {
 			"title": "Company Caller ID",

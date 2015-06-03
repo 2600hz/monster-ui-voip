@@ -2163,7 +2163,7 @@ define(function(require){
 					inputOnly: true,
 					wrapperClass: 'file-upload input-append',
 					btnText: self.i18n.active().users.music_on_hold.audioUploadButton,
-					btnClass: 'btn',
+					btnClass: 'monster-button',
 					maxSize: 5,
 					success: function(results) {
 						mediaToUpload = results[0];

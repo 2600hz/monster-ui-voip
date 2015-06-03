@@ -610,7 +610,7 @@ define(function(require){
 				inputOnly: true,
 				wrapperClass: 'file-upload input-append',
 				btnText: self.i18n.active().myOffice.musicOnHold.audioUploadButton,
-				btnClass: 'btn',
+				btnClass: 'monster-button',
 				maxSize: 5,
 				success: function(results) {
 					mediaToUpload = results[0];
