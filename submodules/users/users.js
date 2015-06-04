@@ -646,11 +646,13 @@ define(function(require){
 				var phoneRow = $(this).parents('.item-row'),
 					emptyRow = phoneRow.siblings('.empty-row');
 
-				if(phoneRow.siblings('.item-row').size() === 0) {
-					emptyRow.show();
-				}
+				phoneRow.slideUp(function() {
+					phoneRow.remove();
 
-				phoneRow.remove();
+					if(!template.find('.list-assigned-items .item-row').is(':visible')) {
+						emptyRow.slideDown();
+					}
+				});
 			});
 
 			template.on('click', '.cancel-extension-link', function() {
