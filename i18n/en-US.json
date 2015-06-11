@@ -105,6 +105,17 @@
 			"title": "Allow Call-Forward",
 			"headline": "Allow Call-Forward",
 			"description": "Enable this option if you want to allow this group's users to press their device \"Forward\" button to forward a call from this ring group. If this option is disabled, it will ignore the user's command."
+		},
+
+		"__comment": "UI-1604: Adding Walkthrough for new users",
+		"__version": "3.21",
+		"walkthrough": {
+			"steps": {
+				"1": "Add a specific User Group by clicking on the button. The handy drag and drop allows you to add users, create a group name and add an extension number. Once complete, each User Group and its settings will be populated below.",
+				"2": "Once a User Group is created, it will pre-populate the area here. Make any necessary changes such as the group name, number of members and extension number.",
+				"3": "Purchase, Port and Assign numbers. Once complete, it will automatically be assigned to the specific User Group.",
+				"4": "Turn on/off and seamlessly manage any of the User Features specific to the User Group."
+			}
 		}
 	},
 
@@ -612,6 +623,19 @@
 		"devices": {
 			"newDevice": "New Device",
 			"spareDevice": "Add from Spare Devices"
+		},
+
+		"__comment": "UI-1604: Adding Walkthrough for new users",
+		"__version": "3.21",
+		"walkthrough": {
+			"steps": {
+				"1": "Add a specific User by clicking on the button and providing their information. Once complete, each user and their settings will be populated below.",
+				"2": "Once a user is created, it will pre-populate the area here. Make any necessary changes to the specific user within Users Settings",
+				"3": "Provide Users with their own unique direct dial extension numbers.",
+				"4": "Click the button to purchase, port, and assign numbers. Once complete, it will automatically be assigned to the specific user.",
+				"5": "Autoprovision one of our supported devices. The UI comes complete with pre-populated manufacturers and devices. Once complete it will automatically be assigned to the specific user.",
+				"6": "Manage what features Users can access. Turn on/off and manage any of the specific User Features."
+			}
 		}
 	},
 
@@ -775,6 +799,24 @@
 				"cnam": "Caller-ID",
 				"dash_e911": "e911"
 			}
+		},
+
+		"__comment": "UI-1604: Walkthrough dashboard",
+		"__version": "3.21",
+		"walkthrough": {
+			"first": {
+				"steps": {
+					"1": "Setup your main company number within SmartPBX by purchasing or porting a number. This is different than User Phone Numbers because it represents the main phone number for the entire company."
+				}
+			},
+			"second": {
+				"steps": {
+					"1": "Set up your office hours phone strategy to your convenience. You can set up a 24 hour open office strategy or if your office is ever closed, create custom hours. You can even close your office during lunch hours.",
+					"2": "Is your office closed on holidays? Create specific dates or time frames when your office will be closed",
+					"3": "Virtual Receptionist allows you to seamlessly answer incoming calls. Add call routes to contact the appropriate department or person within the system. You can also create customized greetings using text-to-speech, uploading your own file or recording it over the phone.",
+					"4": "Create a main Conference Number for your business. Purchase, port or add an existing number and set up a Conference Number seamlessly."
+				}
+			}
 		}
 	},
 
@@ -878,7 +920,18 @@
 		},
 		"__comment": "UI-1220: Adding a Main VMBox automatically when they first load the SmartPBX if they don't have one",
 		"__version": "3.19",
-		"mainVMBoxName": "Main Voicemail Box"
+		"mainVMBoxName": "Main Voicemail Box",
+
+		"__comment": "UI-1604: Walkthrough dashboard",
+		"__version": "3.21",
+		"walkthrough": {
+			"steps": {
+				"1": "Review your entire office setup including your users, devices, numbers, main number and conference number",
+				"2": "Create and manage most of your services in the Users tab. Create new users, purchase port, and assign numbers, add an autoprovision devices, and manage User Features.",
+				"3": "Once you have created enough users, create user groups. This is extremely useful if you have users that work in the same department, such as a sales team.",
+				"4": "Create a main number for your business. Manage call handling with Virtual Receptionist, and route calls depending on Office Hours and Holidays"
+			}
+		}
 	},
 
 	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SmartPBX.",

@@ -3,7 +3,8 @@
 }
 
 #strategy_container .element-container:not(:first-of-type) {
-	margin-top: 10px;
+	margin-bottom: 5px;
+	margin-top: 5px;
 }
 
 #strategy_container .element-header-outer {

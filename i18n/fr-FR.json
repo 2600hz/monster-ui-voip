@@ -101,6 +101,17 @@
 			"title": "Redirection d'appel",
 			"headline": "Autoriser la Redirection d'Appels",
 			"description": "Si cette option est activée, les utilisateurs de ce group pourront presser le bouton \"Redirection\" de leur téléphone afin de rediriger un appel de ce groupe. Si cette option est desactivée, ce groupe ignorera les commandes de redirections."
+		},
+
+		"__comment": "UI-1604: Adding Walkthrough for new users",
+		"__version": "3.21",
+		"walkthrough": {
+			"steps": {
+				"1": "Ajouter un group en cliquant sur ce bouton. Vous pourrez dès lors sélectionner ses membres ainsi que lui assigner un nom et un numéro.",
+				"2": "Une fois créé, chaque groupe et ses options apparaîtront ici, et vous pourrez changer ces réglages en cliquant sur les cases associées.",
+				"3": "Cliquez sur cette case pour acheter, assigner ou porter des numéros. Une fois fait, ces numéros seront automatiquement liés à ce groupe.",
+				"4": "Enfin, cliquez sur cette case pour activer ou désactiver les fonctionnalités de ce groupe d'utilisateurs."
+			}
 		}
 	},
 
@@ -576,6 +587,19 @@
 		"devices": {
 			"newDevice": "Nouveau Téléphone",
 			"spareDevice": "Ajouter depuis les Téléphones Disponibles"
+		},
+
+		"__comment": "UI-1604: Adding Walkthrough for new users",
+		"__version": "3.21",
+		"walkthrough": {
+			"steps": {
+				"1": "Accèder à la création utilisateur via ce bouton. ",
+				"2": "Une fois compléter, chaque utilisateur et ses réglages seront affichés ici. Cliquez sur cette case pour changer ses informations.",
+				"3": "Fournissez un numéro unique d'extension à chacun de vos utilisateur ici.",
+				"4": "Cliquez sur cette case pour acheter, porter ou sélectionner un numéro disponible. Ils seront automatiquement assignés à cet utilisateur.",
+				"5": "Ajouter des téléphones à vos utilisateurs via cette case.",
+				"6": "Gérez les différentes fonctionnalités disponibles pour vos utilisateurs via ce menu."
+			}
 		}
 	},
 
@@ -729,6 +753,23 @@
 				"cnam": "Caller-ID",
 				"dash_e911": "Adresse d'urgence (e911)"
 			}
+		},
+		"__comment": "UI-1604: Walkthrough dashboard",
+		"__version": "3.21",
+		"walkthrough": {
+			"first": {
+				"steps": {
+					"1": "Configurer votre numéro principal d'entreprise ici. Ce numéro est différent de vos numéros assignés à vos utilisateurs car il représente votre entreprise dans son ensemble."
+				}
+			},
+			"second": {
+				"steps": {
+					"1": "Configurez les heures d'ouverture de votre bureau ici. Vous avez le choix de laisser votre ligne ouverte 24h/24h ou bien de créer des horaires personnalisés. Vous pourrez même sélectionner des horaires de repas.",
+					"2": "Votre bureau ferme t'il pendant les vacances? Gérez tout cela dans cette section.",
+					"3": "Le \"Virtual Receptionist\" disponible dans ce menu vous permet de répondre intelligemment à tous les appels entrants sur votre numéro d'entreprise.",
+					"4": "Sélectionnez un numéro de conférence pour votre entreprise ici."
+				}
+			}
 		}
 	},
 
@@ -830,7 +871,18 @@
 		},
 		"__comment": "UI-1220: Adding a Main VMBox automatically when they first load the SmartPBX if they don't have one",
 		"__version": "3.19",
-		"mainVMBoxName": "Répondeur Principal"
+		"mainVMBoxName": "Répondeur Principal",
+
+		"__comment": "UI-1604: Walkthrough dashboard",
+		"__version": "3.21",
+		"walkthrough": {
+			"steps": {
+				"1": "Observez les statistiques d'appels et plein d'autre informations en un coup d'oeil sur ce menu.",
+				"2": "Gérez les différents services de vos utilisateurs ici. Vous pourrez leur assigner des numéros, gérez leurs appareils téléphoniques et bien plus encore!",
+				"3": "Une fois les utilisateurs créés, dirigez-vous vers la section \"Groupes\". Ceci est très pratique pour les utilisateurs travaillant dans une même section (Marketing, Ventes...) afin de définir un répondeur global etc...",
+				"4": "Créer votre numéro d'entreprise dans cette section. Vous pourrez gérer les appels entrants et les router differemment en fonction de vos réglages d'horaires ou de vacances..."
+			}
+		}
 	},
 
 	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SmartPBX.",

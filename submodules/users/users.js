@@ -61,6 +61,8 @@ define(function(require){
 					.empty()
 					.append(template);
 
+				self.usersCheckWalkthrough();
+
 				if(_userId) {
 					var cells = parent.find('.grid-row[data-id=' + _userId + '] .grid-cell');
 
@@ -80,6 +82,76 @@ define(function(require){
 
 					args.callback && args.callback();
 				}
+			});
+		},
+
+		usersCheckWalkthrough: function() {
+			var self = this;
+
+			self.usersHasWalkthrough(function() {
+				self.usersShowWalkthrough(function() {
+					self.usersUpdateWalkthroughFlagUser();
+				});
+			});
+		},
+
+		usersHasWalkthrough: function(callback) {
+			var self = this,
+				flag = self.helpSettings.user.get('showUsersWalkthrough');
+
+			if(flag !== false) {
+				callback && callback();
+			}
+		},
+
+		usersUpdateWalkthroughFlagUser: function(callback) {
+			var self = this,
+				userToSave = self.helpSettings.user.set('showUsersWalkthrough', false);
+
+			self.usersUpdateOriginalUser(userToSave, function(user) {
+				callback && callback(user);
+			});
+		},
+
+		usersShowWalkthrough: function(callback) {
+			var self = this,
+				mainTemplate = $('#voip_container'),
+				rowFirstUser = mainTemplate.find('.grid-row:not(.title):first'),
+				steps =  [
+					{
+						element: mainTemplate.find('.add-user')[0],
+						intro: self.i18n.active().users.walkthrough.steps['1'],
+						position: 'right'
+					},
+					{
+						element: rowFirstUser.find('.name')[0],
+						intro: self.i18n.active().users.walkthrough.steps['2'],
+						position: 'right'
+					},
+					{
+						element: rowFirstUser.find('.extension')[0],
+						intro: self.i18n.active().users.walkthrough.steps['3'],
+						position: 'bottom'
+					},
+					{
+						element: rowFirstUser.find('.phone-number')[0],
+						intro: self.i18n.active().users.walkthrough.steps['4'],
+						position: 'bottom'
+					},
+					{
+						element: rowFirstUser.find('.devices')[0],
+						intro: self.i18n.active().users.walkthrough.steps['5'],
+						position: 'left'
+					},
+					{
+						element: rowFirstUser.find('.features')[0],
+						intro: self.i18n.active().users.walkthrough.steps['6'],
+						position: 'left'
+					}
+				];
+
+			monster.ui.stepByStep(steps, function() {
+				callback && callback();
 			});
 		},
 
@@ -3352,15 +3424,27 @@ define(function(require){
 			});
 		},
 
+		usersUpdateOriginalUser: function(user, callback) {
+			var self = this;
+
+			self.usersUpdateUserAPI(user, callback, monster.apps.auth.originalAccount.id);
+		},
+
 		usersUpdateUser: function(userData, callback) {
 			var self = this;
 
 			userData = self.usersCleanUserData(userData);
 
+			self.usersUpdateUserAPI(userData, callback, self.accountId);
+		},
+
+		usersUpdateUserAPI: function(userData, callback, accountId) {
+			var self = this;
+
 			self.callApi({
 				resource: 'user.update',
 				data: {
-					accountId: self.accountId,
+					accountId: accountId,
 					userId: userData.id,
 					data: userData
 				},

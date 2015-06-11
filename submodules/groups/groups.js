@@ -48,6 +48,8 @@ define(function(require){
 					parent
 						.empty()
 						.append(template);
+
+					self.groupsCheckWalkthrough();
 						
 					if(_groupId) {
 						var cells =  parent.find('.grid-row[data-id=' + _groupId + '] .grid-cell');
@@ -1554,6 +1556,66 @@ define(function(require){
 			});
 		},
 
+		groupsCheckWalkthrough: function() {
+			var self = this;
+
+			self.groupsHasWalkthrough(function() {
+				self.groupsShowWalkthrough(function() {
+					self.groupsUpdateWalkthroughFlagUser();
+				});
+			});
+		},
+
+		groupsHasWalkthrough: function(callback) {
+			var self = this,
+				flag = self.helpSettings.user.get('showGroupsWalkthrough');
+
+			if(flag !== false) {
+				callback && callback();
+			}
+		},
+
+		groupsUpdateWalkthroughFlagUser: function(callback) {
+			var self = this,
+				userToSave = self.helpSettings.user.set('showGroupsWalkthrough', false);
+
+			self.groupsUpdateOriginalUser(userToSave, function(user) {
+				callback && callback(user);
+			});
+		},
+
+		groupsShowWalkthrough: function(callback) {
+			var self = this,
+				mainTemplate = $('#voip_container'),
+				rowFirstGroup = mainTemplate.find('.grid-row:not(.title):first'),
+				steps =  [
+					{
+						element: mainTemplate.find('.add-group')[0],
+						intro: self.i18n.active().groups.walkthrough.steps['1'],
+						position: 'right'
+					},
+					{
+						element: rowFirstGroup.find('.walkthrough-group')[0],
+						intro: self.i18n.active().groups.walkthrough.steps['2'],
+						position: 'right'
+					},
+					{
+						element: rowFirstGroup.find('.phone-number')[0],
+						intro: self.i18n.active().groups.walkthrough.steps['3'],
+						position: 'bottom'
+					},
+					{
+						element: rowFirstGroup.find('.features')[0],
+						intro: self.i18n.active().groups.walkthrough.steps['4'],
+						position: 'left'
+					}
+				];
+
+			monster.ui.stepByStep(steps, function() {
+				callback && callback();
+			});
+		},
+
 		groupsListCallflows: function(callback) {
 			var self = this;
 
@@ -1971,6 +2033,22 @@ define(function(require){
 
 		groupsRemoveOverlay: function() {
 			$('body').find('#groups_container_overlay').remove();
+		},
+
+		groupsUpdateOriginalUser: function(userToUpdate, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'user.update',
+				data: {
+					userId: userToUpdate.id,
+					accountId: monster.apps.auth.originalAccount.id,
+					data: userToUpdate
+				},
+				success: function(savedUser) {
+					callback && callback(savedUser.data);
+				}
+			});
 		}
 	};
 

@@ -9,7 +9,8 @@ define(function(require){
 		requests: {},
 
 		subscribe: {
-			'voip.myOffice.render': 'myOfficeRender'
+			'voip.myOffice.render': 'myOfficeRender',
+			'myaccount.closed': 'myOfficeMyAccountClosed'
 		},
 
 		chartColors: [
@@ -864,6 +865,72 @@ define(function(require){
 			loadNumberDetails(callerIdNumberSelect.val());
 		},
 
+		myOfficeMyAccountClosed: function() {
+			var self = this;
+
+			// ghetto way before we add the self.isVisible method
+			if($('#voip_container').length) {
+				// First we check if the user hasn't seen the walkthrough already
+				// if he hasn't we show the walkthrough, and once they're done with it, we update their user doc so they won't see the walkthrough again
+				self.myOfficeHasWalkthrough(function() {
+					self.myOfficeShowWalkthrough(function() {
+						self.myOfficeUpdateWalkthroughFlagUser();
+					});
+				});
+			}
+		},
+
+		myOfficeHasWalkthrough: function(callback) {
+			var self = this,
+				flag = self.helpSettings.user.get('showDashboardWalkthrough');
+
+			if(flag !== false) {
+				callback && callback();
+			}
+		},
+
+		// Triggers firstUseWalkthrough. First we render the dropdown, then we show a greeting popup, and once they click go, we render the step by step.
+		myOfficeShowWalkthrough: function(callback) {
+			var self = this,
+				mainTemplate = $('#voip_container'),
+				steps =  [
+					{
+						element: mainTemplate.find('.category#myOffice')[0],
+						intro: self.i18n.active().myOffice.walkthrough.steps['1'],
+						position: 'right'
+					},
+					{
+						element: mainTemplate.find('.category#users')[0],
+						intro: self.i18n.active().myOffice.walkthrough.steps['2'],
+						position: 'right'
+					},
+					{
+						element: mainTemplate.find('.category#groups')[0],
+						intro: self.i18n.active().myOffice.walkthrough.steps['3'],
+						position: 'right'
+					},
+					{
+						element: mainTemplate.find('.category#strategy')[0],
+						intro: self.i18n.active().myOffice.walkthrough.steps['4'],
+						position: 'right'
+					}
+				];
+
+			monster.ui.stepByStep(steps, function() {
+				callback && callback();
+			});
+		},
+
+		myOfficeUpdateWalkthroughFlagUser: function(callback) {
+			var self = this,
+				userToSave = self.helpSettings.user.set('showDashboardWalkthrough', false);
+
+			self.myOfficeUpdateOriginalUser(userToSave, function(user) {
+				callback && callback(user);
+			});
+		},
+
+		/* API Calls */
 		myOfficeGetNumber: function(number, success, error) {
 			var self = this;
 
@@ -929,6 +996,22 @@ define(function(require){
 				},
 				success: function(data) {
 					callback && callback(data.data);
+				}
+			});
+		},
+
+		myOfficeUpdateOriginalUser: function(userToUpdate, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'user.update',
+				data: {
+					userId: userToUpdate.id,
+					accountId: monster.apps.auth.originalAccount.id,
+					data: userToUpdate
+				},
+				success: function(savedUser) {
+					callback && callback(savedUser.data);
 				}
 			});
 		}

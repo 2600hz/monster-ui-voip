@@ -131,6 +131,13 @@
 	cursor: pointer;
 }
 
+#groups_container .groups-grid .walkthrough-group {
+/*	Hack to wrap right group for walkthrough */
+	display: inline;
+	padding-top:15px;
+	padding-bottom:15px;
+}
+
 #groups_container .groups-grid .groups-rows .grid-cell:last-child:not(.active):hover { border-right: 1px solid #dcdcdc; }
 
 #groups_container .groups-grid .grid-row .grid-cell:not(:last-child) { white-space: nowrap; }

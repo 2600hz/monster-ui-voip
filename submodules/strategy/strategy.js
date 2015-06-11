@@ -204,9 +204,13 @@ define(function(require){
 						template.find('.element-container.strategy-hours,.element-container.strategy-holidays,.element-container.strategy-calls').hide();
 						template.find('.element-container.helper').css('display', 'block');
 						template.find('.element-container.main-number').css('margin-top', '10px');
+
+						self.strategyCheckFirstWalkthrough();
 					} else {
 						template.find('.element-container.helper').css('display', 'none');
 						template.find('.element-container.main-number').css('margin-top', '0px');
+
+						self.strategyCheckSecondWalkthrough();
 					}
 
 					if(openElement) {
@@ -222,6 +226,93 @@ define(function(require){
 			);
 
 			self.strategyCreateFeatureCodes();
+		},
+
+		strategyCheckFirstWalkthrough: function() {
+			var self = this,
+				flagName = 'showStrategyFirstWalkthrough';
+
+			self.strategyHasWalkthrough(flagName, function() {
+				self.strategyShowFirstWalkthrough(function() {
+					self.strategyUpdateWalkthroughFlagUser(flagName);
+				});
+			});
+		},
+
+		strategyCheckSecondWalkthrough: function() {
+			var self = this,
+				flagName = 'showStrategySecondWalkthrough';
+
+			self.strategyHasWalkthrough(flagName, function() {
+				self.strategyShowSecondWalkthrough(function() {
+					self.strategyUpdateWalkthroughFlagUser(flagName);
+				});
+			});
+		},
+
+		strategyHasWalkthrough: function(name, callback) {
+			var self = this,
+				flag = self.helpSettings.user.get(name);
+
+			if(flag !== false) {
+				callback && callback();
+			}
+		},
+
+		strategyUpdateWalkthroughFlagUser: function(flagName, callback) {
+			var self = this,
+				userToSave = self.helpSettings.user.set(flagName, false);
+
+			self.strategyUpdateOriginalUser(userToSave, function(user) {
+				callback && callback(user);
+			});
+		},
+
+		strategyShowFirstWalkthrough: function(callback) {
+			var self = this,
+				mainTemplate = $('#strategy_container'),
+				steps =  [
+					{
+						element: mainTemplate.find('.element-container.main-number')[0],
+						intro: self.i18n.active().strategy.walkthrough.first.steps['1'],
+						position: 'bottom'
+					}
+				];
+
+			monster.ui.stepByStep(steps, function() {
+				callback && callback();
+			});
+		},
+
+		strategyShowSecondWalkthrough: function(callback) {
+			var self = this,
+				mainTemplate = $('#strategy_container'),
+				steps = [
+					{
+						element: mainTemplate.find('.element-container.strategy-hours')[0],
+						intro: self.i18n.active().strategy.walkthrough.second.steps['1'],
+						position: 'bottom'
+					},
+					{
+						element: mainTemplate.find('.element-container.strategy-holidays')[0],
+						intro: self.i18n.active().strategy.walkthrough.second.steps['2'],
+						position: 'bottom'
+					},
+					{
+						element: mainTemplate.find('.element-container.strategy-calls')[0],
+						intro: self.i18n.active().strategy.walkthrough.second.steps['3'],
+						position: 'top'
+					},
+					{
+						element: mainTemplate.find('.element-container.strategy-confnum')[0],
+						intro: self.i18n.active().strategy.walkthrough.second.steps['4'],
+						position: 'top'
+					}
+				];
+
+			monster.ui.stepByStep(steps, function() {
+				callback && callback();
+			});
 		},
 
 		strategyBindEvents: function(template, strategyData) {
@@ -302,6 +393,7 @@ define(function(require){
 
 							container.find('.element-content').empty()
 															  .append(template);
+
 							callback && callback();
 						});
 						break;
@@ -565,6 +657,8 @@ define(function(require){
 						container.parents('#strategy_container').find('.element-container:not(.main-number,.strategy-confnum)').show();
 						container.parents('#strategy_container').find('.element-container.helper').hide();
 						container.parents('#strategy_container').find('.element-container.main-number').css('margin-top', '0px');
+
+						self.strategyCheckSecondWalkthrough();
 					} else {
 						headerSpan.html(self.i18n.active().strategy.noNumberTitle);
 						container.parents('#strategy_container').find('.element-container:not(.main-number,.strategy-confnum)').hide();
@@ -2480,6 +2574,22 @@ define(function(require){
 		_strategyOnCurrentAccountUpdated: function(accountData) {
 			var self = this;
 			$('#strategy_custom_hours_timezone').text(timezone.formatTimezone(accountData.timezone));
+		},
+
+		strategyUpdateOriginalUser: function(userToUpdate, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'user.update',
+				data: {
+					userId: userToUpdate.id,
+					accountId: monster.apps.auth.originalAccount.id,
+					data: userToUpdate
+				},
+				success: function(savedUser) {
+					callback && callback(savedUser.data);
+				}
+			});
 		}
 	};
 
