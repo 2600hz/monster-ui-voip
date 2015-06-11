@@ -204,7 +204,7 @@ define(function(require){
 						'z-index': '2'
 					});
 
-					cell.parent().siblings('.edit-groups').css({
+					cell.parents('.groups-cells').siblings('.edit-groups').css({
 						'position': 'relative',
 						'z-index': '2',
 						'border-top-color': 'transparent'
