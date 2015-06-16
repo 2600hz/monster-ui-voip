@@ -387,7 +387,7 @@
 		"dialogChangePassword": {
 			"help": "You can set a new password by just typing any password you want, along with the Email address!",
 			"password": "Password",
-			"passwordPlaceholder": "Password (Min. 8 characters)",
+			"passwordPlaceholder": "Password (Min. 6 characters)",
 			"title": "Update Email and password",
 			"username": "User's Email address"
 		},
@@ -406,7 +406,7 @@
 			"lastName": "Last Name",
 			"loginEmail": "Email used for Login",
 			"notificationEmail": "Notification E-mail",
-			"password": "Password (Min. 8 characters)",
+			"password": "Password (Min. 6 characters)",
 			"sendToDifferentEmail": "Send emails to an alternate address",
 			"title": "Create User",
 			"vmboxAlreadyExist": "VMBox Number is already taken, please choose a different Voicemail Box Number.",

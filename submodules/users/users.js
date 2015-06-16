@@ -588,6 +588,9 @@ define(function(require){
 								},
 								'vmbox.number': {
 									checkList: originalData.listVMBoxes
+								},
+								'user.password': {
+									minlength: 6
 								}
 							},
 							messages: {
@@ -859,6 +862,14 @@ define(function(require){
 					form = passwordTemplate.find('#form_new_username');
 
 				monster.ui.showPasswordStrength(passwordTemplate.find('#inputPassword'));
+
+				monster.ui.validate(form, {
+					rules: {
+						'password': {
+							minlength: 6
+						}
+					}
+				});
 
 				passwordTemplate.find('.save-new-username').on('click', function() {
 					var formData = monster.ui.getFormData('form_new_username'),

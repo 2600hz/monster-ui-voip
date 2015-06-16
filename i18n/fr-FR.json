@@ -357,7 +357,7 @@
 		"dialogChangePassword": {
 			"help": "Vous pouvez mettre à jour votre mot de passe en tapant votre Email et le nouveau mot de passe ci-dessus!",
 			"password": "Mot de passe",
-			"passwordPlaceholder": "(Min. 8 caractères)",
+			"passwordPlaceholder": "(Min. 6 caractères)",
 			"title": "Mettre à jour Email / Mot de passe",
 			"username": "Email de l'utilisateur"
 		},
@@ -376,7 +376,7 @@
 			"lastName": "Nom",
 			"loginEmail": "Email/Login de l'utilisateur",
 			"notificationEmail": "Email pour notifications",
-			"password": "(Min. 8 caractères)",
+			"password": "(Min. 6 caractères)",
 			"sendToDifferentEmail": "Envoyer les emails à une autre adresse",
 			"title": "Créer Utilisateur",
 			"vmboxAlreadyExist": "Le numéro de répondeur existe déjà, veuillez en choisir un autre.",
