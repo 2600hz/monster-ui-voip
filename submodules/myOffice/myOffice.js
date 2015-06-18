@@ -868,8 +868,7 @@ define(function(require){
 		myOfficeMyAccountClosed: function() {
 			var self = this;
 
-			// ghetto way before we add the self.isVisible method
-			if($('#voip_container').length) {
+			if(self.isActive()) {
 				// First we check if the user hasn't seen the walkthrough already
 				// if he hasn't we show the walkthrough, and once they're done with it, we update their user doc so they won't see the walkthrough again
 				self.myOfficeHasWalkthrough(function() {
