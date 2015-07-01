@@ -703,7 +703,7 @@ define(function(require){
 			});
 
 			template.on('click', '#add_extensions', function() {
-				var nextExtension = parseInt(self.usersGetNextInt(existingExtensions)) + '',
+				var nextExtension = parseInt(monster.util.getNextExtension(existingExtensions)) + '',
 					dataTemplate = {
 						recommendedExtension: nextExtension
 					},
@@ -1457,55 +1457,6 @@ define(function(require){
 			
 		},
 
-		/* Helper function that takes an array of number in parameter, sorts it, and returns the first number not in the array, greater than the minVal */
-		usersGetNextInt: function(listNumbers) {
-			var orderedArray = listNumbers,
-				previousIterationNumber,
-				minNumber = 1000,
-				lowestNumber = minNumber,
-				increment = 1;
-
-			orderedArray.sort(function(a,b) {
-				var parsedA = parseInt(a),
-					parsedB = parseInt(b);
-
-				if(isNaN(parsedA)) {
-					return -1;
-				}
-				else if(isNaN(parsedB)) {
-					return 1;
-				}
-				else {
-					return parsedA > parsedB ? 1 : -1;
-				}
-			});
-
-			_.each(orderedArray, function(number) {
-				var currentNumber = parseInt(number);
-
-				// First we make sure it's a valid number, if not we move on to the next number
-				if(!isNaN(currentNumber)) {
-					// If we went through this loop already, previousIterationNumber will be set to the number of the previous iteration
-					if(typeof previousIterationNumber !== 'undefined') {
-						// If there's a gap for a number between the last number and the current number, we check if it's a valid possible number (ie, greater than minNumber)
-						// And If yes, we return it, if not we just continue
-						if(currentNumber - previousIterationNumber !== increment && previousIterationNumber >= minNumber) {
-							return previousIterationNumber + increment;
-						}
-					}
-					// else, it's the first iteration, we initialize the minValue to the first number in the ordered array
-					// only if it's greater than 1000, because we don't want to recommend lower numbers
-					else if(currentNumber > minNumber) {
-						lowestNumber = currentNumber;
-					}
-					// We store current as the previous number for the next iteration
-					previousIterationNumber = currentNumber;
-				}
-			});
-
-			return (previousIterationNumber) ? previousIterationNumber + increment : lowestNumber;
-		},
-
 		usersFormatAddUser: function(data) {
 			var self = this,
 				formattedData = {
@@ -1535,7 +1486,7 @@ define(function(require){
 			// We concat both arrays because we want to create users with the same number for the extension # and the vmbox, 
 			// If for some reason a vmbox number exist without an extension, we still don't want to let them set their extension number to that number.
 			allNumbers = arrayExtensions.concat(arrayVMBoxes);
-			formattedData.nextExtension = parseInt(self.usersGetNextInt(allNumbers)) + '';
+			formattedData.nextExtension = parseInt(monster.util.getNextExtension(allNumbers)) + '';
 
 			return formattedData;
 		},
