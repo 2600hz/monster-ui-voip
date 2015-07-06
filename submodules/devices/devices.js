@@ -127,9 +127,9 @@ define(function(require){
 			template.find('.settings').on('click', function() {
 				var $this = $(this),
 					dataDevice = {
-						id: $this.parents('.grid-row').data('id')
+						id: $this.parents('.grid-row').data('id'),
+						isRegistered: $this.parents('.grid-row').data('registered') === 'true'
 					};
-
 
 				self.devicesRenderEdit({ data: dataDevice, callbackSave: function(dataDevice) {
 					self.devicesRender({ deviceId: dataDevice.id });
@@ -365,6 +365,14 @@ define(function(require){
 				templateDevice.find('#rtp_method').toggle();
 			});
 
+			templateDevice.find('#restart_device').on('click', function() {
+				if(!$(this).hasClass('disabled')) {
+					self.devicesRestart(data.id, function() {
+						toastr.success(self.i18n.active().devices.popupSettings.miscellaneous.restart.success);
+					});
+				}
+			});
+
 			templateDevice.find('.actions .save').on('click', function() {
 				if(monster.ui.valid(deviceForm)) {
 					templateDevice.find('.feature-key-value:not(.active)').remove();
@@ -498,6 +506,21 @@ define(function(require){
 			});
 		},
 
+		devicesRestart: function(deviceId, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'device.restart',
+				data: {
+					accountId: self.accountId,
+					deviceId: deviceId
+				},
+				success: function(data) {
+					callback && callback(data.data);
+				}
+			});
+		},
+
 		devicesMergeData: function(originalData, template, audioCodecs, videoCodecs) {
 			var self = this,
 				hasCodecs = $.inArray(originalData.device_type, ['sip_device', 'landline', 'fax', 'ata', 'softphone', 'smartphone', 'mobile', 'sip_uri']) > -1,
@@ -612,7 +635,7 @@ define(function(require){
 			return mergedData;
 		},
 
-		devicesFormatData: function(data) {
+		devicesFormatData: function(data, dataList) {
 			var self = this,
 				defaults = {
 					extra: {
@@ -763,6 +786,8 @@ define(function(require){
 				formattedData.media.video.codecs = data.device.media.video.codecs;
 			}
 
+			formattedData.extra.isRegistered = dataList.isRegistered;
+
 			return formattedData;
 		},
 
@@ -807,7 +832,8 @@ define(function(require){
 					type: device.device_type,
 					friendlyType: self.i18n.active().devices.types[device.device_type],
 					registered: false,
-					classStatus: device.enabled ? 'unregistered' : 'disabled' /* Display a device in black if it's disabled, otherwise, until we know whether it's registered or not, we set the color to red */
+					classStatus: device.enabled ? 'unregistered' : 'disabled' /* Display a device in black if it's disabled, otherwise, until we know whether it's registered or not, we set the color to red */,
+					isRegistered: false
 				}
 			});
 
@@ -820,6 +846,7 @@ define(function(require){
 					/* Now that we know if it's registered, we set the color to green */
 					if(device.enabled) {
 						device.classStatus = 'registered';
+						device.isRegistered = true;
 					}
 				}
 			});
@@ -972,7 +999,7 @@ define(function(require){
 					}
 				},
 				function(error, results) {
-					var formattedData = self.devicesFormatData(results);
+					var formattedData = self.devicesFormatData(results, dataDevice);
 
 					callback && callback(formattedData);
 				}

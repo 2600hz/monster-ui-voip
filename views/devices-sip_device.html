@@ -209,7 +209,7 @@
 					</label>
 				</div>
 
-				<div class="rtp-line">
+				<div class="rtp-line clearfix">
 					<div class="control-group">
 						<label class="control-label checkbox">
 							{{#monsterCheckbox i18n.devices.popupSettings.miscellaneous.rtp.enable }}
@@ -227,6 +227,16 @@
 						</select>
 					</div>
 				</div>
+
+				{{#if provision}}
+					<div class="control-group">
+						<label class="control-label checkbox">{{ i18n.devices.popupSettings.miscellaneous.restart.label }}</label>
+						<div class="controls">
+							<button id="restart_device" type="button" class="monster-button monster-button-primary{{#unless extra.isRegistered}} disabled{{/unless}}">{{ i18n.devices.popupSettings.miscellaneous.restart.button }}</button>
+							<i class="help-popover fa fa-question-circle" data-original-title="{{ i18n.devices.popupSettings.miscellaneous.restart.help }}" data-placement="top" data-toggle="tooltip"></i>
+						</div>
+					</div>
+				{{/if}}
 			</div>
 
 		{{#if provision.feature_keys}}

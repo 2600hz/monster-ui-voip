@@ -397,3 +397,8 @@
 	margin-left: 35px;
 	padding-top: 3px;
 }
+
+/* Restart Button */
+.edit-device #restart_device {
+	margin-left: 10px;
+}

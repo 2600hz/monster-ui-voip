@@ -165,6 +165,14 @@
 				"ignoreCompletedElsewhere": {
 					"label": "Afficher les appels manqués des groupes d'Appels",
 					"help": "Si cette case est cochée, les téléphones ayant accès à cette fonctionnalité afficheront les appels manqués même s'ils viennent d'un Groupe d'Appel et que l'appel a été pris par un collègue"
+				},
+				"__comment": "UI-377: Adding Restart device feature",
+				"__version": "3.21",
+				"restart": {
+					"label": "Envoyer une requête de redémarrage",
+					"button": "Redémarrer",
+					"help": "Ce bouton envoie une requête de redémarrage. Cette action n'est disponible que pour les appareils qui sont actuellement connectés à la plateforme.",
+					"success": "Vous avez envoyé une requête de redémarrage avec succès!"
 				}
 			},
 			"restrictions": {
