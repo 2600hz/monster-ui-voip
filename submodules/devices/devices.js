@@ -24,9 +24,9 @@ define(function(require){
 
 		/* Users */
 		/* args: parent and deviceId */
-		devicesRender: function(args) {
+		devicesRender: function(pArgs) {
 			var self = this,
-				args = args || {},
+				args = pArgs || {},
 				parent = args.parent || $('.right-content'),
 				_deviceId = args.deviceId || '';
 
@@ -55,7 +55,7 @@ define(function(require){
 					});
 				}
 
-				if ( dataTemplate.devices.length == 0 ) {
+				if ( dataTemplate.devices.length === 0 ) {
 					parent.find('.no-devices-row').css('display', 'block');
 				} else {
 					parent.find('.no-devices-row').css('display', 'none');
@@ -73,8 +73,8 @@ define(function(require){
 					rows = template.find('.devices-rows .grid-row:not(.title)'),
 					emptySearch = template.find('.devices-rows .empty-search-row');
 
-				_.each(rows, function(row) {
-					var row = $(row);
+				_.each(rows, function(pRow) {
+					var row = $(pRow);
 
 					row.data('search').toLowerCase().indexOf(searchString) < 0 ? row.hide() : row.show();
 				});
@@ -265,7 +265,7 @@ define(function(require){
 			var self = this,
 				mode = data.id ? 'edit' : 'add',
 				type = data.device_type,
-				popupTitle = mode === 'edit' ? monster.template(self, '!' + self.i18n.active().devices[type].editTitle, { name: data.name }) : self.i18n.active().devices[type].addTitle;
+				popupTitle = mode === 'edit' ? monster.template(self, '!' + self.i18n.active().devices[type].editTitle, { name: data.name }) : self.i18n.active().devices[type].addTitle,
 				templateDevice = $(monster.template(self, 'devices-'+type, data)),
 				deviceForm = templateDevice.find('#form_device');
 
@@ -289,7 +289,7 @@ define(function(require){
 			}
 
 			if ( data.extra.hasE911Numbers ) {
-				var currentNumber = undefined;
+				var currentNumber;
 
 				if(data.caller_id && data.caller_id.emergency && data.caller_id.emergency.number) {
 					currentNumber = data.caller_id.emergency.number;
@@ -649,7 +649,7 @@ define(function(require){
 					sip_device: {
 						sip: {
 							password: monster.util.randomString(12),
-							realm: monster.apps['auth'].currentAccount.realm,
+							realm: monster.apps.auth.currentAccount.realm,
 							username: 'user_' + monster.util.randomString(10)
 						}
 					},
@@ -674,7 +674,7 @@ define(function(require){
 					ata: {
 						sip: {
 							password: monster.util.randomString(12),
-							realm: monster.apps['auth'].currentAccount.realm,
+							realm: monster.apps.auth.currentAccount.realm,
 							username: 'user_' + monster.util.randomString(10)
 						}
 					},
@@ -685,21 +685,21 @@ define(function(require){
 						outbound_flags: ['fax'],
 						sip: {
 							password: monster.util.randomString(12),
-							realm: monster.apps['auth'].currentAccount.realm,
+							realm: monster.apps.auth.currentAccount.realm,
 							username: 'user_' + monster.util.randomString(10)
 						}
 					},
 					softphone: {
 						sip: {
 							password: monster.util.randomString(12),
-							realm: monster.apps['auth'].currentAccount.realm,
+							realm: monster.apps.auth.currentAccount.realm,
 							username: 'user_' + monster.util.randomString(10)
 						}
 					},
 					mobile: {
 						sip: {
 							password: monster.util.randomString(12),
-							realm: monster.apps['auth'].currentAccount.realm,
+							realm: monster.apps.auth.currentAccount.realm,
 							username: 'user_' + monster.util.randomString(10)
 						}
 					},
@@ -713,7 +713,7 @@ define(function(require){
 						},
 						sip: {
 							password: monster.util.randomString(12),
-							realm: monster.apps['auth'].currentAccount.realm,
+							realm: monster.apps.auth.currentAccount.realm,
 							username: 'user_' + monster.util.randomString(10)
 						}
 					},
@@ -737,9 +737,7 @@ define(function(require){
 					}
 				}
 
-				if('call_restriction' in data.accountLimits 
-				&& name in data.accountLimits.call_restriction
-				&& data.accountLimits.call_restriction[name].action === 'deny') {
+				if('call_restriction' in data.accountLimits && name in data.accountLimits.call_restriction && data.accountLimits.call_restriction[name].action === 'deny') {
 					defaults.extra.restrictions[name].disabled = true;
 					defaults.extra.hasDisabledRestrictions = true;
 				}
