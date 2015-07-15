@@ -54,9 +54,7 @@
 		"userDeleted": "Usuario eliminado",
 		"removeMember": "Eliminar miembro",
 		"distribute": "distribuir",
-		"maxDurationTooltip": "Haga clic en este cuadro
-para cambiar la duración máxima para su grupo de timbre. Debe ingresar
-un numero entre 30 y 999.",
+		"maxDurationTooltip": "Haga clic en este cuadro para cambiar la duración máxima para su grupo de timbre. Debe ingresar un numero entre 30 y 999.",
 		"title": "Grupos en Total",
 		"titleGrid": {
 			"groups": "Nombre de Grupo",
@@ -66,8 +64,7 @@ un numero entre 30 y 999.",
 			"features": "Funciones del grupo"
 		},
 		"toastrMessages": {
-			"numbersUpdated": "Ha actualizado con exito
-los numeros de telefono de {{name}}",
+			"numbersUpdated": "Ha actualizado con exito los numeros de telefono de {{name}}",
 			"extensionsUpdated": "Ha actualizado con exito los numeros de extensión de {{name}}"
 		},
 		"callRecording": {
@@ -576,7 +573,7 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 			"deleteAfterNotify": "Eliminar los mensajes de la base de datos después de enviar la notificación.",
 			"headline": "Configuración de correo de voz a correo electrónico",
 			"help": "Si quiere cambiar a donde las notificaciones del correo electrónico van, por favor corrija la dirección de correo electrónico del usuario en la sección de la Administración del Usuario",
-			"label": "Se enviará un mensaje de correo electrónico a { {variable}} para cada nuevo mensaje de correo de voz",
+			"label": "Se enviará un mensaje de correo electrónico a {{variable}} para cada nuevo mensaje de correo de voz",
 			"title": "correos de voz"
 		},
 		"find_me_follow_me": {
@@ -683,7 +680,7 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 			"lunchbreakTitle": "¿Están cerrados para las horas del almuerzo ?",
 			"__comment": "UI-1250: Adding help boxes",
 			"__version": "3.20_s2",
-			"helpAfterHours": "¡No olvide de poner el enrutamiento de llamadas para cuando su oficina este cerrada por la noche! Para configurarlo, vaya a la sección de  \"Manejo de llamadas entrantes\" en esta página, y seleccione la opcion \" Fuera de horario\". Para configurarlo, vaya a la sección \"Manejo de llamadas entrantes\" en esta página, y seleccione opcion \"fuera de horario\".",
+			"helpAfterHours": "¡No olvide de poner el enrutamiento de llamadas para cuando su oficina este cerrada por la noche! Para configurarlo, vaya a la sección de \"Manejo de llamadas entrantes\" en esta página, y seleccione la opcion \" Fuera de horario\". Para configurarlo, vaya a la sección \"Manejo de llamadas entrantes\" en esta página, y seleccione opcion \"fuera de horario\".",
 			"helpLunchHours": "Si su oficina esta cerrada durante horas del almuerzo, también tiene que elegir el enrutamiento de llamadas para esto. Para configurarlo, vaya a la sección \"Manejo de llamadas entrantes\" en esta página, y seleccione opcion \"Horario de almuerzo\"."
 		},
 		"holidays": {
@@ -899,7 +896,7 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 			"nameLabel": "Nombre identificador de la compañía ",
 			"nameHelp": "Este nombre aparecerá como su ID de llamada cuando realiza llamadas salientes.",
 			"emergencyLabel": "Dirección de emergencia (E911) de la compañía ",
-1.	  "emergencyZipcode": "Código Postal",
+  	  "emergencyZipcode": "Código Postal",
 			"emergencyAddress1": "Dirección línea 1",
 			"emergencyAddress2": "Dirección línea 2",
 			"emergencyCity": "Cuidad",
@@ -917,7 +914,7 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 		"mainNumberLabel": "Número principal",
 		"noMainNumber": "Agregar Número principal",
 		"confNumberLabel": "Número de conferencia",
-1.			"faxNumberLabel": "Número de Fax",
+		"faxNumberLabel": "Número de Fax",
 		"totalNumbers": "Números Totales",
 		"unregisteredDevices": "Dispositivos no registrados",
 		"accountId": "Identificación de la cuenta:",
@@ -1004,7 +1001,7 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 		"deleteVmbox": "Borar un buzón de voz",
 		"deleteNotAllowed": "No se puede borrar este buzón porque pertenece a un usuario",
 		"confirmDeleteVmbox": "Este buzón de voz se eliminará permanentemente. ¿Desea continuar?",
-		"deletedVmbox": "Se ha eliminado el siguiente Buzón de \" { {vmboxName} } \".",
+		"deletedVmbox": "Se ha eliminado el siguiente Buzón de \"{{vmboxName}}\".",
 		"titleGrid": {
 			"name": "Nombre",
 			"number": "N úmero",
@@ -1072,7 +1069,7 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 			"recipients": {
 				"menuTitle": "Recipiente",
 				"sectionTitle": "Recipiente",
-				"header": "Este panel le permite administrar quienes serán notificados cuando alguien deje un mensaje en el buzón de voz. Haga clic en \"Añada el Nuevo Recipiente \"para añadir una dirección de correo electrónico a la lista",
+				"header": "Este panel le permite administrar quienes serán notificados cuando alguien deje un mensaje en el buzón de voz. Haga clic en \"Añada el Nuevo Recipiente\" para añadir una dirección de correo electrónico a la lista",
 				"create": "Añada el Nuevo Recipiente"
 			}
 		}
