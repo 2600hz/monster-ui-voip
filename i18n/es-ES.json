@@ -201,7 +201,7 @@
 				"inherit": "Heredar",
 				"deny": "Negar",
 				"matcher": {
-					"help": "Escriba un número y seleccione \"Revisar\"para ver si la llamada es permitida.",
+					"help": "Escriba un número y seleccione \"Revisar\" para ver si la llamada es permitida.",
 					"placeholder": "+18554443333",
 					"button": "Revisar",
 					"label": "El el número de arriba coincide con esta regla.",
@@ -322,10 +322,10 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 			"new": "New Móvil "
 		},
 		"smartphone": {
-			"addTitle": "Adición de un Smartphone",
+			"addTitle": "Adición de un Teléfono Inteligente",
 			"deviceName": "Nombre de Dispositivo",
-			"editTitle": "Editar Smartphone: {{name}}",
-			"new": "Smartphone Nuevo",
+			"editTitle": "Editar Teléfono Inteligente: {{name}}",
+			"new": "Teléfono Inteligente Nuevo",
 			"requireKeypress": "Permitir el uso de correo de voz del teléfono móvil",
 			"keepCallerId": "Mantener el Original ID de llamada",
 			"hideContactList": "Ocultar de la lista de contactos"
@@ -343,9 +343,9 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 			"force": "Siempre Fuerza"
 		},
 		"softphone": {
-			"addTitle": "Adición de un Softphone",
-			"editTitle": "Editar un Softphone: {{name}}",
-			"new": "Nuevo Softphone",
+			"addTitle": "Adición de un Teléfono de software",
+			"editTitle": "Editar un Teléfono de software: {{name}}",
+			"new": "Nuevo Teléfono de software",
 			"deviceName": "Nombre de Dispositivo"
 		},
 		"ata": {
@@ -371,9 +371,9 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 		"types": {
 			"cellphone": "Teléfono Celular",
 			"sip_device": "Teléfono SIP",
-			"smartphone": "Smartphone",
+			"smartphone": "Teléfono Inteligente",
 			"mobile": "Mòvil",
-			"softphone": "Soft Phone",
+			"softphone": "Teléfono de software",
 			"landline": "Teléfono fijo",
 			"fax": "Fax",
 			"ata": "ATA",
@@ -418,7 +418,7 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 			"sendToDifferentEmail": "Enviar mensajes de correo electrónico a una dirección alternativa",
 			"title": "Crear usuario ",
 			"vmboxAlreadyExist": "Este Número de buzón del correo de voz ya se ha adoptado, por favor seleccione otro número del buzón del correo de voz.",
-			"vmboxNumber": "número del buzón del correo de voz",
+			"vmboxNumber": "Número del buzón del correo de voz",
 			"__comment": "UI-814: Añadir la opción de enviar automáticamente correo creación de usuario",
 			"__version": "3.20_s3",
 			"sendWelcomeEmail": "Enviar las credenciales a este usuario"
@@ -475,7 +475,7 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 		"noUserFeatures": "Ningun ",
 		"noUserCallflow": "Se ha producido un error. No hay flujo de llamada asignado a este usuario, por eso no se pueden añadir al directorio de la empresa ",
 		"port": "Transferir números",
-		"resetPassword": "reajustar contraseña",
+		"resetPassword": "Reajustar contraseña",
 		"resendInstructions": "Reenvíar instrucciones",
 		"title": "Usuarios totales",
 		"titleGrid": {
