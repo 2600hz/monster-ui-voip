@@ -44,7 +44,7 @@
 		"noGroupsConfigured": "Por favor, añada un grupo de usuarios para comenzar",
 		"noNumber": "Ningun",
 		"noAssignedNumbers": "No hay ningun numero asignado a este grupo.",
-		"noUnassignedNumbers": "No hay numeros disponibles para  asignar a este grupo.",
+		"noUnassignedNumbers": "No hay numeros disponibles para asignar a este grupo.",
 		"noAssignedNumbers": "Corrientemente, no hay ningun numero asignado a este grupo.",
 		"noMoreSpareNumbers": "No quedan ningunos numeros repuestos, puedes comprar numeros nuevos haciendo clic en el enlace de abajo",
 		"noMatchingNumbers": "No hubo numeros que coinciden con su búsqueda ",
@@ -72,7 +72,7 @@
 			"headline": "Programar la grabacion de llamadas en grupo",
 			"formatLabel": "Formato:",
 			"urlLabel": "URL:",
-			"urlPlaceholder": "http://your.server.com/place/to/store/recordings",
+			"urlPlaceholder": "http://tu.servidor.com/lugar/endonde/guardar/grabacciones",
 			"timeLimitLabel": "Limite de tiempo (sec):"
 		},
 		"ringback": {
@@ -102,7 +102,7 @@
 		"__comment": "UI-1352: Adding an option to enable/disable call forwarding on ring group ",
 		"__version": "3.20",
 		"forward": {
-			"title": "Permitir Desvío  de llamadas",
+			"title": "Permitir Desvío de llamadas",
 			"headline": "Permitir Desvío  de llamadas",
 			"description": "Activa esta opción si quieres permitir que los usuarios de este grupo pulsen el botón de \"adelanto\" si esta opcion esta desactivada el comando del usaurio del grupo de timbre sera ignorado.",
 
@@ -445,7 +445,7 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 			"nameHelp": "Escriba el nombre del usuario en la primera entrada, y el apellido del usuario en la segunda",
 			"loginHelp": "Este es el usuario de este usuario, que se utiliza para iniciar sesión en la aplicación",
 			"vmboxHelp": "Este es el número del buzón del correo de voz de este usuario, haga clic en Cambiar el PIN para restablecer el PIN del buzón de correo de voz de este usuario",
-			"roleHelp": "La \"Admin\" tendrá derecho a acceder a la aplicación Exchange y agregar aplicaciones a esta cuenta, mientras que los \"Usuario\"sólo podrá acceder a las aplicaciones que se han habilitado para él",
+			"roleHelp": "La \"Admin\" tendrá derecho a acceder a la aplicación Exchange y agregar aplicaciones a esta cuenta, mientras que los \"Usuario\" sólo podrá acceder a las aplicaciones que se han habilitado para él",
 			"languageHelp": "Esta función permite cambiar el idioma del texto que se muestra en la INTERFAZ DE USUARIO (UI)",
 			"timezoneHelp": "Esto establece la zona horaria usada para dispositivos de usuario y buzón de voz",
 			"ringingHelp": "Esto fijará el tiempo de espera de llamada para este usuario y sus dispositivos. Por ejemplo, si se establece en 20, este usuario sonara durante 20 segundos antes de que el sistema lo traslade a su casilla de correo de voz ",
@@ -487,9 +487,9 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 		},
 		"toastrMessages": {
 			"devicesUpdated": "Ha actualizado correctamente los dispositivos asignados a {{ name }}.",
-			"instructionsSent": "Se ha enviado un correo electrónico a { { email }} con todas las instrucciones para el usuario sobre cómo comenzar a trabajar con la interfaz de usuario",
-			"numbersUpdated": "Ha actualizado correctamente el número de teléfono de {{ name}}.",
-			"passwordReseted": "Ha restablecido la contraseña, un correo electrónico ha sido enviado a {{email}} con instrucciones sobre cómo crear una nueva contraseña.",
+			"instructionsSent": "Se ha enviado un correo electrónico a {{ email }} con todas las instrucciones para el usuario sobre cómo comenzar a trabajar con la interfaz de usuario",
+			"numbersUpdated": "Ha actualizado correctamente el número de teléfono de {{ name }}.",
+			"passwordReseted": "Ha restablecido la contraseña, un correo electrónico ha sido enviado a {{ email }} con instrucciones sobre cómo crear una nueva contraseña.",
 			"userDelete": "Se eliminó correctamente {{ name }} desde el PBX inteligente!",
 			"userUpdated": "Ha actualizado correctamente {{ name }} configuración.",
 			"pinUpdated": "Ha actualizado correctamente el PIN de {{ name }}.",
@@ -935,10 +935,10 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 		"__version": "3.21",
 		"walkthrough": {
 			"steps": {
-				"1": "Examine su sistema de la oficina entero incluso sus usuarios, dispositivos, números, número principal y número de la conferencia ",
+				"1": "Examine su sistema de la oficina entero incluso sus usuarios, dispositivos, números, número principal y número de la conferencia.",
 				"2": "Cree y maneje la mayor parte de sus servicios en la etiqueta Usuarios. Cree a nuevos usuarios, compre el puerto, y asigne números, añada unos dispositivos de autoprovisión y maneje funciones de usuario.",
 				"3": "Una vez que ha creado suficientes usuarios, crear grupos de usuarios. Esto es muy útil si tienes usuarios que trabajan en el mismo departamento, como un equipo de ventas.",
-				"4": "Crear un número principal para su negocio. Maneje gestión de llamadas con el Recepcionista Virtual, y enrutar las llamadas en función de horas de oficina y Días Festivos"
+				"4": "Crear un número principal para su negocio. Maneje gestión de llamadas con el Recepcionista Virtual, y enrutar las llamadas en función de horas de oficina y Días Festivos."
 			}
 		}
 	},
@@ -952,7 +952,7 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 			"call_forward[action=activate]": "Permitir Desvío de llamada",
 			"call_forward[action=deactivate]": "Desactivar el Desvío de llamada",
 			"call_forward[action=toggle]": "Activar Desvío de llamada",
-			"call_forward[action=update]": "Activar/desactivar Desvío de llamada ",
+			"call_forward[action=update]": "Activar/desactivar Desvío de llamada",
 			"call_forward[action=on_busy_enable]": "Activar Desvío de llamada cuando ocupado",
 			"call_forward[action=on_busy_disable]": "Disactivar Desvío de llamadas cuando ocupado",
 			"call_forward[action=no_answer_enable]": "Actualizar Desvío de llamadas cuando No Contestan",
@@ -961,7 +961,7 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 			"hotdesk[action=logout]": "Desactivar Hot Desking",
 			"hotdesk[action=toggle]": "Activatar/Desactivar Hot Desking",
 			"voicemail[action=check]": "Revisar buzón de Voz",
-			"voicemail[action=\"direct\"]": "Directo al buzón de voz ",
+			"voicemail[action=\"direct\"]": "Directo al buzón de voz",
 			"intercom": "Interfono",
 			"privacy[mode=full]": "Privacidad",
 			"park_and_retrieve": "Parque y recuperar",
@@ -1013,7 +1013,7 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 		"popupSettings": {
 			"advancedTitle": "Advanzado",
 			"basicTitle": "Configuraciónes Basicas",
-			"basicSectionTitle": "Configuración  Basicas",
+			"basicSectionTitle": "Configuración Basicas",
 			"basic": {
 				"name": {
 					"label": "Nombre"
@@ -1032,7 +1032,7 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 					"label": "Zona Horaria"
 				},
 				"unavailableMessage": {
-					"label": "Unavailable Message"
+					"label": "Mensaje no disponible"
 				},
 				"timezone": {
 					"label": "Zona Horaria"
@@ -1046,7 +1046,7 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 					"help": "Verificar si el correo de voz requiere un PIN."
 				},
 				"autoLogin": {
-					"label": "Ingreso automático (auto-login)activado?",
+					"label": "Ingreso automático (auto-login) activado?",
 					"help": "¿Compruebe que activar auto-login para este buzón de voz? (Si el usuario llama a su propio buzón de voz, que va directo a sus mensajes)"
 				},
 				"skipGreetings": {
