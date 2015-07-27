@@ -103,8 +103,9 @@
 		"__version": "3.20",
 		"forward": {
 			"title": "Permitir Desvío de llamadas",
-			"headline": "Permitir Desvío  de llamadas",
-			"description": "Activa esta opción si quieres permitir que los usuarios de este grupo pulsen el botón de \"adelanto\" si esta opcion esta desactivada el comando del usaurio del grupo de timbre sera ignorado.",
+			"headline": "Permitir Desvío de llamadas",
+			"description": "Activa esta opción si quieres permitir que los usuarios de este grupo pulsen el botón de \"adelanto\" si esta opcion esta desactivada el comando del usaurio del grupo de timbre sera ignorado."
+		},
 
 		"__comment": "UI-1604: Adding Walkthrough for new users",
 		"__version": "3.21",
@@ -243,7 +244,7 @@
 					"types": {
 						"presence": "Indicar cuando el usuario tiene una llamada entrante ò esta en el teléfono. El indicador puede utilizarse para recoger llamadas entrantes o hacer marcación rápida a ese usuario.",
 						"parking": "Indicar cuando una llamada a sido puesta en ranura de estacionamiento disponible a la compañía entera. El indicador puede ser usada para transferir una llamada al la ranura de estacionamiento ò contestar una llamada estacionada.",
-						"personal_parking": "Indicar cuando una llamada este puesta en una ranura de estacionamiento dedicada al usuario seleccionado. El indicador puede ser usado para transferir una llamada a la ranura de estacionamiento  or recivir una llamada ya estacionada.",
+						"personal_parking": "Indicar cuando una llamada este puesta en una ranura de estacionamiento dedicada al usuario seleccionado. El indicador puede ser usado para transferir una llamada a la ranura de estacionamiento or recivir una llamada ya estacionada.",
 						"speed_dial": "No es indicada para cualquier evento de llamada pero se puede usar para llamar el número configurado rapidamente."
 					}
 				},
@@ -259,9 +260,8 @@
 		"buy": "Comprar diapositivo",
 		"classifiers": {
 			"unknown": {
-			    "name": "Además de los de arriba",
-			    "help": "Por favor seleccione esta opción cuando quieres que esta cuenta haga llamadas a QUALQUIER NUMERO no mencionado
-en la lista. (Cuando el formato del número es desconocido al sistema)"
+				"name": "Además de los de arriba",
+				"help": "Por favor seleccione esta opción cuando quieres que esta cuenta haga llamadas a QUALQUIER NUMERO no mencionado en la lista. (Cuando el formato del número es desconocido al sistema)"
 			}
 		},
 		"noMatchingDevices": "No se ha encontrado ningún dispositivo que corresponden a su búsqueda",
@@ -434,7 +434,7 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 			"timeout": "Tiempo de espera de llamada",
 			"timeoutSec": "Segundos",
 			"timeoutEdit": "Editar en función Find-Me-Follow-Me",
-			"timeoutEditHint": "El tiempo de supervisión de llamada se anula por ls función de Find-Me - Follow-Me. Seleccione  el siguiente enlace para editarlo.",
+			"timeoutEditHint": "El tiempo de supervisión de llamada se anula por ls función de Find-Me - Follow-Me. Seleccione el siguiente enlace para editarlo.",
 			"disabledTimeoutHint": "Necesita al menos un número o extensión para configurar el tiempo de espera de llamada.",
 			"__comment": "UI-1109: Agregar la configuración de identificación de la presencia en el documento de usuario",
 			"__version": "3.19",
@@ -593,7 +593,7 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 		},
 		"music_on_hold": {
 			"title": "Música de espera ",
-			"headline": "Configuacion de Música en espera  del Usuario",
+			"headline": "Configuacion de Música en espera del Usuario",
 			"dropdownLabel": "Música de espera:",
 			"silence": "Silencio",
 			"emptyUploadAlert": "Por favor, seleccione un archivo para cargar ",
@@ -691,7 +691,7 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 			"advancedLink": "Advancado",
 			"__comment": "UI-1250: Adding help boxes",
 			"__version": "3.20_s2",
-  		"helpHolidays": "No te olvides de configurar el enrutamiento de la llamada para cuando el consultorio está cerrado para los dias feriados! Para configurarlo, vaya a la sección \"Manejo de llamadas entrantes\" en esta página, y seleccione opcion \"Dias Feriados\"."
+			"helpHolidays": "No te olvides de configurar el enrutamiento de la llamada para cuando el consultorio está cerrado para los dias feriados! Para configurarlo, vaya a la sección \"Manejo de llamadas entrantes\" en esta página, y seleccione opcion \"Dias Feriados\"."
 
 		},
 		"calls": {
@@ -896,7 +896,7 @@ en la lista. (Cuando el formato del número es desconocido al sistema)"
 			"nameLabel": "Nombre identificador de la compañía ",
 			"nameHelp": "Este nombre aparecerá como su ID de llamada cuando realiza llamadas salientes.",
 			"emergencyLabel": "Dirección de emergencia (E911) de la compañía ",
-  	  "emergencyZipcode": "Código Postal",
+			"emergencyZipcode": "Código Postal",
 			"emergencyAddress1": "Dirección línea 1",
 			"emergencyAddress2": "Dirección línea 2",
 			"emergencyCity": "Cuidad",
