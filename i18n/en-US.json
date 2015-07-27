@@ -734,7 +734,10 @@
 			"fileUploadButton": "Choose File",
 			"__comment": "UI-1185: Adding a help message to the greetings",
 			"__version": "3.20_s4",
-			"greetingsHelp": "You need to click the \"Update\" button in order to save your changes for the greeting message."
+			"greetingsHelp": "You need to click the \"Update\" button in order to save your changes for the greeting message.",
+			"__comment": "UI-1657: Add default action translation",
+			"__version": "v3.22",
+			"defaultAction": "Default action"
 		},
 		"open": "Open",
 		"closed": "Closed",

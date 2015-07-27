@@ -690,7 +690,8 @@
 			"pressKey": "Appuyer",
 			"for": "pour",
 			"fileUploadButton": "Choisir fichier",
-			"greetingsHelp": "Vous devez cliquer sur le bouton \"Mettre à jour\" pour sauvegarder les changements apportés au message d'accueil."
+			"greetingsHelp": "Vous devez cliquer sur le bouton \"Mettre à jour\" pour sauvegarder les changements apportés au message d'accueil.",
+			"defaultAction": "Action par défaut"
 		},
 		"open": "Ouvert",
 		"closed": "Fermé",
