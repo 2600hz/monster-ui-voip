@@ -520,7 +520,7 @@
 }
 
 #strategy_menu_popup {
-	width: 700px;
+	width: 760px;
 	padding: 20px;
 }
 #strategy_menu_popup > div:not(:last-of-type) {
@@ -528,10 +528,13 @@
 }
 #strategy_menu_popup .menu-block > div {
 	float: left;
-	width: 340px;
+}
+#strategy_menu_popup .menu-block .left {
+	width: 400px;
 }
 #strategy_menu_popup .menu-block .right {
 	margin-left: 20px;
+	width: 340px;
 }
 #strategy_menu_popup .menu-block .title {
 	color: #22a5ff;
@@ -548,18 +551,6 @@
 	margin: 0 12px 0 0;
 	display: inline-block;
 	vertical-align: middle;
-}
-#strategy_menu_popup .menu-block .menu-line .number-input {
-	width: 18px;
-	text-align: center;
-}
-#strategy_menu_popup .menu-block .menu-line .number-text {
-	width: 32px;
-	text-align: center;
-	color: #22a5ff;
-	font-size: 18px;
-	font-weight: bold;
-	cursor: pointer;
 }
 #strategy_menu_popup .menu-block .menu-line .target-input .add-on {
 	width: 20px;
@@ -578,12 +569,6 @@
 #strategy_menu_popup .menu-block .menu-line i.remove-btn:active {
 	color: #ff1212 !important;
 	text-shadow: 1px 1px 1px #999;
-}
-#strategy_menu_popup .menu-block .menu-line.editing .number-text {
-	display: none;
-}
-#strategy_menu_popup .menu-block .menu-line:not(.editing) .number-input {
-	display: none;
 }
 
 #strategy_menu_popup .menu-block .add-menu-line {
