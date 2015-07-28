@@ -1605,24 +1605,24 @@ define(function(require){
 				}
 			});
 
-			container.on('click', '.number-text', function(e) {
-				var $this = $(this);
-				$this.parents('.menu-line').addClass('editing');
-				$this.siblings('.number-input').focus();
-			});
+			// container.on('click', '.number-text', function(e) {
+			// 	var $this = $(this);
+			// 	$this.parents('.menu-line').addClass('editing');
+			// 	$this.siblings('.number-input').focus();
+			// });
 
-			container.on('blur', '.number-input', function(e) {
-				var $this = $(this);
-				$this.parents('.menu-line').removeClass('editing');
-				$this.siblings('.number-text').text($this.val() || "?");
-			});
+			// container.on('blur', '.number-input', function(e) {
+			// 	var $this = $(this);
+			// 	$this.parents('.menu-line').removeClass('editing');
+			// 	$this.siblings('.number-text').text($this.val() || "?");
+			// });
 
-			container.on('keyup', '.number-input', function(e) {
-				var $this = $(this);
-				if(!/^[0-9#*]*$/.test($this.val())) {
-					$this.val($this.val().replace(/[^0-9#*]/g, ""));
-				}
-			});
+			// container.on('keyup', '.number-input', function(e) {
+			// 	var $this = $(this);
+			// 	if(!/^[0-9#*]*$/.test($this.val())) {
+			// 		$this.val($this.val().replace(/[^0-9#*]/g, ""));
+			// 	}
+			// });
 
 			container.on('change', '.target-select', function(e) {
 				var $this = $(this),

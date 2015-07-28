@@ -1,0 +1,33 @@
+<div class="feature-popup-container" data-feature="prepend">
+	<div class="feature-popup-title">
+		<div class="feature-fa-wrapper">
+			<i class="{{group.extra.mapFeatures.prepend.icon}}"></i>
+		</div>
+		{{ i18n.groups.prepend.headline }}
+		<div class="switch">
+		{{#monsterSwitch}}
+			<input class="switch-state" type="checkbox" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if group.extra.mapFeatures.prepend.active}} checked="checked"{{/if}}></input>
+		{{/monsterSwitch}}
+		</div>
+	</div>
+
+	<div class="content{{#unless group.extra.mapFeatures.prepend.active}} disabled{{/unless}}">
+		<form id="prepend_form">
+			<div>
+				<span>{{ i18n.groups.prepend.cidNameLabel }}</span>
+				<input required name="caller_id_name_prefix" type="text" value="{{caller_id_name_prefix}}">
+			</div>
+			<div>
+				<span>{{ i18n.groups.prepend.cidNumberLabel }}</span>
+				<input required name="caller_id_number_prefix" type="text" value="{{caller_id_number_prefix}}">
+			</div>
+		</form>
+	</div>
+
+	<div class="actions clearfix">
+		<div class="pull-right">
+			<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
+			<button type="button" class="monster-button monster-button-success save">{{ i18n.saveChanges }}</button>
+		</div>
+	</div>
+</div>
