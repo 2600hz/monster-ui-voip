@@ -146,6 +146,11 @@ define(function(require){
 							icon: 'fa fa-mail-forward',
 							iconColor: 'monster-orange',
 							title: self.i18n.active().groups.forward.title
+						},
+						prepend: {
+							icon: 'fa fa-file-text-o',
+							iconColor: 'monster-pink',
+							title: self.i18n.active().groups.prepend.title
 						}
 					},
 					hasFeatures: false
@@ -226,9 +231,9 @@ define(function(require){
 					emptySearch = template.find('.groups-rows .empty-search-row');
 
 				_.each(rows, function(row) {
-					var row = $(row);
+					var $row = $(row);
 
-					row.data('search').toLowerCase().indexOf(searchString) < 0 ? row.hide() : row.show();
+					$row.data('search').toLowerCase().indexOf(searchString) < 0 ? $row.hide() : $row.show();
 				});
 
 				if(rows.size() > 0) {
@@ -471,17 +476,22 @@ define(function(require){
 			template.find('.feature[data-feature="forward"]').on('click', function() {
 				self.groupsRenderForward(data);
 			});
+
+			template.find('.feature[data-feature="prepend"]').on('click', function() {
+				self.groupsRenderPrepend(data);
+			});
 		},
 
 		groupsRenderCallRecording: function(data) {
 			var self = this,
+				recordCallNode = monster.util.findCallflowNode(data.callflow, 'record_call'),
 				templateData = $.extend(true, {
 												group: data.group
 											},
-											(data.group.extra.mapFeatures.call_recording.active ? {
-												url: data.callflow.flow.data.url,
-												format: data.callflow.flow.data.format,
-												timeLimit: data.callflow.flow.data.time_limit
+											(data.group.extra.mapFeatures.call_recording.active && recordCallNode ? {
+												url: recordCallNode.data.url,
+												format: recordCallNode.data.format,
+												timeLimit: recordCallNode.data.time_limit
 											} : {})
 										),
 				featureTemplate = $(monster.template(self, 'groups-feature-call_recording', templateData)),
@@ -519,21 +529,23 @@ define(function(require){
 
 					if(data.group.smartpbx.call_recording.enabled || enabled) {
 						data.group.smartpbx.call_recording.enabled = enabled;
-						var newCallflow = $.extend(true, {}, data.callflow);
+						var newCallflow = $.extend(true, {}, data.callflow),
+							currentNode = monster.util.findCallflowNode(newCallflow, 'record_call') || monster.util.findCallflowNode(newCallflow, 'callflow');
 						if(enabled) {
-							if(newCallflow.flow.module === 'record_call') {
-								newCallflow.flow.data = $.extend(true, { action: "start" }, formData);
+
+							if(currentNode.module === 'record_call') {
+								currentNode.data = $.extend(true, { action: "start" }, formData);
 							} else {
-								newCallflow.flow = {
-									children: {
-										"_": $.extend(true, {}, data.callflow.flow)
-									},
-									module: "record_call",
-									data: $.extend(true, { action: "start" }, formData)
-								}
+								currentNode.children = {
+									"_": $.extend(true, {}, currentNode)
+								};
+								currentNode.module = "record_call";
+								currentNode.data = $.extend(true, { action: "start" }, formData);
 							}
-						} else {
-							newCallflow.flow = $.extend(true, {}, data.callflow.flow.children["_"]);
+						} else if(currentNode.module === 'record_call') {
+							currentNode.module = currentNode.children["_"].module;
+							currentNode.data = currentNode.children["_"].data;
+							currentNode.children = currentNode.children["_"].children;
 						}
 						self.groupsUpdateCallflow(newCallflow, function(updatedCallflow) {
 							self.groupsUpdate(data.group, function(updatedGroup) {
@@ -755,14 +767,11 @@ define(function(require){
 				if(data.group.smartpbx.next_action.enabled || enabled) {
 					data.group.smartpbx.next_action.enabled = enabled;
 					var newCallflow = $.extend(true, {}, data.callflow),
-						newFlow = newCallflow.flow;
+						callflowNode = monster.util.findCallflowNode(newCallflow, 'callflow');
 
-					if(newFlow.module === 'record_call') {
-						newFlow = newFlow.children['_'];
-					}
-					newFlow.children = {};
+					callflowNode.children = {};
 					if(enabled) {
-						newFlow.children['_'] = {
+						callflowNode.children['_'] = {
 							children: {},
 							module: selectedOption.data('module'),
 							data: { id: selectedOption.val() }
@@ -827,6 +836,76 @@ define(function(require){
 
 			popup = monster.ui.dialog(featureTemplate, {
 				title: data.group.extra.mapFeatures.forward.title,
+				position: ['center', 20]
+			});
+		},
+
+		groupsRenderPrepend: function(data) {
+			var self = this,
+				prependNode = monster.util.findCallflowNode(data.callflow, 'prepend_cid'),
+				templateData = $.extend(true, {
+												group: data.group
+											},
+											(data.group.extra.mapFeatures.call_recording.active && prependNode ? {
+												caller_id_name_prefix: prependNode.data.caller_id_name_prefix,
+												caller_id_number_prefix: prependNode.data.caller_id_number_prefix
+											} : {})
+										),
+				featureTemplate = $(monster.template(self, 'groups-feature-prepend', templateData)),
+				switchFeature = featureTemplate.find('.switch-state'),
+				popup;
+
+			featureTemplate.find('.cancel-link').on('click', function() {
+				popup.dialog('close').remove();
+			});
+
+			switchFeature.on('change', function() {
+				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+			});
+
+			featureTemplate.find('.save').on('click', function() {
+				var enabled = switchFeature.prop('checked'),
+					prependData = $.extend(true, { action: 'prepend' }, monster.ui.getFormData('prepend_form'));
+
+				if(!('smartpbx' in data.group)) { data.group.smartpbx = {}; }
+				if(!('prepend' in data.group.smartpbx)) {
+					data.group.smartpbx.prepend = {
+						enabled: false
+					};
+				}
+
+				if(data.group.smartpbx.prepend.enabled || enabled) {
+					data.group.smartpbx.prepend.enabled = enabled;
+					var newCallflow = $.extend(true, {}, data.callflow);
+					if(enabled) {
+						if(newCallflow.flow.module !== 'prepend_cid') {
+							newCallflow.flow = {
+								children: {
+									"_": $.extend(true, {}, data.callflow.flow)
+								},
+								module: 'prepend_cid',
+								data: prependData
+							}
+						}
+					} else {
+						if(prependNode) {
+							newCallflow.flow = $.extend(true, {}, prependNode.children["_"]);
+						}
+					}
+					self.groupsUpdateCallflow(newCallflow, function(updatedCallflow) {
+						self.groupsUpdate(data.group, function(updatedGroup) {
+							popup.dialog('close').remove();
+							self.groupsRender({ groupId: data.group.id });
+						});
+					});
+				} else {
+					popup.dialog('close').remove();
+					self.groupsRender({ groupId: data.group.id });
+				}
+			});
+
+			popup = monster.ui.dialog(featureTemplate, {
+				title: data.group.extra.mapFeatures.prepend.title,
 				position: ['center', 20]
 			});
 		},

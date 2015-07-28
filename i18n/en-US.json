@@ -116,6 +116,15 @@
 				"3": "Purchase, Port and Assign numbers. Once complete, it will automatically be assigned to the specific User Group.",
 				"4": "Turn on/off and seamlessly manage any of the User Features specific to the User Group."
 			}
+		},
+
+		"__comment": "UI-1206: Adding a feature to add a Caller ID prepend on groups",
+		"__version": "3.22",
+		"prepend": {
+			"title": "Caller ID Prepend",
+			"headline": "Caller ID Prepend",
+			"cidNameLabel": "Caller ID Name prefix",
+			"cidNumberLabel": "Caller ID Number prefix"
 		}
 	},
 

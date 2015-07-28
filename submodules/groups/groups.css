@@ -424,9 +424,8 @@
 	display: inline-block;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
-
 	box-sizing: border-box;
-	width: 25%;
+	width: 33.33%;
 	height: 150px;
 	border: 1px solid #FFF;
 	text-align: center;
@@ -547,7 +546,26 @@
 }
 
 
-/* Next Action Feature */
+/* Allow Call Forward Feature */
 .feature-popup-container[data-feature="forward"] .help-box {
 	margin: 5px 20px 20px
+}
+
+/* CID Prepend Feature */
+.feature-popup-container[data-feature="prepend"] form {
+	margin-bottom: 0;
+}
+.feature-popup-container[data-feature="prepend"] form > div {
+	position: relative;
+	margin-bottom: 10px;
+}
+.feature-popup-container[data-feature="prepend"] form span {
+	display: inline-block;
+	width: 160px;
+	vertical-align: middle;
+	text-align: right;
+}
+.feature-popup-container[data-feature="prepend"] form input {
+	margin-bottom: 0;
+	width: 100px;
 }
