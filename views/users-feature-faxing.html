@@ -25,10 +25,10 @@
 				<legend>{{i18n.users.faxing.emailToFax.title}}</legend>
 				<p>
 					{{i18n.users.faxing.emailToFax.text1}}
-					<strong><em><span class="number-mirror">{{i18n.users.faxing.emailToFax.default}}</span></em></strong>
+					<strong><em><span class="number-mirror">{{#if faxbox}}{{faxbox.caller_id}}{{else}}{{i18n.users.faxing.emailToFax.default}}{{/if}}</span></em></strong>
 					<strong class="monster-primary-color">@{{account.realm}}</strong>
 					{{i18n.users.faxing.emailToFax.text2}}
-					<strong><em><span class="number-mirror">{{i18n.users.faxing.emailToFax.default}}</span></em></strong>.
+					<strong><em><span class="number-mirror">{{#if faxbox}}{{faxbox.caller_id}}{{else}}{{i18n.users.faxing.emailToFax.default}}{{/if}}</span></em></strong>.
 					<br>
 					{{i18n.users.faxing.emailToFax.text3}}
 					<strong class="monster-primary-color">{{user.email}}</strong>.
