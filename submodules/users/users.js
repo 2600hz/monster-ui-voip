@@ -1593,15 +1593,16 @@ define(function(require){
 			monster.pub('common.numberSelector.render', {
 				container: featureTemplate.find('.number-select'),
 				inputName: 'caller_id',
-				number: data.hasOwnProperty('faxbox') ? data.faxbox.caller_id : undefined
-			});
-
-			featureTemplate.find('#destination_number').on('keyup', function() {
-				if ($(this).val() === '') {
-					featureTemplate.find('.number-mirror').text(self.i18n.active().users.faxing.emailToFax.default);
-				}
-				else {
-					featureTemplate.find('.number-mirror').text($(this).val());
+				number: data.hasOwnProperty('faxbox') ? data.faxbox.caller_id : undefined,
+				removeCallback: function () {
+					featureTemplate
+						.find('.number-mirror')
+							.text(self.i18n.active().users.faxing.emailToFax.default);
+				},
+				globalAddNumberCallback: function (number) {
+					featureTemplate
+						.find('.number-mirror')
+							.text(number);
 				}
 			});
 
