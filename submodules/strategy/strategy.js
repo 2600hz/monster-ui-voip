@@ -2,7 +2,6 @@ define(function(require){
 	var $ = require('jquery'),
 		_ = require('underscore'),
 		monster = require('monster'),
-		timepicker = require('timepicker'),
 		timezone = require('monster-timezone'),
 		toastr = require('toastr');
 
@@ -512,9 +511,7 @@ define(function(require){
 
 						container.find('.element-content').empty()
 														  .append(template);
-						template.find('.timepicker').timepicker({
-							timeFormat: is12hMode ? 'g:ia' : 'G:i'
-						});
+						monster.ui.timepicker(template.find('.timepicker'));
 						callback && callback();
 						break;
 					case "holidays":
