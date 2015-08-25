@@ -23,6 +23,7 @@
 				<ul class="dropdown-menu pull-right">
 					<li><a class="tabs-selector change-section" data-section="options" href="javascript:void(0)"><i class="fa fa-ambulance"></i>{{ i18n.vmboxes.popupSettings.options.menuTitle }}</a></li>
 					<li><a class="tabs-selector change-section" data-section="recipients" href="javascript:void(0)"><i class="fa fa-envelope"></i>{{ i18n.vmboxes.popupSettings.recipients.menuTitle }}</a></li>
+					<li><a class="tabs-selector change-section" data-section="greeting" href="javascript:void(0)"><i class="fa icon-telicon-voicemail"></i>{{ i18n.vmboxes.popupSettings.greeting.menuTitle }}</a></li>
 				</ul>
 			</li>
 		</ul>
@@ -164,6 +165,32 @@
 					</div>
 
 					<div class="saved-entities">
+					</div>
+				</div>
+			</div>
+
+			<div class="tabs-section" data-section="greeting">
+				<div class="title">
+					{{ i18n.vmboxes.popupSettings.greeting.sectionTitle }}
+				</div>
+
+				<div class="greeting-container">
+					<div>
+						<span>{{ i18n.vmboxes.popupSettings.greeting.dropdownLabel }}</span>
+						<select name="media.unavailable" class="media-dropdown">
+							<option value="none">{{ i18n.vmboxes.popupSettings.greeting.noGreeting }}</option>
+							{{#each extra.mediaList}}
+								<option value="{{this.id}}" {{#compare ../media.unavailable '===' this.id}}selected{{/compare}}>{{this.name}}</option>
+							{{/each}}
+						</select>
+						<button type="button" class="monster-button-primary non-fixed upload-toggle" data-toggle="button">
+							{{ i18n.upload }}
+						</button>
+					</div>
+					<div class="upload-div">
+						<input type="file" class="upload-input" accept="audio/*">
+						<button type="button" class="monster-button-success non-fixed upload-action upload-submit"><i class="fa fa-upload"></i></button>
+						<button type="button" class="monster-button-danger non-fixed upload-action upload-cancel"><i class="fa fa-times"></i></button>
 					</div>
 				</div>
 			</div>

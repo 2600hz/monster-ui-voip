@@ -243,3 +243,43 @@
 .edit-vmbox .list-entities.emails-list {
 	padding: 0 20px;
 }
+
+.edit-vmbox .tabs-section[data-section="greeting"] .greeting-container {
+	padding: 0 40px;
+}
+.edit-vmbox .tabs-section[data-section="greeting"] .greeting-container .media-dropdown {
+	margin-bottom: 0px;
+	margin-left: 10px
+}
+.edit-vmbox .tabs-section[data-section="greeting"] .greeting-container .upload-toggle {
+	margin-left: 10px;
+	min-width: 117px;
+}
+.edit-vmbox .tabs-section[data-section="greeting"] .greeting-container .upload-div {
+	display: none;
+	margin-top: 20px;
+}
+.edit-vmbox .tabs-section[data-section="greeting"] .greeting-container .upload-div .upload-input {
+	margin: 0;
+	width: 330px;
+}
+.edit-vmbox .tabs-section[data-section="greeting"] .greeting-container .upload-div button.upload-action {
+	margin-left: 10px;
+	padding-left: 19px;
+	padding-right: 19px;
+}
+
+.edit-vmbox .tabs-section[data-section="greeting"] .greeting-container .upload-div button > i {
+	margin-right: 0;
+	padding-right: 0;
+}
+
+.edit-vmbox .tabs-section[data-section="greeting"] .greeting-container .upload-div .file-upload {
+	margin: 0;
+	display: inline-block;
+}
+.edit-vmbox .tabs-section[data-section="greeting"] .greeting-container .upload-div .file-upload > input {
+	margin: 0;
+	padding: 6px;
+	width: 140px;
+}
