@@ -251,7 +251,7 @@ define(function(require){
 
 		strategyHasWalkthrough: function(name, callback) {
 			var self = this,
-				flag = self.helpSettings.user.get(name);
+				flag = self.uiFlags.user.get(name);
 
 			if(flag !== false) {
 				callback && callback();
@@ -260,7 +260,7 @@ define(function(require){
 
 		strategyUpdateWalkthroughFlagUser: function(flagName, callback) {
 			var self = this,
-				userToSave = self.helpSettings.user.set(flagName, false);
+				userToSave = self.uiFlags.user.set(flagName, false);
 
 			self.strategyUpdateOriginalUser(userToSave, function(user) {
 				callback && callback(user);

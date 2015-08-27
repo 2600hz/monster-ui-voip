@@ -1647,7 +1647,7 @@ define(function(require){
 
 		groupsHasWalkthrough: function(callback) {
 			var self = this,
-				flag = self.helpSettings.user.get('showGroupsWalkthrough');
+				flag = self.uiFlags.user.get('showGroupsWalkthrough');
 
 			if(flag !== false) {
 				callback && callback();
@@ -1656,7 +1656,7 @@ define(function(require){
 
 		groupsUpdateWalkthroughFlagUser: function(callback) {
 			var self = this,
-				userToSave = self.helpSettings.user.set('showGroupsWalkthrough', false);
+				userToSave = self.uiFlags.user.set('showGroupsWalkthrough', false);
 
 			self.groupsUpdateOriginalUser(userToSave, function(user) {
 				callback && callback(user);

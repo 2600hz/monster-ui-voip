@@ -881,7 +881,7 @@ define(function(require){
 
 		myOfficeHasWalkthrough: function(callback) {
 			var self = this,
-				flag = self.helpSettings.user.get('showDashboardWalkthrough');
+				flag = self.uiFlags.user.get('showDashboardWalkthrough');
 
 			if(flag !== false) {
 				callback && callback();
@@ -922,7 +922,7 @@ define(function(require){
 
 		myOfficeUpdateWalkthroughFlagUser: function(callback) {
 			var self = this,
-				userToSave = self.helpSettings.user.set('showDashboardWalkthrough', false);
+				userToSave = self.uiFlags.user.set('showDashboardWalkthrough', false);
 
 			self.myOfficeUpdateOriginalUser(userToSave, function(user) {
 				callback && callback(user);

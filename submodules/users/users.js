@@ -97,7 +97,7 @@ define(function(require){
 
 		usersHasWalkthrough: function(callback) {
 			var self = this,
-				flag = self.helpSettings.user.get('showUsersWalkthrough');
+				flag = self.uiFlags.user.get('showUsersWalkthrough');
 
 			if(flag !== false) {
 				callback && callback();
@@ -106,7 +106,7 @@ define(function(require){
 
 		usersUpdateWalkthroughFlagUser: function(callback) {
 			var self = this,
-				userToSave = self.helpSettings.user.set('showUsersWalkthrough', false);
+				userToSave = self.uiFlags.user.set('showUsersWalkthrough', false);
 
 			self.usersUpdateOriginalUser(userToSave, function(user) {
 				callback && callback(user);
