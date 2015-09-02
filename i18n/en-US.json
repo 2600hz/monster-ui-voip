@@ -323,12 +323,12 @@
 			"hideContactList": "Hide from Contact List"
 		},
 		"mobile": {
-			"addTitle": "Adding a Mobile",
+			"addTitle": "Adding a Business Mobile",
 			"deviceName": "Device Name",
-			"editTitle": "Editing Mobile: {{name}}",
+			"editTitle": "Editing Business Mobile: {{name}}",
 			"mdn": "MDN",
 			"mdnPlaceholder": "10 digits phone number",
-			"new": "New Mobile"
+			"new": "New Business Mobile"
 		},
 		"smartphone": {
 			"addTitle": "Adding a Smartphone",
@@ -381,7 +381,7 @@
 			"cellphone": "Cell Phone",
 			"sip_device": "SIP Phone",
 			"smartphone": "Smartphone",
-			"mobile": "Mobile",
+			"mobile": "Business Mobile",
 			"softphone": "Soft Phone",
 			"landline": "Landline",
 			"fax": "Fax",
