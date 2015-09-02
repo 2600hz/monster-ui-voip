@@ -582,6 +582,7 @@ define(function(require){
 									callOption: {
 										type: "default"
 									},
+									hideAdvancedCallflows: _.isEmpty(strategyData.callEntities.advancedCallflows),
 									callflow: callflowName,
 									callEntities: self.strategyGetCallEntitiesDropdownData(strategyData.callEntities, true, true),
 									voicemails: strategyData.voicemails,
@@ -589,7 +590,10 @@ define(function(require){
 								};
 
 
-							if(strategyData.callflows[callflowName].flow.module === "voicemail") {
+							if (strategyData.callflows[callflowName].flow.hasOwnProperty("is_main_number_cf")) {
+								tabData.callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
+								tabData.callOption.type = "advanced-callflow";
+							} else if(strategyData.callflows[callflowName].flow.module === "voicemail") {
 								tabData.callOption.callEntityId = 'none';
 								tabData.callOption.voicemailId = strategyData.callflows[callflowName].flow.data.id;
 								tabData.callOption.type = "user-voicemail";
@@ -618,6 +622,7 @@ define(function(require){
 						});
 
 						template.find('.voicemail-select select').chosen({ search_contains: true, width: '160px' });
+						template.find('.advancedCallflows-select select').chosen({ search_contains: true, width: '160px' });
 
 						callback && callback();
 						break;
@@ -1317,7 +1322,8 @@ define(function(require){
 						callOption = $this.find('.call-option.active'),
 						menu = callOption.find('.menu-div'),
 						callEntity = callOption.find('.user-select'),
-						voicemail = callOption.find('.voicemail-select')
+						voicemail = callOption.find('.voicemail-select'),
+						advancedCallflow = callOption.find('.advancedCallflows-select'),
 						flow = {};
 
 					if(callEntity.length) {
@@ -1384,6 +1390,17 @@ define(function(require){
 								flow = flowElement;
 							}
 						}
+					}
+
+					if (advancedCallflow.length) {
+						flow = {
+							children: {},
+							module: 'callflow',
+							data: {
+								id: advancedCallflow.find('option:selected').val()
+							},
+							is_main_number_cf: true
+						};
 					}
 
 					flows[callflowName] = flow;
@@ -2367,7 +2384,14 @@ define(function(require){
 								_callback(null, data.data);
 							}
 						});
-					}
+					},
+					advancedCallflows: function(_callback) {
+						self.strategyGetCallflows(function (advancedCallflowsData) {
+							_callback(null, advancedCallflowsData);
+						}, {
+							'filter_ui_is_main_number_cf': true
+						});
+					},
 				},
 				function(err, results) {
 					var callEntities = {
@@ -2380,7 +2404,8 @@ define(function(require){
 							val.name = group && group.name || val.name;
 							val.module = 'callflow';
 							return val;
-						})
+						}),
+						advancedCallflows: results.advancedCallflows
 					};
 
 					_.each(callEntities.device, function(device) {
@@ -2407,6 +2432,10 @@ define(function(require){
 							group.module = 'ring_group';
 						}
 						callEntities.ring_group.push(group);
+					});
+
+					_.each(results.advancedCallflows, function(callflow) {
+						callflow.module = 'callflow';
 					});
 
 					callback(callEntities);

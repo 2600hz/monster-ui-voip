@@ -788,7 +788,10 @@
 			"voicemail": "Voicemail Boxes",
 			"__comment": "UI-1353: Add directory support for the virtual receptionist",
 			"__version": "v3.20_s4",
-			"directory": "Directory"
+			"directory": "Directory",
+			"__comment": "UI-1742: Can now select a callflow created in Advanced Callflows in Main Number",
+			"__version": "3.22",
+			"advancedCallflows": "Advanced Callflows"
 		},
 		"confirmMessages": {
 			"deleteHoliday": "This holiday will be permanently deleted. Continue?",
