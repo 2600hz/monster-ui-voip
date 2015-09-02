@@ -417,10 +417,6 @@
 	background: transparent;
 }
 
-#strategy_container .element-container.strategy-calls .callflow-tabs .callflow-tab-title {
-	margin-bottom: 10px;
-}
-
 #strategy_container .element-container.strategy-calls .callflow-tabs .call-option {
 	display: inline-block;
 	vertical-align: top;
@@ -443,8 +439,12 @@
 	width: 160px;
 }
 
-#strategy_container .element-container.strategy-calls .callflow-tabs .call-option:not(:first-of-type) {
-	margin-left: 20px;
+#strategy_container .element-container.strategy-calls .call-options-container .call-option {
+	margin: 14px 14px 0 0;
+}
+
+#strategy_container .element-container.strategy-calls .call-options-container .call-option:last-child {
+	margin-right: 0;
 }
 
 #strategy_container .element-container.strategy-calls .callflow-tabs .call-option > div:not(:first-of-type) {
