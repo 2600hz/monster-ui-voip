@@ -498,6 +498,15 @@
 	color: #44cc44;
 }
 
+/************ Strategy Faxbox *************/
+
+#strategy_container .element-container.strategy-faxingnum .title i {
+	position: relative;
+	top: 2px;
+	font-size: 28px;
+	color: #44cc44;
+}
+
 /********** Strategy Helper ***********/
 
 #strategy_container .element-container.helper {
