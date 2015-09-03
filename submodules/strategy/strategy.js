@@ -433,6 +433,7 @@ define(function(require){
 											};
 										}
 									}),
+									actionLinksEnabled: _.isEmpty(callflow.flow.data),
 									spareLinkEnabled: (_.countBy(accountNumbers, function(number) {return number.used_by ? 'assigned' : 'spare';})['spare'] > 0),
 								},
 								template = monster.template(self, 'strategy-'+templateName, templateData);
