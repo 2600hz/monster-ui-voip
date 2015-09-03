@@ -895,7 +895,8 @@
 				"3": "Une fois les utilisateurs créés, dirigez-vous vers la section \"Groupes\". Ceci est très pratique pour les utilisateurs travaillant dans une même section (Marketing, Ventes...) afin de définir un répondeur global etc...",
 				"4": "Créer votre numéro d'entreprise dans cette section. Vous pourrez gérer les appels entrants et les router differemment en fonction de vos réglages d'horaires ou de vacances..."
 			}
-		}
+		},
+		"faxingNumberLabel": "Numéro de Fax"
 	},
 
 	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SmartPBX.",

@@ -966,7 +966,10 @@
 				"3": "Once you have created enough users, create user groups. This is extremely useful if you have users that work in the same department, such as a sales team.",
 				"4": "Create a main number for your business. Manage call handling with Virtual Receptionist, and route calls depending on Office Hours and Holidays"
 			}
-		}
+		},
+		"__comment": "UI-1210: Display the Main Faxbox number on the dashboard",
+		"__version": "3.22",
+		"faxingNumberLabel": "Faxbox Number"
 	},
 
 	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SmartPBX.",
