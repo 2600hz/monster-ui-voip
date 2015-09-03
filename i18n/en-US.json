@@ -840,7 +840,10 @@
 					"1": "Set up your office hours phone strategy to your convenience. You can set up a 24 hour open office strategy or if your office is ever closed, create custom hours. You can even close your office during lunch hours.",
 					"2": "Is your office closed on holidays? Create specific dates or time frames when your office will be closed",
 					"3": "Virtual Receptionist allows you to seamlessly answer incoming calls. Add call routes to contact the appropriate department or person within the system. You can also create customized greetings using text-to-speech, uploading your own file or recording it over the phone.",
-					"4": "Create a main Conference Number for your business. Purchase, port or add an existing number and set up a Conference Number seamlessly."
+					"4": "Create a main Conference Number for your business. Purchase, port or add an existing number and set up a Conference Number seamlessly.",
+					"__comment": "UI-1210: Add a step to the walkthrough to explain the main faxbox number",
+					"__version": "3.22",
+					"5": "Create a main Faxbox Number for your business. Purchase, port or add an existing number and set up a Faxbox Number seamlessly."
 				}
 			}
 		},

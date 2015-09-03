@@ -776,7 +776,8 @@
 					"1": "Configurez les heures d'ouverture de votre bureau ici. Vous avez le choix de laisser votre ligne ouverte 24h/24h ou bien de créer des horaires personnalisés. Vous pourrez même sélectionner des horaires de repas.",
 					"2": "Votre bureau ferme t'il pendant les vacances? Gérez tout cela dans cette section.",
 					"3": "Le \"Virtual Receptionist\" disponible dans ce menu vous permet de répondre intelligemment à tous les appels entrants sur votre numéro d'entreprise.",
-					"4": "Sélectionnez un numéro de conférence pour votre entreprise ici."
+					"4": "Sélectionnez un numéro de conférence pour votre entreprise ici.",
+					"5": "Sélectionnez un numéro de fax pour votre entreprise ici."
 				}
 			}
 		},

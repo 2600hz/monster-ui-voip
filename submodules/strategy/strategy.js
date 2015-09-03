@@ -308,6 +308,11 @@ define(function(require){
 						element: mainTemplate.find('.element-container.strategy-confnum')[0],
 						intro: self.i18n.active().strategy.walkthrough.second.steps['4'],
 						position: 'top'
+					},
+					{
+						element: mainTemplate.find('.element-container.strategy-faxingnum')[0],
+						intro: self.i18n.active().strategy.walkthrough.second.steps['5'],
+						position: 'top'
 					}
 				];
 
