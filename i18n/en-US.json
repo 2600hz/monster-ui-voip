@@ -846,7 +846,13 @@
 		},
 		"__comment": "UI-17142: ",
 		"__version": "3.22",
-		"noFaxingNumMessage": "Please add a main faxbox number."
+		"noFaxingNumMessage": "Please add a main faxbox number.",
+		"__comment": "UI-1210: ",
+		"__version": "3.22",
+		"faxing": {
+			"nameExtension": "'s Main Faxbox",
+			"headerExtension": " Fax Printer"
+		}
 	},
 
 	"callLogs": {

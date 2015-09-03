@@ -996,18 +996,34 @@ define(function(require){
 			var self = this,
 				addNumbersToMainFaxing = function(numbers) {
 					if(numbers.length) {
-						var mainFaxing = strategyData.callflows["MainFaxing"];
+						var mainFaxing = strategyData.callflows["MainFaxing"],
+							updateCallflow = function () {
+								self.strategyUpdateCallflow(mainFaxing, function(updatedCallflow) {
+									var parentContainer = container.parents('.element-container');
+									strategyData.callflows["MainFaxing"] = updatedCallflow;
+									refreshFaxingNumHeader(parentContainer);
+									self.strategyRefreshTemplate(parentContainer, strategyData);
+								});
+							};
 						if(mainFaxing.numbers.length <= 1
 						&& mainFaxing.numbers[0] === "undefinedfaxing") {
 							mainFaxing.numbers = [];
 						}
 						mainFaxing.numbers = mainFaxing.numbers.concat(numbers);
-						self.strategyUpdateCallflow(mainFaxing, function(updatedCallflow) {
-							var parentContainer = container.parents('.element-container');
-							strategyData.callflows["MainFaxing"] = updatedCallflow;
-							refreshFaxingNumHeader(parentContainer);
-							self.strategyRefreshTemplate(parentContainer, strategyData);
-						});
+						if (mainFaxing.flow.data.hasOwnProperty('id')) {
+							updateCallflow();
+						}
+						else {
+							self.strategyBuildFaxbox({
+								data: {
+									number: mainFaxing.numbers[0]
+								},
+								success: function(data) {
+									mainFaxing.flow.data.id = data.id;
+									updateCallflow();
+								}
+							});
+						}
 					}
 				},
 				refreshFaxingNumHeader = function(parentContainer) {
@@ -1031,6 +1047,7 @@ define(function(require){
 				var args = {
 					accountName: monster.apps['auth'].currentAccount.name,
 					accountId: self.accountId,
+					singleSelect: true,
 					callback: function(numberList) {
 						var numbers = $.map(numberList, function(val) {
 							return val.phoneNumber;
@@ -1046,6 +1063,7 @@ define(function(require){
 				e.preventDefault();
 				monster.pub('common.buyNumbers', {
 					searchType: $(this).data('type'),
+					singleSelect: true,
 					callbacks: {
 						success: function(numbers) {
 							addNumbersToMainFaxing(Object.keys(numbers));
@@ -1061,19 +1079,28 @@ define(function(require){
 			container.on('click', '.number-element .remove-number', function(e) {
 				e.preventDefault();
 				var numberToRemove = $(this).data('number'),
-					indexToRemove = strategyData.callflows["MainFaxing"].numbers.indexOf(numberToRemove);
+					mainFaxing = strategyData.callflows["MainFaxing"],
+					indexToRemove = mainFaxing.numbers.indexOf(numberToRemove);
 
 				if(indexToRemove >= 0) {
-					strategyData.callflows["MainFaxing"].numbers.splice(indexToRemove, 1);
-					if(strategyData.callflows["MainFaxing"].numbers.length === 0) {
-						strategyData.callflows["MainFaxing"].numbers = ["undefinedfaxing"];
+					mainFaxing.numbers.splice(indexToRemove, 1);
+					if(mainFaxing.numbers.length === 0) {
+						mainFaxing.numbers = ["undefinedfaxing"];
 					}
-					self.strategyUpdateCallflow(strategyData.callflows["MainFaxing"], function(updatedCallflow) {
-						var parentContainer = container.parents('.element-container');
-						toastr.success(self.i18n.active().strategy.toastrMessages.removeNumberSuccess);
-						strategyData.callflows["MainFaxing"] = updatedCallflow;
-						refreshFaxingNumHeader(parentContainer);
-						self.strategyRefreshTemplate(parentContainer, strategyData);
+					self.strategyDeleteFaxbox({
+						data: {
+							id: mainFaxing.flow.data.id
+						},
+						success: function(data) {
+							delete mainFaxing.flow.data.id;
+							self.strategyUpdateCallflow(mainFaxing, function(updatedCallflow) {
+								var parentContainer = container.parents('.element-container');
+								toastr.success(self.i18n.active().strategy.toastrMessages.removeNumberSuccess);
+								strategyData.callflows["MainFaxing"] = updatedCallflow;
+								refreshFaxingNumHeader(parentContainer);
+								self.strategyRefreshTemplate(parentContainer, strategyData);
+							});
+						}
 					});
 				}
 			});
@@ -2049,6 +2076,38 @@ define(function(require){
 			return results;
 		},
 
+		strategyBuildFaxbox: function(args) {
+			var self = this;
+
+			self.strategyGetAccount({
+				success: function(account) {
+					args.data = {
+						name: account.name + self.i18n.active().strategy.faxing.nameExtension,
+						caller_name: account.name,
+						caller_id: args.data.number,
+						fax_header: monster.config.whitelabel.companyName + self.i18n.active().strategy.faxing.headerExtension,
+						fax_timezone: account.timezone,
+						fax_identity: monster.util.formatPhoneNumber(args.data.number),
+						owner_id: account.id,
+						notifications: {
+							inbound: {
+								email: {
+									send_to: account.contact.technical.email
+								}
+							},
+							outbound: {
+								email: {
+									send_to: account.contact.technical.email
+								}
+							}
+						}
+					};
+
+					self.strategyCreateFaxbox(args);
+				}
+			});
+		},
+
 		strategyGetMainCallflows: function(callback) {
 			var self = this;
 			self.callApi({
@@ -2761,6 +2820,59 @@ define(function(require){
 				},
 				success: function(savedUser) {
 					callback && callback(savedUser.data);
+				}
+			});
+		},
+
+		strategyGetAccount: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'account.get',
+				data: {
+					accountId: self.accountId
+				},
+				success: function(data, status) {
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(data, status) {
+					args.hasOwnProperty('error') && args.error();
+				}
+			});
+		},
+
+		strategyCreateFaxbox: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'faxbox.create',
+				data: {
+					accountId: self.accountId,
+					data: args.data
+				},
+				success: function(data, status) {
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(data, status) {
+					args.hasOwnProperty('error') && args.error();
+				}
+			});
+		},
+
+		strategyDeleteFaxbox: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'faxbox.delete',
+				data: {
+					accountId: self.accountId,
+					faxboxId: args.data.id
+				},
+				success: function(data, status) {
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(data, status) {
+					args.hasOwnProperty('error') && args.error();
 				}
 			});
 		}

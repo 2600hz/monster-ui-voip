@@ -779,6 +779,10 @@
 					"4": "Sélectionnez un numéro de conférence pour votre entreprise ici."
 				}
 			}
+		},
+		"faxing": {
+			"nameExtension": "'s Faxbox",
+			"headerExtension": " Fax Printer"
 		}
 	},
 
