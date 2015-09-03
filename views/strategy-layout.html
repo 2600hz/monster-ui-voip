@@ -96,4 +96,28 @@
 		</div>
 		<div class="element-content"></div>
 	</div>
+	<div class="element-container strategy-faxingnum" data-template="faxingnum">
+		<div class="element-header-outer clearfix">
+			<div class="element-header-inner">
+				<div class="title">
+					<i class="fa fa-comments"></i>
+					<span>{{ i18n.strategy.sectionTitles.faxingnum }}</span>
+				</div>
+				<div class="summary">
+					<span>
+						{{formatPhoneNumber faxingNumbers.[0]}}
+						{{#if faxingNumbers.[1]}}
+							{{#if faxingNumbers.[2]}}
+								<i class="icon-telicon-multiple-items icon-small"></i>
+							{{else}}
+								, {{formatPhoneNumber faxingNumbers.[1]}}
+							{{/if}}
+						{{/if}}
+					</span>
+					<i class="fa fa-play"></i>
+				</div>
+			</div>
+		</div>
+		<div class="element-content"></div>
+	</div>
 </div>

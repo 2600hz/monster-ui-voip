@@ -1,0 +1,30 @@
+{{#each numbers}}
+<div class="number-element">
+	<div class="number">
+		<button type="button" class="monster-button monster-button-danger remove-number" data-number="{{this.number}}">
+			{{ ../i18n.unassign }}
+		</button>
+		<span>{{formatPhoneNumber this.number}}</span>
+	</div>
+</div>
+{{else}}
+<div class="number-element">
+	<div class="no-number-error">{{ i18n.strategy.noFaxingNumMessage }}</div>
+</div>
+{{/each}}
+<div class="number-actions">
+	<a href="#" class="monster-link blue cancel-link pull-right">{{ i18n.close }}</a>
+	<div class="action-links nav-bar clearfix">
+		<a href="#" class="spare-link monster-link pull-left{{#unless spareLinkEnabled}} disabled{{/unless}}"><i class="fa fa-file-text-o monster-orange fa-lg"></i>{{ i18n.strategy.numberLinks.spare }}</a>
+		<ul class="nav pull-left">
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle buy-dropdown monster-link" data-toggle="dropdown" data-target="#"><i class="fa fa-shopping-cart monster-green fa-lg"></i>{{ i18n.strategy.numberLinks.buy.link }}</a>
+				<ul class="dropdown-menu" role="menu">
+					<li><a class="buy-link" data-type="regular" href="#">{{i18n.strategy.numberLinks.buy.regular}}</a></li>
+					<li><a class="buy-link" data-type="tollfree" href="#">{{i18n.strategy.numberLinks.buy.tollfree}}</a></li>
+					<li><a class="buy-link" data-type="vanity" href="#">{{i18n.strategy.numberLinks.buy.vanity}}</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+</div>

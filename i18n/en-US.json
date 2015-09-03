@@ -663,7 +663,10 @@
 			"confnum": "Main Conference Number",
 			"hours": "Office Hours Strategy",
 			"holidays": "Office Holidays",
-			"calls": "Incoming Call Handling"
+			"calls": "Incoming Call Handling",
+			"__comment": "UI-1210",
+			"__version": "3.22",
+			"faxingnum": "Main Faxbox Number"
 		},
 		"noNumberTitle": "Add Main Number",
 		"noNumberMessage": "Please add or buy a number from the links below to continue.",
@@ -840,7 +843,10 @@
 					"4": "Create a main Conference Number for your business. Purchase, port or add an existing number and set up a Conference Number seamlessly."
 				}
 			}
-		}
+		},
+		"__comment": "UI-17142: ",
+		"__version": "3.22",
+		"noFaxingNumMessage": "Please add a main faxbox number."
 	},
 
 	"callLogs": {
