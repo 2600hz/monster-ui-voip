@@ -267,8 +267,8 @@ define(function(require){
 					monster.ui.validate(groupForm);
 
 					groupTemplate.find('#create_group').on('click', function() {
-						var formattedData = self.groupsCreationMergeData(data, groupTemplate);
 						if(monster.ui.valid(groupForm)) {
+							var formattedData = self.groupsCreationMergeData(data, groupTemplate);
 							self.groupsCreate(formattedData, function(data) {
 								popup.dialog('close').remove();
 
@@ -353,7 +353,15 @@ define(function(require){
 					name: formData.name + ' Ring Group',
 					flow: {
 						module: 'callflow',
-						children: {},
+						children: {
+							'_': {
+								module: 'play',
+								children: {},
+								data: {
+									id: 'system_media/vm-not_available_no_voicemail'
+								}
+							}
+						},
 						data: {
 							id: ''
 						}
@@ -769,6 +777,10 @@ define(function(require){
 					var newCallflow = $.extend(true, {}, data.callflow),
 						callflowNode = monster.util.findCallflowNode(newCallflow, 'callflow');
 
+					if(_.isArray(callflowNode)) {
+						callflowNode = callflowNode[0];
+					}
+
 					callflowNode.children = {};
 					if(enabled) {
 						callflowNode.children['_'] = {
@@ -776,6 +788,14 @@ define(function(require){
 							module: selectedOption.data('module'),
 							data: { id: selectedOption.val() }
 						}
+					} else {
+						callflowNode.children['_'] = {
+							module: 'play',
+							children: {},
+							data: {
+								id: 'system_media/vm-not_available_no_voicemail'
+							}
+						};
 					}
 					self.groupsUpdateCallflow(newCallflow, function(updatedCallflow) {
 						self.groupsUpdate(data.group, function(updatedGroup) {
@@ -1927,16 +1947,6 @@ define(function(require){
 						self.groupsGetBaseRingGroup(groupId, function(ringGroup) {
 							ringGroup.flow.data.endpoints = endpoints;
 							ringGroup.flow.data.timeout = self.groupsComputeTimeout(endpoints);
-
-							// if(extraNode) {
-							// 	flow.children['_'] = {
-							// 		data: {
-							// 			id: extraNode.id
-							// 		},
-							// 		module: extraNode.module,
-							// 		children: {}
-							// 	}
-							// }
 
 							self.groupsUpdateCallflow(ringGroup, function(data) {
 								callback && callback(null, data);
