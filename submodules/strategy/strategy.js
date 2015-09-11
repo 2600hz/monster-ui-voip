@@ -1874,7 +1874,7 @@ define(function(require){
 				container = popup.find('#strategy_menu_popup'),
 				ttsGreeting = container.find('#strategy_menu_popup_tts_greeting'),
 				uploadGreeting = container.find('#strategy_menu_popup_upload_greeting'),
-				mediaToUpload = undefined;
+				mediaToUpload;
 
 			container.find('.target-select').chosen({ search_contains: true, width: '150px' });
 
@@ -2260,25 +2260,26 @@ define(function(require){
 						menuRequests = {};
 
 					_.each(data.data, function(val, key) {
-						if(val.type === "main" || val.type === "conference")
-						var name = val.name || val.numbers[0];
-						if (val.type === 'conference') {
-							name = "MainConference"
-						}
-						else if (val.type === "faxing") {
-							name = "MainFaxing";
-						}
-						parallelRequests[name] = function(callback) {
-							self.callApi({
-								resource: 'callflow.get',
-								data: {
-									accountId: self.accountId,
-									callflowId: val.id
-								},
-								success: function(data, status) {
-									callback(null, data.data);
-								}
-							});
+						if(val.type === "main" || val.type === "conference" || val.type === "faxing") {
+							var name = val.name || val.numbers[0];
+							if (val.type === 'conference') {
+								name = "MainConference"
+							}
+							else if (val.type === "faxing") {
+								name = "MainFaxing";
+							}
+							parallelRequests[name] = function(callback) {
+								self.callApi({
+									resource: 'callflow.get',
+									data: {
+										accountId: self.accountId,
+										callflowId: val.id
+									},
+									success: function(data, status) {
+										callback(null, data.data);
+									}
+								});
+							}
 						}
 					});
 
@@ -2384,6 +2385,9 @@ define(function(require){
 									}
 								});
 							}
+						} else if(!parallelRequests[val]) {
+							menuRequests[menuName] = parallelRequests[menuName];
+							delete parallelRequests[menuName];
 						}
 					});
 
