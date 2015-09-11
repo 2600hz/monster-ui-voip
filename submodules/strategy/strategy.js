@@ -192,6 +192,7 @@ define(function(require){
 					templateData = {
 						mainNumbers: hasMainNumber ? results.callflows["MainCallflow"].numbers.slice(1) : [self.i18n.active().strategy.noNumberTitle],
 						confNumbers: hasConfNumber ? results.callflows["MainConference"].numbers : [self.i18n.active().strategy.noNumberTitle],
+						customConfGreeting: results.callflows.MainConference && ('welcome_prompt' in results.callflows.MainConference.flow.data) ? true : false,
 						faxingNumbers: hasFaxingNumber ? results.callflows["MainFaxing"].numbers : [self.i18n.active().strategy.noNumberTitle]
 					}
 					template = $(monster.template(self, 'strategy-layout', templateData));
@@ -961,6 +962,101 @@ define(function(require){
 				monster.pub('common.numbers.dialogSpare', args);
 			});
 
+			container.on('click', '.action-links .greeting-link', function(e) {
+				e.preventDefault();
+				var confCallflow = strategyData.callflows.MainConference;
+				if(confCallflow) {
+					self.getMainConferenceGreetingMedia(function(greetingMedia) {
+						var greetingTemplate = $(monster.template(self, 'strategy-customConferenceGreeting', {
+								enabled: ('welcome_prompt' in confCallflow.flow.data),
+								greeting: greetingMedia && greetingMedia.tts ? greetingMedia.tts.text : ''
+							})),
+							greetingPopup = monster.ui.dialog(greetingTemplate, {
+								title: self.i18n.active().strategy.customConferenceGreeting.title,
+								position: ['center', 20]
+							});
+
+						greetingTemplate.find('.switch-state').on('change', function() {
+							$(this).prop('checked') ? greetingTemplate.find('.content').slideDown() : greetingTemplate.find('.content').slideUp();
+						});
+
+						greetingTemplate.find('.cancel').on('click', function() {
+							greetingPopup.dialog('close').remove();
+						});
+
+						greetingTemplate.find('.save').on('click', function() {
+							if(greetingTemplate.find('.switch-state').prop('checked')) {
+								var updateMedia = function(callback) {
+										if(greetingMedia) {
+											greetingMedia.description = "<Text to Speech>";
+											greetingMedia.media_source = "tts";
+											greetingMedia.tts = {
+												text: greetingTemplate.find('.custom-greeting-text').val(),
+												voice: "female/en-US"
+											}
+											self.callApi({
+												resource: 'media.update',
+												data: {
+													accountId: self.accountId,
+													mediaId: greetingMedia.id,
+													data: greetingMedia
+												},
+												success: function(data, status) {
+													callback && callback(data.data);
+												}
+											});
+										} else {
+											self.callApi({
+												resource: 'media.create',
+												data: {
+													accountId: self.accountId,
+													data: {
+														description: '<Text to Speech>',
+														media_source: 'tts',
+														name: 'MainConferenceGreeting',
+														streamable: true,
+														type: 'mainConfGreeting',
+														tts: {
+															text: greetingTemplate.find('.custom-greeting-text').val(),
+															voice: "female/en-US"
+														}
+													}
+												},
+												success: function(data, status) {
+													callback && callback(data.data);
+												}
+											});
+										}
+									};
+
+								updateMedia(function(updatedGreeting) {
+									confCallflow.flow.data.welcome_prompt = {
+										media_id: updatedGreeting.id
+									};
+									self.strategyUpdateCallflow(confCallflow, function() {
+										greetingPopup.dialog('close').remove();
+										$('#strategy_container .custom-greeting-icon').show();
+									});
+								});
+							} else {
+								if('welcome_prompt' in confCallflow.flow.data) {
+									delete confCallflow.flow.data.welcome_prompt;
+									self.strategyUpdateCallflow(confCallflow, function() {
+										greetingPopup.dialog('close').remove();
+										$('#strategy_container .custom-greeting-icon').hide();
+									});
+								} else {
+									greetingPopup.dialog('close').remove();
+								}
+							}
+						});
+					});
+					
+				} else {
+					monster.ui.alert('error', self.i18n.active().strategy.customConferenceGreeting.mainConfMissing)
+				}
+			});
+
 			container.on('click', '.action-links .buy-link', function(e) {
 				e.preventDefault();
 				monster.pub('common.buyNumbers', {
@@ -979,9 +1075,8 @@ define(function(require){
 
 			container.on('click', '.number-element .remove-number', function(e) {
 				e.preventDefault();
-				var numberToRemove = $(this).data('number'),
+				var numberToRemove = $(this).data('number').toString(),
 					indexToRemove = strategyData.callflows["MainConference"].numbers.indexOf(numberToRemove);
-
 				if(indexToRemove >= 0) {
 					strategyData.callflows["MainConference"].numbers.splice(indexToRemove, 1);
 					if(strategyData.callflows["MainConference"].numbers.length === 0) {
@@ -994,6 +1089,41 @@ define(function(require){
 						refreshConfNumHeader(parentContainer);
 						self.strategyRefreshTemplate(parentContainer, strategyData);
 					});
+				}
+			});
+		},
+
+		getMainConferenceGreetingMedia: function(callback) {
+			var self = this;
+			self.callApi({
+				resource: 'media.list',
+				data: {
+					accountId: self.accountId,
+					filters: {
+						'filter_type': 'mainConfGreeting'
+					}
+				},
+				success: function(data, status) {
+					if(data.data && data.data.length > 0) {
+						self.callApi({
+							resource: 'media.get',
+							data: {
+								accountId: self.accountId,
+								mediaId: data.data[0].id
+							},
+							success: function(data, status) {
+								callback && callback(data.data);
+							},
+							error: function(data, status) {
+								callback && callback(null);
+							}
+						});
+					} else {
+						callback && callback(null);
+					}
+				},
+				error: function(data, status) {
+					callback && callback(null);
 				}
 			});
 		},

@@ -17,6 +17,7 @@
 	background: #f3f3f3;
 	margin: 5px;
 	cursor: pointer;
+	position: relative;
 }
 
 #strategy_container .element-container.open .element-header-outer {
@@ -496,6 +497,32 @@
 	top: 2px;
 	font-size: 28px;
 	color: #44cc44;
+}
+#strategy_container .element-container.strategy-confnum .greeting-link {
+	margin-right: 30px !important;
+	position: relative;
+}
+#strategy_container .element-container.strategy-confnum .greeting-link:after {
+	content: "";
+	position: absolute;
+	width: 0px;
+	height: 50px;
+	border-right: solid 1px #c0c0c9;
+	top: -15px;
+	right: -15px;
+}
+
+#strategy_custom_conference_greeting textarea {
+	width: 100%;
+	box-sizing: border-box;
+}
+#strategy_custom_conference_greeting .actions button:not(:first-child) {
+	margin-left: 10px;
+}
+#strategy_container .element-container.strategy-confnum .custom-greeting-icon {
+	position: absolute;
+	right: 45px;
+	top: 23px;
 }
 
 /************ Strategy Faxbox *************/

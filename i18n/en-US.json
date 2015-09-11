@@ -855,6 +855,14 @@
 		"faxing": {
 			"nameExtension": "'s Main Faxbox",
 			"headerExtension": " Fax Printer"
+		},
+		"__comment": "UI-1774: Adding custom greetings to conference",
+		"__version": "3.22",
+		"customConferenceGreeting": {
+			"title": "Custom Conference Greeting",
+			"link": "Custom Greeting",
+			"info": "Customize your conference greeting message using our Text-to-Speech feature. Simply type your greeting message in the input field below.",
+			"mainConfMissing": "Your Main Conference could not be found."
 		}
 	},
 
