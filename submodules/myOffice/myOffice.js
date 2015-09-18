@@ -28,7 +28,8 @@ define(function(require){
 		/* My Office */
 		myOfficeRender: function(args) {
 			var self = this,
-				parent = args.parent || $('.right-content');
+				parent = args.parent || $('.right-content'),
+				callback = args.callback;
 
 			self.myOfficeLoadData(function(myOfficeData) {
 				var dataTemplate = {
@@ -112,6 +113,8 @@ define(function(require){
 				parent
 					.empty()
 					.append(template);
+
+				callback && callback();
 			});
 		},
 

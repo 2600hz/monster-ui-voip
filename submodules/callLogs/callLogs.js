@@ -13,10 +13,10 @@ define(function(require){
 		callLogsRender: function(args) {
 			var self = this;
 
-			self.callLogsRenderContent(args.parent);
+			self.callLogsRenderContent(args.parent, args.fromDate, args.toDate, args.type, args.callback);
 		},
 
-		callLogsRenderContent: function(parent, fromDate, toDate, type) {
+		callLogsRenderContent: function(parent, fromDate, toDate, type, callback) {
 			var self = this,
 				template,
 				defaultDateRange = 1,
@@ -78,6 +78,8 @@ define(function(require){
 				parent
 					.empty()
 					.append(template);
+
+				callback && callback();
 			});
 		},
 

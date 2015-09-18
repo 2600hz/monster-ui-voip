@@ -21,6 +21,7 @@ define(function(require){
 				args = args || {},
 				parent = args.parent || $('.right-content'),
 				_groupId = args.groupId,
+				callback = args.callback,
 				noGroup = true;
 
 			self.groupsRemoveOverlay();
@@ -68,6 +69,8 @@ define(function(require){
 						parent.find('.grid-row.title').css('display', 'block');
 						parent.find('.no-groups-row').css('display', 'none');
 					}
+
+					callback && callback();
 				}
 			});
 		},

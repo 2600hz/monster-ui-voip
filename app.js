@@ -61,18 +61,22 @@ define(function(require){
 			var self = this,
 				container = parent.find('.right-content');
 
-			parent.find('.category').on('click', function() {
+			parent.find('.left-menu').on('click', '.category:not(.loading)', function() {
 				// Get the ID of the submodule to render
 				var $this = $(this),
 					args = {
-						parent: container
+						parent: container,
+						callback: function() {
+							parent.find('.category').removeClass('loading');
+						}
 					},
 					id = $this.attr('id');
 
 				// Display the category we clicked as active
 				parent
 					.find('.category')
-					.removeClass('active');
+					.removeClass('active')
+					.addClass('loading');
 				$this.toggleClass('active');
 
 				// Empty the main container and then render the submodule content

@@ -28,7 +28,8 @@ define(function(require){
 			var self = this,
 				args = pArgs || {},
 				parent = args.parent || $('.right-content'),
-				_deviceId = args.deviceId || '';
+				_deviceId = args.deviceId || '',
+				callback = args.callback;
 
 			self.devicesGetData(function(data) {
 				var dataTemplate = self.devicesFormatListData(data),
@@ -60,6 +61,8 @@ define(function(require){
 				} else {
 					parent.find('.no-devices-row').css('display', 'none');
 				}
+
+				callback && callback();
 			});
 		},
 

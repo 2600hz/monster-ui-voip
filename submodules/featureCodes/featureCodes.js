@@ -54,7 +54,8 @@ define(function(require){
 
 		featureCodesRender: function(args) {
 			var self = this,
-				parent = args.parent || $('.right-content');
+				parent = args.parent || $('.right-content'),
+				callback = args.callback;
 
 			self.featureCodesLoadData(function(featureCodesData) {
 				var template = $(monster.template(self, 'featureCodes-layout', { featureCodes: self.featureCodesFormatData(featureCodesData) }));
@@ -68,6 +69,8 @@ define(function(require){
 				parent
 					.empty()
 					.append(template);
+
+				callback && callback();
 			});
 		},
 

@@ -19,7 +19,8 @@ define(function(require){
 			var self = this,
 				args = args || {},
 				parent = args.parent || $('.right-content'),
-				_voicemailId = args.voicemailId || '';
+				_voicemailId = args.voicemailId || '',
+				callback = args.callback;
 
 			self.vmboxesGetData(function(data) {
 				var dataTemplate = self.vmboxesFormatListData(data),
@@ -51,6 +52,8 @@ define(function(require){
 				} else {
 					parent.find('.no-vmboxes-row').css('display', 'none');
 				}
+
+				callback && callback();
 			});
 		},
 

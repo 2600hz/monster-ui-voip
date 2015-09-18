@@ -13,11 +13,13 @@ define(function(require){
 
 		numbersRender: function(args){
 			var self = this,
-				parent = args.parent || $('#ws_content');
+				parent = args.parent || $('#ws_content'),
+				callback = args.callback;
 
 			monster.pub('common.numbers.render', {
 				container: parent,
-				viewType: 'pbx'
+				viewType: 'pbx',
+				callbackAfterRender: callback
 			});
 		}
 	};

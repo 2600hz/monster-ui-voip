@@ -150,6 +150,7 @@ define(function(require){
 				args = args || {},
 				parent = args.parent || $('.right-content'),
 				openElement = args.openElement,
+				callback = args.callback,
 				templateData = {},
 				template;
 
@@ -224,6 +225,8 @@ define(function(require){
 							});
 						}
 					}
+
+					callback && callback();
 				}
 			);
 
