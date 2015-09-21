@@ -980,7 +980,10 @@
 		},
 		"__comment": "UI-1210: Display the Main Faxbox number on the dashboard",
 		"__version": "3.22",
-		"faxingNumberLabel": "Faxbox Number"
+		"faxingNumberLabel": "Faxbox Number",
+		"__comment": "UI-1197: Display company directory on the dashboard",
+		"__version": "3.22",
+		"directoryLabel": "Company Directory Users:"
 	},
 
 	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SmartPBX.",

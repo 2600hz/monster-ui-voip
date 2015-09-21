@@ -198,14 +198,16 @@
 					</div>
 				</div>
 				<!-- <div class="dashboard-box-row">
-					<div class="row-label">Company Directory Users</div>
-					<div class="row-number">22</div>
-					<div class="row-link pull-right"><a href="#">Print</a></div>
-				</div>
-				<div class="dashboard-box-row">
 					<div class="row-label">Download Phone System Manual</div>
 					<div class="row-link pull-right"><a href="#">Print</a></div>
 				</div> -->
+				<div class="dashboard-box-row account-info-box">
+					<div class="row-label">{{i18n.myOffice.directoryLabel}}</div>
+					<div class="row-value">{{directoryUsers}}</div>
+					{{#if directoryLink}}
+					<div class="row-link pull-right"><a href="{{directoryLink}}" target="_blank"><i class="fa fa-download monster-blue"></i> {{i18n.download}}</a></div>
+					{{/if}}
+				</div>
 				<div class="dashboard-box-row account-info-box">
 					<div class="row-label">{{i18n.myOffice.accountId}}</div>
 					<div class="row-value">{{account.id}}</div>

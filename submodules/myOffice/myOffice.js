@@ -48,7 +48,9 @@ define(function(require){
 						devicesList: _.toArray(myOfficeData.devicesData).sort(function(a, b) { return b.count - a.count ; }),
 						assignedNumbersList: _.toArray(myOfficeData.assignedNumbersData).sort(function(a, b) { return b.count - a.count ; }),
 						// numberTypesList: _.toArray(myOfficeData.numberTypesData).sort(function(a, b) { return b.count - a.count ; }),
-						classifiedNumbers: myOfficeData.classifiedNumbers
+						classifiedNumbers: myOfficeData.classifiedNumbers,
+						directoryUsers: myOfficeData.directory && myOfficeData.directory.users.length || 0,
+						directoryLink: myOfficeData.directoryLink
 					},
 					template = $(monster.template(self, 'myOffice-layout', dataTemplate)),
 					chartOptions = {
@@ -296,6 +298,39 @@ define(function(require){
 								parallelCallback && parallelCallback(null, data.data);
 							}
 						});
+					},
+					directory: function(parallelCallback) {
+						self.callApi({
+							resource: 'directory.list',
+							data: {
+								accountId: self.accountId
+							},
+							success: function(data, status) {
+								var mainDirectory = _.find(data.data, function(val) {
+									return val.name === 'SmartPBX Directory';
+								});
+								if(mainDirectory) {
+									self.callApi({
+										resource: 'directory.get',
+										data: {
+											accountId: self.accountId,
+											directoryId: mainDirectory.id
+										},
+										success: function(data, status) {
+											parallelCallback && parallelCallback(null, data.data);
+										},
+										error: function(data, status) {
+											parallelCallback && parallelCallback(null, {});
+										}
+									});
+								} else {
+									parallelCallback && parallelCallback(null, {});
+								}
+							},
+							error: function(data, status) {
+								parallelCallback && parallelCallback(null, {});
+							}
+						});
 					}
 				},
 				function(error, results) {
@@ -512,6 +547,10 @@ define(function(require){
 			data.assignedNumbersData = assignedNumbers;
 			// data.numberTypesData = numberTypes;
 			data.totalConferences = totalConferences;
+
+			if(data.directory && data.directory.id) {
+				data.directoryLink = self.apiUrl + 'accounts/' + self.accountId +'/directories/' + data.directory.id + '?accept=pdf&auth_token=' + self.authToken;
+			}
 
 			return data;
 		},
