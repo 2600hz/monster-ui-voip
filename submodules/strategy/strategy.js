@@ -203,6 +203,8 @@ define(function(require){
 						.empty()
 						.append(template);
 
+					monster.ui.tooltips(template);
+
 					if(!hasMainNumber) {
 						template.find('.element-container.strategy-hours,.element-container.strategy-holidays,.element-container.strategy-calls').hide();
 						template.find('.element-container.helper').css('display', 'block');
@@ -1036,7 +1038,8 @@ define(function(require){
 									confCallflow.flow.data.welcome_prompt = {
 										media_id: updatedGreeting.id
 									};
-									self.strategyUpdateCallflow(confCallflow, function() {
+									self.strategyUpdateCallflow(confCallflow, function(updatedCallflow) {
+										strategyData.callflows.MainConference = updatedCallflow;
 										greetingPopup.dialog('close').remove();
 										$('#strategy_container .custom-greeting-icon').show();
 									});
@@ -1044,7 +1047,8 @@ define(function(require){
 							} else {
 								if('welcome_prompt' in confCallflow.flow.data) {
 									delete confCallflow.flow.data.welcome_prompt;
-									self.strategyUpdateCallflow(confCallflow, function() {
+									self.strategyUpdateCallflow(confCallflow, function(updatedCallflow) {
+										strategyData.callflows.MainConference = updatedCallflow;
 										greetingPopup.dialog('close').remove();
 										$('#strategy_container .custom-greeting-icon').hide();
 									});
@@ -1054,7 +1058,6 @@ define(function(require){
 							}
 						});
 					});
-					
 				} else {
 					monster.ui.alert('error', self.i18n.active().strategy.customConferenceGreeting.mainConfMissing)
 				}
