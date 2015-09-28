@@ -2382,6 +2382,10 @@ define(function(require){
 				userData.caller_id.internal.number = userData.presence_id + '';
 			}
 
+			if(userData.timezone === 'inherit') {
+				delete userData.timezone;
+			}
+
 			delete userData.include_directory;
 			delete userData.features;
 			delete userData.extra;
@@ -2739,7 +2743,6 @@ define(function(require){
 			var self = this,
 				fullName = data.user.first_name + ' ' + data.user.last_name,
 				callerIdName = fullName.substring(0, 15),
-				defaultTimezone = 'inherit',
 				formattedData = {
 					user: $.extend(true, {}, {
 						caller_id: {
@@ -2753,13 +2756,11 @@ define(function(require){
 						},
 						presence_id: data.callflow.extension,
 						email: data.extra.differentEmail ? data.extra.email : data.user.username,
-						priv_level: 'user',
-						timezone: defaultTimezone
+						priv_level: 'user'
 					}, data.user),
 					vmbox: {
 						mailbox: data.callflow.extension,
-						name: fullName + '\'s VMBox',
-						timezone: defaultTimezone
+						name: fullName + '\'s VMBox'
 					},
 					callflow: {
 						contact_list: {
@@ -3356,6 +3357,9 @@ define(function(require){
 		usersUpdateVMBox: function(vmData, callback) {
 			var self = this;
 
+			// VMboxes should not specify any timezone in order to use the user's default.
+			delete vmData.timezone;
+
 			self.callApi({
 				resource: 'voicemail.update',
 				data: {
@@ -3861,8 +3865,7 @@ define(function(require){
 					var vmbox = {
 						owner_id: user.id,
 						mailbox: user.presence_id || user.extra.vmbox.mailbox,
-						name: user.first_name + ' ' + user.last_name + '\'s VMBox',
-						timezone: user.timezone
+						name: user.first_name + ' ' + user.last_name + '\'s VMBox'
 					};
 
 					self.usersCreateVMBox(vmbox, function(vmbox) {
