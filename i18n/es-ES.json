@@ -623,9 +623,6 @@
 			"header": "Parece que quiere quitar el número que había puesto como su Extensión Principal. Por favor seleccione su nueva Extensión Principal de las opciones abajo:",
 			"none": "No quiero establecer una nueva extensión principal "
 		},
-		"__comment": "UI-1289: Masks should be in i18n",
-		"__version": "v3.20_s3",
-		"defaultPhoneMask": "+1 (999) 999-9999",
 		"__comment": "UI-1393: Updating user devices to use the monsterListing common control",
 		"__version": "v3.20_s4",
 		"devices": {
