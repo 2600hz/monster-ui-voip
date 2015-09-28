@@ -1912,8 +1912,6 @@ define(function(require){
 				featureTemplate.find('#phoneType').val('deskphone');
 			}
 
-			featureTemplate.find('#number').mask(self.i18n.active().users.defaultPhoneMask);
-
 			var popup = monster.ui.dialog(featureTemplate, {
 				title: currentUser.extra.mapFeatures.call_forward.title,
 				position: ['center', 20]

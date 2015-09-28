@@ -604,9 +604,6 @@
 			"header": "Похоже вы пытаетесь удалить номер, который назначен как основной внутренний номер. Пожалуйста, назначьте другой основной внутренний номер из списка ниже:",
 			"none": "Я не хочу назначать основной внутренний номер"
 		},
-		"__comment": "UI-1289: Masks should be in i18n",
-		"__version": "v3.20_s3",
-		"defaultPhoneMask": "7 (111) 111-1111",
 		"__comment": "UI-1393: Updating user devices to use the monsterListing common control",
 		"__version": "v3.20_s4",
 		"devices": {
