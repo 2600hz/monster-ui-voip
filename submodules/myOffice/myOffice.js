@@ -49,7 +49,7 @@ define(function(require){
 						assignedNumbersList: _.toArray(myOfficeData.assignedNumbersData).sort(function(a, b) { return b.count - a.count ; }),
 						// numberTypesList: _.toArray(myOfficeData.numberTypesData).sort(function(a, b) { return b.count - a.count ; }),
 						classifiedNumbers: myOfficeData.classifiedNumbers,
-						directoryUsers: myOfficeData.directory && myOfficeData.directory.users.length || 0,
+						directoryUsers: myOfficeData.directory.users && myOfficeData.directory.users.length || 0,
 						directoryLink: myOfficeData.directoryLink
 					},
 					template = $(monster.template(self, 'myOffice-layout', dataTemplate)),
