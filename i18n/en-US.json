@@ -203,6 +203,12 @@
 					"button": "Restart",
 					"help": "This sends a request to restart the device. This action is only available if the device is currently registered to the platform.",
 					"success": "You successfully sent a Restart request to this device!"
+				},
+				"__comment": "UI-1818: Adding notify unregister",
+				"__version": "3.22",
+				"unregisterNotifications": {
+					"label": "Notify when unregistered",
+					"help": "Do you want to notify the administrator each time this device unregisters?"
 				}
 			},
 			"restrictions": {

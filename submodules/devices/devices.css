@@ -402,3 +402,8 @@
 .edit-device #restart_device {
 	margin-left: 10px;
 }
+
+/* Special checkbox case */
+.edit-device .form-horizontal .control-label.checkbox-basic {
+	margin-left: 160px;
+}
