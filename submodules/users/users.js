@@ -1414,7 +1414,7 @@ define(function(require){
 				var newPresenceID = template.find('.presence-id-option.active').data('number');
 
 				if(newPresenceID !== 'none') {
-					user.presence_id = newPresenceID;
+					user.presence_id = newPresenceID + '';
 				}
 				else {
 					delete user.presence_id;
