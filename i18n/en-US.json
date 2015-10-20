@@ -1117,7 +1117,7 @@
 			"recipients": {
 				"menuTitle": "Recipients",
 				"sectionTitle": "Recipients",
-				"header": "This panel lets you manage who will be notified when someones leave a message on this voicemail box. Click on  \"Add New Recipient\" to add an e-mail address to the list",
+				"header": "This panel lets you manage who will be notified when someone leaves a message in this voicemail box. Click on  \"Add New Recipient\" to add an e-mail address to the list",
 				"create": "Add New Recipient"
 			},
 			"__comment": "UI-975: Adding the prepend feature to numbers",
