@@ -971,23 +971,23 @@
 		"__comment": "UI-1220: Adding a Main VMBox automatically when they first load the SmartPBX if they don't have one",
 		"__version": "3.19",
 		"mainVMBoxName": "Main Voicemail Box",
-
-		"__comment": "UI-1604: Walkthrough dashboard",
-		"__version": "3.21",
-		"walkthrough": {
-			"steps": {
-				"1": "Review your entire office setup including your users, devices, numbers, main number and conference number",
-				"2": "Create and manage most of your services in the Users tab. Create new users, purchase port, and assign numbers, add an autoprovision devices, and manage User Features.",
-				"3": "Once you have created enough users, create user groups. This is extremely useful if you have users that work in the same department, such as a sales team.",
-				"4": "Create a main number for your business. Manage call handling with Virtual Receptionist, and route calls depending on Office Hours and Holidays"
-			}
-		},
 		"__comment": "UI-1210: Display the Main Faxbox number on the dashboard",
 		"__version": "3.22",
 		"faxingNumberLabel": "Faxbox Number",
 		"__comment": "UI-1197: Display company directory on the dashboard",
 		"__version": "3.22",
-		"directoryLabel": "Company Directory Users:"
+		"directoryLabel": "Company Directory Users:",
+
+		"__comment": "UI-1851: Update walkthrough dashboard text",
+		"__version": "3.23",
+		"walkthrough": {
+			"steps": {
+				"1": "Welcome to SmartPBX, the easiest way to set up your office phone system! This is the main dashboard. From here you can see your users, devices, numbers all in one place!",
+				"2": "Setting up Users is a breeze in SmartPBX. Create and manage most of your services in the Users tab. Create new users, purchase port, and assign numbers, add an autoprovision devices, and manage User Features.",
+				"3": "Once you have created enough users, create user groups. This is extremely useful if you have users that work in the same department, such as a sales team.",
+				"4": "Main Number services are highly important for your business! Manage call handling with Virtual Receptionist, and route calls depending on Office Hours and Holidays."
+			}
+		}
 	},
 
 	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SmartPBX.",
