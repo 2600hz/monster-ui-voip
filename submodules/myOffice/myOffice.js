@@ -523,11 +523,12 @@ define(function(require){
 				if(channelsArray.indexOf(val.bridge_id) < 0) {
 					channelsArray.push(val.bridge_id);
 				}
-			})
+			});
 
 			if(
 				data.mainNumbers
 			 && data.mainNumbers.length > 0
+			 && monster.util.isNumberFeatureEnabled('e911')
 			 && (
 			 	   !('caller_id' in data.account)
 				|| !('emergency' in data.account.caller_id)
@@ -539,7 +540,7 @@ define(function(require){
 				data.topMessage = {
 					class: 'btn-danger',
 					message: self.i18n.active().myOffice.missingE911Message
-				}
+				};
 			}
 
 			data.totalChannels = channelsArray.length;
@@ -754,35 +755,40 @@ define(function(require){
 			var self = this,
 				parent = args.parent,
 				myOfficeData = args.myOfficeData,
+				isE911Enabled = monster.util.isNumberFeatureEnabled('e911'),
 				templateData = {
+					isE911Enabled: isE911Enabled,
 					mainNumbers: myOfficeData.mainNumbers,
 					selectedMainNumber: 'caller_id' in myOfficeData.account && 'external' in myOfficeData.account.caller_id ? myOfficeData.account.caller_id.external.number || 'none' : 'none'
 				},
 				popupTemplate = $(monster.template(self, 'myOffice-callerIdPopup', templateData)),
-				e911Form = popupTemplate.find('.emergency-form > form'),
 				popup = monster.ui.dialog(popupTemplate, {
 					title: self.i18n.active().myOffice.callerId.title,
 					position: ['center', 20]
 				});
 
-			monster.ui.validate(e911Form, {
-				messages: {
-					'postal_code': {
-						required: '*'
-					},
-					'street_address': {
-						required: '*'
-					},
-					'locality': {
-						required: '*'
-					},
-					'region': {
-						required: '*'
-					}
-				}
-			});
+			if (isE911Enabled) {
+				var e911Form = popupTemplate.find('.emergency-form > form');
 
-			monster.ui.valid(e911Form);
+				monster.ui.validate(e911Form, {
+					messages: {
+						'postal_code': {
+							required: '*'
+						},
+						'street_address': {
+							required: '*'
+						},
+						'locality': {
+							required: '*'
+						},
+						'region': {
+							required: '*'
+						}
+					}
+				});
+
+				monster.ui.valid(e911Form);
+			}
 
 			self.myOfficeCallerIdPopupBindEvents({
 				parent: parent,
@@ -814,18 +820,20 @@ define(function(require){
 								callerIdNameInput.val("");
 							}
 
-							if("dash_e911" in numberData) {
-								emergencyZipcodeInput.val(numberData.dash_e911.postal_code);
-								emergencyAddress1Input.val(numberData.dash_e911.street_address);
-								emergencyAddress2Input.val(numberData.dash_e911.extended_address);
-								emergencyCityInput.val(numberData.dash_e911.locality);
-								emergencyStateInput.val(numberData.dash_e911.region);
-							} else {
-								emergencyZipcodeInput.val("");
-								emergencyAddress1Input.val("");
-								emergencyAddress2Input.val("");
-								emergencyCityInput.val("");
-								emergencyStateInput.val("");
+							if (monster.util.isNumberFeatureEnabled('e911')) {
+								if("dash_e911" in numberData) {
+									emergencyZipcodeInput.val(numberData.dash_e911.postal_code);
+									emergencyAddress1Input.val(numberData.dash_e911.street_address);
+									emergencyAddress2Input.val(numberData.dash_e911.extended_address);
+									emergencyCityInput.val(numberData.dash_e911.locality);
+									emergencyStateInput.val(numberData.dash_e911.region);
+								} else {
+									emergencyZipcodeInput.val("");
+									emergencyAddress1Input.val("");
+									emergencyAddress2Input.val("");
+									emergencyCityInput.val("");
+									emergencyStateInput.val("");
+								}
 							}
 						});
 					}
@@ -860,7 +868,6 @@ define(function(require){
 
 			popupTemplate.find('.save').on('click', function() {
 				var callerIdNumber = callerIdNumberSelect.val(),
-					e911Form = popupTemplate.find('.emergency-form > form'),
 					updateAccount = function() {
 						self.myOfficeUpdateAccount(account, function(updatedAccount) {
 							popup.dialog('close').remove();
@@ -868,9 +875,8 @@ define(function(require){
 								parent: parent
 							});
 						});
-					};
-				if(callerIdNumber) {
-					if(monster.ui.valid(e911Form)) {
+					},
+					setCallerId = function () {
 						var callerIdName = callerIdNameInput.val();
 
 						account.caller_id = $.extend(true, {}, account.caller_id, {
@@ -889,16 +895,32 @@ define(function(require){
 								delete numberData.cnam;
 							}
 
-							$.extend(true, numberData, {
-								dash_e911: monster.ui.getFormData(e911Form[0])
-							});
-
 							self.myOfficeUpdateNumber(numberData, function(data) {
 								updateAccount();
 							});
 						});
-					} else {
-						monster.ui.alert(self.i18n.active().myOffice.callerId.mandatoryE911Alert);
+					},
+					e911Form;
+
+				if (monster.util.isNumberFeatureEnabled('e911')) {
+					e911Form = popupTemplate.find('.emergency-form > form');
+				}
+
+				if(callerIdNumber) {
+					if (monster.util.isNumberFeatureEnabled('e911')) {
+						if (monster.ui.valid(e911Form)) {
+							$.extend(true, numberData, {
+								dash_e911: monster.ui.getFormData(e911Form[0])
+							});
+
+							setCallerId();
+						}
+						else {
+							monster.ui.alert(self.i18n.active().myOffice.callerId.mandatoryE911Alert);
+						}
+					}
+					else {
+						setCallerId();
 					}
 				} else {
 					delete account.caller_id.external;
