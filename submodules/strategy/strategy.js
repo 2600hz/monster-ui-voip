@@ -399,6 +399,7 @@ define(function(require){
 											return ret;
 										}
 									}),
+									isE911Enabled: monster.util.isNumberFeatureEnabled('e911'),
 									spareLinkEnabled: (_.countBy(accountNumbers, function(number) {return number.used_by ? 'assigned' : 'spare';})['spare'] > 0)
 								},
 								template = $(monster.template(self, 'strategy-'+templateName, templateData));
@@ -750,9 +751,10 @@ define(function(require){
 				var $this = $(this),
 					numberToRemove = $this.data('number'),
 					e911Feature = $this.data('e911'),
+					isE911Enabled = monster.util.isNumberFeatureEnabled('e911'),
 					indexToRemove = strategyData.callflows["MainCallflow"].numbers.indexOf(numberToRemove.toString());
 
-				if(e911Feature === 'active' && container.find('.number-element .remove-number[data-e911="active"]').length === 1) {
+				if(e911Feature === 'active' && container.find('.number-element .remove-number[data-e911="active"]').length === 1 && isE911Enabled) {
 					monster.ui.alert('error', self.i18n.active().strategy.alertMessages.lastE911Error);
 				} else if(indexToRemove >= 0) {
 					self.strategyGetNumber(numberToRemove, function(dataNumber) {
@@ -871,28 +873,30 @@ define(function(require){
 				}
 			});
 
-			container.on('click', '.number-element .e911-number', function() {
-				var e911Cell = $(this).parents('.number-element').first(),
-					phoneNumber = e911Cell.find('.remove-number').data('number');
+			if (monster.util.isNumberFeatureEnabled('e911')) {
+				container.on('click', '.number-element .e911-number', function() {
+					var e911Cell = $(this).parents('.number-element').first(),
+						phoneNumber = e911Cell.find('.remove-number').data('number');
 
-				if(phoneNumber) {
-					var args = {
-						phoneNumber: phoneNumber,
-						callbacks: {
-							success: function(data) {
-								if(!($.isEmptyObject(data.data.dash_e911))) {
-									e911Cell.find('.features i.feature-dash_e911').addClass('active');
-								}
-								else {
-									e911Cell.find('.features i.feature-dash_e911').removeClass('active');
+					if(phoneNumber) {
+						var args = {
+							phoneNumber: phoneNumber,
+							callbacks: {
+								success: function(data) {
+									if(!($.isEmptyObject(data.data.dash_e911))) {
+										e911Cell.find('.features i.feature-dash_e911').addClass('active');
+									}
+									else {
+										e911Cell.find('.features i.feature-dash_e911').removeClass('active');
+									}
 								}
 							}
-						}
-					};
+						};
 
-					monster.pub('common.e911.renderPopup', args);
-				}
-			});
+						monster.pub('common.e911.renderPopup', args);
+					}
+				});
+			}
 
 			container.on('click', '.number-element .prepend-number', function() {
 				var prependCell = $(this).parents('.number-element').first(),
