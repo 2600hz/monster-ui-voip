@@ -1053,7 +1053,10 @@ define(function(require){
 
 								template
 									.find('.list-assigned-items')
-									.append($(monster.template(self, 'users-numbersItemRow', { number: val })));
+									.append($(monster.template(self, 'users-numbersItemRow', {
+										isE911Enabled: monster.util.isNumberFeatureEnabled('e911'),
+										number: val
+									})));
 
 								extraSpareNumbers = _.without(extraSpareNumbers, val.phoneNumber);
 							});
@@ -1080,7 +1083,10 @@ define(function(require){
 									number.viewFeatures = $.extend(true, {}, features);
 									number.phoneNumber = number.id;
 
-									var rowTemplate = monster.template(self, 'users-numbersItemRow', { number: number });
+									var rowTemplate = monster.template(self, 'users-numbersItemRow', {
+										isE911Enabled: monster.util.isNumberFeatureEnabled('e911'),
+										number: number
+									});
 
 									monster.ui.tooltips(rowTemplate);
 
@@ -1164,28 +1170,30 @@ define(function(require){
 				}
 			});
 
-			template.on('click', '.e911-number', function() {
-				var e911Cell = $(this).parents('.item-row').first(),
-					phoneNumber = e911Cell.data('id');
+			if (monster.util.isNumberFeatureEnabled('e911')) {
+				template.on('click', '.e911-number', function() {
+					var e911Cell = $(this).parents('.item-row').first(),
+						phoneNumber = e911Cell.data('id');
 
-				if(phoneNumber) {
-					var args = {
-						phoneNumber: phoneNumber,
-						callbacks: {
-							success: function(data) {
-								if(!($.isEmptyObject(data.data.dash_e911))) {
-									e911Cell.find('.features i.feature-dash_e911').addClass('active');
-								}
-								else {
-									e911Cell.find('.features i.feature-dash_e911').removeClass('active');
+					if(phoneNumber) {
+						var args = {
+							phoneNumber: phoneNumber,
+							callbacks: {
+								success: function(data) {
+									if(!($.isEmptyObject(data.data.dash_e911))) {
+										e911Cell.find('.features i.feature-dash_e911').addClass('active');
+									}
+									else {
+										e911Cell.find('.features i.feature-dash_e911').removeClass('active');
+									}
 								}
 							}
-						}
-					};
+						};
 
-					monster.pub('common.e911.renderPopup', args);
-				}
-			});
+						monster.pub('common.e911.renderPopup', args);
+					}
+				});
+			}
 
 			template.on('click', '.prepend-number', function() {
 				var prependCell = $(this).parents('.item-row').first(),
@@ -2608,7 +2616,9 @@ define(function(require){
 
 			self.usersGetNumbersData(userId, function(results) {
 				self.usersFormatNumbersData(userId, results, function(results) {
-					template = $(monster.template(self, 'users-numbers', results));
+					template = $(monster.template(self, 'users-numbers', $.extend(true, {}, results, {
+						isE911Enabled: monster.util.isNumberFeatureEnabled('e911')
+					})));
 
 					callback && callback(template, results);
 				});
