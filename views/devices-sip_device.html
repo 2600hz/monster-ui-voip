@@ -32,7 +32,9 @@
 					<li><a class="tabs-selector change-section" data-section="audio" href="javascript:void(0)"><i class="fa fa-music"></i>{{ i18n.devices.popupSettings.audio.menuTitle }}</a></li>
 					<li><a class="tabs-selector change-section" data-section="video" href="javascript:void(0)"><i class="fa fa-video-camera"></i>{{ i18n.devices.popupSettings.video.menuTitle }}</a></li>
 					<li><a class="tabs-selector change-section" data-section="restrictions" href="javascript:void(0)"><i class="fa fa-ban"></i>{{ i18n.devices.popupSettings.restrictions.menuTitle }}</a></li>
-					<li><a class="tabs-selector change-section" data-section="callerId" href="javascript:void(0)"><i class="fa fa-ambulance"></i>{{ i18n.devices.popupSettings.callerId.menuTitle }}</a></li>
+					{{#if isE911Enabled}}
+						<li><a class="tabs-selector change-section" data-section="callerId" href="javascript:void(0)"><i class="fa fa-ambulance"></i>{{ i18n.devices.popupSettings.callerId.menuTitle }}</a></li>
+					{{/if}}
 					<li><a class="tabs-selector change-section" data-section="miscellaneous" href="javascript:void(0)"><i class="fa fa-cogs"></i>{{ i18n.devices.popupSettings.miscellaneous.menuTitle }}</a></li>
 				{{#if provision.feature_keys}}
 					<li><a class="tabs-selector change-section" data-section="featureKeys" href="javascript:void(0);"><i class="fa fa-lightbulb-o"></i>{{ i18n.devices.popupSettings.featureKeys.menuTitle }}</a></li>
@@ -172,28 +174,30 @@
 				</div>
 			</div>
 
-			<div class="tabs-section clearfix" data-section="callerId">
-				<div class="title">
-					{{ i18n.devices.popupSettings.callerId.sectionTitle }}
-				</div>
+			{{#if isE911Enabled}}
+				<div class="tabs-section clearfix" data-section="callerId">
+					<div class="title">
+						{{ i18n.devices.popupSettings.callerId.sectionTitle }}
+					</div>
 
-				{{#if extra.hasE911Numbers}}
-					<div class="control-group">
-						<label class="control-label">{{ i18n.devices.popupSettings.callerId.emergency }}</label>
-						<div class="controls emergency-number"></div>
-					</div>
-					<div class="control-group number-address">
-						<label class="control-label">{{i18n.devices.popupSettings.callerId.address}}</label>
-						<div class="controls">
-							<p></p>
+					{{#if extra.hasE911Numbers}}
+						<div class="control-group">
+							<label class="control-label">{{ i18n.devices.popupSettings.callerId.emergency }}</label>
+							<div class="controls emergency-number"></div>
 						</div>
-					</div>
-				{{else}}
-					{{#monsterText 'error'}}
-						{{ i18n.devices.popupSettings.callerId.noE911Numbers }}
-					{{/monsterText}}
-				{{/if}}
-			</div>
+						<div class="control-group number-address">
+							<label class="control-label">{{i18n.devices.popupSettings.callerId.address}}</label>
+							<div class="controls">
+								<p></p>
+							</div>
+						</div>
+					{{else}}
+						{{#monsterText 'error'}}
+							{{ i18n.devices.popupSettings.callerId.noE911Numbers }}
+						{{/monsterText}}
+					{{/if}}
+				</div>
+			{{/if}}
 
 			<div class="tabs-section clearfix" data-section="miscellaneous">
 				<div class="title">

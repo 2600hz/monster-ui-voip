@@ -269,7 +269,9 @@ define(function(require){
 				mode = data.id ? 'edit' : 'add',
 				type = data.device_type,
 				popupTitle = mode === 'edit' ? monster.template(self, '!' + self.i18n.active().devices[type].editTitle, { name: data.name }) : self.i18n.active().devices[type].addTitle,
-				templateDevice = $(monster.template(self, 'devices-'+type, data)),
+				templateDevice = $(monster.template(self, 'devices-'+type, $.extend(true, {}, data, {
+					isE911Enabled: monster.util.isNumberFeatureEnabled('e911')
+				}))),
 				deviceForm = templateDevice.find('#form_device');
 
 			if (data.hasOwnProperty('provision') && data.provision.hasOwnProperty('feature_keys')) {

@@ -15,7 +15,9 @@
 						<ul class="dropdown-menu">
 						{{#unless isLocal}}
 							<li><a class="callerId-number" href="#"><i class="fa fa-user"></i>{{ ../../i18n.callerId }}</a></li>
-							<li><a class="e911-number" href="#"><i class="fa fa-ambulance"></i>{{ ../../i18n.e911 }}</a></li>
+							{{#if ../../isE911Enabled}}
+								<li><a class="e911-number" href="#"><i class="fa fa-ambulance"></i>{{ ../../../i18n.e911 }}</a></li>
+							{{/if}}
 						{{/unless}}
 							<li><a class="prepend-number" href="#"><i class="fa fa-file-text-o"></i>{{ ../i18n.numberPrepend }}</a></li>
 						</ul>

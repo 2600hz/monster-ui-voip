@@ -33,6 +33,7 @@
 		{{/monsterText}}
 	</div>
 
+	{{#if isE911Enabled}}
 	<div class="content number-feature" {{#compare selectedMainNumber '===' 'none'}}style="display:none;"{{/compare}}>
 		<div>
 			<div>{{ i18n.myOffice.callerId.emergencyLabel }}</div>
@@ -67,6 +68,7 @@
 			<p>{{ i18n.myOffice.callerId.emergencyHelp2 }}</p>
 		{{/monsterText}}
 	</div>
+	{{/if}}
 
 	<div class="actions clearfix">
 		<div class="pull-right">
