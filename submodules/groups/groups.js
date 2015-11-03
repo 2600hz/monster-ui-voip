@@ -1148,7 +1148,7 @@ define(function(require){
 							template.find('.spare-link').addClass('disabled');
 						}
 					}
-				}
+				};
 
 				monster.pub('common.numbers.dialogSpare', args);
 			});
@@ -1160,16 +1160,15 @@ define(function(require){
 					searchType: $(this).data('type'),
 					callbacks: {
 						success: function(numbers) {
-
 							monster.pub('common.numbers.getListFeatures', function(features) {
 								_.each(numbers, function(number, k) {
 									number.viewFeatures = $.extend(true, {}, features);
 									number.phoneNumber = number.id;
 
-									var rowTemplate = monster.template(self, 'groups-numbersItemRow', {
+									var rowTemplate = $(monster.template(self, 'groups-numbersItemRow', {
 										isE911Enabled: monster.util.isNumberFeatureEnabled('e911'),
 										number: number
-									});
+									}));
 
 									monster.ui.tooltips(rowTemplate);
 
@@ -1464,7 +1463,9 @@ define(function(require){
 					number.localityEnabled = 'locality' in number ? true : false;
 
 					_.each(number.features, function(feature) {
-						number.viewFeatures[feature].active = 'active';
+						if(feature in number.viewFeatures) {
+							number.viewFeatures[feature].active = 'active';
+						}
 					});
 
 					if(number.used_by === '') {

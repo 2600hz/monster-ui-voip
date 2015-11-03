@@ -1074,6 +1074,7 @@ define(function(require){
 
 			template.on('click', '.actions .buy-link', function(e) {
 				e.preventDefault();
+
 				monster.pub('common.buyNumbers', {
 					searchType: $(this).data('type'),
 					callbacks: {
@@ -1083,10 +1084,10 @@ define(function(require){
 									number.viewFeatures = $.extend(true, {}, features);
 									number.phoneNumber = number.id;
 
-									var rowTemplate = monster.template(self, 'users-numbersItemRow', {
+									var rowTemplate = $(monster.template(self, 'users-numbersItemRow', {
 										isE911Enabled: monster.util.isNumberFeatureEnabled('e911'),
 										number: number
-									});
+									}));
 
 									monster.ui.tooltips(rowTemplate);
 
