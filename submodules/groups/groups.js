@@ -427,6 +427,7 @@ define(function(require){
 			self.groupsGetNumbersData(groupId, function(data) {
 				self.groupsFormatNumbersData(data, function(data) {
 					template = $(monster.template(self, 'groups-numbers', $.extend(true, {}, data, {
+						isCnamEnabled: monster.util.isNumberFeatureEnabled('cnam'),
 						isE911Enabled: monster.util.isNumberFeatureEnabled('e911')
 					})));
 
@@ -1065,33 +1066,35 @@ define(function(require){
 				});
 			}
 
-			template.on('click', '.callerId-number', function() {
-				var cnamCell = $(this).parents('.item-row').first(),
-					phoneNumber = cnamCell.data('id');
+			if (monster.util.isNumberFeatureEnabled('cnam')) {
+				template.on('click', '.callerId-number', function() {
+					var cnamCell = $(this).parents('.item-row').first(),
+						phoneNumber = cnamCell.data('id');
 
-				if(phoneNumber) {
-					var args = {
-						phoneNumber: phoneNumber,
-						callbacks: {
-							success: function(data) {
-								if('cnam' in data.data && data.data.cnam.display_name) {
-									cnamCell.find('.features i.feature-outbound_cnam').addClass('active');
-								} else {
-									cnamCell.find('.features i.feature-outbound_cnam').removeClass('active');
-								}
+					if(phoneNumber) {
+						var args = {
+							phoneNumber: phoneNumber,
+							callbacks: {
+								success: function(data) {
+									if('cnam' in data.data && data.data.cnam.display_name) {
+										cnamCell.find('.features i.feature-outbound_cnam').addClass('active');
+									} else {
+										cnamCell.find('.features i.feature-outbound_cnam').removeClass('active');
+									}
 
-								if('cnam' in data.data && data.data.cnam.inbound_lookup) {
-									cnamCell.find('.features i.feature-inbound_cnam').addClass('active');
-								} else {
-									cnamCell.find('.features i.feature-inbound_cnam').removeClass('active');
+									if('cnam' in data.data && data.data.cnam.inbound_lookup) {
+										cnamCell.find('.features i.feature-inbound_cnam').addClass('active');
+									} else {
+										cnamCell.find('.features i.feature-inbound_cnam').removeClass('active');
+									}
 								}
 							}
-						}
-					};
+						};
 
-					monster.pub('common.callerId.renderPopup', args);
-				}
-			});
+						monster.pub('common.callerId.renderPopup', args);
+					}
+				});
+			}
 
 			template.on('click', '.prepend-number', function() {
 				var prependCell = $(this).parents('.item-row').first(),
@@ -1135,6 +1138,7 @@ define(function(require){
 							template
 								.find('.list-assigned-items')
 								.append($(monster.template(self, 'groups-numbersItemRow', {
+									isCnamEnabled: monster.util.isNumberFeatureEnabled('cnam'),
 									isE911Enabled: monster.util.isNumberFeatureEnabled('e911'),
 									number: val
 								})));
@@ -1166,6 +1170,7 @@ define(function(require){
 									number.phoneNumber = number.id;
 
 									var rowTemplate = $(monster.template(self, 'groups-numbersItemRow', {
+										isCnamEnabled: monster.util.isNumberFeatureEnabled('cnam'),
 										isE911Enabled: monster.util.isNumberFeatureEnabled('e911'),
 										number: number
 									}));
