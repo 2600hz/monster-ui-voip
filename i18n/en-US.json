@@ -797,7 +797,10 @@
 			"directory": "Directory",
 			"__comment": "UI-1742: Can now select a callflow created in Advanced Callflows in Main Number",
 			"__version": "3.22",
-			"advancedCallflows": "Advanced Callflows"
+			"advancedCallflows": "Advanced Callflows",
+			"__comment": "UI-1886: Can now select a media in virtual receptionist",
+			"__version": "3.23",
+			"media": "Media"
 		},
 		"confirmMessages": {
 			"deleteHoliday": "This holiday will be permanently deleted. Continue?",

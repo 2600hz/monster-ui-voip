@@ -367,7 +367,6 @@ define(function(require){
 				});
 			});
 
-
 			self.strategyNumbersBindEvents(strategyNumbersContainer, strategyData);
 			self.strategyConfNumBindEvents(strategyConfNumContainer, strategyData);
 			self.strategyFaxingNumBindEvents(strategyFaxingNumContainer, strategyData);
@@ -626,7 +625,6 @@ define(function(require){
 									voicemails: strategyData.voicemails,
 									tabMessage: self.i18n.active().strategy.calls.callTabsMessages[callflowName]
 								};
-
 
 							if (strategyData.callflows[callflowName].flow.hasOwnProperty("is_main_number_cf")) {
 								tabData.callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
@@ -1624,6 +1622,7 @@ define(function(require){
 							case 'user':
 							case 'device':
 							case 'callflow':
+							case 'media':
 								flowElement.data.id = selectedEntity.val();
 								break;
 							case 'ring_group':
@@ -2127,18 +2126,14 @@ define(function(require){
 					}
 
 					switch(entityType) {
-						case 'directory':
-						case 'user':
-						case 'device':
-						case 'voicemail':
-						case 'callflow':
-							menuElements[number].data.id = entityId;
-							break;
 						case 'ring_group':
 							menuElements[number].data.endpoints = [{
 								endpoint_type: "group",
 								id: entityId
 							}];
+							break;
+						default: 
+							menuElements[number].data.id = entityId;
 							break;
 					}
 				});
@@ -2173,16 +2168,16 @@ define(function(require){
 
 			_.each(entities, function(value, key) {
 				var group = {
-						groupName: self.i18n.active().strategy.callEntities[key],
-						groupType: key,
-						entities: $.map(value, function(entity) {
-							return {
-								id: entity.id,
-								name: entity.name || (entity.first_name + ' ' + entity.last_name),
-								module: entity.module || key
-							};
-						})
-					};
+					groupName: self.i18n.active().strategy.callEntities[key],
+					groupType: key,
+					entities: $.map(value, function(entity) {
+						return {
+							id: entity.id,
+							name: entity.name || (entity.first_name + ' ' + entity.last_name),
+							module: entity.module || key
+						};
+					})
+				};
 
 				switch(group.groupType) {
 					case 'directory':
@@ -2196,6 +2191,9 @@ define(function(require){
 						break;
 					case 'ring_group':
 						group.groupIcon = 'fa fa-users';
+						break;
+					case 'media':
+						group.groupIcon = 'fa fa-music';
 						break;
 					case 'voicemail':
 						group.groupIcon = 'icon-telicon-voicemail';
@@ -2668,6 +2666,11 @@ define(function(require){
 							}
 						});
 					},
+					media: function (callback) {
+						self.strategyListMedia(function (media) {
+							callback(null, media);
+						});
+					},
 					userCallflows: function(_callback) {
 						self.callApi({
 							resource: 'callflow.list',
@@ -2753,6 +2756,7 @@ define(function(require){
 					var callEntities = {
 						device: results.devices,
 						user: $.extend(true, [], results.users),
+						media: results.media,
 						userCallflows: [],
 						ring_group: [],
 						userGroups: $.map(results.userGroups, function(val) {
@@ -2763,6 +2767,10 @@ define(function(require){
 						}),
 						advancedCallflows: results.advancedCallflows
 					};
+
+					_.each(callEntities.media, function(media) {
+						media.module = 'media';
+					});
 
 					_.each(callEntities.device, function(device) {
 						device.module = 'device';
@@ -2949,6 +2957,20 @@ define(function(require){
 				},
 				error: function(data, status) {
 					callbackError && callbackError();
+				}
+			});
+		},
+
+		strategyListMedia: function(callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'media.list',
+				data: {
+					accountId: self.accountId
+				},
+				success: function(data, status) {
+					callback && callback(data.data);
 				}
 			});
 		},
