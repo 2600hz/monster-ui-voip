@@ -947,7 +947,6 @@
 			"mandatoryE911Alert": "You must specify e911 information for your company caller ID number."
 		},
 		"missingMainNumberForCallerId": "You need to add a main number to your office before configuring the Caller-ID!",
-		"missingE911Message": "Please setup your Company Caller ID and e911 on a Main Number.",
 		"missingMainNumberMessage": "Please add a Main Number to your account.",
 		"totalUsers": "Total Users",
 		"totalDevices": "Total Devices",
@@ -987,7 +986,12 @@
 		"faxingNumberLabel": "Faxbox Number",
 		"__comment": "UI-1197: Display company directory on the dashboard",
 		"__version": "3.22",
-		"directoryLabel": "Company Directory Users:"
+		"directoryLabel": "Company Directory Users:",
+		"__comment": "UI-1856: On the dashboard, hide cnam related actions when the feature is disabled on the account",
+		"__version": "3.23",
+		"missingCnamE911Message": "Please setup your Company Caller ID and e911 on a Main Number.",
+		"missingCnamMessage": "Please setup your Company Caller ID on a Main Number.",
+		"missingE911Message": "Please setup your e911 on a Main Number."
 	},
 
 	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SmartPBX.",
