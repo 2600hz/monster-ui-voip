@@ -33,6 +33,7 @@ define(function(require){
 
 			self.myOfficeLoadData(function(myOfficeData) {
 				var dataTemplate = {
+						isCnamEnabled: monster.util.isNumberFeatureEnabled('cnam'),
 						account: myOfficeData.account,
 						totalUsers: myOfficeData.users.length,
 						totalDevices: myOfficeData.devices.length,
@@ -528,7 +529,6 @@ define(function(require){
 			if(
 				data.mainNumbers
 			 && data.mainNumbers.length > 0
-			 && monster.util.isNumberFeatureEnabled('e911')
 			 && (
 			 	   !('caller_id' in data.account)
 				|| !('emergency' in data.account.caller_id)
@@ -537,10 +537,24 @@ define(function(require){
 				|| data.numbers[data.account.caller_id.emergency.number].features.indexOf('dash_e911') < 0
 				)
 			) {
-				data.topMessage = {
-					class: 'btn-danger',
-					message: self.i18n.active().myOffice.missingE911Message
-				};
+				if (monster.util.isNumberFeatureEnabled('cnam') && monster.util.isNumberFeatureEnabled('e911')) {
+					data.topMessage = {
+						class: 'btn-danger',
+						message: self.i18n.active().myOffice.missingCnamE911Message
+					};
+				}
+				else if (monster.util.isNumberFeatureEnabled('cnam')) {
+					data.topMessage = {
+						class: 'btn-danger',
+						message: self.i18n.active().myOffice.missingCnamMessage
+					};
+				}
+				else if (monster.util.isNumberFeatureEnabled('e911')) {
+					data.topMessage = {
+						class: 'btn-danger',
+						message: self.i18n.active().myOffice.missingE911Message
+					};
+				}
 			}
 
 			data.totalChannels = channelsArray.length;
@@ -595,13 +609,15 @@ define(function(require){
 				});
 			});
 
-			template.find('.header-link.caller-id:not(.disabled)').on('click', function(e) {
-				e.preventDefault();
-				self.myOfficeRenderCallerIdPopup({
-					parent: parent,
-					myOfficeData: myOfficeData
+			if (monster.util.isNumberFeatureEnabled('cnam')) {
+				template.find('.header-link.caller-id:not(.disabled)').on('click', function(e) {
+					e.preventDefault();
+					self.myOfficeRenderCallerIdPopup({
+						parent: parent,
+						myOfficeData: myOfficeData
+					});
 				});
-			});
+			}
 
 			template.find('.header-link.caller-id.disabled').on('click', function(e) {
 				monster.ui.alert(self.i18n.active().myOffice.missingMainNumberForCallerId);
@@ -755,9 +771,8 @@ define(function(require){
 			var self = this,
 				parent = args.parent,
 				myOfficeData = args.myOfficeData,
-				isE911Enabled = monster.util.isNumberFeatureEnabled('e911'),
 				templateData = {
-					isE911Enabled: isE911Enabled,
+					isE911Enabled: monster.util.isNumberFeatureEnabled('e911'),
 					mainNumbers: myOfficeData.mainNumbers,
 					selectedMainNumber: 'caller_id' in myOfficeData.account && 'external' in myOfficeData.account.caller_id ? myOfficeData.account.caller_id.external.number || 'none' : 'none'
 				},
@@ -767,7 +782,7 @@ define(function(require){
 					position: ['center', 20]
 				});
 
-			if (isE911Enabled) {
+			if (monster.util.isNumberFeatureEnabled('e911')) {
 				var e911Form = popupTemplate.find('.emergency-form > form');
 
 				monster.ui.validate(e911Form, {

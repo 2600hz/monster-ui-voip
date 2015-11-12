@@ -1,22 +1,24 @@
 <div id="myoffice_container">
 	<div class="dashboard-header">
 		<div class="header-title">{{account.name}}</div>
-		<a href="#" class="header-link caller-id{{#compare mainNumbers.length "===" 0}} disabled{{/compare}}">
-			<div class="header-link-icon"><i class="monster-white fa-lg fa fa-user"></i></div>
-			<div class="header-link-title">{{i18n.myOffice.topBarLinks.callerID}}</div>
-		</a>
-		<a href="#" class="header-link music-on-hold">
-			<div class="header-link-icon"><i class="monster-white fa-lg fa fa-music"></i></div>
-			<div class="header-link-title">{{i18n.myOffice.topBarLinks.musicOnHold}}</div>
+		<a href="#" class="header-link strategy-hours link-box" data-category="strategy" data-subcategory="strategy-hours">
+			<div class="header-link-icon"><i class="fa fa-clock-o fa-lg monster-white"></i></div>
+			<div class="header-link-title">{{i18n.myOffice.topBarLinks.hours}}</div>
 		</a>
 		<!-- <a href="#" class="header-link call-recording">
 			<div class="header-link-icon"><i class="monster-white fa-lg fa fa-microphone"></i></div>
 			<div class="header-link-title">{{i18n.myOffice.topBarLinks.callRecording}}</div>
 		</a> -->
-		<a href="#" class="header-link strategy-hours link-box" data-category="strategy" data-subcategory="strategy-hours">
-			<div class="header-link-icon"><i class="fa fa-clock-o fa-lg monster-white"></i></div>
-			<div class="header-link-title">{{i18n.myOffice.topBarLinks.hours}}</div>
+		<a href="#" class="header-link music-on-hold">
+			<div class="header-link-icon"><i class="monster-white fa-lg fa fa-music"></i></div>
+			<div class="header-link-title">{{i18n.myOffice.topBarLinks.musicOnHold}}</div>
 		</a>
+	{{#if isCnamEnabled}}
+		<a href="#" class="header-link caller-id{{#compare mainNumbers.length "===" 0}} disabled{{/compare}}">
+			<div class="header-link-icon"><i class="monster-white fa-lg fa fa-user"></i></div>
+			<div class="header-link-title">{{i18n.myOffice.topBarLinks.callerID}}</div>
+		</a>
+	{{/if}}
 	</div>
 
 	<div class="dashboard-content">
