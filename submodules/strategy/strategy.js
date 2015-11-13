@@ -398,6 +398,7 @@ define(function(require){
 											return ret;
 										}
 									}),
+									isCnamEnabled: monster.util.isNumberFeatureEnabled('cnam'),
 									isE911Enabled: monster.util.isNumberFeatureEnabled('e911'),
 									spareLinkEnabled: (_.countBy(accountNumbers, function(number) {return number.used_by ? 'assigned' : 'spare';})['spare'] > 0)
 								},
@@ -843,33 +844,35 @@ define(function(require){
 				}
 			});
 
-			container.on('click', '.number-element .callerId-number', function() {
-				var cnamCell = $(this).parents('.number-element').first(),
-					phoneNumber = cnamCell.find('.remove-number').data('number');
+			if (monster.util.isNumberFeatureEnabled('cnam')) {
+				container.on('click', '.number-element .callerId-number', function() {
+					var cnamCell = $(this).parents('.number-element').first(),
+						phoneNumber = cnamCell.find('.remove-number').data('number');
 
-				if(phoneNumber) {
-					var args = {
-						phoneNumber: phoneNumber,
-						callbacks: {
-							success: function(data) {
-								if('cnam' in data.data && data.data.cnam.display_name) {
-									cnamCell.find('.features i.feature-outbound_cnam').addClass('active');
-								} else {
-									cnamCell.find('.features i.feature-outbound_cnam').removeClass('active');
-								}
+					if(phoneNumber) {
+						var args = {
+							phoneNumber: phoneNumber,
+							callbacks: {
+								success: function(data) {
+									if('cnam' in data.data && data.data.cnam.display_name) {
+										cnamCell.find('.features i.feature-outbound_cnam').addClass('active');
+									} else {
+										cnamCell.find('.features i.feature-outbound_cnam').removeClass('active');
+									}
 
-								if('cnam' in data.data && data.data.cnam.inbound_lookup) {
-									cnamCell.find('.features i.feature-inbound_cnam').addClass('active');
-								} else {
-									cnamCell.find('.features i.feature-inbound_cnam').removeClass('active');
+									if('cnam' in data.data && data.data.cnam.inbound_lookup) {
+										cnamCell.find('.features i.feature-inbound_cnam').addClass('active');
+									} else {
+										cnamCell.find('.features i.feature-inbound_cnam').removeClass('active');
+									}
 								}
 							}
-						}
-					};
+						};
 
-					monster.pub('common.callerId.renderPopup', args);
-				}
-			});
+						monster.pub('common.callerId.renderPopup', args);
+					}
+				});
+			}
 
 			if (monster.util.isNumberFeatureEnabled('e911')) {
 				container.on('click', '.number-element .e911-number', function() {
