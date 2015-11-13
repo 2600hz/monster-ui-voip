@@ -394,19 +394,21 @@ define(function(require){
 				}
 			});
 
-			templateDevice.find('#delete_device').on('click', function() {
-				var deviceId = $(this).parents('.edit-device').data('id');
+			if (type !== 'mobile') {
+				templateDevice.find('#delete_device').on('click', function() {
+					var deviceId = $(this).parents('.edit-device').data('id');
 
-				monster.ui.confirm(self.i18n.active().devices.confirmDeleteDevice, function() {
-					self.devicesDeleteDevice(deviceId, function(device) {
-						popup.dialog('close').remove();
+					monster.ui.confirm(self.i18n.active().devices.confirmDeleteDevice, function() {
+						self.devicesDeleteDevice(deviceId, function(device) {
+							popup.dialog('close').remove();
 
-						toastr.success(monster.template(self, '!' + self.i18n.active().devices.deletedDevice, { deviceName: device.name }));
+							toastr.success(monster.template(self, '!' + self.i18n.active().devices.deletedDevice, { deviceName: device.name }));
 
-						callbackDelete && callbackDelete(device);
+							callbackDelete && callbackDelete(device);
+						});
 					});
 				});
-			});
+			}
 
 			templateDevice.find('.actions .cancel-link').on('click', function() {
 				popup.dialog('close').remove();
