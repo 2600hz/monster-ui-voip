@@ -2337,7 +2337,7 @@ define(function(require){
 										flow: {
 											children: {},
 											data: {},
-											module: "faxing"
+											module: "faxbox"
 										}
 									}
 								},
