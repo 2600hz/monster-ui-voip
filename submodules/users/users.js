@@ -1950,8 +1950,13 @@ define(function(require){
 						},
 						openedTab: 'features'
 					},
-					endpoints = (userCallflow.flow.module === 'ring_group' ? userCallflow.flow.data.endpoints : []),
 					userDevices = {};
+
+				var nodeSearch = userCallflow.flow;
+				while(nodeSearch.hasOwnProperty('module') && ['ring_group', 'user'].indexOf(nodeSearch.module) < 0) {
+					nodeSearch = nodeSearch.children['_'];
+				}
+				endpoints = nodeSearch.module === 'ring_group' ? nodeSearch.data.endpoints : [];
 
 				_.each(params.userDevices, function(val) {
 					userDevices[val.id] = val;
@@ -2008,31 +2013,44 @@ define(function(require){
 							currentUser.smartpbx.find_me_follow_me = currentUser.smartpbx.find_me_follow_me || {};
 							currentUser.smartpbx.find_me_follow_me.enabled = (enabled && endpoints.length > 0);
 
+							var callflowNode = {};
+
 							if(enabled && endpoints.length > 0) {
-								userCallflow.flow.module = 'ring_group';
-								userCallflow.flow.data = {
+								callflowNode.module = 'ring_group';
+								callflowNode.data = {
 									strategy: "simultaneous",
 									timeout: 20,
 									endpoints: []
 								}
+
 								_.each(endpoints, function(endpoint) {
-									userCallflow.flow.data.endpoints.push({
+									callflowNode.data.endpoints.push({
 										id: endpoint.id,
 										endpoint_type: "device",
 										delay: endpoint.delay,
 										timeout: endpoint.timeout
 									});
 
-									if((endpoint.delay+endpoint.timeout) > userCallflow.flow.data.timeout) { userCallflow.flow.data.timeout = (endpoint.delay+endpoint.timeout); }
+									if((endpoint.delay+endpoint.timeout) > callflowNode.data.timeout) { 
+										callflowNode.data.timeout = (endpoint.delay+endpoint.timeout); 
+									}
 								});
 							} else {
-								userCallflow.flow.module = 'user';
-								userCallflow.flow.data = {
+								callflowNode.module='user';
+								callflowNode.data = {
 									can_call_self: false,
 									id: currentUser.id,
 									timeout: 20
-								}
+								};
 							}
+
+							// In next 5 lines, look for user/group node, and replace it with the new data;
+							var flow = userCallflow.flow;
+							while(flow.hasOwnProperty('module') && ['ring_group', 'user'].indexOf(flow.module) < 0) {
+								flow = flow.children['_'];
+							}
+							flow.module = callflowNode.module;
+							flow.data = callflowNode.data;
 
 							monster.parallel({
 									callflow: function(callbackParallel) {
