@@ -23,7 +23,7 @@
 				<ul class="dropdown-menu pull-right">
 					<li><a class="tabs-selector change-section" data-section="audio" href="javascript:void(0)"><i class="fa fa-music"></i>{{ i18n.devices.popupSettings.audio.menuTitle }}</a></li>
 					<li><a class="tabs-selector change-section" data-section="restrictions" href="javascript:void(0)"><i class="fa fa-ban"></i>{{ i18n.devices.popupSettings.restrictions.menuTitle }}</a></li>
-					{{#if isE911Enabled}}
+					{{#if showEmergencyCnam}}
 						<li><a class="tabs-selector change-section" data-section="callerId" href="javascript:void(0)"><i class="fa fa-ambulance"></i>{{ i18n.devices.popupSettings.callerId.menuTitle }}</a></li>
 					{{/if}}
 				</ul>
@@ -115,7 +115,7 @@
 				</div>
 			</div>
 
-			{{#if isE911Enabled}}
+			{{#if showEmergencyCnam}}
 				<div class="tabs-section clearfix" data-section="callerId">
 					<div class="title">
 						{{ i18n.devices.popupSettings.callerId.sectionTitle }}
