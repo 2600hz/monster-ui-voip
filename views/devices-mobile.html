@@ -21,13 +21,17 @@
 					<b class="caret"></b>
 				</a>
 				<ul class="dropdown-menu pull-right">
+				{{#compare device_type "!==" "mobile"}}
 					<li><a class="tabs-selector change-section" data-section="audio" href="javascript:void(0)"><i class="fa fa-music"></i>{{ i18n.devices.popupSettings.audio.menuTitle }}</a></li>
 					<li><a class="tabs-selector change-section" data-section="video" href="javascript:void(0)"><i class="fa fa-video-camera"></i>{{ i18n.devices.popupSettings.video.menuTitle }}</a></li>
+				{{/compare}}
 					<li><a class="tabs-selector change-section" data-section="restrictions" href="javascript:void(0)"><i class="fa fa-ban"></i>{{ i18n.devices.popupSettings.restrictions.menuTitle }}</a></li>
+				{{#compare device_type "!==" "mobile"}}
 					{{#if showEmergencyCnam}}
 						<li><a class="tabs-selector change-section" data-section="callerId" href="javascript:void(0)"><i class="fa fa-ambulance"></i>{{ i18n.devices.popupSettings.callerId.menuTitle }}</a></li>
 					{{/if}}
 					<li><a class="tabs-selector change-section" data-section="miscellaneous" href="javascript:void(0)"><i class="fa fa-cogs"></i>{{ i18n.devices.popupSettings.miscellaneous.menuTitle }}</a></li>
+				{{/compare}}
 				</ul>
 			</li>
 		</ul>
@@ -39,28 +43,28 @@
 				<div class="control-group">
 					<label class="control-label" for="name">{{ i18n.devices.mobile.deviceName }}</label>
 					<div class="controls">
-						<input type="text" id="name" name="name" value="{{name}}">
+						<div class="text">{{name}}</div>
 					</div>
 				</div>
 
 				<div class="control-group">
 					<label class="control-label" for="mobile_mdn">{{ i18n.devices.mobile.mdn }}</label>
 					<div class="controls">
-						<input required minlength="10" maxlength="10" type="text" id="mobile_mdn" name="mobile.mdn" value="{{mobile.mdn}}" placeholder="{{ i18n.devices.mobile.mdnPlaceholder }}">
+						<div class="text">{{mobile.mdn}}</div>
 					</div>
 				</div>
 
 				<div class="control-group">
 					<label class="control-label" for="sip_username">{{ i18n.devices.sip.username }}</label>
 					<div class="controls">
-						<input type="text" id="sip_username" name="sip.username" value="{{sip.username}}">
+						<div class="text">{{sip.username}}</div>
 					</div>
 				</div>
 
 				<div class="control-group">
 					<label class="control-label" for="sip_password">{{ i18n.devices.sip.password }}</label>
 					<div class="controls">
-						<input type="password" id="sip_password" name="sip.password" value="{{sip.password}}">
+						<div class="text">{{sip.password}}</div>
 					</div>
 				</div>
 
