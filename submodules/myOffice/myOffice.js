@@ -10,7 +10,7 @@ define(function(require){
 
 		subscribe: {
 			'voip.myOffice.render': 'myOfficeRender',
-			'myaccount.closed': 'myOfficeMyAccountClosed'
+			'auth.continueTrial': 'myOfficeWalkthroughRender'
 		},
 
 		chartColors: [
@@ -116,6 +116,12 @@ define(function(require){
 				parent
 					.empty()
 					.append(template);
+
+				// If it's not a trial, we show the Walkthrough the first time
+				// If it's a trial, this code will be called by trial handler
+				if(!monster.apps.auth.currentAccount.hasOwnProperty('trial_time_left')) {
+					self.myOfficeWalkthroughRender();
+				}
 
 				callback && callback();
 			});
@@ -947,7 +953,7 @@ define(function(require){
 			loadNumberDetails(callerIdNumberSelect.val());
 		},
 
-		myOfficeMyAccountClosed: function() {
+		myOfficeWalkthroughRender: function() {
 			var self = this;
 
 			if(self.isActive()) {
