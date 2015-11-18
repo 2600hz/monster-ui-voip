@@ -300,6 +300,10 @@
 	margin: 10px 25px;
 }
 
+.voip-edit-device-popup .edit-device .content #form_device .controls .text {
+	padding-top: 5px;
+}
+
 .voip-edit-device-popup .edit-device .content #form_device .displayed-realm {
 	line-height: 30px;
 	font-weight: bold;
