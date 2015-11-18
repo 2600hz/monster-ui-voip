@@ -1249,7 +1249,7 @@ define(function(require){
 							currentUser: currentUser
 						});
 					} else {
-						monster.ui.alert('error', self.i18n.active().users.call_recording.noNumber);
+						monster.ui.alert('error', self.i18n.active().users.callRecording.noNumber);
 					}
 				});
 			});
