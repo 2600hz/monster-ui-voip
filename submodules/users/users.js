@@ -407,13 +407,19 @@ define(function(require){
 						}
 					}
 					else {
-						mapUsers[userId].extra.devices.push({
-							id: device.id,
-							name: device.name + ' (' + device.device_type.replace('_', ' ') + ')',
-							type: device.device_type,
-							registered: isRegistered,
-							icon: self.deviceIcons[device.device_type]
-						});
+						var deviceDataToTemplate = {
+								id: device.id,
+								name: device.name + ' (' + device.device_type.replace('_', ' ') + ')',
+								type: device.device_type,
+								registered: isRegistered,
+								icon: self.deviceIcons[device.device_type]
+							};
+
+						if (device.device_type === 'mobile') {
+							deviceDataToTemplate.mobile = device.mobile;
+						}
+
+						mapUsers[userId].extra.devices.push(deviceDataToTemplate);
 					}
 				}
 			});
