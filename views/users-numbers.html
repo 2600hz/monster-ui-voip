@@ -5,8 +5,9 @@
 				{{ i18n.users.noAssignedNumbers }}
 			</div>
 			{{#each assignedNumbers}}
-				<div class="item-row" data-id="{{this.phoneNumber}}" data-search="{{formatPhoneNumber this.phoneNumber}} {{this.phoneNumber}} {{this.locality.city}} {{this.locality.country}}">
+				<div class="item-row" data-id="{{this.phoneNumber}}" data-type="{{this.used_by}}" data-search="{{formatPhoneNumber this.phoneNumber}} {{this.phoneNumber}} {{this.locality.city}} {{this.locality.country}}">
 					<div class="features-block pull-right">
+					{{#compare this.used_by "!==" "mobile"}}
 						<div class="edit-features">
 							<div class="navbar">
 								<ul class="nav pull-right">
@@ -14,19 +15,20 @@
 										<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cog"></i></a>
 										<ul class="dropdown-menu">
 										{{#unless this.isLocal}}
-											{{#if ../../isCnamEnabled}}
-												<li><a class="callerId-number" href="#"><i class="fa fa-user"></i>{{ ../../../i18n.callerId }}</a></li>
+											{{#if ../../../isCnamEnabled}}
+												<li><a class="callerId-number" href="#"><i class="fa fa-user"></i>{{ ../../../../i18n.callerId }}</a></li>
 											{{/if}}
-											{{#if ../../isE911Enabled}}
-												<li><a class="e911-number" href="#"><i class="fa fa-ambulance"></i>{{ ../../../i18n.e911 }}</a></li>
+											{{#if ../../../isE911Enabled}}
+												<li><a class="e911-number" href="#"><i class="fa fa-ambulance"></i>{{ ../../../../i18n.e911 }}</a></li>
 											{{/if}}
 										{{/unless}}
-											<li><a class="prepend-number" href="#"><i class="fa fa-file-text-o"></i>{{ ../i18n.numberPrepend }}</a></li>
+											<li><a class="prepend-number" href="#"><i class="fa fa-file-text-o"></i>{{ ../../i18n.numberPrepend }}</a></li>
 										</ul>
 									</li>
 								</ul>
 							</div>
 						</div>
+					{{/compare}}
 						<div class="features">
 						{{#compare this.state '===' 'port_in'}}
 							<i class="fa fa-exclamation-triangle monster-red active help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{../../i18n.portIconHelp}}"></i>
@@ -36,9 +38,11 @@
 							{{/each}}
 						</div>
 					</div>
-					<div class="number">
-						<button type="button" class="monster-button monster-button-danger remove-number">{{ ../i18n.unassign }}</button>
-						{{ formatPhoneNumber this.phoneNumber }}
+					<div class="number-container">
+						<button type="button" class="monster-button monster-button-danger remove-number{{#compare this.used_by "===" "mobile"}} disabled" disabled{{else}}"{{/compare}}>{{ ../i18n.unassign }}</button>
+						<span class="number">
+							{{ formatPhoneNumber this.phoneNumber }}
+						</span>
 					</div>
 					<!--<div class="locality">
 						{{#if this.localityEnabled}}

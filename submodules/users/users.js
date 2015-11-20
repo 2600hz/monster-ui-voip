@@ -1018,15 +1018,33 @@ define(function(require){
 			});
 
 			template.on('click', '.detail-devices .list-assigned-items .remove-device', function() {
-				var row = $(this).parents('.item-row');
+				var row = $(this).parents('.item-row'),
+					userId = template.find('.grid-row.active').data('id'),
+					deviceId = row.data('id'),
+					userData = _.find(data.users, function(user, idx) { return user.id === userId; }),
+					deviceData = _.find(userData.extra.devices, function(device, idx) { return device.id === deviceId; }),
+					removeDevice = function () {
+						if(row.hasClass('assigned')) {
+							unassignedDevices[row.data('id')] = true;
+						}
+						row.remove();
+						var rows = template.find('.detail-devices .list-assigned-items .item-row');
+						if(rows.is(':visible') === false) {
+							template.find('.detail-devices .list-assigned-items .empty-row').show();
+						}
+					};
 
-				if(row.hasClass('assigned')) {
-					unassignedDevices[row.data('id')] = true;
+				if (deviceData.type === 'mobile') {
+					monster.ui.confirm(
+						self.i18n.active().users.confirmMobileUnAssignment.replace(
+							'{{variable}}',
+							monster.util.formatPhoneNumber(deviceData.mobile.mdn)
+						),
+						removeDevice
+					);
 				}
-				row.remove();
-				var rows = template.find('.detail-devices .list-assigned-items .item-row');
-				if(rows.is(':visible') === false) {
-					template.find('.detail-devices .list-assigned-items .empty-row').show();
+				else {
+					removeDevice();
 				}
 			});
 
@@ -1035,17 +1053,19 @@ define(function(require){
 				var $this = $(this),
 					row = $this.parents('.item-row');
 
-				extraSpareNumbers.push(row.data('id'));
+				if (row.data('type') !== 'mobile') {
+					extraSpareNumbers.push(row.data('id'));
 
-				row.slideUp(function() {
-					row.remove();
+					row.slideUp(function() {
+						row.remove();
 
-					if ( !template.find('.list-assigned-items .item-row').is(':visible') ) {
-						template.find('.list-assigned-items .empty-row').slideDown();
-					}
+						if ( !template.find('.list-assigned-items .item-row').is(':visible') ) {
+							template.find('.list-assigned-items .empty-row').slideDown();
+						}
 
-					template.find('.spare-link').removeClass('disabled');
-				});
+						template.find('.spare-link').removeClass('disabled');
+					});
+				}
 			});
 
 			template.on('click', '.actions .spare-link:not(.disabled)', function(e) {
@@ -2590,10 +2610,9 @@ define(function(require){
 			});
 		},
 
-		usersGetNumbersData: function(userId, callback) {
-			var self = this;
-
-			monster.parallel({
+		usersGetNumbersData: function(userId, callback, loadNumbersView) {
+			var self = this,
+				parallelRequests = {
 					user: function(callbackParallel) {
 						self.usersGetUser(userId, function(user) {
 							callbackParallel && callbackParallel(null, user);
@@ -2639,13 +2658,20 @@ define(function(require){
 						self.usersListNumbers(function(listNumbers) {
 							callbackParallel && callbackParallel(null, listNumbers);
 						});
-
 					}
-				},
-				function(err, results) {
-					callback && callback(results);
 				}
-			);
+
+			if (loadNumbersView) {
+				parallelRequests.devices = function(callbackParallel) {
+					self.usersListDeviceUser(userId, function (listDevices) {
+						callbackParallel && callbackParallel(null, listDevices);
+					});
+				};
+			}
+
+			monster.parallel(parallelRequests, function(err, results) {
+				callback && callback(results);
+			});
 		},
 
 		usersGetNumbersTemplate: function(userId, callback) {
@@ -2660,7 +2686,7 @@ define(function(require){
 
 					callback && callback(template, results);
 				});
-			});
+			}, true);
 		},
 		usersGetDevicesTemplate: function(userId, callback) {
 			var self = this;
@@ -2718,6 +2744,21 @@ define(function(require){
 					user: data.user || {}
 				};
 
+			if (data.devices.length) {
+				_.each(data.devices, function(device, idx) {
+					if (device.device_type === 'mobile') {
+						data.numbers.numbers[device.mobile.mdn] = {
+							assigned_to: response.user.id,
+							features: [ 'mobile' ],
+							isLocal: false,
+							phoneNumber: device.mobile.mdn,
+							state: 'in_service',
+							used_by: 'mobile'
+						};
+					}
+				});
+			}
+
 			monster.pub('common.numbers.getListFeatures', function(features) {
 				if('numbers' in data.numbers) {
 					_.each(data.numbers.numbers, function(number, k) {
@@ -2736,6 +2777,9 @@ define(function(require){
 						if(number.used_by === '') {
 							response.countSpare++;
 							response.unassignedNumbers[k] = number;
+						}
+						else if (number.used_by === 'mobile') {
+							response.assignedNumbers.push(number);
 						}
 					});
 				}
