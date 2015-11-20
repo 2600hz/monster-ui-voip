@@ -328,6 +328,20 @@ define(function(require){
 				mapUsers[user.id] = self.usersFormatUserData(user);
 			});
 
+			// Inject MDNs into the numbers' indicator so they are displayed like Kazoo numbers
+			_.each(data.devices, function(device, idx) {
+				if (device.device_type === 'mobile'&& device.hasOwnProperty('owner_id')) {
+					var user = mapUsers[device.owner_id];
+
+					if (user.extra.phoneNumber === '') {
+						user.extra.phoneNumber = device.mobile.mdn;
+					}
+					else {
+						user.extra.additionalNumbers++;
+					}
+				}
+			});
+
 			_.each(data.callflows, function(callflow) {
 				if(callflow.type !== 'faxing') {
 					var userId = callflow.owner_id;
