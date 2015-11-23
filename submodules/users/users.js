@@ -3292,6 +3292,23 @@ define(function(require){
 			});
 		},
 
+		usersSearchMobileCallflowsByNumber: function (userId, phoneNumber, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'callflow.searchByNumber',
+				data: {
+					accountId: self.accountId,
+					value: encodeURIComponent('+1' + phoneNumber),
+					filter_owner_id: userId,
+					filter_type: 'mobile'
+				},
+				success: function(data) {
+					callback(data.data[0]);
+				}
+			});
+		},
+
 		usersGetMainDirectory: function(callback) {
 			var self = this;
 
@@ -3778,16 +3795,19 @@ define(function(require){
 		usersUpdateDevices: function(data, userId, callbackAfterUpdate) {
 			var self = this,
 				updateDevices = function(userCallflow) {
-					var listFnParallel = [];
+					var listFnParallel = [],
+						updateDeviceRequest = function (newDataDevice, callback) {
+							self.usersUpdateDevice(newDataDevice, function (updatedDataDevice) {
+								callback(null, updatedDataDevice);
+							});
+						}
 
 					_.each(data.new, function(deviceId) {
 						listFnParallel.push(function(callback) {
 							self.usersGetDevice(deviceId, function(data) {
 								data.owner_id = userId;
 
-								self.usersUpdateDevice(data, function(data) {
-									callback(null, data);
-								});
+								updateDeviceRequest(data, callback);
 							});
 						});
 					});
@@ -3797,9 +3817,37 @@ define(function(require){
 							self.usersGetDevice(deviceId, function(data) {
 								delete data.owner_id;
 
-								self.usersUpdateDevice(data, function(data) {
-									callback(null, data);
-								});
+								if (data.device_type === 'mobile') {
+									self.usersSearchMobileCallflowsByNumber(userId, data.mobile.mdn, function (listCallflowData) {
+										self.callApi({
+											resource: 'callflow.get',
+											data: {
+												accountId: self.accountId,
+												callflowId: listCallflowData.id
+											},
+											success: function(rawCallflowData, status) {
+												var callflowData = rawCallflowData.data;
+
+												delete callflowData.owner_id;
+												$.extend(true, callflowData, {
+													flow: {
+														module: 'device',
+														data: {
+															id: deviceId
+														}
+													}
+												});
+
+												self.usersUpdateCallflow(callflowData, function () {
+													updateDeviceRequest(data, callback);
+												});
+											}
+										});
+									});
+								}
+								else {
+									updateDeviceRequest(data, callback);
+								}
 							});
 						});
 					});
