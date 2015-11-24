@@ -3807,7 +3807,50 @@ define(function(require){
 							self.usersGetDevice(deviceId, function(data) {
 								data.owner_id = userId;
 
-								updateDeviceRequest(data, callback);
+								if (data.device_type === "mobile") {
+									self.usersSearchMobileCallflowsByNumber(userId, data.mobile.mdn, function (listCallflowData) {
+										self.callApi({
+											resource: 'callflow.get',
+											data: {
+												accountId: self.accountId,
+												callflowId: listCallflowData.id
+											},
+											success: function(rawCallflowData, status) {
+												var callflowData = rawCallflowData.data;
+
+												if (userCallflow) {
+													$.extend(true, callflowData, {
+														owner_id: userId,
+														flow: {
+															module: 'callflow',
+															data: {
+																id: userCallflow.id
+															}
+														}
+													});
+												}
+												else {
+													$.extend(true, callflowData, {
+														owner_id: userId,
+														flow: {
+															module: 'device',
+															data: {
+																id: deviceId
+															}
+														}
+													});
+												}
+
+												self.usersUpdateCallflow(callflowData, function () {
+													updateDeviceRequest(data, callback);
+												});
+											}
+										});
+									});
+								}
+								else {
+									updateDeviceRequest(data, callback);
+								}
 							});
 						});
 					});
