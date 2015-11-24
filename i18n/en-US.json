@@ -656,7 +656,11 @@
 				"5": "Autoprovision one of our supported devices. The UI comes complete with pre-populated manufacturers and devices. Once complete it will automatically be assigned to the specific user.",
 				"6": "Manage what features Users can access. Turn on/off and manage any of the specific User Features."
 			}
-		}
+		},
+
+		"__comment": "UI-1888: ",
+		"__version": "4.0",
+		"confirmMobileUnAssignment": "You are about to un-assign a Mobile device. Be aware the phone number associated with this device ({{variable}}) will also be un-assigned from this user. Are you sure?"
 	},
 
 	"strategy": {
