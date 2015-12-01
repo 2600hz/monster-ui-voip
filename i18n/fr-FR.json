@@ -605,7 +605,9 @@
 				"5": "Ajouter des téléphones à vos utilisateurs via cette case.",
 				"6": "Gérez les différentes fonctionnalités disponibles pour vos utilisateurs via ce menu."
 			}
-		}
+		},
+
+		"confirmMobileUnAssignment": "Vous allez retirer un téléphone mobile. Le numéro lié à ce téléphone ({{variable}}) sera aussi retiré de cet utilisateur. Voulez-vous continuer ?"
 	},
 
 	"strategy": {

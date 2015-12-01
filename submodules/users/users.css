@@ -435,6 +435,10 @@
 }
 
 /* Detail Numbers */
+#users_container .detail-numbers .list-wrapper .item-row .number-container {
+	min-width: 237px;
+}
+
 #users_container .detail-numbers .list-wrapper .item-row .features .tooltip-inner {
 	white-space:pre-wrap;
 }
