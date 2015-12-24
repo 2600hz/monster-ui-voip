@@ -167,7 +167,7 @@ define(function(require){
 								dataDevice.provision.feature_keys = {};
 							}
 
-							for (var i = 1, len = template.feature_keys.iterate; i < len; i++) {
+							for (var i = 0, len = template.feature_keys.iterate; i < len; i++) {
 								if (!dataDevice.provision.feature_keys.hasOwnProperty(i)) {
 									dataDevice.provision.feature_keys[i] = { type: 'none' };
 								}
