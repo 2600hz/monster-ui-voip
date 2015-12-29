@@ -583,7 +583,7 @@ define(function(require){
 				var featureKeys = {};
 
 				formData.provision.feature_keys.forEach(function(val, idx) {
-					featureKeys[idx + 1] = val;
+					featureKeys[idx] = val;
 				});
 
 				formData.provision.feature_keys = featureKeys;
