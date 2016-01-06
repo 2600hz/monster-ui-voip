@@ -354,6 +354,10 @@ define(function(require){
 				delete mergedData.timezone;
 			}
 
+			if(mergedData.media && mergedData.media.unavailable === 'none') {
+				delete mergedData.media.unavailable;
+			}
+
 			delete mergedData.extra;
 
 			return mergedData;
