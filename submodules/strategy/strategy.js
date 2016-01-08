@@ -2530,9 +2530,20 @@ define(function(require){
 					groupName: self.i18n.active().strategy.callEntities[key],
 					groupType: key,
 					entities: $.map(value, function(entity) {
+						var name = entity.name;
+
+						if(!name) {
+							if(entity.hasOwnProperty('first_name')) {
+								name = entity.first_name + ' ' + entity.last_name;
+							}
+							else if (entity.hasOwnProperty('numbers')) {
+								name = entity.numbers.toString();
+							}
+						}
+
 						return {
 							id: entity.id,
-							name: entity.name || (entity.first_name + ' ' + entity.last_name),
+							name: name,
 							module: entity.module || key
 						};
 					})
