@@ -80,8 +80,6 @@ define(function(require){
 
 				if(_userId && _openedTab) {
 					template.find('.grid-row[data-id="'+ _userId +'"] .grid-cell[data-type="' + _openedTab + '"]').click();
-
-					args.callback && args.callback();
 				}
 
 				callback && callback();
