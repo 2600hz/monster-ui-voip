@@ -813,7 +813,7 @@ define(function(require){
 				mapIconClass = {
 					cellphone: 'fa fa-phone',
 					smartphone: 'icon-telicon-mobile-phone',
-					landline: 'icon-telicon-home-phone',
+					landline: 'icon-telicon-home',
 					mobile: 'icon-telicon-sprint-phone',
 					softphone: 'icon-telicon-soft-phone',
 					sip_device: 'icon-telicon-voip-phone',
