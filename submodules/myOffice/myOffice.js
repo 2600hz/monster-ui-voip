@@ -891,7 +891,7 @@ define(function(require){
 							});
 						});
 					},
-					setCallerId = function () {
+					setNumberData = function (e911Data) {
 						var callerIdName = callerIdNameInput.val();
 
 						account.caller_id = $.extend(true, {}, account.caller_id, {
@@ -910,6 +910,12 @@ define(function(require){
 								delete numberData.cnam;
 							}
 
+							if(e911Data) {
+								$.extend(true, numberData, {
+									dash_e911: e911Data
+								});
+							}
+
 							self.myOfficeUpdateNumber(numberData, function(data) {
 								updateAccount();
 							});
@@ -923,19 +929,18 @@ define(function(require){
 
 				if(callerIdNumber) {
 					if (monster.util.isNumberFeatureEnabled('e911')) {
-						if (monster.ui.valid(e911Form)) {
-							$.extend(true, numberData, {
-								dash_e911: monster.ui.getFormData(e911Form[0])
-							});
 
-							setCallerId();
+						if (monster.ui.valid(e911Form)) {
+							var e911Data = monster.ui.getFormData(e911Form[0]);
+
+							setNumberData(e911Data);
 						}
 						else {
 							monster.ui.alert(self.i18n.active().myOffice.callerId.mandatoryE911Alert);
 						}
 					}
 					else {
-						setCallerId();
+						setNumberData();
 					}
 				} else {
 					delete account.caller_id.external;
