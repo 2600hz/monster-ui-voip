@@ -17,7 +17,7 @@ define(function(require){
 		deviceIcons: {
 			'cellphone': 'fa fa-phone',
 			'smartphone': 'icon-telicon-mobile-phone',
-			'landline': 'icon-telicon-home-phone',
+			'landline': 'icon-telicon-home',
 			'mobile': 'icon-telicon-sprint-phone',
 			'softphone': 'icon-telicon-soft-phone',
 			'sip_device': 'icon-telicon-voip-phone',
@@ -326,6 +326,20 @@ define(function(require){
 				mapUsers[user.id] = self.usersFormatUserData(user);
 			});
 
+			// Inject MDNs into the numbers' indicator so they are displayed like Kazoo numbers
+			_.each(data.devices, function(device, idx) {
+				if (device.device_type === 'mobile'&& device.hasOwnProperty('owner_id')) {
+					var user = mapUsers[device.owner_id];
+
+					if (user.extra.phoneNumber === '') {
+						user.extra.phoneNumber = device.mobile.mdn;
+					}
+					else {
+						user.extra.additionalNumbers++;
+					}
+				}
+			});
+
 			_.each(data.callflows, function(callflow) {
 				if(callflow.type !== 'faxing') {
 					var userId = callflow.owner_id;
@@ -391,13 +405,19 @@ define(function(require){
 						}
 					}
 					else {
-						mapUsers[userId].extra.devices.push({
-							id: device.id,
-							name: device.name + ' (' + device.device_type.replace('_', ' ') + ')',
-							type: device.device_type,
-							registered: isRegistered,
-							icon: self.deviceIcons[device.device_type]
-						});
+						var deviceDataToTemplate = {
+								id: device.id,
+								name: device.name + ' (' + device.device_type.replace('_', ' ') + ')',
+								type: device.device_type,
+								registered: isRegistered,
+								icon: self.deviceIcons[device.device_type]
+							};
+
+						if (device.device_type === 'mobile') {
+							deviceDataToTemplate.mobile = device.mobile;
+						}
+
+						mapUsers[userId].extra.devices.push(deviceDataToTemplate);
 					}
 				}
 			});
@@ -1002,15 +1022,33 @@ define(function(require){
 			});
 
 			template.on('click', '.detail-devices .list-assigned-items .remove-device', function() {
-				var row = $(this).parents('.item-row');
+				var row = $(this).parents('.item-row'),
+					userId = template.find('.grid-row.active').data('id'),
+					deviceId = row.data('id'),
+					userData = _.find(data.users, function(user, idx) { return user.id === userId; }),
+					deviceData = _.find(userData.extra.devices, function(device, idx) { return device.id === deviceId; }),
+					removeDevice = function () {
+						if(row.hasClass('assigned')) {
+							unassignedDevices[row.data('id')] = true;
+						}
+						row.remove();
+						var rows = template.find('.detail-devices .list-assigned-items .item-row');
+						if(rows.is(':visible') === false) {
+							template.find('.detail-devices .list-assigned-items .empty-row').show();
+						}
+					};
 
-				if(row.hasClass('assigned')) {
-					unassignedDevices[row.data('id')] = true;
+				if (deviceData.type === 'mobile') {
+					monster.ui.confirm(
+						self.i18n.active().users.confirmMobileUnAssignment.replace(
+							'{{variable}}',
+							monster.util.formatPhoneNumber(deviceData.mobile.mdn)
+						),
+						removeDevice
+					);
 				}
-				row.remove();
-				var rows = template.find('.detail-devices .list-assigned-items .item-row');
-				if(rows.is(':visible') === false) {
-					template.find('.detail-devices .list-assigned-items .empty-row').show();
+				else {
+					removeDevice();
 				}
 			});
 
@@ -1019,17 +1057,19 @@ define(function(require){
 				var $this = $(this),
 					row = $this.parents('.item-row');
 
-				extraSpareNumbers.push(row.data('id'));
+				if (row.data('type') !== 'mobile') {
+					extraSpareNumbers.push(row.data('id'));
 
-				row.slideUp(function() {
-					row.remove();
+					row.slideUp(function() {
+						row.remove();
 
-					if ( !template.find('.list-assigned-items .item-row').is(':visible') ) {
-						template.find('.list-assigned-items .empty-row').slideDown();
-					}
+						if ( !template.find('.list-assigned-items .item-row').is(':visible') ) {
+							template.find('.list-assigned-items .empty-row').slideDown();
+						}
 
-					template.find('.spare-link').removeClass('disabled');
-				});
+						template.find('.spare-link').removeClass('disabled');
+					});
+				}
 			});
 
 			template.on('click', '.actions .spare-link:not(.disabled)', function(e) {
@@ -2044,7 +2084,10 @@ define(function(require){
 									id: currentUser.id,
 									timeout: 20
 								};
+
 							}
+							flow.module = callflowNode.module;
+							flow.data = callflowNode.data;
 
 							// In next 5 lines, look for user/group node, and replace it with the new data;
 							var flow = userCallflow.flow;
@@ -2574,10 +2617,9 @@ define(function(require){
 			});
 		},
 
-		usersGetNumbersData: function(userId, callback) {
-			var self = this;
-
-			monster.parallel({
+		usersGetNumbersData: function(userId, callback, loadNumbersView) {
+			var self = this,
+				parallelRequests = {
 					user: function(callbackParallel) {
 						self.usersGetUser(userId, function(user) {
 							callbackParallel && callbackParallel(null, user);
@@ -2623,13 +2665,20 @@ define(function(require){
 						self.usersListNumbers(function(listNumbers) {
 							callbackParallel && callbackParallel(null, listNumbers);
 						});
-
 					}
-				},
-				function(err, results) {
-					callback && callback(results);
 				}
-			);
+
+			if (loadNumbersView) {
+				parallelRequests.devices = function(callbackParallel) {
+					self.usersListDeviceUser(userId, function (listDevices) {
+						callbackParallel && callbackParallel(null, listDevices);
+					});
+				};
+			}
+
+			monster.parallel(parallelRequests, function(err, results) {
+				callback && callback(results);
+			});
 		},
 
 		usersGetNumbersTemplate: function(userId, callback) {
@@ -2644,7 +2693,7 @@ define(function(require){
 
 					callback && callback(template, results);
 				});
-			});
+			}, true);
 		},
 		usersGetDevicesTemplate: function(userId, callback) {
 			var self = this;
@@ -2702,6 +2751,21 @@ define(function(require){
 					user: data.user || {}
 				};
 
+			if (data.hasOwnProperty('devices') && data.devices.length) {
+				_.each(data.devices, function(device, idx) {
+					if (device.device_type === 'mobile') {
+						data.numbers.numbers[device.mobile.mdn] = {
+							assigned_to: response.user.id,
+							features: [ 'mobile' ],
+							isLocal: false,
+							phoneNumber: device.mobile.mdn,
+							state: 'in_service',
+							used_by: 'mobile'
+						};
+					}
+				});
+			}
+
 			monster.pub('common.numbers.getListFeatures', function(features) {
 				if('numbers' in data.numbers) {
 					_.each(data.numbers.numbers, function(number, k) {
@@ -2720,6 +2784,9 @@ define(function(require){
 						if(number.used_by === '') {
 							response.countSpare++;
 							response.unassignedNumbers[k] = number;
+						}
+						else if (number.used_by === 'mobile') {
+							response.assignedNumbers.push(number);
 						}
 					});
 				}
@@ -3226,6 +3293,23 @@ define(function(require){
 			});
 		},
 
+		usersSearchMobileCallflowsByNumber: function (userId, phoneNumber, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'callflow.searchByNumber',
+				data: {
+					accountId: self.accountId,
+					value: encodeURIComponent('+1' + phoneNumber),
+					filter_owner_id: userId,
+					filter_type: 'mobile'
+				},
+				success: function(data) {
+					callback(data.data[0]);
+				}
+			});
+		},
+
 		usersGetMainDirectory: function(callback) {
 			var self = this;
 
@@ -3712,16 +3796,62 @@ define(function(require){
 		usersUpdateDevices: function(data, userId, callbackAfterUpdate) {
 			var self = this,
 				updateDevices = function(userCallflow) {
-					var listFnParallel = [];
+					var listFnParallel = [],
+						updateDeviceRequest = function (newDataDevice, callback) {
+							self.usersUpdateDevice(newDataDevice, function (updatedDataDevice) {
+								callback(null, updatedDataDevice);
+							});
+						}
 
 					_.each(data.new, function(deviceId) {
 						listFnParallel.push(function(callback) {
 							self.usersGetDevice(deviceId, function(data) {
 								data.owner_id = userId;
 
-								self.usersUpdateDevice(data, function(data) {
-									callback(null, data);
-								});
+								if (data.device_type === "mobile") {
+									self.usersSearchMobileCallflowsByNumber(userId, data.mobile.mdn, function (listCallflowData) {
+										self.callApi({
+											resource: 'callflow.get',
+											data: {
+												accountId: self.accountId,
+												callflowId: listCallflowData.id
+											},
+											success: function(rawCallflowData, status) {
+												var callflowData = rawCallflowData.data;
+
+												if (userCallflow) {
+													$.extend(true, callflowData, {
+														owner_id: userId,
+														flow: {
+															module: 'callflow',
+															data: {
+																id: userCallflow.id
+															}
+														}
+													});
+												}
+												else {
+													$.extend(true, callflowData, {
+														owner_id: userId,
+														flow: {
+															module: 'device',
+															data: {
+																id: deviceId
+															}
+														}
+													});
+												}
+
+												self.usersUpdateCallflow(callflowData, function () {
+													updateDeviceRequest(data, callback);
+												});
+											}
+										});
+									});
+								}
+								else {
+									updateDeviceRequest(data, callback);
+								}
 							});
 						});
 					});
@@ -3731,9 +3861,37 @@ define(function(require){
 							self.usersGetDevice(deviceId, function(data) {
 								delete data.owner_id;
 
-								self.usersUpdateDevice(data, function(data) {
-									callback(null, data);
-								});
+								if (data.device_type === 'mobile') {
+									self.usersSearchMobileCallflowsByNumber(userId, data.mobile.mdn, function (listCallflowData) {
+										self.callApi({
+											resource: 'callflow.get',
+											data: {
+												accountId: self.accountId,
+												callflowId: listCallflowData.id
+											},
+											success: function(rawCallflowData, status) {
+												var callflowData = rawCallflowData.data;
+
+												delete callflowData.owner_id;
+												$.extend(true, callflowData, {
+													flow: {
+														module: 'device',
+														data: {
+															id: deviceId
+														}
+													}
+												});
+
+												self.usersUpdateCallflow(callflowData, function () {
+													updateDeviceRequest(data, callback);
+												});
+											}
+										});
+									});
+								}
+								else {
+									updateDeviceRequest(data, callback);
+								}
 							});
 						});
 					});

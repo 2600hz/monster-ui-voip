@@ -10,7 +10,8 @@ define(function(require){
 
 		subscribe: {
 			'voip.myOffice.render': 'myOfficeRender',
-			'myaccount.closed': 'myOfficeMyAccountClosed'
+			'auth.continueTrial': 'myOfficeWalkthroughRender',
+			'myaccount.closed': 'myOfficeAfterMyaccountClosed'
 		},
 
 		chartColors: [
@@ -117,8 +118,35 @@ define(function(require){
 					.empty()
 					.append(template);
 
+				self.myOfficeCheckWalkthrough();
+
 				callback && callback();
 			});
+		},
+
+		// we check if we have to display the walkthrough:
+		// first make sure it's not a trial, then
+		// only show it if we've already shown the walkthrough in myaccount 
+		myOfficeCheckWalkthrough: function() {
+			var self = this;
+
+			if(!monster.apps.auth.currentAccount.hasOwnProperty('trial_time_left')) {
+				monster.pub('myaccount.hasToShowWalkthrough', function(response) {
+					if(response === false) {
+						self.myOfficeWalkthroughRender();
+					}
+				});
+			}
+		},
+
+		myOfficeAfterMyaccountClosed: function() {
+			var self = this;
+
+			// If it's not a trial, we show the Walkthrough the first time
+			// because if it's a trial, myOfficeWalkthroughRender will be called by another event
+			if(!monster.apps.auth.currentAccount.hasOwnProperty('trial_time_left')) {
+				self.myOfficeWalkthroughRender();
+			}
 		},
 
 		myOfficeCreateMainVMBoxIfMissing: function(callback) {
@@ -952,7 +980,7 @@ define(function(require){
 			loadNumberDetails(callerIdNumberSelect.val());
 		},
 
-		myOfficeMyAccountClosed: function() {
+		myOfficeWalkthroughRender: function() {
 			var self = this;
 
 			if(self.isActive()) {

@@ -1,12 +1,12 @@
-<div class="holidays-element" {{#if id}}data-id="{{id}}{{/if}}">
+<div class="holidays-element" {{#if id}}data-id="{{id}}"{{/if}} data-type="{{#if set}}set{{else}}rule{{/if}}">
 	<div class="delete-holiday">
 		<i class="fa fa-trash-o monster-red"></i>
 	</div>
 	<div class="holiday-inputs">
 		<input type="text" class="name" value="{{name}}">
-		<select class="month">
+		<select class="month from">
 			{{#each resources.months}}
-				<option value="{{this.value}}" {{#compare this.value '===' ../month}}selected{{/compare}}>{{this.label}}</option>
+				<option value="{{this.value}}" {{#compare this.value '===' ../fromMonth}}selected{{/compare}}>{{this.label}}</option>
 			{{/each}}
 		</select>
 		{{#compare holidayType '===' 'advanced'}}
@@ -28,6 +28,11 @@
 			</select>
 			{{#compare holidayType '===' 'range'}}
 				<span>to</span>
+				<select class="month to">
+					{{#each resources.months}}
+						<option value="{{this.value}}" {{#compare this.value '===' ../toMonth}}selected{{/compare}}>{{this.label}}</option>
+					{{/each}}
+				</select>
 				<select class="day to">
 					{{#each resources.days}}
 						<option value="{{this.value}}" {{#compare this.value '===' ../toDay}}selected{{/compare}}>{{this.value}}</option>

@@ -367,7 +367,6 @@ define(function(require){
 				});
 			});
 
-
 			self.strategyNumbersBindEvents(strategyNumbersContainer, strategyData);
 			self.strategyConfNumBindEvents(strategyConfNumContainer, strategyData);
 			self.strategyFaxingNumBindEvents(strategyFaxingNumContainer, strategyData);
@@ -571,20 +570,33 @@ define(function(require){
 									holidayData = {
 										id: val.id,
 										name: val.name,
-										month: val.month
+										fromMonth: val.month
 									};
 
-								if("ordinal" in val) {
-									holidayType = "advanced";
+								if(val.hasOwnProperty('ordinal')) {
+									holidayType = 'advanced';
 									holidayData.ordinal = val.ordinal;
 									holidayData.wday = val.wdays[0];
-								} else {
-									holidayData.fromDay = val.days[0];
-									if(val.days.length > 1) {
-										holidayType = "range";
-										holidayData.toDay = val.days[val.days.length-1];
-									} else {
-										holidayType = "single";
+								}
+								else {
+									if(val.hasOwnProperty('viewData')) {
+										holidayType = 'range';
+										holidayData.fromDay = val.viewData.fromDay;
+										holidayData.fromMonth = val.viewData.fromMonth;
+										holidayData.toDay = val.viewData.toDay;
+										holidayData.toMonth = val.viewData.toMonth;
+										holidayData.set = true;
+									}
+									else {
+										holidayData.fromDay = val.days[0];
+										if(val.days.length > 1) {
+											holidayType = 'range';
+											holidayData.toDay = val.days[val.days.length-1];
+											holidayData.toMonth = val.month;
+										}
+										else {
+											holidayType = 'single';
+										}
 									}
 								}
 
@@ -627,7 +639,6 @@ define(function(require){
 									voicemails: strategyData.voicemails,
 									tabMessage: self.i18n.active().strategy.calls.callTabsMessages[callflowName]
 								};
-
 
 							if (strategyData.callflows[callflowName].flow.hasOwnProperty("is_main_number_cf")) {
 								tabData.callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
@@ -1396,7 +1407,8 @@ define(function(require){
 
 			container.on('click', '.delete-holiday', function(e) {
 				var holidaysElement = $(this).parents('.holidays-element'),
-					id = holidaysElement.data('id');
+					id = holidaysElement.data('id'),
+					type = holidaysElement.data('type');
 
 				if(id) {
 					monster.ui.confirm(self.i18n.active().strategy.confirmMessages.deleteHoliday, function() {
@@ -1406,23 +1418,22 @@ define(function(require){
 						self.strategyRebuildMainCallflowRuleArray(strategyData);
 						self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
 							strategyData.callflows["MainCallflow"] = updatedCallflow;
-							self.callApi({
-								resource: 'temporalRule.delete',
-								data: {
-									accountId: self.accountId,
-									ruleId: id
-								},
-								success: function(data, status) {
-									delete strategyData.temporalRules.holidays[data.data.name];
-									holidaysElement.remove();
-								}
-							});
+							var afterDelete = function(data) {
+								delete strategyData.temporalRules.holidays[data.name];
+								holidaysElement.remove();
+							};
+
+							if(type === 'set') {
+								self.strategyDeleteRuleSetAndRules(id, afterDelete);
+							}
+							else {
+								self.strategyDeleteHoliday(id, afterDelete);
+							}
 						});
 					})
 				} else {
 					holidaysElement.remove();
 				}
-
 			});
 
 			container.on('click', '.save-button', function(e) {
@@ -1435,76 +1446,52 @@ define(function(require){
 
 				if(holidaysEnabled) {
 					$.each(container.find('.holidays-element'), function() {
-						var $this = $(this),
-							name = $this.find('.name').val().trim(),
-							month = $this.find('.month :selected').val(),
-							fromDay = $this.find('.day.from :selected').val(),
-							toDay = $this.find('.day.to :selected').val(),
-							ordinal = $this.find('.ordinal :selected').val(),
-							wday = $this.find('.wday :selected').val(),
-							id = $this.data('id'),
-							holidayRule = {
-								cycle: "yearly",
-								interval: 1,
-								month: parseInt(month),
-								type: "main_holidays"
-							};
+						var holidayRule = self.strategyBuildHolidayRule($(this), holidayRulesRequests);
 
-						if(!name || Object.keys(holidayRulesRequests).indexOf(name) >= 0) {
+						if(!holidayRule) {
 							invalidData = true;
 							return false;
 						}
 
-						holidayRule.name = name;
-						if(fromDay) {
-							var firstDay = parseInt(fromDay);
-							holidayRule.days = [firstDay];
-							if(toDay) {
-								var lastDay = parseInt(toDay);
-								for(var day = firstDay+1; day <= lastDay; day++) {
-									holidayRule.days.push(day);
-								}
-							}
-						} else {
-							holidayRule.ordinal = ordinal
-							holidayRule.wdays = [wday]
-						}
-
-						if(id) {
-							holidayRulesRequests[name] = function(callback) {
-								self.callApi({
-									resource: 'temporalRule.update',
-									data: {
-										accountId: self.accountId,
-										ruleId: id,
-										data: holidayRule
-									},
-									success: function(data, status) {
-										callback(null, data.data);
-									}
+						holidayRulesRequests[holidayRule.name] = function(callback) {
+							// ghetto strategyBuildHoliday builds a complete different object for a range, so we check if one of the different key is in there, if yes, this is a range spanning multiple months
+							if(holidayRule.hasOwnProperty('isRange')) {
+								self.strategyBuildMultiMonthRangeHoliday(holidayRule, function(data) {
+									data.viewData = holidayRule;
+									callback && callback(null, data);
 								});
 							}
-						} else {
-							holidayRulesRequests[name] = function(callback) {
-								self.callApi({
-									resource: 'temporalRule.create',
-									data: {
-										accountId: self.accountId,
-										data: holidayRule
-									},
-									success: function(data, status) {
-										callback(null, data.data);
-									}
+							else {
+								self.strategyCleanUpdateHoliday(holidayRule, function(data) {
+									callback && callback(null, data);
 								});
 							}
-						}
-
+						};
 					});
 
 					if(invalidData) {
 						monster.ui.alert(self.i18n.active().strategy.alertMessages.uniqueHoliday)
 					} else {
 						monster.parallel(holidayRulesRequests, function(err, results) {
+							// First extract all ids from the new holidayList
+							var existingHolidaysCallflowsIds = [],
+								newHolidayCallflowsIds = _.pluck(holidayRulesRequests, 'id');
+
+							// Find all IDs of existing Callflows in the Main Callflow that are linking to the Main Holidays
+							_.each(mainCallflow.flow.children, function(directChild, id) {
+								if(id !== '_' && directChild.data.id === strategyData.callflows["MainHolidays"].id) {
+									existingHolidaysCallflowsIds.push(id);
+								}
+							});
+
+							// Now see if any of these existing IDs that are no longer in the list of holidays
+							// If we find orphans, remove them from the main callflow
+							_.each(existingHolidaysCallflowsIds, function(id) {
+								if(newHolidayCallflowsIds.indexOf(id) < 0) {
+									delete mainCallflow.flow.children[id];
+								}
+							});
+
 							_.each(results, function(val, key) {
 								mainCallflow.flow.children[val.id] = {
 									children: {},
@@ -1526,21 +1513,21 @@ define(function(require){
 						});
 					}
 				} else {
-
 					monster.ui.confirm(self.i18n.active().strategy.confirmMessages.disableHolidays, function() {
 						_.each(strategyData.temporalRules.holidays, function(val, key) {
 							holidayRulesRequests[key] = function(callback) {
-								self.callApi({
-									resource: 'temporalRule.delete',
-									data: {
-										accountId: self.accountId,
-										ruleId: val.id
-									},
-									success: function(data, status) {
+								if(val.hasOwnProperty('temporal_rules')) {
+									self.strategyDeleteRuleSetAndRules(val.id, function() {
 										delete mainCallflow.flow.children[val.id];
-										callback(null, data.data);
-									}
-								});
+										callback(null, {});
+									});
+								}
+								else {
+									self.strategyDeleteHoliday(val.id, function() {
+										delete mainCallflow.flow.children[val.id];
+										callback(null, {});
+									});
+								}
 							}
 						});
 
@@ -1555,6 +1542,373 @@ define(function(require){
 							});
 						});
 					});
+				}
+			});
+		},
+
+		strategyCleanUpdateHoliday: function(data, callback) {
+			var self = this,
+				updateHoliday = function() {
+					delete data.extra;
+					self.strategyUpdateHoliday(data, function(data) {
+						callback && callback(data);
+					});
+				};
+
+			if(data.extra.oldType === 'set') {
+				self.strategyDeleteRuleSetAndRules(data.id, function() {
+					delete data.id;
+					updateHoliday();
+				});
+			}
+			else {
+				updateHoliday();
+			}
+		},
+
+		strategyBuildMultiMonthRangeHoliday: function(data, globalCallback) {
+			var self = this,
+				fromDay = parseInt(data.fromDay),
+				fromMonth = parseInt(data.fromMonth),
+				toDay = parseInt(data.toDay),
+				toMonth = parseInt(data.toMonth),
+				name = data.name,
+				getMonthRule = function(name, pMonth, pStartDay, pEndDay) {
+					var month = parseInt(pMonth),
+						fromDay = pStartDay || 1,
+						toDay = pEndDay || 31,
+						days = [];
+
+					for(var day = fromDay; day <= toDay; day++) {
+						days.push(day);
+					}
+
+					return {
+						name: name + '_' + month,
+						cycle: 'yearly',
+						days: days,
+						interval: 1,
+						month: month
+					};
+				},
+				rulesToCreate = [ ],
+				ruleSet = {
+					name: name,
+					temporal_rules: [],
+					type: 'main_holidays'
+				},
+				parallelRequests = {},
+				junkName = name + '_' + monster.util.randomString(6);
+
+			if(fromMonth !== toMonth) {
+				rulesToCreate.push(getMonthRule(junkName, fromMonth, fromDay, 31));
+
+				var firstMonthLoop = fromMonth === 12 ? 1 : fromMonth + 1;
+
+				for(var loopMonth = firstMonthLoop; (loopMonth !== toMonth && (loopMonth - 12) !== toMonth); loopMonth++) {
+					if(loopMonth === 13) { loopMonth = 1 };
+					rulesToCreate.push(getMonthRule(junkName, loopMonth, 1, 31));
+				}
+
+				rulesToCreate.push(getMonthRule(junkName, toMonth, 1, toDay));
+			}
+			else {
+				rulesToCreate.push(getMonthRule(junkName, fromMonth, fromDay, toDay));
+			}
+
+			_.each(rulesToCreate, function(rule) {
+				parallelRequests[rule.name] = function(callback) {
+					self.strategyUpdateHoliday(rule, function(data) {
+						callback && callback(null, data);
+					});
+				};
+			});
+
+			var createCleanSet = function() {
+				// Create All Rules, and then Create Rule Set.
+				monster.parallel(parallelRequests, function(err, results) {
+					_.each(rulesToCreate, function(rule) {
+						ruleSet.temporal_rules.push(results[rule.name].id);
+					});
+
+					self.strategyCreateRuleSet(ruleSet, function(data) {
+						globalCallback(data);
+					});
+				});
+			};
+
+			if(data.hasOwnProperty('id')) {
+				if(data.extra.oldType === 'rule') {
+					self.strategyDeleteHoliday(data.id, function() {
+						createCleanSet();
+					});
+				}
+				else {
+					self.strategyDeleteRuleSetAndRules(data.id, function() {
+						createCleanSet();
+					});
+				}
+			}
+			else {
+				createCleanSet();
+			}
+		},
+
+		strategyGetDetailRuleSet: function(id, globalCallback) {
+			var self = this;
+
+			self.strategyGetRuleSet(id, function(set) {
+				var parallelRequests = {};
+
+				_.each(set.temporal_rules, function(ruleId) {
+					parallelRequests[ruleId] = function(callback) {
+						self.strategyGetRule(ruleId, function(data) {
+							if(data.hasOwnProperty('message') && data.message === 'bad identifier') {
+								data = {};
+							}
+							callback && callback(null, data);
+						});
+					}
+				});
+
+				monster.parallel(parallelRequests, function(err, results) {
+					var ruleDetails = [], 
+						listRules = [],
+						viewData = {};
+
+					_.each(set.temporal_rules, function(ruleId) {
+						if(!_.isEmpty(results[ruleId])) {
+							listRules.push(ruleId);
+							ruleDetails.push(results[ruleId]);
+						}
+					});
+
+					if(ruleDetails.length) {
+						viewData.fromDay = ruleDetails[0].days[0];
+						viewData.toDay = ruleDetails[ruleDetails.length-1].days[ruleDetails[ruleDetails.length-1].days.length-1];
+						viewData.fromMonth = ruleDetails[0].month;
+						viewData.toMonth = ruleDetails[ruleDetails.length-1].month;
+					}
+
+					// If list of actual existing rules isn't the same as the ones in the set, we'll update the set and remove the reference to non-existing rules.
+					if(!_.isEqual(listRules, set.temporal_rules)) {
+						// If there is at least one valid rule in the set
+						if(listRules.length > 0) {
+							set.temporal_rules = listRules;
+							// We just want to update the list of rules
+							self.strategyUpdateRuleSet(set, function(data) {
+								data.viewData = viewData;
+
+								globalCallback && globalCallback(data);
+							});
+						}
+						// Otherwise we delete the set
+						else {
+							self.strategyDeleteRuleSet(set.id, function() {
+								globalCallback && globalCallback({});
+							});
+						}
+					}
+					else {
+						set.viewData = viewData;
+
+						globalCallback && globalCallback(set);
+					}
+				});
+			});
+			
+		},
+
+		strategyGetRuleSet: function(id, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'temporalSet.get',
+				data: {
+					accountId: self.accountId,
+					setId: id
+				},
+				success: function(data, status) {
+					callback(data.data);
+				}
+			});
+		},
+
+		strategyUpdateRuleSet: function(data, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'temporalSet.update',
+				data: {
+					accountId: self.accountId,
+					setId: data.id,
+					data: data
+				},
+				success: function(data, status) {
+					callback(data.data);
+				}
+			});
+		},
+
+		strategyCreateRuleSet: function(data, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'temporalSet.create',
+				data: {
+					accountId: self.accountId,
+					data: data
+				},
+				success: function(data, status) {
+					callback(data.data);
+				}
+			});
+		},
+
+		strategyDeleteRuleSetAndRules: function(id, globalCallback) {
+			var self = this;
+
+			self.strategyGetRuleSet(id, function(data) {
+				var parallelRequests = {};
+
+				_.each(data.temporal_rules, function(id) {
+					parallelRequests[id] = function(callback) {
+						self.strategyDeleteHoliday(id, function() {
+							callback && callback(null, {});
+						});
+					};
+				});
+
+				monster.parallel(parallelRequests, function(err, results) {
+					self.strategyDeleteRuleSet(id, function(data) {
+						globalCallback && globalCallback(data);
+					});
+				});
+			});
+		},
+
+		strategyDeleteRuleSet: function(id, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'temporalSet.delete',
+				data: {
+					accountId: self.accountId,
+					setId: id
+				},
+				success: function(data, status) {
+					callback && callback(data.data);
+				}
+			});
+		},
+
+		strategyBuildHolidayRule: function(container, rules) {
+			var self = this,
+				$this = $(container),
+				name = $this.find('.name').val().trim(),
+				month = parseInt($this.find('.month.from :selected').val()),
+				toMonth = parseInt($this.find('.month.to :selected').val()),
+				fromDay = parseInt($this.find('.day.from :selected').val()),
+				toDay = parseInt($this.find('.day.to :selected').val()),
+				ordinal = $this.find('.ordinal :selected').val(),
+				wday = $this.find('.wday :selected').val(),
+				id = $this.data('id'),
+				type = $this.data('type'),
+				holidayRule = {};
+
+			if(!name || Object.keys(rules).indexOf(name) >= 0) {
+				holidayRule = false;
+			}
+			else if(toMonth && month !== toMonth) {
+				holidayRule = {
+					isRange: true,
+					name: name,
+					fromDay: fromDay,
+					fromMonth: month,
+					toDay: toDay,
+					toMonth: toMonth
+				};
+			}
+			else {
+				holidayRule = {
+					name: name,
+					cycle: 'yearly',
+					interval: 1,
+					month: month,
+					type: 'main_holidays'
+				};
+
+				if(fromDay) {
+					var firstDay = fromDay;
+					holidayRule.days = [firstDay];
+					if(toDay) {
+						for(var day = firstDay+1; day <= toDay; day++) {
+							holidayRule.days.push(day);
+						}
+					}
+				} 
+				else {
+					holidayRule.ordinal = ordinal
+					holidayRule.wdays = [wday]
+				}
+			}
+
+			if(id) {
+				holidayRule.id = id;
+			}
+
+			holidayRule.extra = {
+				oldType: type
+			};
+
+			return holidayRule;
+		},
+
+		strategyUpdateHoliday: function(data, callback) {
+			var self = this;
+
+			if(data.id) {
+				self.callApi({
+					resource: 'temporalRule.update',
+					data: {
+						accountId: self.accountId,
+						ruleId: data.id,
+						data: data
+					},
+					success: function(data, status) {
+						callback(data.data);
+					}
+				});
+			} else {
+				self.callApi({
+					resource: 'temporalRule.create',
+					data: {
+						accountId: self.accountId,
+						data: data
+					},
+					success: function(data, status) {
+						callback(data.data);
+					}
+				});
+			}
+		},
+
+		strategyDeleteHoliday: function(id, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'temporalRule.delete',
+				data: {
+					accountId: self.accountId,
+					ruleId: id,
+					generateError: false
+				},
+				success: function(data, status) {
+					callback(data.data);
+				},
+				// Sometimes we'll try to delete a time of day which no longer exist, but still need to execute the callback
+				error: function(data, status) {
+					callback(data.data);
 				}
 			});
 		},
@@ -1627,6 +1981,7 @@ define(function(require){
 							case 'user':
 							case 'device':
 							case 'callflow':
+							case 'media':
 								flowElement.data.id = selectedEntity.val();
 								break;
 							case 'ring_group':
@@ -2130,18 +2485,14 @@ define(function(require){
 					}
 
 					switch(entityType) {
-						case 'directory':
-						case 'user':
-						case 'device':
-						case 'voicemail':
-						case 'callflow':
-							menuElements[number].data.id = entityId;
-							break;
 						case 'ring_group':
 							menuElements[number].data.endpoints = [{
 								endpoint_type: "group",
 								id: entityId
 							}];
+							break;
+						default: 
+							menuElements[number].data.id = entityId;
 							break;
 					}
 				});
@@ -2176,27 +2527,27 @@ define(function(require){
 
 			_.each(entities, function(value, key) {
 				var group = {
-						groupName: self.i18n.active().strategy.callEntities[key],
-						groupType: key,
-						entities: $.map(value, function(entity) {
-							var name = entity.name;
+					groupName: self.i18n.active().strategy.callEntities[key],
+					groupType: key,
+					entities: $.map(value, function(entity) {
+						var name = entity.name;
 
-							if(!name) {
-								if(entity.hasOwnProperty('first_name')) {
-									name = entity.first_name + ' ' + entity.last_name;
-								}
-								else if (entity.hasOwnProperty('numbers')) {
-									name = entity.numbers.toString();
-								}
+						if(!name) {
+							if(entity.hasOwnProperty('first_name')) {
+								name = entity.first_name + ' ' + entity.last_name;
 							}
+							else if (entity.hasOwnProperty('numbers')) {
+								name = entity.numbers.toString();
+							}
+						}
 
-							return {
-								id: entity.id,
-								name: name,
-								module: entity.module || key
-							};
-						})
-					};
+						return {
+							id: entity.id,
+							name: name,
+							module: entity.module || key
+						};
+					})
+				};
 
 				switch(group.groupType) {
 					case 'directory':
@@ -2210,6 +2561,9 @@ define(function(require){
 						break;
 					case 'ring_group':
 						group.groupIcon = 'fa fa-users';
+						break;
+					case 'media':
+						group.groupIcon = 'fa fa-music';
 						break;
 					case 'voicemail':
 						group.groupIcon = 'icon-telicon-voicemail';
@@ -2350,7 +2704,7 @@ define(function(require){
 										flow: {
 											children: {},
 											data: {},
-											module: "faxing"
+											module: "faxbox"
 										}
 									}
 								},
@@ -2563,59 +2917,93 @@ define(function(require){
 			}, filters);
 		},
 
-		strategyGetTemporalRules: function(callback) {
+		strategyGetAllRules: function(globalCallback) {
 			var self = this;
-			self.callApi({
-				resource: 'temporalRule.list',
-				data: {
-					accountId: self.accountId,
-					filters: { 'has_key':'type' }
-				},
-				success: function(data, status) {
-					var parallelRequests = {};
 
-					_.each(data.data, function(val, key) {
-						parallelRequests[val.name] = function(callback) {
-							self.callApi({
-								resource: 'temporalRule.get',
-								data: {
-									accountId: self.accountId,
-									ruleId: val.id
-								},
-								success: function(data, status) {
-									callback(null, data.data);
+			monster.parallel({
+					'rules': function(localCallback) {
+						self.callApi({
+							resource: 'temporalRule.list',
+							data: {
+								accountId: self.accountId,
+								filters: { 'has_key':'type' }
+							},
+							success: function(data, status) {
+								localCallback && localCallback(null, data.data);
+							}
+						});
+					},
+					'sets': function(localCallback) {
+						self.callApi({
+							resource: 'temporalSet.list',
+							data: {
+								accountId: self.accountId,
+								filters: { 
+									has_key:'type',
+									filter_type: 'main_holidays'
 								}
-							});
-						}
-					});
+							},
+							success: function(data, status) {
+								var parallelRequests = {};
 
-					_.each(self.weekdayLabels, function(val) {
-						if(!(val in parallelRequests)) {
-							parallelRequests[val] = function(callback) {
-								self.callApi({
-									resource: 'temporalRule.create',
-									data: {
-										accountId: self.accountId,
-										data: {
-											cycle: "weekly",
-											interval: 1,
-											name: val,
-											type: "main_weekdays",
-											time_window_start: 32400, // 9:00AM
-											time_window_stop: 61200,  // 5:00PM
-											wdays: [val.substring(4).toLowerCase()]
-										}
-									},
-									success: function(data, status) {
-										callback(null, data.data);
-									}
+								_.each(data.data, function(set) {
+									parallelRequests[set.id] = function(callback) {
+										self.strategyGetDetailRuleSet(set.id, function(data) {
+											callback && callback(null, data);
+										});
+									};
+								});
+
+								monster.parallel(parallelRequests, function(err, results) {
+									localCallback && localCallback(null, results);
 								});
 							}
-						}
-					});
+						});
+					}
+				},
+				function(err, results) {
+					globalCallback && globalCallback(results);
+				}
+			);
+		},
 
-					if(!("MainLunchHours" in parallelRequests)) {
-						parallelRequests["MainLunchHours"] = function(callback) {
+		strategyGetRule: function(id, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'temporalRule.get',
+				data: {
+					accountId: self.accountId,
+					ruleId: id,
+					generateError: false
+				},
+				success: function(data, status) {
+					callback && callback(data.data);
+				},
+				error: function(data, status) {
+					callback && callback(data.data);
+				}
+			});
+		},
+
+		strategyGetTemporalRules: function(callback) {
+			var self = this;
+
+			self.strategyGetAllRules(function(data) {
+				var parallelRequests = {};
+
+				_.each(data.rules, function(val, key) {
+					parallelRequests[val.name] = function(callback) {
+						self.strategyGetRule(val.id, function(data) {
+							callback(null, data);
+						});
+					}
+				});
+
+				// Always check that the necessary time rules exist, or re-create them
+				_.each(self.weekdayLabels, function(val) {
+					if(!(val in parallelRequests)) {
+						parallelRequests[val] = function(callback) {
 							self.callApi({
 								resource: 'temporalRule.create',
 								data: {
@@ -2623,11 +3011,11 @@ define(function(require){
 									data: {
 										cycle: "weekly",
 										interval: 1,
-										name: "MainLunchHours",
-										type: "main_lunchbreak",
-										time_window_start: 43200,
-										time_window_stop: 46800,
-										wdays: self.weekdays
+										name: val,
+										type: "main_weekdays",
+										time_window_start: 32400, // 9:00AM
+										time_window_stop: 61200,  // 5:00PM
+										wdays: [val.substring(4).toLowerCase()]
 									}
 								},
 								success: function(data, status) {
@@ -2636,31 +3024,60 @@ define(function(require){
 							});
 						}
 					}
+				});
 
-					monster.parallel(parallelRequests, function(err, results) {
-						var temporalRules = {
-							weekdays: {},
-							lunchbreak: {},
-							holidays: {}
-						};
-
-						_.each(results, function(val, key) {
-							switch(val.type) {
-								case "main_weekdays":
-									temporalRules.weekdays[key] = val
-									break;
-								case "main_lunchbreak":
-									temporalRules.lunchbreak = val;
-									break;
-								case "main_holidays":
-									temporalRules.holidays[key] = val;
-									break;
+				if(!("MainLunchHours" in parallelRequests)) {
+					parallelRequests["MainLunchHours"] = function(callback) {
+						self.callApi({
+							resource: 'temporalRule.create',
+							data: {
+								accountId: self.accountId,
+								data: {
+									cycle: "weekly",
+									interval: 1,
+									name: "MainLunchHours",
+									type: "main_lunchbreak",
+									time_window_start: 43200,
+									time_window_stop: 46800,
+									wdays: self.weekdays
+								}
+							},
+							success: function(data, status) {
+								callback(null, data.data);
 							}
 						});
-
-						callback(temporalRules);
-					});
+					}
 				}
+
+				monster.parallel(parallelRequests, function(err, results) {
+					var temporalRules = {
+						weekdays: {},
+						lunchbreak: {},
+						holidays: {}
+					};
+
+					_.each(results, function(val, key) {
+						switch(val.type) {
+							case "main_weekdays":
+								temporalRules.weekdays[key] = val
+								break;
+							case "main_lunchbreak":
+								temporalRules.lunchbreak = val;
+								break;
+							case "main_holidays":
+								temporalRules.holidays[key] = val;
+								break;
+						}
+					});
+
+					_.each(data.sets, function(set) {
+						if(!_.isEmpty(set)) {
+							temporalRules.holidays[set.name] = set;
+						}
+					});
+
+					callback(temporalRules);
+				});
 			});
 		},
 
@@ -2680,6 +3097,11 @@ define(function(require){
 							success: function(data, status) {
 								_callback(null, data.data);
 							}
+						});
+					},
+					media: function (callback) {
+						self.strategyListMedia(function (media) {
+							callback(null, media);
 						});
 					},
 					userCallflows: function(_callback) {
@@ -2767,6 +3189,7 @@ define(function(require){
 					var callEntities = {
 						device: results.devices,
 						user: $.extend(true, [], results.users),
+						media: results.media,
 						userCallflows: [],
 						ring_group: [],
 						userGroups: $.map(results.userGroups, function(val) {
@@ -2777,6 +3200,10 @@ define(function(require){
 						}),
 						advancedCallflows: results.advancedCallflows
 					};
+
+					_.each(callEntities.media, function(media) {
+						media.module = 'media';
+					});
 
 					_.each(callEntities.device, function(device) {
 						device.module = 'device';
@@ -2963,6 +3390,20 @@ define(function(require){
 				},
 				error: function(data, status) {
 					callbackError && callbackError();
+				}
+			});
+		},
+
+		strategyListMedia: function(callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'media.list',
+				data: {
+					accountId: self.accountId
+				},
+				success: function(data, status) {
+					callback && callback(data.data);
 				}
 			});
 		},

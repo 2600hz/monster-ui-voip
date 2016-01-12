@@ -223,28 +223,28 @@
 	overflow: visible;
 }
 
-.edit-device {
+.voip-edit-device-popup .edit-device {
 	width: 700px;
 }
 
-.edit-device .actions {
+.voip-edit-device-popup .edit-device .actions {
 	border-top: 1px solid #CCCCCC;
 	height: 30px;
 	line-height: 30px;
 	padding: 15px;
 }
 
-.edit-device .actions button {
+.voip-edit-device-popup .edit-device .actions button {
 	margin-left: 10px;
 }
 
-.edit-device .title-bar {
+.voip-edit-device-popup .edit-device .title-bar {
 	border-bottom: 1px solid #ccc;
 	margin-bottom: 20px;
 	padding: 15px 0;
 }
 
-.edit-device .title-bar .device-title > div {
+.voip-edit-device-popup .edit-device .title-bar .device-title > div {
 	display: inline-block;
 	float: left;
 	font-size: 18px;
@@ -253,27 +253,27 @@
 	margin-left: 40px;
 }
 
-.edit-device .title-bar .device-title .device-icon {
+.voip-edit-device-popup .edit-device .title-bar .device-title .device-icon {
 	height: 75px;
 	line-height: 75px;
 }
 
-.edit-device .title-bar .device-title .device-icon > i {
+.voip-edit-device-popup .edit-device .title-bar .device-title .device-icon > i {
 	font-size: 48px;
 	vertical-align: middle;
 }
 
-.edit-device .title-bar .device-title .device-image {
+.voip-edit-device-popup .edit-device .title-bar .device-title .device-image {
 	border-radius: 2px;
 	border: 1px solid #CCC;
 }
 
-.edit-device .title-bar .nav-pills {
+.voip-edit-device-popup .edit-device .title-bar .nav-pills {
 	margin-top: 24px;
 	margin-right: 15px;
 }
 
-.edit-device .content .tabs-section .title {
+.voip-edit-device-popup .edit-device .content .tabs-section .title {
 	color: #22a5ff;
 	font-size: 24px;
 	margin-bottom: 30px;
@@ -281,57 +281,61 @@
 	text-shadow: 1px 0 1px #CCCCCC;
 }
 
-.edit-device .content .tabs-section .helper {
+.voip-edit-device-popup .edit-device .content .tabs-section .helper {
 	position: relative;
 	margin: 0 40px 15px 40px;
 }
 
-.edit-device .content .tabs-section .helper i {
+.voip-edit-device-popup .edit-device .content .tabs-section .helper i {
 	position: absolute;
 	top: 0;
 	left: -25px;
 }
 
-.edit-device .content .tabs-section .number-address {
+.voip-edit-device-popup .edit-device .content .tabs-section .number-address {
 	display: none;
 }
 
-.edit-device .help-box.red-box {
-	margin: 10px 25px
+.voip-edit-device-popup .edit-device .help-box.red-box {
+	margin: 10px 25px;
 }
 
-.edit-device .content #form_device .displayed-realm {
+.voip-edit-device-popup .edit-device .content #form_device .controls .text {
+	padding-top: 5px;
+}
+
+.voip-edit-device-popup .edit-device .content #form_device .displayed-realm {
 	line-height: 30px;
 	font-weight: bold;
 }
 
-.edit-device .restrictions-container {
+.voip-edit-device-popup .edit-device .restrictions-container {
 	position: relative;
 }
 
-.edit-device .restriction-matcher-div {
+.voip-edit-device-popup .edit-device .restriction-matcher-div {
 	margin-right: 40px;
 	float: right;
 }
 
-.edit-device .restriction-matcher-input {
+.voip-edit-device-popup .edit-device .restriction-matcher-input {
 	width: 120px;
 	margin-right: 10px;
 	margin-left: 5px;
 }
 
-.edit-device .restriction-matcher-sign {
+.voip-edit-device-popup .edit-device .restriction-matcher-sign {
 	margin-left: 20px;
 	width: 25px;
 	vertical-align: middle;
 	display: none;
 }
 
-.edit-device .restriction-list {
+.voip-edit-device-popup .edit-device .restriction-list {
 	display: inline-block;
 }
 
-.edit-device .restriction-message {
+.voip-edit-device-popup .edit-device .restriction-message {
 	width: 275px;
 	margin: 0 0 0 30px !important;
 	padding: 10px;
@@ -339,71 +343,71 @@
 	display: none;
 }
 
-.edit-device .disabled-restrictions-info {
+.voip-edit-device-popup .edit-device .disabled-restrictions-info {
 	width: 270px;
 	position: absolute;
 	bottom: 0px;
 	right: 40px;
 }
 
-.edit-device .restriction-list .restriction-line.disabled .control-label,
-.edit-device .restriction-list .restriction-line.disabled .control-label > i {
+.voip-edit-device-popup .edit-device .restriction-list .restriction-line.disabled .control-label,
+.voip-edit-device-popup .edit-device .restriction-list .restriction-line.disabled .control-label > i {
 	cursor: default;
 	color: #aaa;
 }
 
-.edit-device .feature-key-value {
+.voip-edit-device-popup .edit-device .feature-key-value {
 	display: none;
 	margin-left: 20px;
 }
 
-.edit-device .feature-key-value.active {
+.voip-edit-device-popup .edit-device .feature-key-value.active {
 	display: inline-block;
 }
 
-.edit-device .feature-key-value label {
+.voip-edit-device-popup .edit-device .feature-key-value label {
 	display: inline-block;
 	margin-right: 10px;
 }
 
 /* Codecs selector */
-.edit-device .content .codec-selector .box-selector {
+.voip-edit-device-popup .edit-device .content .codec-selector .box-selector {
 	float: left;
 	width: 300px;
 }
 
-.edit-device .content .codec-selector .box-selector:first-child {
+.voip-edit-device-popup .edit-device .content .codec-selector .box-selector:first-child {
 	margin-left: 30px;
 	margin-right: 40px;
 }
-.edit-device .content .codec-selector .box-selector ul {
+.voip-edit-device-popup .edit-device .content .codec-selector .box-selector ul {
 	height: 328px;
 	overflow: auto;
 }
 
-.edit-device .content #video_codec_selector .box-selector ul {
+.voip-edit-device-popup .edit-device .content #video_codec_selector .box-selector ul {
 	min-height: 123px;
 }
 
 /* RTP Special CSS */
-.edit-device .content .rtp-line > * {
+.voip-edit-device-popup .edit-device .content .rtp-line > * {
 	float: left;
 	font-size: 14px;
 	margin-right: 10px;
 }
 
-.edit-device .form-horizontal .control-label.checkbox {
+.voip-edit-device-popup .edit-device .form-horizontal .control-label.checkbox {
 	width: inherit;
 	margin-left: 35px;
 	padding-top: 3px;
 }
 
 /* Restart Button */
-.edit-device #restart_device {
+.voip-edit-device-popup .edit-device #restart_device {
 	margin-left: 10px;
 }
 
 /* Special checkbox case */
-.edit-device .form-horizontal .control-label.checkbox-basic {
+.voip-edit-device-popup .edit-device .form-horizontal .control-label.checkbox-basic {
 	margin-left: 160px;
 }
