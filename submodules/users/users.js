@@ -2748,7 +2748,7 @@ define(function(require){
 					user: data.user || {}
 				};
 
-			if (data.devices.length) {
+			if (data.hasOwnProperty('devices') && data.devices.length) {
 				_.each(data.devices, function(device, idx) {
 					if (device.device_type === 'mobile') {
 						data.numbers.numbers[device.mobile.mdn] = {
