@@ -712,7 +712,8 @@ define(function(require){
 									callback: function() {
 										updateCallflow();
 									},
-									oldPresenceId: oldPresenceId
+									oldPresenceId: oldPresenceId,
+									userExtension: extensionsList[0]
 								});
 							});
 						});
@@ -1505,10 +1506,12 @@ define(function(require){
 
 				return found;
 			}
+			else if(listNumbers.length) {
+				return false;
+			}
 			else {
 				return true;
 			}
-			
 		},
 
 		usersFormatAddUser: function(data) {
@@ -4032,7 +4035,8 @@ define(function(require){
 				user = args.user,
 				needVMUpdate = args.needVMUpdate || true,
 				callback = args.callback,
-				oldPresenceId = args.oldPresenceId || undefined;
+				oldPresenceId = args.oldPresenceId || undefined,
+				userExtension = args.userExtension;
 
 			self.usersListVMBoxesUser(user.id, function(vmboxes) {
 				if(vmboxes.length > 0) {
@@ -4058,7 +4062,7 @@ define(function(require){
 				else {
 					var vmbox = {
 						owner_id: user.id,
-						mailbox: user.presence_id || user.extra.vmbox.mailbox,
+						mailbox: user.presence_id || userExtension || user.extra.vmbox.mailbox,
 						name: user.first_name + ' ' + user.last_name + '\'s VMBox'
 					};
 

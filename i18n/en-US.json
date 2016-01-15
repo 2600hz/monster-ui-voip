@@ -635,7 +635,7 @@
 		"__version": "3.19",
 		"presenceIDPopup": {
 			"title": "Select your new Main Extension",
-			"header": "It appears that you want to remove the number you had set as your Main Extension. Please select your new Main Extension from the choices below:",
+			"header": "It appears that you don't have a valid Main Extension configured. Please select your Main Extension from the choices below:",
 			"none": "I don't want to set a new Main Extension"
 		},
 		"__comment": "UI-1393: Updating user devices to use the monsterListing common control",
