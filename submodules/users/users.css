@@ -878,3 +878,7 @@
 .presence-id-change-wrapper .actions {
 	margin-top: 10px;
 }
+
+.presence-id-change-wrapper #save-presence-id {
+	margin-left: 5px;
+}
