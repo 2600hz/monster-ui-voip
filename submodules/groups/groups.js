@@ -872,7 +872,7 @@ define(function(require){
 				templateData = $.extend(true, {
 												group: data.group
 											},
-											(data.group.extra.mapFeatures.call_recording.active && prependNode ? {
+											(data.group.extra.mapFeatures.prepend.active && prependNode ? {
 												caller_id_name_prefix: prependNode.data.caller_id_name_prefix,
 												caller_id_number_prefix: prependNode.data.caller_id_number_prefix
 											} : {})
@@ -907,11 +907,14 @@ define(function(require){
 						if(newCallflow.flow.module !== 'prepend_cid') {
 							newCallflow.flow = {
 								children: {
-									"_": $.extend(true, {}, data.callflow.flow)
+									'_': $.extend(true, {}, data.callflow.flow)
 								},
 								module: 'prepend_cid',
 								data: prependData
 							}
+						}
+						else {
+							newCallflow.flow.data = prependData;
 						}
 					} else {
 						if(prependNode) {
