@@ -545,6 +545,7 @@
 			"noConfNumbers": "You need to add a Main Conference Number (in the Main number section on the left of the SmartPBX) in order to enable the Personnals Conference Bridges"
 		},
 		"faxing": {
+			"trialError": "You're currently using a trial version of the UI. Please upgrade your account to have access to the Faxing feature!",
 			"title": "Faxbox",
 			"headline": "Faxbox",
 			"defaultSettings": {

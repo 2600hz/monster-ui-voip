@@ -1344,89 +1344,94 @@ define(function(require){
 			});
 
 			template.on('click', '.feature[data-feature="faxing"]', function() {
-				monster.parallel({
-						numbers: function(callback) {
-							self.usersListNumbers(function(listNumbers) {
-								var spareNumbers = {};
+				if(!monster.util.isTrial()) {
+					monster.parallel({
+							numbers: function(callback) {
+								self.usersListNumbers(function(listNumbers) {
+									var spareNumbers = {};
 
-								_.each(listNumbers.numbers, function(number, key) {
-									if(number.used_by === '') {
-										spareNumbers[key] = number;
-									}
-								});
-
-								callback && callback(null, spareNumbers);
-							});
-						},
-						callflows: function(callback) {
-							self.usersListCallflowsUser(currentUser.id, function(callflows) {
-								var existingCallflow;
-
-								_.each(callflows, function(callflow) {
-									if(callflow.type === 'faxing') {
-										existingCallflow = callflow;
-
-										return false;
-									}
-								});
-
-								if ( existingCallflow ) {
-									self.callApi({
-										resource: 'callflow.get',
-										data: {
-											accountId: self.accountId,
-											callflowId: existingCallflow.id
-										},
-										success: function(data, status) {
-											callback && callback(null, data.data);
+									_.each(listNumbers.numbers, function(number, key) {
+										if(number.used_by === '') {
+											spareNumbers[key] = number;
 										}
 									});
-								} else {
-									callback && callback(null, existingCallflow);
-								}
-							});
+
+									callback && callback(null, spareNumbers);
+								});
+							},
+							callflows: function(callback) {
+								self.usersListCallflowsUser(currentUser.id, function(callflows) {
+									var existingCallflow;
+
+									_.each(callflows, function(callflow) {
+										if(callflow.type === 'faxing') {
+											existingCallflow = callflow;
+
+											return false;
+										}
+									});
+
+									if ( existingCallflow ) {
+										self.callApi({
+											resource: 'callflow.get',
+											data: {
+												accountId: self.accountId,
+												callflowId: existingCallflow.id
+											},
+											success: function(data, status) {
+												callback && callback(null, data.data);
+											}
+										});
+									} else {
+										callback && callback(null, existingCallflow);
+									}
+								});
+							},
+							account: function(callback) {
+								self.callApi({
+									resource: 'account.get',
+									data: {
+										accountId: self.accountId
+									},
+									success: function(data, status) {
+										callback(null, data.data);
+									}
+								});
+							}
 						},
-						account: function(callback) {
-							self.callApi({
-								resource: 'account.get',
-								data: {
-									accountId: self.accountId
-								},
-								success: function(data, status) {
-									callback(null, data.data);
-								}
-							});
+						function(err, results) {
+							results.user = currentUser;
+
+							if ( typeof results.callflows !== 'undefined' ) {
+								// Compatibility with old version
+								var faxboxId = results.callflows.flow.data.hasOwnProperty('faxbox_id') ? results.callflows.flow.data.faxbox_id : results.callflows.flow.data.id;
+
+								self.callApi({
+									resource: 'faxbox.get',
+									data: {
+										accountId: self.accountId,
+										faxboxId: faxboxId
+									},
+									success: function(_data) {
+										results.faxbox = _data.data;
+
+										results.faxbox.id = faxboxId;
+
+										self.usersRenderFaxboxes(results);
+									},
+									error: function() {
+										self.usersRenderFaxboxes(results);
+									}
+								});
+							} else {
+								self.usersRenderFaxboxes(results);
+							}
 						}
-					},
-					function(err, results) {
-						results.user = currentUser;
-
-						if ( typeof results.callflows !== 'undefined' ) {
-							// Compatibility with old version
-							var faxboxId = results.callflows.flow.data.hasOwnProperty('faxbox_id') ? results.callflows.flow.data.faxbox_id : results.callflows.flow.data.id;
-
-							self.callApi({
-								resource: 'faxbox.get',
-								data: {
-									accountId: self.accountId,
-									faxboxId: faxboxId
-								},
-								success: function(_data) {
-									results.faxbox = _data.data;
-
-									results.faxbox.id = faxboxId;
-
-									self.usersRenderFaxboxes(results);
-								},
-								error: function() {
-									self.usersRenderFaxboxes(results);
-								}
-							});
-						} else {
-							self.usersRenderFaxboxes(results);
-						}
-					}
-				);
+					);
+				}
+				else {
+					monster.ui.alert('warning', self.i18n.active().users.faxing.trialError);
+				}
 			});
 
 			$('body').on('click', '#users_container_overlay', function() {
