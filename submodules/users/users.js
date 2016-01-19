@@ -1656,10 +1656,16 @@ define(function(require){
 						.find('.number-mirror')
 							.text(self.i18n.active().users.faxing.emailToFax.default);
 				},
-				globalAddNumberCallback: function (number) {
+				globalAddNumberCallback: function (number, addNumberToControl) {
+					var found = false,
+						// Number can come back from the buy common control, as an object, or from the spare selector, as a string
+						foundNumber = _.isObject(number) ? Object.keys(number)[0] : number;
+
+					addNumberToControl && addNumberToControl(foundNumber);
+
 					featureTemplate
 						.find('.number-mirror')
-							.text(number);
+							.text(foundNumber);
 				}
 			});
 
