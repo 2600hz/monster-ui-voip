@@ -2595,6 +2595,8 @@ define(function(require){
 
 			self.strategyGetAccount({
 				success: function(account) {
+					var email = account.contact && account.contact.technical && account.contact.technical.hasOwnProperty('email') ? account.contact.technical.email : undefined;
+
 					args.data = {
 						name: account.name + self.i18n.active().strategy.faxing.nameExtension,
 						caller_name: account.name,
@@ -2606,16 +2608,20 @@ define(function(require){
 						notifications: {
 							inbound: {
 								email: {
-									send_to: account.contact.technical.email
+									send_to: email
 								}
 							},
 							outbound: {
 								email: {
-									send_to: account.contact.technical.email
+									send_to: email
 								}
 							}
 						}
 					};
+
+					if(!email) {
+						delete args.data.notifications;
+					}
 
 					self.strategyCreateFaxbox(args);
 				}
