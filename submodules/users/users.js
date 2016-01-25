@@ -2100,8 +2100,6 @@ define(function(require){
 								};
 
 							}
-							flow.module = callflowNode.module;
-							flow.data = callflowNode.data;
 
 							// In next 5 lines, look for user/group node, and replace it with the new data;
 							var flow = userCallflow.flow;
