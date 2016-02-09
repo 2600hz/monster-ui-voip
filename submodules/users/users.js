@@ -1039,7 +1039,7 @@ define(function(require){
 						}
 					};
 
-				if (deviceData.type === 'mobile') {
+				if (deviceData && deviceData.type === 'mobile') {
 					monster.ui.confirm(
 						self.i18n.active().users.confirmMobileUnAssignment.replace(
 							'{{variable}}',
