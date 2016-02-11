@@ -391,34 +391,33 @@ define(function(require){
 
 				if(userId in mapUsers) {
 					var isRegistered = _.find(data.deviceStatus, function(status){ return (status.device_id === device.id && status.registered === true); }) ? true : false;
-					if(mapUsers[userId].extra.devices.length == 2) {
-						if(mapUsers[userId].extra.additionalDevices) {
-							mapUsers[userId].extra.additionalDevices.count++;
-							mapUsers[userId].extra.additionalDevices.tooltip += '<br><i class=\"device-popover-icon '+self.deviceIcons[device.device_type]+(isRegistered?' monster-green':' monster-red')+'\"></i>'
-							                                                 + device.name + ' (' + device.device_type.replace('_', ' ') + ')';
-						} else {
+
+					if(mapUsers[userId].extra.devices.length >= 2) {
+						if(mapUsers[userId].extra.additionalDevices === 0) {
 							mapUsers[userId].extra.additionalDevices = {
-								count: 1,
-								tooltip: '<i class=\"device-popover-icon '+self.deviceIcons[device.device_type]+(isRegistered?' monster-green':' monster-red')+'\"></i>'
-								         + device.name + ' (' + device.device_type.replace('_', ' ') + ')'
+								count: 0,
+								tooltip: ''
 							};
 						}
-					}
-					else {
-						var deviceDataToTemplate = {
-								id: device.id,
-								name: device.name + ' (' + device.device_type.replace('_', ' ') + ')',
-								type: device.device_type,
-								registered: isRegistered,
-								icon: self.deviceIcons[device.device_type]
-							};
 
-						if (device.device_type === 'mobile') {
-							deviceDataToTemplate.mobile = device.mobile;
-						}
-
-						mapUsers[userId].extra.devices.push(deviceDataToTemplate);
+						mapUsers[userId].extra.additionalDevices.count++;
+						mapUsers[userId].extra.additionalDevices.tooltip += '<i class=\"device-popover-icon '+self.deviceIcons[device.device_type]+(isRegistered?' monster-green':' monster-red')+'\"></i>'
+							                                                 + device.name + ' (' + device.device_type.replace('_', ' ') + ')<br>';
 					}
+
+					var deviceDataToTemplate = {
+							id: device.id,
+							name: device.name + ' (' + device.device_type.replace('_', ' ') + ')',
+							type: device.device_type,
+							registered: isRegistered,
+							icon: self.deviceIcons[device.device_type]
+						};
+
+					if (device.device_type === 'mobile') {
+						deviceDataToTemplate.mobile = device.mobile;
+					}
+
+					mapUsers[userId].extra.devices.push(deviceDataToTemplate);
 				}
 			});
 
@@ -1004,7 +1003,6 @@ define(function(require){
 					self.usersRender({ userId: userId });
 				});
 			});
-
 
 			template.on('click', '.detail-devices .edit-device-link', function() {
 				var row = $(this).parents('.item-row'),
