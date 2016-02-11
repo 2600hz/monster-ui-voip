@@ -546,6 +546,10 @@ define(function(require){
 					require_keypress: true,
 					keep_caller_id: true
 				}, formData.call_forward);
+
+				if (originalData.device_type === 'smartphone') {
+					formData.call_forward.failover = true;
+				}
 			}
 
 			if(hasCodecs) {
