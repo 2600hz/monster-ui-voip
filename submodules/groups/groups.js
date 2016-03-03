@@ -175,6 +175,12 @@ define(function(require){
 
 			setTimeout(function() { template.find('.search-query').focus(); });
 
+			monster.ui.tooltips(template, {
+				options: {
+					container: 'body'
+				}
+			});
+
 			template.find('.grid-row:not(.title) .grid-cell').on('click', function() {
 				var cell = $(this),
 					type = cell.data('type'),
