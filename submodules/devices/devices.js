@@ -823,7 +823,7 @@ define(function(require){
 					sip_device: 'icon-telicon-voip-phone',
 					sip_uri: 'icon-telicon-voip-phone',
 					fax: 'icon-telicon-fax',
-					ata: 'icon-telicon-fax'
+					ata: 'icon-telicon-ata'
 				};
 
 			_.each(data.users, function(user) {
