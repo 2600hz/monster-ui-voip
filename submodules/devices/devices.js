@@ -550,6 +550,10 @@ define(function(require){
 				if (originalData.device_type === 'smartphone') {
 					formData.call_forward.failover = true;
 				}
+
+				if(formData.hasOwnProperty('extra') && formData.extra.allowVMCellphone) {
+					formData.call_forward.require_keypress = !formData.extra.allowVMCellphone;
+				}
 			}
 
 			if(hasCodecs) {
@@ -802,6 +806,10 @@ define(function(require){
 			}
 
 			formattedData.extra.isRegistered = dataList.isRegistered;
+
+			if(formattedData.hasOwnProperty('call_forward') && formattedData.call_forward.hasOwnProperty('require_keypress')) {
+				formattedData.extra.allowVMCellphone = !formattedData.call_forward.require_keypress;
+			}
 
 			return formattedData;
 		},

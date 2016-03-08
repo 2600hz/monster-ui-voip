@@ -313,7 +313,7 @@
 			"new": "New Landline",
 			"number": "Number",
 			"numberPlaceholder": "+14152231121",
-			"requireKeypress": "Require Key Press",
+			"requireKeypress": "Allow use of landline's voicemail",
 			"keepCallerId": "Keep Original Caller-ID",
 			"hideContactList": "Hide from Contact List"
 		},
@@ -324,7 +324,7 @@
 			"new": "New Cell Phone",
 			"number": "Number",
 			"numberPlaceholder": "+14152231121",
-			"requireKeypress": "Allow use of cellphone voicemail",
+			"requireKeypress": "Allow use of cellphone's voicemail",
 			"keepCallerId": "Keep Original Caller-ID",
 			"hideContactList": "Hide from Contact List"
 		},
@@ -341,7 +341,7 @@
 			"deviceName": "Device Name",
 			"editTitle": "Editing Smartphone: {{name}}",
 			"new": "New Smartphone",
-			"requireKeypress": "Allow use of cellphone voicemail",
+			"requireKeypress": "Allow use of smartphone's voicemail",
 			"keepCallerId": "Keep Original Caller-ID",
 			"hideContactList": "Hide from Contact List"
 		},
