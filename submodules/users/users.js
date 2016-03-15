@@ -42,7 +42,7 @@ define(function(require){
 				var dataTemplate = self.usersFormatListData(data),
 					template = $(monster.template(self, 'users-layout', dataTemplate)),
 					templateUser;
-console.log(dataTemplate);
+
 				_.each(dataTemplate.users, function(user) {
 					templateUser = monster.template(self, 'users-row', user);
 
@@ -325,20 +325,6 @@ console.log(dataTemplate);
 			_.each(data.users, function(user) {
 				mapUsers[user.id] = self.usersFormatUserData(user);
 			});
-
-			// Inject MDNs into the numbers' indicator so they are displayed like Kazoo numbers
-			// _.each(data.devices, function(device, idx) {
-			// 	if (device.device_type === 'mobile'&& device.hasOwnProperty('owner_id')) {
-			// 		var user = mapUsers[device.owner_id];
-
-			// 		if (user.extra.phoneNumber === '') {
-			// 			user.extra.phoneNumber = device.mobile.mdn;
-			// 		}
-			// 		else {
-			// 			user.extra.additionalNumbers++;
-			// 		}
-			// 	}
-			// });
 
 			_.each(data.callflows, function(callflow) {
 				if(callflow.type !== 'faxing') {
@@ -1147,9 +1133,12 @@ console.log(dataTemplate);
 
 				template.find('.item-row').each(function(k, row) {
 					var row = $(row),
-						number = row.data('id');
+						number = row.data('id'),
+						type = row.data('type');
 
-					dataNumbers.push(number);
+					if (type !== 'mobile') {
+						dataNumbers.push(number);
+					}
 				});
 
 				if(dataNumbers.length > 0) {
@@ -2645,7 +2634,7 @@ console.log(dataTemplate);
 
 							$.each(callflows, function(k, callflowLoop) {
 								/* Find Smart PBX Callflow of this user */
-								if(callflowLoop.owner_id === userId && callflowLoop.type !== 'faxing') {
+								if(callflowLoop.owner_id === userId && callflowLoop.type === 'mainUserCallflow') {
 									callflowId = callflowLoop.id;
 
 									return false;
