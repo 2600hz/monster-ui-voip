@@ -42,7 +42,7 @@ define(function(require){
 				var dataTemplate = self.usersFormatListData(data),
 					template = $(monster.template(self, 'users-layout', dataTemplate)),
 					templateUser;
-
+console.log(dataTemplate);
 				_.each(dataTemplate.users, function(user) {
 					templateUser = monster.template(self, 'users-row', user);
 
@@ -327,18 +327,18 @@ define(function(require){
 			});
 
 			// Inject MDNs into the numbers' indicator so they are displayed like Kazoo numbers
-			_.each(data.devices, function(device, idx) {
-				if (device.device_type === 'mobile'&& device.hasOwnProperty('owner_id')) {
-					var user = mapUsers[device.owner_id];
+			// _.each(data.devices, function(device, idx) {
+			// 	if (device.device_type === 'mobile'&& device.hasOwnProperty('owner_id')) {
+			// 		var user = mapUsers[device.owner_id];
 
-					if (user.extra.phoneNumber === '') {
-						user.extra.phoneNumber = device.mobile.mdn;
-					}
-					else {
-						user.extra.additionalNumbers++;
-					}
-				}
-			});
+			// 		if (user.extra.phoneNumber === '') {
+			// 			user.extra.phoneNumber = device.mobile.mdn;
+			// 		}
+			// 		else {
+			// 			user.extra.additionalNumbers++;
+			// 		}
+			// 	}
+			// });
 
 			_.each(data.callflows, function(callflow) {
 				if(callflow.type !== 'faxing') {
