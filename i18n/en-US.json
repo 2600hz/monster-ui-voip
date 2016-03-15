@@ -990,7 +990,7 @@
 		"walkthrough": {
 			"steps": {
 				"1": "Welcome to SmartPBX, the easiest way to set up your office phone system! This is the main dashboard. From here you can see your users, devices, numbers all in one place!",
-				"2": "Setting up Users is a breeze in SmartPBX. Create and manage most of your services in the Users tab. Create new users, purchase port, and assign numbers, add an autoprovision devices, and manage User Features.",
+				"2": "Setting up Users is a breeze in SmartPBX. Create and manage most of your services in the Users tab. Create new users, assign numbers, add devices, and manage User Features.",
 				"3": "Once you have created enough users, create user groups. This is extremely useful if you have users that work in the same department, such as a sales team.",
 				"4": "Main Number services are highly important for your business! Manage call handling with Virtual Receptionist, and route calls depending on Office Hours and Holidays."
 			}
