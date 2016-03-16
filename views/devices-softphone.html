@@ -170,6 +170,15 @@
 					</label>
 				</div>
 
+				<div class="control-group">
+					<label class="control-label checkbox">
+						{{#monsterCheckbox i18n.devices.popupSettings.miscellaneous.unregisterNotifications.label }}
+							<input type="checkbox" name="extra.notify_unregister" id="notify_unregister" {{#unless suppress_unregister_notifications}}checked{{/unless}} />
+						{{/monsterCheckbox}}
+						<i class="help-popover fa fa-question-circle fa-lg" data-original-title="{{i18n.devices.popupSettings.miscellaneous.unregisterNotifications.help}}" data-placement="top" data-toggle="tooltip"></i>
+					</label>
+				</div>
+
 				<div class="rtp-line">
 					<div class="control-group">
 						<label class="control-label checkbox">
