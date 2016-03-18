@@ -109,6 +109,8 @@
 	overflow: hidden;
 	padding-left: 10px;
 	width: 20%;
+	/* For Safari */
+	float: left;
 
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
