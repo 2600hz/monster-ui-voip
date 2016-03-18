@@ -48,6 +48,8 @@
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
+	/* For Safari */
+	float: left;
 }
 
 #strategy_container .element-header-inner .title > i {
