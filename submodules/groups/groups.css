@@ -413,6 +413,11 @@
 	background: #FFF;
 }
 
+#groups_container .detail-numbers .buy-dropdown {
+	margin-top :5px;
+	margin-left: 10px;
+}
+
 #groups_container .detail-numbers .buy-dropdown:hover,
 #groups_container .detail-numbers .buy-dropdown:focus {
 	background-color: #E0E0E0;
