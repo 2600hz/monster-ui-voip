@@ -539,7 +539,7 @@ define(function(require){
 							};
 							if(num in data.numbers) {
 								_.each(data.numbers[num].features, function(feature) {
-									number.features[feature].active = 'active';
+									number.features[feature] = $.extend(true, number.features[feature], { active : 'active'});
 								});
 							}
 							data[numberArrayName].push(number);
@@ -554,30 +554,23 @@ define(function(require){
 				}
 			});
 
-			if(
-				data.mainNumbers
-			 && data.mainNumbers.length > 0
-			 && (
-			 	   !('caller_id' in data.account)
-				|| !('emergency' in data.account.caller_id)
-				|| !('number' in data.account.caller_id.emergency)
-				|| !(data.account.caller_id.emergency.number in data.numbers)
-				|| data.numbers[data.account.caller_id.emergency.number].features.indexOf('dash_e911') < 0
-				)
-			) {
-				if (monster.util.isNumberFeatureEnabled('cnam') && monster.util.isNumberFeatureEnabled('e911')) {
+			if( data.mainNumbers && data.mainNumbers.length > 0 ) {
+				var hasValidCallerId = monster.util.isNumberFeatureEnabled('cnam') === false || data.account.hasOwnProperty('caller_id') && data.account.caller_id.hasOwnProperty('emergency') && data.account.caller_id.emergency.hasOwnProperty('number') && data.numbers.hasOwnProperty(data.account.caller_id.emergency.number),
+					hasValidE911 = monster.util.isNumberFeatureEnabled('e911') === false || data.account.hasOwnProperty('caller_id') && data.account.caller_id.hasOwnProperty('emergency') && data.account.caller_id.emergency.hasOwnProperty('number') && data.numbers.hasOwnProperty(data.account.caller_id.emergency.number) && data.numbers[data.account.caller_id.emergency.number].features.indexOf('dash_e911') >= 0;
+
+				if (!hasValidCallerId && !hasValidE911) {
 					data.topMessage = {
 						class: 'btn-danger',
 						message: self.i18n.active().myOffice.missingCnamE911Message
 					};
 				}
-				else if (monster.util.isNumberFeatureEnabled('cnam')) {
+				else if (!hasValidCallerId) {
 					data.topMessage = {
 						class: 'btn-danger',
 						message: self.i18n.active().myOffice.missingCnamMessage
 					};
 				}
-				else if (monster.util.isNumberFeatureEnabled('e911')) {
+				else if (!hasValidE911) {
 					data.topMessage = {
 						class: 'btn-danger',
 						message: self.i18n.active().myOffice.missingE911Message
