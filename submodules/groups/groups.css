@@ -338,6 +338,11 @@
 	white-space: nowrap;
 }
 
+#groups_container .list-wrapper .item-row .input-extension {
+	margin: 0 5px 2px 5px;
+	width: 50px;
+}
+
 #groups_container .list-wrapper .item-row > * {
 	display: inline-block;
 	padding: 10px;
@@ -347,10 +352,7 @@
 
 #groups_container .list-wrapper .item-row button {
 	margin-right: 15px;
-	padding: 2px;
-	width: 80px;
 }
-
 #groups_container .list-wrapper .empty-search-row,
 #groups_container .list-wrapper .empty-row {
 	display: none;
