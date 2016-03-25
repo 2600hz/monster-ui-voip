@@ -359,7 +359,7 @@ define(function(require){
 			monster.ui.protectField(templateDevice.find('#sip_password'), templateDevice);
 
 			monster.ui.tooltips(templateDevice);
-			templateDevice.find('#mac_address').mask("hh:hh:hh:hh:hh:hh", { placeholder:" " });
+			templateDevice.find('#mac_address').mask('FF:FF:FF:FF:FF:FF', {translation: {"F": { pattern:/[A-Fa-f0-9]/ }}});
 			templateDevice.find('.chosen-feature-key-user').chosen({ search_contains: true, width: 'inherit' });
 
 			if(!(data.media.encryption.enforce_security)) {

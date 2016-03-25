@@ -587,6 +587,8 @@ define(function(require){
 						var originalData = self.usersFormatAddUser(results),
 							userTemplate = $(monster.template(self, 'users-creation', originalData));
 
+						userTemplate.find('#extension').mask('99ZZZZZZZZZZZZZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
+
 						monster.ui.validate(userTemplate.find('#form_user_creation'), {
 							rules: {
 								'callflow.extension': {
@@ -716,6 +718,8 @@ define(function(require){
 					},
 					newLineTemplate = $(monster.template(self, 'users-newExtension', dataTemplate)),
 					listExtensions = template.find('.extensions .list-assigned-items');
+
+				newLineTemplate.find('.input-extension ').mask('99ZZZZZZZZZZZZZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
 
 				listExtensions.find('.empty-row').hide();
 
