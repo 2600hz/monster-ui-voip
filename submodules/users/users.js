@@ -2400,9 +2400,6 @@ define(function(require){
 					caller_id: {
 						internal: {
 							name: defaultCallerIdName
-						},
-						external: {
-							name: defaultCallerIdName
 						}
 					}
 				};
@@ -2854,9 +2851,6 @@ define(function(require){
 							internal: {
 								name: callerIdName,
 								number: data.callflow.extension
-							},
-							external: {
-								name: callerIdName
 							}
 						},
 						presence_id: data.callflow.extension,
