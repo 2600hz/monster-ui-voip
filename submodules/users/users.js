@@ -1609,8 +1609,8 @@ define(function(require){
 						});
 					}
 					else {
-						self.usersDeleteConferencing(data.user.id, function(data) {
-							args.userId = data.user.data.id;
+						self.usersDeleteConferencing(data.user.id, function() {
+							args.userId = data.user.id;
 
 							self.usersRender(args);
 						});
@@ -2089,7 +2089,6 @@ define(function(require){
 									id: currentUser.id,
 									timeout: 20
 								};
-
 							}
 
 							// In next 5 lines, look for user/group node, and replace it with the new data;
