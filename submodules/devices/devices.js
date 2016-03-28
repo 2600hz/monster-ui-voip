@@ -1,7 +1,6 @@
 define(function(require){
 	var $ = require('jquery'),
 		_ = require('underscore'),
-		mask = require('mask'),
 		monster = require('monster'),
 		toastr = require('toastr');
 
@@ -359,7 +358,8 @@ define(function(require){
 			monster.ui.protectField(templateDevice.find('#sip_password'), templateDevice);
 
 			monster.ui.tooltips(templateDevice);
-			templateDevice.find('#mac_address').mask('FF:FF:FF:FF:FF:FF', {translation: {"F": { pattern:/[A-Fa-f0-9]/ }}});
+			monster.ui.mask(templateDevice.find('#mac_address'), 'macAddress');
+			monster.ui.mask(templateDevice.find('[name="call_forward.number"]'), 'phoneNumber');
 			templateDevice.find('.chosen-feature-key-user').chosen({ search_contains: true, width: 'inherit' });
 
 			if(!(data.media.encryption.enforce_security)) {

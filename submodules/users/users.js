@@ -587,7 +587,7 @@ define(function(require){
 						var originalData = self.usersFormatAddUser(results),
 							userTemplate = $(monster.template(self, 'users-creation', originalData));
 
-						userTemplate.find('#extension').mask('99ZZZZZZZZZZZZZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
+						monster.ui.mask(userTemplate.find('#extension'), 'extension');
 
 						monster.ui.validate(userTemplate.find('#form_user_creation'), {
 							rules: {
@@ -719,7 +719,7 @@ define(function(require){
 					newLineTemplate = $(monster.template(self, 'users-newExtension', dataTemplate)),
 					listExtensions = template.find('.extensions .list-assigned-items');
 
-				newLineTemplate.find('.input-extension ').mask('99ZZZZZZZZZZZZZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
+				monster.ui.mask(newLineTemplate.find('.input-extension '), 'extension');
 
 				listExtensions.find('.empty-row').hide();
 
@@ -1924,6 +1924,8 @@ define(function(require){
 					openedTab: 'features'
 				},
 				timeoutWarningBox = featureTemplate.find('.help-box.red-box');
+
+			monster.ui.mask(featureTemplate.find('#number'), 'phoneNumber');
 
 			if(currentUser.hasOwnProperty('call_forward') && currentUser.call_forward.require_keypress) {
 				timeoutWarningBox.hide();
