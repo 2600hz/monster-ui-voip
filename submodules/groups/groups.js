@@ -274,8 +274,7 @@ define(function(require){
 						groupForm = groupTemplate.find('#form_group_creation');
 
 					monster.ui.validate(groupForm);
-
-					groupForm.find('#inputExtension').mask('99ZZZZZZZZZZZZZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
+					monster.ui.mask(groupForm.find('#inputExtension'), 'extension');
 
 					groupTemplate.find('#create_group').on('click', function() {
 						if(monster.ui.valid(groupForm)) {
@@ -1250,7 +1249,7 @@ define(function(require){
 						newLineTemplate = $(monster.template(self, 'groups-newExtension', dataTemplate)),
 						$listExtensions = template.find('.list-assigned-items');
 
-					newLineTemplate.find('.input-extension').mask('99ZZZZZZZZZZZZZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
+					monster.ui.mask(newLineTemplate.find('.input-extension'), 'extension');
 
 					listExtension.push(lastExtension);
 					$listExtensions.find('.empty-row').hide();
