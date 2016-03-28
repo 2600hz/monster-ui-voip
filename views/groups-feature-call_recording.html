@@ -20,8 +20,10 @@
 			<div>
 				<span>{{ i18n.groups.callRecording.formatLabel }}</span>
 				<select name="format" class="input-medium">
-					<option value="mp3" {{#if format}}{{#compare format '===' 'mp3'}}selected{{/compare}}{{else}}selected{{/if}}>mp3</option>
-					<option value="wav" {{#compare format '===' 'wav'}}selected{{/compare}}>wav</option>
+					{{#select format}}
+						<option value="mp3">mp3</option>
+						<option value="wav">wav</option>
+					{{/select}}
 				</select>
 			</div>
 			<div>
