@@ -1581,6 +1581,7 @@ define(function(require){
 				featureForm = featureTemplate.find('#conferencing_form');
 
 			monster.ui.validate(featureForm);
+			monster.ui.mask(featureTemplate.find('#pin'), 'extension');
 
 			featureTemplate.find('.cancel-link').on('click', function() {
 				popup.dialog('close').remove();
