@@ -131,8 +131,6 @@ define(function(require){
 					}
 				};
 
-			console.log(data);
-
 			_.each(data.notify_email_addresses, function(recipient) {
 				templateVMBox.find('.saved-entities')
 							  .append(monster.template(self, 'vmboxes-emailRow', { name: recipient }));
@@ -142,7 +140,8 @@ define(function(require){
 
 			var popup = monster.ui.dialog(templateVMBox, {
 				position: ['center', 20],
-				title: popupTitle
+				title: popupTitle,
+				width: '700'
 			});
 		},
 
