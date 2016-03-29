@@ -279,11 +279,17 @@ define(function(require){
 					groupTemplate.find('#create_group').on('click', function() {
 						if(monster.ui.valid(groupForm)) {
 							var formattedData = self.groupsCreationMergeData(data, groupTemplate);
-							self.groupsCreate(formattedData, function(data) {
-								popup.dialog('close').remove();
 
-								self.groupsRender({ groupId: data.id });
-							});
+							if(!_.isEmpty(formattedData.group.endpoints)) {
+								self.groupsCreate(formattedData, function(data) {
+									popup.dialog('close').remove();
+
+									self.groupsRender({ groupId: data.id });
+								});
+							}
+							else {
+								monster.ui.alert('warning', self.i18n.active().groups.emptyEndpointsWarning);
+							}
 						}
 					});
 

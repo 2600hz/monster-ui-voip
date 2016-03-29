@@ -125,7 +125,11 @@
 			"headline": "Caller ID Prepend",
 			"cidNameLabel": "Caller ID Name prefix",
 			"cidNumberLabel": "Caller ID Number prefix"
-		}
+		},
+
+		"__comment": "UI-2104: Adding a warning when adding a group with no endpoints",
+		"__version": "3.22",
+		"emptyEndpointsWarning": "You need to select at least one member to create a group"
 	},
 
 	"devices": {
