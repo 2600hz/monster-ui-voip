@@ -171,10 +171,6 @@
 }
 
 /* Adding / Edition vmboxes Popups */
-.edit-vmbox {
-	width: 700px;
-}
-
 .edit-vmbox .actions {
 	border-top: 1px solid #CCCCCC;
 	height: 30px;
