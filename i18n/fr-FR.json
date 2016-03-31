@@ -173,6 +173,12 @@
 					"button": "Redémarrer",
 					"help": "Ce bouton envoie une requête de redémarrage. Cette action n'est disponible que pour les appareils qui sont actuellement connectés à la plateforme.",
 					"success": "Vous avez envoyé une requête de redémarrage avec succès!"
+				},
+
+				"unlock": {
+					"label": "Autoriser la mise à jour",
+					"button": "Déverrouiller",
+					"success": "Ce téléphone est déverrouillé pour les prochaines 24 heures"
 				}
 			},
 			"restrictions": {

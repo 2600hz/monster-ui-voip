@@ -12,6 +12,11 @@ define(function(require){
 				'url': 'ui/{brand}/{family}/{model}',
 				'verb': 'GET',
 				generateError: false
+			},
+			'provisioner.devices.unlock': {
+				'apiRoot': monster.config.api.provisioner,
+				'url': 'locks/{accountId}/{macAddress}',
+				'verb': 'DELETE'
 			}
 		},
 
@@ -269,6 +274,7 @@ define(function(require){
 				type = data.device_type,
 				popupTitle = mode === 'edit' ? monster.template(self, '!' + self.i18n.active().devices[type].editTitle, { name: data.name }) : self.i18n.active().devices[type].addTitle,
 				templateDevice = $(monster.template(self, 'devices-'+type, $.extend(true, {}, data, {
+					isProvisionerConfigured: monster.config.api.hasOwnProperty('provisioner'),
 					showEmergencyCnam: monster.util.isNumberFeatureEnabled('cnam') && monster.util.isNumberFeatureEnabled('e911')
 				}))),
 				deviceForm = templateDevice.find('#form_device');
@@ -376,6 +382,12 @@ define(function(require){
 						toastr.success(self.i18n.active().devices.popupSettings.miscellaneous.restart.success);
 					});
 				}
+			});
+
+			templateDevice.find('#unlock_device').on('click', function() {
+				self.devicesUnlock(data.mac_address.replace(/\:/g, ''), function() {
+					toastr.success(self.i18n.active().devices.popupSettings.miscellaneous.unlock.success);
+				});
 			});
 
 			templateDevice.find('.actions .save').on('click', function() {
@@ -524,6 +536,21 @@ define(function(require){
 				},
 				success: function(data) {
 					callback && callback(data.data);
+				}
+			});
+		},
+
+		devicesUnlock: function(macAddress, callback) {
+			var self = this;
+
+			monster.request({
+				resource: 'provisioner.devices.unlock',
+				data: {
+					accountId: self.accountId,
+					macAddress: macAddress
+				},
+				success: function(data, status) {
+					callback && callback();
 				}
 			});
 		},
