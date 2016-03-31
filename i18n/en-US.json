@@ -213,6 +213,13 @@
 				"unregisterNotifications": {
 					"label": "Notify when unregistered",
 					"help": "Do you want to notify the administrator each time this device unregisters?"
+				},
+				"__comment": "UI-1917: Add button to unlock device on SmartPBX app",
+				"__version": "3.22",
+				"unlock": {
+					"label": "Allow Reprovision",
+					"button": "Unlock",
+					"success": "This device is unlocked for the next 24 hours"
 				}
 			},
 			"restrictions": {

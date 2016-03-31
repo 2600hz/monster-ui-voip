@@ -249,6 +249,17 @@
 							<i class="help-popover fa fa-question-circle" data-original-title="{{ i18n.devices.popupSettings.miscellaneous.restart.help }}" data-placement="top" data-toggle="tooltip"></i>
 						</div>
 					</div>
+
+					{{#if isProvisionerConfigured}}
+					<div class="control-group">
+						<label class="control-label checkbox">{{ i18n.devices.popupSettings.miscellaneous.unlock.label }}</label>
+						<div class="controls">
+							<button id="unlock_device" type="button" class="monster-button-primary">
+								{{ i18n.devices.popupSettings.miscellaneous.unlock.button }}
+							</button>
+						</div>
+					</div>
+					{{/if}}
 				{{/if}}
 			</div>
 
