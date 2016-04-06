@@ -15,13 +15,13 @@
 										<ul class="dropdown-menu">
 										{{#unless isLocal}}
 											{{#if ../../isCnamEnabled}}
-												<li><a class="callerId-number" href="#"><i class="fa fa-user"></i>{{ ../../../i18n.callerId }}</a></li>
+												<li><a class="callerId-number" href="#"><i class="fa fa-user"></i>{{ @root.i18n.callerId }}</a></li>
 											{{/if}}
 											{{#if ../../isE911Enabled}}
-												<li><a class="e911-number" href="#"><i class="fa fa-ambulance"></i>{{ ../../../i18n.e911 }}</a></li>
+												<li><a class="e911-number" href="#"><i class="fa fa-ambulance"></i>{{ @root.i18n.e911 }}</a></li>
 											{{/if}}
 										{{/unless}}
-											<li><a class="prepend-number" href="#"><i class="fa fa-file-text-o"></i>{{ ../i18n.numberPrepend }}</a></li>
+											<li><a class="prepend-number" href="#"><i class="fa fa-file-text-o"></i>{{ @root.i18n.numberPrepend }}</a></li>
 										</ul>
 									</li>
 								</ul>
@@ -29,7 +29,7 @@
 						</div>
 						<div class="features">
 						{{#compare this.state '===' 'port_in'}}
-							<i class="fa fa-exclamation-triangle monster-red active help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{../../i18n.portIconHelp}}"></i>
+							<i class="fa fa-exclamation-triangle monster-red active help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{@root.i18n.portIconHelp}}"></i>
 						{{/compare}}
 							{{#each viewFeatures}}
 								<i class="{{icon}} {{active}} help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ help }}"></i>
@@ -37,7 +37,7 @@
 						</div>
 					</div>
 					<div class="number">
-						<button type="button" class="monster-button monster-button-danger remove-number">{{ ../i18n.unassign }}</button>
+						<button type="button" class="monster-button monster-button-danger remove-number">{{ @root.i18n.unassign }}</button>
 						{{ formatPhoneNumber @key }}
 					</div>
 					<!--<div class="locality">
