@@ -101,7 +101,7 @@
 				</div>
 				{{else}}
 				<div class="dashboard-warning-row main-number-row link-box" data-category="strategy" data-subcategory="main-number">
-					<i class="fa fa-exclamation-triangle"></i>{{../i18n.myOffice.missingMainNumberMessage}}
+					<i class="fa fa-exclamation-triangle"></i>{{@root.i18n.myOffice.missingMainNumberMessage}}
 				</div>	
 				{{/if}}
 				<div class="dashboard-box-row conf-number-row link-box" data-category="strategy" data-subcategory="strategy-confnum">
@@ -193,7 +193,7 @@
 									<span class="legend-number">{{count}}</span>
 								</li>
 								{{else}}
-								<li class="no-number">{{../i18n.myOffice.numberChartLegend.noNumber}}</li>
+								<li class="no-number">{{@root.i18n.myOffice.numberChartLegend.noNumber}}</li>
 								{{/each}}
 							</ul>
 						</div>

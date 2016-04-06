@@ -2,7 +2,7 @@
 <div class="number-element">
 	<div class="number">
 		<button type="button" class="monster-button monster-button-danger remove-number" data-number="{{this.number}}" data-e911="{{this.features.dash_e911.active}}">
-			{{ ../i18n.unassign }}
+			{{ @root.i18n.unassign }}
 		</button>
 		<span>{{formatPhoneNumber this.number}}</span>
 	</div>
@@ -15,13 +15,13 @@
 						<ul class="dropdown-menu">
 						{{#unless isLocal}}
 							{{#if ../../isCnamEnabled}}
-								<li><a class="callerId-number" href="#"><i class="fa fa-user"></i>{{ ../../../i18n.callerId }}</a></li>
+								<li><a class="callerId-number" href="#"><i class="fa fa-user"></i>{{ @root.i18n.callerId }}</a></li>
 							{{/if}}
 							{{#if ../../isE911Enabled}}
-								<li><a class="e911-number" href="#"><i class="fa fa-ambulance"></i>{{ ../../../i18n.e911 }}</a></li>
+								<li><a class="e911-number" href="#"><i class="fa fa-ambulance"></i>{{ @root.i18n.e911 }}</a></li>
 							{{/if}}
 						{{/unless}}
-							<li><a class="prepend-number" href="#"><i class="fa fa-file-text-o"></i>{{ ../i18n.numberPrepend }}</a></li>
+							<li><a class="prepend-number" href="#"><i class="fa fa-file-text-o"></i>{{ @root.i18n.numberPrepend }}</a></li>
 						</ul>
 					</li>
 				</ul>

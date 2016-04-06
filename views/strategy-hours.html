@@ -30,7 +30,7 @@
 			<div class="custom-days">
 				{{#each days}}
 				<div class="custom-day">
-					<span class="status pull-right">{{#if this.open}}{{../../i18n.strategy.open}}{{else}}{{../../i18n.strategy.closed}}{{/if}}</span>
+					<span class="status pull-right">{{#if this.open}}{{@root.i18n.strategy.open}}{{else}}{{@root.i18n.strategy.closed}}{{/if}}</span>
 					<div>
 						<label class="custom-day-label">
 							{{#monsterCheckbox this.label}}
@@ -39,7 +39,7 @@
 						</label>
 						<span class="timepickers" {{#unless this.open}}style="display:none;"{{/unless}}>
 							<input required class="from-hour timepicker" type="text" name="weekdays.{{this.name}}.from" value="{{this.from}}">
-							{{../i18n.strategy.hours.to}}
+							{{@root.i18n.strategy.hours.to}}
 							<input required class="to-hour timepicker" type="text" name="weekdays.{{this.name}}.to" value="{{this.to}}">
 						</span>
 					</div>
