@@ -10,12 +10,11 @@
 		{{/monsterSwitch}}
 		</div>
 	</div>
-
 	<div class="content{{#unless extra.mapFeatures.caller_id.active}} disabled{{/unless}}">
 		{{ i18n.users.caller_id.dropdownLabel }}
 		<select class="caller-id-select">
 			{{#each extra.listCallerId}}
-				<option{{#compare ../this.caller_id.internal.number "===" this}} selected{{/compare}} value="{{this}}">{{this}}</option>
+				<option{{#compare ../this.caller_id.external.number "===" this}} selected{{/compare}} value="{{this}}">{{this}}</option>
 			{{/each}}
 		</select>
 
