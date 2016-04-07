@@ -284,7 +284,7 @@
 					<div class="controls">
 						<select name="provision.feature_keys[{{@key}}].type" class="feature-key-type span2">
 						{{#select type}}
-							{{#each ../../extra.featureKeys.types}}
+							{{#each ../extra.featureKeys.types}}
 								<option value="{{id}}">{{text}}</option>
 							{{/each}}
 						{{/select}}
@@ -292,7 +292,7 @@
 						<div class="feature-key-value" data-type="presence">
 							<label for="provision.feature_keys[{{@key}}].value">{{ @root.i18n.devices.popupSettings.featureKeys.labels.user }}</label>
 							<select name="provision.feature_keys[{{@key}}].value" class="chosen-feature-key-user">
-							{{#each ../../extra.users}}
+							{{#each ../extra.users}}
 								<option value="{{id}}">{{first_name}} {{last_name}}</option>
 							{{/each}}
 							</select>
@@ -300,7 +300,7 @@
 						<div class="feature-key-value" data-type="parking">
 							<label for="provision.feature_keys[{{@key}}].value">{{ @root.i18n.devices.popupSettings.featureKeys.labels.parkingSpot }}</label>
 							<select class="span1" name="provision.feature_keys[{{@key}}].value">
-							{{#each ../../extra.featureKeys.parkingSpots}}
+							{{#each ../extra.featureKeys.parkingSpots}}
 								<option value="{{this}}">{{this}}</option>
 							{{/each}}
 							</select>
@@ -308,7 +308,7 @@
 						<div class="feature-key-value" data-type="personal_parking">
 							<label for="provision.feature_keys[{{@key}}].value">{{ @root.i18n.devices.popupSettings.featureKeys.labels.user }}</label>
 							<select name="provision.feature_keys[{{@key}}].value" class="chosen-feature-key-user">
-							{{#each ../../extra.users}}
+							{{#each ../extra.users}}
 								<option value="{{id}}">{{first_name}} {{last_name}}</option>
 							{{/each}}
 							</select>
