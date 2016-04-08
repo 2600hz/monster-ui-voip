@@ -391,10 +391,14 @@ define(function(require){
 												number: val,
 												features: $.extend(true, {}, strategyData.numberFeatures)
 											};
-											_.each(accountNumbers[val].features, function(feature) {
-												ret.features[feature].active = 'active';
-											});
-											ret.isLocal = accountNumbers[val].features.indexOf('local') > -1;
+
+											if(accountNumbers.hasOwnProperty(val)) {
+												_.each(accountNumbers[val].features, function(feature) {
+													ret.features[feature].active = 'active';
+												});
+												ret.isLocal = accountNumbers[val].features.indexOf('local') > -1;
+											}
+
 											return ret;
 										}
 									}),
