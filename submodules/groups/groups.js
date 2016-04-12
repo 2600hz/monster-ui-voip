@@ -1491,7 +1491,7 @@ define(function(require){
 						}
 					});
 
-					if(number.used_by === '') {
+					if(!number.hasOwnProperty('used_by') || number.used_by === '') {
 						response.unassignedNumbers[id] = number;
 						response.countSpare++;
 					}
