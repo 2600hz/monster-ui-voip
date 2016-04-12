@@ -1342,7 +1342,7 @@ define(function(require){
 									var spareNumbers = {};
 
 									_.each(listNumbers.numbers, function(number, key) {
-										if(number.used_by === '') {
+										if(!number.hasOwnProperty('used_by') || number.used_by === '') {
 											spareNumbers[key] = number;
 										}
 									});
@@ -2783,7 +2783,7 @@ define(function(require){
 						});
 
 						/* Adding to spare numbers */
-						if(number.used_by === '') {
+						if(!number.hasOwnProperty('used_by') || number.used_by === '') {
 							response.countSpare++;
 							response.unassignedNumbers[k] = number;
 						}
