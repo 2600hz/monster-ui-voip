@@ -2926,11 +2926,54 @@ define(function(require){
 					});
 
 					_.each(results.callflows, function(callflow) {
-						listFnDelete.push(function(callback) {
-							self.usersDeleteCallflow(callflow.id, function(data) {
-								callback(null, '');
+
+						/*
+						Special case for users with mobile devices:
+						reassign mobile devices to their respective mobile callflow instead of just deleting the callflow
+						 */
+						if (callflow.type === 'mobile') {
+							listFnDelete.push(function(mainCallback) {
+								monster.parallel({
+										callflow: function(callback) {
+											self.usersGetCallflow(callflow.id, function(data) {
+												callback(null, data);
+											});
+										},
+										mobileDevice: function(callback) {
+											self.usersGetMobileDevice(callflow.numbers[0].slice(2), function(data) {
+												callback(null, data);
+											});
+										}
+									},
+									function(err, results) {
+										var fullCallflow = results.callflow,
+											mobileDeviceId = results.mobileDevice.id;
+
+										delete fullCallflow.owner_id;
+
+										$.extend(true, fullCallflow, {
+											flow: {
+												module: 'device',
+												data: {
+													id: mobileDeviceId
+												}
+											}
+										});
+
+										self.usersUpdateCallflow(fullCallflow, function(data) {
+											mainCallback(null, data);
+										});
+									}
+								);
 							});
-						});
+						}
+						else {
+							listFnDelete.push(function(callback) {
+								self.usersDeleteCallflow(callflow.id, function(data) {
+									callback(null, '');
+								});
+							});
+						}
 					});
 
 					_.each(results.vmbox, function(vmbox) {
@@ -2949,6 +2992,40 @@ define(function(require){
 					});
 				}
 			);
+		},
+
+		usersGetCallflow: function(callflowId, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'callflow.get',
+				data: {
+					accountId: self.accountId,
+					callflowId: callflowId
+				},
+				success: function(data, status) {
+					callback(data.data);
+				}
+			});
+		},
+
+		usersGetMobileDevice: function(mdn, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'device.list',
+				data: {
+					accountId: self.accountId,
+					data: {
+						filters: {
+							'filter_mobile.mdn': mdn
+						}
+					}
+				},
+				success: function(data, status) {
+					callback(data.data);
+				}
+			});
 		},
 
 		usersDeleteUser: function(userId, callback) {
