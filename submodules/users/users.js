@@ -996,7 +996,8 @@ define(function(require){
 
 			template.on('click', '.detail-devices .edit-device-link', function() {
 				var row = $(this).parents('.item-row'),
-					id = row.data('id')
+					id = row.data('id'),
+					userId = $(this).parents('.grid-row').data('id');
 
 				monster.pub('voip.devices.editDevice', { 
 						data: { id: id }, 
@@ -1004,7 +1005,7 @@ define(function(require){
 							row.find('.edit-device').html(device.name);
 						},
 						callbackDelete: function(device) {
-							row.remove();
+							self.usersRender({ userId: userId, openedTab: 'devices' });
 						}
 					}
 				);
