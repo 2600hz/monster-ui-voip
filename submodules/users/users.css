@@ -853,6 +853,10 @@
 	width: 400px;
 }
 
+.presence-id-change-wrapper .cancel-link {
+	margin-right: 5px;
+}
+
 .presence-id-change-wrapper .list-choices {
 	margin-bottom: 20px;
 	margin-top: 20px;
@@ -879,6 +883,7 @@
 	margin-top: 10px;
 }
 
-.presence-id-change-wrapper #save-presence-id {
-	margin-left: 5px;
+/**** CSS for delete user dialog ****/
+.delete-user-wrapper .dialog-text {
+	margin-top: 10px;
 }
