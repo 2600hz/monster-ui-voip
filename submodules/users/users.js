@@ -420,6 +420,36 @@ define(function(require){
 			return dataTemplate;
 		},
 
+		usersDeleteDialog: function(user, callback) {
+			var self = this,
+				dataTemplate = {
+					user: user
+				},
+				dialogTemplate = $(monster.template(self, 'users-deleteDialog', dataTemplate));
+
+			monster.ui.tooltips(dialogTemplate);
+
+			dialogTemplate.find('#confirm_button').on('click', function() {
+				var removeDevices = dialogTemplate.find('#delete_devices').is(':checked');
+
+				self.usersDelete(user.id, removeDevices, function(data) {
+					popup.dialog('close').remove();
+
+					callback && callback(data);
+				});
+			});
+
+			dialogTemplate.find('#cancel_button').on('click', function() {
+				popup.dialog('close').remove();
+			});
+
+			var popup = monster.ui.dialog(dialogTemplate, {
+				title: '<i class="fa fa-question-circle monster-blue"></i>',
+				position: ['center', 20],
+				dialogClass: 'monster-alert'
+			});
+		},
+
 		usersBindEvents: function(template, parent, data) {
 			var self = this,
 				currentNumberSearch = '',
@@ -753,13 +783,11 @@ define(function(require){
 			});
 
 			template.on('click', '#delete_user', function() {
-				var dataUser = $(this).parents('.grid-row').data(),
-					deleteType = dataUser.priv_level === 'admin' ? 'confirmDeleteAdmin' : 'confirmDeleteUser';
+				var dataUser = $(this).parents('.grid-row').data();
 
-				monster.ui.confirm(self.i18n.active().users[deleteType], function() {
-					self.usersDelete(dataUser.id, function(data) {
-						toastr.success(monster.template(self, '!' + toastrMessages.userDeleted));
-					});
+				self.usersDeleteDialog(dataUser, function(data) {
+					toastr.success(monster.template(self, '!' + self.i18n.active().users.toastrMessages.userDelete, { name: data.first_name + ' ' + data.last_name }));
+					self.usersRender();
 				});
 			});
 
@@ -2893,7 +2921,7 @@ define(function(require){
 		},
 
 		/* Utils */
-		usersDelete: function(userId, callback) {
+		usersDelete: function(userId, removeDevices, callback) {
 			var self = this;
 
 			monster.parallel({
@@ -2918,10 +2946,16 @@ define(function(require){
 
 					_.each(results.devices, function(device) {
 						listFnDelete.push(function(callback) {
-							// self.usersDeleteDevice(device.id, function(data) {
-							self.usersUnassignDevice(device.id, function(data) {
-								callback(null, '');
-							});
+							if(removeDevices) {
+								self.usersDeleteDevice(device.id, function(data) {
+									callback(null, '');
+								});
+							}
+							else {
+								self.usersUnassignDevice(device.id, function(data) {
+									callback(null, '');
+								});
+							}
 						});
 					});
 
@@ -2986,8 +3020,7 @@ define(function(require){
 
 					monster.parallel(listFnDelete, function(err, resultsDelete) {
 						self.usersDeleteUser(userId, function(data) {
-							toastr.success(monster.template(self, '!' + self.i18n.active().users.toastrMessages.userDelete, { name: data.first_name + ' ' + data.last_name }));
-							self.usersRender();
+							callback && callback(data);
 						});
 					});
 				}

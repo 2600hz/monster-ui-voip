@@ -416,8 +416,6 @@
 		"addFromSpare": "Add from Spare Numbers",
 		"addFromSpareDevices": "Add from Spare Devices",
 		"buy": "Buy Numbers",
-		"confirmDeleteAdmin": "You're about to delete an ADMIN! Deleting an admin will delete his Kazoo user, as well as his voicemail boxes and numbers, it will also prevent him from managing this UI. Do you want to continue?",
-		"confirmDeleteUser": "Deleting a user will delete this user and his Voicemail Box, and unassign the devices and numbers that were assigned to this user. Do you want to continue?",
 		"dialogChangePassword": {
 			"help": "You can set a new password by just typing any password you want, along with the Email address!",
 			"password": "Password",
@@ -672,7 +670,20 @@
 
 		"__comment": "UI-1888: ",
 		"__version": "4.0",
-		"confirmMobileUnAssignment": "You are about to un-assign a Mobile device. Be aware the phone number associated with this device ({{variable}}) will also be un-assigned from this user. Are you sure?"
+		"confirmMobileUnAssignment": "You are about to un-assign a Mobile device. Be aware the phone number associated with this device ({{variable}}) will also be un-assigned from this user. Are you sure?",
+
+		"__comment": "UI-2138: Delete User new Dialog",
+		"__version": "3.22",
+		"deleteDialog": {
+			"title": "Remove {{ name }} from the system",
+			"headerAdmin": "You're about to delete an ADMIN! Deleting an admin will delete his user, voicemail boxes and unassign his devices. It will also prevent him from managing this UI. Do you want to continue?",
+			"headerUser": "Deleting a user will delete this user and his Voicemail Box, and unassign the devices and numbers that were assigned to this user. Do you want to continue?",
+			"deleteUser": "Delete",
+			"deleteUserName": "Delete \"{{variable}}\"",
+			"proceed": "Proceed",
+			"deleteDevices": "Also remove this user's devices from the system",
+			"deleteDevicesHelp": "If you leave this option unchecked, we'll just unassign these devices and they will show up in the list of Spare Devices"
+		}
 	},
 
 	"strategy": {
