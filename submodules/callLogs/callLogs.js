@@ -419,31 +419,11 @@ define(function(require){
 					cdrId: callLogId
 				},
 				success: function(data, status) {
-					function objToArray(obj, prefix) {
-						var prefix = prefix || "",
-							result = [];
-						_.each(obj, function(val, key) {
-							if(typeof val === "object") {
-								result = result.concat(objToArray(val, prefix+key+"."));
-							} else {
-								result.push({
-									key: prefix+key,
-									value: val
-								});
-							}
-						});
-						return result;
-					}
+					var template = $(monster.template(self, 'callLogs-detailsPopup'));
 
-					var detailsArray = objToArray(data.data);
-					detailsArray.sort(function(a, b) {
-						return a.key < b.key ? -1 : a.key > b.key ? 1 : 0;
-					})
+					monster.ui.renderJSON(data.data, template.find('#jsoneditor'));
 
-					monster.ui.dialog(
-						monster.template(self, 'callLogs-detailsPopup', { details: detailsArray }),
-						{ title: self.i18n.active().callLogs.detailsPopupTitle }
-					);
+					monster.ui.dialog(template, { title: self.i18n.active().callLogs.detailsPopupTitle });
 				},
 				error: function(data, status) {
 					monster.ui.alert('error', self.i18n.active().callLogs.alertMessages.getDetailsError);
