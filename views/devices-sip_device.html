@@ -1,7 +1,7 @@
 <div class="edit-device" data-id="{{id}}">
 	<div class="title-bar clearfix">
 		<div class="device-title pull-left">
-			{{#if provision}}
+			{{#if provision.endpoint_brand}}
 			<div class="device-image model-image" style="background-image: url('css/assets/models/{{toLowerCase provision.endpoint_brand}}_{{toLowerCase provision.endpoint_family}}_{{toLowerCase provision.endpoint_model}}.jpg');"></div>
 			<div class="device-model">{{provision.endpoint_brand}} - {{provision.endpoint_model}}</div>
 			{{else}}

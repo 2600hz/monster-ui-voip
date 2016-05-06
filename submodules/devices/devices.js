@@ -1199,20 +1199,25 @@ define(function(require){
 		devicesGetIterator: function(args, callbackSuccess, callbackError) {
 			var self = this;
 
-			monster.request({
-				resource: 'provisioner.ui.getModel',
-				data: {
-					brand: args.endpoint_brand,
-					family: args.endpoint_family,
-					model: args.endpoint_model
-				},
-				success: function(data, status) {
-					callbackSuccess && callbackSuccess(data.data.template);
-				},
-				error: function(data, status) {
-					callbackError && callbackError();
-				}
-			});
+			if(args.hasOwnProperty('endpoint_brand') && args.hasOwnProperty('endpoint_family') && args.hasOwnProperty('endpoint_model')) {
+				monster.request({
+					resource: 'provisioner.ui.getModel',
+					data: {
+						brand: args.endpoint_brand,
+						family: args.endpoint_family,
+						model: args.endpoint_model
+					},
+					success: function(data, status) {
+						callbackSuccess && callbackSuccess(data.data.template);
+					},
+					error: function(data, status) {
+						
+					}
+				});
+			}
+			else {
+				callbackError && callbackError();
+			}
 		}
 	};
 
