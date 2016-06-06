@@ -827,7 +827,7 @@
 			"advancedCallflows": "Advanced Callflows",
 			"__comment": "UI-1886: Can now select a media in virtual receptionist",
 			"__version": "3.23",
-			"media": "Media"
+			"play": "Media"
 		},
 		"confirmMessages": {
 			"deleteHoliday": "This holiday will be permanently deleted. Continue?",
