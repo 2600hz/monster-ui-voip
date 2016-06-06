@@ -1985,7 +1985,7 @@ define(function(require){
 							case 'user':
 							case 'device':
 							case 'callflow':
-							case 'media':
+							case 'play':
 								flowElement.data.id = selectedEntity.val();
 								break;
 							case 'ring_group':
@@ -3199,7 +3199,7 @@ define(function(require){
 					var callEntities = {
 						device: results.devices,
 						user: $.extend(true, [], results.users),
-						media: results.media,
+						play: results.media,
 						userCallflows: [],
 						ring_group: [],
 						userGroups: $.map(results.userGroups, function(val) {
@@ -3211,8 +3211,8 @@ define(function(require){
 						advancedCallflows: results.advancedCallflows
 					};
 
-					_.each(callEntities.media, function(media) {
-						media.module = 'media';
+					_.each(callEntities.play, function(media) {
+						media.module = 'play';
 					});
 
 					_.each(callEntities.device, function(device) {
