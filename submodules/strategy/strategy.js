@@ -146,7 +146,7 @@ define(function(require){
 			{
 				name: 'move',
 				number: '6683',
-				callflowNumber: '*6683',
+				callflowNumber: '6683',
 				moduleName: 'move'
 			}
 		],
