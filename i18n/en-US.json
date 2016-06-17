@@ -1059,7 +1059,10 @@
 			"call_recording": "Call Recording",
 			"__comment": "UI-1395: Added voicemail[single_mailbox_login] feature code",
 			"__version": "3.20",
-			"voicemail[single_mailbox_login]": "Check Voicemail (auto login)"
+			"voicemail[single_mailbox_login]": "Check Voicemail (auto login)",
+			"__comment": "UI-2256: adding move feature code",
+			"__version": "4.0",
+			"move": "Move"
 		},
 		"__comment": "UI-1028, v3.20_s0: Added categories for the feature codes.",
 		"categories": {

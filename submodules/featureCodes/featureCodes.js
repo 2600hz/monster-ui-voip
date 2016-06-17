@@ -48,7 +48,8 @@ define(function(require){
 				"call_waiting[action=enable]",
 				"call_waiting[action=disable]",
 				"sound_test_service",
-				"call_recording"
+				"call_recording",
+				"move"
 			]
 		},
 

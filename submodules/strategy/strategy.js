@@ -142,6 +142,12 @@ define(function(require){
 				pattern: '^\\*5([0-9]*)$',
 				moduleName: 'park',
 				actionName: 'retrieve'
+			},
+			{
+				name: 'move',
+				number: '6683',
+				callflowNumber: '*6683',
+				moduleName: 'move'
 			}
 		],
 
@@ -2879,9 +2885,7 @@ define(function(require){
 						var callflow = {
 							flow: {
 								children: {},
-								data: $.extend(true, (featureCode.extraData || {}), {
-									action: featureCode.actionName
-								}),
+								data: featureCode.extraData || {},
 								module: featureCode.moduleName
 							},
 							featurecode: {
@@ -2889,6 +2893,12 @@ define(function(require){
 								number: featureCode.number
 							}
 						};
+
+						if(featureCode.hasOwnProperty('actionName')) {
+							callflow.flow.data = $.extend(callflow.flow.data, {
+								action: featureCode.actionName
+							});
+						}
 
 						if('pattern' in featureCode) {
 							callflow.patterns = [ featureCode.pattern ];
