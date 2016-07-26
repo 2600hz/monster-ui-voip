@@ -441,7 +441,7 @@
 }
 
 #groups_container .detail-features .features-grid .feature .fa-wrapper,
-.feature-popup-container .feature-fa-wrapper{
+.monster-feature-popup-container .feature-fa-wrapper{
 	display: inline-block;
 	margin: 20px;
 	width: 60px;
@@ -463,7 +463,7 @@
 }
 
 #groups_container .detail-features .features-grid .feature .fa-wrapper.active,
-.feature-popup-container .feature-fa-wrapper.active{
+.monster-feature-popup-container .feature-fa-wrapper.active{
 	background: #19d332; /* Old browsers */
 	background: -moz-radial-gradient(center, ellipse cover,  hsl(128,79%,46%) 0%, hsl(132,46%,46%) 61%, hsl(0,0%,0%) 99%); /* FF3.6+ */
 	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,hsl(128,79%,46%)), color-stop(61%,hsl(132,46%,46%)), color-stop(99%,hsl(0,0%,0%))); /* Chrome,Safari4+ */
@@ -480,99 +480,99 @@
 }
 
 /* Call Recording Feature */
-.feature-popup-container[data-feature="call_recording"] form {
+.monster-feature-popup-container[data-feature="call_recording"] form {
 	margin-bottom: 0;
 }
-.feature-popup-container[data-feature="call_recording"] form > div {
+.monster-feature-popup-container[data-feature="call_recording"] form > div {
 	position: relative;
 	margin-bottom: 10px;
 }
-.feature-popup-container[data-feature="call_recording"] form span {
+.monster-feature-popup-container[data-feature="call_recording"] form span {
 	display: inline-block;
 	width: 120px;
 	vertical-align: text-bottom;
 	text-align: right;
 }
-.feature-popup-container[data-feature="call_recording"] form label.monster-invalid {
+.monster-feature-popup-container[data-feature="call_recording"] form label.monster-invalid {
 	top: 30px;
 	left: 130px;
 }
 
 /* Ringback Feature */
-.feature-popup-container[data-feature="ringback"] {
+.monster-feature-popup-container[data-feature="ringback"] {
 	width: 516px;
 }
 
-.feature-popup-container[data-feature="ringback"] .media-dropdown {
+.monster-feature-popup-container[data-feature="ringback"] .media-dropdown {
 	margin-bottom: 0px;
 }
-.feature-popup-container[data-feature="ringback"] .upload-toggle {
+.monster-feature-popup-container[data-feature="ringback"] .upload-toggle {
 	margin-left: 10px;
 	width: 117px;
 }
-.feature-popup-container[data-feature="ringback"] .upload-div {
+.monster-feature-popup-container[data-feature="ringback"] .upload-div {
 	display: none;
 	margin-top: 20px;
 }
-.feature-popup-container[data-feature="ringback"] .upload-div .upload-input {
+.monster-feature-popup-container[data-feature="ringback"] .upload-div .upload-input {
 	margin: 0;
 	width: 330px;
 }
-.feature-popup-container[data-feature="ringback"] .upload-div button.upload-action {
+.monster-feature-popup-container[data-feature="ringback"] .upload-div button.upload-action {
 	margin-left: 10px;
 	padding-left: 19px;
 	padding-right: 19px;
 }
 
-.feature-popup-container[data-feature="ringback"] .upload-div button > i {
+.monster-feature-popup-container[data-feature="ringback"] .upload-div button > i {
 	margin-right: 0;
 	padding-right: 0;
 }
 
-.feature-popup-container[data-feature="ringback"] .upload-div .file-upload {
+.monster-feature-popup-container[data-feature="ringback"] .upload-div .file-upload {
 	margin: 0;
 }
-.feature-popup-container[data-feature="ringback"] .upload-div .file-upload > input {
+.monster-feature-popup-container[data-feature="ringback"] .upload-div .file-upload > input {
 	margin: 0;
 	width: 205px;
 	padding: 6px;
 }
 
 /* Next Action Feature */
-.feature-popup-container[data-feature="next_action"] {
+.monster-feature-popup-container[data-feature="next_action"] {
 	width: 540px;
 }
 
-.feature-popup-container[data-feature="next_action"] .next-action > * {
+.monster-feature-popup-container[data-feature="next_action"] .next-action > * {
 	vertical-align: middle;
 	margin: 0;
 }
 
-.feature-popup-container[data-feature="next_action"] .next-action > *:not(:first-child) {
+.monster-feature-popup-container[data-feature="next_action"] .next-action > *:not(:first-child) {
 	margin-left: 10px;
 }
 
 
 /* Allow Call Forward Feature */
-.feature-popup-container[data-feature="forward"] .help-box {
+.monster-feature-popup-container[data-feature="forward"] .help-box {
 	margin: 5px 20px 20px
 }
 
 /* CID Prepend Feature */
-.feature-popup-container[data-feature="prepend"] form {
+.monster-feature-popup-container[data-feature="prepend"] form {
 	margin-bottom: 0;
 }
-.feature-popup-container[data-feature="prepend"] form > div {
+.monster-feature-popup-container[data-feature="prepend"] form > div {
 	position: relative;
 	margin-bottom: 10px;
 }
-.feature-popup-container[data-feature="prepend"] form span {
+.monster-feature-popup-container[data-feature="prepend"] form span {
 	display: inline-block;
 	width: 160px;
 	vertical-align: middle;
 	text-align: right;
 }
-.feature-popup-container[data-feature="prepend"] form input {
+.monster-feature-popup-container[data-feature="prepend"] form input {
 	margin-bottom: 0;
 	width: 100px;
 }

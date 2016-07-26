@@ -527,7 +527,7 @@
 }
 
 #users_container .detail-features .features-grid .feature .fa-wrapper,
-.feature-popup-container .feature-fa-wrapper{
+.monster-feature-popup-container .feature-fa-wrapper{
 	display: inline-block;
 	margin: 20px;
 	width: 60px;
@@ -549,7 +549,7 @@
 }
 
 #users_container .detail-features .features-grid .feature .fa-wrapper.active,
-.feature-popup-container .feature-fa-wrapper.active{
+.monster-feature-popup-container .feature-fa-wrapper.active{
 	background: #19d332; /* Old browsers */
 	background: -moz-radial-gradient(center, ellipse cover,  hsl(128,79%,46%) 0%, hsl(132,46%,46%) 61%, hsl(0,0%,0%) 99%); /* FF3.6+ */
 	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,hsl(128,79%,46%)), color-stop(61%,hsl(132,46%,46%)), color-stop(99%,hsl(0,0%,0%))); /* Chrome,Safari4+ */
@@ -661,36 +661,36 @@
 }
 
 /* Caller-ID User Feature Popup */
-.feature-popup-container[data-feature="caller_id"] {
+.monster-feature-popup-container[data-feature="caller_id"] {
 	width: 525px;
 }
 
-.feature-popup-container .caller-id-select {
+.monster-feature-popup-container .caller-id-select {
 	margin-top: 5px;
 }
 
 /* Hot Desking User Feature Popup */
-.feature-popup-container[data-feature="hotdesk"] #pin {
+.monster-feature-popup-container[data-feature="hotdesk"] #pin {
 	margin-top: 10px;
 }
 
 /* VM To Email User Feature Popup */
-.feature-popup-container[data-feature="vm_to_email"] #email {
+.monster-feature-popup-container[data-feature="vm_to_email"] #email {
 	margin-top: 8px;
 }
 
-.feature-popup-container[data-feature="vm_to_email"] .main-line {
+.monster-feature-popup-container[data-feature="vm_to_email"] .main-line {
 	height: auto;
 	line-height: 20px;
 	margin: 10px 0 30px 0;
 }
 
 /* Conferencing */
-.feature-popup-container[data-feature="conferencing"] form {
+.monster-feature-popup-container[data-feature="conferencing"] form {
 	margin-bottom: 0;
 }
 
-.feature-popup-container[data-feature="conferencing"] form .list-numbers {
+.monster-feature-popup-container[data-feature="conferencing"] form .list-numbers {
 	display: inline-block;
 	font-weight: 600;
 	height: 65px;
@@ -701,86 +701,86 @@
 	width: 180px;
 }
 
-.feature-popup-container[data-feature="conferencing"] form .list-numbers[data-count="1"] {
+.monster-feature-popup-container[data-feature="conferencing"] form .list-numbers[data-count="1"] {
 	line-height: 61px;
 }
 
-.feature-popup-container[data-feature="conferencing"] form .list-numbers[data-count="2"] {
+.monster-feature-popup-container[data-feature="conferencing"] form .list-numbers[data-count="2"] {
 	line-height: 32px;
 }
 
-.feature-popup-container[data-feature="conferencing"] form .list-numbers[data-count="3"] {
+.monster-feature-popup-container[data-feature="conferencing"] form .list-numbers[data-count="3"] {
 	line-height: 20px;
 }
 
 /* Music-On-Hold Feature */
-.feature-popup-container[data-feature="music_on_hold"] .media-dropdown {
+.monster-feature-popup-container[data-feature="music_on_hold"] .media-dropdown {
 	margin-bottom: 0px;
 }
-.feature-popup-container[data-feature="music_on_hold"] .upload-toggle {
+.monster-feature-popup-container[data-feature="music_on_hold"] .upload-toggle {
 	margin-left: 10px;
 	min-width: 117px;
 }
-.feature-popup-container[data-feature="music_on_hold"] .upload-div {
+.monster-feature-popup-container[data-feature="music_on_hold"] .upload-div {
 	display: none;
 	margin-top: 20px;
 }
-.feature-popup-container[data-feature="music_on_hold"] .upload-div .upload-input {
+.monster-feature-popup-container[data-feature="music_on_hold"] .upload-div .upload-input {
 	margin: 0;
 	width: 330px;
 }
-.feature-popup-container[data-feature="music_on_hold"] .upload-div button.upload-action {
+.monster-feature-popup-container[data-feature="music_on_hold"] .upload-div button.upload-action {
 	margin-left: 10px;
 	padding-left: 19px;
 	padding-right: 19px;
 }
 
-.feature-popup-container[data-feature="music_on_hold"] .upload-div button > i {
+.monster-feature-popup-container[data-feature="music_on_hold"] .upload-div button > i {
 	margin-right: 0;
 	padding-right: 0;
 }
 
-.feature-popup-container[data-feature="music_on_hold"] .upload-div .file-upload {
+.monster-feature-popup-container[data-feature="music_on_hold"] .upload-div .file-upload {
 	margin: 0;
 }
-.feature-popup-container[data-feature="music_on_hold"] .upload-div .file-upload > input {
+.monster-feature-popup-container[data-feature="music_on_hold"] .upload-div .file-upload > input {
 	margin: 0;
 	padding: 6px;
 	width: 192px;
 }
 
 /* Faxing Feature Popup */
-.feature-popup-container[data-feature='faxing'] {
+.monster-feature-popup-container[data-feature='faxing'] {
 	overflow: hidden;
 }
 
-.feature-popup-container[data-feature='faxing'] #faxbox_form {
+.monster-feature-popup-container[data-feature='faxing'] #faxbox_form {
 	margin-bottom: 0;
 }
 
-.feature-popup-container[data-feature='faxing'] #faxbox_form a {
+.monster-feature-popup-container[data-feature='faxing'] #faxbox_form a {
 	color: #22a5ff;
 	text-decoration: underline;
 }
 
-.feature-popup-container[data-feature='faxing'] #faxbox_form a:hover {
+.monster-feature-popup-container[data-feature='faxing'] #faxbox_form a:hover {
 	text-decoration: none;
 }
 
-.feature-popup-container[data-feature='faxing'] #faxbox_form p {
+.monster-feature-popup-container[data-feature='faxing'] #faxbox_form p {
 	line-height: 30px;
 }
 
-.feature-popup-container[data-feature='faxing'] #faxbox_form .monster-primary-color {
+.monster-feature-popup-container[data-feature='faxing'] #faxbox_form .monster-primary-color {
 	color: #22a5ff;
 }
 
-.feature-popup-container[data-feature='faxing'] #faxbox_form .number-selector {
+.monster-feature-popup-container[data-feature='faxing'] #faxbox_form .number-selector {
 	display: inline-block;
 	margin: 0 10px;
 }
 
-.feature-popup-container[data-feature='faxing'] #faxbox_form #helper_content {
+.monster-feature-popup-container[data-feature='faxing'] #faxbox_form #helper_content {
 	margin-top: 10px;
 }
 
@@ -808,7 +808,7 @@
 }
 
 /* Find me Follow me feature popup */
-.feature-popup-container[data-feature="find_me_follow_me"] {
+.monster-feature-popup-container[data-feature="find_me_follow_me"] {
 	width: 620px;
 }
 
