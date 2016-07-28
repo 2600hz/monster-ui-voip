@@ -146,7 +146,7 @@ define(function(require){
 											 + cdr.fromNumber + "|" + cdr.toName + "|"
 											 + cdr.toNumber + "|" + cdr.hangupCause + "|"
 											 + callIds).toLowerCase(),
-								rowGroup = template.find('.grid-row.a-leg[data-id="'+cdr.id+'"]').parents('.grid-row-group');
+								rowGroup = template.find('.grid-row.main-leg[data-id="'+cdr.id+'"]').parents('.grid-row-group');
 							if(searchString.indexOf(searchValue) >= 0) {
 								matchedResults = true;
 								rowGroup.show();
@@ -175,20 +175,38 @@ define(function(require){
 				}
 			});
 
-			template.on('click', '.a-leg.has-b-legs', function(e) {
-				var rowGroup = $(this).parents('.grid-row-group');
+			template.on('click', '.grid-row.main-leg', function(e) {
+				var $this = $(this),
+					rowGroup = $this.parents('.grid-row-group'),
+					callId = $this.data('id'),
+					extraLegs = rowGroup.find('.extra-legs');
+
 				if(rowGroup.hasClass('open')) {
 					rowGroup.removeClass('open');
-					rowGroup.find('.b-leg').slideUp();
+					extraLegs.slideUp();
 				} else {
+					// Reset all slidedDown legs
 					template.find('.grid-row-group').removeClass('open');
-					template.find('.b-leg').slideUp();
+					template.find('.extra-legs').slideUp();
+
+					// Slide down current leg
 					rowGroup.addClass('open');
-					rowGroup.find('.b-leg').slideDown();
+					extraLegs.slideDown();
+
+					if(!extraLegs.hasClass('data-loaded')) {
+						self.callLogsGetLegs(callId, function(cdrs) {
+							var formattedCdrs = self.callLogsFormatCdrs(cdrs);
+
+							rowGroup.find('.extra-legs')
+									.empty()
+									.addClass('data-loaded')
+									.append(monster.template(self, 'callLogs-interactionLegs', { cdrs: formattedCdrs }));
+						});
+					}
 				}
 			});
 
-			template.on('click', '.grid-cell.details i', function(e) {
+			template.on('click', '.grid-cell.actions .details-cdr', function(e) {
 				e.stopPropagation();
 				var cdrId = $(this).parents('.grid-row').data('id');
 				self.callLogsShowDetailsPopup(cdrId);
@@ -293,6 +311,21 @@ define(function(require){
 				},
 				success: function(data, status) {
 					callback(data.data, data['next_start_key']);
+				}
+			});
+		},
+
+		callLogsGetLegs: function(callId, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'cdrs.listLegs',
+				data: {
+					accountId: self.accountId,
+					callId: callId
+				},
+				success: function(data) {
+					callback && callback(data.data);
 				}
 			});
 		},

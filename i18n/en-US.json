@@ -918,9 +918,7 @@
 			"hangup1": "Hangup",
 			"hangup2": "Cause",
 			"details1": "Call",
-			"details2": "Details",
-			"report1": "Submit",
-			"report2": "Report"
+			"actions": "Actions"
 		},
 		"reportCall": "Report Call",
 		"loaderMessage": "Scroll down or click here to load additional Call Logs.",
@@ -937,7 +935,14 @@
 		"thisDay": "Today",
 		"custom": "Custom",
 		"callsFrom": "Showing calls from",
-		"callsTo": "to"
+		"callsTo": "to",
+		"__comment": "UI-",
+		"__version": "v4.0",
+		"loading": "Loading additional information...",
+		"actions": {
+			"report": "Report Call",
+			"details": "Technical Details"
+		}
 	},
 
 	"myOffice": {

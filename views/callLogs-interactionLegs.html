@@ -1,14 +1,7 @@
 {{#each cdrs}}
-<div class="grid-row-group">
-	<div class="grid-row main-leg" data-id="{{this.id}}">
+	<div class="grid-row extra-leg" data-id={{this.id}}>
 		<div class="grid-cell direction">
-			<div class="sub-cell single-cell">
-				{{#if this.isOutboundCall}}
-				<i class="fa fa-arrow-left monster-orange"></i>
-				{{else}}
-				<i class="fa fa-arrow-right monster-green"></i>
-				{{/if}}
-			</div>
+			<div class="sub-cell single-cell"></div>
 		</div>
 		<div class="grid-cell datetime">
 			<div class="sub-cell cell-top">{{this.date}}</div>
@@ -36,20 +29,14 @@
 			</div>
 		</div>
 		<div class="grid-cell hangup">
-			<div class="sub-cell single-cell" data-original-title="{{this.hangupHelp}}" data-placement="top" data-toggle="tooltip">
-				<span class="cause-title">{{this.hangupCause}}</span>
+			<div class="sub-cell single-cell cause-title" title="{{this.hangupCause}}">
+				{{this.hangupCause}}
 			</div>
 		</div>
 		<div class="grid-cell actions">
 			<div class="sub-cell single-cell">
-				{{#if ../showReport}}<a class="monster-link" href="{{this.mailtoLink}}"><i data-placement="top" data-toggle="tooltip" data-placement="top" data-original-title="{{ @root.i18n.callLogs.actions.report }}" class="fa fa-lg fa-fire-extinguisher"></i></a>{{/if}}
+				<i class="fa fa-cog fa-lg details-cdr" data-toggle="tooltip" data-placement="top" data-original-title="{{ @root.i18n.callLogs.actions.details }}"></i>
 			</div>
 		</div>
 	</div>
-	<div class="extra-legs">
-		<div class="loading-container">
-			{{@root.i18n.callLogs.loading}} <i class="fa fa-spinner fa-spin monster-blue fa-lg"></i>
-		</div>
-	</div>
-</div>
 {{/each}}
