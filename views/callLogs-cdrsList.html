@@ -1,6 +1,6 @@
 {{#each cdrs}}
 <div class="grid-row-group">
-	<div class="grid-row a-leg {{#if this.bLegs.length}}has-b-legs{{/if}}" data-id="{{this.id}}">
+	<div class="grid-row" data-id="{{this.id}}">
 		<div class="grid-cell direction">
 			<div class="sub-cell single-cell">
 				{{#if this.isOutboundCall}}
@@ -53,52 +53,5 @@
 		</div>
 		{{/if}}
 	</div>
-	{{#each this.bLegs}}
-	<div class="grid-row b-leg" data-id={{this.id}}>
-		<div class="grid-cell direction">
-			<div class="sub-cell single-cell"></div>
-		</div>
-		<div class="grid-cell datetime">
-			<div class="sub-cell cell-top">{{this.date}}</div>
-			<div class="sub-cell cell-bottom">{{this.time}}</div>
-		</div>
-		<div class="grid-cell from">
-			{{#if this.fromName}}
-			<div class="sub-cell cell-top">{{formatPhoneNumber this.fromNumber}}</div>
-			<div class="sub-cell cell-bottom">{{this.fromName}}</div>
-			{{else}}
-			<div class="sub-cell single-cell">{{formatPhoneNumber this.fromNumber}}</div>
-			{{/if}}
-		</div>
-		<div class="grid-cell to">
-			{{#if this.toName}}
-			<div class="sub-cell cell-top">{{formatPhoneNumber this.toNumber}}</div>
-			<div class="sub-cell cell-bottom">{{this.toName}}</div>
-			{{else}}
-			<div class="sub-cell single-cell">{{formatPhoneNumber this.toNumber}}</div>
-			{{/if}}
-		</div>
-		<div class="grid-cell duration">
-			<div class="sub-cell single-cell">
-				{{this.duration}}
-			</div>
-		</div>
-		<div class="grid-cell hangup">
-			<div class="sub-cell single-cell" title="{{this.hangupCause}}">
-				{{this.hangupCause}}
-			</div>
-		</div>
-		<div class="grid-cell details">
-			<div class="sub-cell single-cell">
-				<i class="fa fa-cog fa-lg"></i>
-			</div>
-		</div>
-		{{#if ../../showReport}}
-		<div class="grid-cell report">
-			<div class="sub-cell single-cell"></div>
-		</div>
-		{{/if}}
-	</div>
-	{{/each}}
 </div>
 {{/each}}

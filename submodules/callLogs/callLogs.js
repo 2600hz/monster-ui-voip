@@ -42,6 +42,7 @@ define(function(require){
 			delete self.loneBLegs;
 			self.callLogsGetCdrs(fromDate, toDate, function(cdrs, nextStartKey) {
 				cdrs = self.callLogsFormatCdrs(cdrs);
+
 				dataTemplate.cdrs = cdrs;
 				template = $(monster.template(self, 'callLogs-layout', dataTemplate));
 
@@ -285,49 +286,13 @@ define(function(require){
 			}
 
 			self.callApi({
-				resource: 'cdrs.list',
+				resource: 'cdrs.listByInteraction',
 				data: {
 					accountId: self.accountId,
 					filters: filters
 				},
 				success: function(data, status) {
-					var cdrs = {},
-						groupedLegs = _.groupBy(data.data, function(val) { return (val.direction === 'inbound' || !val.bridge_id) ? 'aLegs' : 'bLegs' });
-
-					if(self.lastALeg) {
-						groupedLegs.aLegs.splice(0, 0, self.lastALeg);
-					}
-					// if(self.loneBLegs && self.loneBLegs.length) {
-					// 	groupedLegs.bLegs = self.loneBLegs.concat(groupedLegs.bLegs);
-					// }
-					if(data['next_start_key']) {
-						self.lastALeg = groupedLegs.aLegs.pop();
-					}
-
-					_.each(groupedLegs.aLegs, function(val) {
-						var call_id = val.call_id || val.id;
-						cdrs[call_id] = { aLeg: val, bLegs: {} };
-					});
-
-					if(self.loneBLegs && self.loneBLegs.length > 0) {
-						_.each(self.loneBLegs, function(val) {
-							if('other_leg_call_id' in val && val.other_leg_call_id in cdrs) {
-								cdrs[val.other_leg_call_id].bLegs[val.id] = val;
-							}
-						});
-					}
-					self.loneBLegs = [];
-					_.each(groupedLegs.bLegs, function(val) {
-						if('other_leg_call_id' in val) {
-							if(val.other_leg_call_id in cdrs) {
-								cdrs[val.other_leg_call_id].bLegs[val.id] = val;
-							} else {
-								self.loneBLegs.push(val);
-							}
-						}
-					});
-
-					callback(cdrs, data['next_start_key']);
+					callback(data.data, data['next_start_key']);
 				}
 			});
 		},
@@ -387,20 +352,8 @@ define(function(require){
 					};
 				};
 
-			_.each(cdrs, function(val, key) {
-				if(!('aLeg' in val)) {
-					// Handling lone b-legs as standalone a-legs
-					_.each(val.bLegs, function(v, k) {
-						result.push($.extend({ bLegs: [] }, formatCdr(v)));
-					});
-				} else {
-					var cdr = formatCdr(val.aLeg);
-					cdr.bLegs = [];
-					_.each(val.bLegs, function(v, k) {
-						cdr.bLegs.push(formatCdr(v));
-					});
-					result.push(cdr);
-				}
+			_.each(cdrs, function(v) {
+				result.push(formatCdr(v));
 			});
 
 			result.sort(function(a, b) {
