@@ -918,9 +918,7 @@
 			"hangup1": "Hangup",
 			"hangup2": "Cause",
 			"details1": "Call",
-			"details2": "Details",
-			"report1": "Submit",
-			"report2": "Report"
+			"actions": "Actions"
 		},
 		"reportCall": "Report Call",
 		"loaderMessage": "Scroll down or click here to load additional Call Logs.",
@@ -937,7 +935,14 @@
 		"thisDay": "Today",
 		"custom": "Custom",
 		"callsFrom": "Showing calls from",
-		"callsTo": "to"
+		"callsTo": "to",
+		"__comment": "UI-",
+		"__version": "v4.0",
+		"loading": "Loading additional information...",
+		"actions": {
+			"report": "Report Call",
+			"details": "Technical Details"
+		}
 	},
 
 	"myOffice": {
@@ -1059,7 +1064,10 @@
 			"call_recording": "Call Recording",
 			"__comment": "UI-1395: Added voicemail[single_mailbox_login] feature code",
 			"__version": "3.20",
-			"voicemail[single_mailbox_login]": "Check Voicemail (auto login)"
+			"voicemail[single_mailbox_login]": "Check Voicemail (auto login)",
+			"__comment": "UI-2256: adding move feature code",
+			"__version": "4.0",
+			"move": "Move"
 		},
 		"__comment": "UI-1028, v3.20_s0: Added categories for the feature codes.",
 		"categories": {

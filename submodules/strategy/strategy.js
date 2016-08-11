@@ -142,6 +142,12 @@ define(function(require){
 				pattern: '^\\*5([0-9]*)$',
 				moduleName: 'park',
 				actionName: 'retrieve'
+			},
+			{
+				name: 'move',
+				number: '6683',
+				callflowNumber: '6683',
+				moduleName: 'move'
 			}
 		],
 
@@ -2879,9 +2885,7 @@ define(function(require){
 						var callflow = {
 							flow: {
 								children: {},
-								data: $.extend(true, (featureCode.extraData || {}), {
-									action: featureCode.actionName
-								}),
+								data: featureCode.extraData || {},
 								module: featureCode.moduleName
 							},
 							featurecode: {
@@ -2889,6 +2893,12 @@ define(function(require){
 								number: featureCode.number
 							}
 						};
+
+						if(featureCode.hasOwnProperty('actionName')) {
+							callflow.flow.data = $.extend(callflow.flow.data, {
+								action: featureCode.actionName
+							});
+						}
 
 						if('pattern' in featureCode) {
 							callflow.patterns = [ featureCode.pattern ];
@@ -3119,13 +3129,15 @@ define(function(require){
 							resource: 'callflow.list',
 							data: {
 								accountId: self.accountId,
-								filters: { 'has_key':'owner_id' }
+								filters: { 
+									has_key:'owner_id',
+									filter_type: 'mainUserCallflow',
+									paginate: 'false'
+								}
 							},
 							success: function(data, status) {
-								var userCallflows = _.filter(data.data, function(callflow) { 
-									return (callflow.type === 'mainUserCallflow' || !('type' in callflow)); 
-								});
-								_callback(null, userCallflows);
+								var mapCallflowsByOwnerId = _.indexBy(data.data, 'owner_id');
+								_callback(null, mapCallflowsByOwnerId);
 							}
 						});
 					},
@@ -3220,11 +3232,11 @@ define(function(require){
 					});
 
 					_.each(results.users, function(user) {
-						var userCallflow = _.find(results.userCallflows, function(callflow) { return callflow.owner_id === user.id });
-						if(userCallflow) {
-							user.id = userCallflow.id;
+						if(results.userCallflows.hasOwnProperty(user.id)) {
+							user.id = results.userCallflows[user.id].id;
 							user.module = 'callflow';
-						} else {
+						}
+						else {
 							user.module = 'user';
 						}
 						callEntities.userCallflows.push(user);

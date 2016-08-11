@@ -42,6 +42,7 @@ define(function(require){
 			delete self.loneBLegs;
 			self.callLogsGetCdrs(fromDate, toDate, function(cdrs, nextStartKey) {
 				cdrs = self.callLogsFormatCdrs(cdrs);
+
 				dataTemplate.cdrs = cdrs;
 				template = $(monster.template(self, 'callLogs-layout', dataTemplate));
 
@@ -145,7 +146,7 @@ define(function(require){
 											 + cdr.fromNumber + "|" + cdr.toName + "|"
 											 + cdr.toNumber + "|" + cdr.hangupCause + "|"
 											 + callIds).toLowerCase(),
-								rowGroup = template.find('.grid-row.a-leg[data-id="'+cdr.id+'"]').parents('.grid-row-group');
+								rowGroup = template.find('.grid-row.main-leg[data-id="'+cdr.id+'"]').parents('.grid-row-group');
 							if(searchString.indexOf(searchValue) >= 0) {
 								matchedResults = true;
 								rowGroup.show();
@@ -174,20 +175,38 @@ define(function(require){
 				}
 			});
 
-			template.on('click', '.a-leg.has-b-legs', function(e) {
-				var rowGroup = $(this).parents('.grid-row-group');
+			template.on('click', '.grid-row.main-leg', function(e) {
+				var $this = $(this),
+					rowGroup = $this.parents('.grid-row-group'),
+					callId = $this.data('id'),
+					extraLegs = rowGroup.find('.extra-legs');
+
 				if(rowGroup.hasClass('open')) {
 					rowGroup.removeClass('open');
-					rowGroup.find('.b-leg').slideUp();
+					extraLegs.slideUp();
 				} else {
+					// Reset all slidedDown legs
 					template.find('.grid-row-group').removeClass('open');
-					template.find('.b-leg').slideUp();
+					template.find('.extra-legs').slideUp();
+
+					// Slide down current leg
 					rowGroup.addClass('open');
-					rowGroup.find('.b-leg').slideDown();
+					extraLegs.slideDown();
+
+					if(!extraLegs.hasClass('data-loaded')) {
+						self.callLogsGetLegs(callId, function(cdrs) {
+							var formattedCdrs = self.callLogsFormatCdrs(cdrs);
+
+							rowGroup.find('.extra-legs')
+									.empty()
+									.addClass('data-loaded')
+									.append(monster.template(self, 'callLogs-interactionLegs', { cdrs: formattedCdrs }));
+						});
+					}
 				}
 			});
 
-			template.on('click', '.grid-cell.details i', function(e) {
+			template.on('click', '.grid-cell.actions .details-cdr', function(e) {
 				e.stopPropagation();
 				var cdrId = $(this).parents('.grid-row').data('id');
 				self.callLogsShowDetailsPopup(cdrId);
@@ -285,49 +304,28 @@ define(function(require){
 			}
 
 			self.callApi({
-				resource: 'cdrs.list',
+				resource: 'cdrs.listByInteraction',
 				data: {
 					accountId: self.accountId,
 					filters: filters
 				},
 				success: function(data, status) {
-					var cdrs = {},
-						groupedLegs = _.groupBy(data.data, function(val) { return (val.direction === 'inbound' || !val.bridge_id) ? 'aLegs' : 'bLegs' });
+					callback(data.data, data['next_start_key']);
+				}
+			});
+		},
 
-					if(self.lastALeg) {
-						groupedLegs.aLegs.splice(0, 0, self.lastALeg);
-					}
-					// if(self.loneBLegs && self.loneBLegs.length) {
-					// 	groupedLegs.bLegs = self.loneBLegs.concat(groupedLegs.bLegs);
-					// }
-					if(data['next_start_key']) {
-						self.lastALeg = groupedLegs.aLegs.pop();
-					}
+		callLogsGetLegs: function(callId, callback) {
+			var self = this;
 
-					_.each(groupedLegs.aLegs, function(val) {
-						var call_id = val.call_id || val.id;
-						cdrs[call_id] = { aLeg: val, bLegs: {} };
-					});
-
-					if(self.loneBLegs && self.loneBLegs.length > 0) {
-						_.each(self.loneBLegs, function(val) {
-							if('other_leg_call_id' in val && val.other_leg_call_id in cdrs) {
-								cdrs[val.other_leg_call_id].bLegs[val.id] = val;
-							}
-						});
-					}
-					self.loneBLegs = [];
-					_.each(groupedLegs.bLegs, function(val) {
-						if('other_leg_call_id' in val) {
-							if(val.other_leg_call_id in cdrs) {
-								cdrs[val.other_leg_call_id].bLegs[val.id] = val;
-							} else {
-								self.loneBLegs.push(val);
-							}
-						}
-					});
-
-					callback(cdrs, data['next_start_key']);
+			self.callApi({
+				resource: 'cdrs.listLegs',
+				data: {
+					accountId: self.accountId,
+					callId: callId
+				},
+				success: function(data) {
+					callback && callback(data.data);
 				}
 			});
 		},
@@ -387,20 +385,8 @@ define(function(require){
 					};
 				};
 
-			_.each(cdrs, function(val, key) {
-				if(!('aLeg' in val)) {
-					// Handling lone b-legs as standalone a-legs
-					_.each(val.bLegs, function(v, k) {
-						result.push($.extend({ bLegs: [] }, formatCdr(v)));
-					});
-				} else {
-					var cdr = formatCdr(val.aLeg);
-					cdr.bLegs = [];
-					_.each(val.bLegs, function(v, k) {
-						cdr.bLegs.push(formatCdr(v));
-					});
-					result.push(cdr);
-				}
+			_.each(cdrs, function(v) {
+				result.push(formatCdr(v));
 			});
 
 			result.sort(function(a, b) {

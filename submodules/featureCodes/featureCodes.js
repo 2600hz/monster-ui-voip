@@ -48,7 +48,8 @@ define(function(require){
 				"call_waiting[action=enable]",
 				"call_waiting[action=disable]",
 				"sound_test_service",
-				"call_recording"
+				"call_recording",
+				"move"
 			]
 		},
 
@@ -98,7 +99,9 @@ define(function(require){
 			_.each(featureCodeData, function(callflow) {
 				// Some old callflows have been created with the feature code key, so we had the check to make sure they also have a name associated
 				if(callflow.featurecode.hasOwnProperty('name')) {
-					var category = 'misc';
+					var category = 'misc',
+						hasStar = (callflow.hasOwnProperty('numbers') && callflow.numbers.length && callflow.numbers[0].substr(0,1) === '*') || (callflow.hasOwnProperty('patterns') && callflow.patterns.length && callflow.patterns[0].substr(0,3) === '^\\*');
+
 					_.find(self.categories, function(cat, key) {
 						if(cat.indexOf(callflow.featurecode.name) >= 0) {
 							category = key;
@@ -114,10 +117,12 @@ define(function(require){
 						};
 					}
 
+					console.log(hasStar);
 					featureCodes[category].codes.push({
 						key: callflow.featurecode.name,
 						name: self.i18n.active().featureCodes.labels[callflow.featurecode.name] || callflow.featurecode.name,
-						number: callflow.featurecode.number ? callflow.featurecode.number.replace(/\\/g,'') : ''
+						number: callflow.featurecode.number ? callflow.featurecode.number.replace(/\\/g,'') : '',
+						hasStar: hasStar
 					});
 				}
 			});

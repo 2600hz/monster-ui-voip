@@ -18,8 +18,9 @@
 	</div>
 
 	<div class="actions">
+		<a class="spare-devices monster-link pull-left" href="javascript:void(0);"><i class="fa fa-list monster-green"></i>{{ i18n.users.devices.spareDevice }}</a>
 		<div class="dropdown pull-left">
-			<a href="#" class="add-device monster-link dropdown-toggle" data-toggle="dropdown"><i class="fa fa-plus-circle monster-green"></i>{{ i18n.users.devices.newDevice }}</a>
+			<a href="#" class="add-device monster-link dropdown-toggle" data-toggle="dropdown"><i class="fa fa-plus monster-green"></i>{{ i18n.users.devices.newDevice }}</a>
 			<ul class="dropdown-menu">
 				<li><a class="create-device" data-type="sip_device"><i class="icon-telicon-voip-phone"></i>{{ i18n.devices.types.sip_device }}</a></li>
 				<li><a class="create-device" data-type="cellphone"><i class="fa fa-phone"></i>{{ i18n.devices.types.cellphone }}</a></li>
@@ -31,7 +32,6 @@
 				<li><a class="create-device" data-type="sip_uri"><i class="icon-telicon-voip-phone"></i>{{ i18n.devices.types.sip_uri }}</a></li>
 			</ul>
 		</div>
-		<a class="spare-devices monster-link" href="javascript:void(0);"><i class="fa fa-phone monster-green"></i>{{ i18n.users.devices.spareDevice }}</a>
 
 		<div class="pull-right">
 			<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
