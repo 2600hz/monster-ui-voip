@@ -413,8 +413,6 @@ define(function(require){
 				sortedUsers.push(user);
 			});
 
-			sortedUsers = monster.util.sort(sortedUsers, 'last_name');
-
 			dataTemplate.users = sortedUsers;
 
 			return dataTemplate;
