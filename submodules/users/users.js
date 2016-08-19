@@ -4190,9 +4190,9 @@ define(function(require){
 							owner_id: data.user.id,
 							play_name_on_join: true,
 							member: {
-								numbers: [],
 								join_muted: false
-							}
+							},
+							conference_numbers: []
 						};
 
 						baseConference = $.extend(true, {}, baseConference, data.conference);
