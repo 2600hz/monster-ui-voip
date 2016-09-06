@@ -125,11 +125,10 @@ define(function(require){
 
 			template.find('.download-csv').on('click', function(e) {
 				var fromDateTimestamp = monster.util.dateToBeginningOfGregorianDay(fromDate),
-					toDateTimestamp = monster.util.dateToEndOfGregorianDay(toDate);
+					toDateTimestamp = monster.util.dateToEndOfGregorianDay(toDate),
+					url = self.apiUrl + 'accounts/' + self.accountId + '/cdrs?created_from=' + fromDateTimestamp + '&created_to=' + toDateTimestamp + '&accept=text/csv&auth_token=' + self.authToken;
 
-				window.location.href = self.apiUrl + 'accounts/' + self.accountId 
-									 + '/cdrs?created_from=' + fromDateTimestamp + '&created_to=' + toDateTimestamp 
-									 + '&accept=text/csv&auth_token=' + self.authToken;
+				window.open(url,'_blank');
 			});
 
 			template.find('.search-div input.search-query').on('keyup', function(e) {
