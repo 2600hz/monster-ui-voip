@@ -285,7 +285,7 @@
 
 .voip-edit-device-popup .edit-device .content .tabs-section .helper {
 	position: relative;
-	margin: 0 40px 15px 40px;
+	margin: 0 40px 25px 40px;
 }
 
 .voip-edit-device-popup .edit-device .content .tabs-section .helper i {
@@ -375,16 +375,20 @@
 /* Codecs selector */
 .voip-edit-device-popup .edit-device .content .codec-selector .box-selector {
 	float: left;
-	width: 300px;
+	width: 285px;
 }
 
 .voip-edit-device-popup .edit-device .content .codec-selector .box-selector:first-child {
-	margin-left: 30px;
+	margin-left: 40px;
 	margin-right: 40px;
 }
 .voip-edit-device-popup .edit-device .content .codec-selector .box-selector ul {
-	height: 328px;
+	height: 327px;
 	overflow: auto;
+}
+
+.voip-edit-device-popup .edit-device .content .codec-selector .box-selector .search-wrapper input {
+	width: 233px;
 }
 
 .voip-edit-device-popup .edit-device .content #video_codec_selector .box-selector ul {
