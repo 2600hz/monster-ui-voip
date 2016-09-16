@@ -442,7 +442,7 @@ define(function(require){
 			});
 
 			var popup = monster.ui.dialog(dialogTemplate, {
-				title: '<i class="fa fa-question-circle monster-blue"></i>',
+				title: '<i class="fa fa-question-circle monster-primary-color"></i>',
 				position: ['center', 20],
 				dialogClass: 'monster-alert'
 			});

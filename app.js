@@ -3,6 +3,18 @@ define(function(require){
 		_ = require('underscore'),
 		monster = require('monster');
 
+	require([
+		'./submodules/devices/devices',
+		'./submodules/groups/groups',
+		'./submodules/numbers/numbers',
+		'./submodules/strategy/strategy',
+		'./submodules/callLogs/callLogs',
+		'./submodules/users/users',
+		'./submodules/myOffice/myOffice',
+		'./submodules/featureCodes/featureCodes',
+		'./submodules/vmboxes/vmboxes'
+	]);
+
 	var app = {
 		name: 'voip',
 

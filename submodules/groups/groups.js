@@ -132,7 +132,7 @@ define(function(require){
 					mapFeatures: {
 						call_recording: {
 							icon: 'fa fa-microphone',
-							iconColor: 'monster-blue',
+							iconColor: 'monster-primary-color',
 							title: self.i18n.active().groups.callRecording.title
 						},
 						ringback: {
