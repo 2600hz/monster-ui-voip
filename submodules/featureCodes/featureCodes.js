@@ -117,7 +117,6 @@ define(function(require){
 						};
 					}
 
-					console.log(hasStar);
 					featureCodes[category].codes.push({
 						key: callflow.featurecode.name,
 						name: self.i18n.active().featureCodes.labels[callflow.featurecode.name] || callflow.featurecode.name,
