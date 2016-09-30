@@ -37,9 +37,6 @@ define(function(require){
 				showReport: monster.config.whitelabel.callReportEmail ? true : false
 			};
 
-			// Reset variables used to link A-Legs & B-Legs sent by different pages in the API
-			delete self.lastALeg;
-			delete self.loneBLegs;
 			self.callLogsGetCdrs(fromDate, toDate, function(cdrs, nextStartKey) {
 				cdrs = self.callLogsFormatCdrs(cdrs);
 
@@ -135,33 +132,22 @@ define(function(require){
 				if(template.find('.grid-row-container .grid-row').length > 0) {
 					var searchValue = $(this).val().replace(/\|/g,'').toLowerCase(),
 						matchedResults = false;
+
 					if(searchValue.length <= 0) {
 						template.find('.grid-row-group').show();
 						matchedResults = true;
-					} else {
+					}
+					else {
 						_.each(cdrs, function(cdr) {
-							var callIds = (cdr.callId || cdr.id) + (cdr.bLegs.length>0 ? "|" + $.map(cdr.bLegs, function(val) { return val.callId || val.id }).join("|") : ""),
-								searchString = (cdr.date + "|" + cdr.fromName + "|"
-											 + cdr.fromNumber + "|" + cdr.toName + "|"
-											 + cdr.toNumber + "|" + cdr.hangupCause + "|"
-											 + callIds).toLowerCase(),
+							var searchString = (cdr.date + "|" + cdr.fromName + "|" + cdr.fromNumber + "|" + cdr.toName + "|"
+											 + cdr.toNumber + "|" + cdr.hangupCause + "|" + cdr.id).toLowerCase(),
 								rowGroup = template.find('.grid-row.main-leg[data-id="'+cdr.id+'"]').parents('.grid-row-group');
+
 							if(searchString.indexOf(searchValue) >= 0) {
 								matchedResults = true;
 								rowGroup.show();
 							} else {
-								var matched = _.find(cdr.bLegs, function(bLeg) {
-									var searchStr = (bLeg.date + "|" + bLeg.fromName + "|"
-												  + bLeg.fromNumber + "|" + bLeg.toName + "|"
-												  + bLeg.toNumber + "|" + bLeg.hangupCause).toLowerCase();
-									return searchStr.indexOf(searchValue) >= 0;
-								});
-								if(matched) {
-									matchedResults = true;
-									rowGroup.show();
-								} else {
-									rowGroup.hide();
-								}
+								rowGroup.hide();
 							}
 						})
 					}
