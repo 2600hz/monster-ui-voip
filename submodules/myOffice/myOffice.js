@@ -585,7 +585,7 @@ define(function(require){
 			data.totalConferences = totalConferences;
 
 			if(data.directory && data.directory.id) {
-				data.directoryLink = self.apiUrl + 'accounts/' + self.accountId +'/directories/' + data.directory.id + '?accept=pdf&auth_token=' + self.authToken;
+				data.directoryLink = self.apiUrl + 'accounts/' + self.accountId +'/directories/' + data.directory.id + '?accept=pdf&auth_token=' + self.getAuthToken();
 			}
 
 			return data;
