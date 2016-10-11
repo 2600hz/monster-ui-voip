@@ -10,21 +10,21 @@
 	</form>
 
 	<div class="items-selector clearfix" id="group_user_selector">
-        <div class="box-selector">
-            <div class="box-title">{{ i18n.groups.dialogCreationGroup.availableUsers }}</div>
-            <ul class="available-users connectedSortable">
-                {{#each extra.listUsers}}
-                    <li class="item-selector" data-user_id="{{this.id}}"><div class="item-handle"></div>{{ this.first_name }} {{ this.last_name }}</li>
-                {{/each}}
-            </ul>
-        </div>
+		<div class="box-selector">
+			<div class="box-title">{{ i18n.groups.dialogCreationGroup.availableUsers }}</div>
+			<ul class="available-users box-content connectedSortable">
+				{{#each extra.listUsers}}
+					<li class="item-selector" data-user_id="{{this.id}}"><div class="item-handle"></div>{{ this.first_name }} {{ this.last_name }}</li>
+				{{/each}}
+			</ul>
+		</div>
 
-        <div class="box-selector">
-            <div class="box-title">{{ i18n.groups.dialogCreationGroup.selectedUsers }}</div>
-            <ul class="selected-users connectedSortable">
-            </ul>
-        </div>
-    </div>
+		<div class="box-selector">
+			<div class="box-title">{{ i18n.groups.dialogCreationGroup.selectedUsers }}</div>
+			<ul class="selected-users box-content connectedSortable">
+			</ul>
+		</div>
+	</div>
 
 	<div class="dialog-buttons-wrapper">
 		<button id="create_group" class="monster-button monster-button-success">{{ i18n.groups.dialogCreationGroup.createGroup }}</button>
