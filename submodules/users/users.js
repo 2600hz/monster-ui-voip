@@ -1012,7 +1012,7 @@ define(function(require){
 				template.find('.detail-devices .list-assigned-items .item-row:not(.assigned)').each(function(k, row) {
 					dataDevices.new.push($(row).data('id'));
 				});
-				dataDevices.old = Object.keys(unassignedDevices);
+				dataDevices.old = _.keys(unassignedDevices);
 
 				self.usersUpdateDevices(dataDevices, userId, function() {
 					toastr.success(monster.template(self, '!' + toastrMessages.devicesUpdated, { name: name }));
@@ -1683,7 +1683,7 @@ define(function(require){
 				globalAddNumberCallback: function (number, addNumberToControl) {
 					var found = false,
 						// Number can come back from the buy common control, as an object, or from the spare selector, as a string
-						foundNumber = _.isObject(number) ? Object.keys(number)[0] : number;
+						foundNumber = _.isObject(number) ? _.keys(number)[0] : number;
 
 					addNumberToControl && addNumberToControl(foundNumber);
 

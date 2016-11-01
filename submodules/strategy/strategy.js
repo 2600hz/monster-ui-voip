@@ -754,7 +754,7 @@ define(function(require){
 					searchType: $(this).data('type'),
 					callbacks: {
 						success: function(numbers) {
-							addNumbersToMainCallflow(Object.keys(numbers));
+							addNumbersToMainCallflow(_.keys(numbers));
 							toastr.success(self.i18n.active().strategy.toastrMessages.buyNumbersSuccess);
 						},
 						error: function(error) {
@@ -1097,7 +1097,7 @@ define(function(require){
 					searchType: $(this).data('type'),
 					callbacks: {
 						success: function(numbers) {
-							addNumbersToMainConference(Object.keys(numbers));
+							addNumbersToMainConference(_.keys(numbers));
 							toastr.success(self.i18n.active().strategy.toastrMessages.buyNumbersSuccess);
 						},
 						error: function(error) {
@@ -1236,7 +1236,7 @@ define(function(require){
 					singleSelect: true,
 					callbacks: {
 						success: function(numbers) {
-							addNumbersToMainFaxing(Object.keys(numbers));
+							addNumbersToMainFaxing(_.keys(numbers));
 							toastr.success(self.i18n.active().strategy.toastrMessages.buyNumbersSuccess);
 						},
 						error: function(error) {
@@ -1826,7 +1826,7 @@ define(function(require){
 				type = $this.data('type'),
 				holidayRule = {};
 
-			if(!name || Object.keys(rules).indexOf(name) >= 0) {
+			if(!name || _.keys(rules).indexOf(name) >= 0) {
 				holidayRule = false;
 			}
 			else if(toMonth && month !== toMonth) {
