@@ -35,7 +35,7 @@ define(function(require){
 					monster.ui.alert('error', self.i18n.active().groups.outdatedGroupsError);
 				} else {
 					var dataTemplate = self.groupsFormatListData(data),
-						template = $(monster.template(self, 'groups-layout', { countGroups: Object.keys(dataTemplate.groups).length })),
+						template = $(monster.template(self, 'groups-layout', { countGroups: _.size(dataTemplate.groups) })),
 						templateGroup;
 
 					_.each(dataTemplate.groups, function(group) {
