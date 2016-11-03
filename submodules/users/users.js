@@ -413,6 +413,10 @@ define(function(require){
 				sortedUsers.push(user);
 			});
 
+			sortedUsers.sort(function(a,b) {
+				return monster.util.cmp(a.first_name.toLowerCase(), b.first_name.toLowerCase()) || monster.util.cmp(a.last_name.toLowerCase(), b.last_name.toLowerCase());
+			});
+
 			dataTemplate.users = sortedUsers;
 
 			return dataTemplate;
