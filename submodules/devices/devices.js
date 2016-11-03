@@ -992,7 +992,7 @@ define(function(require){
 					monster.pub('common.numbers.getListFeatures', function(viewFeatures) {
 						var e911Numbers = {};
 						_.each(data.data.numbers, function(val, key) {
-							if(val.features.indexOf('dash_e911') >= 0) {
+							if(val.features.indexOf('e911') >= 0) {
 								e911Numbers[key] = self.devicesFormatNumber(val, viewFeatures);
 							}
 						});
@@ -1191,13 +1191,13 @@ define(function(require){
 					phoneNumber: encodeURIComponent(number)
 				},
 				success: function(_data, status) {
-					var street_address = _data.data.dash_e911.street_address,
-						locality = _data.data.dash_e911.locality,
-						postal_code = _data.data.dash_e911.postal_code,
-						region = _data.data.dash_e911.region;
+					var street_address = _data.data.e911.street_address,
+						locality = _data.data.e911.locality,
+						postal_code = _data.data.e911.postal_code,
+						region = _data.data.e911.region;
 
-					if ( typeof _data.data.dash_e911.extended_address !== 'undefined' ) {
-						callback(street_address + ', ' + _data.data.dash_e911.extended_address + '<br>' + locality + ', ' + region + ' ' + postal_code);
+					if ( typeof _data.data.e911.extended_address !== 'undefined' ) {
+						callback(street_address + ', ' + _data.data.e911.extended_address + '<br>' + locality + ', ' + region + ' ' + postal_code);
 					} else {
 						callback(street_address + ', ' + '<br>' + locality + ', ' + region + ' ' + postal_code);
 					}

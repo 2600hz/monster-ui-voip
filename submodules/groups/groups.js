@@ -1073,11 +1073,11 @@ define(function(require){
 							phoneNumber: phoneNumber,
 							callbacks: {
 								success: function(data) {
-									if(!($.isEmptyObject(data.data.dash_e911))) {
-										e911Cell.find('.features i.feature-dash_e911').addClass('active');
+									if(!($.isEmptyObject(data.data.e911))) {
+										e911Cell.find('.features i.feature-e911').addClass('active');
 									}
 									else {
-										e911Cell.find('.features i.feature-dash_e911').removeClass('active');
+										e911Cell.find('.features i.feature-e911').removeClass('active');
 									}
 								}
 							}

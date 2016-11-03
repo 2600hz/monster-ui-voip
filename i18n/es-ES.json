@@ -803,7 +803,7 @@
 			"featuresToRemove": "Verificar la característica(s) para eliminar:",
 			"features": {
 				"cnam": "Caller-ID",
-				"dash_e911": "e911"
+				"e911": "e911"
 			}
 		},
 
