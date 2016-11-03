@@ -847,31 +847,50 @@ define(function(require){
 				emergencyAddress2Input = popupTemplate.find('.caller-id-emergency-address2'),
 				emergencyCityInput = popupTemplate.find('.caller-id-emergency-city'),
 				emergencyStateInput = popupTemplate.find('.caller-id-emergency-state'),
-				loadNumberDetails = function(number) {
+				loadNumberDetails = function(number, callback) {
+					var allowedFeatures = [];
 					if(number) {
 						self.myOfficeGetNumber(number, function(numberData) {
-							if("cnam" in numberData) {
-								callerIdNameInput.val(numberData.cnam.display_name);
-							} else {
-								callerIdNameInput.val("");
-							}
+							var availableFeatures = numberData.hasOwnProperty('_read_only') && numberData._read_only.hasOwnProperty('features_available') ? numberData._read_only.features_available : [],
+								hasE911 = availableFeatures.indexOf('e911') >= 0,
+								hasCNAM = availableFeatures.indexOf('cnam') >= 0;
 
-							if (monster.util.isNumberFeatureEnabled('e911')) {
-								if("dash_e911" in numberData) {
-									emergencyZipcodeInput.val(numberData.dash_e911.postal_code);
-									emergencyAddress1Input.val(numberData.dash_e911.street_address);
-									emergencyAddress2Input.val(numberData.dash_e911.extended_address);
-									emergencyCityInput.val(numberData.dash_e911.locality);
-									emergencyStateInput.val(numberData.dash_e911.region);
-								} else {
-									emergencyZipcodeInput.val("");
-									emergencyAddress1Input.val("");
-									emergencyAddress2Input.val("");
-									emergencyCityInput.val("");
-									emergencyStateInput.val("");
+							if(hasE911) {
+								if (monster.util.isNumberFeatureEnabled('e911')) {
+									allowedFeatures.push('e911');
+
+									if("dash_e911" in numberData) {
+										emergencyZipcodeInput.val(numberData.dash_e911.postal_code);
+										emergencyAddress1Input.val(numberData.dash_e911.street_address);
+										emergencyAddress2Input.val(numberData.dash_e911.extended_address);
+										emergencyCityInput.val(numberData.dash_e911.locality);
+										emergencyStateInput.val(numberData.dash_e911.region);
+									} else {
+										emergencyZipcodeInput.val("");
+										emergencyAddress1Input.val("");
+										emergencyAddress2Input.val("");
+										emergencyCityInput.val("");
+										emergencyStateInput.val("");
+									}
 								}
 							}
+
+							if(hasCNAM) {
+								allowedFeatures.push('cnam');
+
+								if("cnam" in numberData) {
+									callerIdNameInput.val(numberData.cnam.display_name);
+								}
+								else {
+									callerIdNameInput.val("");
+								}
+							}
+
+							callback && callback(allowedFeatures);
 						});
+					}
+					else {
+						callback && callback(allowedFeatures);
 					}
 				};
 
@@ -886,8 +905,11 @@ define(function(require){
 			callerIdNumberSelect.on('change', function() {
 				var selectedNumber = $(this).val();
 				if(selectedNumber) {
-					popupTemplate.find('.number-feature').slideDown();
-					loadNumberDetails(selectedNumber);
+					loadNumberDetails(selectedNumber, function(features) {
+						_.each(features, function(featureName) {
+							popupTemplate.find('.number-feature[data-feature="'+ featureName + '"]').slideDown();
+						});
+					});
 				} else {
 					popupTemplate.find('.number-feature').slideUp();
 				}

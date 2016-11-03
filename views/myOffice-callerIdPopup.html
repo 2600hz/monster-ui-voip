@@ -22,7 +22,7 @@
 		{{/monsterText}}
 	</div>
 
-	<div class="content number-feature" {{#compare selectedMainNumber '===' 'none'}}style="display:none;"{{/compare}}>
+	<div class="content number-feature" data-feature="cnam" {{#compare selectedMainNumber '===' 'none'}}style="display:none;"{{/compare}}>
 		<div>
 			{{ i18n.myOffice.callerId.nameLabel }}
 			<input type="text" class="caller-id-name">
@@ -34,7 +34,7 @@
 	</div>
 
 	{{#if isE911Enabled}}
-	<div class="content number-feature" {{#compare selectedMainNumber '===' 'none'}}style="display:none;"{{/compare}}>
+	<div class="content number-feature" data-feature="e911" {{#compare selectedMainNumber '===' 'none'}}style="display:none;"{{/compare}}>
 		<div>
 			<div>{{ i18n.myOffice.callerId.emergencyLabel }}</div>
 			<div class="emergency-form">
