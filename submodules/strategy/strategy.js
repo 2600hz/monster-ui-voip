@@ -826,7 +826,7 @@ define(function(require){
 							};
 
 						_.each(dataNumber, function(val, idx) {
-							if ( idx === 'cnam' || idx === 'dash_e911' ) {
+							if ( idx === 'cnam' || idx === 'e911' ) {
 								featureList.push({
 									name: idx,
 									friendlyName: self.i18n.active().strategy.popupRemoveFeatures.features[idx]
@@ -907,11 +907,11 @@ define(function(require){
 							phoneNumber: phoneNumber,
 							callbacks: {
 								success: function(data) {
-									if(!($.isEmptyObject(data.data.dash_e911))) {
-										e911Cell.find('.features i.feature-dash_e911').addClass('active');
+									if(!($.isEmptyObject(data.data.e911))) {
+										e911Cell.find('.features i.feature-e911').addClass('active');
 									}
 									else {
-										e911Cell.find('.features i.feature-dash_e911').removeClass('active');
+										e911Cell.find('.features i.feature-e911').removeClass('active');
 									}
 								}
 							}

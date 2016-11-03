@@ -556,7 +556,7 @@ define(function(require){
 
 			if( data.mainNumbers && data.mainNumbers.length > 0 ) {
 				var hasValidCallerId = monster.util.isNumberFeatureEnabled('cnam') === false || data.account.hasOwnProperty('caller_id') && data.account.caller_id.hasOwnProperty('emergency') && data.account.caller_id.emergency.hasOwnProperty('number') && data.numbers.hasOwnProperty(data.account.caller_id.emergency.number),
-					hasValidE911 = monster.util.isNumberFeatureEnabled('e911') === false || data.account.hasOwnProperty('caller_id') && data.account.caller_id.hasOwnProperty('emergency') && data.account.caller_id.emergency.hasOwnProperty('number') && data.numbers.hasOwnProperty(data.account.caller_id.emergency.number) && data.numbers[data.account.caller_id.emergency.number].features.indexOf('dash_e911') >= 0;
+					hasValidE911 = monster.util.isNumberFeatureEnabled('e911') === false || data.account.hasOwnProperty('caller_id') && data.account.caller_id.hasOwnProperty('emergency') && data.account.caller_id.emergency.hasOwnProperty('number') && data.numbers.hasOwnProperty(data.account.caller_id.emergency.number) && data.numbers[data.account.caller_id.emergency.number].features.indexOf('e911') >= 0;
 
 				if (!hasValidCallerId && !hasValidE911) {
 					data.topMessage = {
@@ -859,12 +859,12 @@ define(function(require){
 								if (monster.util.isNumberFeatureEnabled('e911')) {
 									allowedFeatures.push('e911');
 
-									if("dash_e911" in numberData) {
-										emergencyZipcodeInput.val(numberData.dash_e911.postal_code);
-										emergencyAddress1Input.val(numberData.dash_e911.street_address);
-										emergencyAddress2Input.val(numberData.dash_e911.extended_address);
-										emergencyCityInput.val(numberData.dash_e911.locality);
-										emergencyStateInput.val(numberData.dash_e911.region);
+									if("e911" in numberData) {
+										emergencyZipcodeInput.val(numberData.e911.postal_code);
+										emergencyAddress1Input.val(numberData.e911.street_address);
+										emergencyAddress2Input.val(numberData.e911.extended_address);
+										emergencyCityInput.val(numberData.e911.locality);
+										emergencyStateInput.val(numberData.e911.region);
 									} else {
 										emergencyZipcodeInput.val("");
 										emergencyAddress1Input.val("");
@@ -955,7 +955,7 @@ define(function(require){
 
 							if(e911Data) {
 								$.extend(true, numberData, {
-									dash_e911: e911Data
+									e911: e911Data
 								});
 							}
 

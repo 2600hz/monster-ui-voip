@@ -765,7 +765,7 @@
 			"featuresToRemove": "Sélectionner les fonctionnalité(s) à supprimer :",
 			"features": {
 				"cnam": "Caller-ID",
-				"dash_e911": "Adresse d'urgence (e911)"
+				"e911": "Adresse d'urgence (e911)"
 			}
 		},
 		"__comment": "UI-1604: Walkthrough dashboard",

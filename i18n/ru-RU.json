@@ -793,7 +793,7 @@
 			"featuresToRemove": "Функции для удаления :",
 			"features": {
 				"cnam": "Caller-ID",
-				"dash_e911": "Экстренные службы"
+				"e911": "Экстренные службы"
 			}
 		},
 		"__comment": "UI-1604: Walkthrough dashboard",

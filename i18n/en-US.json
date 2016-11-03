@@ -856,7 +856,7 @@
 			"featuresToRemove": "Check the feature(s) to remove :",
 			"features": {
 				"cnam": "Caller-ID",
-				"dash_e911": "e911"
+				"e911": "e911"
 			}
 		},
 
