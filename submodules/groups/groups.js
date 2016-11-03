@@ -1361,10 +1361,6 @@ define(function(require){
 			var self = this;
 
 			self.groupsListUsers(function(dataUsers) {
-				dataUsers.sort(function(a,b) {
-					return monster.util.cmp(a.first_name.toLowerCase(), b.first_name.toLowerCase()) || monster.util.cmp(a.last_name.toLowerCase(), b.last_name.toLowerCase());
-				});
-
 				var dataTemplate = {
 					extra: {
 						listUsers: dataUsers
