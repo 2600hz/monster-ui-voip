@@ -675,6 +675,14 @@ define(function(require){
 				}
 			}
 
+			if(mergedData.hasOwnProperty('caller_id') && mergedData.caller_id.hasOwnProperty('emergency') && mergedData.caller_id.emergency.hasOwnProperty('number') && mergedData.caller_id.emergency.number === '') {
+				delete mergedData.caller_id.emergency.number;
+
+				if(_.isEmpty(mergedData.caller_id.emergency)) {
+					delete mergedData.caller_id.emergency;
+				}
+			}
+
 			/* Migration clean-up */
 			delete mergedData.media.secure_rtp;
 			delete mergedData.extra;
