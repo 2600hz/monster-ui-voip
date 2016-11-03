@@ -318,6 +318,7 @@ define(function(require){
 					number: currentNumber,
 					customNumbers: data.extra.e911Numbers,
 					noBuy: true,
+					noExtension: true,
 					labels: {
 						empty: self.i18n.active().devices.popupSettings.callerId.notSet,
 						remove: self.i18n.active().devices.popupSettings.callerId.useDefault,
