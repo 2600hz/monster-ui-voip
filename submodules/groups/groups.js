@@ -35,7 +35,8 @@ define(function(require){
 					monster.ui.alert('error', self.i18n.active().groups.outdatedGroupsError);
 				} else {
 					var dataTemplate = self.groupsFormatListData(data),
-						template = $(monster.template(self, 'groups-layout', { countGroups: _.size(dataTemplate.groups) })),
+						countGroups = _.size(dataTemplate.groups),
+						template = $(monster.template(self, 'groups-layout', { countGroups: countGroups })),
 						templateGroup;
 
 					_.each(dataTemplate.groups, function(group) {
@@ -51,18 +52,14 @@ define(function(require){
 						.append(template);
 
 					self.groupsCheckWalkthrough();
-						
+
 					if(_groupId) {
 						var cells =  parent.find('.grid-row[data-id=' + _groupId + '] .grid-cell');
 
 						monster.ui.highlight(cells);
 					}
 
-					for (var group in dataTemplate.groups) {
-						noGroup = ( typeof dataTemplate.groups[group] === 'undefined' ) ? true : false;
-					}
-
-					if ( noGroup ) {
+					if ( countGroups === 0 ) {
 						parent.find('.grid-row.title').css('display', 'none');
 						parent.find('.no-groups-row').css('display', 'block');
 					} else {
@@ -77,7 +74,8 @@ define(function(require){
 
 		groupsFormatListData: function(data) {
 			var self = this,
-				mapGroups = {};
+				mapGroups = {},
+				arrayGroups = [];
 
 			_.each(data.groups, function(group) {
 				mapGroups[group.id] = group;
@@ -121,7 +119,15 @@ define(function(require){
 				}
 			});
 
-			data.groups = mapGroups;
+			_.each(mapGroups, function(group) {
+				arrayGroups.push(group);
+			});
+
+			arrayGroups.sort(function(a,b) {
+				return a.name > b.name ? 1 : -1;
+			});
+
+			data.groups = arrayGroups;
 
 			return data;
 		},
@@ -1356,7 +1362,7 @@ define(function(require){
 
 			self.groupsListUsers(function(dataUsers) {
 				dataUsers.sort(function(a, b) {
-					return a.last_name > b.last_name;
+					return a.first_name > b.first_name ? 1 : -1;
 				});
 
 				var dataTemplate = {
