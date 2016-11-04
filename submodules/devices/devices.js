@@ -211,7 +211,7 @@ define(function(require){
 										}
 									};
 
-									dataDevice.extra = dataDevice.hasOwnProperty(extra) ? $.extend(true, {}, dataDevice.extra, extra) : extra;
+									dataDevice.extra = dataDevice.hasOwnProperty('extra') ? $.extend(true, {}, dataDevice.extra, extra) : extra;
 
 									self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
 								}
