@@ -847,8 +847,15 @@ define(function(require){
 				emergencyAddress2Input = popupTemplate.find('.caller-id-emergency-address2'),
 				emergencyCityInput = popupTemplate.find('.caller-id-emergency-city'),
 				emergencyStateInput = popupTemplate.find('.caller-id-emergency-state'),
-				loadNumberDetails = function(number, callback) {
-					var allowedFeatures = [];
+				loadNumberDetails = function(number, popupTemplate) {
+					var allowedFeatures = [],
+						callback = function(features) {
+							popupTemplate.find('.number-feature').hide();
+							_.each(features, function(featureName) {
+								popupTemplate.find('.number-feature[data-feature="'+ featureName + '"]').slideDown();
+							});
+						};
+
 					if(number) {
 						self.myOfficeGetNumber(number, function(numberData) {
 							var availableFeatures = numberData.hasOwnProperty('_read_only') && numberData._read_only.hasOwnProperty('features_available') ? numberData._read_only.features_available : [],
@@ -903,16 +910,7 @@ define(function(require){
 			});
 
 			callerIdNumberSelect.on('change', function() {
-				var selectedNumber = $(this).val();
-				if(selectedNumber) {
-					loadNumberDetails(selectedNumber, function(features) {
-						_.each(features, function(featureName) {
-							popupTemplate.find('.number-feature[data-feature="'+ featureName + '"]').slideDown();
-						});
-					});
-				} else {
-					popupTemplate.find('.number-feature').slideUp();
-				}
+				loadNumberDetails($(this).val(), popupTemplate);
 			});
 
 			emergencyZipcodeInput.on('blur', function() {
@@ -935,7 +933,9 @@ define(function(require){
 						});
 					},
 					setNumberData = function (e911Data) {
-						var callerIdName = callerIdNameInput.val();
+						var callerIdName = callerIdNameInput.val(),
+							setCNAM = popupTemplate.find('.number-feature[data-feature="cnam"]').is(':visible'),
+							setE911 = popupTemplate.find('.number-feature[data-feature="e911"]').is(':visible');
 
 						account.caller_id = $.extend(true, {}, account.caller_id, {
 							external: {
@@ -947,16 +947,20 @@ define(function(require){
 						});
 
 						self.myOfficeGetNumber(callerIdNumber, function(numberData) {
-							if(callerIdNumber) {
+							if(setCNAM && callerIdName.length) {
 								$.extend(true, numberData, { cnam: { display_name: callerIdName } });
-							} else {
+							}
+							else {
 								delete numberData.cnam;
 							}
 
-							if(e911Data) {
+							if(setE911) {
 								$.extend(true, numberData, {
 									e911: e911Data
 								});
+							}
+							else {
+								delete numberData.e911;
 							}
 
 							self.myOfficeUpdateNumber(numberData, function(data) {
@@ -992,7 +996,7 @@ define(function(require){
 				}
 			});
 
-			loadNumberDetails(callerIdNumberSelect.val());
+			loadNumberDetails(callerIdNumberSelect.val(), popupTemplate);
 		},
 
 		myOfficeWalkthroughRender: function() {
