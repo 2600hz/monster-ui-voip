@@ -425,6 +425,10 @@
 	margin-top: 5px;
 }
 
+#my_office_caller_id_popup .number-feature {
+	display: none;
+}
+
 #myoffice_container .warning-pulse-box {
 	-webkit-animation: "warning-pulse-box" 1s ease-in-out 0 infinite alternate;
 
