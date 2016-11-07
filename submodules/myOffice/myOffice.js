@@ -859,8 +859,10 @@ define(function(require){
 					if(number) {
 						self.myOfficeGetNumber(number, function(numberData) {
 							var availableFeatures = numberData.hasOwnProperty('_read_only') && numberData._read_only.hasOwnProperty('features_available') ? numberData._read_only.features_available : [],
-								hasE911 = availableFeatures.indexOf('e911') >= 0,
-								hasCNAM = availableFeatures.indexOf('cnam') >= 0;
+								activatedFeatures = numberData.hasOwnProperty('_read_only') && numberData._read_only.hasOwnProperty('features') ? numberData._read_only.features : [],
+								allFeatures = availableFeatures.concat(activatedFeatures),
+								hasE911 = allFeatures.indexOf('e911') >= 0,
+								hasCNAM = allFeatures.indexOf('cnam') >= 0;
 
 							if(hasE911) {
 								if (monster.util.isNumberFeatureEnabled('e911')) {
