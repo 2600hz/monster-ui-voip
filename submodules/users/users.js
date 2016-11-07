@@ -908,6 +908,19 @@ define(function(require){
 					}
 				});
 
+				passwordTemplate.find('.reset-password').on('click', function() {
+					var dataReset = {
+						username: currentUser.username,
+						account_name: monster.apps.auth.currentAccount.name
+					};
+
+					self.usersResetPassword(dataReset, function() {
+						popup.dialog('close').remove();
+
+						toastr.success(monster.template(self, '!' + toastrMessages.successResetPassword, { name: dataReset.username }));
+					});
+				});
+
 				passwordTemplate.find('.save-new-username').on('click', function() {
 					var formData = monster.ui.getFormData('form_new_username'),
 						userToSave = $.extend(true, {}, currentUser, formData);
@@ -4468,6 +4481,25 @@ define(function(require){
 
 		usersRemoveOverlay: function() {
 			$('body').find('#users_container_overlay').remove();
+		},
+
+		usersResetPassword: function(data, callback) {
+			var self = this,
+				dataPassword = {
+					username: data.username,
+					account_name: data.account_name,
+					ui_url: window.location.href.split('#')[0]
+				};
+
+			self.callApi({
+				resource: 'auth.recovery',
+				data: {
+					data: dataPassword
+				},
+				success: function(data) {
+					callback && callback(data.data);
+				}
+			});
 		}
 	};
 
