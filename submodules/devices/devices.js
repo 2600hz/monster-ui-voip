@@ -892,7 +892,8 @@ define(function(require){
 					friendlyType: self.i18n.active().devices.types[device.device_type],
 					registered: false,
 					classStatus: device.enabled ? 'unregistered' : 'disabled' /* Display a device in black if it's disabled, otherwise, until we know whether it's registered or not, we set the color to red */,
-					isRegistered: false
+					isRegistered: false,
+					sipUserName: device.username
 				}
 			});
 
