@@ -1191,9 +1191,10 @@ define(function(require){
 									number.viewFeatures = $.extend(true, {}, features);
 									number.phoneNumber = number.id;
 
+									monster.util.populateBooleansNumberFeatures(number);
+									number.extra.hasFeatures = number.extra.hasE911 || number.extra.hasPrepend || number.extra.hasCnam;
+
 									var rowTemplate = $(monster.template(self, 'groups-numbersItemRow', {
-										isCnamEnabled: monster.util.isNumberFeatureEnabled('cnam'),
-										isE911Enabled: monster.util.isNumberFeatureEnabled('e911'),
 										number: number
 									}));
 
@@ -1492,6 +1493,9 @@ define(function(require){
 							number.viewFeatures[feature].active = 'active';
 						}
 					});
+
+					monster.util.populateBooleansNumberFeatures(number);
+					number.extra.hasFeatures = number.extra.hasE911 || number.extra.hasPrepend || number.extra.hasCnam;
 
 					if(!number.hasOwnProperty('used_by') || number.used_by === '') {
 						response.unassignedNumbers[id] = number;

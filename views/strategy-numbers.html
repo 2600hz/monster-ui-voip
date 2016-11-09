@@ -1,31 +1,33 @@
 {{#each numbers}}
 <div class="number-element">
 	<div class="number">
-		<button type="button" class="monster-button monster-button-danger remove-number" data-number="{{this.number}}" data-e911="{{this.features.e911.active}}">
+		<button type="button" class="monster-button monster-button-danger remove-number" data-number="{{this.number.id}}" data-e911="{{this.features.e911.active}}">
 			{{ @root.i18n.unassign }}
 		</button>
-		<span>{{formatPhoneNumber this.number}}</span>
+		<span>{{formatPhoneNumber this.number.id}}</span>
 	</div>
 	<div class="features-block pull-right">
 		<div class="edit-features">
-			<div class="navbar">
-				<ul class="nav pull-right">
-					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cog"></i></a>
-						<ul class="dropdown-menu">
-						{{#unless isLocal}}
-							{{#if ../isCnamEnabled}}
-								<li><a class="callerId-number" href="#"><i class="fa fa-user"></i>{{ @root.i18n.callerId }}</a></li>
-							{{/if}}
-							{{#if ../isE911Enabled}}
-								<li><a class="e911-number" href="#"><i class="fa fa-ambulance"></i>{{ @root.i18n.e911 }}</a></li>
-							{{/if}}
-						{{/unless}}
-							<li><a class="prepend-number" href="#"><i class="fa fa-file-text-o"></i>{{ @root.i18n.numberPrepend }}</a></li>
-						</ul>
-					</li>
-				</ul>
-			</div>
+			{{#if this.number.extra.hasFeatures}}
+				<div class="navbar">
+					<ul class="nav pull-right">
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cog"></i></a>
+							<ul class="dropdown-menu">
+								{{#if this.number.extra.hasCnam}}
+									<li><a class="callerId-number" href="#"><i class="fa fa-user"></i>{{ @root.i18n.callerId }}</a></li>
+								{{/if}}
+								{{#if this.number.extra.hasE911}}
+									<li><a class="e911-number" href="#"><i class="fa fa-ambulance"></i>{{ @root.i18n.e911 }}</a></li>
+								{{/if}}
+								{{#if this.number.extra.hasPrepend}}
+									<li><a class="prepend-number" href="#"><i class="fa fa-file-text-o"></i>{{ @root.i18n.numberPrepend }}</a></li>
+								{{/if}}
+							</ul>
+						</li>
+					</ul>
+				</div>
+			{{/if}}
 		</div>
 		<div class="features">
 			{{#each this.features}}
