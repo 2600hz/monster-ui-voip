@@ -394,7 +394,9 @@ define(function(require){
 									numbers: $.map(numbers, function(val, key) {
 										if(val!=="0") {
 											var ret = {
-												number: val,
+												number: {
+													id: val
+												},
 												features: $.extend(true, {}, strategyData.numberFeatures)
 											};
 
@@ -402,14 +404,15 @@ define(function(require){
 												_.each(accountNumbers[val].features, function(feature) {
 													ret.features[feature].active = 'active';
 												});
-												ret.isLocal = accountNumbers[val].features.indexOf('local') > -1;
+												ret.number = $.extend(true, accountNumbers[val], ret.number);
 											}
+
+											monster.util.populateBooleansNumberFeatures(ret.number);
+											ret.number.extra.hasFeatures = ret.number.extra.hasE911 || ret.number.extra.hasPrepend || ret.number.extra.hasCnam;
 
 											return ret;
 										}
 									}),
-									isCnamEnabled: monster.util.isNumberFeatureEnabled('cnam'),
-									isE911Enabled: monster.util.isNumberFeatureEnabled('e911'),
 									spareLinkEnabled: (_.countBy(accountNumbers, function(number) {return number.used_by ? 'assigned' : 'spare';})['spare'] > 0)
 								},
 								template = $(monster.template(self, 'strategy-'+templateName, templateData));
