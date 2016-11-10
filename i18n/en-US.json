@@ -254,9 +254,15 @@
 			},
 			"__comment": "UI-1351: Add ability to configure feature keys for SIP devices in SmartPBX",
 			"__version": "v3.20_s4",
-			"featureKeys": {
-				"menuTitle": "Feature Keys",
-				"description": "Feature key",
+			"keys": {
+				"featureKeys": {
+					"title": "Feature Keys",
+					"label": "Feature key"
+				},
+				"comboKeys": {
+					"title": "Combo Keys",
+					"label": "Combo key"
+				},
 				"labels": {
 					"user": "User",
 					"parkingSpot": "Parking Spot",
