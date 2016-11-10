@@ -313,7 +313,7 @@ define(function(require){
 				}))),
 				deviceForm = templateDevice.find('#form_device');
 
-			if (data.extra.provision.hasOwnProperty('keys')) {
+			if (data.extra.hasOwnProperty('provision') && data.extra.provision.hasOwnProperty('keys')) {
 				_.each(data.extra.provision.keys, function(value, idx) {
 					var section = '.tabs-section[data-section="' + value.type + '"] ';
 
