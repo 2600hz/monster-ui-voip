@@ -251,62 +251,6 @@ define(function(require){
 								}
 							});
 						}
-						// if (template.hasOwnProperty('feature_keys') && template.feature_keys.iterate > 0) {
-						// 	if (!dataDevice.provision.hasOwnProperty('feature_keys')) {
-						// 		dataDevice.provision.feature_keys = {};
-						// 	}
-
-						// 	for (var i = 0, len = template.feature_keys.iterate; i < len; i++) {
-						// 		if (!dataDevice.provision.feature_keys.hasOwnProperty(i)) {
-						// 			dataDevice.provision.feature_keys[i] = { type: 'none' };
-						// 		}
-						// 	}
-
-						// 	self.callApi({
-						// 		resource: 'user.list',
-						// 		data: {
-						// 			accountId: self.accountId
-						// 		},
-						// 		success: function(data, status) {
-						// 			var keyTypes = [ 'none', 'presence', 'parking', 'personal_parking', 'speed_dial' ],
-						// 				parkingSpots = [],
-						// 				extra;
-
-						// 			// Sort user list by last name
-						// 			data.data.sort(function(a, b) {
-						// 				return a.last_name.toLowerCase() > b.last_name.toLowerCase() ? 1 : -1;
-						// 			});
-
-						// 			// Generate parking spots map
-						// 			for (var i = 0; i < 10; i++) {
-						// 				parkingSpots[i] = i + 1;
-						// 			}
-
-						// 			keyTypes.forEach(function(val, idx, arr) {
-						// 				arr[idx] = {
-						// 					id: val,
-						// 					text: self.i18n.active().devices.popupSettings.keys.types[val]
-						// 				};
-
-						// 				if (val !== 'none') {
-						// 					arr[idx].info = self.i18n.active().devices.popupSettings.keys.info.types[val];
-						// 				}
-						// 			});
-
-						// 			extra = {
-						// 				users: data.data,
-						// 				featureKeys:{
-						// 					parkingSpots: parkingSpots,
-						// 					types: keyTypes
-						// 				}
-						// 			};
-
-						// 			dataDevice.extra = dataDevice.hasOwnProperty('extra') ? $.extend(true, {}, dataDevice.extra, extra) : extra;
-
-						// 			self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
-						// 		}
-						// 	});
-						// }
 						else {
 							self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
 						}
