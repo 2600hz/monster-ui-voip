@@ -1,59 +1,39 @@
-{{#each numbers}}
-<div class="number-element">
-	<div class="number">
-		<button type="button" class="monster-button monster-button-danger remove-number" data-number="{{this.number.id}}" data-e911="{{this.features.e911.active}}">
-			{{ @root.i18n.unassign }}
-		</button>
-		<span>{{formatPhoneNumber this.number.id}}</span>
-	</div>
-	<div class="features-block pull-right">
-		<div class="edit-features">
-			{{#if this.number.extra.hasFeatures}}
-				<div class="navbar">
-					<ul class="nav pull-right">
-						<li class="dropdown">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cog"></i></a>
-							<ul class="dropdown-menu">
-								{{#if this.number.extra.hasCnam}}
-									<li><a class="callerId-number" href="#"><i class="fa fa-user"></i>{{ @root.i18n.callerId }}</a></li>
-								{{/if}}
-								{{#if this.number.extra.hasE911}}
-									<li><a class="e911-number" href="#"><i class="fa fa-ambulance"></i>{{ @root.i18n.e911 }}</a></li>
-								{{/if}}
-								{{#if this.number.extra.hasPrepend}}
-									<li><a class="prepend-number" href="#"><i class="fa fa-file-text-o"></i>{{ @root.i18n.numberPrepend }}</a></li>
-								{{/if}}
-							</ul>
-						</li>
-					</ul>
+<div class="strategy-numbers-wrapper">
+	{{#each numbers}}
+		<div class="number-element" data-phoneNumber="{{number.id}}">
+			<div class="number">
+				<button type="button" class="monster-button monster-button-danger remove-number" data-number="{{number.id}}" data-e911="{{#ifInArray 'e911' number.features}}active{{/ifInArray}}">
+					{{ @root.i18n.unassign }}
+				</button>
+				<span>{{formatPhoneNumber number.id}}</span>
+			</div>
+			<div class="features-block pull-right">
+				<div class="edit-features"></div>
+				<div class="features">
+					{{#numberFeatures number.features}}{{/numberFeatures}}
 				</div>
-			{{/if}}
+			</div>
 		</div>
-		<div class="features">
-			{{#each this.features}}
-				<i class="{{icon}} {{active}} help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ help }}"></i>
-			{{/each}}
+	{{else}}
+		<div class="number-element">
+			<div class="no-number-error">{{ i18n.strategy.noNumberMessage }}</div>
 		</div>
-	</div>
-</div>
-{{else}}
-<div class="number-element">
-	<div class="no-number-error">{{ i18n.strategy.noNumberMessage }}</div>
-</div>
-{{/each}}
-<div class="number-actions">
-	<a href="#" class="cancel-link pull-right monster-link blue">{{ i18n.close }}</a>
-	<div class="action-links nav-bar clearfix">
-		<a href="#" class="spare-link monster-link pull-left{{#unless spareLinkEnabled}} disabled{{/unless}}"><i class="fa fa-file-text-o monster-orange fa-lg"></i>{{ i18n.strategy.numberLinks.spare }}</a>
-		<ul class="nav pull-left">
-			<li class="dropdown">
-				<a href="#" class="dropdown-toggle buy-dropdown monster-link" data-toggle="dropdown" data-target="#"><i class="fa fa-shopping-cart monster-green fa-lg"></i>{{ i18n.strategy.numberLinks.buy.link }}</a>
-				<ul class="dropdown-menu" role="menu">
-					<li><a class="buy-link" data-type="regular" href="#">{{i18n.strategy.numberLinks.buy.regular}}</a></li>
-					<li><a class="buy-link" data-type="tollfree" href="#">{{i18n.strategy.numberLinks.buy.tollfree}}</a></li>
-					<!-- <li><a class="buy-link" data-type="vanity" href="#">{{i18n.strategy.numberLinks.buy.vanity}}</a></li> -->
-				</ul>
-			</li>
-		</ul>
+	{{/each}}
+
+	<div class="number-actions">
+		<a href="#" class="cancel-link pull-right monster-link blue">{{ i18n.close }}</a>
+		<div class="action-links nav-bar clearfix">
+			<a href="#" class="spare-link monster-link pull-left{{#unless spareLinkEnabled}} disabled{{/unless}}"><i class="fa fa-file-text-o monster-orange fa-lg"></i>{{ i18n.strategy.numberLinks.spare }}</a>
+			<ul class="nav pull-left">
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle buy-dropdown monster-link" data-toggle="dropdown" data-target="#"><i class="fa fa-shopping-cart monster-green fa-lg"></i>{{ i18n.strategy.numberLinks.buy.link }}</a>
+					<ul class="dropdown-menu" role="menu">
+						<li><a class="buy-link" data-type="regular" href="#">{{i18n.strategy.numberLinks.buy.regular}}</a></li>
+						<li><a class="buy-link" data-type="tollfree" href="#">{{i18n.strategy.numberLinks.buy.tollfree}}</a></li>
+						<!-- <li><a class="buy-link" data-type="vanity" href="#">{{i18n.strategy.numberLinks.buy.vanity}}</a></li> -->
+					</ul>
+				</li>
+			</ul>
+		</div>
 	</div>
 </div>

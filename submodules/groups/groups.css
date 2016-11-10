@@ -370,14 +370,6 @@
 	white-space:pre-wrap;
 }
 
-#groups_container .list-wrapper .item-row .features > i {
-	display: none;
-}
-
-#groups_container .list-wrapper .item-row .features > i.active {
-	display: inline-block;
-}
-
 #groups_container .list-wrapper .item-row .locality {
 	display: none;
 	border-left: 1px solid #CCC;

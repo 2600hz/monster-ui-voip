@@ -443,14 +443,6 @@
 	white-space:pre-wrap;
 }
 
-#users_container .detail-numbers .list-wrapper .item-row .features > i {
-	display: none;
-}
-
-#users_container .detail-numbers .list-wrapper .item-row .features > i.active {
-	display: inline-block;
-}
-
 #users_container .detail-numbers .list-wrapper .item-row .locality {
 	display: none;
 	border-left: 1px solid #CCC;

@@ -7,39 +7,16 @@
 			{{#each assignedNumbers}}
 				<div class="item-row" data-id="{{this.phoneNumber}}" data-type="{{this.used_by}}" data-search="{{formatPhoneNumber this.phoneNumber}} {{this.phoneNumber}} {{this.locality.city}} {{this.locality.country}}">
 					<div class="features-block pull-right">
-					{{#compare this.used_by "!==" "mobile"}}
-						<div class="edit-features">
-							{{#if this.extra.hasFeatures}}
-								<div class="navbar">
-									<ul class="nav pull-right">
-										<li class="dropdown">
-											<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cog"></i></a>
-											<ul class="dropdown-menu">
-												{{#if this.extra.hasCnam}}
-													<li><a class="callerId-number" href="#"><i class="fa fa-user"></i>{{ @root.i18n.callerId }}</a></li>
-												{{/if}}
-												{{#if this.extra.hasE911}}
-													<li><a class="e911-number" href="#"><i class="fa fa-ambulance"></i>{{ @root.i18n.e911 }}</a></li>
-												{{/if}}
-												{{#if this.extra.hasPrepend}}
-													<li><a class="prepend-number" href="#"><i class="fa fa-file-text-o"></i>{{ @root.i18n.numberPrepend }}</a></li>
-												{{/if}}
-											</ul>
-										</li>
-									</ul>
-								</div>
-							{{/if}}
-						</div>
-					{{/compare}}
+						<div class="edit-features"></div>
+
 						<div class="features">
-						{{#compare this.state '===' 'port_in'}}
-							<i class="fa fa-exclamation-triangle monster-red active help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{@root.i18n.portIconHelp}}"></i>
-						{{/compare}}
-							{{#each this.viewFeatures}}
-								<i class="{{icon}} {{active}} help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ help }}"></i>
-							{{/each}}
+							{{#numberFeatures features}}{{/numberFeatures}}
+							{{#compare state '===' 'port_in'}}
+								<i class="fa fa-exclamation-triangle monster-red active help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{@root.i18n.portIconHelp}}"></i>
+							{{/compare}}
 						</div>
 					</div>
+
 					<div class="number-container">
 						<button type="button" class="monster-button monster-button-danger remove-number{{#compare this.used_by "===" "mobile"}} disabled" disabled{{else}}"{{/compare}}>{{ @root.i18n.unassign }}</button>
 						<span class="number">

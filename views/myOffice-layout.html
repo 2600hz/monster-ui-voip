@@ -87,9 +87,7 @@
 							{{#each mainNumbers}}
 							<li{{#compare this.number '===' ../account.caller_id.external.number}} class="caller-id"{{/compare}}>
 								<div class="features pull-right">
-									{{#each this.features}}
-										<i class="icon-small {{icon}} {{active}} help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ help }}"></i>
-									{{/each}}
+									{{#numberFeatures this.features}}{{/numberFeatures}}
 								</div>
 								<div class="number-div">{{formatPhoneNumber this.number}}</div>
 							</li>
@@ -113,9 +111,7 @@
 							{{#each confNumbers}}
 							<li>
 								<div class="features pull-right">
-									{{#each this.features}}
-										<i class="{{icon}} {{active}} help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ help }}"></i>
-									{{/each}}
+									{{#numberFeatures this.features}}{{/numberFeatures}}
 								</div>
 								<div class="number-div">{{formatPhoneNumber number}}</div>
 							</li>
@@ -134,9 +130,7 @@
 							{{#each faxingNumbers}}
 							<li>
 								<div class="features pull-right">
-									{{#each this.features}}
-										<i class="{{icon}} {{active}} help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ help }}"></i>
-									{{/each}}
+									{{#numberFeatures this.features}}{{/numberFeatures}}
 								</div>
 								<div class="number-div">{{formatPhoneNumber number}}</div>
 							</li>

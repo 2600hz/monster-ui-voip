@@ -990,34 +990,26 @@ define(function(require){
 					}
 				},
 				success: function(data) {
-					monster.pub('common.numbers.getListFeatures', function(viewFeatures) {
-						var e911Numbers = {};
-						_.each(data.data.numbers, function(val, key) {
-							if(val.features.indexOf('e911') >= 0) {
-								e911Numbers[key] = self.devicesFormatNumber(val, viewFeatures);
-							}
-						});
+					var e911Numbers = {};
 
-						callback(e911Numbers);
+					_.each(data.data.numbers, function(val, key) {
+						if(val.features.indexOf('e911') >= 0) {
+							e911Numbers[key] = self.devicesFormatNumber(val);
+						}
 					});
+
+					callback(e911Numbers);
 				}
 			});
 		},
 
-		devicesFormatNumber: function(value, viewFeatures) {
+		devicesFormatNumber: function(value) {
 			var self = this;
 
-			value.viewFeatures = $.extend(true, {}, viewFeatures);
 			if('locality' in value) {
 				value.isoCountry = value.locality.country || '';
 				value.friendlyLocality = 'city' in value.locality ? value.locality.city + ('state' in value.locality ? ', ' + value.locality.state : '') : '';
 			}
-
-			_.each(value.features, function(feature) {
-				if(feature in value.viewFeatures) {
-					value.viewFeatures[feature].active = 'active';
-				}
-			});
 
 			return value;
 		},
