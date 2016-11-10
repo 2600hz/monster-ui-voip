@@ -70,7 +70,7 @@ define(function(require){
 					monster.ui.highlight(cells);
 				}
 
-				if ( dataTemplate.users.length == 0) {
+				if ( dataTemplate.users.length === 0) {
 					parent.find('.grid-row.title').css('display', 'none');
 					parent.find('.no-users-row').css('display', 'block');
 				} else {
@@ -908,6 +908,19 @@ define(function(require){
 					}
 				});
 
+				passwordTemplate.find('.reset-password').on('click', function() {
+					var dataReset = {
+						username: currentUser.username,
+						account_name: monster.apps.auth.currentAccount.name
+					};
+
+					self.usersResetPassword(dataReset, function() {
+						popup.dialog('close').remove();
+
+						toastr.success(monster.template(self, '!' + toastrMessages.successResetPassword, { name: dataReset.username }));
+					});
+				});
+
 				passwordTemplate.find('.save-new-username').on('click', function() {
 					var formData = monster.ui.getFormData('form_new_username'),
 						userToSave = $.extend(true, {}, currentUser, formData);
@@ -1108,8 +1121,6 @@ define(function(require){
 								template
 									.find('.list-assigned-items')
 									.append($(monster.template(self, 'users-numbersItemRow', {
-										isCnamEnabled: monster.util.isNumberFeatureEnabled('cnam'),
-										isE911Enabled: monster.util.isNumberFeatureEnabled('e911'),
 										number: val
 									})));
 
@@ -1139,9 +1150,10 @@ define(function(require){
 									number.viewFeatures = $.extend(true, {}, features);
 									number.phoneNumber = number.id;
 
+									monster.util.populateBooleansNumberFeatures(number);
+									number.extra.hasFeatures = number.extra.hasE911 || number.extra.hasPrepend || number.extra.hasCnam;
+
 									var rowTemplate = $(monster.template(self, 'users-numbersItemRow', {
-										isCnamEnabled: monster.util.isNumberFeatureEnabled('cnam'),
-										isE911Enabled: monster.util.isNumberFeatureEnabled('e911'),
 										number: number
 									}));
 
@@ -2711,32 +2723,33 @@ define(function(require){
 		},
 
 		usersGetNumbersTemplate: function(userId, callback) {
-			var self = this;
+			var self = this,
+				template;
 
 			self.usersGetNumbersData(userId, function(results) {
 				self.usersFormatNumbersData(userId, results, function(results) {
-					template = $(monster.template(self, 'users-numbers', $.extend(true, {}, results, {
-						isCnamEnabled: monster.util.isNumberFeatureEnabled('cnam'),
-						isE911Enabled: monster.util.isNumberFeatureEnabled('e911')
-					})));
+					template = $(monster.template(self, 'users-numbers', results));
 
 					callback && callback(template, results);
 				});
 			}, true);
 		},
 		usersGetDevicesTemplate: function(userId, callback) {
-			var self = this;
+			var self = this,
+				template;
 
 			self.usersGetDevicesData(function(results) {
-				var results = self.usersFormatDevicesData(userId, results);
+				var formattedResults = self.usersFormatDevicesData(userId, results);
 
-				template = $(monster.template(self, 'users-devices', results));
+				template = $(monster.template(self, 'users-devices', formattedResults));
 
 				callback && callback(template, results);
 			});
 		},
 		usersGetExtensionsTemplate: function(userId, callback) {
-			var self = this;
+			var self = this,
+				template;
+
 			self.usersGetNumbersData(userId, function(results) {
 				self.usersFormatNumbersData(userId, results, function(results) {
 					template = $(monster.template(self, 'users-extensions', results));
@@ -2808,6 +2821,9 @@ define(function(require){
 								number.viewFeatures[feature].active = 'active';
 							}
 						});
+
+						monster.util.populateBooleansNumberFeatures(number);
+						number.extra.hasFeatures = number.extra.hasE911 || number.extra.hasPrepend || number.extra.hasCnam;
 
 						/* Adding to spare numbers */
 						if(!number.hasOwnProperty('used_by') || number.used_by === '') {
@@ -4468,6 +4484,25 @@ define(function(require){
 
 		usersRemoveOverlay: function() {
 			$('body').find('#users_container_overlay').remove();
+		},
+
+		usersResetPassword: function(data, callback) {
+			var self = this,
+				dataPassword = {
+					username: data.username,
+					account_name: data.account_name,
+					ui_url: window.location.href.split('#')[0]
+				};
+
+			self.callApi({
+				resource: 'auth.recovery',
+				data: {
+					data: dataPassword
+				},
+				success: function(data) {
+					callback && callback(data.data);
+				}
+			});
 		}
 	};
 

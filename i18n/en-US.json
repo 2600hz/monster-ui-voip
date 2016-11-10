@@ -427,7 +427,11 @@
 			"password": "Password",
 			"passwordPlaceholder": "Password (Min. 6 characters)",
 			"title": "Update Email and password",
-			"username": "User's Email address"
+			"username": "User's Email address",
+			"resetPassword": {
+				"linkTitle": "here",
+				"text": "If you want the system to send an e-mail to this user with instructions on how to reset his password, click "
+			}
 		},
 		"dialogChangePin": {
 			"help": "You can use this popup to set a temporary PIN for a user that lost his PIN for example.",
@@ -525,7 +529,10 @@
 			"pinUpdated": "You successfully updated the PIN of {{ name }}.",
 			"__comment": "UI-1033: Now properly remove the Caller-ID Feature if we remove a number that was set as that Caller-ID Number",
 			"__version": "3.20",
-			"callerIDDeleted": "The Caller-ID Number of this user was set to a number that was no longer assigned to him, so we disabled the Caller-ID Feature."
+			"callerIDDeleted": "The Caller-ID Number of this user was set to a number that was no longer assigned to him, so we disabled the Caller-ID Feature.",
+			"__comment": ": Now offer admin the option to send an email to reset the password of a user",
+			"__version": "4.0",
+			"successResetPassword": "Success! {{ name }} will be receiving an e-mail with instructions on how to reset his password shortly."
 		},
 		"uploadPicture": "Upload a Picture",
 		"user": "User",
