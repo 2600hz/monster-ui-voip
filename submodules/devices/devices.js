@@ -177,17 +177,13 @@ define(function(require){
 								}
 							}
 
-							self.callApi({
-								resource: 'user.list',
-								data: {
-									accountId: self.accountId
-								},
-								success: function(data, status) {
+							self.devicesListUsers({
+								success: function(users) {
 									var keyTypes = [ 'none', 'presence', 'parking', 'personal_parking', 'speed_dial' ],
 										parkingSpots = [],
 										extra;
 
-									data.data.sort(function(a, b) {
+									users.sort(function(a, b) {
 										return a.last_name.toLowerCase() > b.last_name.toLowerCase() ? 1 : -1;
 									});
 
@@ -204,7 +200,7 @@ define(function(require){
 									});
 
 									extra = {
-										users: data.data,
+										users: users,
 										featureKeys:{
 											parkingSpots: parkingSpots,
 											types: keyTypes
@@ -1228,6 +1224,23 @@ define(function(require){
 			else {
 				callbackError && callbackError();
 			}
+		},
+
+		devicesListUsers: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'user.list',
+				data: {
+					accountId: self.accountId
+				},
+				success: function(data, status) {
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(data, status) {
+					args.hasOwnProperty('error') && args.error();
+				}
+			});
 		}
 	};
 
