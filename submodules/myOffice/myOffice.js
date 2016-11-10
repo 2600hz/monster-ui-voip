@@ -283,11 +283,6 @@ define(function(require){
 							}
 						});
 					},
-					numberFeatures: function(callback) {
-						monster.pub('common.numbers.getListFeatures', function(features) {
-							callback(null, features);
-						});
-					},
 					channels: function(parallelCallback) {
 						self.callApi({
 							resource: 'channel.list',
@@ -534,13 +529,10 @@ define(function(require){
 					_.each(val.numbers, function(num) {
 						if(num !== '0' && num !== 'undefined' && num !== 'undefinedconf' && num !== 'undefinedfaxing') {
 							var number = {
-								number: num,
-								features: $.extend(true, {}, data.numberFeatures)
+								number: num
 							};
 							if(num in data.numbers) {
-								_.each(data.numbers[num].features, function(feature) {
-									number.features[feature] = $.extend(true, number.features[feature], { active : 'active'});
-								});
+								number.features = data.numbers[num].features;
 							}
 							data[numberArrayName].push(number);
 						}

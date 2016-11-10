@@ -134,9 +134,6 @@
 #strategy_container .element-container .number-element .features-block .features {
 	margin-right: 45px;
 }
-#strategy_container .element-container .number-element .features-block .features > i {
-	display: none;
-}
 
 #strategy_container .element-container .number-element .features-block .features > i.active {
 	display: inline-block;

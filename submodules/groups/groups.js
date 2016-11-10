@@ -445,10 +445,22 @@ define(function(require){
 
 			self.groupsGetNumbersData(groupId, function(data) {
 				self.groupsFormatNumbersData(data, function(data) {
-					template = $(monster.template(self, 'groups-numbers', $.extend(true, {}, data, {
-						isCnamEnabled: monster.util.isNumberFeatureEnabled('cnam'),
-						isE911Enabled: monster.util.isNumberFeatureEnabled('e911')
-					})));
+					template = $(monster.template(self, 'groups-numbers', data));
+
+					_.each(data.assignedNumbers, function(numberData, numberId) {
+						numberData.phoneNumber = numberId;
+
+						var numberDiv = template.find('[data-id="' + numberId + '"]'),
+							argsFeatures = {
+								target: numberDiv.find('.edit-features'),
+								numberData: numberData,
+								afterUpdate: function(features) {
+									monster.ui.paintNumberFeaturesIcon(features, numberDiv.find('.features'));
+								}
+							};
+
+						monster.pub('common.numberFeaturesMenu.render', argsFeatures);
+					});
 
 					self.groupsBindNumbers(template, data);
 
@@ -1063,83 +1075,6 @@ define(function(require){
 				}
 			});
 
-			if (monster.util.isNumberFeatureEnabled('e911')) {
-				template.on('click', '.e911-number', function() {
-					var e911Cell = $(this).parents('.item-row').first(),
-						phoneNumber = e911Cell.data('id');
-
-					if(phoneNumber) {
-						var args = {
-							phoneNumber: phoneNumber,
-							callbacks: {
-								success: function(data) {
-									if(!($.isEmptyObject(data.data.e911))) {
-										e911Cell.find('.features i.feature-e911').addClass('active');
-									}
-									else {
-										e911Cell.find('.features i.feature-e911').removeClass('active');
-									}
-								}
-							}
-						};
-
-						monster.pub('common.e911.renderPopup', args);
-					}
-				});
-			}
-
-			if (monster.util.isNumberFeatureEnabled('cnam')) {
-				template.on('click', '.callerId-number', function() {
-					var cnamCell = $(this).parents('.item-row').first(),
-						phoneNumber = cnamCell.data('id');
-
-					if(phoneNumber) {
-						var args = {
-							phoneNumber: phoneNumber,
-							callbacks: {
-								success: function(data) {
-									if('cnam' in data.data && data.data.cnam.display_name) {
-										cnamCell.find('.features i.feature-outbound_cnam').addClass('active');
-									} else {
-										cnamCell.find('.features i.feature-outbound_cnam').removeClass('active');
-									}
-
-									if('cnam' in data.data && data.data.cnam.inbound_lookup) {
-										cnamCell.find('.features i.feature-inbound_cnam').addClass('active');
-									} else {
-										cnamCell.find('.features i.feature-inbound_cnam').removeClass('active');
-									}
-								}
-							}
-						};
-
-						monster.pub('common.callerId.renderPopup', args);
-					}
-				});
-			}
-
-			template.on('click', '.prepend-number', function() {
-				var prependCell = $(this).parents('.item-row').first(),
-					phoneNumber = prependCell.data('id');
-
-				if(phoneNumber) {
-					var args = {
-						phoneNumber: phoneNumber,
-						callbacks: {
-							success: function(data) {
-								if('prepend' in data.data && data.data.prepend.enabled) {
-									prependCell.find('.features i.feature-prepend').addClass('active');
-								} else {
-									prependCell.find('.features i.feature-prepend').removeClass('active');
-								}
-							}
-						}
-					};
-
-					monster.pub('common.numberPrepend.renderPopup', args);
-				}
-			});
-
 			template.on('click', '.actions .spare-link:not(.disabled)', function(e) {
 				e.preventDefault();
 
@@ -1155,15 +1090,22 @@ define(function(require){
 						template.find('.empty-row').hide();
 
 						_.each(numberList, function(val, idx) {
-							val.isLocal = val.features.indexOf('local') > -1;
-
 							template
 								.find('.list-assigned-items')
 								.append($(monster.template(self, 'groups-numbersItemRow', {
-									isCnamEnabled: monster.util.isNumberFeatureEnabled('cnam'),
-									isE911Enabled: monster.util.isNumberFeatureEnabled('e911'),
 									number: val
 								})));
+
+							var numberDiv = template.find('[data-id="'+val.phoneNumber+'"]'),
+								args = {
+									target: numberDiv.find('.edit-features'),
+									numberData: val,
+									afterUpdate: function(features) {
+										monster.ui.paintNumberFeaturesIcon(features, numberDiv.find('.features'));
+									}
+								};
+
+								monster.pub('common.numberFeaturesMenu.render', args);
 
 							extraSpareNumbers = _.without(extraSpareNumbers, val.phoneNumber);
 						});
@@ -1186,23 +1128,26 @@ define(function(require){
 					searchType: $(this).data('type'),
 					callbacks: {
 						success: function(numbers) {
-							monster.pub('common.numbers.getListFeatures', function(features) {
-								_.each(numbers, function(number, k) {
-									number.viewFeatures = $.extend(true, {}, features);
-									number.phoneNumber = number.id;
+							_.each(numbers, function(number, k) {
+								number.phoneNumber = number.id;
 
-									monster.util.populateBooleansNumberFeatures(number);
-									number.extra.hasFeatures = number.extra.hasE911 || number.extra.hasPrepend || number.extra.hasCnam;
-
-									var rowTemplate = $(monster.template(self, 'groups-numbersItemRow', {
+								var rowTemplate = $(monster.template(self, 'groups-numbersItemRow', {
 										number: number
-									}));
+									})),
+									argsFeatures = {
+										target: rowTemplate.find('.edit-features'),
+										numberData: number,
+										afterUpdate: function(features) {
+											monster.ui.paintNumberFeaturesIcon(features, rowTemplate.find('.features'));
+										}
+									};
 
-									monster.ui.tooltips(rowTemplate);
+								monster.pub('common.numberFeaturesMenu.render', argsFeatures);
 
-									template.find('.list-unassigned-items .empty-row').hide();
-									template.find('.list-unassigned-items').append(rowTemplate);
-								});
+								monster.ui.tooltips(rowTemplate);
+
+								template.find('.list-unassigned-items .empty-row').hide();
+								template.find('.list-unassigned-items').append(rowTemplate);
 							});
 						}
 					}
@@ -1481,45 +1426,32 @@ define(function(require){
 					unassignedNumbers: {}
 				};
 
-			monster.pub('common.numbers.getListFeatures', function(features) {
-				_.each(data.numbers.numbers, function(number, id) {
-					/* Formating number */
-					number.viewFeatures = $.extend(true, {}, features);
-					/* TODO: Once locality is enabled, we need to remove it */
-					number.localityEnabled = 'locality' in number ? true : false;
+			_.each(data.numbers.numbers, function(number, id) {
+				/* TODO: Once locality is enabled, we need to remove it */
+				number.localityEnabled = 'locality' in number ? true : false;
 
-					_.each(number.features, function(feature) {
-						if(feature in number.viewFeatures) {
-							number.viewFeatures[feature].active = 'active';
-						}
-					});
+				if(!number.hasOwnProperty('used_by') || number.used_by === '') {
+					response.unassignedNumbers[id] = number;
+					response.countSpare++;
+				}
+			});
 
-					monster.util.populateBooleansNumberFeatures(number);
-					number.extra.hasFeatures = number.extra.hasE911 || number.extra.hasPrepend || number.extra.hasCnam;
-
-					if(!number.hasOwnProperty('used_by') || number.used_by === '') {
-						response.unassignedNumbers[id] = number;
-						response.countSpare++;
+			if('groupCallflow' in data.callflow && 'numbers' in data.callflow.groupCallflow) {
+				_.each(data.callflow.groupCallflow.numbers, function(number) {
+					if(!(number in data.numbers.numbers)) {
+						response.extensions.push(number);
+					}
+					else {
+						data.numbers.numbers[number].isLocal = data.numbers.numbers[number].features.indexOf('local') > -1;
+						response.assignedNumbers[number] = data.numbers.numbers[number];
 					}
 				});
+			}
+			response.emptyExtensions = _.isEmpty(response.extensions);
+			response.emptyAssigned = _.isEmpty(response.assignedNumbers);
+			response.emptySpare = _.isEmpty(response.unassignedNumbers);
 
-				if('groupCallflow' in data.callflow && 'numbers' in data.callflow.groupCallflow) {
-					_.each(data.callflow.groupCallflow.numbers, function(number) {
-						if(!(number in data.numbers.numbers)) {
-							response.extensions.push(number);
-						}
-						else {
-							data.numbers.numbers[number].isLocal = data.numbers.numbers[number].features.indexOf('local') > -1;
-							response.assignedNumbers[number] = data.numbers.numbers[number];
-						}
-					});
-				}
-				response.emptyExtensions = _.isEmpty(response.extensions);
-				response.emptyAssigned = _.isEmpty(response.assignedNumbers);
-				response.emptySpare = _.isEmpty(response.unassignedNumbers);
-
-				callback && callback(response);
-			});
+			callback && callback(response);
 		},
 
 		groupsGetNumbersData: function(groupId, callback) {
