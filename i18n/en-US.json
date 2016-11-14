@@ -695,7 +695,11 @@
 			"deleteUserName": "Delete \"{{variable}}\"",
 			"proceed": "Proceed",
 			"deleteDevices": "Also remove this user's devices from the system",
-			"deleteDevicesHelp": "If you leave this option unchecked, we'll just unassign these devices and they will show up in the list of Spare Devices"
+			"deleteDevicesHelp": "If you leave this option unchecked, we'll just unassign these devices and they will show up in the list of Spare Devices",
+			"__comment": "UI-2467: also remove conferences when deleting a user from smartpbx",
+			"__version": "4.0",
+			"deleteConferences": "Also remove this user's conferences from the system",
+			"deleteConferencesHelp": "If you leave this option unchecked, you won't be able to use the user's conference number anywhere else, as it will still be used by that conference."
 		}
 	},
 

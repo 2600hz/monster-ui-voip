@@ -428,9 +428,10 @@ define(function(require){
 			monster.ui.tooltips(dialogTemplate);
 
 			dialogTemplate.find('#confirm_button').on('click', function() {
-				var removeDevices = dialogTemplate.find('#delete_devices').is(':checked');
+				var removeDevices = dialogTemplate.find('#delete_devices').is(':checked'),
+					removeConferences = dialogTemplate.find('#delete_conferences').is(':checked');
 
-				self.usersDelete(user.id, removeDevices, function(data) {
+				self.usersDelete(user.id, removeDevices, removeConferences, function(data) {
 					popup.dialog('close').remove();
 
 					callback && callback(data);
@@ -2870,7 +2871,7 @@ define(function(require){
 		},
 
 		/* Utils */
-		usersDelete: function(userId, removeDevices, callback) {
+		usersDelete: function(userId, removeDevices, removeConferences, callback) {
 			var self = this;
 
 			monster.parallel({
@@ -2886,6 +2887,11 @@ define(function(require){
 					},
 					callflows: function(callback) {
 						self.usersListCallflowsUser(userId, function(data) {
+							callback(null, data);
+						});
+					},
+					conferences: function(callback) {
+						self.usersListConferences(userId, function(data) {
 							callback(null, data);
 						});
 					}
@@ -2905,6 +2911,12 @@ define(function(require){
 									callback(null, '');
 								});
 							}
+						});
+					});
+
+					listFnDelete.push(function(callback) {
+						self.usersRemoveBulkConferences(results.conferences, removeConferences, function() {
+							callback(null, '');
 						});
 					});
 
@@ -3693,6 +3705,19 @@ define(function(require){
 			});
 		},
 
+		usersUnassignConference: function(conferenceId, callback) {
+			var self = this;
+
+			self.usersGetConference(conferenceId, function(conference) {
+				conference.name = 'Unassigned ' + conference.name;
+				delete conference.owner_id;
+
+				self.usersUpdateConference(conference, function(conference) {
+					callback && callback(conference);
+				});
+			});
+		},
+
 		usersUpdateConference: function(conference, callback) {
 			var self = this;
 
@@ -4144,6 +4169,8 @@ define(function(require){
 							conference_numbers: []
 						};
 
+						monster.util.dataFlags.add({ source: 'smartpbx'}, baseConference);
+
 						baseConference = $.extend(true, {}, baseConference, data.conference);
 
 						self.usersListConferences(data.user.id, function(conferences) {
@@ -4295,24 +4322,38 @@ define(function(require){
 			}
 		},
 
+		usersRemoveBulkConferences: function(conferences, forceDelete, callback) {
+			var self = this,
+				listRequests = [];
+
+			_.each(conferences, function(conference) {
+				listRequests.push(function(subCallback) {
+					if(forceDelete) {
+						self.usersDeleteConference(conference.id, function(data) {
+							subCallback(null, data);
+						});
+					}
+					else {
+						self.usersUnassignConference(conference.id, function(data) {
+							subCallback(null, data);
+						});
+					}
+				});
+			});
+
+			monster.parallel(listRequests, function(err, results) {
+				callback && callback(results);
+			});
+		},
+
 		usersDeleteConferencing: function(userId, globalCallback) {
 			var self = this;
 
 			monster.parallel({
 					conferences: function(callback) {
 						self.usersListConferences(userId, function(conferences) {
-							var listRequests = [];
-
-							_.each(conferences, function(conference) {
-								listRequests.push(function(subCallback) {
-									self.usersDeleteConference(conference.id, function(data) {
-										subCallback(null, data);
-									});
-								});
-							});
-
-							monster.parallel(listRequests, function(err, results) {
-								callback && callback(results);
+							self.usersRemoveBulkConferences(conferences, true, function(results) {
+								callback && callback(null, results);
 							});
 						});
 					},
