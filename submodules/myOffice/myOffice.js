@@ -918,17 +918,21 @@ define(function(require){
 			});
 
 			emergencyZipcodeInput.on('blur', function() {
-				self.myOfficeGetAddessFromZipCode({
-					data: {
-						zipCode: $(this).val()
-					},
-					success: function(results) {
-						if (!_.isEmpty(results)) {
-							emergencyCityInput.val(results[0].address_components[1].long_name);
-							emergencyStateInput.val(results[0].address_components[3].short_name);
+				var zipCode = $(this).val();
+
+				if (zipCode) {
+					self.myOfficeGetAddessFromZipCode({
+						data: {
+							zipCode: zipCode
+						},
+						success: function(results) {
+							if (!_.isEmpty(results)) {
+								emergencyCityInput.val(results[0].address_components[1].long_name);
+								emergencyStateInput.val(results[0].address_components[3].short_name);
+							}
 						}
-					}
-				});
+					});
+				}
 			});
 
 			popupTemplate.find('.save').on('click', function() {
