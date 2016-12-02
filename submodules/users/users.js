@@ -428,9 +428,10 @@ define(function(require){
 			monster.ui.tooltips(dialogTemplate);
 
 			dialogTemplate.find('#confirm_button').on('click', function() {
-				var removeDevices = dialogTemplate.find('#delete_devices').is(':checked');
+				var removeDevices = dialogTemplate.find('#delete_devices').is(':checked'),
+					removeConferences = dialogTemplate.find('#delete_conferences').is(':checked');
 
-				self.usersDelete(user.id, removeDevices, function(data) {
+				self.usersDelete(user.id, removeDevices, removeConferences, function(data) {
 					popup.dialog('close').remove();
 
 					callback && callback(data);
@@ -648,6 +649,9 @@ define(function(require){
 							if(monster.ui.valid(userTemplate.find('#form_user_creation'))) {
 								var dataForm = monster.ui.getFormData('form_user_creation'),
 									formattedData = self.usersFormatCreationData(dataForm);
+
+								$(this)
+									.prop({ disabled: 'true' });
 
 								self.usersCreate(formattedData, function(data) {
 									popup.dialog('close').remove();
@@ -1116,13 +1120,22 @@ define(function(require){
 							template.find('.empty-row').hide();
 
 							_.each(numberList, function(val, idx) {
-								val.isLocal = val.features.indexOf('local') > -1;
-
 								template
 									.find('.list-assigned-items')
 									.append($(monster.template(self, 'users-numbersItemRow', {
 										number: val
 									})));
+
+								var numberDiv = template.find('[data-id="'+val.phoneNumber+'"]'),
+									args = {
+										target: numberDiv.find('.edit-features'),
+										numberData: val,
+										afterUpdate: function(features) {
+											monster.ui.paintNumberFeaturesIcon(features, numberDiv.find('.features'));
+										}
+									};
+
+								monster.pub('common.numberFeaturesMenu.render', args);
 
 								extraSpareNumbers = _.without(extraSpareNumbers, val.phoneNumber);
 							});
@@ -1145,23 +1158,26 @@ define(function(require){
 					searchType: $(this).data('type'),
 					callbacks: {
 						success: function(numbers) {
-							monster.pub('common.numbers.getListFeatures', function(features) {
-								_.each(numbers, function(number, k) {
-									number.viewFeatures = $.extend(true, {}, features);
-									number.phoneNumber = number.id;
+							_.each(numbers, function(number, k) {
+								number.phoneNumber = number.id;
 
-									monster.util.populateBooleansNumberFeatures(number);
-									number.extra.hasFeatures = number.extra.hasE911 || number.extra.hasPrepend || number.extra.hasCnam;
-
-									var rowTemplate = $(monster.template(self, 'users-numbersItemRow', {
+								var rowTemplate = $(monster.template(self, 'users-numbersItemRow', {
 										number: number
-									}));
+									})),
+									argsFeatures = {
+										target: rowTemplate.find('.edit-features'),
+										numberData: number,
+										afterUpdate: function(features) {
+											monster.ui.paintNumberFeaturesIcon(features, rowTemplate.find('.features'));
+										}
+									};
 
-									monster.ui.tooltips(rowTemplate);
+								monster.pub('common.numberFeaturesMenu.render', argsFeatures);
 
-									template.find('.list-assigned-items .empty-row').hide();
-									template.find('.list-assigned-items').append(rowTemplate);
-								});
+								monster.ui.tooltips(rowTemplate);
+
+								template.find('.list-assigned-items .empty-row').hide();
+								template.find('.list-assigned-items').append(rowTemplate);
 							});
 						}
 					}
@@ -1211,83 +1227,6 @@ define(function(require){
 				}
 				else {
 					monster.ui.alert('warning', self.i18n.active().users.noNumberCallflow);
-				}
-			});
-
-			if (monster.util.isNumberFeatureEnabled('cnam')) {
-				template.on('click', '.callerId-number', function() {
-					var cnamCell = $(this).parents('.item-row').first(),
-						phoneNumber = cnamCell.data('id');
-
-					if(phoneNumber) {
-						var args = {
-							phoneNumber: phoneNumber,
-							callbacks: {
-								success: function(data) {
-									if('cnam' in data.data && data.data.cnam.display_name) {
-										cnamCell.find('.features i.feature-outbound_cnam').addClass('active');
-									} else {
-										cnamCell.find('.features i.feature-outbound_cnam').removeClass('active');
-									}
-
-									if('cnam' in data.data && data.data.cnam.inbound_lookup) {
-										cnamCell.find('.features i.feature-inbound_cnam').addClass('active');
-									} else {
-										cnamCell.find('.features i.feature-inbound_cnam').removeClass('active');
-									}
-								}
-							}
-						};
-
-						monster.pub('common.callerId.renderPopup', args);
-					}
-				});
-			}
-
-			if (monster.util.isNumberFeatureEnabled('e911')) {
-				template.on('click', '.e911-number', function() {
-					var e911Cell = $(this).parents('.item-row').first(),
-						phoneNumber = e911Cell.data('id');
-
-					if(phoneNumber) {
-						var args = {
-							phoneNumber: phoneNumber,
-							callbacks: {
-								success: function(data) {
-									if(!($.isEmptyObject(data.data.e911))) {
-										e911Cell.find('.features i.feature-e911').addClass('active');
-									}
-									else {
-										e911Cell.find('.features i.feature-e911').removeClass('active');
-									}
-								}
-							}
-						};
-
-						monster.pub('common.e911.renderPopup', args);
-					}
-				});
-			}
-
-			template.on('click', '.prepend-number', function() {
-				var prependCell = $(this).parents('.item-row').first(),
-					phoneNumber = prependCell.data('id');
-
-				if(phoneNumber) {
-					var args = {
-						phoneNumber: phoneNumber,
-						callbacks: {
-							success: function(data) {
-								if('prepend' in data.data && data.data.prepend.enabled) {
-									prependCell.find('.features i.feature-prepend').addClass('active');
-								} else {
-									prependCell.find('.features i.feature-prepend').removeClass('active');
-								}
-							}
-						}
-					};
-
-					monster.pub('common.numberPrepend.renderPopup', args);
 				}
 			});
 
@@ -2730,6 +2669,19 @@ define(function(require){
 				self.usersFormatNumbersData(userId, results, function(results) {
 					template = $(monster.template(self, 'users-numbers', results));
 
+					_.each(results.assignedNumbers, function(number) {
+						var numberDiv = template.find('[data-id="' + number.phoneNumber + '"]'),
+							argsFeatures = {
+								target: numberDiv.find('.edit-features'),
+								numberData: number,
+								afterUpdate: function(features) {
+									monster.ui.paintNumberFeaturesIcon(features, numberDiv.find('.features'));
+								}
+							};
+
+						monster.pub('common.numberFeaturesMenu.render', argsFeatures);
+					});
+
 					callback && callback(template, results);
 				});
 			}, true);
@@ -2808,83 +2760,70 @@ define(function(require){
 				});
 			}
 
-			monster.pub('common.numbers.getListFeatures', function(features) {
-				if('numbers' in data.numbers) {
-					_.each(data.numbers.numbers, function(number, k) {
-						/* Formating number */
-						number.viewFeatures = $.extend(true, {}, features);
-						/* TODO: Once locality is enabled, we need to remove it */
-						number.localityEnabled = 'locality' in number ? true : false;
+			if('numbers' in data.numbers) {
+				_.each(data.numbers.numbers, function(number, k) {
+					/* TODO: Once locality is enabled, we need to remove it */
+					number.localityEnabled = 'locality' in number ? true : false;
 
-						_.each(number.features, function(feature) {
-							if(feature in number.viewFeatures) {
-								number.viewFeatures[feature].active = 'active';
-							}
-						});
-
-						monster.util.populateBooleansNumberFeatures(number);
-						number.extra.hasFeatures = number.extra.hasE911 || number.extra.hasPrepend || number.extra.hasCnam;
-
-						/* Adding to spare numbers */
-						if(!number.hasOwnProperty('used_by') || number.used_by === '') {
-							response.countSpare++;
-							response.unassignedNumbers[k] = number;
-						}
-						else if (number.used_by === 'mobile') {
-							response.assignedNumbers.push(number);
-						}
-					});
-				}
-
-				if(response.callflow) {
-					/* If a number is in a callflow and is returned by the phone_numbers, add it to the assigned numbers  */
-					_.each(response.callflow.numbers, function(number) {
-						if(number in data.numbers.numbers) {
-							var numberElement = data.numbers.numbers[number];
-							numberElement.phoneNumber = number;
-							numberElement.isLocal = numberElement.features.indexOf('local') > -1;
-
-							response.assignedNumbers.push(numberElement);
-						}
-						else {
-							response.extensions.push(number);
-						}
-					});
-				}
-
-				response.assignedNumbers = monster.util.sort(response.assignedNumbers, 'phoneNumber');
-
-				/* List of extensions */
-				response.allExtensions = [];
-
-				_.each(data.callflow.list, function(callflow) {
-					_.each(callflow.numbers, function(number) {
-						/* If it's a valid extension number (ie: a number that's not in the number database) */
-						if(!(number in data.numbers.numbers) && !(_.isNaN(parseInt(number)))) {
-							response.allExtensions.push(number);
-						}
-					});
-				});
-
-				/* Sort extensions so that we can recommend an available extension to a user whom would add a new one */
-				response.allExtensions.sort(function(a, b) {
-					var parsedA = parseInt(a),
-						parsedB = parseInt(b),
-						result = -1;
-
-					if(parsedA > 0 && parsedB > 0) {
-						result = parsedA > parsedB;
+					/* Adding to spare numbers */
+					if(!number.hasOwnProperty('used_by') || number.used_by === '') {
+						response.countSpare++;
+						response.unassignedNumbers[k] = number;
 					}
-
-					return result;
+					else if (number.used_by === 'mobile') {
+						response.assignedNumbers.push(number);
+					}
 				});
+			}
 
-				response.emptyAssigned = _.isEmpty(response.assignedNumbers);
-				response.emptySpare = _.isEmpty(response.unassignedNumbers);
-				response.emptyExtensions = _.isEmpty(response.extensions);
+			if(response.callflow) {
+				/* If a number is in a callflow and is returned by the phone_numbers, add it to the assigned numbers  */
+				_.each(response.callflow.numbers, function(number) {
+					if(number in data.numbers.numbers) {
+						var numberElement = data.numbers.numbers[number];
+						numberElement.phoneNumber = number;
+						numberElement.isLocal = numberElement.features.indexOf('local') > -1;
 
-				callback && callback(response);
+						response.assignedNumbers.push(numberElement);
+					}
+					else {
+						response.extensions.push(number);
+					}
+				});
+			}
+
+			response.assignedNumbers = monster.util.sort(response.assignedNumbers, 'phoneNumber');
+
+			/* List of extensions */
+			response.allExtensions = [];
+
+			_.each(data.callflow.list, function(callflow) {
+				_.each(callflow.numbers, function(number) {
+					/* If it's a valid extension number (ie: a number that's not in the number database) */
+					if(!(number in data.numbers.numbers) && !(_.isNaN(parseInt(number)))) {
+						response.allExtensions.push(number);
+					}
+				});
 			});
+
+			/* Sort extensions so that we can recommend an available extension to a user whom would add a new one */
+			response.allExtensions.sort(function(a, b) {
+				var parsedA = parseInt(a),
+					parsedB = parseInt(b),
+					result = -1;
+
+				if(parsedA > 0 && parsedB > 0) {
+					result = parsedA > parsedB;
+				}
+
+				return result;
+			});
+
+			response.emptyAssigned = _.isEmpty(response.assignedNumbers);
+			response.emptySpare = _.isEmpty(response.unassignedNumbers);
+			response.emptyExtensions = _.isEmpty(response.extensions);
+
+			callback && callback(response);
 		},
 
 		usersFormatCreationData: function(data, callback) {
@@ -2935,7 +2874,7 @@ define(function(require){
 		},
 
 		/* Utils */
-		usersDelete: function(userId, removeDevices, callback) {
+		usersDelete: function(userId, removeDevices, removeConferences, callback) {
 			var self = this;
 
 			monster.parallel({
@@ -2951,6 +2890,11 @@ define(function(require){
 					},
 					callflows: function(callback) {
 						self.usersListCallflowsUser(userId, function(data) {
+							callback(null, data);
+						});
+					},
+					conferences: function(callback) {
+						self.usersListConferences(userId, function(data) {
 							callback(null, data);
 						});
 					}
@@ -2970,6 +2914,12 @@ define(function(require){
 									callback(null, '');
 								});
 							}
+						});
+					});
+
+					listFnDelete.push(function(callback) {
+						self.usersRemoveBulkConferences(results.conferences, removeConferences, function() {
+							callback(null, '');
 						});
 					});
 
@@ -3758,6 +3708,19 @@ define(function(require){
 			});
 		},
 
+		usersUnassignConference: function(conferenceId, callback) {
+			var self = this;
+
+			self.usersGetConference(conferenceId, function(conference) {
+				conference.name = 'Unassigned ' + conference.name;
+				delete conference.owner_id;
+
+				self.usersUpdateConference(conference, function(conference) {
+					callback && callback(conference);
+				});
+			});
+		},
+
 		usersUpdateConference: function(conference, callback) {
 			var self = this;
 
@@ -4209,6 +4172,8 @@ define(function(require){
 							conference_numbers: []
 						};
 
+						monster.util.dataFlags.add({ source: 'smartpbx'}, baseConference);
+
 						baseConference = $.extend(true, {}, baseConference, data.conference);
 
 						self.usersListConferences(data.user.id, function(conferences) {
@@ -4360,24 +4325,38 @@ define(function(require){
 			}
 		},
 
+		usersRemoveBulkConferences: function(conferences, forceDelete, callback) {
+			var self = this,
+				listRequests = [];
+
+			_.each(conferences, function(conference) {
+				listRequests.push(function(subCallback) {
+					if(forceDelete) {
+						self.usersDeleteConference(conference.id, function(data) {
+							subCallback(null, data);
+						});
+					}
+					else {
+						self.usersUnassignConference(conference.id, function(data) {
+							subCallback(null, data);
+						});
+					}
+				});
+			});
+
+			monster.parallel(listRequests, function(err, results) {
+				callback && callback(results);
+			});
+		},
+
 		usersDeleteConferencing: function(userId, globalCallback) {
 			var self = this;
 
 			monster.parallel({
 					conferences: function(callback) {
 						self.usersListConferences(userId, function(conferences) {
-							var listRequests = [];
-
-							_.each(conferences, function(conference) {
-								listRequests.push(function(subCallback) {
-									self.usersDeleteConference(conference.id, function(data) {
-										subCallback(null, data);
-									});
-								});
-							});
-
-							monster.parallel(listRequests, function(err, results) {
-								callback && callback(results);
+							self.usersRemoveBulkConferences(conferences, true, function(results) {
+								callback && callback(null, results);
 							});
 						});
 					},

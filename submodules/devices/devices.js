@@ -155,6 +155,20 @@ define(function(require){
 			});
 		},
 
+		getKeyTypes: function(data) {
+			var types = [];
+
+			if (data.hasOwnProperty('feature_keys') && data.feature_keys.iterate > 0) {
+				types.push('feature_keys');
+			}
+
+			if (data.hasOwnProperty('combo_keys') && data.combo_keys.iterate > 0) {
+				types.push('combo_keys');
+			}
+
+			return _.isEmpty(types) ? null : types;
+		},
+
 		devicesRenderEdit: function(args) {
 			var self = this,
 				data = args.data,
@@ -166,28 +180,32 @@ define(function(require){
 			self.devicesGetEditData(data, function(dataDevice) {
 				if (dataDevice.hasOwnProperty('provision')) {
 					self.devicesGetIterator(dataDevice.provision, function(template) {
-						if (template.hasOwnProperty('feature_keys') && template.feature_keys.iterate > 0) {
-							if (!dataDevice.provision.hasOwnProperty('feature_keys')) {
-								dataDevice.provision.feature_keys = {};
-							}
+						var keyTypes = self.getKeyTypes(template);
 
-							for (var i = 0, len = template.feature_keys.iterate; i < len; i++) {
-								if (!dataDevice.provision.feature_keys.hasOwnProperty(i)) {
-									dataDevice.provision.feature_keys[i] = { type: 'none' };
-								}
-							}
+						if (keyTypes) {
+							self.devicesListUsers({
+								success: function(users) {
+									_.each(keyTypes, function(type, idx) {
+										if (!dataDevice.provision.hasOwnProperty(type)) {
+											dataDevice.provision[type] = {};
+										}
 
-							self.callApi({
-								resource: 'user.list',
-								data: {
-									accountId: self.accountId
-								},
-								success: function(data, status) {
-									var keyTypes = [ 'none', 'presence', 'parking', 'personal_parking', 'speed_dial' ],
+										var i = 0,
+											len = template[type].iterate;
+										for (; i < len; i++) {
+											if (!dataDevice.provision[type].hasOwnProperty(i)) {
+												dataDevice.provision[type][i] = {
+													type: 'none'
+												}
+											}
+										}
+									});
+
+									var actions = [ 'none', 'presence', 'parking', 'personal_parking', 'speed_dial' ],
 										parkingSpots = [],
 										extra;
 
-									data.data.sort(function(a, b) {
+									users.sort(function(a, b) {
 										return a.last_name.toLowerCase() > b.last_name.toLowerCase() ? 1 : -1;
 									});
 
@@ -195,21 +213,37 @@ define(function(require){
 										parkingSpots[i] = i + 1;
 									}
 
-									keyTypes.forEach(function(val, idx, arr) {
-										arr[idx] = { id: val, text: self.i18n.active().devices.popupSettings.featureKeys.types[val] };
+									_.each(actions, function(action, idx, list) {
+										list[idx] = {
+											id: action,
+											text: self.i18n.active().devices.popupSettings.keys.types[action]
+										};
 
-										if (val !== 'none') {
-											arr[idx].info = self.i18n.active().devices.popupSettings.featureKeys.info.types[val];
+										if (action !== 'none') {
+											list[idx].info = self.i18n.active().devices.popupSettings.keys.info.types[action];
 										}
 									});
 
 									extra = {
-										users: data.data,
-										featureKeys:{
+										provision: {
+											users: users,
 											parkingSpots: parkingSpots,
-											types: keyTypes
+											keyActions: actions,
+											keys: []
 										}
 									};
+
+									_.each(keyTypes, function(key, idx) {
+										var camelCaseKey = self.devicesSnakeToCamel(key);
+
+										extra.provision.keys.push({
+											id: key,
+											type: camelCaseKey,
+											title: self.i18n.active().devices.popupSettings.keys[camelCaseKey].title,
+											label: self.i18n.active().devices.popupSettings.keys[camelCaseKey].label,
+											data: dataDevice.provision[key]
+										});
+									});
 
 									dataDevice.extra = dataDevice.hasOwnProperty('extra') ? $.extend(true, {}, dataDevice.extra, extra) : extra;
 
@@ -279,23 +313,28 @@ define(function(require){
 				}))),
 				deviceForm = templateDevice.find('#form_device');
 
-			if (data.hasOwnProperty('provision') && data.provision.hasOwnProperty('feature_keys')) {
-				var section = '.tabs-section[data-section="featureKeys"] ';
+			if (data.extra.hasOwnProperty('provision') && data.extra.provision.hasOwnProperty('keys')) {
+				_.each(data.extra.provision.keys, function(value, idx) {
+					var section = '.tabs-section[data-section="' + value.type + '"] ';
 
-				_.each(data.provision.feature_keys, function(val, key){
-					var group = '.control-group[data-id="' + key + '"] ',
-						value = '.feature-key-value[data-type="' + val.type + '"]';
+					_.each(value.data, function(val, key) {
+						var group = '.control-group[data-id="' + key + '"] ',
+							value = '.feature-key-value[data-type="' + val.type + '"]';
 
-					templateDevice
-						.find(section.concat(group, value))
-							.addClass('active')
-						.find('[name="provision.feature_keys[' + key + '].value"]')
-							.val(val.value);
+						templateDevice
+							.find(section.concat(group, value))
+								.addClass('active')
+							.find('[name="provision.feature_keys[' + key + '].value"]')
+								.val(val.value);
+					});
 				});
 
-				$.each(templateDevice.find('.feature-key-index'), function(idx, val) {
-					$(val).text(parseInt($(val).text(), 10) + 1);
-				});
+				templateDevice
+					.find('.feature-key-index')
+						.each(function(idx, el) {
+							$(el)
+								.text(parseInt($(el).text(), 10) + 1);
+						});
 			}
 
 			if ( data.extra.hasE911Numbers ) {
@@ -515,7 +554,7 @@ define(function(require){
 				setTimeout(function() {
 					var action = ($this.hasClass('collapsed') ? 'show' : 'hide').concat('Info');
 
-					$this.find('.text').text(self.i18n.active().devices.popupSettings.featureKeys.info.link[action]);
+					$this.find('.text').text(self.i18n.active().devices.popupSettings.keys.info.link[action]);
 				});
 			});
 
@@ -613,18 +652,29 @@ define(function(require){
 				});
 			}
 
-			/**
-			 * form2object sends feature_keys back as an array even if the first key is 1
-			 * feature_key needs to be coerced into an object to match the datatype in originalData
-			 */
-			if (formData.hasOwnProperty('provision') && formData.provision.hasOwnProperty('feature_keys')) {
-				var featureKeys = {};
+			if (formData.hasOwnProperty('provision') && formData.provision.hasOwnProperty('keys')) {
+				/**
+				 * form2object sends keys back as arrays even if the first key is 1
+				 * they needs to be coerced into an object to match the datatype in originalData
+				 */
+				_.each(formData.provision.keys, function(value, key, list) {
+					var keys = {};
 
-				formData.provision.feature_keys.forEach(function(val, idx) {
-					featureKeys[idx] = val;
+					list[key].forEach(function(val, idx) {
+						if (val.type !== 'none') {
+							keys[idx] = val;
+						}
+					});
+
+					if (_.isEmpty(keys)) {
+						delete originalData.provision[key];
+					}
+					else {
+						originalData.provision[key] = keys;
+					}
 				});
 
-				formData.provision.feature_keys = featureKeys;
+				delete formData.provision.keys;
 			}
 
 			var mergedData = $.extend(true, {}, originalData, formData);
@@ -660,19 +710,6 @@ define(function(require){
 			// The UI mistakenly created this key, so we clean it up
 			if(mergedData.hasOwnProperty('media') && mergedData.media.hasOwnProperty('fax') && mergedData.media.fax.hasOwnProperty('option')) {
 				delete mergedData.media.fax.option;
-			}
-
-			// Remove feature keys that are not defined
-			if (mergedData.hasOwnProperty('provision') && mergedData.provision.hasOwnProperty('feature_keys')) {
-				for (var key in mergedData.provision.feature_keys) {
-					if (mergedData.provision.feature_keys[key].type === 'none') {
-						delete mergedData.provision.feature_keys[key];
-					}
-				}
-
-				if (_.isEmpty(mergedData.provision.feature_keys)) {
-					delete mergedData.provision.feature_keys;
-				}
 			}
 
 			if(mergedData.hasOwnProperty('caller_id') && mergedData.caller_id.hasOwnProperty('emergency') && mergedData.caller_id.emergency.hasOwnProperty('number') && mergedData.caller_id.emergency.number === '') {
@@ -947,6 +984,10 @@ define(function(require){
 			return formattedData;
 		},
 
+		devicesSnakeToCamel: function(string) {
+			return string.replace(/(\_\w)/g, function (match) { return match[1].toUpperCase(); });
+		},
+
 		/* Utils */
 		devicesDeleteDevice: function(deviceId, callback) {
 			var self = this;
@@ -990,34 +1031,26 @@ define(function(require){
 					}
 				},
 				success: function(data) {
-					monster.pub('common.numbers.getListFeatures', function(viewFeatures) {
-						var e911Numbers = {};
-						_.each(data.data.numbers, function(val, key) {
-							if(val.features.indexOf('e911') >= 0) {
-								e911Numbers[key] = self.devicesFormatNumber(val, viewFeatures);
-							}
-						});
+					var e911Numbers = {};
 
-						callback(e911Numbers);
+					_.each(data.data.numbers, function(val, key) {
+						if(val.features.indexOf('e911') >= 0) {
+							e911Numbers[key] = self.devicesFormatNumber(val);
+						}
 					});
+
+					callback(e911Numbers);
 				}
 			});
 		},
 
-		devicesFormatNumber: function(value, viewFeatures) {
+		devicesFormatNumber: function(value) {
 			var self = this;
 
-			value.viewFeatures = $.extend(true, {}, viewFeatures);
 			if('locality' in value) {
 				value.isoCountry = value.locality.country || '';
 				value.friendlyLocality = 'city' in value.locality ? value.locality.city + ('state' in value.locality ? ', ' + value.locality.state : '') : '';
 			}
-
-			_.each(value.features, function(feature) {
-				if(feature in value.viewFeatures) {
-					value.viewFeatures[feature].active = 'active';
-				}
-			});
 
 			return value;
 		},
@@ -1228,6 +1261,23 @@ define(function(require){
 			else {
 				callbackError && callbackError();
 			}
+		},
+
+		devicesListUsers: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'user.list',
+				data: {
+					accountId: self.accountId
+				},
+				success: function(data, status) {
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(data, status) {
+					args.hasOwnProperty('error') && args.error();
+				}
+			});
 		}
 	};
 

@@ -246,31 +246,13 @@
 	color: #22a5ff;
 }
 #myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-row .row-content .number-list .features > i {
-	display: none;
 	cursor: inherit;
-}
-#myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-row .row-content .number-list .features > i.active {
-	display: inline-block;
 }
 #myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-row .row-content .number-list .number-div {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
-/*#myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-row.e911-row > div {
-	line-height: 20px;
-}
-#myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-row.e911-row .row-title .line1 {
-	font-size: 24px;
-	line-height: 24px;
-}
-#myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-row.e911-row .row-title .line2 {
-	line-height: 16px;
-}
-#myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-row.e911-row .row-content {
-	text-transform: uppercase;
-	font-size: 12px;
-}*/
 #myoffice_container .dashboard-right-content .dashboard-box .dashboard-box-row.account-info-box > div {
 	height: 20px;
 	line-height: 20px;

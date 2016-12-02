@@ -10,6 +10,13 @@
 				<i class="help-popover fa fa-question-circle fa-lg" data-original-title="{{ i18n.users.deleteDialog.deleteDevicesHelp }}" data-placement="left" data-toggle="tooltip"></i>
 			</div>
 
+			<div>
+				{{#monsterCheckbox i18n.users.deleteDialog.deleteConferences }}
+					<input id="delete_conferences" type="checkbox"></input>
+				{{/monsterCheckbox}}
+				<i class="help-popover fa fa-question-circle fa-lg" data-original-title="{{ i18n.users.deleteDialog.deleteConferencesHelp }}" data-placement="left" data-toggle="tooltip"></i>
+			</div>
+
 			<div class="dialog-text">
 				{{#compare user.priv_level "===" "admin"}}
 					{{ i18n.users.deleteDialog.headerAdmin }}
