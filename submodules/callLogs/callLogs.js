@@ -366,7 +366,7 @@ define(function(require){
 								  + "%0D%0AHangup Cause: " + (cdr.hangup_cause || "")
 								  + "%0D%0ACall ID: " + cdr.call_id
 								  + "%0D%0AOther Leg Call ID: " + (cdr.other_leg_call_id || "")
-								  + "%0D%0AHandling Server: " + (cdr.handling_server || "")
+								  + "%0D%0AHandling Server: " + (cdr.media_server || "")
 					};
 				};
 
