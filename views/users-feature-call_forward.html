@@ -4,14 +4,20 @@
 			<i class="{{extra.mapFeatures.call_forward.icon}}"></i>
 		</div>
 		{{ i18n.users.call_forward.headline }}
-		<div class="switch">
-		{{#monsterSwitch}}
-			<input class="switch-state" type="checkbox" id="checkbox_call_forward" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if extra.mapFeatures.call_forward.active}} checked="checked"{{/if}}></input>
-		{{/monsterSwitch}}
+
+		<div class="btn-group feature-select-mode">
+			<button data-value="on" class="monster-button monster-button-fit{{#compare extra.callForwardMode "===" "on"}} monster-button-primary selected{{/compare}}">On</button>
+			<button data-value="failover" class="monster-button monster-button-fit{{#compare extra.callForwardMode "===" "failover"}} monster-button-primary selected{{/compare}}">Failover Mode</button>
+			<button data-value="off" class="monster-button monster-button-fit{{#compare extra.callForwardMode "===" "off"}} monster-button-primary selected{{/compare}}">Off</button>
 		</div>
 	</div>
 
-	<div class="content{{#unless extra.mapFeatures.call_forward.active}} disabled{{/unless}}">
+	<div class="content{{#compare extra.callForwardMode "===" "off"}} disabled{{/compare}}">
+		<div class="failover-info{{#compare extra.callForwardMode "!==" "failover"}} disabled{{/compare}}">
+			{{#monsterText 'info'}}
+				{{ i18n.users.call_forward.failoverWarning }}
+			{{/monsterText}}
+		</div>
 		<form id="call_forward_form" class="form form-horizontal">
 			<div class="control-group">
 				<label class="control-label" for="phoneType">{{ i18n.users.call_forward.label }}</label>

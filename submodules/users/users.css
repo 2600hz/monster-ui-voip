@@ -879,3 +879,22 @@
 .delete-user-wrapper .dialog-text {
 	margin-top: 10px;
 }
+
+.monster-feature-popup-container[data-feature="call_forward"] {
+	width: 600px;
+}
+
+.monster-feature-popup-container[data-feature="call_forward"] .btn-group {
+	float: right;
+	font-size: 14px;
+	margin-right: 25px;
+	margin-top: 40px;
+}
+
+.monster-feature-popup-container[data-feature="call_forward"] .failover-info {
+	margin-bottom: 25px;
+}
+
+.monster-feature-popup-container[data-feature="call_forward"] .failover-info.disabled {
+	display: none;
+}
