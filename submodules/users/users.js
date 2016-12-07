@@ -177,6 +177,12 @@ define(function(require){
 							iconColor: 'monster-blue',
 							title: self.i18n.active().users.caller_id.title
 						},
+						call_forward_failover: {
+							icon: 'fa fa-share',
+							iconColor: 'monster-orange',
+							title: self.i18n.active().users.call_forward.failover_title,
+							hidden: true
+						},
 						call_forward: {
 							icon: 'fa fa-share',
 							iconColor: 'monster-yellow',
@@ -1891,9 +1897,33 @@ define(function(require){
 			}
 		},
 
+		usersFormatCallForwardData: function(user) {
+			var self = this,
+				cfMode = 'off';
+
+			user.extra = user.extra || {};
+
+			//cfmode is on if call_forward.enabled = true
+			//cfmode is failover if call_forward.enabled = false & call_forward.failover = true
+			//cfmode is off if call_forward.enabled = false & call_forward.failover = false
+			if(user.hasOwnProperty('call_forward') && user.call_forward.hasOwnProperty('enabled')) {
+				if(user.call_forward.enabled === true) {
+					cfMode = 'on';
+				}
+				else if(user.call_forward.enabled === false) {
+					cfMode = user.call_forward.hasOwnProperty('failover') && user.call_forward.failover === true ? 'failover' : 'off';
+				}
+			}
+
+			user.extra.callForwardMode = cfMode;
+
+			return user;
+		},
+
 		usersRenderCallForward: function(currentUser) {
 			var self = this,
-				featureTemplate = $(monster.template(self, 'users-feature-call_forward', currentUser)),
+				formattedCallForwardData = self.usersFormatCallForwardData(currentUser),
+				featureTemplate = $(monster.template(self, 'users-feature-call_forward', formattedCallForwardData)),
 				switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#call_forward_form'),
 				args = {
@@ -1920,6 +1950,16 @@ define(function(require){
 				popup.dialog('close').remove();
 			});
 
+			featureTemplate.find('.feature-select-mode button').on('click', function() {
+				var $this = $(this);
+
+				featureTemplate.find('.feature-select-mode button').removeClass('selected monster-button-primary');
+				$(this).addClass('selected monster-button-primary');
+
+				$this.data('value') === 'off' ? featureTemplate.find('.content').slideUp() : featureTemplate.find('.content').slideDown();
+				$this.data('value') === 'failover' ? featureTemplate.find('.failover-info').slideDown() : featureTemplate.find('.failover-info').slideUp();
+			});
+
 			switchFeature.on('change', function() {
 				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
 			});
@@ -1929,11 +1969,24 @@ define(function(require){
 					var formData = monster.ui.getFormData('call_forward_form');
 					formData.require_keypress = !formData.require_keypress;
 
-					formData.enabled = switchFeature.prop('checked');
+					var selectedType = featureTemplate.find('.feature-select-mode button.selected').data('value');
+					if(selectedType === 'off') {
+						formData.enabled = false;
+						formData.failover = false;
+					}
+					else if(selectedType === 'failover') {
+						formData.enabled = false;
+						formData.failover = true;
+					}
+					else {
+						formData.enabled = true;
+						formData.failover = true;
+					}
+
 					formData.number = monster.util.unformatPhoneNumber(formData.number, 'keepPlus');
 					delete formData.phoneType;
 
-					var userToSave = $.extend(true, {}, currentUser, { call_forward: formData});
+					var userToSave = $.extend(true, {}, currentUser, { call_forward: formData });
 
 					if(timeoutWarningBox.is(':visible')) {
 						args.openedTab = 'name';
@@ -1957,6 +2010,8 @@ define(function(require){
 				title: currentUser.extra.mapFeatures.call_forward.title,
 				position: ['center', 20]
 			});
+
+			popup.find(".monster-button").blur();
 		},
 
 		usersRenderFindMeFollowMe: function(params) {

@@ -547,7 +547,11 @@
 			"placeholder": "+14157283992",
 			"requireKeyPress": "Leave voicemails on forwarded numbers",
 			"title": "Call Forwarding",
-			"timeoutWarning": "In order to leave voicemails on forwarded numbers, your ringing timeout needs to be set to at least 30sec. By saving now, you will automatically be redirected to the user edition where you can update the ringing timeout."
+			"timeoutWarning": "In order to leave voicemails on forwarded numbers, your ringing timeout needs to be set to at least 30sec. By saving now, you will automatically be redirected to the user edition where you can update the ringing timeout.",
+			"__comment": ": Now add a mode for failover for call forward",
+			"__version": "4.0",
+			"failoverWarning": "In \"Failover Mode\", the call-forward settings will only apply when none of this user's devices are registered.",
+			"failover_title": "Call-Forwarding (Failover Mode)"
 		},
 		"callRecording": {
 			"title": "Inbound Call Recording",
