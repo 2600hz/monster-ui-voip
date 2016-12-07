@@ -656,6 +656,9 @@ define(function(require){
 								var dataForm = monster.ui.getFormData('form_user_creation'),
 									formattedData = self.usersFormatCreationData(dataForm);
 
+								$(this)
+									.prop({ disabled: 'true' });
+
 								self.usersCreate(formattedData, function(data) {
 									popup.dialog('close').remove();
 

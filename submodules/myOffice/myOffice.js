@@ -6,7 +6,19 @@ define(function(require){
 
 	var app = {
 
-		requests: {},
+		requests: {
+			'google.geocode.address': {
+				apiRoot: '//maps.googleapis.com/',
+				url: 'maps/api/geocode/json?address={zipCode}',
+				verb: 'GET',
+				generateError: false,
+				removeHeaders: [
+					'X-Kazoo-Cluster-ID',
+					'X-Auth-Token',
+					'Content-Type'
+				]
+			}
+		},
 
 		subscribe: {
 			'voip.myOffice.render': 'myOfficeRender',
@@ -908,12 +920,21 @@ define(function(require){
 			});
 
 			emergencyZipcodeInput.on('blur', function() {
-				$.getJSON('http://www.geonames.org/postalCodeLookupJSON?&country=US&callback=?', { postalcode: $(this).val() }, function(response) {
-					if (response && response.postalcodes.length && response.postalcodes[0].placeName) {
-						emergencyCityInput.val(response.postalcodes[0].placeName);
-						emergencyStateInput.val(response.postalcodes[0].adminName1);
-					}
-				});
+				var zipCode = $(this).val();
+
+				if (zipCode) {
+					self.myOfficeGetAddessFromZipCode({
+						data: {
+							zipCode: zipCode
+						},
+						success: function(results) {
+							if (!_.isEmpty(results)) {
+								emergencyCityInput.val(results[0].address_components[1].long_name);
+								emergencyStateInput.val(results[0].address_components[3].short_name);
+							}
+						}
+					});
+				}
 			});
 
 			popupTemplate.find('.save').on('click', function() {
@@ -1139,6 +1160,21 @@ define(function(require){
 				},
 				success: function(savedUser) {
 					callback && callback(savedUser.data);
+				}
+			});
+		},
+
+		myOfficeGetAddessFromZipCode: function(args) {
+			var self = this;
+
+			monster.request({
+				resource: 'google.geocode.address',
+				data: args.data,
+				success: function(data, status) {
+					args.hasOwnProperty('success') && args.success(data.results);
+				},
+				error: function(errorPayload, data, globalHandler) {
+					args.hasOwnProperty('error') ? args.error() : globalHandler(data, { generateError: true });
 				}
 			});
 		}
