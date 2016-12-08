@@ -2109,11 +2109,21 @@ define(function(require){
 								resource: 'media.get',
 								data: {
 									accountId: self.accountId,
-									mediaId: menu.media.greeting
+									mediaId: menu.media.greeting,
+									generateError: false
 								},
 								success: function(data, status) {
 									greeting = data.data;
 									showPopup();
+								},
+								error: function(data, status, globalHandler) {
+									if(data && data.error === '404') {
+										showPopup();
+										toastr.warning(self.i18n.active().strategy.greetingMissing);
+									}
+									else {
+										globalHandler(data, { generateError: true });
+									}
 								}
 							});
 						} else {
