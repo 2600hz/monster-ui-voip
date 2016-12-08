@@ -918,7 +918,11 @@
 			"info": "Customize your conference greeting message using our Text-to-Speech feature. Simply type your greeting message in the input field below.",
 			"mainConfMissing": "Your Main Conference could not be found.",
 			"tooltip": "Your Main Conference has a custom greeting message."
-		}
+		},
+
+		"__comment": "UI-2499: Handle case where greeting has been deleted",
+		"__version": "4.0",
+		"greetingMissing": "The greeting that was configured on this Virtual Receptionist is missing. Please setup a new greeting."
 	},
 
 	"callLogs": {
