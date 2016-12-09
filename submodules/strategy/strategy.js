@@ -1187,11 +1187,6 @@ define(function(require){
 												email: {
 													send_to: email
 												}
-											},
-											outbound: {
-												email: {
-													send_to: email
-												}
 											}
 										}
 									});
@@ -2584,11 +2579,6 @@ define(function(require){
 						owner_id: account.id,
 						notifications: {
 							inbound: {
-								email: {
-									send_to: args.data.email
-								}
-							},
-							outbound: {
 								email: {
 									send_to: args.data.email
 								}
