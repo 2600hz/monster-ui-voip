@@ -1104,8 +1104,8 @@ define(function(require){
 									self.strategyRefreshTemplate(parentContainer, strategyData);
 								});
 							};
-						if(mainFaxing.numbers.length <= 1
-						&& mainFaxing.numbers[0] === "undefinedfaxing") {
+
+						if(mainFaxing.numbers.length <= 1 && mainFaxing.numbers[0] === "undefinedfaxing") {
 							mainFaxing.numbers = [];
 						}
 						mainFaxing.numbers = mainFaxing.numbers.concat(numbers);
@@ -1113,8 +1113,11 @@ define(function(require){
 							updateCallflow();
 						}
 						else {
+							var email = window.prompt('Email address for the main faxbox');
+
 							self.strategyBuildFaxbox({
 								data: {
+									email: email,
 									number: mainFaxing.numbers[0]
 								},
 								success: function(data) {
@@ -1156,6 +1159,14 @@ define(function(require){
 				}
 
 				monster.pub('common.numbers.dialogSpare', args);
+			});
+
+			container.on('click', '.action-links .edit-email', function(e) {
+				event.preventDefault();
+
+				var email = window.prompt('Email address for the main faxbox');
+
+				console.log(email);
 			});
 
 			container.on('click', '.action-links .buy-link', function(e) {
@@ -2519,14 +2530,11 @@ define(function(require){
 
 			return results;
 		},
-
 		strategyBuildFaxbox: function(args) {
 			var self = this;
 
 			self.strategyGetAccount({
 				success: function(account) {
-					var email = account.contact && account.contact.technical && account.contact.technical.hasOwnProperty('email') ? account.contact.technical.email : undefined;
-
 					args.data = {
 						name: account.name + self.i18n.active().strategy.faxing.nameExtension,
 						caller_name: account.name,
@@ -2538,20 +2546,16 @@ define(function(require){
 						notifications: {
 							inbound: {
 								email: {
-									send_to: email
+									send_to: args.data.email
 								}
 							},
 							outbound: {
 								email: {
-									send_to: email
+									send_to: args.data.email
 								}
 							}
 						}
 					};
-
-					if(!email) {
-						delete args.data.notifications;
-					}
 
 					self.strategyCreateFaxbox(args);
 				}
