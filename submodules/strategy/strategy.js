@@ -1189,7 +1189,7 @@ define(function(require){
 												}
 											}
 										}
-									});
+									})
 								},
 								success: function(updatedFaxbox) {
 									callback(null, updatedFaxbox);
