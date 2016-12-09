@@ -1170,7 +1170,7 @@ define(function(require){
 						function(callback) {
 							self.strategyGetFaxbox({
 								data: {
-									faxboxId: strategyData.callflow.MainFaxing.flow.data.id
+									faxboxId: strategyData.callflows.MainFaxing.flow.data.id
 								},
 								success: function(faxbox) {
 									callback(null, faxbox);
