@@ -185,7 +185,7 @@ define(function(require){
 						self.strategyListDirectories(function (directories) {
 							callback(null, directories);
 						});
-					}
+					},
 				},
 				function(err, results) {
 					var hasMainNumber = (results.callflows["MainCallflow"].numbers.length > 1),
@@ -1166,7 +1166,50 @@ define(function(require){
 
 				var email = window.prompt('Email address for the main faxbox');
 
-				console.log(email);
+				monster.waterfall([
+						function(callback) {
+							self.callApi({
+								resource: 'faxbox.get',
+								data: {
+									accountId: self.accountId,
+									faxboxId: strategyData.callflows.MainFaxing.flow.data.id
+								},
+								success: function(data, status) {
+									callback(null, data.data);
+								}
+							});
+						},
+						function(faxboxData, callback) {
+							self.callApi({
+								resource: 'faxbox.update',
+								data: {
+									accountId: self.accountId,
+									faxboxId: faxboxData.id,
+									data: $.extend(true, {}, faxboxData, {
+										notifications: {
+											inbound: {
+												email: {
+													send_to: email
+												}
+											},
+											outbound: {
+												email: {
+													send_to: email
+												}
+											}
+										}
+									})
+								},
+								success: function(data, status) {
+									callback(null, data.data);
+								}
+							});
+						}
+					],
+					function(err, results) {
+						toastr.success('Main Fabox Email Successfully Changed');
+					}
+				);
 			});
 
 			container.on('click', '.action-links .buy-link', function(e) {
