@@ -1168,22 +1168,18 @@ define(function(require){
 
 				monster.waterfall([
 						function(callback) {
-							self.callApi({
-								resource: 'faxbox.get',
+							self.strategyGetFaxbox({
 								data: {
-									accountId: self.accountId,
-									faxboxId: strategyData.callflows.MainFaxing.flow.data.id
+									faxboxId: strategyData.callflow.MainFaxing.flow.data.id
 								},
-								success: function(data, status) {
-									callback(null, data.data);
+								success: function(faxbox) {
+									callback(null, faxbox);
 								}
 							});
 						},
 						function(faxboxData, callback) {
-							self.callApi({
-								resource: 'faxbox.update',
+							self.strategyUpdateFaxbox({
 								data: {
-									accountId: self.accountId,
 									faxboxId: faxboxData.id,
 									data: $.extend(true, {}, faxboxData, {
 										notifications: {
@@ -1198,10 +1194,10 @@ define(function(require){
 												}
 											}
 										}
-									})
+									});
 								},
-								success: function(data, status) {
-									callback(null, data.data);
+								success: function(updatedFaxbox) {
+									callback(null, updatedFaxbox);
 								}
 							});
 						}
@@ -3435,6 +3431,23 @@ define(function(require){
 			});
 		},
 
+		strategyGetFaxbox: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'faxbox.get',
+				data: $.extend(true, {
+					accountId: self.accountId
+				}, args.data),
+				success: function(data, status) {
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(data, status) {
+					args.hasOwnProperty('error') && args.error();
+				}
+			});
+		},
+
 		strategyCreateFaxbox: function(args) {
 			var self = this;
 
@@ -3444,6 +3457,23 @@ define(function(require){
 					accountId: self.accountId,
 					data: args.data
 				},
+				success: function(data, status) {
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(data, status) {
+					args.hasOwnProperty('error') && args.error();
+				}
+			});
+		},
+
+		strategyUpdateFaxbox: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'faxbox.update',
+				data: $.extend(true, {
+					accountId: self.accountId
+				}, args.data),
 				success: function(data, status) {
 					args.hasOwnProperty('success') && args.success(data.data);
 				},
