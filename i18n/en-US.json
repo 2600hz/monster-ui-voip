@@ -967,7 +967,8 @@
 		"actions": {
 			"report": "Report Call",
 			"details": "Technical Details"
-		}
+		},
+		"downloadTooltip": "In \"Custom\" Mode, you'll need to click on \"Filter\" before clicking on download." 
 	},
 
 	"myOffice": {
