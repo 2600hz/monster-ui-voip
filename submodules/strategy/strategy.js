@@ -1113,18 +1113,53 @@ define(function(require){
 							updateCallflow();
 						}
 						else {
-							var email = window.prompt('Email address for the main faxbox');
+							var template = $(monster.template(self, 'strategy-popupEditFaxbox')),
+								popup = monster.ui.dialog(template, {
+									title: 'Create Main Faxbox',
+									position: ['center', 20],
+									hideClose: true
+								});
 
-							self.strategyBuildFaxbox({
-								data: {
-									email: email,
-									number: mainFaxing.numbers[0]
-								},
-								success: function(data) {
-									mainFaxing.flow.data.id = data.id;
-									updateCallflow();
-								}
-							});
+							template
+								.find('.cancel-link')
+									.on('click', function(event) {
+										event.preventDefault();
+
+										popup.dialog('close').remove();
+									});
+
+							template
+								.find('.save')
+									.on('click', function(event) {
+										event.preventDefault();
+
+										var $form = template.find('#faxbox_form'),
+											email = monster.ui.getFormData('faxbox_form').email;
+
+										monster.ui.validate($form, {
+											rules: {
+												email: {
+													required: true,
+													email: true
+												}
+											}
+										});
+
+										if (monster.ui.valid($form)) {
+											popup.dialog('close').remove();
+
+											self.strategyBuildFaxbox({
+												data: {
+													email: email,
+													number: mainFaxing.numbers[0]
+												},
+												success: function(data) {
+													mainFaxing.flow.data.id = data.id;
+													updateCallflow();
+												}
+											});
+										}
+									});
 						}
 					}
 				},
@@ -1164,8 +1199,6 @@ define(function(require){
 			container.on('click', '.action-links .edit-email', function(e) {
 				event.preventDefault();
 
-				var email = window.prompt('Email address for the main faxbox');
-
 				monster.waterfall([
 						function(callback) {
 							self.strategyGetFaxbox({
@@ -1173,7 +1206,55 @@ define(function(require){
 									faxboxId: strategyData.callflows.MainFaxing.flow.data.id
 								},
 								success: function(faxbox) {
-									callback(null, faxbox);
+									var template = $(monster.template(self, 'strategy-popupEditFaxbox', {
+											email: faxbox.notifications.inbound.email.send_to
+										})),
+										popup = monster.ui.dialog(template, {
+											title: 'Edit Main Faxbox',
+											position: ['center', 20]
+										});
+
+									template
+										.find('.cancel-link')
+											.on('click', function(event) {
+												event.preventDefault();
+
+												popup.dialog('close').remove();
+
+												callback(true, null);
+											});
+
+									template
+										.find('.save')
+											.on('click', function(event) {
+												event.preventDefault();
+
+												var $form = template.find('#faxbox_form'),
+													email = monster.ui.getFormData('faxbox_form').email;
+
+												monster.ui.validate($form, {
+													rules: {
+														email: {
+															required: true,
+															email: true
+														}
+													}
+												});
+
+												if (monster.ui.valid($form)) {
+													popup.dialog('close').remove();
+
+													callback(null, _.extend(faxbox, {
+														notifications: {
+															inbound: {
+																email: {
+																	send_to: email
+																}
+															}
+														}
+													}));
+												}
+											});
 								}
 							});
 						},
@@ -1181,15 +1262,7 @@ define(function(require){
 							self.strategyUpdateFaxbox({
 								data: {
 									faxboxId: faxboxData.id,
-									data: $.extend(true, {}, faxboxData, {
-										notifications: {
-											inbound: {
-												email: {
-													send_to: email
-												}
-											}
-										}
-									})
+									data: faxboxData
 								},
 								success: function(updatedFaxbox) {
 									callback(null, updatedFaxbox);
@@ -1198,7 +1271,9 @@ define(function(require){
 						}
 					],
 					function(err, results) {
-						toastr.success('Main Fabox Email Successfully Changed');
+						if (!err) {
+							toastr.success('Main Fabox Email Successfully Changed');
+						}
 					}
 				);
 			});
