@@ -185,7 +185,7 @@ define(function(require){
 						self.strategyListDirectories(function (directories) {
 							callback(null, directories);
 						});
-					}
+					},
 				},
 				function(err, results) {
 					var hasMainNumber = (results.callflows["MainCallflow"].numbers.length > 1),
@@ -1104,8 +1104,8 @@ define(function(require){
 									self.strategyRefreshTemplate(parentContainer, strategyData);
 								});
 							};
-						if(mainFaxing.numbers.length <= 1
-						&& mainFaxing.numbers[0] === "undefinedfaxing") {
+
+						if(mainFaxing.numbers.length <= 1 && mainFaxing.numbers[0] === "undefinedfaxing") {
 							mainFaxing.numbers = [];
 						}
 						mainFaxing.numbers = mainFaxing.numbers.concat(numbers);
@@ -1113,15 +1113,53 @@ define(function(require){
 							updateCallflow();
 						}
 						else {
-							self.strategyBuildFaxbox({
-								data: {
-									number: mainFaxing.numbers[0]
-								},
-								success: function(data) {
-									mainFaxing.flow.data.id = data.id;
-									updateCallflow();
-								}
-							});
+							var template = $(monster.template(self, 'strategy-popupEditFaxbox')),
+								popup = monster.ui.dialog(template, {
+									title: self.i18n.active().strategy.popupEditFaxbox.titles.create,
+									position: ['center', 20],
+									hideClose: true
+								});
+
+							template
+								.find('.cancel-link')
+									.on('click', function(event) {
+										event.preventDefault();
+
+										popup.dialog('close').remove();
+									});
+
+							template
+								.find('.save')
+									.on('click', function(event) {
+										event.preventDefault();
+
+										var $form = template.find('#faxbox_form'),
+											email = monster.ui.getFormData('faxbox_form').email;
+
+										monster.ui.validate($form, {
+											rules: {
+												email: {
+													required: true,
+													email: true
+												}
+											}
+										});
+
+										if (monster.ui.valid($form)) {
+											popup.dialog('close').remove();
+
+											self.strategyBuildFaxbox({
+												data: {
+													email: email,
+													number: mainFaxing.numbers[0]
+												},
+												success: function(data) {
+													mainFaxing.flow.data.id = data.id;
+													updateCallflow();
+												}
+											});
+										}
+									});
 						}
 					}
 				},
@@ -1156,6 +1194,88 @@ define(function(require){
 				}
 
 				monster.pub('common.numbers.dialogSpare', args);
+			});
+
+			container.on('click', '.action-links .edit-email', function(e) {
+				event.preventDefault();
+
+				monster.waterfall([
+						function(callback) {
+							self.strategyGetFaxbox({
+								data: {
+									faxboxId: strategyData.callflows.MainFaxing.flow.data.id
+								},
+								success: function(faxbox) {
+									var template = $(monster.template(self, 'strategy-popupEditFaxbox', {
+											email: faxbox.notifications.inbound.email.send_to
+										})),
+										popup = monster.ui.dialog(template, {
+											title: self.i18n.active().strategy.popupEditFaxbox.titles.edit,
+											position: ['center', 20]
+										});
+
+									template
+										.find('.cancel-link')
+											.on('click', function(event) {
+												event.preventDefault();
+
+												popup.dialog('close').remove();
+
+												callback(true, null);
+											});
+
+									template
+										.find('.save')
+											.on('click', function(event) {
+												event.preventDefault();
+
+												var $form = template.find('#faxbox_form'),
+													email = monster.ui.getFormData('faxbox_form').email;
+
+												monster.ui.validate($form, {
+													rules: {
+														email: {
+															required: true,
+															email: true
+														}
+													}
+												});
+
+												if (monster.ui.valid($form)) {
+													popup.dialog('close').remove();
+
+													callback(null, _.extend(faxbox, {
+														notifications: {
+															inbound: {
+																email: {
+																	send_to: email
+																}
+															}
+														}
+													}));
+												}
+											});
+								}
+							});
+						},
+						function(faxboxData, callback) {
+							self.strategyUpdateFaxbox({
+								data: {
+									faxboxId: faxboxData.id,
+									data: faxboxData
+								},
+								success: function(updatedFaxbox) {
+									callback(null, updatedFaxbox);
+								}
+							});
+						}
+					],
+					function(err, results) {
+						if (!err) {
+							toastr.success('Main Fabox Email Successfully Changed');
+						}
+					}
+				);
 			});
 
 			container.on('click', '.action-links .buy-link', function(e) {
@@ -2519,14 +2639,11 @@ define(function(require){
 
 			return results;
 		},
-
 		strategyBuildFaxbox: function(args) {
 			var self = this;
 
 			self.strategyGetAccount({
 				success: function(account) {
-					var email = account.contact && account.contact.technical && account.contact.technical.hasOwnProperty('email') ? account.contact.technical.email : undefined;
-
 					args.data = {
 						name: account.name + self.i18n.active().strategy.faxing.nameExtension,
 						caller_name: account.name,
@@ -2538,20 +2655,11 @@ define(function(require){
 						notifications: {
 							inbound: {
 								email: {
-									send_to: email
-								}
-							},
-							outbound: {
-								email: {
-									send_to: email
+									send_to: args.data.email
 								}
 							}
 						}
 					};
-
-					if(!email) {
-						delete args.data.notifications;
-					}
 
 					self.strategyCreateFaxbox(args);
 				}
@@ -3388,6 +3496,23 @@ define(function(require){
 			});
 		},
 
+		strategyGetFaxbox: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'faxbox.get',
+				data: $.extend(true, {
+					accountId: self.accountId
+				}, args.data),
+				success: function(data, status) {
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(data, status) {
+					args.hasOwnProperty('error') && args.error();
+				}
+			});
+		},
+
 		strategyCreateFaxbox: function(args) {
 			var self = this;
 
@@ -3397,6 +3522,23 @@ define(function(require){
 					accountId: self.accountId,
 					data: args.data
 				},
+				success: function(data, status) {
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(data, status) {
+					args.hasOwnProperty('error') && args.error();
+				}
+			});
+		},
+
+		strategyUpdateFaxbox: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'faxbox.update',
+				data: $.extend(true, {
+					accountId: self.accountId
+				}, args.data),
 				success: function(data, status) {
 					args.hasOwnProperty('success') && args.success(data.data);
 				},

@@ -908,7 +908,8 @@
 		"__version": "3.22",
 		"faxing": {
 			"nameExtension": "'s Main Faxbox",
-			"headerExtension": " Fax Printer"
+			"headerExtension": " Fax Printer",
+			"editFaxbox": "Edit Faxbox"
 		},
 		"__comment": "UI-1774: Adding custom greetings to conference",
 		"__version": "3.22",
@@ -922,7 +923,20 @@
 
 		"__comment": "UI-2499: Handle case where greeting has been deleted",
 		"__version": "4.0",
-		"greetingMissing": "The greeting that was configured on this Virtual Receptionist is missing. Please setup a new greeting."
+		"greetingMissing": "The greeting that was configured on this Virtual Receptionist is missing. Please setup a new greeting.",
+
+		"__comment": "",
+		"__version": "3.22",
+		"popupEditFaxbox": {
+			"titles": {
+				"create": "Create Main Faxbox",
+				"edit": "Edit Main Faxbox"
+			},
+			"text": "Main Faxbox",
+			"labels": {
+				"inbound": "Inbound Notification Email"
+			}
+		}
 	},
 
 	"callLogs": {

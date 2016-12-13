@@ -1,0 +1,30 @@
+<div class="monster-feature-popup-container" data-feature="faxing">
+	<div class="feature-popup-title">
+		<div class="feature-fa-wrapper">
+			<i class="icon-telicon-fax"></i>
+		</div>
+		{{i18n.strategy.popupEditFaxbox.text}}
+	</div>
+
+	<div class="content">
+		<form class="form-horizontal" id="faxbox_form">
+			<div class="contorl-group">
+				<label for="email" class="control-label">
+					{{i18n.strategy.popupEditFaxbox.labels.inbound}}
+				</label>
+				<div class="controls">
+					<input type="text" id="email" name="email" value="{{email}}">
+				</div>
+			</div>
+		</form>
+	</div>
+
+	<div class="actions clearfix">
+		<div class="pull-right">
+		{{#if email}}
+			<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
+		{{/if}}
+			<button type="button" class="monster-button monster-button-success save">{{ i18n.saveChanges }}</button>
+		</div>
+	</div>
+</div>
