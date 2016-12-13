@@ -1115,7 +1115,7 @@ define(function(require){
 						else {
 							var template = $(monster.template(self, 'strategy-popupEditFaxbox')),
 								popup = monster.ui.dialog(template, {
-									title: 'Create Main Faxbox',
+									title: self.i18n.active().strategy.popupEditFaxbox.titles.create,
 									position: ['center', 20],
 									hideClose: true
 								});
@@ -1210,7 +1210,7 @@ define(function(require){
 											email: faxbox.notifications.inbound.email.send_to
 										})),
 										popup = monster.ui.dialog(template, {
-											title: 'Edit Main Faxbox',
+											title: self.i18n.active().strategy.popupEditFaxbox.titles.edit,
 											position: ['center', 20]
 										});
 
