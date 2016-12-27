@@ -319,7 +319,7 @@ define(function(require){
 			var self = this,
 				result = [],
 				formatCdr = function(cdr) {
-					var date = monster.util.gregorianToDate(cdr.timestamp),
+					var date = cdr.hasOwnProperty('channel_created_time') ? monster.util.unixToDate(cdr.channel_created_time, true) : monster.util.gregorianToDate(cdr.timestamp),
 						shortDate = monster.util.toFriendlyDate(date, 'shortDate'),
 						time = monster.util.toFriendlyDate(date, 'time'),
 						durationMin = parseInt(cdr.duration_seconds/60).toString(),
@@ -338,7 +338,7 @@ define(function(require){
 						}
 					}
 
-					return {
+					var call = {
 						id: cdr.id,
 						callId: cdr.call_id,
 						timestamp: cdr.timestamp,
@@ -368,15 +368,24 @@ define(function(require){
 								  + "%0D%0AOther Leg Call ID: " + (cdr.other_leg_call_id || "")
 								  + "%0D%0AHandling Server: " + (cdr.media_server || "")
 					};
+
+					if(cdr.hasOwnProperty('channel_created_time')) {
+						call.channelCreatedTime = cdr.channel_created_time;
+					}
+
+					return call;
 				};
 
 			_.each(cdrs, function(v) {
 				result.push(formatCdr(v));
 			});
 
+			// In this automagic function... if field doesn't have channelCreateTime, it's because it's a "Main Leg" (legs listed on the first listing, not details)
+			// if it's a "main leg" we sort by descending timestamp.
+			// if it's a "detail leg", then it has a channelCreatedTime attribute set, and we sort on this as it's more precise. We sort it ascendingly so the details of the calls go from top to bottom in the UI
 			result.sort(function(a, b) {
-				return b.timestamp - a.timestamp;
-			})
+				return (a.hasOwnProperty('channelCreatedTime') && b.hasOwnProperty('channelCreatedTime')) ? (a.channelCreatedTime > b.channelCreatedTime ? 1 : -1) : (a.timestamp > b.timestamp ? -1 : 1);
+			});
 
 			return result;
 		},
