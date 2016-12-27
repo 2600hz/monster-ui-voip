@@ -32,6 +32,7 @@
 
 #call_logs_container .fixed-ranges-date {
 	margin-top: 10px;
+	margin-right: 30px;
 }
 
 #call_logs_container .fixed-ranges-date .highlight-date {
@@ -42,6 +43,7 @@
 
 #call_logs_container .custom-range {
 	display: none;
+	margin-right: 30px;
 }
 
 #call_logs_container .custom-range.active {

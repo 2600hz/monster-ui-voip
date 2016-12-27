@@ -42,6 +42,7 @@ define(function(require){
 
 				dataTemplate.cdrs = cdrs;
 				template = $(monster.template(self, 'callLogs-layout', dataTemplate));
+				monster.ui.tooltips(template);
 
 				if(cdrs && cdrs.length) {
 					var cdrsTemplate = $(monster.template(self, 'callLogs-cdrsList', {cdrs: cdrs, showReport: monster.config.whitelabel.callReportEmail ? true : false}));
