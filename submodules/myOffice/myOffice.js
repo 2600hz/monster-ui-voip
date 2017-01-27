@@ -929,8 +929,9 @@ define(function(require){
 						},
 						success: function(results) {
 							if (!_.isEmpty(results)) {
+								var length = results[0].address_components.length;
 								emergencyCityInput.val(results[0].address_components[1].long_name);
-								emergencyStateInput.val(results[0].address_components[3].short_name);
+								emergencyStateInput.val(results[0].address_components[length-2].short_name);
 							}
 						}
 					});
