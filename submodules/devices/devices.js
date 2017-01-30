@@ -324,7 +324,7 @@ define(function(require){
 						templateDevice
 							.find(section.concat(group, value))
 								.addClass('active')
-							.find('[name="provision.feature_keys[' + key + '].value"]')
+							.find('[name="provision.keys.' + value.id + '[' + key + '].value"]')
 								.val(val.value);
 					});
 				});
