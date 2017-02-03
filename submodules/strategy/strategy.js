@@ -387,14 +387,16 @@ define(function(require){
 								numbers = callflow.numbers,
 								templateData = {
 									numbers: $.map(numbers, function(val, key) {
-										if(val!=="0" && accountNumbers.hasOwnProperty(val)) {
+										if(val!=="0") {
 											var ret = {
 												number: {
 													id: val
 												}
 											};
 
-											ret.number = $.extend(true, accountNumbers[val], ret.number);
+											if(accountNumbers.hasOwnProperty(val)) {
+												ret.number = $.extend(true, accountNumbers[val], ret.number);
+											}
 
 											return ret;
 										}
@@ -3328,10 +3330,14 @@ define(function(require){
 				resource: 'numbers.get',
 				data: {
 					accountId: self.accountId,
-					phoneNumber: encodeURIComponent(phoneNumber)
+					phoneNumber: encodeURIComponent(phoneNumber),
+					generateError: false
 				},
 				success: function(data, status) {
 					callback(data.data);
+				},
+				error: function(data, status) {
+					callback({});
 				}
 			});
 		},
