@@ -318,13 +318,13 @@ define(function(require){
 					var section = '.tabs-section[data-section="' + value.type + '"] ';
 
 					_.each(value.data, function(val, key) {
-						var group = '.control-group[data-id="' + key + '"] ',
-							value = '.feature-key-value[data-type="' + val.type + '"]';
+						var groupSelector = '.control-group[data-id="' + key + '"] ',
+							valueSelector = '.feature-key-value[data-type="' + val.type + '"]';
 
 						templateDevice
-							.find(section.concat(group, value))
+							.find(section.concat(groupSelector, valueSelector))
 								.addClass('active')
-							.find('[name="provision.feature_keys[' + key + '].value"]')
+							.find('[name="provision.keys.' + value.id + '[' + key + '].value"]')
 								.val(val.value);
 					});
 				});
