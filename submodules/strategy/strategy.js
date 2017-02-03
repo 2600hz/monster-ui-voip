@@ -387,16 +387,14 @@ define(function(require){
 								numbers = callflow.numbers,
 								templateData = {
 									numbers: $.map(numbers, function(val, key) {
-										if(val!=="0") {
+										if(val!=="0" && accountNumbers.hasOwnProperty(val)) {
 											var ret = {
 												number: {
 													id: val
 												}
 											};
 
-											if(accountNumbers.hasOwnProperty(val)) {
-												ret.number = $.extend(true, accountNumbers[val], ret.number);
-											}
+											ret.number = $.extend(true, accountNumbers[val], ret.number);
 
 											return ret;
 										}
