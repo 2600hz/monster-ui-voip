@@ -3070,7 +3070,7 @@ define(function(require){
 					accountId: self.accountId,
 					data: {
 						filters: {
-							'filter_mobile.mdn': mdn
+							'filter_mobile.mdn': encodeURIComponent(mdn)
 						}
 					}
 				},
@@ -3429,7 +3429,7 @@ define(function(require){
 				resource: 'callflow.searchByNumber',
 				data: {
 					accountId: self.accountId,
-					value: encodeURIComponent('+1' + phoneNumber),
+					value: encodeURIComponent(phoneNumber),
 					filter_owner_id: userId,
 					filter_type: 'mobile'
 				},
