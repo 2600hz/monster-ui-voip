@@ -653,16 +653,20 @@ define(function(require){
 
 						userTemplate.find('#create_user').on('click', function() {
 							if(monster.ui.valid(userTemplate.find('#form_user_creation'))) {
-								var dataForm = monster.ui.getFormData('form_user_creation'),
+								var $this = $(this),
+									dataForm = monster.ui.getFormData('form_user_creation'),
 									formattedData = self.usersFormatCreationData(dataForm);
 
-								$(this)
-									.prop({ disabled: 'true' });
+								$this
+									.prop('disabled', true);
 
 								self.usersCreate(formattedData, function(data) {
 									popup.dialog('close').remove();
 
 									self.usersRender({ userId: data.user.id });
+								}, function() {
+									$this
+										.prop('disabled', false);
 								});
 							}
 						});
@@ -3155,7 +3159,7 @@ define(function(require){
 			});
 		},
 
-		usersCreate: function(data, callback) {
+		usersCreate: function(data, success, error) {
 			var self = this;
 
 			self.callApi({
@@ -3178,14 +3182,17 @@ define(function(require){
 						self.usersCreateCallflow(data.callflow, function(_dataCF) {
 							if(data.extra.includeInDirectory) {
 								self.usersAddUserToMainDirectory(_dataUser.data, _dataCF.id, function(dataDirectory) {
-									callback(data);
+									success(data);
 								});
 							}
 							else {
-								callback(data);
+								success(data);
 							}
 						});
 					});
+				},
+				error: function() {
+					error();
 				}
 			});
 		},
