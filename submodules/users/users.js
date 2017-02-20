@@ -1,7 +1,6 @@
-define(function(require){
+define(function(require) {
 	var $ = require('jquery'),
 		_ = require('underscore'),
-		chosen = require('chosen'),
 		monster = require('monster'),
 		timezone = require('monster-timezone'),
 		toastr = require('toastr');
@@ -54,7 +53,7 @@ define(function(require){
 						container: 'body'
 					}
 				});
-				template.find('[data-toggle="popover"]').popover({ container: 'body'});
+				template.find('[data-toggle="popover"]').popover({ container: 'body' });
 
 				self.usersBindEvents(template, parent, dataTemplate);
 
@@ -64,13 +63,13 @@ define(function(require){
 
 				self.usersCheckWalkthrough();
 
-				if(_userId) {
+				if (_userId) {
 					var cells = parent.find('.grid-row[data-id=' + _userId + '] .grid-cell');
 
 					monster.ui.highlight(cells);
 				}
 
-				if ( dataTemplate.users.length === 0) {
+				if (dataTemplate.users.length === 0) {
 					parent.find('.grid-row.title').css('display', 'none');
 					parent.find('.no-users-row').css('display', 'block');
 				} else {
@@ -78,8 +77,8 @@ define(function(require){
 					parent.find('.no-users-row').css('display', 'none');
 				}
 
-				if(_userId && _openedTab) {
-					template.find('.grid-row[data-id="'+ _userId +'"] .grid-cell[data-type="' + _openedTab + '"]').click();
+				if (_userId && _openedTab) {
+					template.find('.grid-row[data-id="' + _userId + '"] .grid-cell[data-type="' + _openedTab + '"]').click();
 				}
 
 				callback && callback();
@@ -100,7 +99,7 @@ define(function(require){
 			var self = this,
 				flag = self.uiFlags.user.get('showUsersWalkthrough');
 
-			if(flag !== false) {
+			if (flag !== false) {
 				callback && callback();
 			}
 		},
@@ -118,7 +117,7 @@ define(function(require){
 			var self = this,
 				mainTemplate = $('#voip_container'),
 				rowFirstUser = mainTemplate.find('.grid-row:not(.title):first'),
-				steps =  [
+				steps = [
 					{
 						element: mainTemplate.find('.add-user')[0],
 						intro: self.i18n.active().users.walkthrough.steps['1'],
@@ -226,57 +225,56 @@ define(function(require){
 					}
 				};
 
-			if(!('extra' in dataUser)) {
+			if (!('extra' in dataUser)) {
 				dataUser.extra = formattedUser;
 			}
 
 			dataUser.extra.countFeatures = 0;
 			_.each(dataUser.features, function(v) {
-				if(v in dataUser.extra.mapFeatures) {
+				if (v in dataUser.extra.mapFeatures) {
 					dataUser.extra.countFeatures++;
 					dataUser.extra.mapFeatures[v].active = true;
 				}
 			});
 
-			if(dataUser.extra.countFeatures > 0) {
+			if (dataUser.extra.countFeatures > 0) {
 				dataUser.extra.hasFeatures = true;
 			}
 
-			if(_mainDirectory) {
+			if (_mainDirectory) {
 				dataUser.extra.mainDirectoryId = _mainDirectory.id;
 
-				if('directories' in dataUser && _mainDirectory.id in dataUser.directories) {
+				if ('directories' in dataUser && _mainDirectory.id in dataUser.directories) {
 					dataUser.extra.includeInDirectory = true;
-				}
-				else {
+				} else {
 					dataUser.extra.includeInDirectory = false;
 				}
 			}
 
-			if(_mainCallflow) {
+			if (_mainCallflow) {
 				dataUser.extra.mainCallflowId = _mainCallflow.id;
 
-				if('flow' in _mainCallflow) {
+				if ('flow' in _mainCallflow) {
 					var flow = _mainCallflow.flow,
 						module = 'user';
 
-					if(dataUser.features.indexOf('find_me_follow_me') >= 0) {
+					if (dataUser.features.indexOf('find_me_follow_me') >= 0) {
 						module = 'ring_group';
 						dataUser.extra.groupTimeout = true;
 					}
 
-					while(flow.module != module && '_' in flow.children) {
-						flow = flow.children['_'];
+					while (flow.module !== module && '_' in flow.children) {
+						flow = flow.children._;
 					}
 					dataUser.extra.ringingTimeout = flow.data.timeout;
 				}
 			}
 
-			if(_vmbox) {
+			if (_vmbox) {
 				dataUser.extra.vmbox = _vmbox;
 			}
 
-			if(!_.isEmpty(_vmbox) && !_.isEmpty(_vmboxes)) {
+			if (!_.isEmpty(_vmbox) && !_.isEmpty(_vmboxes)) {
 				var i = _vmboxes.indexOf(_vmbox.mailbox);
 
 				_vmboxes.splice(i, 1);
@@ -300,7 +298,7 @@ define(function(require){
 				};
 
 			_.each(dataUser.extra.listExtensions, function(extension) {
-				if(dataUser.hasOwnProperty('presence_id') && dataUser.presence_id === extension) {
+				if (dataUser.hasOwnProperty('presence_id') && dataUser.presence_id === extension) {
 					hasValidPresenceID = true;
 				}
 
@@ -308,12 +306,12 @@ define(function(require){
 			});
 
 			// Sort it from lower number to greater number
-			dataUser.extra.presenceIdOptions.sort(function(a,b) {
+			dataUser.extra.presenceIdOptions.sort(function(a, b) {
 				return a.key > b.key ? 1 : -1;
 			});
 
 			// If they don't have a valid Presence ID, then we add the "Unset" option
-			if(!hasValidPresenceID) {
+			if (!hasValidPresenceID) {
 				dataUser.extra.presenceIdOptions.unshift({ key: 'unset', value: self.i18n.active().users.editionForm.noPresenceID });
 			}
 
@@ -333,43 +331,41 @@ define(function(require){
 			});
 
 			_.each(data.callflows, function(callflow) {
-				if(callflow.type !== 'faxing') {
+				if (callflow.type !== 'faxing') {
 					var userId = callflow.owner_id;
 
 					_.each(callflow.numbers, function(number) {
-						if(number && number.length < 7) {
+						if (number && number.length < 7) {
 							dataTemplate.existingExtensions.push(number);
 						}
 					});
 
-					if(userId in mapUsers) {
+					if (userId in mapUsers) {
 						var user = mapUsers[userId];
 
 						//User can only have one phoneNumber and one extension displayed with this code
 						_.each(callflow.numbers, function(number) {
-							if(number.length < 7) {
+							if (number.length < 7) {
 								user.extra.listExtensions.push(number);
-							}
-							else {
+							} else {
 								user.extra.listCallerId.push(number);
 
 								user.extra.listNumbers.push(number);
 
-								if(user.extra.phoneNumber === '') {
+								if (user.extra.phoneNumber === '') {
 									user.extra.phoneNumber = number;
-								}
-								else {
+								} else {
 									user.extra.additionalNumbers++;
 								}
 							}
 						});
 
-						// The additional extensions show how many more extensions than 1 a user has. 
+						// The additional extensions show how many more extensions than 1 a user has.
 						// So if the user has at least 1 extension, then we count how many he has minus the one we already display, otherwise we display 0.
 						user.extra.additionalExtensions = user.extra.listExtensions.length >= 1 ? user.extra.listExtensions.length - 1 : 0;
 
 						// If the main extension hasn't been defined because the presence_id isn't set, just pick the first extension
-						if(user.extra.extension === '' && user.extra.listExtensions.length > 0) {
+						if (user.extra.extension === '' && user.extra.listExtensions.length > 0) {
 							user.extra.extension = user.extra.listExtensions[0];
 						}
 					}
@@ -381,11 +377,11 @@ define(function(require){
 			_.each(data.devices, function(device) {
 				var userId = device.owner_id;
 
-				if(userId in mapUsers) {
-					var isRegistered = _.find(data.deviceStatus, function(status){ return (status.device_id === device.id && status.registered === true); }) ? true : false;
+				if (userId in mapUsers) {
+					var isRegistered = _.find(data.deviceStatus, function(status) { return (status.device_id === device.id && status.registered === true); }) ? true : false;
 
-					if(mapUsers[userId].extra.devices.length >= 2) {
-						if(mapUsers[userId].extra.additionalDevices === 0) {
+					if (mapUsers[userId].extra.devices.length >= 2) {
+						if (mapUsers[userId].extra.additionalDevices === 0) {
 							mapUsers[userId].extra.additionalDevices = {
 								count: 0,
 								tooltip: ''
@@ -393,17 +389,17 @@ define(function(require){
 						}
 
 						mapUsers[userId].extra.additionalDevices.count++;
-						mapUsers[userId].extra.additionalDevices.tooltip += '<i class=\"device-popover-icon '+self.deviceIcons[device.device_type]+(isRegistered?' monster-green':' monster-red')+'\"></i>'
-							                                                 + device.name + ' (' + device.device_type.replace('_', ' ') + ')<br>';
+						mapUsers[userId].extra.additionalDevices.tooltip += '<i class="device-popover-icon ' + self.deviceIcons[device.device_type] + (isRegistered ? ' monster-green' : ' monster-red') + '"></i>'
+																			+ device.name + ' (' + device.device_type.replace('_', ' ') + ')<br>';
 					}
 
 					var deviceDataToTemplate = {
-							id: device.id,
-							name: device.name + ' (' + device.device_type.replace('_', ' ') + ')',
-							type: device.device_type,
-							registered: isRegistered,
-							icon: self.deviceIcons[device.device_type]
-						};
+						id: device.id,
+						name: device.name + ' (' + device.device_type.replace('_', ' ') + ')',
+						type: device.device_type,
+						registered: isRegistered,
+						icon: self.deviceIcons[device.device_type]
+					};
 
 					if (device.device_type === 'mobile') {
 						deviceDataToTemplate.mobile = device.mobile;
@@ -457,7 +453,6 @@ define(function(require){
 
 		usersBindEvents: function(template, parent, data) {
 			var self = this,
-				currentNumberSearch = '',
 				currentUser,
 				currentCallflow,
 				existingExtensions = data.existingExtensions,
@@ -466,29 +461,25 @@ define(function(require){
 				extraSpareNumbers,
 				unassignedDevices,
 				toastrMessages = self.i18n.active().users.toastrMessages,
-				mainDirectoryId,
-				mainCallflowId,
 				listUsers = data,
 				renderFindMeFollowMeFeature = function(featureCallback) {
 					monster.parallel({
-							userDevices: function(callback) {
-								self.usersListDeviceUser(currentUser.id, function(devices) {
-									callback(null, devices);
-								});
-							},
-							userCallflow: function(callback) {
-								self.usersGetMainCallflow(currentUser.id, function(callflow) {
-									callback(null, callflow);
-								});
-							}
+						userDevices: function(callback) {
+							self.usersListDeviceUser(currentUser.id, function(devices) {
+								callback(null, devices);
+							});
 						},
-						function(error, results) {
-							self.usersRenderFindMeFollowMe($.extend(true, results, { currentUser: currentUser, saveCallback: featureCallback }));
+						userCallflow: function(callback) {
+							self.usersGetMainCallflow(currentUser.id, function(callflow) {
+								callback(null, callflow);
+							});
 						}
-					);
+					}, function(error, results) {
+						self.usersRenderFindMeFollowMe($.extend(true, results, { currentUser: currentUser, saveCallback: featureCallback }));
+					});
 				};
 
-			setTimeout(function() { template.find('.search-query').focus() });
+			setTimeout(function() { template.find('.search-query').focus(); });
 
 			template.find('.grid-row:not(.title) .grid-cell').on('click', function() {
 				var cell = $(this),
@@ -496,11 +487,11 @@ define(function(require){
 					row = cell.parents('.grid-row'),
 					userId = row.data('id');
 
-				template.find('.edit-user').slideUp("400", function() {
+				template.find('.edit-user').slideUp('400', function() {
 					$(this).empty();
 				});
 
-				if(cell.hasClass('active')) {
+				if (cell.hasClass('active')) {
 					template.find('.grid-cell').removeClass('active');
 					template.find('.grid-row').removeClass('active');
 
@@ -515,8 +506,7 @@ define(function(require){
 						'z-index': '0',
 						'border-top-color': '#a6a7a9'
 					});
-				}
-				else {
+				} else {
 					template.find('.grid-cell').removeClass('active');
 					template.find('.grid-row').removeClass('active');
 					cell.toggleClass('active');
@@ -534,22 +524,13 @@ define(function(require){
 					});
 
 					self.usersGetTemplate(type, userId, listUsers, function(template, data) {
-						if(type === 'name') {
+						if (type === 'name') {
 							currentUser = data;
 
-							template.find('#user_timezone').chosen({search_contains: true, width: "220px"});
+							template.find('#user_timezone').chosen({ search_contains: true, width: '220px' });
 
 							data.extra.differentEmail ? template.find('.email-group').show() : template.find('.email-group').hide();
-
-							if(data.extra.mainDirectoryId) {
-								mainDirectoryId = data.extra.mainDirectoryId;
-							}
-
-							if(data.extra.mainCallflowId) {
-								mainCallflowId = data.extra.mainCallflowId;
-							}
-						}
-						else if(type === 'numbers') {
+						} else if (type === 'numbers') {
 							extensionsToSave = [];
 							extraSpareNumbers = [];
 							currentCallflow = data.callflow;
@@ -560,8 +541,7 @@ define(function(require){
 							_.each(data.extensions, function(number) {
 								extensionsToSave.push(number);
 							});
-						}
-						else if(type === 'extensions') {
+						} else if (type === 'extensions') {
 							existingExtensions = data.allExtensions;
 							currentCallflow = data.callflow;
 							currentUser = data.user;
@@ -570,11 +550,9 @@ define(function(require){
 							_.each(data.assignedNumbers, function(v) {
 								numbersToSave.push(v.phoneNumber);
 							});
-						}
-						else if(type === 'features') {
+						} else if (type === 'features') {
 							currentUser = data;
-						}
-						else if (type === 'devices') {
+						} else if (type === 'devices') {
 							setTimeout(function() { template.find('.search-query').focus(); });
 							currentUser = userId;
 							unassignedDevices = {};
@@ -600,90 +578,88 @@ define(function(require){
 					row.data('search').toLowerCase().indexOf(searchString) < 0 ? row.hide() : row.show();
 				});
 
-				if(rows.size() > 0) {
+				if (rows.size() > 0) {
 					rows.is(':visible') ? emptySearch.hide() : emptySearch.show();
 				}
 			});
 
 			template.find('.users-header .add-user').on('click', function() {
 				monster.parallel({
-						callflows: function(callback) {
-							self.usersListCallflows(function(callflows) {
-								callback(null, callflows);
-							});
-						},
-						vmboxes: function(callback) {
-							self.usersListVMBoxes(function(vmboxes) {
-								callback(null, vmboxes);
-							});
-						}
+					callflows: function(callback) {
+						self.usersListCallflows(function(callflows) {
+							callback(null, callflows);
+						});
 					},
-					function(err, results) {
-						var originalData = self.usersFormatAddUser(results),
-							userTemplate = $(monster.template(self, 'users-creation', originalData));
-
-						monster.ui.mask(userTemplate.find('#extension'), 'extension');
-
-						monster.ui.validate(userTemplate.find('#form_user_creation'), {
-							rules: {
-								'callflow.extension': {
-									checkList: originalData.listExtensions
-								},
-								'vmbox.number': {
-									checkList: originalData.listVMBoxes
-								},
-								'user.password': {
-									minlength: 6
-								}
-							},
-							messages: {
-								'user.first_name': {
-									required: self.i18n.active().validation.required
-								},
-								'user.last_name': {
-									required: self.i18n.active().validation.required
-								},
-								'callflow.extension': {
-									required: self.i18n.active().validation.required
-								}
-							}
-						});
-
-						monster.ui.showPasswordStrength(userTemplate.find('#password'));
-
-						userTemplate.find('#create_user').on('click', function() {
-							if(monster.ui.valid(userTemplate.find('#form_user_creation'))) {
-								var $this = $(this),
-									dataForm = monster.ui.getFormData('form_user_creation'),
-									formattedData = self.usersFormatCreationData(dataForm);
-
-								$this
-									.prop('disabled', true);
-
-								self.usersCreate(formattedData, function(data) {
-									popup.dialog('close').remove();
-
-									self.usersRender({ userId: data.user.id });
-								}, function() {
-									$this
-										.prop('disabled', false);
-								});
-							}
-						});
-
-						userTemplate.find('#notification_email').on('change', function() {
-							userTemplate.find('.email-group').toggleClass('hidden');
-						});
-
-						var popup = monster.ui.dialog(userTemplate, {
-							title: self.i18n.active().users.dialogCreationUser.title
+					vmboxes: function(callback) {
+						self.usersListVMBoxes(function(vmboxes) {
+							callback(null, vmboxes);
 						});
 					}
-				);
+				}, function(err, results) {
+					var originalData = self.usersFormatAddUser(results),
+						userTemplate = $(monster.template(self, 'users-creation', originalData));
+
+					monster.ui.mask(userTemplate.find('#extension'), 'extension');
+
+					monster.ui.validate(userTemplate.find('#form_user_creation'), {
+						rules: {
+							'callflow.extension': {
+								checkList: originalData.listExtensions
+							},
+							'vmbox.number': {
+								checkList: originalData.listVMBoxes
+							},
+							'user.password': {
+								minlength: 6
+							}
+						},
+						messages: {
+							'user.first_name': {
+								required: self.i18n.active().validation.required
+							},
+							'user.last_name': {
+								required: self.i18n.active().validation.required
+							},
+							'callflow.extension': {
+								required: self.i18n.active().validation.required
+							}
+						}
+					});
+
+					monster.ui.showPasswordStrength(userTemplate.find('#password'));
+
+					userTemplate.find('#create_user').on('click', function() {
+						if (monster.ui.valid(userTemplate.find('#form_user_creation'))) {
+							var $this = $(this),
+								dataForm = monster.ui.getFormData('form_user_creation'),
+								formattedData = self.usersFormatCreationData(dataForm);
+
+							$this
+								.prop('disabled', true);
+
+							self.usersCreate(formattedData, function(data) {
+								popup.dialog('close').remove();
+
+								self.usersRender({ userId: data.user.id });
+							}, function() {
+								$this
+									.prop('disabled', false);
+							});
+						}
+					});
+
+					userTemplate.find('#notification_email').on('change', function() {
+						userTemplate.find('.email-group').toggleClass('hidden');
+					});
+
+					var popup = monster.ui.dialog(userTemplate, {
+						title: self.i18n.active().users.dialogCreationUser.title
+					});
+				});
 			});
 
 			template.on('click', '.cancel-link', function() {
-				template.find('.edit-user').slideUp("400", function() {
+				template.find('.edit-user').slideUp('400', function() {
 					$(this).empty();
 					template.find('.grid-cell.active').css({
 						'position': 'inline-block',
@@ -719,7 +695,7 @@ define(function(require){
 					extensionsList.push(number);
 				});
 
-				if(numbers.length > 0) {
+				if (numbers.length > 0) {
 					var updateCallflow = function() {
 						self.usersUpdateCallflowNumbers(userId, (currentCallflow || {}).id, numbers, function(callflowData) {
 							toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: name }));
@@ -728,16 +704,15 @@ define(function(require){
 						});
 					};
 
-					if(self.usersHasProperPresenceId(extensionsList, currentUser)) {
+					if (self.usersHasProperPresenceId(extensionsList, currentUser)) {
 						updateCallflow();
-					}
-					else {
+					} else {
 						var oldPresenceId = currentUser.presence_id;
 						self.usersUpdatePresenceIDPopup(extensionsList, currentUser, function(user) {
 							// Update the user and the vmbox with the new presence_id / main number
 							self.usersUpdateUser(user, function() {
-								self.usersSmartUpdateVMBox({ 
-									user: user, 
+								self.usersSmartUpdateVMBox({
+									user: user,
 									callback: function() {
 										updateCallflow();
 									},
@@ -747,8 +722,7 @@ define(function(require){
 							});
 						});
 					}
-				}
-				else {
+				} else {
 					monster.ui.alert('warning', self.i18n.active().users.noNumberCallflow);
 				}
 			});
@@ -777,7 +751,7 @@ define(function(require){
 				phoneRow.slideUp(function() {
 					phoneRow.remove();
 
-					if(!template.find('.list-assigned-items .item-row').is(':visible')) {
+					if (!template.find('.list-assigned-items .item-row').is(':visible')) {
 						emptyRow.slideDown();
 					}
 				});
@@ -787,7 +761,7 @@ define(function(require){
 				var extension = $(this).siblings('input').val(),
 					index = existingExtensions.indexOf(extension);
 
-				if(index > -1) {
+				if (index > -1) {
 					existingExtensions.splice(index, 1);
 				}
 
@@ -804,7 +778,7 @@ define(function(require){
 			});
 
 			template.on('change', '#notification_email', function() {
-				if ( template.find('.email-border').hasClass('open') ) {
+				if (template.find('.email-border').hasClass('open')) {
 					template.find('.email-border').removeClass('open', 400);
 					template.find('.email-group').slideUp();
 				} else {
@@ -814,58 +788,56 @@ define(function(require){
 			});
 
 			template.on('click', '.save-user', function() {
-				var formData = monster.ui.getFormData('form-'+currentUser.id),
-					form = template.find('#form-'+currentUser.id);
+				var formData = monster.ui.getFormData('form-' + currentUser.id),
+					form = template.find('#form-' + currentUser.id);
 
 				monster.util.checkVersion(currentUser, function() {
-					if(monster.ui.valid(form)) {
+					if (monster.ui.valid(form)) {
 						currentUser.extra.vmbox.timezone = formData.timezone;
 
 						var userToSave = $.extend(true, {}, currentUser, formData),
 							oldPresenceId = currentUser.presence_id;
 
 						monster.parallel({
-								vmbox: function(callback) {
-									self.usersSmartUpdateVMBox({
-										user: userToSave, 
-										callback: function(vmbox) {
-											callback(null, vmbox);
-										},
-										oldPresenceId: oldPresenceId
-									});
-								},
-								user: function(callback) {
-									self.usersUpdateUser(userToSave, function(userData) {
-										callback(null, userData.data);
-									});
-								},
-								callflow: function(callback) {
-									if(userToSave.extra.ringingTimeout && userToSave.features.indexOf('find_me_follow_me') < 0) {
-										self.usersGetMainCallflow(userToSave.id, function(mainCallflow) {
-											if('flow' in mainCallflow) {
-												var flow = mainCallflow.flow;
-												while(flow.module != 'user' && '_' in flow.children) {
-													flow = flow.children['_'];
-												}
-												flow.data.timeout = parseInt(userToSave.extra.ringingTimeout);
-												self.usersUpdateCallflow(mainCallflow, function(updatedCallflow) {
-													callback(null, updatedCallflow);
-												});
-											} else {
-												callback(null, null);
-											}
-										});
-									} else {
-										callback(null, null);
-									}
-								}
+							vmbox: function(callback) {
+								self.usersSmartUpdateVMBox({
+									user: userToSave,
+									callback: function(vmbox) {
+										callback(null, vmbox);
+									},
+									oldPresenceId: oldPresenceId
+								});
 							},
-							function(error, results) {
-								toastr.success(monster.template(self, '!' + toastrMessages.userUpdated, { name: results.user.first_name + ' ' + results.user.last_name }));
-
-								self.usersRender({ userId: results.user.id });
+							user: function(callback) {
+								self.usersUpdateUser(userToSave, function(userData) {
+									callback(null, userData.data);
+								});
+							},
+							callflow: function(callback) {
+								if (userToSave.extra.ringingTimeout && userToSave.features.indexOf('find_me_follow_me') < 0) {
+									self.usersGetMainCallflow(userToSave.id, function(mainCallflow) {
+										if ('flow' in mainCallflow) {
+											var flow = mainCallflow.flow;
+											while (flow.module !== 'user' && '_' in flow.children) {
+												flow = flow.children._;
+											}
+											flow.data.timeout = parseInt(userToSave.extra.ringingTimeout);
+											self.usersUpdateCallflow(mainCallflow, function(updatedCallflow) {
+												callback(null, updatedCallflow);
+											});
+										} else {
+											callback(null, null);
+										}
+									});
+								} else {
+									callback(null, null);
+								}
 							}
-						);
+						}, function(error, results) {
+							toastr.success(monster.template(self, '!' + toastrMessages.userUpdated, { name: results.user.first_name + ' ' + results.user.last_name }));
+
+							self.usersRender({ userId: results.user.id });
+						});
 					}
 				});
 			});
@@ -880,7 +852,7 @@ define(function(require){
 					rules: {
 						'pin': {
 							number: true,
-							minlength:4,
+							minlength: 4,
 							min: 0
 						}
 					}
@@ -890,7 +862,7 @@ define(function(require){
 					var formData = monster.ui.getFormData('form_new_pin'),
 						vmboxData = $.extend(true, currentUser.extra.vmbox, formData);
 
-					if(monster.ui.valid(form)) {
+					if (monster.ui.valid(form)) {
 						self.usersUpdateVMBox(vmboxData, function(data) {
 							popup.dialog('close').remove();
 
@@ -939,8 +911,8 @@ define(function(require){
 					var formData = monster.ui.getFormData('form_new_username'),
 						userToSave = $.extend(true, {}, currentUser, formData);
 
-					if(monster.ui.valid(form)) {
-						if(!currentUser.extra.differentEmail) {
+					if (monster.ui.valid(form)) {
+						if (!currentUser.extra.differentEmail) {
 							userToSave.email = userToSave.username;
 						}
 
@@ -948,7 +920,7 @@ define(function(require){
 							currentUser.username = userData.data.username;
 							template.find('#username').html(userData.data.username);
 
-							if(!currentUser.extra.differentEmail) {
+							if (!currentUser.extra.differentEmail) {
 								template.find('#email').val(userData.data.email);
 								currentUser.email = userData.username;
 							}
@@ -983,8 +955,7 @@ define(function(require){
 			/* Events for Devices in Users */
 			template.on('click', '.create-device', function() {
 				var $this = $(this),
-					type = $this.data('type'),
-					userId = $this.parents('.grid-row').data('id');
+					type = $this.data('type');
 
 				monster.pub('voip.devices.renderAdd', {
 					type: type,
@@ -999,11 +970,11 @@ define(function(require){
 			});
 
 			template.on('click', '.spare-devices:not(.disabled)', function() {
-				var currentlySelected = $.map(template.find('.device-list.list-assigned-items .item-row'), function(val) { return $(val).data('id') });
+				var currentlySelected = $.map(template.find('.device-list.list-assigned-items .item-row'), function(val) { return $(val).data('id'); });
 				self.usersGetDevicesData(function(devicesData) {
 					var spareDevices = {};
 					_.each(devicesData, function(device) {
-						if( (!('owner_id' in device) || device.owner_id === '' || device.owner_id === currentUser) && currentlySelected.indexOf(device.id) === -1 ) {
+						if ((!('owner_id' in device) || device.owner_id === '' || device.owner_id === currentUser) && currentlySelected.indexOf(device.id) === -1) {
 							spareDevices[device.id] = device;
 						}
 					});
@@ -1019,7 +990,7 @@ define(function(require){
 								listAssigned.find('.empty-row').hide();
 								listAssigned.append(rowDevice);
 
-								if(device.owner_id) {
+								if (device.owner_id) {
 									delete unassignedDevices[device.id];
 								}
 							});
@@ -1030,16 +1001,16 @@ define(function(require){
 
 			template.on('click', '.save-devices', function() {
 				var dataDevices = {
-						new: [],
-						old: []
+						newDevices: [],
+						oldDevices: []
 					},
 					name = $(this).parents('.grid-row').find('.grid-cell.name').text(),
 					userId = $(this).parents('.grid-row').data('id');
 
 				template.find('.detail-devices .list-assigned-items .item-row:not(.assigned)').each(function(k, row) {
-					dataDevices.new.push($(row).data('id'));
+					dataDevices.newDevice.push($(row).data('id'));
 				});
-				dataDevices.old = _.keys(unassignedDevices);
+				dataDevices.oldDevice = _.keys(unassignedDevices);
 
 				self.usersUpdateDevices(dataDevices, userId, function() {
 					toastr.success(monster.template(self, '!' + toastrMessages.devicesUpdated, { name: name }));
@@ -1052,31 +1023,30 @@ define(function(require){
 					id = row.data('id'),
 					userId = $(this).parents('.grid-row').data('id');
 
-				monster.pub('voip.devices.editDevice', { 
-						data: { id: id }, 
-						callbackSave: function(device) {
-							row.find('.edit-device').html(device.name);
-						},
-						callbackDelete: function(device) {
-							self.usersRender({ userId: userId, openedTab: 'devices' });
-						}
+				monster.pub('voip.devices.editDevice', {
+					data: { id: id },
+					callbackSave: function(device) {
+						row.find('.edit-device').html(device.name);
+					},
+					callbackDelete: function(device) {
+						self.usersRender({ userId: userId, openedTab: 'devices' });
 					}
-				);
+				});
 			});
 
 			template.on('click', '.detail-devices .list-assigned-items .remove-device', function() {
 				var row = $(this).parents('.item-row'),
 					userId = template.find('.grid-row.active').data('id'),
 					deviceId = row.data('id'),
-					userData = _.find(data.users, function(user, idx) { return user.id === userId; }),
-					deviceData = _.find(userData.extra.devices, function(device, idx) { return device.id === deviceId; }),
-					removeDevice = function () {
-						if(row.hasClass('assigned')) {
+					userData = _.find(data.users, function(user) { return user.id === userId; }),
+					deviceData = _.find(userData.extra.devices, function(device) { return device.id === deviceId; }),
+					removeDevice = function() {
+						if (row.hasClass('assigned')) {
 							unassignedDevices[row.data('id')] = true;
 						}
 						row.remove();
 						var rows = template.find('.detail-devices .list-assigned-items .item-row');
-						if(rows.is(':visible') === false) {
+						if (rows.is(':visible') === false) {
 							template.find('.detail-devices .list-assigned-items .empty-row').show();
 						}
 					};
@@ -1089,8 +1059,7 @@ define(function(require){
 						),
 						removeDevice
 					);
-				}
-				else {
+				} else {
 					removeDevice();
 				}
 			});
@@ -1106,7 +1075,7 @@ define(function(require){
 					row.slideUp(function() {
 						row.remove();
 
-						if ( !template.find('.list-assigned-items .item-row').is(':visible') ) {
+						if (!template.find('.list-assigned-items .item-row').is(':visible')) {
 							template.find('.list-assigned-items .empty-row').slideDown();
 						}
 
@@ -1118,45 +1087,44 @@ define(function(require){
 			template.on('click', '.actions .spare-link:not(.disabled)', function(e) {
 				e.preventDefault();
 
-				var $this = $(this),
-					args = {
-						accountName: monster.apps['auth'].currentAccount.name,
-						accountId: self.accountId,
-						ignoreNumbers: $.map(template.find('.item-row'), function(row) {
-							return $(row).data('id');
-						}),
-						extraNumbers: extraSpareNumbers,
-						callback: function(numberList, remainingQuantity) {
-							template.find('.empty-row').hide();
+				var args = {
+					accountName: monster.apps.auth.currentAccount.name,
+					accountId: self.accountId,
+					ignoreNumbers: $.map(template.find('.item-row'), function(row) {
+						return $(row).data('id');
+					}),
+					extraNumbers: extraSpareNumbers,
+					callback: function(numberList, remainingQuantity) {
+						template.find('.empty-row').hide();
 
-							_.each(numberList, function(val, idx) {
-								template
-									.find('.list-assigned-items')
-									.append($(monster.template(self, 'users-numbersItemRow', {
-										number: val
-									})));
+						_.each(numberList, function(val) {
+							template
+								.find('.list-assigned-items')
+								.append($(monster.template(self, 'users-numbersItemRow', {
+									number: val
+								})));
 
-								var numberDiv = template.find('[data-id="'+val.phoneNumber+'"]'),
-									args = {
-										target: numberDiv.find('.edit-features'),
-										numberData: val,
-										afterUpdate: function(features) {
-											monster.ui.paintNumberFeaturesIcon(features, numberDiv.find('.features'));
-										}
-									};
+							var numberDiv = template.find('[data-id="' + val.phoneNumber + '"]'),
+								args = {
+									target: numberDiv.find('.edit-features'),
+									numberData: val,
+									afterUpdate: function(features) {
+										monster.ui.paintNumberFeaturesIcon(features, numberDiv.find('.features'));
+									}
+								};
 
-								monster.pub('common.numberFeaturesMenu.render', args);
+							monster.pub('common.numberFeaturesMenu.render', args);
 
-								extraSpareNumbers = _.without(extraSpareNumbers, val.phoneNumber);
-							});
+							extraSpareNumbers = _.without(extraSpareNumbers, val.phoneNumber);
+						});
 
-							monster.ui.tooltips(template);
+						monster.ui.tooltips(template);
 
-							if(remainingQuantity == 0) {
-								template.find('.spare-link').addClass('disabled');
-							}
+						if (remainingQuantity === 0) {
+							template.find('.spare-link').addClass('disabled');
 						}
-					};
+					}
+				};
 
 				monster.pub('common.numbers.dialogSpare', args);
 			});
@@ -1168,7 +1136,7 @@ define(function(require){
 					searchType: $(this).data('type'),
 					callbacks: {
 						success: function(numbers) {
-							_.each(numbers, function(number, k) {
+							_.each(numbers, function(number) {
 								number.phoneNumber = number.id;
 
 								var rowTemplate = $(monster.template(self, 'users-numbersItemRow', {
@@ -1210,7 +1178,7 @@ define(function(require){
 					}
 				});
 
-				if(dataNumbers.length > 0) {
+				if (dataNumbers.length > 0) {
 					self.usersUpdateCallflowNumbers(userId, (currentCallflow || {}).id, dataNumbers, function(callflowData) {
 						var afterUpdate = function() {
 							toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: name }));
@@ -1219,7 +1187,7 @@ define(function(require){
 						};
 
 						// If the User has the External Caller ID Number setup to a number that is no longer assigned to this user, then remove the Caller-ID Feature
-						if(currentUser.caller_id.hasOwnProperty('external')
+						if (currentUser.caller_id.hasOwnProperty('external')
 						&& currentUser.caller_id.external.hasOwnProperty('number')
 						&& callflowData.numbers.indexOf(currentUser.caller_id.external.number) < 0) {
 							delete currentUser.caller_id.external.number;
@@ -1229,13 +1197,11 @@ define(function(require){
 
 								toastr.info(toastrMessages.callerIDDeleted);
 							});
-						}
-						else {
+						} else {
 							afterUpdate();
 						}
 					});
-				}
-				else {
+				} else {
 					monster.ui.alert('warning', self.i18n.active().users.noNumberCallflow);
 				}
 			});
@@ -1245,15 +1211,15 @@ define(function(require){
 			});
 
 			template.on('click', '.feature[data-feature="call_forward"]', function() {
-				if(currentUser.features.indexOf('find_me_follow_me') < 0) {
+				if (currentUser.features.indexOf('find_me_follow_me') < 0) {
 					var featureUser = $.extend(true, {}, currentUser);
 					self.usersGetMainCallflow(featureUser.id, function(mainCallflow) {
-						if(mainCallflow && 'flow' in mainCallflow) {
+						if (mainCallflow && 'flow' in mainCallflow) {
 							var flow = mainCallflow.flow;
-							while(flow.module != 'user' && '_' in flow.children) {
-								flow = flow.children['_'];
+							while (flow.module !== 'user' && '_' in flow.children) {
+								flow = flow.children._;
 							}
-							if(flow.data.timeout < 30) {
+							if (flow.data.timeout < 30) {
 								featureUser.extra.timeoutTooShort = true;
 							}
 						}
@@ -1274,7 +1240,7 @@ define(function(require){
 
 			template.on('click', '.feature[data-feature="call_recording"]', function() {
 				self.usersGetMainCallflow(currentUser.id, function(callflow) {
-					if(callflow) {
+					if (callflow) {
 						self.usersRenderCallRecording({
 							userCallflow: callflow,
 							currentUser: currentUser
@@ -1292,14 +1258,13 @@ define(function(require){
 			template.on('click', '.feature[data-feature="vm_to_email"]', function() {
 				self.usersListVMBoxesUser(currentUser.id, function(vmboxes) {
 					currentUser.extra.deleteAfterNotify = true;
-					if(vmboxes.length > 0) {
+					if (vmboxes.length > 0) {
 						self.usersGetVMBox(vmboxes[0].id, function(data) {
 							currentUser.extra.deleteAfterNotify = data.delete_after_notify;
 
 							self.usersRenderVMToEmail(currentUser);
 						});
-					}
-					else {
+					} else {
 						self.usersRenderVMToEmail(currentUser);
 					}
 				});
@@ -1313,108 +1278,104 @@ define(function(require){
 						conference: dataConf.conference
 					};
 
-					if(_.isEmpty(data.listConferences)) {
+					if (_.isEmpty(data.listConferences)) {
 						monster.ui.alert('error', self.i18n.active().users.conferencing.noConfNumbers);
-					}
-					else {
+					} else {
 						self.usersRenderConferencing(data);
 					}
 				});
 			});
 
 			template.on('click', '.feature[data-feature="faxing"]', function() {
-				if(!monster.util.isTrial()) {
+				if (!monster.util.isTrial()) {
 					monster.parallel({
-							numbers: function(callback) {
-								self.usersListNumbers(function(listNumbers) {
-									var spareNumbers = {};
+						numbers: function(callback) {
+							self.usersListNumbers(function(listNumbers) {
+								var spareNumbers = {};
 
-									_.each(listNumbers.numbers, function(number, key) {
-										if(!number.hasOwnProperty('used_by') || number.used_by === '') {
-											spareNumbers[key] = number;
-										}
-									});
-
-									callback && callback(null, spareNumbers);
-								});
-							},
-							callflows: function(callback) {
-								self.usersListCallflowsUser(currentUser.id, function(callflows) {
-									var existingCallflow;
-
-									_.each(callflows, function(callflow) {
-										if(callflow.type === 'faxing') {
-											existingCallflow = callflow;
-
-											return false;
-										}
-									});
-
-									if ( existingCallflow ) {
-										self.callApi({
-											resource: 'callflow.get',
-											data: {
-												accountId: self.accountId,
-												callflowId: existingCallflow.id
-											},
-											success: function(data, status) {
-												callback && callback(null, data.data);
-											}
-										});
-									} else {
-										callback && callback(null, existingCallflow);
+								_.each(listNumbers.numbers, function(number, key) {
+									if (!number.hasOwnProperty('used_by') || number.used_by === '') {
+										spareNumbers[key] = number;
 									}
 								});
-							},
-							account: function(callback) {
-								self.callApi({
-									resource: 'account.get',
-									data: {
-										accountId: self.accountId
-									},
-									success: function(data, status) {
-										callback(null, data.data);
-									}
-								});
-							}
+
+								callback && callback(null, spareNumbers);
+							});
 						},
-						function(err, results) {
-							results.user = currentUser;
+						callflows: function(callback) {
+							self.usersListCallflowsUser(currentUser.id, function(callflows) {
+								var existingCallflow;
 
-							if ( typeof results.callflows !== 'undefined' ) {
-								// Compatibility with old version
-								var faxboxId = results.callflows.flow.data.hasOwnProperty('faxbox_id') ? results.callflows.flow.data.faxbox_id : results.callflows.flow.data.id;
+								_.each(callflows, function(callflow) {
+									if (callflow.type === 'faxing') {
+										existingCallflow = callflow;
 
-								self.callApi({
-									resource: 'faxbox.get',
-									data: {
-										accountId: self.accountId,
-										faxboxId: faxboxId
-									},
-									success: function(_data) {
-										results.faxbox = _data.data;
-
-										results.faxbox.id = faxboxId;
-
-										self.usersRenderFaxboxes(results);
-									},
-									error: function() {
-										self.usersRenderFaxboxes(results);
+										return false;
 									}
 								});
-							} else {
-								self.usersRenderFaxboxes(results);
-							}
+
+								if (existingCallflow) {
+									self.callApi({
+										resource: 'callflow.get',
+										data: {
+											accountId: self.accountId,
+											callflowId: existingCallflow.id
+										},
+										success: function(data, status) {
+											callback && callback(null, data.data);
+										}
+									});
+								} else {
+									callback && callback(null, existingCallflow);
+								}
+							});
+						},
+						account: function(callback) {
+							self.callApi({
+								resource: 'account.get',
+								data: {
+									accountId: self.accountId
+								},
+								success: function(data, status) {
+									callback(null, data.data);
+								}
+							});
 						}
-					);
-				}
-				else {
+					}, function(err, results) {
+						results.user = currentUser;
+
+						if (typeof results.callflows !== 'undefined') {
+							// Compatibility with old version
+							var faxboxId = results.callflows.flow.data.hasOwnProperty('faxbox_id') ? results.callflows.flow.data.faxbox_id : results.callflows.flow.data.id;
+
+							self.callApi({
+								resource: 'faxbox.get',
+								data: {
+									accountId: self.accountId,
+									faxboxId: faxboxId
+								},
+								success: function(_data) {
+									results.faxbox = _data.data;
+
+									results.faxbox.id = faxboxId;
+
+									self.usersRenderFaxboxes(results);
+								},
+								error: function() {
+									self.usersRenderFaxboxes(results);
+								}
+							});
+						} else {
+							self.usersRenderFaxboxes(results);
+						}
+					});
+				} else {
 					monster.ui.alert('warning', self.i18n.active().users.faxing.trialError);
 				}
 			});
 
 			$('body').on('click', '#users_container_overlay', function() {
-				template.find('.edit-user').slideUp("400", function() {
+				template.find('.edit-user').slideUp('400', function() {
 					$(this).empty();
 				});
 
@@ -1432,7 +1393,6 @@ define(function(require){
 
 				template.find('.grid-cell.active').removeClass('active');
 				template.find('.grid-row.active').removeClass('active');
-
 			});
 		},
 
@@ -1452,10 +1412,9 @@ define(function(require){
 			template.find('.save-presence-id').on('click', function() {
 				var newPresenceID = template.find('.presence-id-option.active').data('number');
 
-				if(newPresenceID !== 'none') {
+				if (newPresenceID !== 'none') {
 					user.presence_id = newPresenceID + '';
-				}
-				else {
+				} else {
 					delete user.presence_id;
 				}
 
@@ -1478,22 +1437,20 @@ define(function(require){
 		usersHasProperPresenceId: function(listNumbers, user) {
 			var self = this;
 
-			if(user.presence_id) {
+			if (user.presence_id) {
 				var found = false,
 					formattedPresenceID = '' + user.presence_id;
 
 				_.each(listNumbers, function(number) {
-					if(number === formattedPresenceID) {
+					if (number === formattedPresenceID) {
 						found = true;
 					}
 				});
 
 				return found;
-			}
-			else if(listNumbers.length) {
+			} else if (listNumbers.length) {
 				return false;
-			}
-			else {
+			} else {
 				return true;
 			}
 		},
@@ -1504,7 +1461,7 @@ define(function(require){
 					sendToSameEmail: true,
 					nextExtension: '',
 					listExtensions: {},
-					listVMBoxes:{},
+					listVMBoxes: {}
 				},
 				arrayExtensions = [],
 				arrayVMBoxes = [],
@@ -1512,7 +1469,7 @@ define(function(require){
 
 			_.each(data.callflows, function(callflow) {
 				_.each(callflow.numbers, function(number) {
-					if(number.length < 7) {
+					if (number.length < 7) {
 						formattedData.listExtensions[number] = callflow;
 						arrayExtensions.push(number);
 					}
@@ -1524,7 +1481,7 @@ define(function(require){
 				arrayVMBoxes.push(vmbox.mailbox);
 			});
 
-			// We concat both arrays because we want to create users with the same number for the extension # and the vmbox, 
+			// We concat both arrays because we want to create users with the same number for the extension # and the vmbox,
 			// If for some reason a vmbox number exist without an extension, we still don't want to let them set their extension number to that number.
 			allNumbers = arrayExtensions.concat(arrayVMBoxes);
 			formattedData.nextExtension = parseInt(monster.util.getNextExtension(allNumbers)) + '';
@@ -1536,7 +1493,7 @@ define(function(require){
 			var tempList = [],
 				listNumbers = {};
 
-			_.each(data.numbers, function(val, key){
+			_.each(data.numbers, function(val, key) {
 				tempList.push(key);
 			});
 
@@ -1544,9 +1501,9 @@ define(function(require){
 				return a < b ? -1 : 1;
 			});
 
-			if(data.callflows) {
-				if(data.callflows.numbers.length > 0) {
-					listNumbers[data.callflows.numbers[0]] = data.callflows.numbers[0]
+			if (data.callflows) {
+				if (data.callflows.numbers.length > 0) {
+					listNumbers[data.callflows.numbers[0]] = data.callflows.numbers[0];
 				}
 			}
 
@@ -1587,17 +1544,16 @@ define(function(require){
 					}
 				};
 
-				if(monster.ui.valid(featureForm)) {
+				if (monster.ui.valid(featureForm)) {
 					data.conference = monster.ui.getFormData('conferencing_form');
 
-					if(switchFeature.prop('checked')) {
+					if (switchFeature.prop('checked')) {
 						self.usersUpdateConferencing(data, function(data) {
 							args.userId = data.user.id;
 
 							self.usersRender(args);
 						});
-					}
-					else {
+					} else {
 						self.usersDeleteConferencing(data.user.id, function() {
 							args.userId = data.user.id;
 
@@ -1621,7 +1577,6 @@ define(function(require){
 			var self = this,
 				data = self.usersFormatFaxingData(data),
 				featureTemplate = $(monster.template(self, 'users-feature-faxing', data)),
-				numberMirror = featureTemplate.find('.number-mirror'),
 				switchFeature = featureTemplate.find('.switch-state'),
 				popup = monster.ui.dialog(featureTemplate, {
 					title: data.user.extra.mapFeatures.faxing.title,
@@ -1636,15 +1591,14 @@ define(function(require){
 				container: featureTemplate.find('.number-select'),
 				inputName: 'caller_id',
 				number: data.hasOwnProperty('faxbox') ? data.faxbox.caller_id : undefined,
-				removeCallback: function () {
+				removeCallback: function() {
 					featureTemplate
 						.find('.number-mirror')
 							.text(self.i18n.active().users.faxing.emailToFax.default);
 				},
-				globalAddNumberCallback: function (number, addNumberToControl) {
-					var found = false,
-						// Number can come back from the buy common control, as an object, or from the spare selector, as a string
-						foundNumber = _.isObject(number) ? _.keys(number)[0] : number;
+				globalAddNumberCallback: function(number, addNumberToControl) {
+					// Number can come back from the buy common control, as an object, or from the spare selector, as a string
+					var foundNumber = _.isObject(number) ? _.keys(number)[0] : number;
 
 					addNumberToControl && addNumberToControl(foundNumber);
 
@@ -1676,15 +1630,14 @@ define(function(require){
 						}
 					};
 
-				if ( switchFeature.prop('checked')) {
+				if (switchFeature.prop('checked')) {
 					if (newNumber !== '') {
 						self.usersUpdateFaxing(data, newNumber, function(results) {
 							args.userId = results.callflow.owner_id;
 
 							self.usersRender(args);
 						});
-					}
-					else {
+					} else {
 						monster.ui.alert('error', self.i18n.active().users.faxing.toastr.error.numberMissing);
 					}
 				} else {
@@ -1715,12 +1668,11 @@ define(function(require){
 			});
 
 			requirePin.on('change', function() {
-				if(requirePin.is(':checked')) {
+				if (requirePin.is(':checked')) {
 					featureTemplate.find('#pin')
 						.removeAttr('disabled', 'disabled')
 						.focus();
-				}
-				else {
+				} else {
 					featureTemplate.find('#pin')
 						.val('')
 						.attr('disabled', 'disabled');
@@ -1728,18 +1680,19 @@ define(function(require){
 			});
 
 			featureTemplate.find('.save').on('click', function() {
-				if(monster.ui.valid(featureForm)) {
+				if (monster.ui.valid(featureForm)) {
 					var formData = monster.ui.getFormData('hotdesk_form'),
-					args = {
-						openedTab: 'features',
-						callback: function() {
-							popup.dialog('close').remove();
-						}
-					};
+						args = {
+							openedTab: 'features',
+							callback: function() {
+								popup.dialog('close').remove();
+							}
+						},
+						userToSave;
 
 					formData.enabled = switchFeature.prop('checked');
-					
-					if(formData.require_pin === false) { delete formData.pin; }
+
+					if (formData.require_pin === false) { delete formData.pin; }
 					delete currentUser.hotdesk;
 
 					userToSave = $.extend(true, {}, currentUser, { hotdesk: formData });
@@ -1800,14 +1753,13 @@ define(function(require){
 								listFnParallel.push(function(callback) {
 									self.usersGetVMBox(vm.id, function(data) {
 										/* Only update vms if the deleteAfterNotify value is different than before */
-										if(data.delete_after_notify !== val) {
+										if (data.delete_after_notify !== val) {
 											data.delete_after_notify = val;
 
 											self.usersUpdateVMBox(data, function(data) {
 												callback(null, data);
 											});
-										}
-										else {
+										} else {
 											callback(null, data);
 										}
 									});
@@ -1823,8 +1775,8 @@ define(function(require){
 				userToSave.vm_to_email_enabled = enabled;
 
 				/* Only update the email and the checkboxes if the setting is enabled */
-				if(enabled === true) {
-					if(monster.ui.valid(featureForm)) {
+				if (enabled === true) {
+					if (monster.ui.valid(featureForm)) {
 						userToSave.email = formData.email;
 
 						/* Update VMBoxes, then update user and finally close the popup */
@@ -1832,8 +1784,7 @@ define(function(require){
 							updateUser(userToSave);
 						});
 					}
-				}
-				else {
+				} else {
 					updateUser(userToSave);
 				}
 			});
@@ -1859,10 +1810,9 @@ define(function(require){
 
 			featureTemplate.find('.save').on('click', function() {
 				var switchCallerId = featureTemplate.find('.switch-state'),
-					userData = currentUser,
 					userToSave = $.extend(true, {}, {
 						caller_id: {
-							external: {},
+							external: {}
 						}
 					}, currentUser),
 					args = {
@@ -1876,11 +1826,8 @@ define(function(require){
 					var callerIdValue = featureTemplate.find('.caller-id-select').val();
 
 					userToSave.caller_id.external.number = callerIdValue;
-				}
-				else {
-					if(userToSave.caller_id.hasOwnProperty('external')) {
-						delete userToSave.caller_id.external.number;
-					}
+				} else if (userToSave.caller_id.hasOwnProperty('external')) {
+					delete userToSave.caller_id.external.number;
 				}
 
 				self.usersUpdateUser(userToSave, function(data) {
@@ -1890,13 +1837,12 @@ define(function(require){
 				});
 			});
 
-			if(currentUser.extra.listCallerId.length > 0){
+			if (currentUser.extra.listCallerId.length > 0) {
 				var popup = monster.ui.dialog(featureTemplate, {
 					title: currentUser.extra.mapFeatures.caller_id.title,
 					position: ['center', 20]
 				});
-			}
-			else {
+			} else {
 				monster.ui.alert('error', self.i18n.active().users.errorCallerId);
 			}
 		},
@@ -1910,11 +1856,10 @@ define(function(require){
 			//cfmode is on if call_forward.enabled = true
 			//cfmode is failover if call_forward.enabled = false & call_forward.failover = true
 			//cfmode is off if call_forward.enabled = false & call_forward.failover = false
-			if(user.hasOwnProperty('call_forward') && user.call_forward.hasOwnProperty('enabled')) {
-				if(user.call_forward.enabled === true) {
+			if (user.hasOwnProperty('call_forward') && user.call_forward.hasOwnProperty('enabled')) {
+				if (user.call_forward.enabled === true) {
 					cfMode = 'on';
-				}
-				else if(user.call_forward.enabled === false) {
+				} else if (user.call_forward.enabled === false) {
 					cfMode = user.call_forward.hasOwnProperty('failover') && user.call_forward.failover === true ? 'failover' : 'off';
 				}
 			}
@@ -1940,7 +1885,7 @@ define(function(require){
 
 			monster.ui.mask(featureTemplate.find('#number'), 'phoneNumber');
 
-			if(currentUser.hasOwnProperty('call_forward') && currentUser.call_forward.require_keypress) {
+			if (currentUser.hasOwnProperty('call_forward') && currentUser.call_forward.require_keypress) {
 				timeoutWarningBox.hide();
 			}
 
@@ -1969,20 +1914,18 @@ define(function(require){
 			});
 
 			featureTemplate.find('.save').on('click', function() {
-				if(monster.ui.valid(featureForm)) {
+				if (monster.ui.valid(featureForm)) {
 					var formData = monster.ui.getFormData('call_forward_form');
 					formData.require_keypress = !formData.require_keypress;
 
 					var selectedType = featureTemplate.find('.feature-select-mode button.selected').data('value');
-					if(selectedType === 'off') {
+					if (selectedType === 'off') {
 						formData.enabled = false;
 						formData.failover = false;
-					}
-					else if(selectedType === 'failover') {
+					} else if (selectedType === 'failover') {
 						formData.enabled = false;
 						formData.failover = true;
-					}
-					else {
+					} else {
 						formData.enabled = true;
 						formData.failover = true;
 					}
@@ -1992,7 +1935,7 @@ define(function(require){
 
 					var userToSave = $.extend(true, {}, currentUser, { call_forward: formData });
 
-					if(timeoutWarningBox.is(':visible')) {
+					if (timeoutWarningBox.is(':visible')) {
 						args.openedTab = 'name';
 					}
 
@@ -2015,15 +1958,15 @@ define(function(require){
 				position: ['center', 20]
 			});
 
-			popup.find(".monster-button").blur();
+			popup.find('.monster-button').blur();
 		},
 
 		usersRenderFindMeFollowMe: function(params) {
 			var self = this;
 
-			if(!params.userCallflow) {
+			if (!params.userCallflow) {
 				monster.ui.alert('error', self.i18n.active().users.find_me_follow_me.noNumber);
-			} else if(!params.userDevices || params.userDevices.length === 0) {
+			} else if (!params.userDevices || params.userDevices.length === 0) {
 				monster.ui.alert('error', self.i18n.active().users.find_me_follow_me.noDevice);
 			} else {
 				var currentUser = params.currentUser,
@@ -2039,9 +1982,11 @@ define(function(require){
 					},
 					userDevices = {};
 
-				var nodeSearch = userCallflow.flow;
-				while(nodeSearch.hasOwnProperty('module') && ['ring_group', 'user'].indexOf(nodeSearch.module) < 0) {
-					nodeSearch = nodeSearch.children['_'];
+				var nodeSearch = userCallflow.flow,
+					endpoints;
+
+				while (nodeSearch.hasOwnProperty('module') && ['ring_group', 'user'].indexOf(nodeSearch.module) < 0) {
+					nodeSearch = nodeSearch.children._;
 				}
 				endpoints = nodeSearch.module === 'ring_group' ? nodeSearch.data.endpoints : [];
 
@@ -2050,7 +1995,7 @@ define(function(require){
 				});
 
 				endpoints = $.map(endpoints, function(endpoint) {
-					if(userDevices[endpoint.id]) {
+					if (userDevices[endpoint.id]) {
 						var device = userDevices[endpoint.id];
 						delete userDevices[endpoint.id];
 						return {
@@ -2060,7 +2005,7 @@ define(function(require){
 							name: device.name,
 							icon: self.deviceIcons[device.device_type],
 							disabled: false
-						}
+						};
 					}
 				});
 
@@ -2072,7 +2017,7 @@ define(function(require){
 						name: device.name,
 						icon: self.deviceIcons[device.device_type],
 						disabled: true
-					})
+					});
 				});
 
 				monster.pub('common.ringingDurationControl.render', {
@@ -2092,38 +2037,37 @@ define(function(require){
 				featureTemplate.find('.save').on('click', function() {
 					var enabled = switchFeature.prop('checked');
 
-					monster.pub('common.ringingDurationControl.getEndpoints', { 
+					monster.pub('common.ringingDurationControl.getEndpoints', {
 						container: featureForm,
 						callback: function(endpoints) {
-
 							currentUser.smartpbx = currentUser.smartpbx || {};
 							currentUser.smartpbx.find_me_follow_me = currentUser.smartpbx.find_me_follow_me || {};
 							currentUser.smartpbx.find_me_follow_me.enabled = (enabled && endpoints.length > 0);
 
 							var callflowNode = {};
 
-							if(enabled && endpoints.length > 0) {
+							if (enabled && endpoints.length > 0) {
 								callflowNode.module = 'ring_group';
 								callflowNode.data = {
-									strategy: "simultaneous",
+									strategy: 'simultaneous',
 									timeout: 20,
 									endpoints: []
-								}
+								};
 
 								_.each(endpoints, function(endpoint) {
 									callflowNode.data.endpoints.push({
 										id: endpoint.id,
-										endpoint_type: "device",
+										endpoint_type: 'device',
 										delay: endpoint.delay,
 										timeout: endpoint.timeout
 									});
 
-									if((endpoint.delay+endpoint.timeout) > callflowNode.data.timeout) { 
-										callflowNode.data.timeout = (endpoint.delay+endpoint.timeout); 
+									if ((endpoint.delay + endpoint.timeout) > callflowNode.data.timeout) {
+										callflowNode.data.timeout = (endpoint.delay + endpoint.timeout);
 									}
 								});
 							} else {
-								callflowNode.module='user';
+								callflowNode.module = 'user';
 								callflowNode.data = {
 									can_call_self: false,
 									id: currentUser.id,
@@ -2133,33 +2077,31 @@ define(function(require){
 
 							// In next 5 lines, look for user/group node, and replace it with the new data;
 							var flow = userCallflow.flow;
-							while(flow.hasOwnProperty('module') && ['ring_group', 'user'].indexOf(flow.module) < 0) {
-								flow = flow.children['_'];
+							while (flow.hasOwnProperty('module') && ['ring_group', 'user'].indexOf(flow.module) < 0) {
+								flow = flow.children._;
 							}
 							flow.module = callflowNode.module;
 							flow.data = callflowNode.data;
 
 							monster.parallel({
-									callflow: function(callbackParallel) {
-										self.usersUpdateCallflow(userCallflow, function(data) {
-											callbackParallel && callbackParallel(null, data.data);
-										});
-									},
-									user: function(callbackParallel) {
-										self.usersUpdateUser(currentUser, function(data) {
-											callbackParallel && callbackParallel(null, data.data);
-										});
-									}
+								callflow: function(callbackParallel) {
+									self.usersUpdateCallflow(userCallflow, function(data) {
+										callbackParallel && callbackParallel(null, data.data);
+									});
 								},
-								function(err, results) {
-									args.userId = results.user.id;
-									if(typeof params.saveCallback === 'function') {
-										params.saveCallback(args);
-									} else {
-										self.usersRender(args);
-									}
+								user: function(callbackParallel) {
+									self.usersUpdateUser(currentUser, function(data) {
+										callbackParallel && callbackParallel(null, data.data);
+									});
 								}
-							);
+							}, function(err, results) {
+								args.userId = results.user.id;
+								if (typeof params.saveCallback === 'function') {
+									params.saveCallback(args);
+								} else {
+									self.usersRender(args);
+								}
+							});
 						}
 					});
 				});
@@ -2174,14 +2116,13 @@ define(function(require){
 		usersRenderCallRecording: function(params) {
 			var self = this,
 				templateData = $.extend(true, {
-												user: params.currentUser
-											},
-											(params.currentUser.extra.mapFeatures.call_recording.active ? {
-												url: params.userCallflow.flow.data.url,
-												format: params.userCallflow.flow.data.format,
-												timeLimit: params.userCallflow.flow.data.time_limit
-											} : {})
-										),
+					user: params.currentUser
+				},
+				(params.currentUser.extra.mapFeatures.call_recording.active ? {
+					url: params.userCallflow.flow.data.url,
+					format: params.userCallflow.flow.data.format,
+					timeLimit: params.userCallflow.flow.data.time_limit
+				} : {})),
 				featureTemplate = $(monster.template(self, 'users-feature-call_recording', templateData)),
 				switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#call_recording_form'),
@@ -2204,67 +2145,70 @@ define(function(require){
 			});
 
 			featureTemplate.find('.save').on('click', function() {
-				if(monster.ui.valid(featureForm)) {
+				if (monster.ui.valid(featureForm)) {
 					var formData = monster.ui.getFormData('call_recording_form'),
 						enabled = switchFeature.prop('checked');
 
-					if(!('smartpbx' in params.currentUser)) { params.currentUser.smartpbx = {}; }
-					if(!('call_recording' in params.currentUser.smartpbx)) {
+					if (!('smartpbx' in params.currentUser)) { params.currentUser.smartpbx = {}; }
+					if (!('call_recording' in params.currentUser.smartpbx)) {
 						params.currentUser.smartpbx.call_recording = {
 							enabled: false
 						};
 					}
 
-					if(params.currentUser.smartpbx.call_recording.enabled || enabled) {
+					if (params.currentUser.smartpbx.call_recording.enabled || enabled) {
 						params.currentUser.smartpbx.call_recording.enabled = enabled;
 						var newCallflow = $.extend(true, {}, params.userCallflow);
-						if(enabled) {
-							if(newCallflow.flow.module === 'record_call') {
-								newCallflow.flow.data = $.extend(true, { action: "start" }, formData);
+						if (enabled) {
+							if (newCallflow.flow.module === 'record_call') {
+								newCallflow.flow.data = $.extend(true, { action: 'start' }, formData);
 							} else {
 								newCallflow.flow = {
 									children: {
-										"_": $.extend(true, {}, params.userCallflow.flow)
+										_: $.extend(true, {}, params.userCallflow.flow)
 									},
-									module: "record_call",
-									data: $.extend(true, { action: "start" }, formData)
-								}
+									module: 'record_call',
+									data: $.extend(true, { action: 'start' }, formData)
+								};
+
 								var flow = newCallflow.flow;
-								while(flow.children && '_' in flow.children) {
-									if(flow.children['_'].module === 'record_call' && flow.children['_'].data.action === 'stop') {
+								while (flow.children && '_' in flow.children) {
+									if (flow.children._.module === 'record_call' && flow.children._.data.action === 'stop') {
 										break; // If there is already a Stop Record Call
-									} else if(flow.children['_'].module === 'voicemail') {
-										var voicemailNode = $.extend(true, {}, flow.children['_']);
-										flow.children['_'] = {
+									} else if (flow.children._.module === 'voicemail') {
+										var voicemailNode = $.extend(true, {}, flow.children._);
+										flow.children._ = {
 											module: 'record_call',
-											data: { action: "stop" },
+											data: { action: 'stop' },
 											children: { '_': voicemailNode }
-										}
+										};
+
 										break;
 									} else {
-										flow = flow.children['_'];
+										flow = flow.children._;
 									}
 								}
 							}
 						} else {
-							newCallflow.flow = $.extend(true, {}, params.userCallflow.flow.children["_"]);
+							newCallflow.flow = $.extend(true, {}, params.userCallflow.flow.children._);
 							var flow = newCallflow.flow;
-							while(flow.children && '_' in flow.children) {
-								if(flow.children['_'].module === 'record_call') {
-									flow.children = flow.children['_'].children;
+							while (flow.children && '_' in flow.children) {
+								if (flow.children._.module === 'record_call') {
+									flow.children = flow.children._.children;
 									break;
 								} else {
-									flow = flow.children['_'];
+									flow = flow.children._;
 								}
 							}
 						}
 						self.usersUpdateCallflow(newCallflow, function(updatedCallflow) {
 							self.usersUpdateUser(params.currentUser, function(updatedUser) {
 								popup.dialog('close').remove();
-									self.usersRender({
-										userId: params.currentUser.id,
-										openedTab: 'features'
-									});
+
+								self.usersRender({
+									userId: params.currentUser.id,
+									openedTab: 'features'
+								});
 							});
 						});
 					} else {
@@ -2286,7 +2230,7 @@ define(function(require){
 		usersRenderMusicOnHold: function(currentUser) {
 			var self = this,
 				silenceMediaId = 'silence_stream://300000',
-				mediaToUpload = undefined;
+				mediaToUpload;
 
 			self.usersListMedias(function(medias) {
 				var templateData = {
@@ -2304,9 +2248,9 @@ define(function(require){
 						featureTemplate.find('.upload-div').slideUp(function() {
 							featureTemplate.find('.upload-toggle').removeClass('active');
 						});
-						if(newMedia) {
+						if (newMedia) {
 							var mediaSelect = featureTemplate.find('.media-dropdown');
-							mediaSelect.append('<option value="'+newMedia.id+'">'+newMedia.name+'</option>');
+							mediaSelect.append('<option value="' + newMedia.id + '">' + newMedia.name + '</option>');
 							mediaSelect.val(newMedia.id);
 						}
 					};
@@ -2321,7 +2265,7 @@ define(function(require){
 						mediaToUpload = results[0];
 					},
 					error: function(errors) {
-						if(errors.hasOwnProperty('size') && errors.size.length > 0) {
+						if (errors.hasOwnProperty('size') && errors.size.length > 0) {
 							monster.ui.alert(self.i18n.active().users.music_on_hold.fileTooBigAlert);
 						}
 						featureTemplate.find('.upload-div input').val('');
@@ -2338,7 +2282,7 @@ define(function(require){
 				});
 
 				featureTemplate.find('.upload-toggle').on('click', function() {
-					if($(this).hasClass('active')) {
+					if ($(this).hasClass('active')) {
 						featureTemplate.find('.upload-div').stop(true, true).slideUp();
 					} else {
 						featureTemplate.find('.upload-div').stop(true, true).slideDown();
@@ -2350,7 +2294,7 @@ define(function(require){
 				});
 
 				featureTemplate.find('.upload-submit').on('click', function() {
-					if(mediaToUpload) {
+					if (mediaToUpload) {
 						self.callApi({
 							resource: 'media.create',
 							data: {
@@ -2358,7 +2302,7 @@ define(function(require){
 								data: {
 									streamable: true,
 									name: mediaToUpload.name,
-									media_source: "upload",
+									media_source: 'upload',
 									description: mediaToUpload.name
 								}
 							},
@@ -2397,12 +2341,12 @@ define(function(require){
 					var selectedMedia = featureTemplate.find('.media-dropdown option:selected').val(),
 						enabled = switchFeature.prop('checked');
 
-					if(!('music_on_hold' in currentUser)) {
+					if (!('music_on_hold' in currentUser)) {
 						currentUser.music_on_hold = {};
 					}
 
-					if('media_id' in currentUser.music_on_hold || enabled) {
-						if(enabled) {
+					if ('media_id' in currentUser.music_on_hold || enabled) {
+						if (enabled) {
 							currentUser.music_on_hold = {
 								media_id: selectedMedia
 							};
@@ -2446,58 +2390,55 @@ define(function(require){
 
 			userData = $.extend(true, userData, newCallerIDs);
 			/* If the user has been removed from the directory */
-			if(userData.extra) {
-				if(userData.extra.includeInDirectory === false) {
-					if('directories' in userData && userData.extra.mainDirectoryId && userData.extra.mainDirectoryId in userData.directories) {
+			if (userData.extra) {
+				if (userData.extra.includeInDirectory === false) {
+					if ('directories' in userData && userData.extra.mainDirectoryId && userData.extra.mainDirectoryId in userData.directories) {
 						delete userData.directories[userData.extra.mainDirectoryId];
 					}
-				}
-				else {
+				} else {
 					userData.directories = userData.directories || {};
 
-					if(userData.extra.mainCallflowId) {
+					if (userData.extra.mainCallflowId) {
 						userData.directories[userData.extra.mainDirectoryId] = userData.extra.mainCallflowId;
 					}
 				}
 
-				if('differentEmail' in userData.extra && userData.extra.differentEmail) {
-					if ( 'email' in userData.extra ) {
-						userData.email = userData.extra.email
+				if ('differentEmail' in userData.extra && userData.extra.differentEmail) {
+					if ('email' in userData.extra) {
+						userData.email = userData.extra.email;
 					}
 				} else {
 					userData.email = userData.username;
 				}
 
-				if('language' in userData.extra) {
-					if(userData.extra.language !== 'auto') {
+				if ('language' in userData.extra) {
+					if (userData.extra.language !== 'auto') {
 						userData.language = userData.extra.language;
-					}
-					else {
+					} else {
 						delete userData.language;
 					}
 				}
 			}
 
-			if(userData.hasOwnProperty('call_forward')) {
-				if(userData.call_forward.number === '') {
+			if (userData.hasOwnProperty('call_forward')) {
+				if (userData.call_forward.number === '') {
 					delete userData.call_forward.number;
 				}
 			}
 
 			// if presence_id doesn't have a proper value, delete it and remove the internal callerId
-			if(!userData.hasOwnProperty('presence_id') || userData.presence_id === 'unset' || !userData.presence_id) {
+			if (!userData.hasOwnProperty('presence_id') || userData.presence_id === 'unset' || !userData.presence_id) {
 				delete userData.presence_id;
 
-				if(userData.caller_id.hasOwnProperty('internal')) {
+				if (userData.caller_id.hasOwnProperty('internal')) {
 					delete userData.caller_id.internal.number;
 				}
-			}
-			else {
+			} else {
 				// Always set the Internal Caller-ID Number to the Main Extension/Presence ID
 				userData.caller_id.internal.number = userData.presence_id + '';
 			}
 
-			if(userData.timezone === 'inherit') {
+			if (userData.timezone === 'inherit') {
 				delete userData.timezone;
 			}
 
@@ -2510,22 +2451,17 @@ define(function(require){
 		},
 
 		usersGetTemplate: function(type, userId, listUsers, callbackAfterData) {
-			var self = this,
-				template;
+			var self = this;
 
-			if(type === 'name') {
+			if (type === 'name') {
 				self.usersGetNameTemplate(userId, listUsers, callbackAfterData);
-			}
-			else if(type === 'numbers') {
+			} else if (type === 'numbers') {
 				self.usersGetNumbersTemplate(userId, callbackAfterData);
-			}
-			else if(type === 'extensions') {
+			} else if (type === 'extensions') {
 				self.usersGetExtensionsTemplate(userId, callbackAfterData);
-			}
-			else if(type === 'features') {
+			} else if (type === 'features') {
 				self.usersGetFeaturesTemplate(userId, listUsers, callbackAfterData);
-			}
-			else if(type === 'devices') {
+			} else if (type === 'devices') {
 				self.usersGetDevicesTemplate(userId, callbackAfterData);
 			}
 		},
@@ -2535,14 +2471,13 @@ define(function(require){
 
 			self.usersGetUser(userId, function(userData) {
 				_.each(listUsers.users, function(user) {
-					if(user.id === userData.id) {
+					if (user.id === userData.id) {
 						userData = $.extend(true, userData, user);
 					}
 				});
 
-				var dataTemplate = self.usersFormatUserData(userData);
-
-				template = $(monster.template(self, 'users-features', dataTemplate));
+				var dataTemplate = self.usersFormatUserData(userData),
+					template = $(monster.template(self, 'users-features', dataTemplate));
 
 				callback && callback(template, dataTemplate);
 			});
@@ -2551,92 +2486,88 @@ define(function(require){
 			var self = this;
 
 			monster.parallel({
-					mainCallflow: function(callback) {
-						self.usersGetMainCallflow(userId, function(mainCallflow) {
-							callback(null, mainCallflow);
-						});
-					},
-					mainDirectory: function(callback) {
-						self.usersGetMainDirectory(function(mainDirectory) {
-							callback(null, mainDirectory);
-						});
-					},
-					user: function(callback) {
-						self.usersGetUser(userId, function(userData) {
-							callback(null, userData);
-						});
-					},
-					vmboxes: function(callback) {
-						self.usersListVMBoxes(function(vmboxes) {
-							var firstVmboxId,
-								results = {
-									listExisting: [],
-									userVM: {}
-								};
-
-							_.each(vmboxes, function(vmbox) {
-								results.listExisting.push(vmbox.mailbox);
-
-								if(vmbox.owner_id === userId && !firstVmboxId) {
-									firstVmboxId = vmbox.id;
-								}
-							});
-
-							if(firstVmboxId) {
-								self.usersGetVMBox(firstVmboxId, function(vmbox) {
-									results.userVM = vmbox;
-
-									callback(null, results);
-								});
-							}
-							else {
-								callback(null, results);
-							}
-						});
-					}
+				mainCallflow: function(callback) {
+					self.usersGetMainCallflow(userId, function(mainCallflow) {
+						callback(null, mainCallflow);
+					});
 				},
-				function(error, results) {
-					var userData = results.user;
+				mainDirectory: function(callback) {
+					self.usersGetMainDirectory(function(mainDirectory) {
+						callback(null, mainDirectory);
+					});
+				},
+				user: function(callback) {
+					self.usersGetUser(userId, function(userData) {
+						callback(null, userData);
+					});
+				},
+				vmboxes: function(callback) {
+					self.usersListVMBoxes(function(vmboxes) {
+						var firstVmboxId,
+							results = {
+								listExisting: [],
+								userVM: {}
+							};
 
-					_.each(listUsers.users, function(user) {
-						if(user.id === results.user.id) {
-							userData = $.extend(true, user, userData);
+						_.each(vmboxes, function(vmbox) {
+							results.listExisting.push(vmbox.mailbox);
 
-							return false;
+							if (vmbox.owner_id === userId && !firstVmboxId) {
+								firstVmboxId = vmbox.id;
+							}
+						});
+
+						if (firstVmboxId) {
+							self.usersGetVMBox(firstVmboxId, function(vmbox) {
+								results.userVM = vmbox;
+
+								callback(null, results);
+							});
+						} else {
+							callback(null, results);
 						}
 					});
+				}
+			}, function(error, results) {
+				var userData = results.user;
 
-					var dataTemplate = self.usersFormatUserData(userData, results.mainDirectory, results.mainCallflow, results.vmboxes.userVM, results.vmboxes.listExisting);
+				_.each(listUsers.users, function(user) {
+					if (user.id === results.user.id) {
+						userData = $.extend(true, user, userData);
 
+						return false;
+					}
+				});
+
+				var dataTemplate = self.usersFormatUserData(userData, results.mainDirectory, results.mainCallflow, results.vmboxes.userVM, results.vmboxes.listExisting),
 					template = $(monster.template(self, 'users-name', dataTemplate));
 
-					monster.ui.validate(template.find('form.user-fields'), {
-						rules: {
-							'extra.ringingTimeout': {
-								digits: true
-							}
+				monster.ui.validate(template.find('form.user-fields'), {
+					rules: {
+						'extra.ringingTimeout': {
+							digits: true
+						}
+					},
+					messages: {
+						'first_name': {
+							required: self.i18n.active().validation.required
 						},
-						messages: {
-							'first_name': {
-								required: self.i18n.active().validation.required
-							},
-							'last_name': {
-								required: self.i18n.active().validation.required
-							}
+						'last_name': {
+							required: self.i18n.active().validation.required
 						}
-					});
+					}
+				});
 
-					timezone.populateDropdown(template.find('#user_timezone'), dataTemplate.timezone||'inherit', {inherit: self.i18n.active().defaultTimezone});
+				timezone.populateDropdown(template.find('#user_timezone'), dataTemplate.timezone || 'inherit', {inherit: self.i18n.active().defaultTimezone});
 
-					monster.ui.tooltips(template, {
-						options: {
-							container: 'body'
-						}
-					});
+				monster.ui.tooltips(template, {
+					options: {
+						container: 'body'
+					}
+				});
 
-					callbackAfterFormat && callbackAfterFormat(template, dataTemplate);
-				}
-			);
+				callbackAfterFormat && callbackAfterFormat(template, dataTemplate);
+			});
 		},
 
 		usersGetDevicesData: function(callback) {
@@ -2674,14 +2605,14 @@ define(function(require){
 
 							$.each(callflows, function(k, callflowLoop) {
 								/* Find Smart PBX Callflow of this user */
-								if(callflowLoop.owner_id === userId && callflowLoop.type === 'mainUserCallflow') {
+								if (callflowLoop.owner_id === userId && callflowLoop.type === 'mainUserCallflow') {
 									callflowId = callflowLoop.id;
 
 									return false;
 								}
 							});
 
-							if(callflowId) {
+							if (callflowId) {
 								self.callApi({
 									resource: 'callflow.get',
 									data: {
@@ -2694,8 +2625,7 @@ define(function(require){
 										callbackParallel && callbackParallel(null, response);
 									}
 								});
-							}
-							else {
+							} else {
 								callbackParallel && callbackParallel(null, response);
 							}
 						});
@@ -2705,11 +2635,11 @@ define(function(require){
 							callbackParallel && callbackParallel(null, listNumbers);
 						});
 					}
-				}
+				};
 
 			if (loadNumbersView) {
 				parallelRequests.devices = function(callbackParallel) {
-					self.usersListDeviceUser(userId, function (listDevices) {
+					self.usersListDeviceUser(userId, function(listDevices) {
 						callbackParallel && callbackParallel(null, listDevices);
 					});
 				};
@@ -2778,10 +2708,9 @@ define(function(require){
 				};
 
 			_.each(data, function(device) {
-				if(device.owner_id === userId) {
+				if (device.owner_id === userId) {
 					formattedData.assignedDevices[device.id] = device;
-				}
-				else if(device.owner_id === '' || !('owner_id' in device)) {
+				} else if (device.owner_id === '' || !('owner_id' in device)) {
 					formattedData.countSpare++;
 					formattedData.unassignedDevices[device.id] = device;
 				}
@@ -2805,7 +2734,7 @@ define(function(require){
 				};
 
 			if (data.hasOwnProperty('devices') && data.devices.length) {
-				_.each(data.devices, function(device, idx) {
+				_.each(data.devices, function(device) {
 					if (device.device_type === 'mobile') {
 						data.numbers.numbers[device.mobile.mdn] = {
 							assigned_to: response.user.id,
@@ -2819,33 +2748,31 @@ define(function(require){
 				});
 			}
 
-			if('numbers' in data.numbers) {
+			if ('numbers' in data.numbers) {
 				_.each(data.numbers.numbers, function(number, k) {
 					/* TODO: Once locality is enabled, we need to remove it */
 					number.localityEnabled = 'locality' in number ? true : false;
 
 					/* Adding to spare numbers */
-					if(!number.hasOwnProperty('used_by') || number.used_by === '') {
+					if (!number.hasOwnProperty('used_by') || number.used_by === '') {
 						response.countSpare++;
 						response.unassignedNumbers[k] = number;
-					}
-					else if (number.used_by === 'mobile') {
+					} else if (number.used_by === 'mobile') {
 						response.assignedNumbers.push(number);
 					}
 				});
 			}
 
-			if(response.callflow) {
+			if (response.callflow) {
 				/* If a number is in a callflow and is returned by the phone_numbers, add it to the assigned numbers  */
 				_.each(response.callflow.numbers, function(number) {
-					if(number in data.numbers.numbers) {
+					if (number in data.numbers.numbers) {
 						var numberElement = data.numbers.numbers[number];
 						numberElement.phoneNumber = number;
 						numberElement.isLocal = numberElement.features.indexOf('local') > -1;
 
 						response.assignedNumbers.push(numberElement);
-					}
-					else {
+					} else {
 						response.extensions.push(number);
 					}
 				});
@@ -2859,7 +2786,7 @@ define(function(require){
 			_.each(data.callflow.list, function(callflow) {
 				_.each(callflow.numbers, function(number) {
 					/* If it's a valid extension number (ie: a number that's not in the number database) */
-					if(!(number in data.numbers.numbers) && !(_.isNaN(parseInt(number)))) {
+					if (!(number in data.numbers.numbers) && !(_.isNaN(parseInt(number)))) {
 						response.allExtensions.push(number);
 					}
 				});
@@ -2871,7 +2798,7 @@ define(function(require){
 					parsedB = parseInt(b),
 					result = -1;
 
-				if(parsedA > 0 && parsedB > 0) {
+				if (parsedA > 0 && parsedB > 0) {
 					result = parsedA > parsedB;
 				}
 
@@ -2885,7 +2812,7 @@ define(function(require){
 			callback && callback(response);
 		},
 
-		usersFormatCreationData: function(data, callback) {
+		usersFormatCreationData: function(data) {
 			var self = this,
 				fullName = data.user.first_name + ' ' + data.user.last_name,
 				callerIdName = fullName.substring(0, 15),
@@ -2937,117 +2864,110 @@ define(function(require){
 			var self = this;
 
 			monster.parallel({
-					devices: function(callback) {
-						self.usersListDeviceUser(userId, function(devices) {
-							callback(null, devices);
-						});
-					},
-					vmbox: function(callback) {
-						self.usersListVMBoxesUser(userId, function(data) {
-							callback(null, data);
-						});
-					},
-					callflows: function(callback) {
-						self.usersListCallflowsUser(userId, function(data) {
-							callback(null, data);
-						});
-					},
-					conferences: function(callback) {
-						self.usersListConferences(userId, function(data) {
-							callback(null, data);
-						});
-					}
+				devices: function(callback) {
+					self.usersListDeviceUser(userId, function(devices) {
+						callback(null, devices);
+					});
 				},
-				function(error, results) {
-					var listFnDelete = [];
-
-					_.each(results.devices, function(device) {
-						listFnDelete.push(function(callback) {
-							if(removeDevices) {
-								self.usersDeleteDevice(device.id, function(data) {
-									callback(null, '');
-								});
-							}
-							else {
-								self.usersUnassignDevice(device.id, function(data) {
-									callback(null, '');
-								});
-							}
-						});
+				vmbox: function(callback) {
+					self.usersListVMBoxesUser(userId, function(data) {
+						callback(null, data);
 					});
+				},
+				callflows: function(callback) {
+					self.usersListCallflowsUser(userId, function(data) {
+						callback(null, data);
+					});
+				},
+				conferences: function(callback) {
+					self.usersListConferences(userId, function(data) {
+						callback(null, data);
+					});
+				}
+			}, function(error, results) {
+				var listFnDelete = [];
 
+				_.each(results.devices, function(device) {
 					listFnDelete.push(function(callback) {
-						self.usersRemoveBulkConferences(results.conferences, removeConferences, function() {
-							callback(null, '');
-						});
-					});
-
-					_.each(results.callflows, function(callflow) {
-
-						/*
-						Special case for users with mobile devices:
-						reassign mobile devices to their respective mobile callflow instead of just deleting the callflow
-						 */
-						if (callflow.type === 'mobile') {
-							listFnDelete.push(function(mainCallback) {
-								monster.parallel({
-										callflow: function(callback) {
-											self.usersGetCallflow(callflow.id, function(data) {
-												callback(null, data);
-											});
-										},
-										mobileDevice: function(callback) {
-											self.usersGetMobileDevice(callflow.numbers[0].slice(2), function(data) {
-												callback(null, data);
-											});
-										}
-									},
-									function(err, results) {
-										var fullCallflow = results.callflow,
-											mobileDeviceId = results.mobileDevice.id;
-
-										delete fullCallflow.owner_id;
-
-										$.extend(true, fullCallflow, {
-											flow: {
-												module: 'device',
-												data: {
-													id: mobileDeviceId
-												}
-											}
-										});
-
-										self.usersUpdateCallflow(fullCallflow, function(data) {
-											mainCallback(null, data);
-										});
-									}
-								);
+						if (removeDevices) {
+							self.usersDeleteDevice(device.id, function(data) {
+								callback(null, '');
+							});
+						} else {
+							self.usersUnassignDevice(device.id, function(data) {
+								callback(null, '');
 							});
 						}
-						else {
-							listFnDelete.push(function(callback) {
-								self.usersDeleteCallflow(callflow.id, function(data) {
-									callback(null, '');
+					});
+				});
+
+				listFnDelete.push(function(callback) {
+					self.usersRemoveBulkConferences(results.conferences, removeConferences, function() {
+						callback(null, '');
+					});
+				});
+
+				_.each(results.callflows, function(callflow) {
+					/*
+					Special case for users with mobile devices:
+					reassign mobile devices to their respective mobile callflow instead of just deleting the callflow
+					 */
+					if (callflow.type === 'mobile') {
+						listFnDelete.push(function(mainCallback) {
+							monster.parallel({
+								callflow: function(callback) {
+									self.usersGetCallflow(callflow.id, function(data) {
+										callback(null, data);
+									});
+								},
+								mobileDevice: function(callback) {
+									self.usersGetMobileDevice(callflow.numbers[0].slice(2), function(data) {
+										callback(null, data);
+									});
+								}
+							}, function(err, results) {
+								var fullCallflow = results.callflow,
+									mobileDeviceId = results.mobileDevice.id;
+
+								delete fullCallflow.owner_id;
+
+								$.extend(true, fullCallflow, {
+									flow: {
+										module: 'device',
+										data: {
+											id: mobileDeviceId
+										}
+									}
+								});
+
+								self.usersUpdateCallflow(fullCallflow, function(data) {
+									mainCallback(null, data);
 								});
 							});
-						}
-					});
-
-					_.each(results.vmbox, function(vmbox) {
+						});
+					} else {
 						listFnDelete.push(function(callback) {
-							self.usersDeleteVMBox(vmbox.id, function(data) {
+							self.usersDeleteCallflow(callflow.id, function(data) {
 								callback(null, '');
 							});
 						});
-					});
+					}
+				});
 
-					monster.parallel(listFnDelete, function(err, resultsDelete) {
-						self.usersDeleteUser(userId, function(data) {
-							callback && callback(data);
+				_.each(results.vmbox, function(vmbox) {
+					listFnDelete.push(function(callback) {
+						self.usersDeleteVMBox(vmbox.id, function(data) {
+							callback(null, '');
 						});
 					});
-				}
-			);
+				});
+
+				monster.parallel(listFnDelete, function(err, resultsDelete) {
+					self.usersDeleteUser(userId, function(data) {
+						callback && callback(data);
+					});
+				});
+			});
 		},
 
 		usersGetCallflow: function(callflowId, callback) {
@@ -3177,15 +3097,14 @@ define(function(require){
 						data.callflow.owner_id = userId;
 						data.callflow.type = 'mainUserCallflow';
 						data.callflow.flow.data.id = userId;
-						data.callflow.flow.children['_'].data.id = _dataVM.id;
+						data.callflow.flow.children._.data.id = _dataVM.id;
 
 						self.usersCreateCallflow(data.callflow, function(_dataCF) {
-							if(data.extra.includeInDirectory) {
+							if (data.extra.includeInDirectory) {
 								self.usersAddUserToMainDirectory(_dataUser.data, _dataCF.id, function(dataDirectory) {
 									success(data);
 								});
-							}
-							else {
+							} else {
 								success(data);
 							}
 						});
@@ -3239,7 +3158,7 @@ define(function(require){
 					user: user,
 					needVMUpdate: false,
 					callback: function(_dataVM) {
-						callflow.flow.children['_'].data.id = _dataVM.id;
+						callflow.flow.children._.data.id = _dataVM.id;
 
 						self.usersCreateCallflow(callflow,
 							function(_dataCF) {
@@ -3250,12 +3169,11 @@ define(function(require){
 									globalHandler && globalHandler(errorPayload, { generateError: true });
 								};
 
-								if(errorPayload.error === '400' && errorPayload.hasOwnProperty('data') && errorPayload.data.hasOwnProperty('numbers') && errorPayload.data.numbers.hasOwnProperty('unique')) {
+								if (errorPayload.error === '400' && errorPayload.hasOwnProperty('data') && errorPayload.data.hasOwnProperty('numbers') && errorPayload.data.numbers.hasOwnProperty('unique')) {
 									self.usersHasKazooUICallflow(callflow, function(existingCallflow) {
 										self.usersMigrateKazooUIUser(callflow, existingCallflow, callback);
 									}, errorCallback);
-								}
-								else {
+								} else {
 									errorCallback();
 								}
 							},
@@ -3277,10 +3195,10 @@ define(function(require){
 					value: number
 				},
 				success: function(results) {
-					if(results.data.length > 0) {
+					if (results.data.length > 0) {
 						_.each(results.data, function(callflow) {
-							_.each(callflow.numbers, function(n) {
-								if(n === number && found === false) {
+							_.each(callflow.numbers, function(num) {
+								if (num === number && found === false) {
 									found = true;
 
 									self.callApi({
@@ -3292,16 +3210,15 @@ define(function(require){
 										success: function(callflow) {
 											callback && callback(callflow.data);
 										}
-									})
+									});
 								}
 							});
 						});
 
-						if(found === false) {
+						if (found === false) {
 							callback && callback({});
 						}
-					}
-					else {
+					} else {
 						callback && callback({});
 					}
 				}
@@ -3318,16 +3235,15 @@ define(function(require){
 			_.each(callflow.numbers, function(number) {
 				parallelRequests[number] = function(callback) {
 					self.usersGetCallflowFromNumber(number, function(callflow) {
-						if(!(callflow.hasOwnProperty('ui_metadata') && callflow.ui_metadata.hasOwnProperty('ui') && callflow.ui_metadata.ui === 'monster-ui')) {
+						if (!(callflow.hasOwnProperty('ui_metadata') && callflow.ui_metadata.hasOwnProperty('ui') && callflow.ui_metadata.ui === 'monster-ui')) {
 							// If we already found a callflow
-							if(typeof kazooUICallflow !== 'undefined') {
+							if (typeof kazooUICallflow !== 'undefined') {
 								// If it's not the same Callflow that we found before, we increment the # of callflows found, which will trigger an error later
 								// If it's the same as before we do nothing
-								if(callflow.id !== kazooUICallflow.id) {
+								if (callflow.id !== kazooUICallflow.id) {
 									kazooUICallflowFound++;
 								}
-							}
-							else {
+							} else {
 								kazooUICallflowFound++;
 								kazooUICallflow = callflow;
 							}
@@ -3335,21 +3251,18 @@ define(function(require){
 
 						callback && callback(null, {});
 					});
-				}
+				};
 			});
 
-			
 			monster.parallel(parallelRequests, function(err, results) {
 				// If we didn't find a single non-Monster-UI Callflow, then we trigger the error
-				if(kazooUICallflowFound === 0) {
+				if (kazooUICallflowFound === 0) {
 					error && error();
-				}
 				// If we had more than 1 Kazoo UI callflow, show an error saying the migration is impossible
-				else if(kazooUICallflowFound > 1) {
+				} else if (kazooUICallflowFound > 1) {
 					monster.ui.alert(self.i18n.active().users.migration.tooManyCallflows);
-				}
 				// Else, we have found 1 callflow from Kazoo-UI, migration is possible, we continue with the success callback
-				else {
+				} else {
 					success && success(kazooUICallflow);
 				}
 			});
@@ -3371,12 +3284,12 @@ define(function(require){
 			// Make sure the User knows what's going to happen
 			monster.ui.confirm(self.i18n.active().users.migration.confirmMigration, function() {
 				// First update the existing callflow with its new fake numbers
-				self.usersUpdateCallflow(existingCallflow, function(oldCallflow) {
+				self.usersUpdateCallflow(existingCallflow, function() {
 					// Now that the numbers have been changed, we can create the new Monster UI Callflow
 					self.usersCreateCallflow(callflowToCreate, function(newCallflow) {
 						// Once all this is done, continue normally to the SmartPBX normal update
 						callback && callback(newCallflow);
-					})
+					});
 				});
 			});
 		},
@@ -3401,17 +3314,16 @@ define(function(require){
 				var indexMain = -1;
 
 				_.each(listCallflows, function(callflow, index) {
-					if(callflow.owner_id === userId && callflow.type === 'mainUserCallflow' || !('type' in callflow)) {
+					if (callflow.owner_id === userId && callflow.type === 'mainUserCallflow' || !('type' in callflow)) {
 						indexMain = index;
 						return false;
 					}
 				});
 
-				if(indexMain === -1) {
+				if (indexMain === -1) {
 					//toastr.error(self.i18n.active().users.noUserCallflow);
 					callback(null);
-				}
-				else {
+				} else {
 					self.callApi({
 						resource: 'callflow.get',
 						data: {
@@ -3429,7 +3341,7 @@ define(function(require){
 			});
 		},
 
-		usersSearchMobileCallflowsByNumber: function (userId, phoneNumber, callback) {
+		usersSearchMobileCallflowsByNumber: function(userId, phoneNumber, callback) {
 			var self = this;
 
 			self.callApi({
@@ -3453,19 +3365,18 @@ define(function(require){
 				var indexMain = -1;
 
 				_.each(listDirectories, function(directory, index) {
-					if(directory.name === 'SmartPBX Directory') {
+					if (directory.name === 'SmartPBX Directory') {
 						indexMain = index;
 
 						return false;
 					}
 				});
 
-				if(indexMain === -1) {
+				if (indexMain === -1) {
 					self.usersCreateMainDirectory(function(data) {
 						callback(data);
 					});
-				}
-				else {
+				} else {
 					callback(listDirectories[indexMain]);
 				}
 			});
@@ -3682,31 +3593,28 @@ define(function(require){
 				};
 
 			monster.parallel({
-					confNumbers: function(callback) {
-						self.usersListConfNumbers(function(numbers) {
-							callback && callback(null, numbers);
-						});
-					},
-					listConferences: function(callback) {
-						self.usersListConferences(userId, function(conferences) {
-							if(conferences.length > 0) {
-								self.usersGetConference(conferences[0].id, function(conference) {
-									callback && callback(null, conference);
-								});
-							}
-							else {
-								callback && callback(null, {});
-							}
-						});
-					}
+				confNumbers: function(callback) {
+					self.usersListConfNumbers(function(numbers) {
+						callback && callback(null, numbers);
+					});
 				},
-				function(err, results) {
-					dataResponse.conference = results.listConferences;
-					dataResponse.listConfNumbers = results.confNumbers;
-
-					globalCallback && globalCallback(dataResponse);
+				listConferences: function(callback) {
+					self.usersListConferences(userId, function(conferences) {
+						if (conferences.length > 0) {
+							self.usersGetConference(conferences[0].id, function(conference) {
+								callback && callback(null, conference);
+							});
+						} else {
+							callback && callback(null, {});
+						}
+					});
 				}
-			);
+			}, function(err, results) {
+				dataResponse.conference = results.listConferences;
+				dataResponse.listConfNumbers = results.confNumbers;
+
+				globalCallback && globalCallback(dataResponse);
+			});
 		},
 
 		usersListConfNumbers: function(callback) {
@@ -3725,8 +3633,8 @@ define(function(require){
 					var numbers = [];
 
 					_.each(data.data, function(conf) {
-						if(conf.name === 'MainConference') {
-							if(conf.numbers.length > 0 && conf.numbers[0] !== 'undefinedconf') {
+						if (conf.name === 'MainConference') {
+							if (conf.numbers.length > 0 && conf.numbers[0] !== 'undefinedconf') {
 								numbers = numbers.concat(conf.numbers);
 							}
 						}
@@ -3897,68 +3805,66 @@ define(function(require){
 			var self = this;
 
 			monster.parallel({
-					users: function(callback) {
-						self.callApi({
-							resource: 'user.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									paginate: 'false'
-								}
-							},
-							success: function(dataUsers) {
-								callback(null, dataUsers.data);
+				users: function(callback) {
+					self.callApi({
+						resource: 'user.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								paginate: 'false'
 							}
-						});
-					},
-					callflows: function(callback) {
-						self.usersListCallflows(function(callflows) {
-							callback(null, callflows);
-						});
-					},
-					devices: function(callback) {
-						self.usersGetDevicesData(function(devices) {
-							callback(null, devices);
-						});
-					},
-					deviceStatus: function(callback) {
-						self.callApi({
-							resource: 'device.getStatus',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									paginate: 'false'
-								}
-							},
-							success: function(data, status) {
-								callback(null, data.data);
-							}
-						});
-					}
+						},
+						success: function(dataUsers) {
+							callback(null, dataUsers.data);
+						}
+					});
 				},
-				function(err, results) {
-					callback && callback(results);
+				callflows: function(callback) {
+					self.usersListCallflows(function(callflows) {
+						callback(null, callflows);
+					});
+				},
+				devices: function(callback) {
+					self.usersGetDevicesData(function(devices) {
+						callback(null, devices);
+					});
+				},
+				deviceStatus: function(callback) {
+					self.callApi({
+						resource: 'device.getStatus',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								paginate: 'false'
+							}
+						},
+						success: function(data, status) {
+							callback(null, data.data);
+						}
+					});
 				}
-			);
+			}, function(err, results) {
+				callback && callback(results);
+			});
 		},
 
 		usersUpdateDevices: function(data, userId, callbackAfterUpdate) {
 			var self = this,
 				updateDevices = function(userCallflow) {
 					var listFnParallel = [],
-						updateDeviceRequest = function (newDataDevice, callback) {
-							self.usersUpdateDevice(newDataDevice, function (updatedDataDevice) {
+						updateDeviceRequest = function(newDataDevice, callback) {
+							self.usersUpdateDevice(newDataDevice, function(updatedDataDevice) {
 								callback(null, updatedDataDevice);
 							});
-						}
+						};
 
-					_.each(data.new, function(deviceId) {
+					_.each(data.newDevices, function(deviceId) {
 						listFnParallel.push(function(callback) {
 							self.usersGetDevice(deviceId, function(data) {
 								data.owner_id = userId;
 
-								if (data.device_type === "mobile") {
-									self.usersSearchMobileCallflowsByNumber(userId, data.mobile.mdn, function (listCallflowData) {
+								if (data.device_type === 'mobile') {
+									self.usersSearchMobileCallflowsByNumber(userId, data.mobile.mdn, function(listCallflowData) {
 										self.callApi({
 											resource: 'callflow.get',
 											data: {
@@ -3978,8 +3884,7 @@ define(function(require){
 															}
 														}
 													});
-												}
-												else {
+												} else {
 													$.extend(true, callflowData, {
 														owner_id: userId,
 														flow: {
@@ -3991,27 +3896,26 @@ define(function(require){
 													});
 												}
 
-												self.usersUpdateCallflow(callflowData, function () {
+												self.usersUpdateCallflow(callflowData, function() {
 													updateDeviceRequest(data, callback);
 												});
 											}
 										});
 									});
-								}
-								else {
+								} else {
 									updateDeviceRequest(data, callback);
 								}
 							});
 						});
 					});
 
-					_.each(data.old, function(deviceId) {
+					_.each(data.oldDevices, function(deviceId) {
 						listFnParallel.push(function(callback) {
 							self.usersGetDevice(deviceId, function(data) {
 								delete data.owner_id;
 
 								if (data.device_type === 'mobile') {
-									self.usersSearchMobileCallflowsByNumber(userId, data.mobile.mdn, function (listCallflowData) {
+									self.usersSearchMobileCallflowsByNumber(userId, data.mobile.mdn, function(listCallflowData) {
 										self.callApi({
 											resource: 'callflow.get',
 											data: {
@@ -4031,38 +3935,39 @@ define(function(require){
 													}
 												});
 
-												self.usersUpdateCallflow(callflowData, function () {
+												self.usersUpdateCallflow(callflowData, function() {
 													updateDeviceRequest(data, callback);
 												});
 											}
 										});
 									});
-								}
-								else {
+								} else {
 									updateDeviceRequest(data, callback);
 								}
 							});
 						});
 					});
 
-					if(data.old.length > 0 && userCallflow && userCallflow.flow.module === 'ring_group') {
+					if (data.oldDevices.length > 0 && userCallflow && userCallflow.flow.module === 'ring_group') {
 						var endpointsCount = userCallflow.flow.data.endpoints.length;
-						userCallflow.flow.data.endpoints =_.filter(userCallflow.flow.data.endpoints, function(endpoint) {
-							return (data.old.indexOf(endpoint.id) < 0);
+
+						userCallflow.flow.data.endpoints = _.filter(userCallflow.flow.data.endpoints, function(endpoint) {
+							return (data.oldDevices.indexOf(endpoint.id) < 0);
 						});
-						if(userCallflow.flow.data.endpoints.length < endpointsCount) {
-							if(userCallflow.flow.data.endpoints.length === 0) {
+
+						if (userCallflow.flow.data.endpoints.length < endpointsCount) {
+							if (userCallflow.flow.data.endpoints.length === 0) {
 								userCallflow.flow.module = 'user';
 								userCallflow.flow.data = {
 									can_call_self: false,
 									id: userId,
-									timeout: "20"
-								}
+									timeout: '20'
+								};
 								listFnParallel.push(function(callback) {
 									self.usersGetUser(userId, function(user) {
 										user.smartpbx.find_me_follow_me.enabled = false;
 										self.usersUpdateUser(user, function(data) {
-											callback(null, data)
+											callback(null, data);
 										});
 									});
 								});
@@ -4081,15 +3986,15 @@ define(function(require){
 				};
 
 			self.usersGetMainCallflow(userId, function(callflow) {
-				updateDevices(callflow)
+				updateDevices(callflow);
 			});
 		},
 
 		usersUpdateCallflowNumbers: function(userId, callflowId, numbers, callback) {
 			var self = this;
 
-			if(numbers.length > 0) {
-				if(callflowId) {
+			if (numbers.length > 0) {
+				if (callflowId) {
 					self.callApi({
 						resource: 'callflow.get',
 						data: {
@@ -4104,19 +4009,16 @@ define(function(require){
 							});
 						}
 					});
-				}
-				else {
-					if(numbers[0].length < 7) {
+				} else {
+					if (numbers[0].length < 7) {
 						self.usersMigrateFromExtensions(userId, numbers, function(data) {
 							callback && callback(data);
 						});
-					}
-					else {
+					} else {
 						toastr.error(self.i18n.active().users.needExtensionFirst);
 					}
 				}
-			}
-			else {
+			} else {
 				toastr.error(self.i18n.active().users.noNumberCallflow);
 			}
 		},
@@ -4185,13 +4087,13 @@ define(function(require){
 				userExtension = args.userExtension;
 
 			self.usersListVMBoxesUser(user.id, function(vmboxes) {
-				if(vmboxes.length > 0) {
-					if(needVMUpdate) {
+				if (vmboxes.length > 0) {
+					if (needVMUpdate) {
 						self.usersGetVMBox(vmboxes[0].id, function(vmbox) {
 							vmbox.name = user.first_name + ' ' + user.last_name + '\'s VMBox';
 							// We only want to update the vmbox number if it was already synced with the presenceId (and if the presenceId was not already set)
 							// This allows us to support old clients who have mailbox number != than their extension number
-							if(oldPresenceId === vmbox.mailbox) {
+							if (oldPresenceId === vmbox.mailbox) {
 								// If it's synced, then we update the vmbox number as long as the main extension is set to something different than 'unset' in which case we don't update the vmbox number value
 								vmbox.mailbox = (user.presence_id && user.presence_id !== 'unset') ? user.presence_id + '' : vmbox.mailbox;
 							}
@@ -4200,12 +4102,10 @@ define(function(require){
 								callback && callback(vmboxSaved);
 							});
 						});
-					}
-					else {
+					} else {
 						callback && callback(vmboxes[0]);
 					}
-				}
-				else {
+				} else {
 					var vmbox = {
 						owner_id: user.id,
 						mailbox: user.presence_id || userExtension || user.extra.vmbox.mailbox,
@@ -4223,100 +4123,93 @@ define(function(require){
 			var self = this;
 
 			monster.parallel({
-					conference: function(callback) {
-						var baseConference = {
-							name: data.user.first_name + ' ' + data.user.last_name + ' SmartPBX Conference',
-							owner_id: data.user.id,
-							play_name_on_join: true,
-							member: {
-								join_muted: false
-							},
-							conference_numbers: []
-						};
+				conference: function(callback) {
+					var baseConference = {
+						name: data.user.first_name + ' ' + data.user.last_name + ' SmartPBX Conference',
+						owner_id: data.user.id,
+						play_name_on_join: true,
+						member: {
+							join_muted: false
+						},
+						conference_numbers: []
+					};
 
-						monster.util.dataFlags.add({ source: 'smartpbx'}, baseConference);
+					monster.util.dataFlags.add({ source: 'smartpbx' }, baseConference);
 
-						baseConference = $.extend(true, {}, baseConference, data.conference);
+					baseConference = $.extend(true, {}, baseConference, data.conference);
 
-						self.usersListConferences(data.user.id, function(conferences) {
-							var conferenceToSave = baseConference;
-							if(conferences.length > 0) {
-								conferenceToSave = $.extend(true, {}, conferences[0], baseConference);
+					self.usersListConferences(data.user.id, function(conferences) {
+						var conferenceToSave = baseConference;
+						if (conferences.length > 0) {
+							conferenceToSave = $.extend(true, {}, conferences[0], baseConference);
 
-								self.usersUpdateConference(conferenceToSave, function(conference) {
-									callback && callback(null, conference);
-								});
-							}
-							else {
-								self.usersCreateConference(conferenceToSave, function(conference) {
-									callback && callback(null, conference);
-								});
-							}
-						});
-					},
-					user: function(callback) {
-						if(data.user.smartpbx && data.user.smartpbx.conferencing && data.user.smartpbx.conferencing.enabled === true) {
-							callback && callback(null, data.user);
-						}
-						else {
-							data.user.smartpbx = data.user.smartpbx || {};
-							data.user.smartpbx.conferencing = data.user.smartpbx.conferencing || {};
-
-							data.user.smartpbx.conferencing.enabled = true;
-
-							self.usersUpdateUser(data.user, function(user) {
-								callback && callback(null, user.data);
+							self.usersUpdateConference(conferenceToSave, function(conference) {
+								callback && callback(null, conference);
+							});
+						} else {
+							self.usersCreateConference(conferenceToSave, function(conference) {
+								callback && callback(null, conference);
 							});
 						}
-					}
+					});
 				},
-				function(err, results) {
-					globalCallback && globalCallback(results);
+				user: function(callback) {
+					if (data.user.smartpbx && data.user.smartpbx.conferencing && data.user.smartpbx.conferencing.enabled === true) {
+						callback && callback(null, data.user);
+					} else {
+						data.user.smartpbx = data.user.smartpbx || {};
+						data.user.smartpbx.conferencing = data.user.smartpbx.conferencing || {};
+
+						data.user.smartpbx.conferencing.enabled = true;
+
+						self.usersUpdateUser(data.user, function(user) {
+							callback && callback(null, user.data);
+						});
+					}
 				}
-			);
+			}, function(err, results) {
+				globalCallback && globalCallback(results);
+			});
 		},
 
 		usersUpdateFaxing: function(data, newNumber, globalCallback) {
 			var self = this;
 
 			monster.parallel({
-					callflow: function(callback) {
-						var baseCallflow = {};
+				callflow: function(callback) {
+					var baseCallflow = {};
 
-						self.usersListCallflowsUser(data.user.id, function(callflows) {
-							_.each(callflows, function(callflow) {
-								if(callflow.type === 'faxing') {
-									baseCallflow.id = callflow.id;
+					self.usersListCallflowsUser(data.user.id, function(callflows) {
+						_.each(callflows, function(callflow) {
+							if (callflow.type === 'faxing') {
+								baseCallflow.id = callflow.id;
 
-									return false;
-								}
-							});
-
-							self.usersUpdateCallflowFaxing(data, newNumber, baseCallflow, function(callflow) {
-								callback && callback(null, callflow);
-							});
+								return false;
+							}
 						});
-					},
-					user: function(callback) {
-						if(data.user.smartpbx && data.user.smartpbx.faxing && data.user.smartpbx.faxing.enabled === true) {
-							callback && callback(null, data.user);
-						}
-						else {
-							data.user.smartpbx = data.user.smartpbx || {};
-							data.user.smartpbx.faxing = data.user.smartpbx.faxing || {};
 
-							data.user.smartpbx.faxing.enabled = true;
-
-							self.usersUpdateUser(data.user, function(user) {
-								callback && callback(null, user.data);
-							});
-						}
-					}
+						self.usersUpdateCallflowFaxing(data, newNumber, baseCallflow, function(callflow) {
+							callback && callback(null, callflow);
+						});
+					});
 				},
-				function(err, results) {
-					globalCallback && globalCallback(results);
+				user: function(callback) {
+					if (data.user.smartpbx && data.user.smartpbx.faxing && data.user.smartpbx.faxing.enabled === true) {
+						callback && callback(null, data.user);
+					} else {
+						data.user.smartpbx = data.user.smartpbx || {};
+						data.user.smartpbx.faxing = data.user.smartpbx.faxing || {};
+
+						data.user.smartpbx.faxing.enabled = true;
+
+						self.usersUpdateUser(data.user, function(user) {
+							callback && callback(null, user.data);
+						});
+					}
 				}
-			);
+			}, function(err, results) {
+				globalCallback && globalCallback(results);
+			});
 		},
 
 		usersUpdateCallflowFaxing: function(data, newNumber, callflow, callback) {
@@ -4342,12 +4235,12 @@ define(function(require){
 
 			callflow = $.extend(true, {}, baseCallflow, callflow);
 
-			if( callflow.hasOwnProperty('id') ) {
+			if (callflow.hasOwnProperty('id')) {
 				faxbox = $.extend(true, {}, faxbox, number);
 
 				self.callApi({
 					resource: 'faxbox.update',
-					data:{
+					data: {
 						accountId: self.accountId,
 						faxboxId: faxbox.id,
 						data: faxbox
@@ -4393,12 +4286,11 @@ define(function(require){
 
 			_.each(conferences, function(conference) {
 				listRequests.push(function(subCallback) {
-					if(forceDelete) {
+					if (forceDelete) {
 						self.usersDeleteConference(conference.id, function(data) {
 							subCallback(null, data);
 						});
-					}
-					else {
+					} else {
 						self.usersUnassignConference(conference.id, function(data) {
 							subCallback(null, data);
 						});
@@ -4415,100 +4307,94 @@ define(function(require){
 			var self = this;
 
 			monster.parallel({
-					conferences: function(callback) {
-						self.usersListConferences(userId, function(conferences) {
-							self.usersRemoveBulkConferences(conferences, true, function(results) {
-								callback && callback(null, results);
-							});
+				conferences: function(callback) {
+					self.usersListConferences(userId, function(conferences) {
+						self.usersRemoveBulkConferences(conferences, true, function(results) {
+							callback && callback(null, results);
 						});
-					},
-					user: function(callback) {
-						self.usersGetUser(userId, function(user) {
-							//user.conferencing_enabled = false;
-							user.smartpbx = user.smartpbx || {};
-							user.smartpbx.conferencing = user.smartpbx.conferencing || {};
-
-							user.smartpbx.conferencing.enabled = false;
-
-							self.usersUpdateUser(user, function(user) {
-								callback(null, user);
-							});
-						});
-
-					}
+					});
 				},
-				function(err, results) {
-					globalCallback && globalCallback(results);
+				user: function(callback) {
+					self.usersGetUser(userId, function(user) {
+						//user.conferencing_enabled = false;
+						user.smartpbx = user.smartpbx || {};
+						user.smartpbx.conferencing = user.smartpbx.conferencing || {};
+
+						user.smartpbx.conferencing.enabled = false;
+
+						self.usersUpdateUser(user, function(user) {
+							callback(null, user);
+						});
+					});
 				}
-			);
+			}, function(err, results) {
+				globalCallback && globalCallback(results);
+			});
 		},
 
 		usersDeleteFaxing: function(userId, globalCallback) {
 			var self = this;
 
 			monster.parallel({
-					callflows: function(callback) {
-						self.usersListCallflowsUser(userId, function(callflows) {
-							var listRequests = [];
+				callflows: function(callback) {
+					self.usersListCallflowsUser(userId, function(callflows) {
+						var listRequests = [];
 
-							_.each(callflows, function(callflow) {
-								if(callflow.type === 'faxing') {
-									listRequests.push(function(subCallback) {
-										self.callApi({
-											resource: 'callflow.get',
-											data: {
-												accountId: self.accountId,
-												callflowId: callflow.id
-											},
-											success: function(data, status) {
-												self.callApi({
-													resource: 'faxbox.delete',
-													data: {
-														accountId: self.accountId,
-														faxboxId: data.data.flow.data.faxbox_id || data.data.flow.data.id,
-														generateError: false
-													},
-													success: function(_data, status) {
-														self.usersDeleteCallflow(callflow.id, function(results) {
-															subCallback(null, results);
-														});
-													},
-													error: function(_data, error) {
-														self.usersDeleteCallflow(callflow.id, function(results) {
-															subCallback(null, results);
-														});
-													}
-												});
-											}
-										});
+						_.each(callflows, function(callflow) {
+							if (callflow.type === 'faxing') {
+								listRequests.push(function(subCallback) {
+									self.callApi({
+										resource: 'callflow.get',
+										data: {
+											accountId: self.accountId,
+											callflowId: callflow.id
+										},
+										success: function(data, status) {
+											self.callApi({
+												resource: 'faxbox.delete',
+												data: {
+													accountId: self.accountId,
+													faxboxId: data.data.flow.data.faxbox_id || data.data.flow.data.id,
+													generateError: false
+												},
+												success: function(_data, status) {
+													self.usersDeleteCallflow(callflow.id, function(results) {
+														subCallback(null, results);
+													});
+												},
+												error: function(_data, error) {
+													self.usersDeleteCallflow(callflow.id, function(results) {
+														subCallback(null, results);
+													});
+												}
+											});
+										}
 									});
-								}
-							});
-
-							monster.parallel(listRequests, function(err, results) {
-								callback && callback(results);
-							});
-						});
-					},
-					user: function(callback) {
-						self.usersGetUser(userId, function(user) {
-							//user.faxing_enabled = false;
-							user.smartpbx = user.smartpbx || {};
-							user.smartpbx.faxing = user.smartpbx.faxing || {};
-
-							user.smartpbx.faxing.enabled = false;
-
-							self.usersUpdateUser(user, function(user) {
-								callback(null, user);
-							});
+								});
+							}
 						});
 
-					}
+						monster.parallel(listRequests, function(err, results) {
+							callback && callback(results);
+						});
+					});
 				},
-				function(err, results) {
-					globalCallback && globalCallback(results);
+				user: function(callback) {
+					self.usersGetUser(userId, function(user) {
+						//user.faxing_enabled = false;
+						user.smartpbx = user.smartpbx || {};
+						user.smartpbx.faxing = user.smartpbx.faxing || {};
+
+						user.smartpbx.faxing.enabled = false;
+
+						self.usersUpdateUser(user, function(user) {
+							callback(null, user);
+						});
+					});
 				}
-			);
+			}, function(err, results) {
+				globalCallback && globalCallback(results);
+			});
 		},
 
 		usersSortExtensions: function(a, b) {
@@ -4516,7 +4402,7 @@ define(function(require){
 				parsedB = parseInt(b),
 				result = -1;
 
-			if(parsedA > 0 && parsedB > 0) {
+			if (parsedA > 0 && parsedB > 0) {
 				result = parsedA > parsedB;
 			}
 
