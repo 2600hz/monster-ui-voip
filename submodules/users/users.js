@@ -1008,9 +1008,9 @@ define(function(require) {
 					userId = $(this).parents('.grid-row').data('id');
 
 				template.find('.detail-devices .list-assigned-items .item-row:not(.assigned)').each(function(k, row) {
-					dataDevices.newDevice.push($(row).data('id'));
+					dataDevices.newDevices.push($(row).data('id'));
 				});
-				dataDevices.oldDevice = _.keys(unassignedDevices);
+				dataDevices.oldDevices = _.keys(unassignedDevices);
 
 				self.usersUpdateDevices(dataDevices, userId, function() {
 					toastr.success(monster.template(self, '!' + toastrMessages.devicesUpdated, { name: name }));
