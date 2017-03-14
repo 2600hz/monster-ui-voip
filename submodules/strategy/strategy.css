@@ -689,3 +689,39 @@
 	padding-top: 4px;
 	padding-bottom: 4px;
 }
+
+/**** CSS For Changing the E911 *****/
+.e911-change-wrapper {
+	padding: 15px;
+	width: 400px;
+}
+
+.e911-change-wrapper .cancel-link {
+	margin-right: 5px;
+}
+
+.e911-change-wrapper .list-choices {
+	margin-bottom: 20px;
+	margin-top: 20px;
+}
+
+.e911-change-wrapper .list-choices .choice {
+	background: #EEE;
+	padding: 20px;
+	border: 1px solid #CCC;
+	margin-bottom: 5px;
+}
+
+.e911-change-wrapper .list-choices .choice:hover {
+	background: #FFF;
+	cursor: pointer;
+}
+
+.e911-change-wrapper .list-choices .choice.active {
+	background: #FFF;
+	border: 1px solid #22a5ff;
+}
+
+.e911-change-wrapper .actions {
+	margin-top: 10px;
+}

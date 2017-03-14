@@ -1,0 +1,26 @@
+<div class="e911-change-wrapper">
+	<div class="header">
+		{{#if oldNumber}}
+			{{ i18n.strategy.updateE911Dialog.headerNewE911 }}
+		{{else}}
+			{{ i18n.strategy.updateE911Dialog.headerNoE911 }}
+		{{/if}}
+	</div>
+
+	<div class="list-choices">
+		{{#if oldNumber}}
+			<div class="choice" data-number="{{oldNumber}}">{{ formatPhoneNumber oldNumber }} <span class="current">({{ i18n.strategy.updateE911Dialog.current }})</span></div>
+		{{/if}}
+
+		{{#each newNumbers}} 
+			<div class="choice"" data-number="{{this}}">{{ formatPhoneNumber this }}</div>
+		{{/each}}
+	</div>
+
+	<div class="actions clearfix">
+		<div class="pull-right">
+			<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
+			<button type="button" class="monster-button monster-button-success save">{{ i18n.save }}</button>
+		</div>
+	</div>
+</div>
