@@ -333,6 +333,39 @@ define(function(require) {
 			});
 		},
 
+		strategyShowE911Choices: function(oldNumber, newNumbers) {
+			var self = this,
+				template = $(monster.template(self, 'strategy-changeE911Popup', { oldNumber: oldNumber, newNumbers: newNumbers })),
+				$options = template.find('.choice');
+
+			$options.on('click', function() {
+				$options.removeClass('active');
+
+				$(this).addClass('active');
+			});
+
+			template.find('.save').on('click', function() {
+				var number = template.find('.active').data('number');
+
+				if (number === oldNumber) {
+					popup.dialog('close');
+				} else {
+					self.strategyChangeEmergencyCallerId(number, function() {
+						toastr.success(monster.template(self, '!'+ self.i18n.active().strategy.updateE911Dialog.success, { number: monster.util.formatPhoneNumber(number) }));
+						popup.dialog('close');
+					});
+				}
+			});
+
+			template.find('.cancel-link').on('click', function() {
+				popup.dialog('close');
+			});
+
+			var popup = monster.ui.dialog(template, {
+				title: self.i18n.active().strategy.updateE911Dialog.title
+			});
+		},
+
 		strategyBindEvents: function(template, strategyData) {
 			var self = this,
 				containers = template.find('.element-container'),
@@ -382,6 +415,42 @@ define(function(require) {
 			self.strategyCallsBindEvents(strategyCallsContainer, strategyData);
 		},
 
+		strategyCheckIfUpdateEmergencyCallerID: function(templateNumbers, features, number) {
+			var self = this;
+
+			// Update data we have about features for main numbers
+			_.each(templateNumbers, function(dataLoop, index) {
+				if(dataLoop.number.id === number) {
+					dataLoop.number.features = features;
+				}
+			});
+
+			var e911Numbers = _.map(_.filter(templateNumbers, function(number) {
+				return (number.number.features || []).indexOf('e911') >= 0;
+			}), function(number) {
+				return number.number.id;
+			});
+			
+			var currAcc = monster.apps.auth.currentAccount,
+				hasEmergencyCallerId = currAcc.hasOwnProperty('caller_id') && currAcc.caller_id.hasOwnProperty('emergency') && currAcc.caller_id.emergency.hasOwnProperty('number') && currAcc.caller_id.emergency.number !== '',
+				hasE911Feature = (features || []).indexOf('e911') >= 0;
+
+			if (hasE911Feature) {
+				if (hasEmergencyCallerId) {
+					if (currAcc.caller_id.emergency.number !== number) {
+						self.strategyShowE911Choices(currAcc.caller_id.emergency.number, [ number ]);
+					}
+				} else {
+					self.strategyChangeEmergencyCallerId(number);
+				}
+			} else {
+				// If they removed e911 from their current emergency caller id number, then we let them select the new one from the list of numbers with e911 configured
+				if(hasEmergencyCallerId && currAcc.caller_id.emergency.number === number) {
+					self.strategyShowE911Choices(undefined, e911Numbers);
+				}
+			}
+		},
+
 		strategyRefreshTemplate: function(container, strategyData, callback) {
 			var self = this,
 				templateName = container.data('template');
@@ -420,6 +489,8 @@ define(function(require) {
 									numberData: data.number,
 									afterUpdate: function(features) {
 										monster.ui.paintNumberFeaturesIcon(features, numberDiv.find('.features'));
+
+										self.strategyCheckIfUpdateEmergencyCallerID(templateData.numbers, features, data.number.id);
 									}
 								};
 
@@ -730,6 +801,22 @@ define(function(require) {
 
 					break;
 			}
+		},
+
+		strategyChangeEmergencyCallerId: function(number, callback) {
+			var self = this;
+
+			self.strategyGetAccount({
+				success: function(data) {
+					data.caller_id = data.caller_id || {};
+					data.caller_id.emergency = data.caller_id.emergency || {};
+					data.caller_id.emergency.number = number;
+
+					self.strategyUpdateAccount(data, function() {
+						callback && callback(number);
+					});
+				}
+			});
 		},
 
 		strategyNumbersBindEvents: function(container, strategyData) {
@@ -3512,6 +3599,21 @@ define(function(require) {
 				},
 				success: function(savedUser) {
 					callback && callback(savedUser.data);
+				}
+			});
+		},
+
+		strategyUpdateAccount: function(data, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'account.update',
+				data: {
+					accountId: data.id,
+					data: data
+				},
+				success: function(data, status) {
+					callback && callback(data.data);
 				}
 			});
 		},

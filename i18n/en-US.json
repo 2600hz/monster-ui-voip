@@ -936,6 +936,16 @@
 			"labels": {
 				"inbound": "Inbound Notification Email"
 			}
+		},
+
+		"__comment": "UI-2629: add options to customize e911",
+		"__version": "4.0",
+		"updateE911Dialog": {
+			"title": "Account Emergency Caller-ID",
+			"headerNewE911": "You've just turned E911 on one of your main number, please select which number you would like to use for your Account Emergency Caller-ID.",
+			"headerNoE911": "You've disabled E911 on the number that was used for your Emergency Caller-ID, please select a new number to use as this Account Emergency Caller-ID.",
+			"success": "You successfully updated the E911 on the account to be {{ number }}.",
+			"current": "Current one"
 		}
 	},
 
