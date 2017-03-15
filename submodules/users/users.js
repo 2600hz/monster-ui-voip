@@ -2778,7 +2778,7 @@ define(function(require) {
 				});
 			}
 
-			response.assignedNumbers = monster.util.sort(response.assignedNumbers, 'phoneNumber');
+			response.assignedNumbers = _.sortBy(response.assignedNumbers, 'phoneNumber');
 
 			/* List of extensions */
 			response.allExtensions = [];

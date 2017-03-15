@@ -126,10 +126,13 @@ define(function(require){
 				}
 			});
 
-			return monster.util.sort($.map(featureCodes, function(category) {
-				monster.util.sort(category.codes, 'number');
-				return category;
-			}), 'category');
+			return _.chain(featureCodes)
+				.map(function(category) {
+					category.codes = _.sortBy(category.codes, 'numbers');
+					return category;
+				})
+				.sortBy('category')
+				.value();
 		},
 
 		featureCodesBindEvents: function(args) {
