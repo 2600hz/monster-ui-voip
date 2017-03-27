@@ -790,6 +790,8 @@ define(function(require){
 				switchFeature = featureTemplate.find('.switch-state'),
 				popup;
 
+			featureTemplate.find('.next-action-select').chosen({ search_contains: true, width: '220px' });
+
 			featureTemplate.find('.cancel-link').on('click', function() {
 				popup.dialog('close').remove();
 			});
@@ -847,6 +849,7 @@ define(function(require){
 			});
 
 			popup = monster.ui.dialog(featureTemplate, {
+				dialogClass: 'next-action-group-dialog',
 				title: data.group.extra.mapFeatures.next_action.title,
 				position: ['center', 20]
 			});
@@ -1334,10 +1337,32 @@ define(function(require){
 			});
 		},
 
+		groupsListDevices: function(callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'device.list',
+				data: {
+					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
+				},
+				success: function(data) {
+					callback && callback(data.data);
+				}
+			});
+		},
+
 		groupsGetFeaturesData: function(groupId, callback) {
 			var self = this;
 
 			monster.parallel({
+					devices: function(callback) {
+						self.groupsListDevices(function(data) {
+							callback(null, data);
+						});
+					},
 					group: function(callback) {
 						self.groupsGetGroup(groupId, function(data) {
 							callback(null, data);
