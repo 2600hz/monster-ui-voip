@@ -544,6 +544,10 @@
 	margin-left: 10px;
 }
 
+/* Had to add this hack so the chosen dialog shows up correctly */
+.next-action-group-dialog .ui-dialog-content {
+	overflow: visible;
+}
 
 /* Allow Call Forward Feature */
 .monster-feature-popup-container[data-feature="forward"] .help-box {
