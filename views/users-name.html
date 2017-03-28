@@ -81,7 +81,11 @@
 			<div class="row-fields">
 				<div class="fa fa-wrapper" data-original-title="{{i18n.users.editionForm.ringingHelp}}" data-placement="top" data-toggle="tooltip"><i class="fa fa-bell-o"></i></div>
 				{{#unless extra.ringingTimeout}}
-					<div class="ringing-timeout disabled" data-original-title="{{i18n.users.editionForm.disabledTimeoutHint}}" data-placement="top" data-toggle="tooltip">
+					{{#compare extra.ringingTimeout "===" 0}}
+						<div class="ringing-timeout">
+					{{else}}
+						<div class="ringing-timeout disabled" data-original-title="{{i18n.users.editionForm.disabledTimeoutHint}}" data-placement="top" data-toggle="tooltip">
+					{{/compare}}
 				{{else}}
 					{{#if extra.groupTimeout}}
 					<div class="ringing-timeout disabled" data-original-title="{{i18n.users.editionForm.timeoutEditHint}}" data-placement="top" data-toggle="tooltip">
