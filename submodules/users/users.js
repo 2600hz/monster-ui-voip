@@ -2541,7 +2541,7 @@ define(function(require) {
 
 				var dataTemplate = self.usersFormatUserData(userData, results.mainDirectory, results.mainCallflow, results.vmboxes.userVM, results.vmboxes.listExisting),
 					template = $(monster.template(self, 'users-name', dataTemplate));
-
+					console.log(dataTemplate);
 				monster.ui.validate(template.find('form.user-fields'), {
 					rules: {
 						'extra.ringingTimeout': {
