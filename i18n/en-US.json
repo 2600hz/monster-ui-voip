@@ -33,7 +33,10 @@
 			"name": "Name this group",
 			"selectedUsers": "Selected Users",
 			"title": "Creating a group",
-			"missingDataAlert": "You must choose a name and an extension for this group"
+			"missingDataAlert": "You must choose a name and an extension for this group",
+			"__comment": "UI-2666: Added VMBox module",
+			"__version": "4.1",
+			"findExtension": "Find one"
 		},
 		"groupDeleted": "You successfully deleted {{name}}'s Group",
 		"name": "Group Name",

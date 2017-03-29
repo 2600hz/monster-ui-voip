@@ -251,13 +251,13 @@ define(function(require){
 					$row.data('search').toLowerCase().indexOf(searchString) < 0 ? $row.hide() : $row.show();
 				});
 
-				if(rows.size() > 0) {
+				if (rows.size() > 0) {
 					rows.is(':visible') ? emptySearch.hide() : emptySearch.show();
 				}
 			});
 
 			template.on('click', '.cancel-link', function() {
-				template.find('.edit-groups').slideUp("400", function() {
+				template.find('.edit-groups').slideUp('400', function() {
 					$(this).empty();
 					template.find('.grid-cell.active').css({
 						'position': 'inline-block',
@@ -283,20 +283,27 @@ define(function(require){
 					monster.ui.mask(groupForm.find('#inputExtension'), 'extension');
 
 					groupTemplate.find('#create_group').on('click', function() {
-						if(monster.ui.valid(groupForm)) {
+						if (monster.ui.valid(groupForm)) {
 							var formattedData = self.groupsCreationMergeData(data, groupTemplate);
 
-							if(!_.isEmpty(formattedData.group.endpoints)) {
+							if (!_.isEmpty(formattedData.group.endpoints)) {
 								self.groupsCreate(formattedData, function(data) {
 									popup.dialog('close').remove();
 
 									self.groupsRender({ groupId: data.id });
 								});
-							}
-							else {
+							} else {
 								monster.ui.alert('warning', self.i18n.active().groups.emptyEndpointsWarning);
 							}
 						}
+					});
+
+					groupTemplate.find('.search-extension').on('click', function() {
+						monster.pub('common.extensionTools.select', {
+							callback: function(number) {
+								groupTemplate.find('#inputExtension').val(number);
+							}
+						});
 					});
 
 					groupTemplate.find('#group_user_selector .selected-users, #group_user_selector .available-users').sortable({
@@ -310,7 +317,7 @@ define(function(require){
 			});
 
 			$('body').on('click', '#groups_container_overlay', function() {
-				template.find('.edit-groups').slideUp("400", function() {
+				template.find('.edit-groups').slideUp('400', function() {
 					$(this).empty();
 				});
 

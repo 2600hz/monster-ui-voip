@@ -294,6 +294,7 @@
 #creation_group_dialog .one-line-form input[type="text"] {
 	margin-right: 20px;
 	margin-left: 5px;
+	margin-bottom: 0;
 }
 #creation_group_dialog .one-line-form label {
 	line-height: 30px;
