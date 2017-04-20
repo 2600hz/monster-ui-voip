@@ -1,4 +1,4 @@
-define(function(require){
+define(function(require) {
 	var $ = require('jquery'),
 		_ = require('underscore'),
 		monster = require('monster'),
@@ -52,7 +52,7 @@ define(function(require){
 					.empty()
 					.append(template);
 
-				if(_deviceId) {
+				if (_deviceId) {
 					var row = parent.find('.grid-row[data-id=' + _deviceId + ']');
 
 					monster.ui.highlight(row, {
@@ -60,7 +60,7 @@ define(function(require){
 					});
 				}
 
-				if ( dataTemplate.devices.length === 0 ) {
+				if (dataTemplate.devices.length === 0) {
 					parent.find('.no-devices-row').css('display', 'block');
 				} else {
 					parent.find('.no-devices-row').css('display', 'none');
@@ -86,7 +86,7 @@ define(function(require){
 					row.data('search').toLowerCase().indexOf(searchString) < 0 ? row.hide() : row.show();
 				});
 
-				if(rows.size() > 0) {
+				if (rows.size() > 0) {
 					rows.is(':visible') ? emptySearch.hide() : emptySearch.show();
 				}
 			});
@@ -105,12 +105,12 @@ define(function(require){
 
 						var classStatus = 'disabled';
 
-						if(dataDevice.enabled === true) {
+						if (dataDevice.enabled === true) {
 							classStatus = 'unregistered';
 
 							_.each(data.devices, function(device) {
-								if(device.id === dataDevice.id) {
-									if(device.registered === true) {
+								if (device.id === dataDevice.id) {
+									if (device.registered === true) {
 										classStatus = 'registered';
 									}
 
@@ -138,9 +138,12 @@ define(function(require){
 						isRegistered: $this.parents('.grid-row').data('registered') === true
 					};
 
-				self.devicesRenderEdit({ data: dataDevice, callbackSave: function(dataDevice) {
-					self.devicesRender({ deviceId: dataDevice.id });
-				}});
+				self.devicesRenderEdit({
+					data: dataDevice,
+					callbackSave: function(dataDevice) {
+						self.devicesRender({ deviceId: dataDevice.id });
+					}
+				});
 			});
 
 			template.find('.create-device').on('click', function() {
@@ -185,7 +188,7 @@ define(function(require){
 						if (keyTypes) {
 							self.devicesListUsers({
 								success: function(users) {
-									_.each(keyTypes, function(type, idx) {
+									_.each(keyTypes, function(type) {
 										if (!dataDevice.provision.hasOwnProperty(type)) {
 											dataDevice.provision[type] = {};
 										}
@@ -196,7 +199,7 @@ define(function(require){
 											if (!dataDevice.provision[type].hasOwnProperty(i)) {
 												dataDevice.provision[type][i] = {
 													type: 'none'
-												}
+												};
 											}
 										}
 									});
@@ -233,7 +236,7 @@ define(function(require){
 										}
 									};
 
-									_.each(keyTypes, function(key, idx) {
+									_.each(keyTypes, function(key) {
 										var camelCaseKey = self.devicesSnakeToCamel(key);
 
 										extra.provision.keys.push({
@@ -250,15 +253,13 @@ define(function(require){
 									self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
 								}
 							});
-						}
-						else {
+						} else {
 							self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
 						}
 					}, function() {
 						self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
 					});
-				}
-				else {
+				} else {
 					self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
 				}
 			});
@@ -272,7 +273,7 @@ define(function(require){
 					device_type: type
 				};
 
-			if(type === 'sip_device' && monster.config.api.provisioner) {
+			if (type === 'sip_device' && monster.config.api.provisioner) {
 				monster.pub('common.chooseModel.render', {
 					callback: function(dataModel, callbackCommonSuccess) {
 						self.callApi({
@@ -289,16 +290,21 @@ define(function(require){
 						});
 					},
 					callbackMissingBrand: function() {
-						self.devicesRenderEdit({ data: data, callbackSave: function(dataDevice) {
-							callback && callback(dataDevice);
-						}});
+						self.devicesRenderEdit({
+							data: data,
+							callbackSave: function(dataDevice) {
+								callback && callback(dataDevice);
+							}
+						});
 					}
 				});
-			}
-			else {
-				self.devicesRenderEdit({ data: data, callbackSave: function(dataDevice) {
-					callback && callback(dataDevice);
-				}});
+			} else {
+				self.devicesRenderEdit({
+					data: data,
+					callbackSave: function(dataDevice) {
+						callback && callback(dataDevice);
+					}
+				});
 			}
 		},
 
@@ -307,14 +313,14 @@ define(function(require){
 				mode = data.id ? 'edit' : 'add',
 				type = data.device_type,
 				popupTitle = mode === 'edit' ? monster.template(self, '!' + self.i18n.active().devices[type].editTitle, { name: data.name }) : self.i18n.active().devices[type].addTitle,
-				templateDevice = $(monster.template(self, 'devices-'+type, $.extend(true, {}, data, {
+				templateDevice = $(monster.template(self, 'devices-' + type, $.extend(true, {}, data, {
 					isProvisionerConfigured: monster.config.api.hasOwnProperty('provisioner'),
 					showEmergencyCnam: monster.util.isNumberFeatureEnabled('cnam') && monster.util.isNumberFeatureEnabled('e911')
 				}))),
 				deviceForm = templateDevice.find('#form_device');
 
 			if (data.extra.hasOwnProperty('provision') && data.extra.provision.hasOwnProperty('keys')) {
-				_.each(data.extra.provision.keys, function(value, idx) {
+				_.each(data.extra.provision.keys, function(value) {
 					var section = '.tabs-section[data-section="' + value.type + '"] ';
 
 					_.each(value.data, function(val, key) {
@@ -337,10 +343,10 @@ define(function(require){
 						});
 			}
 
-			if ( data.extra.hasE911Numbers ) {
+			if (data.extra.hasE911Numbers) {
 				var currentNumber;
 
-				if(data.caller_id && data.caller_id.emergency && data.caller_id.emergency.number) {
+				if (data.caller_id && data.caller_id.emergency && data.caller_id.emergency.number) {
 					currentNumber = data.caller_id.emergency.number;
 					self.devicesGetE911NumberAddress(data.caller_id.emergency.number, function(address) {
 						templateDevice
@@ -392,11 +398,11 @@ define(function(require){
 				ignore: '' // Do not ignore hidden fields
 			});
 
-			if($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone', 'fax', 'ata']) > -1) {
+			if ($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone', 'fax', 'ata']) > -1) {
 				var audioCodecs = monster.ui.codecSelector('audio', templateDevice.find('#audio_codec_selector'), data.media.audio.codecs);
 			}
 
-			if($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone']) > -1) {
+			if ($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone']) > -1) {
 				var videoCodecs = monster.ui.codecSelector('video', templateDevice.find('#video_codec_selector'), data.media.video.codecs);
 			}
 
@@ -408,7 +414,7 @@ define(function(require){
 			monster.ui.mask(templateDevice.find('[name="call_forward.number"]'), 'phoneNumber');
 			templateDevice.find('.chosen-feature-key-user').chosen({ search_contains: true, width: 'inherit' });
 
-			if(!(data.media.encryption.enforce_security)) {
+			if (!(data.media.encryption.enforce_security)) {
 				templateDevice.find('#rtp_method').hide();
 			}
 
@@ -417,7 +423,7 @@ define(function(require){
 			});
 
 			templateDevice.find('#restart_device').on('click', function() {
-				if(!$(this).hasClass('disabled')) {
+				if (!$(this).hasClass('disabled')) {
 					self.devicesRestart(data.id, function() {
 						toastr.success(self.i18n.active().devices.popupSettings.miscellaneous.restart.success);
 					});
@@ -425,13 +431,13 @@ define(function(require){
 			});
 
 			templateDevice.find('#unlock_device').on('click', function() {
-				self.devicesUnlock(data.mac_address.replace(/\:/g, ''), function() {
+				self.devicesUnlock(data.mac_address.replace(/:/g, ''), function() {
 					toastr.success(self.i18n.active().devices.popupSettings.miscellaneous.unlock.success);
 				});
 			});
 
 			templateDevice.find('.actions .save').on('click', function() {
-				if(monster.ui.valid(deviceForm)) {
+				if (monster.ui.valid(deviceForm)) {
 					templateDevice.find('.feature-key-value:not(.active)').remove();
 
 					var dataToSave = self.devicesMergeData(data, templateDevice, audioCodecs, videoCodecs);
@@ -479,8 +485,7 @@ define(function(require){
 					});
 
 					divAddress.slideDown();
-				}
-				else {
+				} else {
 					divAddress.slideUp();
 				}
 			});
@@ -492,10 +497,9 @@ define(function(require){
 
 			templateDevice.find('.restriction-matcher-button').on('click', function(e) {
 				e.preventDefault();
-				var number = templateDevice.find('.restriction-matcher-input').val(),
-					matched = false;
+				var number = templateDevice.find('.restriction-matcher-input').val();
 
-				if(number) {
+				if (number) {
 					self.callApi({
 						resource: 'numbers.matchClassifier',
 						data: {
@@ -503,35 +507,35 @@ define(function(require){
 							phoneNumber: encodeURIComponent(number)
 						},
 						success: function(data, status) {
-							var matchedLine = templateDevice.find('.restriction-line[data-restriction="'+data.data.name+'"]'),
+							var matchedLine = templateDevice.find('.restriction-line[data-restriction="' + data.data.name + '"]'),
 								matchedSign = matchedLine.find('.restriction-matcher-sign'),
 								matchedMsg = templateDevice.find('.restriction-message');
 
 							templateDevice.find('.restriction-matcher-sign').hide();
-							if(matchedLine.find('.restrictions-switch').prop('checked')) {
-								matchedSign.removeClass('monster-red fa-times')
-										   .addClass('monster-green fa-check')
-										   .css('display', 'inline-block');
+							if (matchedLine.find('.restrictions-switch').prop('checked')) {
+								matchedSign
+									.removeClass('monster-red fa-times')
+									.addClass('monster-green fa-check')
+									.css('display', 'inline-block');
 
-								matchedMsg.removeClass('red-box')
-										  .addClass('green-box')
-										  .css('display', 'inline-block')
-										  .empty()
-										  .text(
-										  	monster.template(self, '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.allowMessage, { phoneNumber: monster.util.formatPhoneNumber(number) })
-										  );
+								matchedMsg
+									.removeClass('red-box')
+									.addClass('green-box')
+									.css('display', 'inline-block')
+									.empty()
+									.text(monster.template(self, '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.allowMessage, { phoneNumber: monster.util.formatPhoneNumber(number) }));
 							} else {
-								matchedSign.removeClass('monster-green fa-check')
-										   .addClass('monster-red fa-times')
-										   .css('display', 'inline-block');
+								matchedSign
+									.removeClass('monster-green fa-check')
+									.addClass('monster-red fa-times')
+									.css('display', 'inline-block');
 
-								matchedMsg.removeClass('green-box')
-										  .addClass('red-box')
-										  .css('display', 'inline-block')
-										  .empty()
-										  .text(
-										  	monster.template(self, '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.denyMessage, { phoneNumber: monster.util.formatPhoneNumber(number) })
-										  );
+								matchedMsg
+									.removeClass('green-box')
+									.addClass('red-box')
+									.css('display', 'inline-block')
+									.empty()
+									.text(monster.template(self, '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.denyMessage, { phoneNumber: monster.util.formatPhoneNumber(number) }));
 							}
 						}
 					});
@@ -603,11 +607,11 @@ define(function(require){
 				hasRTP = $.inArray(originalData.device_type, ['sip_device', 'mobile', 'softphone']) > -1,
 				formData = monster.ui.getFormData('form_device');
 
-			if('mac_address' in formData) {
+			if ('mac_address' in formData) {
 				formData.mac_address = monster.util.formatMacAddress(formData.mac_address);
 			}
 
-			if(hasCallForward) {
+			if (hasCallForward) {
 				formData.call_forward = $.extend(true, {
 					enabled: true,
 					require_keypress: true,
@@ -618,12 +622,12 @@ define(function(require){
 					formData.call_forward.failover = true;
 				}
 
-				if(formData.hasOwnProperty('extra') && formData.extra.allowVMCellphone) {
+				if (formData.hasOwnProperty('extra') && formData.extra.allowVMCellphone) {
 					formData.call_forward.require_keypress = !formData.extra.allowVMCellphone;
 				}
 			}
 
-			if(hasCodecs) {
+			if (hasCodecs) {
 				formData.media = $.extend(true, {
 					audio: {
 						codecs: []
@@ -634,7 +638,7 @@ define(function(require){
 				}, formData.media);
 			}
 
-			if(hasSIP) {
+			if (hasSIP) {
 				formData.sip = $.extend(true, {
 					expire_seconds: 360,
 					invite_format: 'username',
@@ -642,10 +646,10 @@ define(function(require){
 				}, formData.sip);
 			}
 
-			if('call_restriction' in formData) {
+			if ('call_restriction' in formData) {
 				_.each(formData.call_restriction, function(restriction, key) {
-					if(key in originalData.extra.restrictions && originalData.extra.restrictions[key].disabled) {
-						restriction.action = originalData.extra.restrictions[key].action
+					if (key in originalData.extra.restrictions && originalData.extra.restrictions[key].disabled) {
+						restriction.action = originalData.extra.restrictions[key].action;
 					} else {
 						restriction.action = restriction.action === true ? 'inherit' : 'deny';
 					}
@@ -668,8 +672,7 @@ define(function(require){
 
 					if (_.isEmpty(keys)) {
 						delete originalData.provision[key];
-					}
-					else {
+					} else {
 						originalData.provision[key] = keys;
 					}
 				});
@@ -680,42 +683,42 @@ define(function(require){
 			var mergedData = $.extend(true, {}, originalData, formData);
 
 			/* The extend doesn't override an array if the new array is empty, so we need to run these snippet after the merge */
-			if(hasRTP) {
+			if (hasRTP) {
 				mergedData.media.encryption.methods = [];
 
-				if(mergedData.media.encryption.enforce_security) {
+				if (mergedData.media.encryption.enforce_security) {
 					mergedData.media.encryption.methods.push(formData.extra.rtpMethod);
 				}
 			}
 
-			if(mergedData.extra.hasOwnProperty('notify_unregister')) {
+			if (mergedData.extra.hasOwnProperty('notify_unregister')) {
 				mergedData.suppress_unregister_notifications = !mergedData.extra.notify_unregister;
 			}
 
-			if(hasCodecs) {
-				if(audioCodecs) {
+			if (hasCodecs) {
+				if (audioCodecs) {
 					mergedData.media.audio.codecs = audioCodecs.getSelectedItems();
 				}
-				
-				if(videoCodecs) {
+
+				if (videoCodecs) {
 					mergedData.media.video.codecs = videoCodecs.getSelectedItems();
 				}
 			}
 
 			// If the key is set to "auto" we remove the key, we don't support this anymore
-			if(mergedData.hasOwnProperty('media') && mergedData.media.hasOwnProperty('fax_option') && mergedData.media.fax_option === 'auto') {
+			if (mergedData.hasOwnProperty('media') && mergedData.media.hasOwnProperty('fax_option') && mergedData.media.fax_option === 'auto') {
 				delete mergedData.media.fax_option;
 			}
 
 			// The UI mistakenly created this key, so we clean it up
-			if(mergedData.hasOwnProperty('media') && mergedData.media.hasOwnProperty('fax') && mergedData.media.fax.hasOwnProperty('option')) {
+			if (mergedData.hasOwnProperty('media') && mergedData.media.hasOwnProperty('fax') && mergedData.media.fax.hasOwnProperty('option')) {
 				delete mergedData.media.fax.option;
 			}
 
-			if(mergedData.hasOwnProperty('caller_id') && mergedData.caller_id.hasOwnProperty('emergency') && mergedData.caller_id.emergency.hasOwnProperty('number') && mergedData.caller_id.emergency.number === '') {
+			if (mergedData.hasOwnProperty('caller_id') && mergedData.caller_id.hasOwnProperty('emergency') && mergedData.caller_id.emergency.hasOwnProperty('number') && mergedData.caller_id.emergency.number === '') {
 				delete mergedData.caller_id.emergency.number;
 
-				if(_.isEmpty(mergedData.caller_id.emergency)) {
+				if (_.isEmpty(mergedData.caller_id.emergency)) {
 					delete mergedData.caller_id.emergency;
 				}
 			}
@@ -749,7 +752,7 @@ define(function(require){
 					enabled: true,
 					media: {
 						encryption: {
-							enforce_security: false,
+							enforce_security: false
 						},
 						audio: {
 							codecs: ['PCMU', 'PCMA']
@@ -784,7 +787,7 @@ define(function(require){
 						},
 						contact_list: {
 							exclude: true
-						},
+						}
 					},
 					ata: {
 						sip: {
@@ -842,25 +845,24 @@ define(function(require){
 						}
 					}
 				};
-			
+
 			_.each(data.listClassifiers, function(restriction, name) {
-				if(name in self.i18n.active().devices.classifiers) {
+				if (name in self.i18n.active().devices.classifiers) {
 					defaults.extra.restrictions[name].friendly_name = self.i18n.active().devices.classifiers[name].name;
 
-					if('help' in self.i18n.active().devices.classifiers[name]) {
+					if ('help' in self.i18n.active().devices.classifiers[name]) {
 						defaults.extra.restrictions[name].help = self.i18n.active().devices.classifiers[name].help;
 					}
 				}
 
-				if('call_restriction' in data.accountLimits && name in data.accountLimits.call_restriction && data.accountLimits.call_restriction[name].action === 'deny') {
+				if ('call_restriction' in data.accountLimits && name in data.accountLimits.call_restriction && data.accountLimits.call_restriction[name].action === 'deny') {
 					defaults.extra.restrictions[name].disabled = true;
 					defaults.extra.hasDisabledRestrictions = true;
 				}
 
-				if('call_restriction' in data.device && name in data.device.call_restriction) {
+				if ('call_restriction' in data.device && name in data.device.call_restriction) {
 					defaults.extra.restrictions[name].action = data.device.call_restriction[name].action;
-				}
-				else {
+				} else {
 					defaults.extra.restrictions[name].action = 'inherit';
 				}
 			});
@@ -869,18 +871,18 @@ define(function(require){
 
 			/* Audio Codecs*/
 			/* extend doesn't replace the array so we need to do it manually */
-			if(data.device.media && data.device.media.audio && data.device.media.audio.codecs) {
+			if (data.device.media && data.device.media.audio && data.device.media.audio.codecs) {
 				formattedData.media.audio.codecs = data.device.media.audio.codecs;
 			}
 
 			/* Video codecs */
-			if(data.device.media && data.device.media.video && data.device.media.video.codecs) {
+			if (data.device.media && data.device.media.video && data.device.media.video.codecs) {
 				formattedData.media.video.codecs = data.device.media.video.codecs;
 			}
 
 			formattedData.extra.isRegistered = dataList.isRegistered;
 
-			if(formattedData.hasOwnProperty('call_forward') && formattedData.call_forward.hasOwnProperty('require_keypress')) {
+			if (formattedData.hasOwnProperty('call_forward') && formattedData.call_forward.hasOwnProperty('require_keypress')) {
 				formattedData.extra.allowVMCellphone = !formattedData.call_forward.require_keypress;
 			}
 
@@ -931,17 +933,17 @@ define(function(require){
 					classStatus: device.enabled ? 'unregistered' : 'disabled' /* Display a device in black if it's disabled, otherwise, until we know whether it's registered or not, we set the color to red */,
 					isRegistered: false,
 					sipUserName: device.username
-				}
+				};
 			});
 
 			_.each(data.status, function(status) {
-				if(status.registered === true && status.device_id in formattedData.devices) {
+				if (status.registered === true && status.device_id in formattedData.devices) {
 					var device = formattedData.devices[status.device_id];
 
 					device.registered = true;
 
 					/* Now that we know if it's registered, we set the color to green */
-					if(device.enabled) {
+					if (device.enabled) {
 						device.classStatus = 'registered';
 						device.isRegistered = true;
 					}
@@ -956,21 +958,18 @@ define(function(require){
 
 			arrayToSort.sort(function(a, b) {
 				/* If owner is the same, order by device name */
-				if(a.userName === b.userName) {
+				if (a.userName === b.userName) {
 					var aName = a.name.toLowerCase(),
 						bName = b.name.toLowerCase();
 
 					return (aName > bName) ? 1 : (aName < bName) ? -1 : 0;
-				}
-				else {
+				} else {
 					/* Otherwise, push the unassigned devices to the bottom of the list, and show the assigned devices ordered by user name */
-					if(a.userName === unassignedString) {
+					if (a.userName === unassignedString) {
 						return 1;
-					}
-					else if(b.userName === unassignedString) {
+					} else if (b.userName === unassignedString) {
 						return -1;
-					}
-					else {
+					} else {
 						var aSortName = a.sortableUserName.toLowerCase(),
 							bSortName = b.sortableUserName.toLowerCase();
 
@@ -985,7 +984,7 @@ define(function(require){
 		},
 
 		devicesSnakeToCamel: function(string) {
-			return string.replace(/(\_\w)/g, function (match) { return match[1].toUpperCase(); });
+			return string.replace(/(_\w)/g, function(match) { return match[1].toUpperCase(); });
 		},
 
 		/* Utils */
@@ -1034,7 +1033,7 @@ define(function(require){
 					var e911Numbers = {};
 
 					_.each(data.data.numbers, function(val, key) {
-						if(val.features.indexOf('e911') >= 0) {
+						if (val.features.indexOf('e911') >= 0) {
 							e911Numbers[key] = self.devicesFormatNumber(val);
 						}
 					});
@@ -1047,7 +1046,7 @@ define(function(require){
 		devicesFormatNumber: function(value) {
 			var self = this;
 
-			if('locality' in value) {
+			if ('locality' in value) {
 				value.isoCountry = value.locality.country || '';
 				value.friendlyLocality = 'city' in value.locality ? value.locality.city + ('state' in value.locality ? ', ' + value.locality.state : '') : '';
 			}
@@ -1057,46 +1056,43 @@ define(function(require){
 
 		devicesGetEditData: function(dataDevice, callback) {
 			var self = this;
-			
+
 			monster.parallel({
-					listClassifiers: function(callback) {
-						self.devicesListClassifiers(function(dataClassifiers) {
-							callback(null, dataClassifiers);
-						});
-					},
-					device: function(callback) {
-						if(dataDevice.id) {
-							self.devicesGetDevice(dataDevice.id, function(dataDevice) {
-								callback(null, dataDevice);
-							});
-						}
-						else {
+				listClassifiers: function(callback) {
+					self.devicesListClassifiers(function(dataClassifiers) {
+						callback(null, dataClassifiers);
+					});
+				},
+				device: function(callback) {
+					if (dataDevice.id) {
+						self.devicesGetDevice(dataDevice.id, function(dataDevice) {
 							callback(null, dataDevice);
-						}
-					},
-					e911Numbers: function(callback) {
-						self.devicesGetE911Numbers(function(e911Numbers) {
-							callback(null, e911Numbers);
 						});
-					},
-					accountLimits: function(callback) {
-						self.callApi({
-							resource: 'limits.get',
-							data: {
-								accountId: self.accountId
-							},
-							success: function(data, status) {
-								callback(null, data.data);
-							}
-						});
+					} else {
+						callback(null, dataDevice);
 					}
 				},
-				function(error, results) {
-					var formattedData = self.devicesFormatData(results, dataDevice);
-
-					callback && callback(formattedData);
+				e911Numbers: function(callback) {
+					self.devicesGetE911Numbers(function(e911Numbers) {
+						callback(null, e911Numbers);
+					});
+				},
+				accountLimits: function(callback) {
+					self.callApi({
+						resource: 'limits.get',
+						data: {
+							accountId: self.accountId
+						},
+						success: function(data, status) {
+							callback(null, data.data);
+						}
+					});
 				}
-			);
+			}, function(error, results) {
+				var formattedData = self.devicesFormatData(results, dataDevice);
+
+				callback && callback(formattedData);
+			});
 		},
 
 		devicesGetDevice: function(deviceId, callbackSuccess, callbackError) {
@@ -1120,10 +1116,9 @@ define(function(require){
 		devicesSaveDevice: function(deviceData, callback) {
 			var self = this;
 
-			if(deviceData.id) {
+			if (deviceData.id) {
 				self.devicesUpdateDevice(deviceData, callback);
-			}
-			else {
+			} else {
 				self.devicesCreateDevice(deviceData, callback);
 			}
 		},
@@ -1166,53 +1161,51 @@ define(function(require){
 			var self = this;
 
 			monster.parallel({
-					users: function(callback) {
-						self.callApi({
-							resource: 'user.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									paginate: 'false'
-								}
-							},
-							success: function(dataUsers) {
-								callback && callback(null, dataUsers.data);
+				users: function(callback) {
+					self.callApi({
+						resource: 'user.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								paginate: 'false'
 							}
-						});
-					},
-					status: function(callback) {
-						self.callApi({
-							resource: 'device.getStatus',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									paginate: 'false'
-								}
-							},
-							success: function(dataStatus) {
-								callback && callback(null, dataStatus.data);
-							}
-						});
-					},
-					devices: function(callback) {
-						self.callApi({
-							resource: 'device.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									paginate: 'false'
-								}
-							},
-							success: function(dataDevices) {
-								callback(null, dataDevices.data);
-							}
-						});
-					}
+						},
+						success: function(dataUsers) {
+							callback && callback(null, dataUsers.data);
+						}
+					});
 				},
-				function(err, results) {
-					callback && callback(results);
+				status: function(callback) {
+					self.callApi({
+						resource: 'device.getStatus',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								paginate: 'false'
+							}
+						},
+						success: function(dataStatus) {
+							callback && callback(null, dataStatus.data);
+						}
+					});
+				},
+				devices: function(callback) {
+					self.callApi({
+						resource: 'device.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								paginate: 'false'
+							}
+						},
+						success: function(dataDevices) {
+							callback(null, dataDevices.data);
+						}
+					});
 				}
-			);
+			}, function(err, results) {
+				callback && callback(results);
+			});
 		},
 
 		devicesGetE911NumberAddress: function(number, callback) {
@@ -1230,7 +1223,7 @@ define(function(require){
 						postal_code = _data.data.e911.postal_code,
 						region = _data.data.e911.region;
 
-					if ( typeof _data.data.e911.extended_address !== 'undefined' ) {
+					if (typeof _data.data.e911.extended_address !== 'undefined') {
 						callback(street_address + ', ' + _data.data.e911.extended_address + '<br>' + locality + ', ' + region + ' ' + postal_code);
 					} else {
 						callback(street_address + ', ' + '<br>' + locality + ', ' + region + ' ' + postal_code);
@@ -1242,7 +1235,7 @@ define(function(require){
 		devicesGetIterator: function(args, callbackSuccess, callbackError) {
 			var self = this;
 
-			if(args.hasOwnProperty('endpoint_brand') && args.hasOwnProperty('endpoint_family') && args.hasOwnProperty('endpoint_model')) {
+			if (args.hasOwnProperty('endpoint_brand') && args.hasOwnProperty('endpoint_family') && args.hasOwnProperty('endpoint_model')) {
 				monster.request({
 					resource: 'provisioner.ui.getModel',
 					data: {
@@ -1254,11 +1247,10 @@ define(function(require){
 						callbackSuccess && callbackSuccess(data.data.template);
 					},
 					error: function(data, status) {
-						
+						callbackError && callbackError();
 					}
 				});
-			}
-			else {
+			} else {
 				callbackError && callbackError();
 			}
 		},
