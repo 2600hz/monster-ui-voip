@@ -441,7 +441,7 @@ define(function(require) {
 					templateDevice.find('.feature-key-value:not(.active)').remove();
 
 					var dataToSave = self.devicesMergeData(data, templateDevice, audioCodecs, videoCodecs);
-
+console.log(dataToSave.provision);
 					self.devicesSaveDevice(dataToSave, function(data) {
 						popup.dialog('close').remove();
 

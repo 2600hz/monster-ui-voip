@@ -280,6 +280,7 @@
 						"hideInfo": "Hide Info"
 					},
 					"types": {
+						"line": "Use as a line key.",
 						"presence": "Indicate when a user has an incoming call or is on the phone. The indicator can be used to pick up ringing calls or speed dial that user.",
 						"parking": "Indicate when a call is placed on a parking slot available to the entire company. The indicator can be used to transfer a call to the parking slot or retrieve a parked call.",
 						"personal_parking": "Indicate when a call is placed on a parking slot dedicated to the selected user. The indicator can be used to transfer a call to the parking slot or retrieve a parked call.",
@@ -287,6 +288,7 @@
 					}
 				},
 				"types": {
+					"line": "Line",
 					"none": "None",
 					"presence": "Presence",
 					"parking": "Parking",
