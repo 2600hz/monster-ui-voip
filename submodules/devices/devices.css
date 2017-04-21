@@ -275,6 +275,20 @@
 	margin-right: 15px;
 }
 
+.voip-edit-device-popup .edit-device .content .tabs-section.keys {
+	padding: 0 20px;
+}
+
+.voip-edit-device-popup .edit-device .content .tabs-section.keys .control-group.error {
+	padding: 10px 0;
+	border: 1px dashed red;
+	border-radius: 2px;
+}
+
+.voip-edit-device-popup .edit-device .content .tabs-section.keys .control-group.error .alert {
+	margin: 0 10px 10px;
+}
+
 .voip-edit-device-popup .edit-device .content .tabs-section .title {
 	color: #22a5ff;
 	font-size: 24px;
