@@ -261,6 +261,7 @@
 			"__comment": "UI-1351: Add ability to configure feature keys for SIP devices in SmartPBX",
 			"__version": "v3.20_s4",
 			"keys": {
+				"alertMessage": "By default, this key will be used as a Line Key and we recommend you not to change it.",
 				"featureKeys": {
 					"title": "Feature Keys",
 					"label": "Feature key"
@@ -280,6 +281,7 @@
 						"hideInfo": "Hide Info"
 					},
 					"types": {
+						"line": "Use as a line key.",
 						"presence": "Indicate when a user has an incoming call or is on the phone. The indicator can be used to pick up ringing calls or speed dial that user.",
 						"parking": "Indicate when a call is placed on a parking slot available to the entire company. The indicator can be used to transfer a call to the parking slot or retrieve a parked call.",
 						"personal_parking": "Indicate when a call is placed on a parking slot dedicated to the selected user. The indicator can be used to transfer a call to the parking slot or retrieve a parked call.",
@@ -287,6 +289,7 @@
 					}
 				},
 				"types": {
+					"line": "Line",
 					"none": "None",
 					"presence": "Presence",
 					"parking": "Parking",
