@@ -297,7 +297,14 @@
 					</div>
 				</div>
 				{{#each data}}
-				<div class="control-group" data-id="{{@key}}">
+				<div class="control-group{{#compare ../id '===' 'combo_keys'}}{{#compare @key '===' '0'}} error{{/compare}}{{/compare}}" data-id="{{@key}}">
+					{{#compare ../id '===' 'combo_keys'}}
+						{{#compare @key '===' '0'}}
+							<div class="alert alert-error">
+								{{@root.i18n.devices.popupSettings.keys.alertMessage}}
+							</div>
+						{{/compare}}
+					{{/compare}}
 					<label for="provision.keys.{{../id}}[{{@key}}].type" class="control-label">
 						{{ ../label }} <span class="feature-key-index">{{@key}}</span>
 					</label>
@@ -340,6 +347,12 @@
 							<label for="provision.keys.{{../id}}[{{@key}}].value">{{ @root.i18n.devices.popupSettings.keys.labels.value }}</label>
 							<input type="text" value="" name="provision.keys.{{../id}}[{{@key}}].value">
 						</div>
+					{{#compare id '===' 'combo_keys'}}
+						{{#compare @key '===' '0'}}
+							{{#if @root.extra.firstComboKeyUnset}}
+							{{/if}}
+						{{/compare}}
+					{{/compare}}
 					</div>
 				</div>
 				{{/each}}

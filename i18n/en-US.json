@@ -261,6 +261,7 @@
 			"__comment": "UI-1351: Add ability to configure feature keys for SIP devices in SmartPBX",
 			"__version": "v3.20_s4",
 			"keys": {
+				"alertMessage": "By default, this key will be used as a Line Key and we recommend you not to change it.",
 				"featureKeys": {
 					"title": "Feature Keys",
 					"label": "Feature key"
