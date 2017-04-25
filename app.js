@@ -51,7 +51,7 @@ define(function(require){
 
 		render: function(container){
 			var self = this,
-				parent = container || $('#monster-content'),
+				parent = container || $('#monster_content'),
 				template = $(monster.template(self, 'app'));
 
 			/* On first Load, load my office */
