@@ -324,14 +324,16 @@ define(function(require) {
 					var section = '.tabs-section[data-section="' + value.type + '"] ';
 
 					_.each(value.data, function(val, key) {
-						var groupSelector = '.control-group[data-id="' + key + '"] ',
-							valueSelector = '.feature-key-value[data-type="' + val.type + '"]';
+						if (val) {
+							var groupSelector = '.control-group[data-id="' + key + '"] ',
+								valueSelector = '.feature-key-value[data-type="' + val.type + '"]';
 
-						templateDevice
-							.find(section.concat(groupSelector, valueSelector))
-								.addClass('active')
-							.find('[name="provision.keys.' + value.id + '[' + key + '].value"]')
-								.val(val.value);
+							templateDevice
+								.find(section.concat(groupSelector, valueSelector))
+									.addClass('active')
+								.find('[name="provision.keys.' + value.id + '[' + key + '].value"]')
+									.val(val.value);
+						}
 					});
 				});
 
@@ -665,9 +667,7 @@ define(function(require) {
 					var keys = {};
 
 					list[key].forEach(function(val, idx) {
-						if (val.type !== 'none') {
-							keys[idx] = val;
-						}
+						keys[idx] = val.type === 'none' ? null : val;
 					});
 
 					if (_.isEmpty(keys)) {

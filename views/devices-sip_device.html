@@ -347,12 +347,6 @@
 							<label for="provision.keys.{{../id}}[{{@key}}].value">{{ @root.i18n.devices.popupSettings.keys.labels.value }}</label>
 							<input type="text" value="" name="provision.keys.{{../id}}[{{@key}}].value">
 						</div>
-					{{#compare id '===' 'combo_keys'}}
-						{{#compare @key '===' '0'}}
-							{{#if @root.extra.firstComboKeyUnset}}
-							{{/if}}
-						{{/compare}}
-					{{/compare}}
 					</div>
 				</div>
 				{{/each}}
