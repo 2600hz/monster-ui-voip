@@ -67,6 +67,23 @@
 				</div>
 
 				<div class="control-group">
+					<label class="control-label" for="timezone">{{ i18n.vmboxes.popupSettings.options.voicemailFormat.label }}</label>
+					<div class="controls">
+                                            <select name="media_extension" id="media_extension">
+                                                <option value="" {{#unless media_extension}}selected{{/unless}}>
+                                                        {{ i18n.vmboxes.popupSettings.options.voicemailFormat.default }}
+                                                </option>
+                                                <option value="mp3" {{#compare media_extension '===' 'mp3'}}selected{{/compare}}>
+                                                        mp3
+                                                </option>
+                                                <option value="wav" {{#compare media_extension '===' 'wav'}}selected{{/compare}}>
+                                                        wav
+                                                </option>
+                                            </select>
+					</div>
+				</div>
+
+				<div class="control-group">
 					<label class="control-input checkbox">
 						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.alreadySetup.help }}">
 							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.alreadySetup.label}}

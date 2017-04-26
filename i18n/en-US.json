@@ -1180,11 +1180,12 @@
 				"timezone": {
 					"label": "Timezone"
 				},
+				"voicemailFormat": {
+					"label": "Voicemail Format",
+                                        "default": "Default"
+				},
 				"unavailableMessage": {
 					"label": "Unavailable Message"
-				},
-				"timezone": {
-					"label": "Timezone"
 				},
 				"alreadySetup": {
 					"label": "Already Setup?",
