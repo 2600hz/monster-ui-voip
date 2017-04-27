@@ -67,6 +67,20 @@
 				</div>
 
 				<div class="control-group">
+					<label class="control-label" for="timezone">{{ i18n.vmboxes.popupSettings.options.mediaExtension.label }}</label>
+					<div class="controls">
+						<select name="media_extension" id="media_extension">
+							{{#select media_extension}}
+								<option value="default">{{ i18n.vmboxes.popupSettings.options.mediaExtension.default }}</option>
+								<option value="mp3">{{ i18n.vmboxes.popupSettings.options.mediaExtension.mp3 }}</option>
+								<!-- <option value="mp4">{{ i18n.callflows.vmbox.mp4 }}</option> -->
+								<option value="wav">{{ i18n.vmboxes.popupSettings.options.mediaExtension.wav }}</option>
+							{{/select}}
+						</select>
+					</div>
+				</div>
+
+				<div class="control-group">
 					<label class="control-input checkbox">
 						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.alreadySetup.help }}">
 							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.alreadySetup.label}}
