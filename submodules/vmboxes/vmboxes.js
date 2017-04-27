@@ -357,6 +357,10 @@ define(function(require){
 				delete mergedData.media.unavailable;
 			}
 
+			if (mergedData.media_extension && mergedData.media_extension === 'default') {
+				delete mergedData.media_extension;
+			}
+
 			delete mergedData.extra;
 
 			return mergedData;

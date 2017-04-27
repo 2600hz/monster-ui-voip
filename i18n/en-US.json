@@ -1213,6 +1213,15 @@
 				"configurable": {
 					"label": "Configurable via Menu?",
 					"help": " If unchecked, it will disallow the user to configure voicemail via the menu"
+				},
+				"__comment": "UI-2634: add support for wav/mp4/mp3 for voicemail media extensions",
+				"__version": "4.1",
+				"mediaExtension": {
+					"label": "Media Extension",
+					"mp3": "mp3",
+					"mp4": "mp4",
+					"wav": "wav",
+					"default": "Account Default"
 				}
 			},
 			"recipients": {
