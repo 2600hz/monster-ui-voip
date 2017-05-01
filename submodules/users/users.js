@@ -13,6 +13,14 @@ define(function(require) {
 			'voip.users.render': 'usersRender'
 		},
 
+		appFlags: {
+			users: {
+				smartPBXCallflowString: ' SmartPBX\'s Callflow',
+				smartPBXConferenceString: ' SmartPBX Conference',
+				smartPBXVMBoxString: '\'s VMBox'
+			}
+		},
+
 		deviceIcons: {
 			'cellphone': 'fa fa-phone',
 			'smartphone': 'icon-telicon-mobile-phone',
@@ -795,8 +803,13 @@ define(function(require) {
 					if (monster.ui.valid(form)) {
 						currentUser.extra.vmbox.timezone = formData.timezone;
 
-						var userToSave = $.extend(true, {}, currentUser, formData),
-							oldPresenceId = currentUser.presence_id;
+						var oldPresenceId = currentUser.presence_id,
+							userToSave = $.extend(true, {}, currentUser, formData),
+							newName = userToSave.first_name + ' ' + userToSave.last_name,
+							oldName = currentUser.first_name + ' ' + currentUser.last_name,
+							isUserNameDifferent = newName !== oldName,
+							hasTimeout = userToSave.extra.ringingTimeout && userToSave.features.indexOf('find_me_follow_me') < 0,
+							shouldUpdateTimeout = hasTimeout ? parseInt(currentUser.extra.ringingTimeout) !== parseInt(userToSave.extra.ringingTimeout) : false;
 
 						monster.parallel({
 							vmbox: function(callback) {
@@ -813,21 +826,55 @@ define(function(require) {
 									callback(null, userData.data);
 								});
 							},
-							callflow: function(callback) {
-								if (userToSave.extra.ringingTimeout && userToSave.features.indexOf('find_me_follow_me') < 0) {
-									self.usersGetMainCallflow(userToSave.id, function(mainCallflow) {
-										if ('flow' in mainCallflow) {
-											var flow = mainCallflow.flow;
-											while (flow.module !== 'user' && '_' in flow.children) {
-												flow = flow.children._;
-											}
-											flow.data.timeout = parseInt(userToSave.extra.ringingTimeout);
-											self.usersUpdateCallflow(mainCallflow, function(updatedCallflow) {
-												callback(null, updatedCallflow);
+							conference: function(callback) {
+								if (isUserNameDifferent) {
+									self.usersListConferences(userToSave.id, function(conferences) {
+										if (conferences.length > 0) {
+											var conferenceIDToChange;
+
+											_.each(conferences, function(conference) {
+												if (!conferenceIDToChange && conference.name.indexOf(self.appFlags.users.smartPBXConferenceString) >= 0) {
+													conferenceIDToChange = conference.id;
+												}
 											});
-										} else {
-											callback(null, null);
+
+											if (conferenceIDToChange) {
+												self.usersGetConference(conferenceIDToChange, function(conference) {
+													conference.name = newName + self.appFlags.users.smartPBXConferenceString;
+
+													self.usersUpdateConference(conference, function(newConference) {
+														callback && callback(null, newConference);
+													});
+												});
+											} else {
+												callback && callback(null, {});
+											}
 										}
+									});
+								} else {
+									callback && callback(null, {});
+								}
+							},
+							callflow: function(callback) {
+								if (isUserNameDifferent || shouldUpdateTimeout) {
+									self.usersGetMainCallflow(userToSave.id, function(mainCallflow) {
+										if (isUserNameDifferent) {
+											mainCallflow.name = newName + self.appFlags.users.smartPBXCallflowString;
+										}
+
+										if (shouldUpdateTimeout) {
+											if ('flow' in mainCallflow) {
+												var flow = mainCallflow.flow;
+												while (flow.module !== 'user' && '_' in flow.children) {
+													flow = flow.children._;
+												}
+												flow.data.timeout = parseInt(userToSave.extra.ringingTimeout);
+											}
+										}
+
+										self.usersUpdateCallflow(mainCallflow, function(updatedCallflow) {
+											callback(null, updatedCallflow);
+										});
 									});
 								} else {
 									callback(null, null);
@@ -2830,7 +2877,7 @@ define(function(require) {
 					}, data.user),
 					vmbox: {
 						mailbox: data.callflow.extension,
-						name: fullName + '\'s VMBox'
+						name: fullName + self.appFlags.users.smartPBXVMBoxString
 					},
 					callflow: {
 						contact_list: {
@@ -2850,7 +2897,7 @@ define(function(require) {
 							},
 							module: 'user'
 						},
-						name: fullName + ' SmartPBX\'s Callflow',
+						name: fullName + self.appFlags.users.smartPBXCallflowString,
 						numbers: [ (data.callflow || {}).extension ]
 					},
 					extra: data.extra
@@ -3148,7 +3195,7 @@ define(function(require) {
 							},
 							module: 'user'
 						},
-						name: fullName + ' SmartPBX\'s Callflow',
+						name: fullName + self.appFlags.users.smartPBXCallflowString,
 						numbers: listExtensions,
 						owner_id: user.id,
 						type: 'mainUserCallflow'
@@ -4090,7 +4137,7 @@ define(function(require) {
 				if (vmboxes.length > 0) {
 					if (needVMUpdate) {
 						self.usersGetVMBox(vmboxes[0].id, function(vmbox) {
-							vmbox.name = user.first_name + ' ' + user.last_name + '\'s VMBox';
+							vmbox.name = user.first_name + ' ' + user.last_name + self.appFlags.users.smartPBXVMBoxString;
 							// We only want to update the vmbox number if it was already synced with the presenceId (and if the presenceId was not already set)
 							// This allows us to support old clients who have mailbox number != than their extension number
 							if (oldPresenceId === vmbox.mailbox) {
@@ -4109,7 +4156,7 @@ define(function(require) {
 					var vmbox = {
 						owner_id: user.id,
 						mailbox: user.presence_id || userExtension || user.extra.vmbox.mailbox,
-						name: user.first_name + ' ' + user.last_name + '\'s VMBox'
+						name: user.first_name + ' ' + user.last_name + self.appFlags.users.smartPBXVMBoxString
 					};
 
 					self.usersCreateVMBox(vmbox, function(vmbox) {
@@ -4125,7 +4172,7 @@ define(function(require) {
 			monster.parallel({
 				conference: function(callback) {
 					var baseConference = {
-						name: data.user.first_name + ' ' + data.user.last_name + ' SmartPBX Conference',
+						name: data.user.first_name + ' ' + data.user.last_name + self.appFlags.users.smartPBXConferenceString,
 						owner_id: data.user.id,
 						play_name_on_join: true,
 						member: {
