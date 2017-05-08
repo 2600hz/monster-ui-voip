@@ -1831,6 +1831,19 @@ define(function(require){
 								}
 							});
 						}
+						error: function(e) {
+							monster.request({
+								resource: 'voip.groups.deleteGroup',
+								data: {
+									accountId: self.accountId,
+									groupId: dataGroup.data.id,
+									data: {}
+								},
+								success: function() {
+									
+								}
+							});
+						}
 					});
 				}
 			});
