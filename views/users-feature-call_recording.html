@@ -5,31 +5,71 @@
 		</div>
 		{{ i18n.users.callRecording.headline }}
 		<div class="switch">
-		{{#monsterSwitch}}
-			<input class="switch-state" type="checkbox" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if user.extra.mapFeatures.call_recording.active}} checked="checked"{{/if}}></input>
-		{{/monsterSwitch}}
+			{{#monsterSwitch}}
+				<input class="switch-state" type="checkbox" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if user.extra.mapFeatures.call_recording.active}} checked="checked"{{/if}}></input>
+			{{/monsterSwitch}}
 		</div>
 	</div>
 
 	<div class="content{{#unless user.extra.mapFeatures.call_recording.active}} disabled{{/unless}}">
 		<form id="call_recording_form">
-			<div>
-				<span>{{ i18n.users.callRecording.urlLabel }}</span>
-				<input required name="url" type="url" placeholder="{{ i18n.users.callRecording.urlPlaceholder }}" value="{{url}}">
+			<div class="btn-group-wrapper">
+				<span class="title">{{ i18n.users.callRecording.toggleValues.inboundOnnet.title }}</span>
+				<div class="btn-group call-recording-type" data-type="inbound-onnet">
+					<button data-value="on" class="monster-button monster-button-fit{{#compare extra.inbound.onnet.enabled "===" true}} monster-button-primary selected{{/compare}}">{{ i18n.users.callRecording.toggleValues.on }}</button>
+					<button data-value="default" class="monster-button monster-button-fit{{#compare extra.inbound.onnet.enabled "===" "default"}} monster-button-primary selected{{/compare}}">{{ i18n.users.callRecording.toggleValues.accountDefault }} ({{ extra.inbound.onnet.accountValue }})</button>
+					<button data-value="off" class="monster-button monster-button-fit{{#compare extra.inbound.onnet.enabled "===" false}} monster-button-primary selected{{/compare}}">{{ i18n.users.callRecording.toggleValues.off }}</button>
+				</div>
 			</div>
-			<div>
-				<span>{{ i18n.users.callRecording.formatLabel }}</span>
-				<select name="format" class="input-medium">
-					{{#select format}}
-						<option value="mp3">mp3</option>
-						<option value="wav">wav</option>
-					{{/select}}
-				</select>
+
+			<div class="btn-group-wrapper">
+				<span class="title">{{ i18n.users.callRecording.toggleValues.inboundOffnet.title }}</span>
+				<div class="btn-group call-recording-type" data-type="inbound-offnet">
+					<button data-value="on" class="monster-button monster-button-fit{{#compare extra.inbound.offnet.enabled "===" true}} monster-button-primary selected{{/compare}}">{{ i18n.users.callRecording.toggleValues.on }}</button>
+					<button data-value="default" class="monster-button monster-button-fit{{#compare extra.inbound.offnet.enabled "===" "default"}} monster-button-primary selected{{/compare}}">{{ i18n.users.callRecording.toggleValues.accountDefault }} ({{ extra.inbound.offnet.accountValue }})</button>
+					<button data-value="off" class="monster-button monster-button-fit{{#compare extra.inbound.offnet.enabled "===" false}} monster-button-primary selected{{/compare}}">{{ i18n.users.callRecording.toggleValues.off }}</button>
+				</div>
 			</div>
-			<div>
-				<span>{{ i18n.users.callRecording.timeLimitLabel }}</span>
-				<input required name="time_limit" type="text" class="input-small" value="{{#if timeLimit}}{{timeLimit}}{{else}}600{{/if}}">
+
+			<div class="btn-group-wrapper">
+				<span class="title">{{ i18n.users.callRecording.toggleValues.outboundOnnet.title }}</span>
+				<div class="btn-group call-recording-type" data-type="outbound-onnet">
+					<button data-value="on" class="monster-button monster-button-fit{{#compare extra.outbound.onnet.enabled "===" true}} monster-button-primary selected{{/compare}}">{{ i18n.users.callRecording.toggleValues.on }}</button>
+					<button data-value="default" class="monster-button monster-button-fit{{#compare extra.outbound.onnet.enabled "===" "default"}} monster-button-primary selected{{/compare}}">{{ i18n.users.callRecording.toggleValues.accountDefault }} ({{ extra.outbound.onnet.accountValue }})</button>
+					<button data-value="off" class="monster-button monster-button-fit{{#compare extra.outbound.onnet.enabled "===" false}} monster-button-primary selected{{/compare}}">{{ i18n.users.callRecording.toggleValues.off }}</button>
+				</div>
 			</div>
+
+			<div class="btn-group-wrapper">
+				<span class="title">{{ i18n.users.callRecording.toggleValues.outboundOffnet.title }}</span>
+				<div class="btn-group call-recording-type" data-type="outbound-offnet">
+					<button data-value="on" class="monster-button monster-button-fit{{#compare extra.outbound.offnet.enabled "===" true}} monster-button-primary selected{{/compare}}">{{ i18n.users.callRecording.toggleValues.on }}</button>
+					<button data-value="default" class="monster-button monster-button-fit{{#compare extra.outbound.offnet.enabled "===" "default"}} monster-button-primary selected{{/compare}}">{{ i18n.users.callRecording.toggleValues.accountDefault }} ({{ extra.outbound.offnet.accountValue }})</button>
+					<button data-value="off" class="monster-button monster-button-fit{{#compare extra.outbound.offnet.enabled "===" false}} monster-button-primary selected{{/compare}}">{{ i18n.users.callRecording.toggleValues.off }}</button>
+				</div>
+			</div>
+
+			{{#unless hasStorageConfigured}}
+				<div class="fields-settings{{#if canShowFields}} active{{/if}}">
+					<div>
+						<span>{{ i18n.users.callRecording.urlLabel }}</span>
+						<input required name="url" type="url" placeholder="{{ i18n.users.callRecording.urlPlaceholder }}" value="{{url}}">
+					</div>
+					<div>
+						<span>{{ i18n.users.callRecording.formatLabel }}</span>
+						<select name="format" class="input-medium">
+							{{#select format}}
+								<option value="mp3">mp3</option>
+								<option value="wav">wav</option>
+							{{/select}}
+						</select>
+					</div>
+					<div>
+						<span>{{ i18n.users.callRecording.timeLimitLabel }}</span>
+						<input required name="time_limit" type="text" class="input-small" value="{{#if timeLimit}}{{timeLimit}}{{else}}600{{/if}}">
+					</div>
+				</div>
+			{{/unless}}
 		</form>
 	</div>
 
