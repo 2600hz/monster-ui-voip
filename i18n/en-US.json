@@ -563,13 +563,36 @@
 			"failover_title": "Call-Forwarding (Failover Mode)"
 		},
 		"callRecording": {
-			"title": "Inbound Call Recording",
-			"headline": "User Call Recording Settings",
+			"title": "Customized Call Recording",
+			"headline": "User Call Recording Customizations",
 			"formatLabel": "Format:",
 			"urlLabel": "URL:",
 			"urlPlaceholder": "http://your.server.com/place/to/store/recordings",
 			"timeLimitLabel": "Time Limit (sec):",
-			"noNumber": "Before configuring the Inbound Call Recording feature for this user, you need to assign him a number or an extension"
+			"noNumber": "Before configuring the Customized Call Recording feature for this user, you need to assign him a number or an extension",
+			"__comment": "UI-2578: adding call-recording toggles to smart pbx",
+			"__version": "4.1",
+			"toggleValues": {
+				"inboundOnnet": {
+					"title": "Inbound Internal:",
+					"help": ""
+				},
+				"inboundOffnet": {
+					"title": "Inbound External:",
+					"help": ""
+				},
+				"outboundOnnet": {
+					"title": "Outbound Internal:",
+					"help": ""
+				},
+				"outboundOffnet": {
+					"title": "Outbound External:",
+					"help": ""
+				},
+				"on": "On",
+				"accountDefault": "Account Default",
+				"off": "Off"
+			}
 		},
 		"conferencing": {
 			"title": "Conference Bridge",

@@ -1286,10 +1286,11 @@ define(function(require) {
 			});
 
 			template.on('click', '.feature[data-feature="call_recording"]', function() {
-				self.usersGetMainCallflow(currentUser.id, function(callflow) {
-					if (callflow) {
+				self.usersGetCallRecordingData(currentUser.id, function(data) {
+					if (data.callflow) {
 						self.usersRenderCallRecording({
-							userCallflow: callflow,
+							hasStorageConfigured: data.hasStorageConfigured,
+							userCallflow: data.callflow,
 							currentUser: currentUser
 						});
 					} else {
@@ -1440,6 +1441,53 @@ define(function(require) {
 
 				template.find('.grid-cell.active').removeClass('active');
 				template.find('.grid-row.active').removeClass('active');
+			});
+		},
+
+		usersGetCallRecordingData: function(userId, globalCallback) {
+			var self = this;
+
+			monster.parallel({
+				callflow: function(callback) {
+					self.usersGetMainCallflow(userId, function(data) {
+						callback && callback(null, data);
+					});
+				},
+				hasStorageConfigured: function(callback) {
+					self.usersGetStoragePlan(function(data) {
+						var isConfigured = false;
+
+						if (data && data.hasOwnProperty('plan') && data.plan.hasOwnProperty('modb') && data.plan.modb.hasOwnProperty('types') && data.plan.modb.types.hasOwnProperty('call_recording')) {
+							isConfigured = true;
+						}
+
+						callback && callback(null, isConfigured);
+					});
+				}
+			}, function(err, results) {
+				globalCallback && globalCallback(results);
+			});
+		},
+
+		usersGetStoragePlan: function(callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'storage.get',
+				data: {
+					accountId: self.accountId,
+					generateError: false
+				},
+				success: function(data) {
+					callback(data.data);
+				},
+				error: function(data, error, globalHandler) {
+					if (error.status === 404) {
+						callback({});
+					} else {
+						globalHandler(data);
+					}
+				}
 			});
 		},
 
@@ -2160,16 +2208,225 @@ define(function(require) {
 			}
 		},
 
+		usersFormatCallRecording: function(params) {
+			var self = this,
+				formattedData = $.extend(true, {}, {
+					user: params.currentUser,
+					hasStorageConfigured: params.hasStorageConfigured,
+					canShowFields: false
+				}),
+				setValueSetting = function(category, direction) {
+					var found = false,
+						currentAccount = monster.apps.auth.currentAccount;
+
+					if (params.currentUser.hasOwnProperty('call_recording')) {
+						if (params.currentUser.call_recording.hasOwnProperty(category)) {
+							if (params.currentUser.call_recording[category].hasOwnProperty(direction) && params.currentUser.call_recording[category][direction].hasOwnProperty('enabled')) {
+								found = true;
+
+								formattedData.extra[category][direction].enabled = params.currentUser.call_recording[category][direction].enabled;
+							}
+						}
+					}
+
+					if (currentAccount.hasOwnProperty('call_recording')) {
+						if (currentAccount.call_recording.hasOwnProperty(category)) {
+							if (currentAccount.call_recording[category].hasOwnProperty(direction) && currentAccount.call_recording[category][direction].hasOwnProperty('enabled')) {
+								formattedData.extra[category][direction].accountValue = currentAccount.call_recording[category][direction].enabled;
+
+								if (!found) {
+									formattedData.extra[category][direction].enabled = 'default';
+								}
+							}
+						}
+					}
+				};
+
+			// First set the defaults, then we'll try to set them based on the hierarchy user > account
+			formattedData.extra = {
+				inbound: {
+					onnet: {
+						enabled: 'default',
+						accountValue: self.i18n.active().users.callRecording.toggleValues.off
+					},
+					offnet: {
+						enabled: 'default',
+						accountValue: self.i18n.active().users.callRecording.toggleValues.off
+					}
+				},
+				outbound: {
+					onnet: {
+						enabled: 'default',
+						accountValue: self.i18n.active().users.callRecording.toggleValues.off
+					},
+					offnet: {
+						enabled: 'default',
+						accountValue: self.i18n.active().users.callRecording.toggleValues.off
+					}
+				}
+			};
+
+			_.each(formattedData.extra, function(category, categoryName) {
+				_.each(category, function(direction, directionName) {
+					setValueSetting(categoryName, directionName);
+				});
+			});
+
+			// If feature is active then we search for value of the 3 other fields
+			if (params.currentUser.extra.mapFeatures.call_recording.active) {
+				// If it's using new data structure, then we look for a customization at any level.
+				// Since the app only lets you set it thru 3 generic fields, we know it will all be the same so we can just take the first results we find
+				if (params.currentUser.hasOwnProperty('call_recording')) {
+					_.each(params.currentUser.call_recording, function(category, categoryName) {
+						_.each(category, function(direction, directionName) {
+							if (direction.enabled === true && !formattedData.hasOwnProperty('url')) {
+								formattedData.url = direction.url;
+								formattedData.format = direction.format;
+								formattedData.timeLimit = direction.time_limit;
+							}
+						});
+					});
+				} else if (params.userCallflow.flow.module === 'record_call') {
+					// Otherwise it's using the old callflow logic
+					formattedData = $.extend(true, formattedData, {
+						url: params.userCallflow.flow.data.url,
+						format: params.userCallflow.flow.data.format,
+						timeLimit: params.userCallflow.flow.data.time_limit,
+						// In old logic we were setting the call recording on the inbound calls only
+						extra: {
+							inbound: {
+								onnet: {
+									enabled: true
+								},
+								offnet: {
+									enabled: true
+								}
+							}
+						}
+					});
+				}
+			}
+
+			// We only display the storage settings if one of the toggle is set to On
+			_.each(formattedData.extra, function(category, categoryName) {
+				_.each(category, function(direction, directionName) {
+					if (formattedData.extra[categoryName][directionName].enabled === true) {
+						formattedData.canShowFields = true;
+					}
+				});
+			});
+
+			return formattedData;
+		},
+
+		usersAnalyzeCallRecordingCallflow: function(callflow) {
+			var self = this,
+				formattedCallflow = $.extend(true, {}, callflow),
+				updated = false;
+
+			// If first node is a record call, we re-initialize callflow with the children
+			if (formattedCallflow.flow.hasOwnProperty('module') && formattedCallflow.flow.module === 'record_call') {
+				formattedCallflow.flow = formattedCallflow.flow.children._;
+				updated = true;
+			}
+
+			var newFlow = formattedCallflow.flow;
+
+			while (newFlow.hasOwnProperty('children') && newFlow.children.hasOwnProperty('_')) {
+				if (newFlow.children._.module === 'record_call') {
+					newFlow.children = newFlow.children._.children;
+					updated = true;
+				} else {
+					newFlow = newFlow.children._;
+				}
+			}
+
+			return {
+				newFlow: formattedCallflow,
+				hasUpdate: updated
+			};
+		},
+
+		usersCallRecordingNormalizeUser: function(template, formData, user) {
+			var self = this,
+				isEnabled = template.find('.switch-state').prop('checked');
+
+			user.smartpbx = user.smartpbx || {};
+			user.smartpbx.call_recording = user.smartpbx.call_recording || {};
+			user.smartpbx.call_recording.enabled = isEnabled;
+
+			if (isEnabled) {
+				user.call_recording = $.extend(true, {}, user.call_recording, {
+					inbound: {
+						onnet: {},
+						offnet: {}
+					},
+					outbound: {
+						onnet: {},
+						offnet: {}
+					}
+				});
+
+				// First we made the decision that SmartPBX would set these 3 fields globally, so we remove individual settings first
+				_.each(user.call_recording, function(category) {
+					_.each(category, function(direction) {
+						delete direction.time_limit;
+						delete direction.url;
+						delete direction.format;
+					});
+				});
+
+				template.find('.call-recording-type').each(function() {
+					var $this = $(this),
+						type = $this.data('type'),
+						category = type.substring(0, type.indexOf('-')),
+						direction = type.substring(type.indexOf('-') + 1, type.length),
+						hasValue = $this.find('button.selected').length,
+						value = hasValue ? $this.find('button.selected').data('value') : 'default';
+
+					// If value is set to something else than account default then we set the enabled boolean
+					if (value && value !== 'default') {
+						user.call_recording[category][direction].enabled = value === 'on' ? true : false;
+					} else {
+						delete user.call_recording[category][direction].enabled;
+
+						if (_.isEmpty(user.call_recording[category][direction])) {
+							delete user.call_recording[category][direction];
+						}
+
+						if (_.isEmpty(user.call_recording[category])) {
+							delete user.call_recording[category];
+						}
+					}
+				});
+
+				if (formData.hasOwnProperty('url')) {
+					_.each(user.call_recording, function(category, categoryName) {
+						_.each(category, function(direction, directionName) {
+							if (direction.enabled === true) {
+								$.extend(true, direction, {
+									time_limit: formData.time_limit,
+									url: formData.url,
+									format: formData.format
+								});
+							}
+						});
+					});
+				}
+			} else {
+				user.call_recording = {};
+			}
+
+			if (_.isEmpty(user.call_recording)) {
+				delete user.call_recording;
+			}
+
+			return user;
+		},
+
 		usersRenderCallRecording: function(params) {
 			var self = this,
-				templateData = $.extend(true, {
-					user: params.currentUser
-				},
-				(params.currentUser.extra.mapFeatures.call_recording.active ? {
-					url: params.userCallflow.flow.data.url,
-					format: params.userCallflow.flow.data.format,
-					timeLimit: params.userCallflow.flow.data.time_limit
-				} : {})),
+				templateData = self.usersFormatCallRecording(params),
 				featureTemplate = $(monster.template(self, 'users-feature-call_recording', templateData)),
 				switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#call_recording_form'),
@@ -2179,92 +2436,66 @@ define(function(require) {
 				rules: {
 					'time_limit': {
 						digits: true
+					},
+					'url': {
+						required: true
 					}
 				}
-			});
-
-			featureTemplate.find('.cancel-link').on('click', function() {
-				popup.dialog('close').remove();
 			});
 
 			switchFeature.on('change', function() {
 				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
 			});
 
+			featureTemplate.find('.cancel-link').on('click', function() {
+				popup.dialog('close').remove();
+			});
+
+			featureTemplate.find('.btn-group-wrapper button').on('click', function(e) {
+				e.preventDefault();
+				var $this = $(this);
+				$this.siblings().removeClass('selected monster-button-primary');
+				$this.addClass('selected monster-button-primary');
+
+				// If there's 1 button "on" we display the settings, if not we hide them.
+				featureTemplate.find('.call-recording-type button[data-value="on"].selected').length > 0 ? featureTemplate.find('.fields-settings').slideDown() : featureTemplate.find('.fields-settings').slideUp();
+			});
+
 			featureTemplate.find('.save').on('click', function() {
-				if (monster.ui.valid(featureForm)) {
-					var formData = monster.ui.getFormData('call_recording_form'),
-						enabled = switchFeature.prop('checked');
+				var formatUserData,
+					updateDB = function() {
+						// Check if it's an old callflow , ie if it has call record action in callflow
+						// If it does we remove them.
+						var resultAnalyze = self.usersAnalyzeCallRecordingCallflow(params.userCallflow),
+							afterCheck = function() {
+								self.usersUpdateUser(formatUserData, function(updatedUser) {
+									popup.dialog('close').remove();
 
-					if (!('smartpbx' in params.currentUser)) { params.currentUser.smartpbx = {}; }
-					if (!('call_recording' in params.currentUser.smartpbx)) {
-						params.currentUser.smartpbx.call_recording = {
-							enabled: false
-						};
-					}
-
-					if (params.currentUser.smartpbx.call_recording.enabled || enabled) {
-						params.currentUser.smartpbx.call_recording.enabled = enabled;
-						var newCallflow = $.extend(true, {}, params.userCallflow);
-						if (enabled) {
-							if (newCallflow.flow.module === 'record_call') {
-								newCallflow.flow.data = $.extend(true, { action: 'start' }, formData);
-							} else {
-								newCallflow.flow = {
-									children: {
-										_: $.extend(true, {}, params.userCallflow.flow)
-									},
-									module: 'record_call',
-									data: $.extend(true, { action: 'start' }, formData)
-								};
-
-								var flow = newCallflow.flow;
-								while (flow.children && '_' in flow.children) {
-									if (flow.children._.module === 'record_call' && flow.children._.data.action === 'stop') {
-										break; // If there is already a Stop Record Call
-									} else if (flow.children._.module === 'voicemail') {
-										var voicemailNode = $.extend(true, {}, flow.children._);
-										flow.children._ = {
-											module: 'record_call',
-											data: { action: 'stop' },
-											children: { '_': voicemailNode }
-										};
-
-										break;
-									} else {
-										flow = flow.children._;
-									}
-								}
-							}
-						} else {
-							newCallflow.flow = $.extend(true, {}, params.userCallflow.flow.children._);
-							var flow = newCallflow.flow;
-							while (flow.children && '_' in flow.children) {
-								if (flow.children._.module === 'record_call') {
-									flow.children = flow.children._.children;
-									break;
-								} else {
-									flow = flow.children._;
-								}
-							}
-						}
-						self.usersUpdateCallflow(newCallflow, function(updatedCallflow) {
-							self.usersUpdateUser(params.currentUser, function(updatedUser) {
-								popup.dialog('close').remove();
-
-								self.usersRender({
-									userId: params.currentUser.id,
-									openedTab: 'features'
+									self.usersRender({
+										userId: params.currentUser.id,
+										openedTab: 'features'
+									});
 								});
+							};
+
+						if (resultAnalyze.hasUpdate) {
+							self.usersUpdateCallflow(resultAnalyze.newFlow, function() {
+								afterCheck();
 							});
-						});
-					} else {
-						popup.dialog('close').remove();
-						self.usersRender({
-							userId: params.currentUser.id,
-							openedTab: 'features'
-						});
-					}
+						} else {
+							afterCheck();
+						}
+					};
+
+				if (!featureTemplate.find('.switch-state').prop('checked')) {
+					formatUserData = self.usersCallRecordingNormalizeUser(featureTemplate, undefined, params.currentUser);
+
+					updateDB();
+				} else if (monster.ui.valid(featureForm)) {
+					var formData = monster.ui.getFormData('call_recording_form');
+					formatUserData = self.usersCallRecordingNormalizeUser(featureTemplate, formData, params.currentUser);
+
+					updateDB();
 				}
 			});
 
@@ -2588,7 +2819,7 @@ define(function(require) {
 
 				var dataTemplate = self.usersFormatUserData(userData, results.mainDirectory, results.mainCallflow, results.vmboxes.userVM, results.vmboxes.listExisting),
 					template = $(monster.template(self, 'users-name', dataTemplate));
-					console.log(dataTemplate);
+
 				monster.ui.validate(template.find('form.user-fields'), {
 					rules: {
 						'extra.ringingTimeout': {

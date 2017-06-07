@@ -473,6 +473,15 @@
 }
 
 /* Call Recording Feature */
+.monster-feature-popup-container[data-feature="call_recording"] {
+	width: 530px;
+}
+
+.monster-feature-popup-container[data-feature="call_recording"] .account-default {
+	text-align: left;
+	margin-left: 10px;
+}
+
 .monster-feature-popup-container[data-feature="call_recording"] form {
 	margin-bottom: 0;
 }
@@ -482,15 +491,26 @@
 }
 .monster-feature-popup-container[data-feature="call_recording"] form span {
 	display: inline-block;
-	width: 120px;
+	width: 140px;
 	vertical-align: text-bottom;
 	text-align: right;
 }
 .monster-feature-popup-container[data-feature="call_recording"] form label.monster-invalid {
 	top: 30px;
-	left: 130px;
+	left: 150px;
 }
 
+.monster-feature-popup-container[data-feature="call_recording"] form input.monster-invalid {
+	margin-bottom: 15px;
+}
+
+.monster-feature-popup-container[data-feature="call_recording"] form div.fields-settings {
+	display: none;
+}
+
+.monster-feature-popup-container[data-feature="call_recording"] form div.fields-settings.active {
+	display: block;
+}
 /* Ringback Feature */
 .monster-feature-popup-container[data-feature="ringback"] {
 	width: 516px;
