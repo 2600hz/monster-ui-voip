@@ -2230,9 +2230,9 @@ define(function(require) {
 					}
 
 					if (currentAccount.hasOwnProperty('call_recording') && currentAccount.call_recording.hasOwnProperty('account')) {
-						if (currentAccount.call_recording.account.hasOwnProperty(category)) {
-							if (currentAccount.call_recording.account[category].hasOwnProperty(direction) && currentAccount.call_recording.account[category][direction].hasOwnProperty('enabled')) {
-								formattedData.extra[category][direction].accountValue = currentAccount.call_recording.account[category][direction].enabled === true ? self.i18n.active().users.callRecording.toggleValues.on : self.i18n.active().users.callRecording.toggleValues.off;
+						if (currentAccount.call_recording.endpoint.hasOwnProperty(category)) {
+							if (currentAccount.call_recording.endpoint[category].hasOwnProperty(direction) && currentAccount.call_recording.endpoint[category][direction].hasOwnProperty('enabled')) {
+								formattedData.extra[category][direction].accountValue = currentAccount.call_recording.endpoint[category][direction].enabled === true ? self.i18n.active().users.callRecording.toggleValues.on : self.i18n.active().users.callRecording.toggleValues.off;
 
 								if (!found) {
 									formattedData.extra[category][direction].enabled = 'default';
