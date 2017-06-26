@@ -1678,36 +1678,29 @@ define(function(require){
 			monster.pub('common.numberSelector.render', {
 				container: featureTemplate.find('.number-select'),
 				inputName: 'caller_id',
-				number: data.hasOwnProperty('faxbox') ? data.faxbox.caller_id : undefined,
-				removeCallback: function () {
-					featureTemplate
-						.find('.number-mirror')
-							.text(self.i18n.active().users.faxing.emailToFax.default);
-				},
-				globalAddNumberCallback: function (number, addNumberToControl) {
-					var found = false,
-						// Number can come back from the buy common control, as an object, or from the spare selector, as a string
-						foundNumber = _.isObject(number) ? _.keys(number)[0] : number;
-
-					addNumberToControl && addNumberToControl(foundNumber);
-
-					featureTemplate
-						.find('.number-mirror')
-							.text(foundNumber);
-				}
+				number: data.hasOwnProperty('faxbox') ? data.faxbox.caller_id : undefined
 			});
 
 			featureTemplate.find('#helper_content').on('shown', function() {
 				$(this).siblings('a').find('.text').text(self.i18n.active().users.faxing.emailToFax.help.hideHelp);
-				$(this).find('#destination_number').focus();
+				featureTemplate.find('#destination_number').focus();
 			});
 
 			featureTemplate.find('#helper_content').on('hidden', function() {
 				$(this).siblings('a').find('.text').text(self.i18n.active().users.faxing.emailToFax.help.showHelp);
+				featureTemplate.find('#destination_number').val('');
+				featureTemplate.find('.number-mirror').text(self.i18n.active().users.faxing.emailToFax.default);
 			});
 
 			featureTemplate.find('.cancel-link').on('click', function() {
 				popup.dialog('close').remove();
+			});
+
+			featureTemplate.find('#destination_number').on('keyup', function() {
+				var val = $(this).val(),
+					textToMirror = val === '' ? self.i18n.active().users.faxing.emailToFax.default : val;
+
+				featureTemplate.find('.number-mirror').text(textToMirror);
 			});
 
 			featureTemplate.find('.save').on('click', function() {
