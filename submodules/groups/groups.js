@@ -1368,7 +1368,10 @@ define(function(require){
 							resource: 'callflow.list',
 							data: {
 								accountId: self.accountId,
-								filters: { 'filter_type':'main' }
+								filters: {
+									filter_type:'main',
+									paginate: 'false'
+								}
 							},
 							success: function(data) {
 								callback(null, data.data && data.data.length > 0 ? _.find(data.data, function(callflow) { return callflow.numbers[0] === "MainOpenHoursMenu" }) : null);
@@ -1380,9 +1383,10 @@ define(function(require){
 							resource: 'callflow.list',
 							data: {
 								accountId: self.accountId,
-								filters: { 
-									'has_key':'owner_id',
-									'filter_type':'mainUserCallflow'
+								filters: {
+									has_key: 'owner_id',
+									filter_type: 'mainUserCallflow',
+									paginate: 'false'
 								}
 							},
 							success: function(data) {
@@ -1465,9 +1469,10 @@ define(function(require){
 							resource: 'callflow.list',
 							data: {
 								accountId: self.accountId,
-								filters: { 
-									'filter_group_id': groupId,
-									'filter_type': 'userGroup'
+								filters: {
+									filter_group_id: groupId,
+									filter_type: 'userGroup',
+									paginate: 'false'
 								}
 							},
 							success: function(data) {
@@ -1811,9 +1816,10 @@ define(function(require){
 				resource: 'callflow.list',
 				data: {
 					accountId: self.accountId,
-					filters: { 
-						'filter_group_id': groupId,
-						'filter_type': 'userGroup'
+					filters: {
+						filter_group_id: groupId,
+						filter_type: 'userGroup',
+						paginate: 'false'
 					}
 				},
 				success: function(data) {
@@ -1841,9 +1847,10 @@ define(function(require){
 				resource: 'callflow.list',
 				data: {
 					accountId: self.accountId,
-					filters: { 
-						'filter_group_id': groupId,
-						'filter_type': 'baseGroup'
+					filters: {
+						filter_group_id: groupId,
+						filter_type: 'baseGroup',
+						paginate: false
 					}
 				},
 				success: function(data) {
@@ -2081,7 +2088,10 @@ define(function(require){
 							resource: 'callflow.list',
 							data: {
 								accountId: self.accountId,
-								filters: {'has_key':'group_id'}
+								filters: {
+									has_key: 'group_id',
+									paginate: 'false'
+								}
 							},
 							success: function(dataCallflows) {
 								callback(null, dataCallflows.data);
