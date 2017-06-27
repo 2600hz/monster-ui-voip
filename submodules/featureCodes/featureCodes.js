@@ -13,6 +13,12 @@ define(function(require){
 		},
 
 		categories: {
+			qubicle: [
+				'qubicle login',
+				'qubicle set ready',
+				'qubicle set away',
+				'qubicle logout'
+			],
 			call_forward: [
 				"call_forward[action=activate]",
 				"call_forward[action=deactivate]",
@@ -128,7 +134,7 @@ define(function(require){
 
 			return _.chain(featureCodes)
 				.map(function(category) {
-					category.codes = _.sortBy(category.codes, 'numbers');
+					category.codes = _.sortBy(category.codes, 'number');
 					return category;
 				})
 				.sortBy('category')
