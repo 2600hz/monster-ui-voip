@@ -13,6 +13,12 @@ define(function(require){
 		},
 
 		categories: {
+			qubicle: [
+				'qubicle login',
+				'qubicle set ready',
+				'qubicle set away',
+				'qubicle logout'
+			],
 			call_forward: [
 				"call_forward[action=activate]",
 				"call_forward[action=deactivate]",

@@ -1061,6 +1061,10 @@
 		"noFeatureCodeMessage": "There are no feature codes enabled on your account yet. Feature codes are automatically created when you load the Main Number page.",
 		"mainNumberLink": "Go to Main Number",
 		"labels": {
+			"qubicle login": "Agent Login",
+			"qubicle set ready": "Set Agent Ready",
+			"qubicle set away": "Set Agent Away",
+			"qubicle logout": "Agent Logout",
 			"call_forward[action=activate]": "Enable Call-Forward",
 			"call_forward[action=deactivate]": "Disable Call-Forward",
 			"call_forward[action=toggle]": "Toggle Call-Forward",
@@ -1097,6 +1101,7 @@
 		},
 		"__comment": "UI-1028, v3.20_s0: Added categories for the feature codes.",
 		"categories": {
+			"qubicle": "Call Center",
 			"call_forward": "Call-Forward",
 			"hotdesk": "Hot-Desking",
 			"parking": "Parking",
