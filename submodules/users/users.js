@@ -1287,15 +1287,11 @@ define(function(require) {
 
 			template.on('click', '.feature[data-feature="call_recording"]', function() {
 				self.usersGetCallRecordingData(currentUser.id, function(data) {
-					if (data.callflow) {
-						self.usersRenderCallRecording({
-							hasStorageConfigured: data.hasStorageConfigured,
-							userCallflow: data.callflow,
-							currentUser: currentUser
-						});
-					} else {
-						monster.ui.alert('error', self.i18n.active().users.callRecording.noNumber);
-					}
+					self.usersRenderCallRecording({
+						hasStorageConfigured: data.hasStorageConfigured,
+						userCallflow: data.callflow,
+						currentUser: currentUser
+					});
 				});
 			});
 
@@ -2207,7 +2203,8 @@ define(function(require) {
 				formattedData = $.extend(true, {}, {
 					user: params.currentUser,
 					hasStorageConfigured: params.hasStorageConfigured,
-					canShowFields: false
+					canShowFields: false,
+					timeLimit: 3600
 				}),
 				setValueSetting = function(category, direction) {
 					var found = false,
@@ -2280,7 +2277,7 @@ define(function(require) {
 							}
 						});
 					});
-				} else if (params.userCallflow.flow.module === 'record_call') {
+				} else if (params.userCallflow && params.userCallflow.hasOwnProperty('flow') && params.userCallflow.flow.module === 'record_call') {
 					// Otherwise it's using the old callflow logic
 					formattedData = $.extend(true, formattedData, {
 						url: params.userCallflow.flow.data.url,
@@ -2318,20 +2315,22 @@ define(function(require) {
 				formattedCallflow = $.extend(true, {}, callflow),
 				updated = false;
 
-			// If first node is a record call, we re-initialize callflow with the children
-			if (formattedCallflow.flow.hasOwnProperty('module') && formattedCallflow.flow.module === 'record_call') {
-				formattedCallflow.flow = formattedCallflow.flow.children._;
-				updated = true;
-			}
-
-			var newFlow = formattedCallflow.flow;
-
-			while (newFlow.hasOwnProperty('children') && newFlow.children.hasOwnProperty('_')) {
-				if (newFlow.children._.module === 'record_call') {
-					newFlow.children = newFlow.children._.children;
+			if (formattedCallflow && formattedCallflow.hasOwnProperty('flow')) {
+				// If first node is a record call, we re-initialize callflow with the children
+				if (formattedCallflow.flow.hasOwnProperty('module') && formattedCallflow.flow.module === 'record_call') {
+					formattedCallflow.flow = formattedCallflow.flow.children._;
 					updated = true;
-				} else {
-					newFlow = newFlow.children._;
+				}
+
+				var newFlow = formattedCallflow.flow;
+
+				while (newFlow.hasOwnProperty('children') && newFlow.children.hasOwnProperty('_')) {
+					if (newFlow.children._.module === 'record_call') {
+						newFlow.children = newFlow.children._.children;
+						updated = true;
+					} else {
+						newFlow = newFlow.children._;
+					}
 				}
 			}
 
@@ -2401,8 +2400,7 @@ define(function(require) {
 								$.extend(true, direction, {
 									time_limit: formData.time_limit,
 									url: formData.url,
-									format: formData.format,
-									record_on_answer: true
+									format: formData.format
 								});
 							}
 						});
