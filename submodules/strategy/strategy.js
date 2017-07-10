@@ -2715,6 +2715,10 @@ define(function(require) {
 				};
 
 				switch (group.groupType) {
+					case 'qubicle':
+						group.groupIcon = 'fa fa-headphones';
+
+						break;
 					case 'directory':
 						group.groupIcon = 'fa fa-book';
 
@@ -3254,6 +3258,13 @@ define(function(require) {
 			var self = this;
 			monster.parallel(
 				{
+					callQueues: function(_callback) {
+						self.strategyGetCallflows(function(callQueuesData) {
+							_callback(null, callQueuesData);
+						}, {
+							'filter_flow.module': 'qubicle'
+						});
+					},
 					users: function(_callback) {
 						self.callApi({
 							resource: 'user.list',
@@ -3358,6 +3369,7 @@ define(function(require) {
 				},
 				function(err, results) {
 					var callEntities = {
+						qubicle: results.callQueues,
 						device: results.devices,
 						user: $.extend(true, [], results.users),
 						play: results.media,
