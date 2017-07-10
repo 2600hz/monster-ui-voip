@@ -868,6 +868,7 @@
 			"december": "Dec"
 		},
 		"callEntities": {
+			"qubicle": "Call Queues",
 			"user": "Users",
 			"device": "Devices",
 			"ring_group": "Groups",
