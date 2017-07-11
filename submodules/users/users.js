@@ -961,8 +961,16 @@ define(function(require){
 
 				monster.ui.validate(form, {
 					rules: {
-						'password': {
+						username: {
+							required: true
+						},
+						password: {
+							required: true,
 							minlength: 6
+						},
+						confirm_password: {
+							required: true,
+							equalTo: '#inputPassword'
 						}
 					}
 				});
@@ -981,11 +989,15 @@ define(function(require){
 				});
 
 				passwordTemplate.find('.save-new-username').on('click', function() {
-					var formData = monster.ui.getFormData('form_new_username'),
+					var $saveButton = $(this),
+						formData = monster.ui.getFormData('form_new_username'),
 						userToSave = $.extend(true, {}, currentUser, formData);
 
-					if(monster.ui.valid(form)) {
-						if(!currentUser.extra.differentEmail) {
+					if (monster.ui.valid(form)) {
+						$saveButton
+							.prop('disabled', true);
+
+						if (!currentUser.extra.differentEmail) {
 							userToSave.email = userToSave.username;
 						}
 
