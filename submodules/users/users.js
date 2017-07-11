@@ -937,10 +937,15 @@ define(function(require) {
 
 				monster.ui.validate(form, {
 					rules: {
-						'password': {
+						username: {
+							required: true
+						},
+						password: {
+							required: true,
 							minlength: 6
 						},
 						confirm_password: {
+							required: true,
 							equalTo: '#inputPassword'
 						}
 					}
