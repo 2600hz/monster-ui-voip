@@ -965,10 +965,14 @@ define(function(require) {
 				});
 
 				passwordTemplate.find('.save-new-username').on('click', function() {
-					var formData = monster.ui.getFormData('form_new_username'),
+					var $saveButton = $(this),
+						formData = monster.ui.getFormData('form_new_username'),
 						userToSave = $.extend(true, {}, currentUser, formData);
 
 					if (monster.ui.valid(form)) {
+						$saveButton
+							.prop('disabled', true);
+
 						if (!currentUser.extra.differentEmail) {
 							userToSave.email = userToSave.username;
 						}
