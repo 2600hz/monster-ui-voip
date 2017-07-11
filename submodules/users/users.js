@@ -875,6 +875,8 @@ define(function(require){
 											} else {
 												callback && callback(null, {});
 											}
+										} else {
+											callback && callback(null, {});
 										}
 									});
 								} else {
