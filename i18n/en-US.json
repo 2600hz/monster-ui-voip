@@ -434,6 +434,7 @@
 		"dialogChangePassword": {
 			"help": "You can set a new password by just typing any password you want, along with the Email address!",
 			"password": "Password",
+			"confirmPassword": "Re-type Password",
 			"passwordPlaceholder": "Password (Min. 6 characters)",
 			"title": "Update Email and password",
 			"username": "User's Email address",

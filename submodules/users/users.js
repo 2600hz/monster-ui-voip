@@ -939,6 +939,9 @@ define(function(require) {
 					rules: {
 						'password': {
 							minlength: 6
+						},
+						confirm_password: {
+							equalTo: '#inputPassword'
 						}
 					}
 				});
