@@ -468,7 +468,7 @@
 		},
 		"editionForm": {
 			"changePIN": "Change PIN",
-			"changeUsername": "Change",
+			"changeUsername": "Change Credentials",
 			"firstName": "First Name",
 			"lastName": "Last Name",
 			"role": "Role",
