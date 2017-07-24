@@ -904,6 +904,8 @@ define(function(require){
 											callback(null, updatedCallflow);
 										});
 									});
+								} else {
+									callback(null, null);
 								}
 							}
 						}, function(error, results) {
