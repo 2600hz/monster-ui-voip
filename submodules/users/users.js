@@ -332,7 +332,8 @@ define(function(require) {
 					existingExtensions: [],
 					countUsers: data.users.length
 				},
-				mapUsers = {};
+				mapUsers = {},
+				registeredDevices = _.map(data.deviceStatus, function(device) { return device.device_id; });
 
 			_.each(data.users, function(user) {
 				mapUsers[user.id] = self.usersFormatUserData(user);
@@ -386,7 +387,7 @@ define(function(require) {
 				var userId = device.owner_id;
 
 				if (userId in mapUsers) {
-					var isRegistered = _.find(data.deviceStatus, function(status) { return (status.device_id === device.id && status.registered === true); }) ? true : false;
+					var isRegistered = device.enabled && (['sip_device', 'smartphone', 'softphone', 'fax', 'ata'].indexOf(device.device_type) >= 0 ? registeredDevices.indexOf(device.id) >= 0 : true);
 
 					if (mapUsers[userId].extra.devices.length >= 2) {
 						if (mapUsers[userId].extra.additionalDevices === 0) {

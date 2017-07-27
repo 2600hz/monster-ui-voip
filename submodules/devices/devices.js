@@ -907,14 +907,16 @@ define(function(require) {
 					sip_uri: 'icon-telicon-voip-phone',
 					fax: 'icon-telicon-fax',
 					ata: 'icon-telicon-ata'
-				};
+				},
+				registeredDevices = _.map(data.status, function(device) { return device.device_id; });
 
 			_.each(data.users, function(user) {
 				mapUsers[user.id] = user;
 			});
 
 			_.each(data.devices, function(device) {
-				var isAssigned = device.owner_id ? true : false;
+				var isAssigned = device.owner_id ? true : false,
+					isRegistered = ['sip_device', 'smartphone', 'softphone', 'fax', 'ata'].indexOf(device.device_type) >= 0 ? registeredDevices.indexOf(device.id) >= 0 : true;
 
 				formattedData.countDevices++;
 
@@ -929,25 +931,11 @@ define(function(require) {
 					enabled: device.enabled,
 					type: device.device_type,
 					friendlyType: self.i18n.active().devices.types[device.device_type],
-					registered: false,
-					classStatus: device.enabled ? 'unregistered' : 'disabled' /* Display a device in black if it's disabled, otherwise, until we know whether it's registered or not, we set the color to red */,
-					isRegistered: false,
+					registered: isRegistered,
+					isRegistered: device.enabled && isRegistered, // even though a device is registered, we don't count it as registered if it's disabled
+					classStatus: device.enabled ? (isRegistered ? 'registered' : 'unregistered') : 'disabled' /* Display a device in black if it's disabled, otherwise, until we know whether it's registered or not, we set the color to red */,
 					sipUserName: device.username
 				};
-			});
-
-			_.each(data.status, function(status) {
-				if (status.registered === true && status.device_id in formattedData.devices) {
-					var device = formattedData.devices[status.device_id];
-
-					device.registered = true;
-
-					/* Now that we know if it's registered, we set the color to green */
-					if (device.enabled) {
-						device.classStatus = 'registered';
-						device.isRegistered = true;
-					}
-				}
 			});
 
 			var arrayToSort = [];

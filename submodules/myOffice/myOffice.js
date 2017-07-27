@@ -50,7 +50,7 @@ define(function(require) {
 						account: myOfficeData.account,
 						totalUsers: myOfficeData.users.length,
 						totalDevices: myOfficeData.devices.length,
-						unregisteredDevices: myOfficeData.devices.length - myOfficeData.devicesStatus.length,
+						unregisteredDevices: myOfficeData.unregisteredDevices,
 						totalNumbers: _.size(myOfficeData.numbers),
 						totalConferences: myOfficeData.totalConferences,
 						totalChannels: myOfficeData.totalChannels,
@@ -455,7 +455,9 @@ define(function(require) {
 				totalConferences = 0,
 				channelsArray = [],
 				classifierRegexes = {},
-				classifiedNumbers = {};
+				classifiedNumbers = {},
+				registeredDevices = _.map(data.devicesStatus, function(device) { return device.device_id; }),
+				unregisteredDevices = 0;
 
 			_.each(data.numbers, function(numData, num) {
 				_.find(data.classifiers, function(classifier, classifierKey) {
@@ -500,6 +502,10 @@ define(function(require) {
 				if (val.device_type in devices) {
 					devices[val.device_type].count++;
 					devices.totalCount++;
+
+					if (val.enabled === false || (['sip_device', 'smartphone', 'softphone', 'fax', 'ata'].indexOf(val.device_type) >= 0 && registeredDevices.indexOf(val.id) < 0)) {
+						unregisteredDevices++;
+					}
 				} else {
 					console.log('Unknown device type: ' + val.device_type);
 				}
@@ -582,6 +588,7 @@ define(function(require) {
 			data.assignedNumbersData = assignedNumbers;
 			// data.numberTypesData = numberTypes;
 			data.totalConferences = totalConferences;
+			data.unregisteredDevices = unregisteredDevices;
 
 			if (data.directory && data.directory.id) {
 				data.directoryLink = self.apiUrl + 'accounts/' + self.accountId + '/directories/' + data.directory.id + '?accept=pdf&auth_token=' + self.getAuthToken();
