@@ -1,4 +1,4 @@
-define(function(require){
+define(function(require) {
 	var $ = require('jquery'),
 		_ = require('underscore'),
 		monster = require('monster'),
@@ -27,15 +27,15 @@ define(function(require){
 		},
 
 		chartColors: [
-			"#B588B9", // Purple ~ Mauve
-			"#698BF7", // Purple ~ Dark Blue
-			"#009AD6", // Blue
-			"#6CC5E9", // Light Blue
-			"#719B11", // Dark Green
-			"#BDE55F", // Light Green
-			"#F1E87C", // Pale Yellow
-			"#EF8F25", // Orange
-			"#6F7C7D"  // Grey
+			'#B588B9', // Purple ~ Mauve
+			'#698BF7', // Purple ~ Dark Blue
+			'#009AD6', // Blue
+			'#6CC5E9', // Light Blue
+			'#719B11', // Dark Green
+			'#BDE55F', // Light Green
+			'#F1E87C', // Pale Yellow
+			'#EF8F25', // Orange
+			'#6F7C7D'  // Grey
 		],
 
 		/* My Office */
@@ -59,8 +59,8 @@ define(function(require){
 						faxingNumbers: myOfficeData.faxingNumbers || [],
 						faxNumbers: myOfficeData.faxNumbers || [],
 						topMessage: myOfficeData.topMessage,
-						devicesList: _.toArray(myOfficeData.devicesData).sort(function(a, b) { return b.count - a.count ; }),
-						assignedNumbersList: _.toArray(myOfficeData.assignedNumbersData).sort(function(a, b) { return b.count - a.count ; }),
+						devicesList: _.toArray(myOfficeData.devicesData).sort(function(a, b) { return b.count - a.count; }),
+						assignedNumbersList: _.toArray(myOfficeData.assignedNumbersData).sort(function(a, b) { return b.count - a.count; }),
 						// numberTypesList: _.toArray(myOfficeData.numberTypesData).sort(function(a, b) { return b.count - a.count ; }),
 						classifiedNumbers: myOfficeData.classifiedNumbers,
 						directoryUsers: myOfficeData.directory.users && myOfficeData.directory.users.length || 0,
@@ -72,52 +72,52 @@ define(function(require){
 						segmentShowStroke: false,
 						// segmentStrokeWidth: 1,
 						animationSteps: 50,
-						animationEasing: "easeOutCirc",
+						animationEasing: 'easeOutCirc',
 						percentageInnerCutout: 60
 					},
-					devicesChart = new Chart(template.find('#dashboard_devices_chart').get(0).getContext("2d")).Doughnut(
-						myOfficeData.devicesData.totalCount > 0 ?
-						$.map(myOfficeData.devicesData, function(val) {
+					devicesChart = new Chart(template.find('#dashboard_devices_chart').get(0).getContext('2d')).Doughnut(
+						myOfficeData.devicesData.totalCount > 0
+						? $.map(myOfficeData.devicesData, function(val) {
 							return typeof val === 'object' ? {
 								value: val.count,
 								color: val.color
 							} : null;
-						}).sort(function(a, b) { return b.value - a.value ; }) :
-						[{ value:1, color:"#DDD" }],
+						}).sort(function(a, b) { return b.value - a.value; })
+						: [{ value: 1, color: '#DDD' }],
 						chartOptions
 					),
-					assignedNumbersChart = new Chart(template.find('#dashboard_assigned_numbers_chart').get(0).getContext("2d")).Doughnut(
-						myOfficeData.assignedNumbersData.totalCount > 0 ?
-						$.map(myOfficeData.assignedNumbersData, function(val) {
+					assignedNumbersChart = new Chart(template.find('#dashboard_assigned_numbers_chart').get(0).getContext('2d')).Doughnut(
+						myOfficeData.assignedNumbersData.totalCount > 0
+						? $.map(myOfficeData.assignedNumbersData, function(val) {
 							return typeof val === 'object' ? {
 								value: val.count,
 								color: val.color
 							} : null;
-						}).sort(function(a, b) { return b.value - a.value ; }) :
-						[{ value:1, color:"#DDD" }],
+						}).sort(function(a, b) { return b.value - a.value; })
+						: [{ value: 1, color: '#DDD' }],
 						chartOptions
 					),
-					numberTypesChart = new Chart(template.find('#dashboard_number_types_chart').get(0).getContext("2d")).Doughnut(
+					numberTypesChart = new Chart(template.find('#dashboard_number_types_chart').get(0).getContext('2d')).Doughnut(
 						// $.map(myOfficeData.numberTypesData, function(val) {
 						// 	return {
 						// 		value: val.count,
 						// 		color: val.color
 						// 	};
 						// }).sort(function(a, b) { return b.value - a.value ; }),
-						myOfficeData.classifiedNumbers.length > 0 ?
-						$.map(myOfficeData.classifiedNumbers, function(val, index) {
+						myOfficeData.classifiedNumbers.length > 0
+						? $.map(myOfficeData.classifiedNumbers, function(val, index) {
 							return typeof val === 'object' ? {
 								value: val.count,
 								color: val.color
 							} : null;
-						}) :
-						[{ value:1, color:"#DDD" }],
+						})
+						: [{ value: 1, color: '#DDD' }],
 						chartOptions
 					);
 
 				// Trick to adjust the vertical positioning of the number types legend
-				if(myOfficeData.classifiedNumbers.length <= 3) {
-					template.find('.number-types-legend').addClass('size-'+myOfficeData.classifiedNumbers.length);
+				if (myOfficeData.classifiedNumbers.length <= 3) {
+					template.find('.number-types-legend').addClass('size-' + myOfficeData.classifiedNumbers.length);
 				}
 
 				self.myOfficeBindEvents({
@@ -138,13 +138,13 @@ define(function(require){
 
 		// we check if we have to display the walkthrough:
 		// first make sure it's not a trial, then
-		// only show it if we've already shown the walkthrough in myaccount 
+		// only show it if we've already shown the walkthrough in myaccount
 		myOfficeCheckWalkthrough: function() {
 			var self = this;
 
-			if(!monster.apps.auth.currentAccount.hasOwnProperty('trial_time_left')) {
+			if (!monster.apps.auth.currentAccount.hasOwnProperty('trial_time_left')) {
 				monster.pub('myaccount.hasToShowWalkthrough', function(response) {
-					if(response === false) {
+					if (response === false) {
 						self.myOfficeWalkthroughRender();
 					}
 				});
@@ -156,7 +156,7 @@ define(function(require){
 
 			// If it's not a trial, we show the Walkthrough the first time
 			// because if it's a trial, myOfficeWalkthroughRender will be called by another event
-			if(!monster.apps.auth.currentAccount.hasOwnProperty('trial_time_left')) {
+			if (!monster.apps.auth.currentAccount.hasOwnProperty('trial_time_left')) {
 				self.myOfficeWalkthroughRender();
 			}
 		},
@@ -171,7 +171,7 @@ define(function(require){
 				function() {
 					self.myOfficeCreateMainVMBox(function(vmbox) {
 						callback(vmbox);
-					})
+					});
 				}
 			);
 		},
@@ -205,14 +205,13 @@ define(function(require){
 				data: {
 					accountId: self.accountId,
 					filters: {
-						'filter_type':'mainVMBox'
+						filter_type: 'mainVMBox'
 					}
 				},
 				success: function(vmboxes) {
-					if(vmboxes.data.length > 0) {
+					if (vmboxes.data.length > 0) {
 						hasVMBoxCallback && hasVMBoxCallback(vmboxes[0]);
-					}
-					else {
+					} else {
 						noVMBoxCallback && noVMBoxCallback();
 					}
 				}
@@ -223,202 +222,200 @@ define(function(require){
 			var self = this;
 
 			monster.parallel({
-					account: function(parallelCallback) {
-						self.callApi({
-							resource: 'account.get',
-							data: {
-								accountId: self.accountId
-							},
-							success: function(dataAccount) {
-								parallelCallback && parallelCallback(null, dataAccount.data);
+				account: function(parallelCallback) {
+					self.callApi({
+						resource: 'account.get',
+						data: {
+							accountId: self.accountId
+						},
+						success: function(dataAccount) {
+							parallelCallback && parallelCallback(null, dataAccount.data);
+						}
+					});
+				},
+				mainVoicemailBox: function(parallelCallback) {
+					self.myOfficeCreateMainVMBoxIfMissing(function(vmbox) {
+						parallelCallback(null, vmbox);
+					});
+				},
+				users: function(parallelCallback) {
+					self.callApi({
+						resource: 'user.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								paginate: 'false'
 							}
-						});
-					},
-					mainVoicemailBox: function(parallelCallback) {
-						self.myOfficeCreateMainVMBoxIfMissing(function(vmbox) {
-							parallelCallback(null, vmbox);
-						});
-					},
-					users: function(parallelCallback) {
-						self.callApi({
-							resource: 'user.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									paginate: 'false'
-								}
-							},
-							success: function(dataUsers) {
-								parallelCallback && parallelCallback(null, dataUsers.data);
+						},
+						success: function(dataUsers) {
+							parallelCallback && parallelCallback(null, dataUsers.data);
+						}
+					});
+				},
+				devices: function(parallelCallback) {
+					self.callApi({
+						resource: 'device.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								paginate: 'false'
 							}
-						});
-					},
-					devices: function(parallelCallback) {
-						self.callApi({
-							resource: 'device.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									paginate: 'false'
-								}
-							},
-							success: function(data) {
-								parallelCallback && parallelCallback(null, data.data);
+						},
+						success: function(data) {
+							parallelCallback && parallelCallback(null, data.data);
+						}
+					});
+				},
+				devicesStatus: function(parallelCallback) {
+					self.callApi({
+						resource: 'device.getStatus',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								paginate: 'false'
 							}
-						});
-					},
-					devicesStatus: function(parallelCallback) {
-						self.callApi({
-							resource: 'device.getStatus',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									paginate: 'false'
-								}
-							},
-							success: function(data) {
-								parallelCallback && parallelCallback(null, data.data);
+						},
+						success: function(data) {
+							parallelCallback && parallelCallback(null, data.data);
+						}
+					});
+				},
+				numbers: function(parallelCallback) {
+					self.callApi({
+						resource: 'numbers.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								paginate: 'false'
 							}
-						});
-					},
-					numbers: function(parallelCallback) {
-						self.callApi({
-							resource: 'numbers.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									paginate: 'false'
-								}
-							},
-							success: function(data) {
-								parallelCallback && parallelCallback(null, data.data.numbers);
+						},
+						success: function(data) {
+							parallelCallback && parallelCallback(null, data.data.numbers);
+						}
+					});
+				},
+				channels: function(parallelCallback) {
+					self.callApi({
+						resource: 'channel.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								paginate: 'false'
 							}
-						});
-					},
-					channels: function(parallelCallback) {
-						self.callApi({
-							resource: 'channel.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									paginate: 'false'
-								}
+						},
+						success: function(data) {
+							parallelCallback && parallelCallback(null, data.data);
+						}
+					});
+				},
+				callflows: function(parallelCallback) {
+					self.callApi({
+						resource: 'callflow.list',
+						data: {
+							filters: {
+								has_type: 'type',
+								paginate: 'false'
 							},
-							success: function(data) {
-								parallelCallback && parallelCallback(null, data.data);
-							}
-						});
-					},
-					callflows: function(parallelCallback) {
-						self.callApi({
-							resource: 'callflow.list',
-							data: {
-								filters: {
-									has_type: 'type',
-									paginate: 'false'
-								},
-								accountId: self.accountId
-							},
-							success: function(data) {
-								parallelCallback && parallelCallback(null, data.data);
-							}
-						});
-					},
-					classifiers: function(parallelCallback) {
-						self.callApi({
-							resource: 'numbers.listClassifiers',
-							data: {
-								accountId: self.accountId
-							},
-							success: function(data) {
-								parallelCallback && parallelCallback(null, data.data);
-							}
-						});
-					},
-					directory: function(parallelCallback) {
-						self.callApi({
-							resource: 'directory.list',
-							data: {
-								accountId: self.accountId
-							},
-							success: function(data, status) {
-								var mainDirectory = _.find(data.data, function(val) {
-									return val.name === 'SmartPBX Directory';
+							accountId: self.accountId
+						},
+						success: function(data) {
+							parallelCallback && parallelCallback(null, data.data);
+						}
+					});
+				},
+				classifiers: function(parallelCallback) {
+					self.callApi({
+						resource: 'numbers.listClassifiers',
+						data: {
+							accountId: self.accountId
+						},
+						success: function(data) {
+							parallelCallback && parallelCallback(null, data.data);
+						}
+					});
+				},
+				directory: function(parallelCallback) {
+					self.callApi({
+						resource: 'directory.list',
+						data: {
+							accountId: self.accountId
+						},
+						success: function(data, status) {
+							var mainDirectory = _.find(data.data, function(val) {
+								return val.name === 'SmartPBX Directory';
+							});
+							if (mainDirectory) {
+								self.callApi({
+									resource: 'directory.get',
+									data: {
+										accountId: self.accountId,
+										directoryId: mainDirectory.id
+									},
+									success: function(data, status) {
+										parallelCallback && parallelCallback(null, data.data);
+									},
+									error: function(data, status) {
+										parallelCallback && parallelCallback(null, {});
+									}
 								});
-								if(mainDirectory) {
-									self.callApi({
-										resource: 'directory.get',
-										data: {
-											accountId: self.accountId,
-											directoryId: mainDirectory.id
-										},
-										success: function(data, status) {
-											parallelCallback && parallelCallback(null, data.data);
-										},
-										error: function(data, status) {
-											parallelCallback && parallelCallback(null, {});
-										}
-									});
-								} else {
-									parallelCallback && parallelCallback(null, {});
-								}
-							},
-							error: function(data, status) {
+							} else {
 								parallelCallback && parallelCallback(null, {});
 							}
-						});
-					}
-				},
-				function(error, results) {
-					callback && callback(self.myOfficeFormatData(results));
+						},
+						error: function(data, status) {
+							parallelCallback && parallelCallback(null, {});
+						}
+					});
 				}
-			);
+			}, function(error, results) {
+				callback && callback(self.myOfficeFormatData(results));
+			});
 		},
 
 		myOfficeFormatData: function(data) {
 			var self = this,
 				devices = {
-					"sip_device": {
+					sip_device: {
 						label: self.i18n.active().devices.types.sip_device,
 						count: 0,
 						color: self.chartColors[5]
 					},
-					"cellphone": {
+					cellphone: {
 						label: self.i18n.active().devices.types.cellphone,
 						count: 0,
 						color: self.chartColors[3]
 					},
-					"smartphone": {
+					smartphone: {
 						label: self.i18n.active().devices.types.smartphone,
 						count: 0,
 						color: self.chartColors[2]
 					},
-					"mobile": {
+					mobile: {
 						label: self.i18n.active().devices.types.mobile,
 						count: 0,
 						color: self.chartColors[1]
 					},
-					"softphone": {
+					softphone: {
 						label: self.i18n.active().devices.types.softphone,
 						count: 0,
 						color: self.chartColors[0]
 					},
-					"landline": {
+					landline: {
 						label: self.i18n.active().devices.types.landline,
 						count: 0,
 						color: self.chartColors[6]
 					},
-					"fax": {
+					fax: {
 						label: self.i18n.active().devices.types.fax,
 						count: 0,
 						color: self.chartColors[7]
 					},
-					"ata": {
+					ata: {
 						label: self.i18n.active().devices.types.ata,
 						count: 0,
 						color: self.chartColors[8]
 					},
-					"sip_uri": {
+					sip_uri: {
 						label: self.i18n.active().devices.types.sip_uri,
 						count: 0,
 						color: self.chartColors[4]
@@ -426,12 +423,12 @@ define(function(require){
 					totalCount: 0
 				},
 				assignedNumbers = {
-					"spare": {
+					spare: {
 						label: self.i18n.active().myOffice.numberChartLegend.spare,
 						count: 0,
 						color: self.chartColors[8]
 					},
-					"assigned": {
+					assigned: {
 						label: self.i18n.active().myOffice.numberChartLegend.assigned,
 						count: 0,
 						color: self.chartColors[3]
@@ -439,20 +436,20 @@ define(function(require){
 					totalCount: 0
 				},
 				// numberTypes = {
-				// 	"local": {
+				// 	local: {
 				// 		label: self.i18n.active().myOffice.numberChartLegend.local,
 				// 		count: 0,
-				// 		color: "#6cc5e9"
+				// 		color: '#6cc5e9'
 				// 	},
-				// 	"tollfree": {
+				// 	tollfree: {
 				// 		label: self.i18n.active().myOffice.numberChartLegend.tollfree,
 				// 		count: 0,
-				// 		color: "#bde55f"
+				// 		color: '#bde55f'
 				// 	},
-				// 	"international": {
+				// 	international: {
 				// 		label: self.i18n.active().myOffice.numberChartLegend.international,
 				// 		count: 0,
-				// 		color: "#b588b9"
+				// 		color: '#b588b9'
 				// 	}
 				// },
 				totalConferences = 0,
@@ -462,11 +459,11 @@ define(function(require){
 
 			_.each(data.numbers, function(numData, num) {
 				_.find(data.classifiers, function(classifier, classifierKey) {
-					if(!(classifierKey in classifierRegexes)) {
+					if (!(classifierKey in classifierRegexes)) {
 						classifierRegexes[classifierKey] = new RegExp(classifier.regex);
 					}
-					if(classifierRegexes[classifierKey].test(num)) {
-						if(classifierKey in classifiedNumbers) {
+					if (classifierRegexes[classifierKey].test(num)) {
+						if (classifierKey in classifiedNumbers) {
 							classifiedNumbers[classifierKey] ++;
 						} else {
 							classifiedNumbers[classifierKey] = 1;
@@ -479,19 +476,19 @@ define(function(require){
 			});
 
 			data.classifiedNumbers = _.map(classifiedNumbers, function(val, key) {
-				return { 
+				return {
 					key: key,
 					label: key in data.classifiers ? data.classifiers[key].friendly_name : key,
 					count: val
 				};
-			}).sort(function(a,b) { return b.count - a.count });
+			}).sort(function(a, b) { return b.count - a.count; });
 
 			var maxLength = self.chartColors.length;
-			if(data.classifiedNumbers.length > maxLength) {
-				data.classifiedNumbers[maxLength-1].key = 'merged_others';
-				data.classifiedNumbers[maxLength-1].label = 'Others';
-				while(data.classifiedNumbers.length > maxLength) {
-					data.classifiedNumbers[maxLength-1].count += data.classifiedNumbers.pop().count;
+			if (data.classifiedNumbers.length > maxLength) {
+				data.classifiedNumbers[maxLength - 1].key = 'merged_others';
+				data.classifiedNumbers[maxLength - 1].label = 'Others';
+				while (data.classifiedNumbers.length > maxLength) {
+					data.classifiedNumbers[maxLength - 1].count += data.classifiedNumbers.pop().count;
 				}
 			}
 
@@ -500,19 +497,19 @@ define(function(require){
 			});
 
 			_.each(data.devices, function(val) {
-				if(val.device_type in devices) {
+				if (val.device_type in devices) {
 					devices[val.device_type].count++;
 					devices.totalCount++;
 				} else {
-					console.log('Unknown device type: '+val.device_type);
+					console.log('Unknown device type: ' + val.device_type);
 				}
 			});
 
 			_.each(data.numbers, function(val) {
-				if("used_by" in val && val["used_by"].length > 0) {
-					assignedNumbers["assigned"].count++;
+				if ('used_by' in val && val.used_by.length > 0) {
+					assignedNumbers.assigned.count++;
 				} else {
-					assignedNumbers["spare"].count++;
+					assignedNumbers.spare.count++;
 				}
 				assignedNumbers.totalCount++;
 
@@ -521,29 +518,29 @@ define(function(require){
 			});
 
 			_.each(data.users, function(val) {
-				if(val.features.indexOf("conferencing") >= 0) {
+				if (val.features.indexOf('conferencing') >= 0) {
 					totalConferences++;
 				}
 			});
 
 			_.each(data.callflows, function(val) {
 				var numberArrayName = '';
-				if(val.type === "main" && val.name === "MainCallflow") {
+				if (val.type === 'main' && val.name === 'MainCallflow') {
 					numberArrayName = 'mainNumbers';
-				} else if(val.type === "conference" && val.name === "MainConference") {
+				} else if (val.type === 'conference' && val.name === 'MainConference') {
 					numberArrayName = 'confNumbers';
-				} else if (val.type === "faxing" && val.name === "MainFaxing") {
-					numberArrayName = "faxingNumbers";
+				} else if (val.type === 'faxing' && val.name === 'MainFaxing') {
+					numberArrayName = 'faxingNumbers';
 				}
 
-				if(numberArrayName.length > 0) {
-					if(!(numberArrayName in data)) { data[numberArrayName] = []; }
+				if (numberArrayName.length > 0) {
+					if (!(numberArrayName in data)) { data[numberArrayName] = []; }
 					_.each(val.numbers, function(num) {
-						if(num !== '0' && num !== 'undefined' && num !== 'undefinedconf' && num !== 'undefinedfaxing') {
+						if (num !== '0' && num !== 'undefined' && num !== 'undefinedconf' && num !== 'undefinedfaxing') {
 							var number = {
 								number: num
 							};
-							if(num in data.numbers) {
+							if (num in data.numbers) {
 								number.features = data.numbers[num].features;
 							}
 							data[numberArrayName].push(number);
@@ -553,30 +550,28 @@ define(function(require){
 			});
 
 			_.each(data.channels, function(val) {
-				if(channelsArray.indexOf(val.bridge_id) < 0) {
+				if (channelsArray.indexOf(val.bridge_id) < 0) {
 					channelsArray.push(val.bridge_id);
 				}
 			});
 
-			if( data.mainNumbers && data.mainNumbers.length > 0 ) {
+			if (data.mainNumbers && data.mainNumbers.length > 0) {
 				var hasValidCallerId = monster.util.isNumberFeatureEnabled('cnam') === false || data.account.hasOwnProperty('caller_id') && data.account.caller_id.hasOwnProperty('emergency') && data.account.caller_id.emergency.hasOwnProperty('number') && data.numbers.hasOwnProperty(data.account.caller_id.emergency.number),
 					hasValidE911 = monster.util.isNumberFeatureEnabled('e911') === false || data.account.hasOwnProperty('caller_id') && data.account.caller_id.hasOwnProperty('emergency') && data.account.caller_id.emergency.hasOwnProperty('number') && data.numbers.hasOwnProperty(data.account.caller_id.emergency.number) && data.numbers[data.account.caller_id.emergency.number].features.indexOf('e911') >= 0;
 
 				if (!hasValidCallerId && !hasValidE911) {
 					data.topMessage = {
-						class: 'btn-danger',
+						cssClass: 'btn-danger',
 						message: self.i18n.active().myOffice.missingCnamE911Message
 					};
-				}
-				else if (!hasValidCallerId) {
+				} else if (!hasValidCallerId) {
 					data.topMessage = {
-						class: 'btn-danger',
+						cssClass: 'btn-danger',
 						message: self.i18n.active().myOffice.missingCnamMessage
 					};
-				}
-				else if (!hasValidE911) {
+				} else if (!hasValidE911) {
 					data.topMessage = {
-						class: 'btn-danger',
+						cssClass: 'btn-danger',
 						message: self.i18n.active().myOffice.missingE911Message
 					};
 				}
@@ -588,8 +583,8 @@ define(function(require){
 			// data.numberTypesData = numberTypes;
 			data.totalConferences = totalConferences;
 
-			if(data.directory && data.directory.id) {
-				data.directoryLink = self.apiUrl + 'accounts/' + self.accountId +'/directories/' + data.directory.id + '?accept=pdf&auth_token=' + self.getAuthToken();
+			if (data.directory && data.directory.id) {
+				data.directoryLink = self.apiUrl + 'accounts/' + self.accountId + '/directories/' + data.directory.id + '?accept=pdf&auth_token=' + self.getAuthToken();
 			}
 
 			return data;
@@ -607,20 +602,20 @@ define(function(require){
 					subcategory = $this.data('subcategory');
 
 				$('.category').removeClass('active');
-				switch(category) {
-					case "users":
+				switch (category) {
+					case 'users':
 						$('.category#users').addClass('active');
 						monster.pub('voip.users.render', { parent: parent });
 						break;
-					case "devices":
+					case 'devices':
 						$('.category#devices').addClass('active');
 						monster.pub('voip.devices.render', { parent: parent });
 						break;
-					case "numbers":
+					case 'numbers':
 						$('.category#numbers').addClass('active');
 						monster.pub('voip.numbers.render', { parent: parent });
 						break;
-					case "strategy":
+					case 'strategy':
 						$('.category#strategy').addClass('active');
 						monster.pub('voip.strategy.render', { parent: parent, openElement: subcategory });
 						break;
@@ -664,15 +659,15 @@ define(function(require){
 					},
 					popupTemplate = $(monster.template(self, 'myOffice-musicOnHoldPopup', templateData)),
 					popup = monster.ui.dialog(popupTemplate, {
-					title: self.i18n.active().myOffice.musicOnHold.title,
-					position: ['center', 20]
-				});
+						title: self.i18n.active().myOffice.musicOnHold.title,
+						position: ['center', 20]
+					});
 
 				self.myOfficeMusicOnHoldPopupBindEvents({
 					popupTemplate: popupTemplate,
 					popup: popup,
 					account: account
-				})
+				});
 			});
 		},
 
@@ -687,12 +682,13 @@ define(function(require){
 					popupTemplate.find('.upload-div').slideUp(function() {
 						popupTemplate.find('.upload-toggle').removeClass('active');
 					});
-					if(newMedia) {
+					if (newMedia) {
 						var mediaSelect = popupTemplate.find('.media-dropdown');
-						mediaSelect.append('<option value="'+newMedia.id+'">'+newMedia.name+'</option>');
+						mediaSelect.append('<option value="' + newMedia.id + '">' + newMedia.name + '</option>');
 						mediaSelect.val(newMedia.id);
 					}
-				};
+				},
+				mediaToUpload;
 
 			popupTemplate.find('.upload-input').fileUpload({
 				inputOnly: true,
@@ -704,7 +700,7 @@ define(function(require){
 					mediaToUpload = results[0];
 				},
 				error: function(errors) {
-					if(errors.hasOwnProperty('size') && errors.size.length > 0) {
+					if (errors.hasOwnProperty('size') && errors.size.length > 0) {
 						monster.ui.alert(self.i18n.active().myOffice.musicOnHold.fileTooBigAlert);
 					}
 					popupTemplate.find('.upload-div input').val('');
@@ -717,7 +713,7 @@ define(function(require){
 			});
 
 			popupTemplate.find('.upload-toggle').on('click', function() {
-				if($(this).hasClass('active')) {
+				if ($(this).hasClass('active')) {
 					popupTemplate.find('.upload-div').stop(true, true).slideUp();
 				} else {
 					popupTemplate.find('.upload-div').stop(true, true).slideDown();
@@ -729,7 +725,7 @@ define(function(require){
 			});
 
 			popupTemplate.find('.upload-submit').on('click', function() {
-				if(mediaToUpload) {
+				if (mediaToUpload) {
 					self.callApi({
 						resource: 'media.create',
 						data: {
@@ -737,7 +733,7 @@ define(function(require){
 							data: {
 								streamable: true,
 								name: mediaToUpload.name,
-								media_source: "upload",
+								media_source: 'upload',
 								description: mediaToUpload.name
 							}
 						},
@@ -775,11 +771,11 @@ define(function(require){
 			popupTemplate.find('.save').on('click', function() {
 				var selectedMedia = popupTemplate.find('.media-dropdown option:selected').val();
 
-				if(!('music_on_hold' in account)) {
+				if (!('music_on_hold' in account)) {
 					account.music_on_hold = {};
 				}
 
-				if(selectedMedia && selectedMedia.length > 0) {
+				if (selectedMedia && selectedMedia.length > 0) {
 					account.music_on_hold = {
 						media_id: selectedMedia
 					};
@@ -856,11 +852,11 @@ define(function(require){
 						callback = function(features) {
 							popupTemplate.find('.number-feature').hide();
 							_.each(features, function(featureName) {
-								popupTemplate.find('.number-feature[data-feature="'+ featureName + '"]').slideDown();
+								popupTemplate.find('.number-feature[data-feature="' + featureName + '"]').slideDown();
 							});
 						};
 
-					if(number) {
+					if (number) {
 						self.myOfficeGetNumber(number, function(numberData) {
 							var availableFeatures = numberData.hasOwnProperty('_read_only') && numberData._read_only.hasOwnProperty('features_available') ? numberData._read_only.features_available : [],
 								activatedFeatures = numberData.hasOwnProperty('_read_only') && numberData._read_only.hasOwnProperty('features') ? numberData._read_only.features : [],
@@ -868,51 +864,45 @@ define(function(require){
 								hasE911 = allFeatures.indexOf('e911') >= 0,
 								hasCNAM = allFeatures.indexOf('cnam') >= 0;
 
-							if(hasE911) {
+							if (hasE911) {
 								if (monster.util.isNumberFeatureEnabled('e911')) {
 									allowedFeatures.push('e911');
 
-									if("e911" in numberData) {
+									if ('e911' in numberData) {
 										emergencyZipcodeInput.val(numberData.e911.postal_code);
 										emergencyAddress1Input.val(numberData.e911.street_address);
 										emergencyAddress2Input.val(numberData.e911.extended_address);
 										emergencyCityInput.val(numberData.e911.locality);
 										emergencyStateInput.val(numberData.e911.region);
 									} else {
-										emergencyZipcodeInput.val("");
-										emergencyAddress1Input.val("");
-										emergencyAddress2Input.val("");
-										emergencyCityInput.val("");
-										emergencyStateInput.val("");
+										emergencyZipcodeInput.val('');
+										emergencyAddress1Input.val('');
+										emergencyAddress2Input.val('');
+										emergencyCityInput.val('');
+										emergencyStateInput.val('');
 									}
 								}
 							}
 
-							if(hasCNAM) {
+							if (hasCNAM) {
 								allowedFeatures.push('cnam');
 
-								if("cnam" in numberData) {
+								if ('cnam' in numberData) {
 									callerIdNameInput.val(numberData.cnam.display_name);
-								}
-								else {
-									callerIdNameInput.val("");
+								} else {
+									callerIdNameInput.val('');
 								}
 							}
 
 							callback && callback(allowedFeatures);
 						});
-					}
-					else {
+					} else {
 						callback && callback(allowedFeatures);
 					}
 				};
 
 			popupTemplate.find('.cancel-link').on('click', function() {
 				popup.dialog('close').remove();
-			});
-
-			popupTemplate.find('.upload-cancel').on('click', function() {
-				closeUploadDiv();
 			});
 
 			callerIdNumberSelect.on('change', function() {
@@ -931,7 +921,7 @@ define(function(require){
 							if (!_.isEmpty(results)) {
 								var length = results[0].address_components.length;
 								emergencyCityInput.val(results[0].address_components[1].long_name);
-								emergencyStateInput.val(results[0].address_components[length-2].short_name);
+								emergencyStateInput.val(results[0].address_components[length - 2].short_name);
 							}
 						}
 					});
@@ -948,7 +938,7 @@ define(function(require){
 							});
 						});
 					},
-					setNumberData = function (e911Data) {
+					setNumberData = function(e911Data) {
 						var callerIdName = callerIdNameInput.val(),
 							setCNAM = popupTemplate.find('.number-feature[data-feature="cnam"]').is(':visible'),
 							setE911 = popupTemplate.find('.number-feature[data-feature="e911"]').is(':visible');
@@ -963,19 +953,17 @@ define(function(require){
 						});
 
 						self.myOfficeGetNumber(callerIdNumber, function(numberData) {
-							if(setCNAM && callerIdName.length) {
+							if (setCNAM && callerIdName.length) {
 								$.extend(true, numberData, { cnam: { display_name: callerIdName } });
-							}
-							else {
+							} else {
 								delete numberData.cnam;
 							}
 
-							if(setE911) {
+							if (setE911) {
 								$.extend(true, numberData, {
 									e911: e911Data
 								});
-							}
-							else {
+							} else {
 								delete numberData.e911;
 							}
 
@@ -990,19 +978,16 @@ define(function(require){
 					e911Form = popupTemplate.find('.emergency-form > form');
 				}
 
-				if(callerIdNumber) {
+				if (callerIdNumber) {
 					if (monster.util.isNumberFeatureEnabled('e911')) {
-
 						if (monster.ui.valid(e911Form)) {
 							var e911Data = monster.ui.getFormData(e911Form[0]);
 
 							setNumberData(e911Data);
-						}
-						else {
+						} else {
 							monster.ui.alert(self.i18n.active().myOffice.callerId.mandatoryE911Alert);
 						}
-					}
-					else {
+					} else {
 						setNumberData();
 					}
 				} else {
@@ -1018,7 +1003,7 @@ define(function(require){
 		myOfficeWalkthroughRender: function() {
 			var self = this;
 
-			if(self.isActive()) {
+			if (self.isActive()) {
 				// First we check if the user hasn't seen the walkthrough already
 				// if he hasn't we show the walkthrough, and once they're done with it, we update their user doc so they won't see the walkthrough again
 				self.myOfficeHasWalkthrough(function() {
@@ -1033,7 +1018,7 @@ define(function(require){
 			var self = this,
 				flag = self.uiFlags.user.get('showDashboardWalkthrough');
 
-			if(flag !== false) {
+			if (flag !== false) {
 				callback && callback();
 			}
 		},
@@ -1042,7 +1027,7 @@ define(function(require){
 		myOfficeShowWalkthrough: function(callback) {
 			var self = this,
 				mainTemplate = $('#voip_container'),
-				steps =  [
+				steps = [
 					{
 						element: mainTemplate.find('.category#myOffice')[0],
 						intro: self.i18n.active().myOffice.walkthrough.steps['1'],
@@ -1124,7 +1109,9 @@ define(function(require){
 				resource: 'media.list',
 				data: {
 					accountId: self.accountId,
-					filters: { 'key_missing':'type' }
+					filters: {
+						key_missing: 'type'
+					}
 				},
 				success: function(medias) {
 					callback && callback(medias.data);

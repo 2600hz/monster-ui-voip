@@ -1,4 +1,4 @@
-define(function(require){
+define(function(require) {
 	var $ = require('jquery'),
 		_ = require('underscore'),
 		monster = require('monster');
@@ -22,7 +22,7 @@ define(function(require){
 				defaultDateRange = 1,
 				maxDateRange = 31;
 
-			if(!toDate && !fromDate) {
+			if (!toDate && !fromDate) {
 				var dates = monster.util.getDefaultRangeDates(defaultDateRange);
 				fromDate = dates.from;
 				toDate = dates.to;
@@ -44,7 +44,7 @@ define(function(require){
 				template = $(monster.template(self, 'callLogs-layout', dataTemplate));
 				monster.ui.tooltips(template);
 
-				if(cdrs && cdrs.length) {
+				if (cdrs && cdrs.length) {
 					var cdrsTemplate = $(monster.template(self, 'callLogs-cdrsList', {cdrs: cdrs, showReport: monster.config.whitelabel.callReportEmail ? true : false}));
 					template.find('.call-logs-grid .grid-row-container')
 							.append(cdrsTemplate);
@@ -60,7 +60,7 @@ define(function(require){
 				template.find('#startDate').datepicker('setDate', fromDate);
 				template.find('#endDate').datepicker('setDate', toDate);
 
-				if(!nextStartKey) {
+				if (!nextStartKey) {
 					template.find('.call-logs-loader').hide();
 				}
 
@@ -90,11 +90,13 @@ define(function(require){
 				toDate = params.toDate,
 				startKey = params.nextStartKey;
 
-			setTimeout(function() { template.find('.search-query').focus() });
+			setTimeout(function() {
+				template.find('.search-query').focus();
+			});
 
 			template.find('.apply-filter').on('click', function(e) {
-				var fromDate = template.find('input.filter-from').datepicker("getDate"),
-					toDate = template.find('input.filter-to').datepicker("getDate");
+				var fromDate = template.find('input.filter-from').datepicker('getDate'),
+					toDate = template.find('input.filter-to').datepicker('getDate');
 
 				self.callLogsRenderContent(template.parents('.right-content'), fromDate, toDate, 'custom');
 			});
@@ -107,15 +109,14 @@ define(function(require){
 				template.find('.fixed-ranges button').removeClass('active');
 				$this.addClass('active');
 
-				if(type !== 'custom') {
+				if (type !== 'custom') {
 					// Without this, it doesn't look like we're refreshing the data.
 					// GOod way to solve it would be to separate the filters from the call logs view, and only refresh the call logs.
 					template.find('.call-logs-content').empty();
 
 					var dates = self.callLogsGetFixedDatesFromType(type);
 					self.callLogsRenderContent(template.parents('.right-content'), dates.from, dates.to, type);
-				}
-				else {
+				} else {
 					template.find('.fixed-ranges-date').hide();
 					template.find('.custom-range').addClass('active');
 				}
@@ -126,34 +127,33 @@ define(function(require){
 					toDateTimestamp = monster.util.dateToEndOfGregorianDay(toDate),
 					url = self.apiUrl + 'accounts/' + self.accountId + '/cdrs?created_from=' + fromDateTimestamp + '&created_to=' + toDateTimestamp + '&accept=text/csv&auth_token=' + self.getAuthToken();
 
-				window.open(url,'_blank');
+				window.open(url, '_blank');
 			});
 
 			template.find('.search-div input.search-query').on('keyup', function(e) {
-				if(template.find('.grid-row-container .grid-row').length > 0) {
-					var searchValue = $(this).val().replace(/\|/g,'').toLowerCase(),
+				if (template.find('.grid-row-container .grid-row').length > 0) {
+					var searchValue = $(this).val().replace(/\|/g, '').toLowerCase(),
 						matchedResults = false;
 
-					if(searchValue.length <= 0) {
+					if (searchValue.length <= 0) {
 						template.find('.grid-row-group').show();
 						matchedResults = true;
-					}
-					else {
+					} else {
 						_.each(cdrs, function(cdr) {
-							var searchString = (cdr.date + "|" + cdr.fromName + "|" + cdr.fromNumber + "|" + cdr.toName + "|"
-											 + cdr.toNumber + "|" + cdr.hangupCause + "|" + cdr.id).toLowerCase(),
-								rowGroup = template.find('.grid-row.main-leg[data-id="'+cdr.id+'"]').parents('.grid-row-group');
+							var searchString = (cdr.date + '|' + cdr.fromName + '|' + cdr.fromNumber + '|' + cdr.toName + '|'
+											+ cdr.toNumber + '|' + cdr.hangupCause + '|' + cdr.id).toLowerCase(),
+								rowGroup = template.find('.grid-row.main-leg[data-id="' + cdr.id + '"]').parents('.grid-row-group');
 
-							if(searchString.indexOf(searchValue) >= 0) {
+							if (searchString.indexOf(searchValue) >= 0) {
 								matchedResults = true;
 								rowGroup.show();
 							} else {
 								rowGroup.hide();
 							}
-						})
+						});
 					}
 
-					if(matchedResults) {
+					if (matchedResults) {
 						template.find('.grid-row.no-match').hide();
 					} else {
 						template.find('.grid-row.no-match').show();
@@ -167,7 +167,7 @@ define(function(require){
 					callId = $this.data('id'),
 					extraLegs = rowGroup.find('.extra-legs');
 
-				if(rowGroup.hasClass('open')) {
+				if (rowGroup.hasClass('open')) {
 					rowGroup.removeClass('open');
 					extraLegs.slideUp();
 				} else {
@@ -179,7 +179,7 @@ define(function(require){
 					rowGroup.addClass('open');
 					extraLegs.slideDown();
 
-					if(!extraLegs.hasClass('data-loaded')) {
+					if (!extraLegs.hasClass('data-loaded')) {
 						self.callLogsGetLegs(callId, function(cdrs) {
 							var formattedCdrs = self.callLogsFormatCdrs(cdrs);
 
@@ -203,16 +203,21 @@ define(function(require){
 			});
 
 			function loadMoreCdrs() {
-				var loaderDiv = template.find('.call-logs-loader');
-				if(startKey) {
+				var loaderDiv = template.find('.call-logs-loader'),
+					cdrsTemplate;
+
+				if (startKey) {
 					loaderDiv.toggleClass('loading');
 					loaderDiv.find('.loading-message > i').toggleClass('fa-spin');
 					self.callLogsGetCdrs(fromDate, toDate, function(newCdrs, nextStartKey) {
 						newCdrs = self.callLogsFormatCdrs(newCdrs);
-						cdrsTemplate = $(monster.template(self, 'callLogs-cdrsList', {cdrs: newCdrs, showReport: monster.config.whitelabel.callReportEmail ? true : false}));
+						cdrsTemplate = $(monster.template(self, 'callLogs-cdrsList', {
+							cdrs: newCdrs,
+							showReport: monster.config.whitelabel.callReportEmail ? true : false
+						}));
 
 						startKey = nextStartKey;
-						if(!startKey) {
+						if (!startKey) {
 							template.find('.call-logs-loader').hide();
 						}
 
@@ -220,13 +225,12 @@ define(function(require){
 
 						cdrs = cdrs.concat(newCdrs);
 						var searchInput = template.find('.search-div input.search-query');
-						if(searchInput.val()) {
+						if (searchInput.val()) {
 							searchInput.keyup();
 						}
 
 						loaderDiv.toggleClass('loading');
 						loaderDiv.find('.loading-message > i').toggleClass('fa-spin');
-
 					}, startKey);
 				} else {
 					loaderDiv.hide();
@@ -235,8 +239,8 @@ define(function(require){
 
 			template.find('.call-logs-grid').on('scroll', function(e) {
 				var $this = $(this);
-				if($this.scrollTop() === $this[0].scrollHeight - $this.innerHeight()) {
-					loadMoreCdrs();	
+				if ($this.scrollTop() === $this[0].scrollHeight - $this.innerHeight()) {
+					loadMoreCdrs();
 				}
 			});
 
@@ -251,22 +255,15 @@ define(function(require){
 				from = new Date(),
 				to = new Date();
 
-			switch(type) {
-				case 'today':
-					break;
-				case 'thisWeek':
-					// First we need to know how many days separate today and monday.
+			if (type === 'thisWeek') {
+				// First we need to know how many days separate today and monday.
 					// Since Sunday is 0 and Monday is 1, we do this little substraction to get the result.
-					var day = from.getDay(),
-						countDaysFromMonday = (day||7) - 1;
-					from.setDate(from.getDate() - countDaysFromMonday);
+				var day = from.getDay(),
+					countDaysFromMonday = (day || 7) - 1;
 
-					break;
-				case 'thisMonth':
-					from.setDate(1);
-					break;
-				default:
-					break;
+				from.setDate(from.getDate() - countDaysFromMonday);
+			} else if (type === 'thisMonth') {
+				from.setDate(1);
 			}
 
 			return {
@@ -285,8 +282,8 @@ define(function(require){
 					'page_size': 50
 				};
 
-			if(pageStartKey) {
-				filters['start_key'] = pageStartKey;
+			if (pageStartKey) {
+				filters.start_key = pageStartKey;
 			}
 
 			self.callApi({
@@ -296,7 +293,7 @@ define(function(require){
 					filters: filters
 				},
 				success: function(data, status) {
-					callback(data.data, data['next_start_key']);
+					callback(data.data, data.next_start_key);
 				}
 			});
 		},
@@ -323,18 +320,17 @@ define(function(require){
 					var date = cdr.hasOwnProperty('channel_created_time') ? monster.util.unixToDate(cdr.channel_created_time, true) : monster.util.gregorianToDate(cdr.timestamp),
 						shortDate = monster.util.toFriendlyDate(date, 'shortDate'),
 						time = monster.util.toFriendlyDate(date, 'time'),
-						durationMin = parseInt(cdr.duration_seconds/60).toString(),
-						durationSec = (cdr.duration_seconds % 60 < 10 ? "0" : "") + (cdr.duration_seconds % 60),
+						durationMin = parseInt(cdr.duration_seconds / 60).toString(),
+						durationSec = (cdr.duration_seconds % 60 < 10 ? '0' : '') + (cdr.duration_seconds % 60),
 						hangupI18n = self.i18n.active().hangupCauses,
 						hangupHelp = '',
-						isOutboundCall = "authorizing_id" in cdr && cdr.authorizing_id.length > 0;
+						isOutboundCall = 'authorizing_id' in cdr && cdr.authorizing_id.length > 0;
 
 					// Only display help if it's in the i18n.
-					if(hangupI18n.hasOwnProperty(cdr.hangup_cause)) {
-						if(isOutboundCall && hangupI18n[cdr.hangup_cause].hasOwnProperty('outbound')) {
+					if (hangupI18n.hasOwnProperty(cdr.hangup_cause)) {
+						if (isOutboundCall && hangupI18n[cdr.hangup_cause].hasOwnProperty('outbound')) {
 							hangupHelp += hangupI18n[cdr.hangup_cause].outbound;
-						}
-						else if(!isOutboundCall && hangupI18n[cdr.hangup_cause].hasOwnProperty('inbound')) {
+						} else if (!isOutboundCall && hangupI18n[cdr.hangup_cause].hasOwnProperty('inbound')) {
 							hangupHelp += hangupI18n[cdr.hangup_cause].inbound;
 						}
 					}
@@ -348,29 +344,29 @@ define(function(require){
 						fromName: cdr.caller_id_name,
 						fromNumber: cdr.caller_id_number || cdr.from.replace(/@.*/, ''),
 						toName: cdr.callee_id_name,
-						toNumber: cdr.callee_id_number || ("request" in cdr) ? cdr.request.replace(/@.*/, '') : cdr.to.replace(/@.*/, ''),
-						duration: durationMin + ":" + durationSec,
+						toNumber: cdr.callee_id_number || ('request' in cdr) ? cdr.request.replace(/@.*/, '') : cdr.to.replace(/@.*/, ''),
+						duration: durationMin + ':' + durationSec,
 						hangupCause: cdr.hangup_cause,
 						hangupHelp: hangupHelp,
 						isOutboundCall: isOutboundCall,
-						mailtoLink: "mailto:" + monster.config.whitelabel.callReportEmail
-								  + "?subject=Call Report: " + cdr.call_id
-								  + "&body=Please describe the details of the issue:%0D%0A%0D%0A"
-								  + "%0D%0A____________________________________________________________%0D%0A"
-								  + "%0D%0AAccount ID: " + self.accountId
-								  + "%0D%0AFrom (Name): " + (cdr.caller_id_name || "")
-								  + "%0D%0AFrom (Number): " + (cdr.caller_id_number || cdr.from.replace(/@.*/, ''))
-								  + "%0D%0ATo (Name): " + (cdr.callee_id_name || "")
-								  + "%0D%0ATo (Number): " + (cdr.callee_id_number || ("request" in cdr) ? cdr.request.replace(/@.*/, '') : cdr.to.replace(/@.*/, ''))
-								  + "%0D%0ADate: " + shortDate
-								  + "%0D%0ADuration: " + durationMin + ":" + durationSec
-								  + "%0D%0AHangup Cause: " + (cdr.hangup_cause || "")
-								  + "%0D%0ACall ID: " + cdr.call_id
-								  + "%0D%0AOther Leg Call ID: " + (cdr.other_leg_call_id || "")
-								  + "%0D%0AHandling Server: " + (cdr.media_server || "")
+						mailtoLink: 'mailto:' + monster.config.whitelabel.callReportEmail
+								+ '?subject=Call Report: ' + cdr.call_id
+								+ '&body=Please describe the details of the issue:%0D%0A%0D%0A'
+								+ '%0D%0A____________________________________________________________%0D%0A'
+								+ '%0D%0AAccount ID: ' + self.accountId
+								+ '%0D%0AFrom (Name): ' + (cdr.caller_id_name || '')
+								+ '%0D%0AFrom (Number): ' + (cdr.caller_id_number || cdr.from.replace(/@.*/, ''))
+								+ '%0D%0ATo (Name): ' + (cdr.callee_id_name || '')
+								+ '%0D%0ATo (Number): ' + (cdr.callee_id_number || ('request' in cdr) ? cdr.request.replace(/@.*/, '') : cdr.to.replace(/@.*/, ''))
+								+ '%0D%0ADate: ' + shortDate
+								+ '%0D%0ADuration: ' + durationMin + ':' + durationSec
+								+ '%0D%0AHangup Cause: ' + (cdr.hangup_cause || '')
+								+ '%0D%0ACall ID: ' + cdr.call_id
+								+ '%0D%0AOther Leg Call ID: ' + (cdr.other_leg_call_id || '')
+								+ '%0D%0AHandling Server: ' + (cdr.media_server || '')
 					};
 
-					if(cdr.hasOwnProperty('channel_created_time')) {
+					if (cdr.hasOwnProperty('channel_created_time')) {
 						call.channelCreatedTime = cdr.channel_created_time;
 					}
 

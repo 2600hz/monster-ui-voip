@@ -351,7 +351,7 @@ define(function(require) {
 					popup.dialog('close');
 				} else {
 					self.strategyChangeEmergencyCallerId(number, function() {
-						toastr.success(monster.template(self, '!'+ self.i18n.active().strategy.updateE911Dialog.success, { number: monster.util.formatPhoneNumber(number) }));
+						toastr.success(monster.template(self, '!' + self.i18n.active().strategy.updateE911Dialog.success, { number: monster.util.formatPhoneNumber(number) }));
 						popup.dialog('close');
 					});
 				}
@@ -420,7 +420,7 @@ define(function(require) {
 
 			// Update data we have about features for main numbers
 			_.each(templateNumbers, function(dataLoop, index) {
-				if(dataLoop.number.id === number) {
+				if (dataLoop.number.id === number) {
 					dataLoop.number.features = features;
 				}
 			});
@@ -430,7 +430,7 @@ define(function(require) {
 			}), function(number) {
 				return number.number.id;
 			});
-			
+
 			var currAcc = monster.apps.auth.currentAccount,
 				hasEmergencyCallerId = currAcc.hasOwnProperty('caller_id') && currAcc.caller_id.hasOwnProperty('emergency') && currAcc.caller_id.emergency.hasOwnProperty('number') && currAcc.caller_id.emergency.number !== '',
 				hasE911Feature = (features || []).indexOf('e911') >= 0;
@@ -445,7 +445,7 @@ define(function(require) {
 				}
 			} else {
 				// If they removed e911 from their current emergency caller id number, then we let them select the new one from the list of numbers with e911 configured
-				if(hasEmergencyCallerId && currAcc.caller_id.emergency.number === number) {
+				if (hasEmergencyCallerId && currAcc.caller_id.emergency.number === number) {
 					self.strategyShowE911Choices(undefined, e911Numbers);
 				}
 			}

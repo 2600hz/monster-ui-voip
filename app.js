@@ -1,4 +1,4 @@
-define(function(require){
+define(function(require) {
 	var $ = require('jquery'),
 		_ = require('underscore'),
 		monster = require('monster');
@@ -20,7 +20,7 @@ define(function(require){
 
 		css: [ 'app' ],
 
-		i18n: { 
+		i18n: {
 			'en-US': { customCss: false },
 			'fr-FR': { customCss: false },
 			'ru-RU': { customCss: false },
@@ -32,7 +32,7 @@ define(function(require){
 
 		subModules: ['devices', 'groups', 'numbers', 'strategy', 'callLogs', 'users', 'myOffice', 'featureCodes', 'vmboxes'],
 
-		load: function(callback){
+		load: function(callback) {
 			var self = this;
 
 			self.initApp(function() {
@@ -49,7 +49,7 @@ define(function(require){
 			});
 		},
 
-		render: function(container){
+		render: function(container) {
 			var self = this,
 				parent = container || $('#monster_content'),
 				template = $(monster.template(self, 'app'));

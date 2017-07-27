@@ -1,4 +1,4 @@
-define(function(require){
+define(function(require) {
 	var $ = require('jquery'),
 		_ = require('underscore'),
 		monster = require('monster'),
@@ -39,7 +39,7 @@ define(function(require){
 					.empty()
 					.append(template);
 
-				if(_voicemailId) {
+				if (_voicemailId) {
 					var row = parent.find('.grid-row[data-id=' + _voicemailId + ']');
 
 					monster.ui.highlight(row, {
@@ -47,7 +47,7 @@ define(function(require){
 					});
 				}
 
-				if (dataTemplate.vmboxes.length == 0 ) {
+				if (dataTemplate.vmboxes.length === 0) {
 					parent.find('.no-vmboxes-row').css('display', 'block');
 				} else {
 					parent.find('.no-vmboxes-row').css('display', 'none');
@@ -84,7 +84,7 @@ define(function(require){
 					row.data('search').toLowerCase().indexOf(searchString) < 0 ? row.hide() : row.show();
 				});
 
-				if(rows.size() > 0) {
+				if (rows.size() > 0) {
 					rows.is(':visible') ? emptySearch.hide() : emptySearch.show();
 				}
 			});
@@ -103,13 +103,13 @@ define(function(require){
 		vmboxesMigrateData: function(data) {
 			var self = this;
 
-			if(data.hasOwnProperty('notify_email_address')) {
+			if (data.hasOwnProperty('notify_email_address')) {
 				data.notify_email_addresses = data.notify_email_address;
 			}
 
 			return data;
 		},
-		
+
 		vmboxesRenderVmbox: function(data, callback) {
 			var self = this,
 				mode = data.id ? 'edit' : 'add',
@@ -121,7 +121,7 @@ define(function(require){
 
 						callback && callback(vmbox);
 					},
-					afterDelete: function(vmbox) {
+					afterDelete: function() {
 						popup.dialog('close').remove();
 
 						self.vmboxesRender();
@@ -132,8 +132,9 @@ define(function(require){
 				};
 
 			_.each(data.notify_email_addresses, function(recipient) {
-				templateVMBox.find('.saved-entities')
-							  .append(monster.template(self, 'vmboxes-emailRow', { name: recipient }));
+				templateVMBox
+					.find('.saved-entities')
+						.append(monster.template(self, 'vmboxes-emailRow', { name: recipient }));
 			});
 
 			self.vmboxesEditBindEvents(templateVMBox, data, callbacks);
@@ -159,13 +160,16 @@ define(function(require){
 
 			monster.ui.tabs(templateVMBox);
 
-			timezone.populateDropdown(templateVMBox.find('#timezone'), data.timezone||'inherit', {inherit: self.i18n.active().defaultTimezone});
-			templateVMBox.find('#timezone').chosen({search_contains: true, width: "220px"});
+			timezone.populateDropdown(templateVMBox.find('#timezone'), data.timezone || 'inherit', {inherit: self.i18n.active().defaultTimezone});
+			templateVMBox.find('#timezone').chosen({
+				search_contains: true,
+				width: '220px'
+			});
 
 			monster.ui.tooltips(templateVMBox);
 
 			templateVMBox.find('.actions .save').on('click', function() {
-				if(monster.ui.valid(vmboxForm)) {
+				if (monster.ui.valid(vmboxForm)) {
 					var dataToSave = self.vmboxesMergeData(data, templateVMBox);
 
 					self.vmboxesSaveVmbox(dataToSave, function(data) {
@@ -197,16 +201,17 @@ define(function(require){
 				event.preventDefault();
 
 				var inputName = templateVMBox.find('#entity_name'),
-					name = inputName.val();
+					name = inputName.val(),
 					templateFlag = monster.template(self, 'vmboxes-emailRow', { name: name });
 
 				templateVMBox.find('.saved-entities').prepend(templateFlag);
 
-				inputName.val('')
-						 .focus();
+				inputName
+					.val('')
+					.focus();
 			};
 
-			templateVMBox.find('.entity-wrapper.placeholder:not(.active)').on('click', function(){
+			templateVMBox.find('.entity-wrapper.placeholder:not(.active)').on('click', function() {
 				$(this).addClass('active');
 				templateVMBox.find('#entity_name').focus();
 			});
@@ -227,7 +232,7 @@ define(function(require){
 			templateVMBox.find('#entity_name').on('keypress', function(e) {
 				var code = e.keyCode || e.which;
 
-				if(code === 13) {;
+				if (code === 13) {
 					addEntity(e);
 				}
 			});
@@ -245,9 +250,9 @@ define(function(require){
 					greetingContainer.find('.upload-div').slideUp(function() {
 						greetingContainer.find('.upload-toggle').removeClass('active');
 					});
-					if(newMedia) {
+					if (newMedia) {
 						var mediaSelect = greetingContainer.find('.media-dropdown');
-						mediaSelect.append('<option value="'+newMedia.id+'">'+newMedia.name+'</option>');
+						mediaSelect.append('<option value="' + newMedia.id + '">' + newMedia.name + '</option>');
 						mediaSelect.val(newMedia.id);
 					}
 				};
@@ -262,7 +267,7 @@ define(function(require){
 					mediaToUpload = results[0];
 				},
 				error: function(errors) {
-					if(errors.hasOwnProperty('size') && errors.size.length > 0) {
+					if (errors.hasOwnProperty('size') && errors.size.length > 0) {
 						monster.ui.alert(self.i18n.active().vmboxes.popupSettings.greeting.fileTooBigAlert);
 					}
 					greetingContainer.find('.upload-div input').val('');
@@ -271,7 +276,7 @@ define(function(require){
 			});
 
 			greetingContainer.find('.upload-toggle').on('click', function() {
-				if($(this).hasClass('active')) {
+				if ($(this).hasClass('active')) {
 					greetingContainer.find('.upload-div').stop(true, true).slideUp();
 				} else {
 					greetingContainer.find('.upload-div').stop(true, true).slideDown();
@@ -283,7 +288,7 @@ define(function(require){
 			});
 
 			greetingContainer.find('.upload-submit').on('click', function() {
-				if(mediaToUpload) {
+				if (mediaToUpload) {
 					self.callApi({
 						resource: 'media.create',
 						data: {
@@ -291,7 +296,7 @@ define(function(require){
 							data: {
 								streamable: true,
 								name: mediaToUpload.name,
-								media_source: "upload",
+								media_source: 'upload',
 								description: mediaToUpload.name
 							}
 						},
@@ -340,20 +345,20 @@ define(function(require){
 
 			mergedData.not_configurable = !formData.extra.configurable;
 
-			if(mergedData.pin === '') {
+			if (mergedData.pin === '') {
 				delete mergedData.pin;
 			}
 
 			// Delete data that is obsolete (migrated to notify_email_addresses)
-			if(mergedData.hasOwnProperty('notify_email_address')) {
+			if (mergedData.hasOwnProperty('notify_email_address')) {
 				delete mergedData.notify_email_address;
 			}
 
-			if(mergedData.timezone && mergedData.timezone === 'inherit') {
+			if (mergedData.timezone && mergedData.timezone === 'inherit') {
 				delete mergedData.timezone;
 			}
 
-			if(mergedData.media && mergedData.media.unavailable === 'none') {
+			if (mergedData.media && mergedData.media.unavailable === 'none') {
 				delete mergedData.media.unavailable;
 			}
 
@@ -393,15 +398,14 @@ define(function(require){
 				mapUsers[user.id] = user;
 			});
 
-			formattedData.vmboxes.sort(function(a,b) {
+			formattedData.vmboxes.sort(function(a, b) {
 				return parseInt(a.mailbox) > parseInt(b.mailbox) ? 1 : -1;
 			});
 
 			_.each(formattedData.vmboxes, function(vmbox) {
-				if(vmbox.hasOwnProperty('owner_id') && mapUsers.hasOwnProperty(vmbox.owner_id)) {
+				if (vmbox.hasOwnProperty('owner_id') && mapUsers.hasOwnProperty(vmbox.owner_id)) {
 					vmbox.friendlyOwnerName = mapUsers[vmbox.owner_id].first_name + ' ' + mapUsers[vmbox.owner_id].last_name;
-				}
-				else {
+				} else {
 					vmbox.friendlyOwnerName = '-';
 				}
 			});
@@ -430,34 +434,31 @@ define(function(require){
 			var self = this;
 
 			monster.parallel({
-					vmbox: function(callback) {
-						if(id) {
-							self.vmboxesGetVmbox(id, function(dataVmbox) {
-								callback(null, dataVmbox);
-							});
-						}
-						else {
-							callback(null, {});
-						}
-					},
-					mediaList: function(callback) {
-						self.callApi({
-							resource: 'media.list',
-							data: {
-								accountId: self.accountId
-							},
-							success: function(data) {
-								callback(null, data.data);
-							}
+				vmbox: function(callback) {
+					if (id) {
+						self.vmboxesGetVmbox(id, function(dataVmbox) {
+							callback(null, dataVmbox);
 						});
+					} else {
+						callback(null, {});
 					}
 				},
-				function(error, results) {
-					var formattedData = self.vmboxesFormatData(results);
-
-					callback && callback(formattedData);
+				mediaList: function(callback) {
+					self.callApi({
+						resource: 'media.list',
+						data: {
+							accountId: self.accountId
+						},
+						success: function(data) {
+							callback(null, data.data);
+						}
+					});
 				}
-			);
+			}, function(error, results) {
+				var formattedData = self.vmboxesFormatData(results);
+
+				callback && callback(formattedData);
+			});
 		},
 
 		vmboxesGetVmbox: function(voicemailId, callbackSuccess, callbackError) {
@@ -481,10 +482,9 @@ define(function(require){
 		vmboxesSaveVmbox: function(vmboxData, callback) {
 			var self = this;
 
-			if(vmboxData.id) {
+			if (vmboxData.id) {
 				self.vmboxesUpdateVmbox(vmboxData, callback);
-			}
-			else {
+			} else {
 				self.vmboxesCreateVmbox(vmboxData, callback);
 			}
 		},
@@ -527,41 +527,39 @@ define(function(require){
 			var self = this;
 
 			monster.parallel({
-					users: function(callback) {
-						self.callApi({
-							resource: 'user.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									paginate: 'false'
-								}
-							},
-							success: function(dataUsers) {
-								callback && callback(null, dataUsers.data);
+				users: function(callback) {
+					self.callApi({
+						resource: 'user.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								paginate: 'false'
 							}
-						});
-					},
-					vmboxes: function(callback) {
-						self.callApi({
-							resource: 'voicemail.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									paginate: 'false'
-								}
-							},
-							success: function(datavmboxes) {
-								callback(null, datavmboxes.data);
-							}
-						});
-					}
+						},
+						success: function(dataUsers) {
+							callback && callback(null, dataUsers.data);
+						}
+					});
 				},
-				function(err, results) {
-					self.vmboxesFormatListData(results);
-
-					callback && callback(results);
+				vmboxes: function(callback) {
+					self.callApi({
+						resource: 'voicemail.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								paginate: 'false'
+							}
+						},
+						success: function(datavmboxes) {
+							callback(null, datavmboxes.data);
+						}
+					});
 				}
-			);
+			}, function(err, results) {
+				self.vmboxesFormatListData(results);
+
+				callback && callback(results);
+			});
 		}
 	};
 
