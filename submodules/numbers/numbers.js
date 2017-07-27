@@ -1,4 +1,4 @@
-define(function(require){
+define(function(require) {
 	var $ = require('jquery'),
 		monster = require('monster');
 
@@ -11,7 +11,7 @@ define(function(require){
 			'voip.numbers.render': 'numbersRender'
 		},
 
-		numbersRender: function(args){
+		numbersRender: function(args) {
 			var self = this,
 				parent = args.parent || $('#ws_content'),
 				callback = args.callback;

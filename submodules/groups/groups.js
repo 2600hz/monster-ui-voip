@@ -1,8 +1,7 @@
-define(function(require){
+define(function(require) {
 	var $ = require('jquery'),
 		_ = require('underscore'),
 		monster = require('monster'),
-		timezone = require('monster-timezone'),
 		toastr = require('toastr');
 
 	var app = {
@@ -21,8 +20,7 @@ define(function(require){
 				args = args || {},
 				parent = args.parent || $('.right-content'),
 				_groupId = args.groupId,
-				callback = args.callback,
-				noGroup = true;
+				callback = args.callback;
 
 			self.groupsRemoveOverlay();
 
@@ -31,7 +29,7 @@ define(function(require){
 					return !callflow.hasOwnProperty('type');
 				});
 
-				if(hasOldData) {
+				if (hasOldData) {
 					monster.ui.alert('error', self.i18n.active().groups.outdatedGroupsError);
 				} else {
 					var dataTemplate = self.groupsFormatListData(data),
@@ -53,13 +51,13 @@ define(function(require){
 
 					self.groupsCheckWalkthrough();
 
-					if(_groupId) {
-						var cells =  parent.find('.grid-row[data-id=' + _groupId + '] .grid-cell');
+					if (_groupId) {
+						var cells = parent.find('.grid-row[data-id=' + _groupId + '] .grid-cell');
 
 						monster.ui.highlight(cells);
 					}
 
-					if ( countGroups === 0 ) {
+					if (countGroups === 0) {
 						parent.find('.grid-row.title').css('display', 'none');
 						parent.find('.no-groups-row').css('display', 'block');
 					} else {
@@ -84,8 +82,8 @@ define(function(require){
 			});
 
 			_.each(data.callflows, function(callflow) {
-				if(callflow.group_id in mapGroups) {
-					if(callflow.type === 'userGroup') {
+				if (callflow.group_id in mapGroups) {
+					if (callflow.type === 'userGroup') {
 						var listExtensions = [],
 							listNumbers = [];
 
@@ -95,7 +93,7 @@ define(function(require){
 
 						mapGroups[callflow.group_id].extra.listCallerId = [];
 
-						if(listExtensions.length > 0) {
+						if (listExtensions.length > 0) {
 							mapGroups[callflow.group_id].extra.extension = listExtensions[0];
 
 							_.each(listExtensions, function(number) {
@@ -104,7 +102,7 @@ define(function(require){
 						}
 						mapGroups[callflow.group_id].extra.additionalExtensions = listExtensions.length > 1;
 
-						if(listNumbers.length > 0) {
+						if (listNumbers.length > 0) {
 							mapGroups[callflow.group_id].extra.mainNumber = listNumbers[0];
 
 							_.each(listNumbers, function(number) {
@@ -113,7 +111,7 @@ define(function(require){
 						}
 						mapGroups[callflow.group_id].extra.additionalNumbers = listNumbers.length > 1;
 						mapGroups[callflow.group_id].extra.callflowId = callflow.id;
-					} else if(callflow.type === 'baseGroup') {
+					} else if (callflow.type === 'baseGroup') {
 						mapGroups[callflow.group_id].extra.baseCallflowId = callflow.id;
 					}
 				}
@@ -123,7 +121,7 @@ define(function(require){
 				arrayGroups.push(group);
 			});
 
-			arrayGroups.sort(function(a,b) {
+			arrayGroups.sort(function(a, b) {
 				return a.name > b.name ? 1 : -1;
 			});
 
@@ -166,7 +164,7 @@ define(function(require){
 				};
 
 			_.each(result.mapFeatures, function(val, key) {
-				if(('features' in group && group.features.indexOf(key) >= 0) // If data from view
+				if (('features' in group && group.features.indexOf(key) >= 0) // If data from view
 				|| ('smartpbx' in group && key in group.smartpbx && group.smartpbx[key].enabled)) { // If data from document
 					val.active = true;
 					result.hasFeatures = true;
@@ -193,11 +191,11 @@ define(function(require){
 					row = cell.parents('.grid-row'),
 					groupId = row.data('id');
 
-				template.find('.edit-groups').slideUp("400", function() {
+				template.find('.edit-groups').slideUp(400, function() {
 					$(this).empty();
 				});
 
-				if(cell.hasClass('active')) {
+				if (cell.hasClass('active')) {
 					template.find('.grid-cell').removeClass('active');
 					template.find('.grid-row').removeClass('active');
 
@@ -212,8 +210,7 @@ define(function(require){
 						'z-index': '0',
 						'border-top-color': '#a6a7a9'
 					});
-				}
-				else {
+				} else {
 					template.find('.grid-cell').removeClass('active');
 					template.find('.grid-row').removeClass('active');
 					cell.toggleClass('active');
@@ -403,22 +400,17 @@ define(function(require){
 		},
 
 		groupsGetTemplate: function(type, groupId, callbackAfterData) {
-			var self = this,
-				template;
+			var self = this;
 
-			if(type === 'name') {
+			if (type === 'name') {
 				self.groupsGetNameTemplate(groupId, callbackAfterData);
-			}
-			else if(type === 'numbers') {
+			} else if (type === 'numbers') {
 				self.groupsGetNumbersTemplate(groupId, callbackAfterData);
-			}
-			else if(type === 'extensions') {
+			} else if (type === 'extensions') {
 				self.groupsGetExtensionsTemplate(groupId, callbackAfterData);
-			}
-			else if(type === 'features') {
+			} else if (type === 'features') {
 				self.groupsGetFeaturesTemplate(groupId, callbackAfterData);
-			}
-			else if(type === 'members') {
+			} else if (type === 'members') {
 				self.groupsGetMembersTemplate(groupId, callbackAfterData);
 			}
 		},
@@ -427,7 +419,7 @@ define(function(require){
 			var self = this;
 
 			self.groupsGetFeaturesData(groupId, function(data) {
-				template = $(monster.template(self, 'groups-features', data.group));
+				var template = $(monster.template(self, 'groups-features', data.group));
 
 				self.groupsBindFeatures(template, data);
 
@@ -439,7 +431,7 @@ define(function(require){
 			var self = this;
 
 			self.groupsGetNameData(groupId, function(data) {
-				template = $(monster.template(self, 'groups-name', data));
+				var template = $(monster.template(self, 'groups-name', data));
 
 				self.groupsBindName(template, data);
 
@@ -452,7 +444,7 @@ define(function(require){
 
 			self.groupsGetNumbersData(groupId, function(data) {
 				self.groupsFormatNumbersData(data, function(data) {
-					template = $(monster.template(self, 'groups-numbers', data));
+					var template = $(monster.template(self, 'groups-numbers', data));
 
 					_.each(data.assignedNumbers, function(numberData, numberId) {
 						numberData.phoneNumber = numberId;
@@ -481,7 +473,7 @@ define(function(require){
 
 			self.groupsGetNumbersData(groupId, function(data) {
 				self.groupsFormatNumbersData(data, function(data) {
-					template = $(monster.template(self, 'groups-extensions', data));
+					var template = $(monster.template(self, 'groups-extensions', data));
 
 					self.groupsBindExtensions(template, data);
 
@@ -494,9 +486,8 @@ define(function(require){
 			var self = this;
 
 			self.groupsGetMembersData(groupId, function(results) {
-				var results = self.groupsFormatMembersData(results);
-
-				template = $(monster.template(self, 'groups-members', results));
+				var results = self.groupsFormatMembersData(results),
+					template = $(monster.template(self, 'groups-members', results));
 
 				monster.pub('common.ringingDurationControl.render', {
 					container: template.find('.members-container'),
@@ -538,14 +529,13 @@ define(function(require){
 			var self = this,
 				recordCallNode = monster.util.findCallflowNode(data.callflow, 'record_call'),
 				templateData = $.extend(true, {
-												group: data.group
-											},
-											(data.group.extra.mapFeatures.call_recording.active && recordCallNode ? {
-												url: recordCallNode.data.url,
-												format: recordCallNode.data.format,
-												timeLimit: recordCallNode.data.time_limit
-											} : {})
-										),
+					group: data.group
+				},
+				(data.group.extra.mapFeatures.call_recording.active && recordCallNode ? {
+					url: recordCallNode.data.url,
+					format: recordCallNode.data.format,
+					timeLimit: recordCallNode.data.time_limit
+				} : {})),
 				featureTemplate = $(monster.template(self, 'groups-feature-call_recording', templateData)),
 				switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#call_recording_form'),
@@ -568,36 +558,35 @@ define(function(require){
 			});
 
 			featureTemplate.find('.save').on('click', function() {
-				if(monster.ui.valid(featureForm)) {
+				if (monster.ui.valid(featureForm)) {
 					var formData = monster.ui.getFormData('call_recording_form'),
 						enabled = switchFeature.prop('checked');
 
-					if(!('smartpbx' in data.group)) { data.group.smartpbx = {}; }
-					if(!('call_recording' in data.group.smartpbx)) {
+					if (!('smartpbx' in data.group)) { data.group.smartpbx = {}; }
+					if (!('call_recording' in data.group.smartpbx)) {
 						data.group.smartpbx.call_recording = {
 							enabled: false
 						};
 					}
 
-					if(data.group.smartpbx.call_recording.enabled || enabled) {
+					if (data.group.smartpbx.call_recording.enabled || enabled) {
 						data.group.smartpbx.call_recording.enabled = enabled;
 						var newCallflow = $.extend(true, {}, data.callflow),
 							currentNode = monster.util.findCallflowNode(newCallflow, 'record_call') || monster.util.findCallflowNode(newCallflow, 'callflow');
-						if(enabled) {
-
-							if(currentNode.module === 'record_call') {
-								currentNode.data = $.extend(true, { action: "start" }, formData);
+						if (enabled) {
+							if (currentNode.module === 'record_call') {
+								currentNode.data = $.extend(true, { action: 'start' }, formData);
 							} else {
 								currentNode.children = {
-									"_": $.extend(true, {}, currentNode)
+									_: $.extend(true, {}, currentNode)
 								};
-								currentNode.module = "record_call";
-								currentNode.data = $.extend(true, { action: "start" }, formData);
+								currentNode.module = 'record_call';
+								currentNode.data = $.extend(true, { action: 'start' }, formData);
 							}
-						} else if(currentNode.module === 'record_call') {
-							currentNode.module = currentNode.children["_"].module;
-							currentNode.data = currentNode.children["_"].data;
-							currentNode.children = currentNode.children["_"].children;
+						} else if (currentNode.module === 'record_call') {
+							currentNode.module = currentNode.children._.module;
+							currentNode.data = currentNode.children._.data;
+							currentNode.children = currentNode.children._.children;
 						}
 						self.groupsUpdateCallflow(newCallflow, function(updatedCallflow) {
 							self.groupsUpdate(data.group, function(updatedGroup) {
@@ -622,10 +611,10 @@ define(function(require){
 			var self = this,
 				silenceMediaId = 'silence_stream://300000',
 				ringGroupNode = data.baseCallflow.flow,
-				mediaToUpload = undefined;
+				mediaToUpload;
 
-			while(ringGroupNode.module !== 'ring_group' && '_' in ringGroupNode.children) {
-				ringGroupNode = ringGroupNode.children['_'];
+			while (ringGroupNode.module !== 'ring_group' && '_' in ringGroupNode.children) {
+				ringGroupNode = ringGroupNode.children._;
 			}
 
 			self.groupsListMedias(function(medias) {
@@ -644,9 +633,9 @@ define(function(require){
 						featureTemplate.find('.upload-div').slideUp(function() {
 							featureTemplate.find('.upload-toggle').removeClass('active');
 						});
-						if(newMedia) {
+						if (newMedia) {
 							var mediaSelect = featureTemplate.find('.media-dropdown');
-							mediaSelect.append('<option value="'+newMedia.id+'">'+newMedia.name+'</option>');
+							mediaSelect.append('<option value="' + newMedia.id + '">' + newMedia.name + '</option>');
 							mediaSelect.val(newMedia.id);
 						}
 					};
@@ -661,7 +650,7 @@ define(function(require){
 						mediaToUpload = results[0];
 					},
 					error: function(errors) {
-						if(errors.hasOwnProperty('size') && errors.size.length > 0) {
+						if (errors.hasOwnProperty('size') && errors.size.length > 0) {
 							monster.ui.alert(self.i18n.active().groups.ringback.fileTooBigAlert);
 						}
 						featureTemplate.find('.upload-div input').val('');
@@ -678,7 +667,7 @@ define(function(require){
 				});
 
 				featureTemplate.find('.upload-toggle').on('click', function() {
-					if($(this).hasClass('active')) {
+					if ($(this).hasClass('active')) {
 						featureTemplate.find('.upload-div').stop(true, true).slideUp();
 					} else {
 						featureTemplate.find('.upload-div').stop(true, true).slideDown();
@@ -690,7 +679,7 @@ define(function(require){
 				});
 
 				featureTemplate.find('.upload-submit').on('click', function() {
-					if(mediaToUpload) {
+					if (mediaToUpload) {
 						self.callApi({
 							resource: 'media.create',
 							data: {
@@ -698,7 +687,7 @@ define(function(require){
 								data: {
 									streamable: true,
 									name: mediaToUpload.name,
-									media_source: "upload",
+									media_source: 'upload',
 									description: mediaToUpload.name
 								}
 							},
@@ -737,13 +726,13 @@ define(function(require){
 					var selectedMedia = featureTemplate.find('.media-dropdown option:selected').val(),
 						enabled = switchFeature.prop('checked');
 
-					if(!('smartpbx' in data.group)) {
+					if (!('smartpbx' in data.group)) {
 						data.group.smartpbx = {};
 					}
 
-					if(enabled) {
+					if (enabled) {
 						ringGroupNode.data.ringback = selectedMedia;
-						if('ringback' in data.group.smartpbx) {
+						if ('ringback' in data.group.smartpbx) {
 							data.group.smartpbx.ringback.enabled = true;
 						} else {
 							data.group.smartpbx.ringback = {
@@ -757,9 +746,9 @@ define(function(require){
 								self.groupsRender({ groupId: data.group.id });
 							});
 						});
-					} else if(ringGroupNode.data.ringback || (data.group.smartpbx.ringback && data.group.smartpbx.ringback.enabled)) {
+					} else if (ringGroupNode.data.ringback || (data.group.smartpbx.ringback && data.group.smartpbx.ringback.enabled)) {
 						delete ringGroupNode.data.ringback;
-						if('ringback' in data.group.smartpbx) {
+						if ('ringback' in data.group.smartpbx) {
 							data.group.smartpbx.ringback.enabled = false;
 						}
 
@@ -784,13 +773,12 @@ define(function(require){
 				flow = data.callflow.flow,
 				selectedEntity = null;
 
-			while(flow.module != 'callflow') {
-				flow = flow.children['_']; 
+			while (flow.module !== 'callflow') {
+				flow = flow.children._;
 			} //Go to the first callflow (i.e. base ring group)
-			if('_' in flow.children) {
-				selectedEntity = flow.children['_'].data.id;
+			if ('_' in flow.children) {
+				selectedEntity = flow.children._.data.id;
 			} //Find the existing Next Action if there is one
-
 
 			var templateData = $.extend(true, {selectedEntity: selectedEntity}, data),
 				featureTemplate = $(monster.template(self, 'groups-feature-next_action', templateData)),
@@ -811,31 +799,31 @@ define(function(require){
 				var selectedOption = featureTemplate.find('.next-action-select option:selected'),
 					enabled = switchFeature.prop('checked');
 
-				if(!('smartpbx' in data.group)) { data.group.smartpbx = {}; }
-				if(!('next_action' in data.group.smartpbx)) {
+				if (!('smartpbx' in data.group)) { data.group.smartpbx = {}; }
+				if (!('next_action' in data.group.smartpbx)) {
 					data.group.smartpbx.next_action = {
 						enabled: false
 					};
 				}
 
-				if(data.group.smartpbx.next_action.enabled || enabled) {
+				if (data.group.smartpbx.next_action.enabled || enabled) {
 					data.group.smartpbx.next_action.enabled = enabled;
 					var newCallflow = $.extend(true, {}, data.callflow),
 						callflowNode = monster.util.findCallflowNode(newCallflow, 'callflow');
 
-					if(_.isArray(callflowNode)) {
+					if (_.isArray(callflowNode)) {
 						callflowNode = callflowNode[0];
 					}
 
 					callflowNode.children = {};
-					if(enabled) {
-						callflowNode.children['_'] = {
+					if (enabled) {
+						callflowNode.children._ = {
 							children: {},
 							module: selectedOption.data('module'),
 							data: { id: selectedOption.val() }
-						}
+						};
 					} else {
-						callflowNode.children['_'] = {
+						callflowNode.children._ = {
 							module: 'play',
 							children: {},
 							data: {
@@ -883,22 +871,20 @@ define(function(require){
 				data.baseCallflow.flow.data.ignore_forward = ignore_forward;
 
 				monster.parallel({
-						groups: function(callback) {
-							self.groupsUpdate(data.group, function(updatedGroup) {
-								callback(null, updatedGroup);
-							});
-						},
-						ringGroup: function(callback) {
-							self.groupsUpdateCallflow(data.baseCallflow, function(callflow) {
-								callback(null, callflow);
-							});
-						}
+					groups: function(callback) {
+						self.groupsUpdate(data.group, function(updatedGroup) {
+							callback(null, updatedGroup);
+						});
 					},
-					function(err, results) {
-						popup.dialog('close').remove();
-						self.groupsRender({ groupId: results.groups.id });
+					ringGroup: function(callback) {
+						self.groupsUpdateCallflow(data.baseCallflow, function(callflow) {
+							callback(null, callflow);
+						});
 					}
-				);
+				}, function(err, results) {
+					popup.dialog('close').remove();
+					self.groupsRender({ groupId: results.groups.id });
+				});
 			});
 
 			popup = monster.ui.dialog(featureTemplate, {
@@ -911,13 +897,12 @@ define(function(require){
 			var self = this,
 				prependNode = monster.util.findCallflowNode(data.callflow, 'prepend_cid'),
 				templateData = $.extend(true, {
-												group: data.group
-											},
-											(data.group.extra.mapFeatures.prepend.active && prependNode ? {
-												caller_id_name_prefix: prependNode.data.caller_id_name_prefix,
-												caller_id_number_prefix: prependNode.data.caller_id_number_prefix
-											} : {})
-										),
+					group: data.group
+				},
+				(data.group.extra.mapFeatures.prepend.active && prependNode ? {
+					caller_id_name_prefix: prependNode.data.caller_id_name_prefix,
+					caller_id_number_prefix: prependNode.data.caller_id_number_prefix
+				} : {})),
 				featureTemplate = $(monster.template(self, 'groups-feature-prepend', templateData)),
 				switchFeature = featureTemplate.find('.switch-state'),
 				popup;
@@ -934,32 +919,31 @@ define(function(require){
 				var enabled = switchFeature.prop('checked'),
 					prependData = $.extend(true, { action: 'prepend' }, monster.ui.getFormData('prepend_form'));
 
-				if(!('smartpbx' in data.group)) { data.group.smartpbx = {}; }
-				if(!('prepend' in data.group.smartpbx)) {
+				if (!('smartpbx' in data.group)) { data.group.smartpbx = {}; }
+				if (!('prepend' in data.group.smartpbx)) {
 					data.group.smartpbx.prepend = {
 						enabled: false
 					};
 				}
 
-				if(data.group.smartpbx.prepend.enabled || enabled) {
+				if (data.group.smartpbx.prepend.enabled || enabled) {
 					data.group.smartpbx.prepend.enabled = enabled;
 					var newCallflow = $.extend(true, {}, data.callflow);
-					if(enabled) {
-						if(newCallflow.flow.module !== 'prepend_cid') {
+					if (enabled) {
+						if (newCallflow.flow.module !== 'prepend_cid') {
 							newCallflow.flow = {
 								children: {
 									'_': $.extend(true, {}, data.callflow.flow)
 								},
 								module: 'prepend_cid',
 								data: prependData
-							}
-						}
-						else {
+							};
+						} else {
 							newCallflow.flow.data = prependData;
 						}
 					} else {
-						if(prependNode) {
-							newCallflow.flow = $.extend(true, {}, prependNode.children["_"]);
+						if (prependNode) {
+							newCallflow.flow = $.extend(true, {}, prependNode.children._);
 						}
 					}
 					self.groupsUpdateCallflow(newCallflow, function(updatedCallflow) {
@@ -987,7 +971,7 @@ define(function(require){
 			monster.ui.validate(nameForm);
 
 			template.find('.save-group').on('click', function() {
-				if(monster.ui.valid(nameForm)) {
+				if (monster.ui.valid(nameForm)) {
 					var formData = monster.ui.getFormData('form-name');
 
 					//formData = self.groupsCleanNameData(formData);
@@ -1040,12 +1024,12 @@ define(function(require){
 
 			// 	var rows = template.find('.list-assigned-items .item-row');
 			// 	/* If no rows beside the clicked one, display empty row */
-			// 	if(rows.is(':visible') === false) {
+			// 	if (rows.is(':visible') === false) {
 			// 		template.find('.list-assigned-items .empty-row').show();
 			// 	}
 
 			// 	/* If it matches the search string, show it */
-			// 	if(row.data('search').indexOf(currentNumberSearch) >= 0) {
+			// 	if (row.data('search').indexOf(currentNumberSearch) >= 0) {
 			// 		row.show();
 			// 		unassignedList.find('.empty-search-row').hide();
 			// 	}
@@ -1060,7 +1044,7 @@ define(function(require){
 				row.slideUp(function() {
 					row.remove();
 
-					if ( !template.find('.list-assigned-items .item-row').is(':visible') ) {
+					if (!template.find('.list-assigned-items .item-row').is(':visible')) {
 						template.find('.list-assigned-items .empty-row').slideDown();
 					}
 
@@ -1080,7 +1064,7 @@ define(function(require){
 					currentRow.data('search').toLowerCase().indexOf(currentNumberSearch) < 0 ? currentRow.hide() : currentRow.show();
 				});
 
-				if(rows.size() > 0) {
+				if (rows.size() > 0) {
 					rows.is(':visible') ? emptySearch.hide() : emptySearch.show();
 				}
 			});
@@ -1088,9 +1072,8 @@ define(function(require){
 			template.on('click', '.actions .spare-link:not(.disabled)', function(e) {
 				e.preventDefault();
 
-				var $this = $(this),
-					args = {
-					accountName: monster.apps['auth'].currentAccount.name,
+				var args = {
+					accountName: monster.apps.auth.currentAccount.name,
 					accountId: self.accountId,
 					ignoreNumbers: $.map(template.find('.item-row'), function(row) {
 						return $(row).data('id');
@@ -1099,14 +1082,14 @@ define(function(require){
 					callback: function(numberList, remainingQuantity) {
 						template.find('.empty-row').hide();
 
-						_.each(numberList, function(val, idx) {
+						_.each(numberList, function(val) {
 							template
 								.find('.list-assigned-items')
 								.append($(monster.template(self, 'groups-numbersItemRow', {
 									number: val
 								})));
 
-							var numberDiv = template.find('[data-id="'+val.phoneNumber+'"]'),
+							var numberDiv = template.find('[data-id="' + val.phoneNumber + '"]'),
 								args = {
 									target: numberDiv.find('.edit-features'),
 									numberData: val,
@@ -1115,14 +1098,14 @@ define(function(require){
 									}
 								};
 
-								monster.pub('common.numberFeaturesMenu.render', args);
+							monster.pub('common.numberFeaturesMenu.render', args);
 
 							extraSpareNumbers = _.without(extraSpareNumbers, val.phoneNumber);
 						});
 
 						monster.ui.tooltips(template);
 
-						if(remainingQuantity === 0) {
+						if (remainingQuantity === 0) {
 							template.find('.spare-link').addClass('disabled');
 						}
 					}
@@ -1138,7 +1121,7 @@ define(function(require){
 					searchType: $(this).data('type'),
 					callbacks: {
 						success: function(numbers) {
-							_.each(numbers, function(number, k) {
+							_.each(numbers, function(number) {
 								number.phoneNumber = number.id;
 
 								var rowTemplate = $(monster.template(self, 'groups-numbersItemRow', {
@@ -1168,7 +1151,7 @@ define(function(require){
 				var $this = $(this),
 					parentRow = $this.parents('.grid-row'),
 					callflowId = parentRow.data('callflow_id'),
-					name = parentRow.data('name');
+					name = parentRow.data('name'),
 					dataNumbers = [];
 
 				template.find('.item-row').each(function(k, row) {
@@ -1225,14 +1208,13 @@ define(function(require){
 					$listExtensions.append(newLineTemplate);
 				};
 
-				if(_.isEmpty(listExtension)) {
+				if (_.isEmpty(listExtension)) {
 					self.groupsListExtensions(function(arrayExtension) {
 						listExtension = arrayExtension;
 
 						renderNewRow();
 					});
-				}
-				else {
+				} else {
 					renderNewRow();
 				}
 			});
@@ -1241,7 +1223,7 @@ define(function(require){
 				var phoneRow = $(this).parents('.item-row'),
 					emptyRow = phoneRow.siblings('.empty-row');
 
-				if(phoneRow.siblings('.item-row').size() === 0) {
+				if (phoneRow.siblings('.item-row').size() === 0) {
 					emptyRow.show();
 				}
 
@@ -1252,7 +1234,7 @@ define(function(require){
 				var extension = parseInt($(this).siblings('input').val()),
 					index = listExtension.indexOf(extension);
 
-				if(index > -1) {
+				if (index > -1) {
 					listExtension.splice(index, 1);
 				}
 
@@ -1266,7 +1248,7 @@ define(function(require){
 			template.find('.save-groups').on('click', function() {
 				var groupId = data.id;
 
-				monster.pub('common.ringingDurationControl.getEndpoints', { 
+				monster.pub('common.ringingDurationControl.getEndpoints', {
 					container: template,
 					callback: function(endpoints) {
 						_.each(endpoints, function(endpoint) {
@@ -1295,12 +1277,12 @@ define(function(require){
 					okCallback: function(users) {
 						_.each(users, function(user) {
 							var newEndpoint = {
-									id: user.id,
-									timeout: 20,
-									delay: 0,
-									endpoint_type: 'user',
-									name: user.name
-								};
+								id: user.id,
+								timeout: 20,
+								delay: 0,
+								endpoint_type: 'user',
+								name: user.name
+							};
 
 							monster.pub('common.ringingDurationControl.addEndpoint', {
 								container: template.find('.members-container'),
@@ -1365,81 +1347,79 @@ define(function(require){
 			var self = this;
 
 			monster.parallel({
-					devices: function(callback) {
-						self.groupsListDevices(function(data) {
-							callback(null, data);
-						});
-					},
-					group: function(callback) {
-						self.groupsGetGroup(groupId, function(data) {
-							callback(null, data);
-						});
-					},
-					users: function(callback) {
-						self.groupsListUsers(function(data) {
-							callback(null, data);
-						});
-					},
-					callflow: function(callback) {
-						self.groupsGetRingGroup(groupId, function(data) {
-							callback(null, data);
-						});
-					},
-					baseCallflow: function(callback) {
-						self.groupsGetBaseRingGroup(groupId, function(data) {
-							callback(null, data);
-						});
-					},
-					voicemails: function(callback) {
-						self.groupsListVMBoxes(function(data) {
-							callback(null, data);
-						});
-					},
-					mainMenu: function(callback) {
-						self.callApi({
-							resource: 'callflow.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									filter_type:'main',
-									paginate: 'false'
-								}
-							},
-							success: function(data) {
-								callback(null, data.data && data.data.length > 0 ? _.find(data.data, function(callflow) { return callflow.numbers[0] === "MainOpenHoursMenu" }) : null);
-							}
-						});
-					},
-					userCallflows: function(callback) {
-						self.callApi({
-							resource: 'callflow.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									has_key: 'owner_id',
-									filter_type: 'mainUserCallflow',
-									paginate: 'false'
-								}
-							},
-							success: function(data) {
-								callback(null, data.data);
-							}
-						});
-					}
-				},
-				function(err, results) {
-					results.group.extra = self.groupsGetGroupFeatures(results.group);
-					results.userCallflows = _.filter(results.userCallflows, function(userCallflow) {
-						var user = _.find(results.users, function(user) { return userCallflow.owner_id === user.id });
-						if(user) {
-							userCallflow.userName = user.first_name + ' ' + user.last_name;
-							return true;
-						}
-						return false;
+				devices: function(callback) {
+					self.groupsListDevices(function(data) {
+						callback(null, data);
 					});
-					callback && callback(results);
+				},
+				group: function(callback) {
+					self.groupsGetGroup(groupId, function(data) {
+						callback(null, data);
+					});
+				},
+				users: function(callback) {
+					self.groupsListUsers(function(data) {
+						callback(null, data);
+					});
+				},
+				callflow: function(callback) {
+					self.groupsGetRingGroup(groupId, function(data) {
+						callback(null, data);
+					});
+				},
+				baseCallflow: function(callback) {
+					self.groupsGetBaseRingGroup(groupId, function(data) {
+						callback(null, data);
+					});
+				},
+				voicemails: function(callback) {
+					self.groupsListVMBoxes(function(data) {
+						callback(null, data);
+					});
+				},
+				mainMenu: function(callback) {
+					self.callApi({
+						resource: 'callflow.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								filter_type: 'main',
+								paginate: 'false'
+							}
+						},
+						success: function(data) {
+							callback(null, data.data && data.data.length > 0 ? _.find(data.data, function(callflow) { return callflow.numbers[0] === 'MainOpenHoursMenu'; }) : null);
+						}
+					});
+				},
+				userCallflows: function(callback) {
+					self.callApi({
+						resource: 'callflow.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								has_key: 'owner_id',
+								filter_type: 'mainUserCallflow',
+								paginate: 'false'
+							}
+						},
+						success: function(data) {
+							callback(null, data.data);
+						}
+					});
 				}
-			);
+			}, function(err, results) {
+				results.group.extra = self.groupsGetGroupFeatures(results.group);
+				results.userCallflows = _.filter(results.userCallflows, function(userCallflow) {
+					var user = _.find(results.users, function(user) { return userCallflow.owner_id === user.id; });
+					if (user) {
+						userCallflow.userName = user.first_name + ' ' + user.last_name;
+						return true;
+					}
+					return false;
+				});
+				callback && callback(results);
+			});
 		},
 
 		groupsGetNameData: function(groupId, callback) {
@@ -1466,18 +1446,17 @@ define(function(require){
 				/* TODO: Once locality is enabled, we need to remove it */
 				number.localityEnabled = 'locality' in number ? true : false;
 
-				if(!number.hasOwnProperty('used_by') || number.used_by === '') {
+				if (!number.hasOwnProperty('used_by') || number.used_by === '') {
 					response.unassignedNumbers[id] = number;
 					response.countSpare++;
 				}
 			});
 
-			if('groupCallflow' in data.callflow && 'numbers' in data.callflow.groupCallflow) {
+			if ('groupCallflow' in data.callflow && 'numbers' in data.callflow.groupCallflow) {
 				_.each(data.callflow.groupCallflow.numbers, function(number) {
-					if(!(number in data.numbers.numbers)) {
+					if (!(number in data.numbers.numbers)) {
 						response.extensions.push(number);
-					}
-					else {
+					} else {
 						data.numbers.numbers[number].isLocal = data.numbers.numbers[number].features.indexOf('local') > -1;
 						response.assignedNumbers[number] = data.numbers.numbers[number];
 					}
@@ -1494,77 +1473,72 @@ define(function(require){
 			var self = this;
 
 			monster.parallel({
-					callflow: function(callbackParallel) {
-						var response = {};
+				callflow: function(callbackParallel) {
+					var response = {};
 
-						self.callApi({
-							resource: 'callflow.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									filter_group_id: groupId,
-									filter_type: 'userGroup',
-									paginate: 'false'
-								}
-							},
-							success: function(data) {
-								if(data.data.length > 0) {
-									self.groupsGetCallflow(data.data[0].id, function(callflow) {
-										response.groupCallflow = callflow;
-										callbackParallel && callbackParallel(null, response);
-									});
-								} else {
-									callbackParallel && callbackParallel(null, null);
-								}
+					self.callApi({
+						resource: 'callflow.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								filter_group_id: groupId,
+								filter_type: 'userGroup',
+								paginate: 'false'
 							}
-						});
-					},
-					numbers: function(callbackParallel) {
-						self.callApi({
-							resource: 'numbers.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									paginate: 'false'
-								}
-							},
-							success: function(numbers) {
-								callbackParallel && callbackParallel(null, numbers.data);
+						},
+						success: function(data) {
+							if (data.data.length > 0) {
+								self.groupsGetCallflow(data.data[0].id, function(callflow) {
+									response.groupCallflow = callflow;
+									callbackParallel && callbackParallel(null, response);
+								});
+							} else {
+								callbackParallel && callbackParallel(null, null);
 							}
-						});
-					}
+						}
+					});
 				},
-				function(err, results) {
-					callback && callback(results);
+				numbers: function(callbackParallel) {
+					self.callApi({
+						resource: 'numbers.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								paginate: 'false'
+							}
+						},
+						success: function(numbers) {
+							callbackParallel && callbackParallel(null, numbers.data);
+						}
+					});
 				}
-			);
+			}, function(err, results) {
+				callback && callback(results);
+			});
 		},
 
 		groupsGetMembersData: function(groupId, globalCallback) {
 			var self = this;
 
 			monster.parallel({
-					users: function(callback) {
-						self.groupsListUsers(function(data) {
-							callback(null, data);
-						});
-					},
-					group: function(callback) {
-						self.groupsGetGroup(groupId, function(data) {
-							callback(null, data);
-						});
-					},
-					baseCallflow: function(callback) {
-						self.groupsGetBaseRingGroup(groupId, function(data) {
-							callback(null, data);
-						});
-					}
+				users: function(callback) {
+					self.groupsListUsers(function(data) {
+						callback(null, data);
+					});
 				},
-				function(err, results) {
-					globalCallback && globalCallback(results);
+				group: function(callback) {
+					self.groupsGetGroup(groupId, function(data) {
+						callback(null, data);
+					});
+				},
+				baseCallflow: function(callback) {
+					self.groupsGetBaseRingGroup(groupId, function(data) {
+						callback(null, data);
+					});
 				}
-			);
-
+			}, function(err, results) {
+				globalCallback && globalCallback(results);
+			});
 		},
 
 		groupsFormatMembersData: function(data) {
@@ -1582,7 +1556,7 @@ define(function(require){
 				endpoint.delay = parseInt(endpoint.delay);
 				endpoint.timeout = parseInt(endpoint.timeout);
 
-				if(endpoint.id in mapUsers) {
+				if (endpoint.id in mapUsers) {
 					endpoint.name = mapUsers[endpoint.id].first_name + ' ' + mapUsers[endpoint.id].last_name;
 				} else {
 					endpoint.name = self.i18n.active().groups.userDeleted;
@@ -1603,7 +1577,7 @@ define(function(require){
 
 			self.groupsGetCallflow(callflowId, function(callflow) {
 				_.each(callflow.numbers, function(number) {
-					if(number.length < 7) {
+					if (number.length < 7) {
 						newNumbers.push(number);
 					}
 				});
@@ -1621,7 +1595,7 @@ define(function(require){
 
 			self.groupsGetCallflow(callflowId, function(callflow) {
 				_.each(callflow.numbers, function(number) {
-					if(number.length > 6) {
+					if (number.length > 6) {
 						newNumbers.push(number);
 					}
 				});
@@ -1641,10 +1615,10 @@ define(function(require){
 			self.groupsListCallflows(function(callflowList) {
 				_.each(callflowList, function(callflow) {
 					_.each(callflow.numbers, function(number) {
-						if(number.length < 7) {
+						if (number.length < 7) {
 							var extension = parseInt(number);
 
-							if(extension > 1) {
+							if (extension > 1) {
 								extensionList.push(extension);
 							}
 						}
@@ -1656,7 +1630,7 @@ define(function(require){
 						parsedB = parseInt(b),
 						result = -1;
 
-					if(parsedA > 0 && parsedB > 0) {
+					if (parsedA > 0 && parsedB > 0) {
 						result = parsedA > parsedB;
 					}
 
@@ -1681,7 +1655,7 @@ define(function(require){
 			var self = this,
 				flag = self.uiFlags.user.get('showGroupsWalkthrough');
 
-			if(flag !== false) {
+			if (flag !== false) {
 				callback && callback();
 			}
 		},
@@ -1699,7 +1673,7 @@ define(function(require){
 			var self = this,
 				mainTemplate = $('#voip_container'),
 				rowFirstGroup = mainTemplate.find('.grid-row:not(.title):first'),
-				steps =  [
+				steps = [
 					{
 						element: mainTemplate.find('.add-group')[0],
 						intro: self.i18n.active().groups.walkthrough.steps['1'],
@@ -1751,9 +1725,9 @@ define(function(require){
 				resource: 'media.list',
 				data: {
 					accountId: self.accountId,
-					filters: { 
-						'paginate': 'false',
-						'key_missing':'type' 
+					filters: {
+						paginate: false,
+						key_missing: 'type'
 					}
 				},
 				success: function(medias) {
@@ -1855,12 +1829,11 @@ define(function(require){
 					}
 				},
 				success: function(data) {
-					if(data.data.length > 0) {
+					if (data.data.length > 0) {
 						self.groupsGetCallflow(data.data[0].id, function(callflow) {
 							callback && callback(callflow);
 						});
-					}
-					else {
+					} else {
 						callbackError && callbackError(data);
 
 						toastr.error(self.i18n.active().groups.ringGroupMissing);
@@ -1886,12 +1859,11 @@ define(function(require){
 					}
 				},
 				success: function(data) {
-					if(data.data.length > 0) {
+					if (data.data.length > 0) {
 						self.groupsGetCallflow(data.data[0].id, function(callflow) {
 							callback && callback(callflow);
 						});
-					}
-					else {
+					} else {
 						callbackError && callbackError(data);
 
 						toastr.error(self.i18n.active().groups.ringGroupMissing);
@@ -1911,7 +1883,7 @@ define(function(require){
 					timeout = parseInt(endpoint.timeout),
 					total = delay + timeout;
 
-				if(total > globalTimeout) {
+				if (total > globalTimeout) {
 					globalTimeout = total;
 				}
 			});
@@ -1923,55 +1895,51 @@ define(function(require){
 			var self = this;
 
 			monster.parallel({
-					group: function(callback) {
-						self.groupsGetGroup(groupId, function(data) {
-							var areDifferent = false;
+				group: function(callback) {
+					self.groupsGetGroup(groupId, function(data) {
+						var areDifferent = false;
 
-							_.each(endpoints, function(endpoint) {
-								if(endpoint.id in data.endpoints) {
-									delete data.endpoints[endpoint.id];
-								}
-								else {
-									areDifferent = true;
-									return false;
-								}
-							});
-
-							if(!_.isEmpty(data.endpoints)) {
+						_.each(endpoints, function(endpoint) {
+							if (endpoint.id in data.endpoints) {
+								delete data.endpoints[endpoint.id];
+							} else {
 								areDifferent = true;
-							}
-
-							if(areDifferent) {
-								data.endpoints = {};
-
-								_.each(endpoints, function(v) {
-									data.endpoints[v.id] = { type: 'user' };
-								});
-
-								self.groupsUpdate(data, function(data) {
-									callback && callback(null, data);
-								});
-							}
-							else {
-								callback && callback(null, data);
+								return false;
 							}
 						});
-					},
-					callflow: function(callback) {
-						self.groupsGetBaseRingGroup(groupId, function(ringGroup) {
-							ringGroup.flow.data.endpoints = endpoints;
-							ringGroup.flow.data.timeout = self.groupsComputeTimeout(endpoints);
 
-							self.groupsUpdateCallflow(ringGroup, function(data) {
+						if (!_.isEmpty(data.endpoints)) {
+							areDifferent = true;
+						}
+
+						if (areDifferent) {
+							data.endpoints = {};
+
+							_.each(endpoints, function(v) {
+								data.endpoints[v.id] = { type: 'user' };
+							});
+
+							self.groupsUpdate(data, function(data) {
 								callback && callback(null, data);
 							});
-						});
-					},
+						} else {
+							callback && callback(null, data);
+						}
+					});
 				},
-				function(error, results) {
-					callback && callback(results);
+				callflow: function(callback) {
+					self.groupsGetBaseRingGroup(groupId, function(ringGroup) {
+						ringGroup.flow.data.endpoints = endpoints;
+						ringGroup.flow.data.timeout = self.groupsComputeTimeout(endpoints);
+
+						self.groupsUpdateCallflow(ringGroup, function(data) {
+							callback && callback(null, data);
+						});
+					});
 				}
-			);
+			}, function(error, results) {
+				callback && callback(results);
+			});
 		},
 
 		groupsUpdate: function(group, callback) {
@@ -2029,57 +1997,55 @@ define(function(require){
 			var self = this;
 
 			monster.parallel({
-					group: function(callback) {
+				group: function(callback) {
+					self.callApi({
+						resource: 'group.delete',
+						data: {
+							accountId: self.accountId,
+							groupId: groupId
+						},
+						success: function(data) {
+							callback && callback(null, data.data);
+						}
+					});
+				},
+				callflow: function(callback) {
+					self.groupsGetRingGroup(groupId, function(data) {
 						self.callApi({
-							resource: 'group.delete',
+							resource: 'callflow.delete',
 							data: {
 								accountId: self.accountId,
-								groupId: groupId
+								callflowId: data.id
 							},
 							success: function(data) {
-								callback && callback(null, data.data);
+								callback && callback(null, data);
 							}
 						});
 					},
-					callflow: function(callback) {
-						self.groupsGetRingGroup(groupId, function(data) {
-							self.callApi({
-								resource: 'callflow.delete',
-								data: {
-									accountId: self.accountId,
-									callflowId: data.id
-								},
-								success: function(data) {
-									callback && callback(null, data);
-								}
-							});
-						},
-						function(data) {
-							callback && callback(null, data);
+					function(data) {
+						callback && callback(null, data);
+					});
+				},
+				baseCallflow: function(callback) {
+					self.groupsGetBaseRingGroup(groupId, function(data) {
+						self.callApi({
+							resource: 'callflow.delete',
+							data: {
+								accountId: self.accountId,
+								callflowId: data.id
+							},
+							success: function(data) {
+								callback && callback(null, data);
+							}
 						});
 					},
-					baseCallflow: function(callback) {
-						self.groupsGetBaseRingGroup(groupId, function(data) {
-							self.callApi({
-								resource: 'callflow.delete',
-								data: {
-									accountId: self.accountId,
-									callflowId: data.id
-								},
-								success: function(data) {
-									callback && callback(null, data);
-								}
-							});
-						},
-						function(data) {
-							callback && callback(null, data);
-						});
-					}
-				},
-				function(err, results) {
-					callback && callback(results);
+					function(data) {
+						callback && callback(null, data);
+					});
 				}
-			);
+			}, function(err, results) {
+				callback && callback(results);
+			});
 		},
 
 		groupsGetCallflow: function(callflowId, callback) {
@@ -2101,40 +2067,38 @@ define(function(require){
 			var self = this;
 
 			monster.parallel({
-					groups: function(callback) {
-						self.callApi({
-							resource: 'group.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									paginate: 'false'
-								}
-							},
-							success: function(dataGroups) {
-								callback(null, dataGroups.data);
+				groups: function(callback) {
+					self.callApi({
+						resource: 'group.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								paginate: 'false'
 							}
-						});
-					},
-					callflows: function(callback) {
-						self.callApi({
-							resource: 'callflow.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									has_key: 'group_id',
-									paginate: 'false'
-								}
-							},
-							success: function(dataCallflows) {
-								callback(null, dataCallflows.data);
-							}
-						});
-					}
+						},
+						success: function(dataGroups) {
+							callback(null, dataGroups.data);
+						}
+					});
 				},
-				function(err, results) {
-					callback && callback(results);
+				callflows: function(callback) {
+					self.callApi({
+						resource: 'callflow.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								has_key: 'group_id',
+								paginate: 'false'
+							}
+						},
+						success: function(dataCallflows) {
+							callback(null, dataCallflows.data);
+						}
+					});
 				}
-			);
+			}, function(err, results) {
+				callback && callback(results);
+			});
 		},
 
 		groupsRemoveOverlay: function() {

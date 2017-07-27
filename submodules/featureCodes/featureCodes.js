@@ -1,4 +1,4 @@
-define(function(require){
+define(function(require) {
 	var $ = require('jquery'),
 		_ = require('underscore'),
 		monster = require('monster'),
@@ -20,42 +20,42 @@ define(function(require){
 				'qubicle logout'
 			],
 			call_forward: [
-				"call_forward[action=activate]",
-				"call_forward[action=deactivate]",
-				"call_forward[action=toggle]",
-				"call_forward[action=update]",
-				"call_forward[action=on_busy_enable]",
-				"call_forward[action=on_busy_disable]",
-				"call_forward[action=no_answer_enable]",
-				"call_forward[action=no_answer_disable]"
+				'call_forward[action=activate]',
+				'call_forward[action=deactivate]',
+				'call_forward[action=toggle]',
+				'call_forward[action=update]',
+				'call_forward[action=on_busy_enable]',
+				'call_forward[action=on_busy_disable]',
+				'call_forward[action=no_answer_enable]',
+				'call_forward[action=no_answer_disable]'
 			],
 			hotdesk: [
-				"hotdesk[action=login]",
-				"hotdesk[action=logout]",
-				"hotdesk[action=toggle]"
+				'hotdesk[action=login]',
+				'hotdesk[action=logout]',
+				'hotdesk[action=toggle]'
 			],
 			parking: [
-				"park_and_retrieve",
-				"valet",
-				"retrieve"
+				'park_and_retrieve',
+				'valet',
+				'retrieve'
 			],
 			do_not_disturb: [
-				"donotdisturb[action=\"enable\"]",
-				"donotdisturb[action=\"disable\"]",
-				"donotdisturb[action=\"toggle\"]"
+				'donotdisturb[action="enable"]',
+				'donotdisturb[action="disable"]',
+				'donotdisturb[action="toggle"]'
 			],
 			misc: [
-				"voicemail[action=check]",
-				"voicemail[action=\"direct\"]",
-				"intercom",
-				"privacy[mode=full]",
-				"directory",
-				"time",
-				"call_waiting[action=enable]",
-				"call_waiting[action=disable]",
-				"sound_test_service",
-				"call_recording",
-				"move"
+				'voicemail[action=check]',
+				'voicemail[action="direct"]',
+				'intercom',
+				'privacy[mode=full]',
+				'directory',
+				'time',
+				'call_waiting[action=enable]',
+				'call_waiting[action=disable]',
+				'sound_test_service',
+				'call_recording',
+				'move'
 			]
 		},
 
@@ -104,19 +104,19 @@ define(function(require){
 
 			_.each(featureCodeData, function(callflow) {
 				// Some old callflows have been created with the feature code key, so we had the check to make sure they also have a name associated
-				if(callflow.featurecode.hasOwnProperty('name')) {
+				if (callflow.featurecode.hasOwnProperty('name')) {
 					var category = 'misc',
-						hasStar = (callflow.hasOwnProperty('numbers') && callflow.numbers.length && callflow.numbers[0].substr(0,1) === '*') || (callflow.hasOwnProperty('patterns') && callflow.patterns.length && callflow.patterns[0].substr(0,3) === '^\\*');
+						hasStar = (callflow.hasOwnProperty('numbers') && callflow.numbers.length && callflow.numbers[0].substr(0, 1) === '*') || (callflow.hasOwnProperty('patterns') && callflow.patterns.length && callflow.patterns[0].substr(0, 3) === '^\\*');
 
 					_.find(self.categories, function(cat, key) {
-						if(cat.indexOf(callflow.featurecode.name) >= 0) {
+						if (cat.indexOf(callflow.featurecode.name) >= 0) {
 							category = key;
 							return true;
 						}
-						return false; 
+						return false;
 					});
 
-					if(!featureCodes.hasOwnProperty(category)) { 
+					if (!featureCodes.hasOwnProperty(category)) {
 						featureCodes[category] = {
 							category: self.i18n.active().featureCodes.categories[category],
 							codes: []
@@ -126,7 +126,7 @@ define(function(require){
 					featureCodes[category].codes.push({
 						key: callflow.featurecode.name,
 						name: self.i18n.active().featureCodes.labels[callflow.featurecode.name] || callflow.featurecode.name,
-						number: callflow.featurecode.number ? callflow.featurecode.number.replace(/\\/g,'') : '',
+						number: callflow.featurecode.number ? callflow.featurecode.number.replace(/\\/g, '') : '',
 						hasStar: hasStar
 					});
 				}
@@ -144,8 +144,7 @@ define(function(require){
 		featureCodesBindEvents: function(args) {
 			var self = this,
 				parent = args.parent,
-				template = args.template,
-				featureCodes = args.featureCodes;
+				template = args.template;
 
 			template.find('.main-number-link').on('click', function(e) {
 				e.preventDefault();
