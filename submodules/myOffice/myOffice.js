@@ -962,6 +962,14 @@ define(function(require){
 							}
 						});
 
+						if (setCNAM) {
+							account.caller_id = $.extend(true, {}, account.caller_id, {
+								external: {
+									name: callerIdName
+								}
+							});
+						}
+
 						self.myOfficeGetNumber(callerIdNumber, function(numberData) {
 							if(setCNAM && callerIdName.length) {
 								$.extend(true, numberData, { cnam: { display_name: callerIdName } });
