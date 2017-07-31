@@ -726,11 +726,11 @@ define(function(require) {
 						},
 						template;
 
-						_.each(self.weekdayLabels, function(val) {
-							if (strategyData.temporalRules.weekdays[val].id in strategyData.callflows.MainCallflow.flow.children) {
-								templateData.afterhours = true;
-							}
-						});
+					_.each(self.weekdayLabels, function(val) {
+						if (strategyData.temporalRules.weekdays[val].id in strategyData.callflows.MainCallflow.flow.children) {
+							templateData.afterhours = true;
+						}
+					});
 
 					template = $(monster.template(self, 'strategy-' + templateName, templateData));
 
