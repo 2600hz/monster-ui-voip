@@ -193,6 +193,7 @@ define(function(require) {
 					});
 				}
 			}, function(err, results) {
+				// has to be > 1 because we automatically add "undefinedMainNumber" as a placeholder for the "0" that will be automatically added if they add a Main number
 				var hasMainNumber = (results.callflows.MainCallflow.numbers.length > 1),
 					hasConfNumber = (results.callflows.MainConference.numbers.length > 0 && results.callflows.MainConference.numbers[0] !== 'undefinedconf'),
 					hasFaxingNumber = (results.callflows.MainFaxing.numbers.length > 0 && results.callflows.MainFaxing.numbers[0] !== 'undefinedfaxing'),
@@ -462,7 +463,7 @@ define(function(require) {
 							numbers = callflow.numbers,
 							templateData = {
 								numbers: $.map(numbers, function(val, key) {
-									if (val !== '0') {
+									if (val !== '0' && val !== 'undefinedMainNumber') {
 										var ret = {
 											number: {
 												id: val
@@ -823,8 +824,15 @@ define(function(require) {
 			var self = this,
 				addNumbersToMainCallflow = function(numbers) {
 					if (numbers.length) {
-						var mainCallflow = strategyData.callflows.MainCallflow;
+						var mainCallflow = strategyData.callflows.MainCallflow,
+							indexPlaceholder = mainCallflow.numbers.indexOf('undefinedMainNumber');
+
+						if (indexPlaceholder >= 0) {
+							mainCallflow.numbers[indexPlaceholder] = '0';
+						}
+
 						mainCallflow.numbers = mainCallflow.numbers.concat(numbers);
+
 						self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
 							var parentContainer = container.parents('.element-container');
 							strategyData.callflows.MainCallflow = updatedCallflow;
@@ -913,6 +921,12 @@ define(function(require) {
 							popup,
 							updateCallflow = function() {
 								strategyData.callflows.MainCallflow.numbers.splice(indexToRemove, 1);
+
+								// We don't want the '0' to stay in the routing system if they're no longer using SmartPBX.
+								// If they remove their last main number, we consider they don't use SmartPBX, so we reset the "0" to be the "undefinedMainNumber"
+								if (strategyData.callflows.MainCallflow.numbers.length === 1 && strategyData.callflows.MainCallflow.numbers[0] === '0') {
+									strategyData.callflows.MainCallflow.numbers[0] = 'undefinedMainNumber';
+								}
 
 								self.strategyUpdateCallflow(strategyData.callflows.MainCallflow, function(updatedCallflow) {
 									var parentContainer = container.parents('.element-container');
@@ -2979,7 +2993,7 @@ define(function(require) {
 											contact_list: {
 												exclude: false
 											},
-											numbers: ['0'],
+											numbers: ['undefinedMainNumber'],
 											name: 'MainCallflow',
 											type: 'main',
 											flow: {
@@ -3003,13 +3017,9 @@ define(function(require) {
 									}
 								});
 							} else {
-								delete results.MainCallflow.flow.data.timezone;
-								if (results.MainCallflow.numbers[0] !== '0') {
-									if (results.MainCallflow.numbers[0] === 'undefined') {
-										results.MainCallflow.numbers[0] = '0';
-									} else {
-										results.MainCallflow.numbers.splice(0, 0, '0');
-									}
+								// For users who had undesired callflow with only "0" in it, we migrate it to our new empty main callflow "undefinedMainNumber"
+								if (results.MainCallflow.numbers && results.MainCallflow.numbers.length === 1 && results.MainCallflow.numbers[0] === '0') {
+									results.MainCallflow.numbers[0] = 'undefinedMainNumber';
 
 									self.strategyUpdateCallflow(results.MainCallflow, function(updatedCallflow) {
 										results.MainCallflow = updatedCallflow;
