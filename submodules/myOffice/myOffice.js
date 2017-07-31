@@ -542,7 +542,7 @@ define(function(require) {
 				if (numberArrayName.length > 0) {
 					if (!(numberArrayName in data)) { data[numberArrayName] = []; }
 					_.each(val.numbers, function(num) {
-						if (num !== '0' && num !== 'undefined' && num !== 'undefinedconf' && num !== 'undefinedfaxing') {
+						if (['0', 'undefined', 'undefinedconf', 'undefinedfaxing', 'undefinedMainNumber'].indexOf(num) < 0) {
 							var number = {
 								number: num
 							};
