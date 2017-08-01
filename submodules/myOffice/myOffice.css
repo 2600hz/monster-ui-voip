@@ -121,6 +121,17 @@
 	margin: 7px 0;
 }
 
+#myoffice_container .devices-section-content .devices-canvas-wrapper {
+	width: 130px;
+	height: 130px;
+}
+
+#myoffice_container .numbers-canvas-wrapper {
+	width: 100px;
+	height: 120px;
+	float: left;
+}
+
 #myoffice_container .devices-section-content .devices-chart-legend {
 	margin-left: 150px;
 	margin-right: 10px;

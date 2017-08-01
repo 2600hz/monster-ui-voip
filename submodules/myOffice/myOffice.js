@@ -67,53 +67,51 @@ define(function(require) {
 						directoryLink: myOfficeData.directoryLink
 					},
 					template = $(monster.template(self, 'myOffice-layout', dataTemplate)),
-					chartOptions = {
-						animateScale: true,
-						segmentShowStroke: false,
-						// segmentStrokeWidth: 1,
-						animationSteps: 50,
-						animationEasing: 'easeOutCirc',
-						percentageInnerCutout: 60
-					},
-					devicesChart = new Chart(template.find('#dashboard_devices_chart').get(0).getContext('2d')).Doughnut(
-						myOfficeData.devicesData.totalCount > 0
-						? $.map(myOfficeData.devicesData, function(val) {
-							return typeof val === 'object' ? {
-								value: val.count,
-								color: val.color
-							} : null;
-						}).sort(function(a, b) { return b.value - a.value; })
-						: [{ value: 1, color: '#DDD' }],
-						chartOptions
-					),
-					assignedNumbersChart = new Chart(template.find('#dashboard_assigned_numbers_chart').get(0).getContext('2d')).Doughnut(
-						myOfficeData.assignedNumbersData.totalCount > 0
-						? $.map(myOfficeData.assignedNumbersData, function(val) {
-							return typeof val === 'object' ? {
-								value: val.count,
-								color: val.color
-							} : null;
-						}).sort(function(a, b) { return b.value - a.value; })
-						: [{ value: 1, color: '#DDD' }],
-						chartOptions
-					),
-					numberTypesChart = new Chart(template.find('#dashboard_number_types_chart').get(0).getContext('2d')).Doughnut(
-						// $.map(myOfficeData.numberTypesData, function(val) {
-						// 	return {
-						// 		value: val.count,
-						// 		color: val.color
-						// 	};
-						// }).sort(function(a, b) { return b.value - a.value ; }),
-						myOfficeData.classifiedNumbers.length > 0
-						? $.map(myOfficeData.classifiedNumbers, function(val, index) {
-							return typeof val === 'object' ? {
-								value: val.count,
-								color: val.color
-							} : null;
-						})
-						: [{ value: 1, color: '#DDD' }],
-						chartOptions
-					);
+					$devicesCanvas = template.find('#dashboard_devices_chart'),
+					$assignedNumbersCanvas = template.find('#dashboard_assigned_numbers_chart'),
+					$classifiedNumbersCanvas = template.find('#dashboard_number_types_chart'),
+					emptyDataSet = [
+						{
+							count: 1,
+							color: '#ddd'
+						}
+					],
+					devicesDataSet = _.chain(myOfficeData.devicesData).omit('totalCount').sortBy('count').value(),
+					assignedNumbersDataSet = _.chain(myOfficeData.assignedNumbersData).omit('totalCount').sortBy('count').value(),
+					classifiedNumbersDataSet = _.chain(myOfficeData.classifiedNumbers).sortBy('count').value(),
+					createDoughnutCanvas = function createDoughnutCanvas($target) {
+						var args = Array.prototype.slice.call(arguments),
+							datasets;
+
+						args.splice(0, 1);
+
+						datasets = args;
+
+						return new Chart($target, $.extend(true, {
+							type: 'doughnut',
+							options: {
+								legend: {
+									display: false
+								},
+								tooltips: {
+									enabled: false
+								},
+								animation: {
+									easing: 'easeOutCirc',
+									animateScale: true
+								},
+								events: []
+							}
+						}, {
+							data: {
+								datasets: datasets
+							}
+						}));
+					};
+
+				devicesDataSet = _.isEmpty(devicesDataSet) ? emptyDataSet : devicesDataSet;
+				assignedNumbersDataSet = _.isEmpty(assignedNumbersDataSet) ? emptyDataSet : assignedNumbersDataSet;
+				classifiedNumbersDataSet = _.isEmpty(classifiedNumbersDataSet) ? emptyDataSet : classifiedNumbersDataSet;
 
 				// Trick to adjust the vertical positioning of the number types legend
 				if (myOfficeData.classifiedNumbers.length <= 3) {
@@ -129,6 +127,24 @@ define(function(require) {
 				parent
 					.empty()
 					.append(template);
+
+				createDoughnutCanvas($devicesCanvas, {
+					data: _.pluck(devicesDataSet, 'count'),
+					backgroundColor: _.pluck(devicesDataSet, 'color'),
+					borderWidth: 0
+				});
+
+				createDoughnutCanvas($assignedNumbersCanvas, {
+					data: _.pluck(assignedNumbersDataSet, 'count'),
+					backgroundColor: _.pluck(assignedNumbersDataSet, 'color'),
+					borderWidth: 0
+				});
+
+				createDoughnutCanvas($classifiedNumbersCanvas, {
+					data: _.pluck(classifiedNumbersDataSet, 'count'),
+					backgroundColor: _.pluck(classifiedNumbersDataSet, 'color'),
+					borderWidth: 0
+				});
 
 				self.myOfficeCheckWalkthrough();
 
