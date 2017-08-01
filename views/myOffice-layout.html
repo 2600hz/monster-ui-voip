@@ -46,7 +46,9 @@
 				</div>
 				<div class="left-section-content devices-section-content">
 					<div class="devices-chart">
-						<canvas id="dashboard_devices_chart" class="pull-left" width="130" height="130"></canvas>
+						<div class="devices-canvas-wrapper pull-left">
+							<canvas id="dashboard_devices_chart"></canvas>
+						</div>
 						<div class="devices-chart-legend">
 							<ul>
 								{{#each devicesList}}
@@ -164,7 +166,9 @@
 						<span class="number">{{totalNumbers}}</span>
 					</div>
 					<div class="chart-container clearfix">
-						<canvas id="dashboard_assigned_numbers_chart" class="pull-left" width="100" height="120"></canvas>
+						<div class="numbers-canvas-wrapper">
+							<canvas id="dashboard_assigned_numbers_chart"></canvas>
+						</div>
 						<div class="chart-legend assigned-numbers-legend">
 							<ul>
 								{{#each assignedNumbersList}}
@@ -177,7 +181,9 @@
 						</div>
 					</div>
 					<div class="chart-container clearfix">
-						<canvas id="dashboard_number_types_chart" class="pull-left" width="100" height="120"></canvas>
+						<div class="numbers-canvas-wrapper">
+							<canvas id="dashboard_number_types_chart"></canvas>
+						</div>
 						<div class="chart-legend number-types-legend">
 							<ul>
 								{{#each classifiedNumbers}}
