@@ -800,10 +800,10 @@
 			"groupOther": "Other",
 			"optionNone": "Skip to Voicemail",
 			"callTabsMessages": {
-				"MainOpenHours":"Select the way you want your callers to reach you when your office is Open.",
-				"MainLunchHours":"Select the way you want your callers to reach you during Lunch Hours.",
-				"MainAfterHours":"Select the way you want your callers to reach you when your office is Closed.",
-				"MainHolidays":"Select the way you want your callers to reach you when you are closed during Holidays."
+				"MainOpenHours": "Select the way you want your callers to reach you when your office is Open.",
+				"MainLunchHours": "Select the way you want your callers to reach you during Lunch Hours.",
+				"MainAfterHours": "Select the way you want your callers to reach you when your office is Closed.",
+				"MainHolidays": "Select the way you want your callers to reach you when you are closed during Holidays."
 			}
 		},
 		"popup": {
@@ -1026,7 +1026,7 @@
 			"report": "Report Call",
 			"details": "Technical Details"
 		},
-		"downloadTooltip": "In \"Custom\" Mode, you'll need to click on \"Filter\" before clicking on download." 
+		"downloadTooltip": "In \"Custom\" Mode, you'll need to click on \"Filter\" before clicking on download."
 	},
 
 	"myOffice": {
