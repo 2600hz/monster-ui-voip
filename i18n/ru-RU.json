@@ -13,8 +13,6 @@
 		"callLogs": "Журнал вызовов",
 		"quickLinks": "Help Topics",
 		"featureCodes": "Коды ДВО",
-		"__comment": "UI-1220: Added VMBox module",
-		"__version": "3.19",
 		"vmboxes": "Голосовая почта"
 	},
 
@@ -84,8 +82,6 @@
 			"defaultRingback": "Мелодия гудка по умолчанию",
 			"emptyUploadAlert": "Пожалуйста, выберите файл для загрузки",
 			"fileTooBigAlert": "Вы не можете загрузить файл размером более 5Мб",
-			"__comment": "UI-1025: Updating media file uploads throughout the UI",
-			"__version": "3.20_s3",
 			"audioUploadButton": "Выберите звуковой файл"
 		},
 		"nextAction": {
@@ -98,18 +94,13 @@
 			"users": "Пользователи",
 			"devices": "Устройства"
 		},
-		"__comment": "UI-819, v3.19_s1: Показывает окно ошибки, если данные о группе устарели.",
 		"outdatedGroupsError": "Данные о вашей пользовательской группе устарели и не могут использоваться. Пожалуйста, обратитесь к вашему администратору для обновления информации.",
 
-		"__comment": "UI-1352: Adding an option to enable/disable call forwarding on ring group",
-		"__version": "3.20",
 		"forward": {
 			"title": "Разрешить переадресацию",
 			"headline": "Разрешить переадресацию",
 			"description": "Включите эту опцию, если вы хотите разрешить членам группы нажимать кнопку \"Переадресация\" для переадресации вызовов этой группы. Если эта опция выключена, пользовательская команда будет проигнорирована."
 		},
-		"__comment": "UI-1604: Adding Walkthrough for new users",
-		"__version": "3.21",
 		"walkthrough": {
 			"steps": {
 				"1": "Нажмите кнопку чтобы добавить группу пользователей. Добавьте устройства и пользователей в вашу группу, просто перетащив их, затем заадайте группе имя и внутренний номер. Когда закончите, все ваши группы и их настройки будут доступны в интерфейсе ниже.",
@@ -177,8 +168,6 @@
 				"notSet": "- Учетная запись по умолчанию -",
 				"noE911Numbers": "Вы не определили номер для экстренных вызовов (Е911) ни для одного из ваших номеров, пожалуйста, установите его для любого из ваших номеров в разделе Управление номерами и продолжите текущую настройку.",
 				"address": "Адрес",
-				"__comment": "UI-1386: Updating devices to use the numberSelector common control",
-				"__version": "v3.20_s4",
 				"selectNumber": "Выберите номер для экстренных служб",
 				"useDefault": "Использовать настройки по умолчанию"
 			},
@@ -191,8 +180,6 @@
 					"srtp": "SRTP",
 					"zrtp": "ZRTP"
 				},
-				"__comment": "UI-1119: Adding ignore_complete_elsewhere",
-				"__version": "3.19",
 				"ignoreCompletedElsewhere": {
 					"label": "Игнорировать ответ в другом месте",
 					"help": "Если включено, поддерживаемые модели телефонов будут отображать пропущенный вызов, даже если он был частью вызова группы и был отвечен кем-то ещё."
@@ -222,11 +209,9 @@
 					"placeholder": "+18554443333",
 					"button": "Проверить",
 					"label": "Указанный номер соответствует этому правилу.",
-					"__comment": "UI-727, v3.19_s2: Информация об изменении ограничений вызовов отображается на устройствах.",
 					"allowMessage": "Этому устройству разрешено совершать вызовы по номеру {{phoneNumber}}",
 					"denyMessage": "Этому устройству запрещено совершать вызовы по номеру {{phoneNumber}}."
 				},
-				"__comment": "UI-727, v3.19_s2: Информация об изменении ограничений вызовов отображается на устройствах.",
 				"allow": "Разрешить",
 				"disabledRestrictionsInfo": "Некоторые типы вызовов ограничены для всей вашей учётной записи и не могут быть назначены для конкретного устройства."
 			},
@@ -242,8 +227,6 @@
 					"H261": "H261"
 				}
 			},
-			"__comment": "UI-1351: Add ability to configure feature keys for SIP devices in SmartPBX",
-			"__version": "v3.20_s4",
 			"keys": {
 				"alertMessage": "По-умолчанию эта клавиша будет использована как клавиша линии и мы рекомендуем Вам не изменять этого.",
 				"featureKeys": {
@@ -447,8 +430,6 @@
 			"title": "Создание пользователя",
 			"vmboxAlreadyExist": "Голосовой ящик уже выбран, пожалуйта выберите номер другого голосового почтового ящика.",
 			"vmboxNumber": "Номер ящика ГП",
-			"__comment": "UI-814: Adding the option to automatically send email on user creation",
-			"__version": "3.20_s3",
 			"sendWelcomeEmail": "Отправить данные входа"
 		},
 		"editionForm": {
@@ -464,12 +445,8 @@
 			"timeoutEdit": "Редактирование функции Find-me-Follow-me",
 			"timeoutEditHint": "Ограничение длительности вызова перекрывается настройкой функции Find-me-Follow-me. Откройте ссылку ниже, чтобы отредактировать её.",
 			"disabledTimeoutHint": "Вам необходим как минимум один номер или внутренний номер, чтобы установить оганичение длительности вызова.",
-			"__comment": "UI-1109: Adding the Presence ID setting on the User document",
-			"__version": "3.19",
 			"presenceId": "Основной внутренний номер",
 			"noPresenceID": "Нет",
-			"__comment": "UI-1066: Adding Help text hover the icons of the user edition form",
-			"__version": "3.19",
 			"nameHelp": "Введите Имя в первом поле и Фамилию во втором",
 			"loginHelp": "Это имя учётной записи пользователя, используется для входа",
 			"vmboxHelp": "Это номер ящика голосовой почты пользователя, нажмите на Изменить PIN для сброса PIN-кода ящика голосовой почты",
@@ -521,8 +498,6 @@
 			"userDelete": "Вы успешно удалили пользователя {{ name }} из Smart PBX!",
 			"userUpdated": "Вы успешно изменили параметры пользователя {{ name }}.",
 			"pinUpdated": "Вы успешно изменили PIN для {{ name }}.",
-			"__comment": "UI-1033: Now properly remove the Caller-ID Feature if we remove a number that was set as that Caller-ID Number",
-			"__version": "3.20",
 			"callerIDDeleted": "Номер Caller-ID установлен в номер, который больше ему не принадлежит, та что мы отключили функцию Caller-ID.",
 			"successResetPassword": "Успешно! {{ name }} скоро получит сообщение по электронной почте как сбросить пароль."
 		},
@@ -584,8 +559,6 @@
 				"nameExtension": "Виртуальный факс",
 				"headerExtension": " Факс-принтер"
 			},
-			"__comment": "UI-1354: Add better explanation to faxbox feature",
-			"__version": "v3.20_s4",
 			"faxToEmail": {
 				"title": "Факс в Email",
 				"text1": "Факсы, отправленные на номер",
@@ -646,8 +619,6 @@
 			"silence": "Без звука",
 			"emptyUploadAlert": "Пожалуйста, выберите файл для загрузки",
 			"fileTooBigAlert": "Вы не можете загрузить файл размером больше 5Мб",
-			"__comment": "UI-1025: Updating media file uploads throughout the UI",
-			"__version": "3.20_s3",
 			"audioUploadButton": "Выберите звуковой файл"
 		},
 		"hotdesk": {
@@ -658,28 +629,20 @@
 			"headline": "Настройка Присвоения телефона",
 			"help": "ID присваиваемого телефона автоматически устанавливается как внутренний номер пользователя."
 		},
-		"__comment": "UI-1129: Migration tool from Kazoo-UI to Monster-UI",
-		"__version": "3.19",
 		"migration": {
 			"confirmMigration": "Мы нашли существующий сценарий для номера, который вы хотите добавить, похоже, мы можем перенести его в SmartPBX. Прежде чем мы продолжим, хочется убедиться что вы понимаете, что больше не сможете изменить этот сценарий через Web-интерфейс. Хотите продолжить?",
 			"tooManyCallflows": "Похоже что номера, которые вы пытаетесь добавить, принадлежат множественным существующим сценариям. Автоматическая миграция невозможна. Пожалуйста, обратитесь в техническую поддержку."
 		},
-		"__commment": "UI-1109: Adding popup for Presence ID change",
-		"__version": "3.19",
 		"presenceIDPopup": {
 			"title": "Выберите ваш новый основной внутренний номер",
 			"header": "Похоже вы пытаетесь удалить номер, который назначен как основной внутренний номер. Пожалуйста, назначьте другой основной внутренний номер из списка ниже:",
 			"none": "Я не хочу назначать основной внутренний номер"
 		},
-		"__comment": "UI-1393: Updating user devices to use the monsterListing common control",
-		"__version": "v3.20_s4",
 		"devices": {
 			"newDevice": "Новое устройство",
 			"spareDevice": "Выбрать из неназначенных устройств"
 		},
 
-		"__comment": "UI-1604: Adding Walkthrough for new users",
-		"__version": "3.21",
 		"walkthrough": {
 			"steps": {
 				"1": "Нажмите на кнопку и введите информацию для создания пользователя. Пользователь появится в списке и его данные можно будет изменить в будущем",
@@ -738,8 +701,6 @@
 			"timezone": "Часовой пояс компании:",
 			"to": "для",
 			"lunchbreakTitle": "Вы закрыты в обеденное время?",
-			"__comment": "UI-1250: Adding help boxes",
-			"__version": "3.20_s2",
 			"helpAfterHours": "Не забудьте назначить маршрут звонка для нерабочего времени! Для настройки перейдите в раздел \"Обработка входящих звонков\", и выберите закладку \"Нерабочее время\".",
 			"helpLunchHours": "Если ваш офис закрывается на обеденный перерыв, вам также нужно настроить обработку звонков в это время. Для настройки перейдите в раздел \"Обработка входящих звонков\", и выберите закладку \"Обеденный перерыв\"."
 		},
@@ -749,8 +710,6 @@
 			"singleLink": "Один день",
 			"rangeLink": "Диапазон дат",
 			"advancedLink": "Расширенный",
-			"__comment": "UI-1250: Adding help boxes",
-			"__version": "3.20_s2",
 			"helpHolidays": "Не забудьте настроить маршрутизацию звонков во время праздников!  Для настройки перейдите в раздел \"Обработка входящих звонков\", и выберите закладку \"Праздники\"."
 		},
 		"calls": {
@@ -789,11 +748,7 @@
 			},
 			"pressKey": "Нажмите",
 			"for": "для",
-			"__comment": "UI-1025: Updating media file uploads throughout the UI",
-			"__version": "3.20_s3",
 			"fileUploadButton": "Выберите файл",
-			"__comment": "UI-1185: Adding a help message to the greetings",
-			"__version": "3.20_s4",
 			"greetingsHelp": "Вы должны нажать кнопку \"Обновить\" для сохранения изменений в сообщении приветствия.",
 			"defaultAction": "Действие по умолчанию"
 		},
@@ -837,8 +792,6 @@
 			"ring_group": "Группы",
 			"voicemail": "Ящики голосовой почты",
 			"directory": "Справочник",
-			"__comment": "UI-1353: Add directory support for the virtual receptionist",
-			"__version": "v3.20_s4",
 			"advancedCallflows": "Раширенные схемы обработки вызова"
 		},
 		"confirmMessages": {
@@ -872,8 +825,6 @@
 			}
 		},
 
-		"__comment": "UI-1604: Walkthrough dashboard",
-		"__version": "3.21",
 		"walkthrough": {
 			"first": {
 				"steps": {
@@ -954,8 +905,6 @@
 		},
 		"key": "Ключ",
 		"value": "Значение",
-		"__comment": "UI-1071: Adding new Range buttons to Call Logs",
-		"__version": "3.20",
 		"thisMonth": "Этот месяц",
 		"thisWeek": "Эта неделя",
 		"thisDay": "Сегодня",
@@ -985,8 +934,6 @@
 			"default": "Музыка по умолчанию",
 			"emptyUploadAlert": "Пожалуйста выберите файл для загрузки",
 			"fileTooBigAlert": "Вы не можете загрузить файли размером более 5Мб",
-			"__comment": "UI-1025: Updating media file uploads throughout the UI",
-			"__version": "3.20_s3",
 			"audioUploadButton": "Выберите звуковой файл"
 		},
 		"callerId": {
@@ -1027,14 +974,10 @@
 			"international": "Международные номера",
 			"noNumber": "Никакие номера не доступны"
 		},
-		"__comment": "UI-1220: Adding a Main VMBox automatically when they first load the SmartPBX if they don't have one",
-		"__version": "3.19",
 		"mainVMBoxName": "Главный ящик ГП",
 		"faxingNumberLabel": "Номер факса",
 		"directoryLabel": "Пользователей в справочнике:",
 
-		"__comment": "UI-1604: Walkthrough dashboard",
-		"__version": "3.21",
 		"walkthrough": {
 			"steps": {
 				"1": "Проверьте все настройки вашего офиса, включая пользователей, устройства, номера, главный номер и номер конференции",
@@ -1048,7 +991,6 @@
 		"missingE911Message": "Пожалуйста установите Caller-ID вашей компании и номер для эстренных служб (E911) для основного номера."
 	},
 
-	"__comment": "UI-299, v3.19_s2: Добавлены коды ДВО для SmartPBX.",
 	"featureCodes": {
 		"title": "Доступные коды ДВО",
 		"noFeatureCodeMessage": "Коды ДВО ещё  не включены для вашей учетной записи. Коды ДВО автоматически создадутся, когда вы загрузите меню для основного номера.",
@@ -1085,12 +1027,9 @@
 			"call_waiting[action=disable]": "Выключить \"ожидание вызова\"",
 			"sound_test_service": "Тест качества голоса",
 			"call_recording": "Запись разговоров",
-			"__comment": "UI-1395: Added voicemail[single_mailbox_login] feature code",
-			"__version": "3.20",
 			"voicemail[single_mailbox_login]": "Проверить ГП (авто-вход)",
 			"move": "Переместить"
 		},
-		"__comment": "UI-1028, v3.20_s0: Added categories for the feature codes.",
 		"categories": {
 			"qubicle": "Контакт-центр",
 			"call_forward": "Переадресация",
@@ -1101,8 +1040,6 @@
 		}
 	},
 
-	"__comment": "UI-1220: Added VMBox module",
-	"__version": "3.19",
 	"vmboxes": {
 		"addTitle": "Добавление ящика ГП",
 		"editTitle": "Редактирование ящика ГП: {{ name }}",
@@ -1200,10 +1137,6 @@
 		}
 	},
 
-	"__comment": "UI-1219: Adding the prepend feature to numbers",
-	"__version": "v3.20_s1",
 	"numberPrepend": "Префикс",
-	"__comment": "UI-1153: Show warning icon next to numbers being transfered",
-	"__version": "v3.20_s3",
 	"portIconHelp": "Этот номер находится в процессе портирования и будет удалён, если этот процесс окончится неудачей. Он не участвует в обработке звонков и приведён здесь исключительно для целей настройки системы"
 }
