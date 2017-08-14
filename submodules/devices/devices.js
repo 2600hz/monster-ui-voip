@@ -643,7 +643,7 @@ define(function(require) {
 			if (hasSIP) {
 				formData.sip = $.extend(true, {
 					expire_seconds: 360,
-					invite_format: 'username',
+					invite_format: 'contact',
 					method: 'password'
 				}, formData.sip);
 			}
