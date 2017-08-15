@@ -1,6 +1,6 @@
 define(function(require) {
 	var $ = require('jquery'),
-		_ = require('underscore'),
+		_ = require('lodash'),
 		monster = require('monster'),
 		timezone = require('monster-timezone'),
 		toastr = require('toastr');
@@ -1668,7 +1668,7 @@ define(function(require) {
 						monster.parallel(holidayRulesRequests, function(err, results) {
 							// First extract all ids from the new holidayList
 							var existingHolidaysCallflowsIds = [],
-								newHolidayCallflowsIds = _.pluck(holidayRulesRequests, 'id');
+								newHolidayCallflowsIds = _.map(holidayRulesRequests, 'id');
 
 							// Find all IDs of existing Callflows in the Main Callflow that are linking to the Main Holidays
 							_.each(mainCallflow.flow.children, function(directChild, id) {
@@ -3306,7 +3306,7 @@ define(function(require) {
 								}
 							},
 							success: function(data, status) {
-								var mapCallflowsByOwnerId = _.indexBy(data.data, 'owner_id');
+								var mapCallflowsByOwnerId = _.keyBy(data.data, 'owner_id');
 								_callback(null, mapCallflowsByOwnerId);
 							}
 						});

@@ -1,6 +1,6 @@
 define(function(require) {
 	var $ = require('jquery'),
-		_ = require('underscore'),
+		_ = require('lodash'),
 		monster = require('monster'),
 		chart = require('chart');
 
@@ -129,20 +129,20 @@ define(function(require) {
 					.append(template);
 
 				createDoughnutCanvas($devicesCanvas, {
-					data: _.pluck(devicesDataSet, 'count'),
-					backgroundColor: _.pluck(devicesDataSet, 'color'),
+					data: _.map(devicesDataSet, 'count'),
+					backgroundColor: _.map(devicesDataSet, 'color'),
 					borderWidth: 0
 				});
 
 				createDoughnutCanvas($assignedNumbersCanvas, {
-					data: _.pluck(assignedNumbersDataSet, 'count'),
-					backgroundColor: _.pluck(assignedNumbersDataSet, 'color'),
+					data: _.map(assignedNumbersDataSet, 'count'),
+					backgroundColor: _.map(assignedNumbersDataSet, 'color'),
 					borderWidth: 0
 				});
 
 				createDoughnutCanvas($classifiedNumbersCanvas, {
-					data: _.pluck(classifiedNumbersDataSet, 'count'),
-					backgroundColor: _.pluck(classifiedNumbersDataSet, 'color'),
+					data: _.map(classifiedNumbersDataSet, 'count'),
+					backgroundColor: _.map(classifiedNumbersDataSet, 'color'),
 					borderWidth: 0
 				});
 
