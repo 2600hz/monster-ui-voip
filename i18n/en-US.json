@@ -540,7 +540,7 @@
 		"call_forward": {
 			"directCallsOnly": "Forward direct calls only",
 			"headline": "User Call Forwarding Settings",
-			"keepCallerId": "Keep your Caller-ID",
+			"keepCallerId": "Keep Original Caller-ID",
 			"label": "Forward all calls to" ,
 			"mobile": "A Mobile Phone",
 			"deskphone": "A Desk Phone",
