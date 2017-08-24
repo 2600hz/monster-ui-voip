@@ -113,7 +113,7 @@ define(function(require) {
 				fromDate = params.fromDate,
 				toDate = params.toDate,
 				startKey = params.nextStartKey;
-console.log(cdrs);
+
 			setTimeout(function() {
 				template.find('.search-query').focus();
 			});
