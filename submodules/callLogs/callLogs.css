@@ -152,6 +152,10 @@
 	text-align: center;
 	vertical-align: bottom;
 }
+#call_logs_container .grid-cell.high-cell {
+	padding-top: 0;
+	padding-bottom: 0;
+}
 #call_logs_container .grid-cell:not(:first-of-type) {
 	border-left: solid 1px #e3e3e3;
 }
