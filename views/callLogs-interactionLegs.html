@@ -1,5 +1,5 @@
 {{#each cdrs}}
-	<div class="grid-row extra-leg" data-id={{this.id}}>
+	<div class="grid-row extra-leg" data-id={{this.id}} data-search="{{searchString}}">
 		<div class="grid-cell direction">
 			<div class="sub-cell single-cell"></div>
 		</div>
@@ -7,20 +7,26 @@
 			<div class="sub-cell cell-top">{{this.date}}</div>
 			<div class="sub-cell cell-bottom">{{this.time}}</div>
 		</div>
-		<div class="grid-cell from">
+		<div class="grid-cell from{{#if formatted.fromDeviceName}} high-cell{{/if}}">
 			{{#if this.fromName}}
-			<div class="sub-cell cell-top">{{formatPhoneNumber this.fromNumber}}</div>
-			<div class="sub-cell cell-bottom">{{this.fromName}}</div>
+			<div class="sub-cell">{{formatPhoneNumber this.fromNumber}}</div>
+			<div class="sub-cell">{{this.fromName}}</div>
 			{{else}}
 			<div class="sub-cell single-cell">{{formatPhoneNumber this.fromNumber}}</div>
 			{{/if}}
+			{{#if formatted.fromDeviceName}}
+				<div class="sub-cell"><i class="{{ formatted.deviceIcon }}" data-placement="top" data-toggle="tooltip" data-original-title="{{ formatted.deviceTooltip }}"></i>{{formatted.fromDeviceName}}</div>
+			{{/if}}
 		</div>
-		<div class="grid-cell to">
+		<div class="grid-cell to{{#if formatted.toDeviceName}} high-cell{{/if}}">
 			{{#if this.toName}}
-			<div class="sub-cell cell-top">{{formatPhoneNumber this.toNumber}}</div>
-			<div class="sub-cell cell-bottom">{{this.toName}}</div>
+			<div class="sub-cell">{{formatPhoneNumber this.toNumber}}</div>
+			<div class="sub-cell">{{this.toName}}</div>
 			{{else}}
 			<div class="sub-cell single-cell">{{formatPhoneNumber this.toNumber}}</div>
+			{{/if}}
+			{{#if formatted.toDeviceName}}
+				<div class="sub-cell"><i class="{{ formatted.deviceIcon }}" data-placement="top" data-toggle="tooltip" data-original-title="{{ formatted.deviceTooltip }}"></i>{{formatted.toDeviceName}}</div>
 			{{/if}}
 		</div>
 		<div class="grid-cell duration">

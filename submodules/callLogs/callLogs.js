@@ -6,6 +6,12 @@ define(function(require){
 	var app = {
 		requests: {},
 
+		appFlags: {
+			callLogs: {
+				devices: []
+			}
+		},
+
 		subscribe: {
 			'voip.callLogs.render': 'callLogsRender'
 		},
@@ -13,7 +19,25 @@ define(function(require){
 		callLogsRender: function(args) {
 			var self = this;
 
-			self.callLogsRenderContent(args.parent, args.fromDate, args.toDate, args.type, args.callback);
+			self.callLogsGetData(function() {
+				self.callLogsRenderContent(args.parent, args.fromDate, args.toDate, args.type, args.callback);
+			});
+		},
+
+		callLogsGetData: function(globalCallback) {
+			var self = this;
+
+			monster.parallel({
+				devices: function(callback) {
+					self.callLogsListDevices(function(devices) {
+						callback && callback(null, devices);
+					});
+				}
+			}, function(err, results) {
+				self.appFlags.callLogs.devices = _.indexBy(results.devices, 'id');
+
+				globalCallback && globalCallback();
+			});
 		},
 
 		callLogsRenderContent: function(parent, fromDate, toDate, type, callback) {
@@ -319,6 +343,18 @@ define(function(require){
 		callLogsFormatCdrs: function(cdrs) {
 			var self = this,
 				result = [],
+				deviceIcons = {
+					'cellphone': 'fa fa-phone',
+					'smartphone': 'icon-telicon-mobile-phone',
+					'landline': 'icon-telicon-home',
+					'mobile': 'icon-telicon-sprint-phone',
+					'softphone': 'icon-telicon-soft-phone',
+					'sip_device': 'icon-telicon-voip-phone',
+					'sip_uri': 'icon-telicon-voip-phone',
+					'fax': 'icon-telicon-fax',
+					'ata': 'icon-telicon-ata',
+					'unknown': 'fa fa-circle'
+				},
 				formatCdr = function(cdr) {
 					var date = cdr.hasOwnProperty('channel_created_time') ? monster.util.unixToDate(cdr.channel_created_time, true) : monster.util.gregorianToDate(cdr.timestamp),
 						shortDate = monster.util.toFriendlyDate(date, 'shortDate'),
@@ -374,6 +410,20 @@ define(function(require){
 						call.channelCreatedTime = cdr.channel_created_time;
 					}
 
+					if (cdr.hasOwnProperty('custom_channel_vars') && cdr.custom_channel_vars.hasOwnProperty('authorizing_id') && self.appFlags.callLogs.devices.hasOwnProperty(cdr.custom_channel_vars.authorizing_id)) {
+						var device = self.appFlags.callLogs.devices[cdr.custom_channel_vars.authorizing_id];
+
+						call.formatted = call.formatted || {};
+						call.formatted.deviceIcon = deviceIcons[device.device_type];
+						call.formatted.deviceTooltip = self.i18n.active().devices.types[device.device_type];
+
+						if (cdr.call_direction === 'inbound') {
+							call.formatted.fromDeviceName = device.name;
+						} else {
+							call.formatted.toDeviceName = device.name;
+						}
+					}
+
 					return call;
 				};
 
@@ -408,6 +458,23 @@ define(function(require){
 				},
 				error: function(data, status) {
 					monster.ui.alert('error', self.i18n.active().callLogs.alertMessages.getDetailsError);
+				}
+			});
+		},
+
+		callLogsListDevices: function(callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'device.list',
+				data: {
+					accountId: self.accountId,
+					filters: {
+						paginate: false
+					}
+				},
+				success: function(data) {
+					callback && callback(data.data);
 				}
 			});
 		}
