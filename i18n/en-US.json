@@ -46,7 +46,6 @@
 		"noMatchingGroup": "There were no groups found matching your search",
 		"noGroupsConfigured": "Please add a user group to begin",
 		"noNumber": "None",
-		"noAssignedNumbers": "There are no numbers assigned to this group.",
 		"noUnassignedNumbers": "There are no available number left to assign to this group.",
 		"noAssignedNumbers": "There are currently no number assigned to this group.",
 		"noMoreSpareNumbers": "There are no spare number left, you can buy new numbers by clicking the link below",
@@ -507,7 +506,6 @@
 		"noMoreSpareDevices": "There are no spare device left, you can buy new devices by going in the Devices Inventory",
 		"noMoreSpareNumbers": "There are no spare number left, you can buy new numbers by clicking the link below",
 		"noAssignedDevices": "There are currently no device assigned to this user.",
-		"noAssignedNumbers": "There are currently no number assigned to this user.",
 		"noAssignedExtensions": "There are currently no extension assigned to this user.",
 		"noNumber": "None",
 		"noNumberCallflow": "You need to assign at least one extension or phone number to this user before saving it",
@@ -1212,9 +1210,6 @@
 				},
 				"unavailableMessage": {
 					"label": "Unavailable Message"
-				},
-				"timezone": {
-					"label": "Timezone"
 				},
 				"alreadySetup": {
 					"label": "Already Setup?",
