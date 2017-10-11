@@ -233,6 +233,10 @@
 	line-height: 30px;
 }
 
+#users_container .actions a {
+	margin-right: 10px;
+}
+
 #users_container .actions .cancel-link {
 	margin-right: 10px;
 }
