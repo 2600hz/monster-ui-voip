@@ -292,6 +292,8 @@ define(function(require) {
 
 			dataUser.extra.adminId = self.userId;
 
+			dataUser.extra.canImpersonate = monster.util.canImpersonate(self.accountId);
+
 			dataUser.extra.presenceIdOptions = [];
 
 			var temp,
@@ -775,6 +777,15 @@ define(function(require) {
 				}
 
 				$(this).parents('.item-row').remove();
+			});
+
+			template.on('click', '#impersonate_user', function() {
+				var dataUser = $(this).parents('.grid-row').data();
+
+				monster.pub('auth.triggerImpersonateUser', {
+					userId: dataUser.id,
+					userName: dataUser.name
+				});
 			});
 
 			template.on('click', '#delete_user', function() {

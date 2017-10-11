@@ -553,7 +553,7 @@
 			"deskphone": "A Desk Phone",
 			"number": "This number",
 			"placeholder": "+14157283992",
-			"requireKeyPress": "Leave voicemails on forwarded numbers",
+			"requireKeyPress": "Require Key Press",
 			"title": "Call Forwarding",
 			"timeoutWarning": "In order to leave voicemails on forwarded numbers, your ringing timeout needs to be set to at least 30sec. By saving now, you will automatically be redirected to the user edition where you can update the ringing timeout.",
 			"__comment": ": Now add a mode for failover for call forward",
@@ -735,7 +735,11 @@
 			"__version": "4.0",
 			"deleteConferences": "Also remove this user's conferences from the system",
 			"deleteConferencesHelp": "If you leave this option unchecked, you won't be able to use the user's conference number anywhere else, as it will still be used by that conference."
-		}
+		},
+
+		"__comment": "UI-2921: Delete User new Dialog",
+		"__version": "4.2",
+		"impersonate": "Impersonate"
 	},
 
 	"strategy": {
