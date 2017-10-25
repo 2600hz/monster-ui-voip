@@ -1345,7 +1345,7 @@ define(function(require) {
 							},
 							success: function(faxbox) {
 								var template = $(monster.template(self, 'strategy-popupEditFaxbox', {
-										email: faxbox.notifications.inbound.email.send_to
+										email: faxbox.hasOwnProperty('notifications') && faxbox.notifications.hasOwnProperty('inbound') && faxbox.notifications.inbound.hasOwnProperty('email') ? faxbox.notifications.inbound.email.send_to : ''
 									})),
 									popup = monster.ui.dialog(template, {
 										title: self.i18n.active().strategy.popupEditFaxbox.titles.edit,
