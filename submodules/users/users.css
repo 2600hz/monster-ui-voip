@@ -95,6 +95,10 @@
 	text-align: left;
 }
 
+#users_container .users-grid .grid-row.title .grid-cell.name , .users-grid .grid-row.title .grid-cell.extension {
+	font-weight: bold;
+}
+
 #users_container .users-grid .grid-row .grid-cell {
 	display: inline-block;
 	overflow: hidden;
