@@ -41,12 +41,13 @@ define(function(require) {
 				parent = args.parent || $('.right-content'),
 				_userId = args.userId,
 				_openedTab = args.openedTab,
+				_sortBy = args.sortBy,
 				callback = args.callback;
 
 			self.usersRemoveOverlay();
 
 			self.usersGetData(function(data) {
-				var dataTemplate = self.usersFormatListData(data),
+				var dataTemplate = self.usersFormatListData(data, _sortBy),
 					template = $(monster.template(self, 'users-layout', dataTemplate)),
 					templateUser;
 
@@ -328,7 +329,7 @@ define(function(require) {
 			return dataUser;
 		},
 
-		usersFormatListData: function(data) {
+		usersFormatListData: function(data, _sortBy) {
 			var self = this,
 				dataTemplate = {
 					existingExtensions: [],
@@ -421,14 +422,46 @@ define(function(require) {
 			});
 
 			var sortedUsers = [];
-
+			//Set blank presence_id for ability to sort by presence_id
 			_.each(mapUsers, function(user) {
+				if(!user.hasOwnProperty('presence_id')){
+					user.presence_id = '';
+				}
 				sortedUsers.push(user);
 			});
+			//Default sort by presence_id
+				if(typeof _sortBy === 'undefined' ){
+					_sortBy = "first_name";
+				}
+				sortedUsers = self.sort(sortedUsers, _sortBy);
 
 			dataTemplate.users = sortedUsers;
 
 			return dataTemplate;
+		},
+
+		/* Automatically sorts an array of objects. secondArg can either be a custom sort to be applied to the dataset, or a fieldName to sort alphabetically on */
+		sort: function(dataSet, secondArg) {
+			var fieldName = 'name',
+				sortFunction = function(a, b) {
+					var aString = a[fieldName].toLowerCase(),
+						bString = b[fieldName].toLowerCase(),
+						result = (aString > bString) ? 1 : (aString < bString) ? -1 : 0;
+
+					return result;
+				},
+				result;
+
+			if(typeof secondArg === 'function') {
+				sortFunction = secondArg;
+			}
+			else if(typeof secondArg === 'string') {
+				fieldName = secondArg;
+			}
+
+			result = dataSet.sort(sortFunction);
+
+			return result;
 		},
 
 		usersDeleteDialog: function(user, callback) {
@@ -491,6 +524,14 @@ define(function(require) {
 				};
 
 			setTimeout(function() { template.find('.search-query').focus(); });
+
+			template.find('.grid-row.title .grid-cell.name').on('click', function() {
+				self.usersRender({ sortBy: 'first_name' });
+			});
+
+			template.find('.grid-row.title .grid-cell.extension').on('click', function() {
+			self.usersRender({ sortBy: 'presence_id' });
+			});
 
 			template.find('.grid-row:not(.title) .grid-cell').on('click', function() {
 				var cell = $(this),
