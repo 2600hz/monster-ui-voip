@@ -96,6 +96,7 @@
 }
 
 #users_container .users-grid .grid-row.title .grid-cell.name , .users-grid .grid-row.title .grid-cell.extension {
+	cursor: pointer;
 	font-weight: bold;
 }
 

@@ -424,16 +424,19 @@ define(function(require) {
 			var sortedUsers = [];
 			//Set blank presence_id for ability to sort by presence_id
 			_.each(mapUsers, function(user) {
-				if(!user.hasOwnProperty('presence_id')){
+				if (!user.hasOwnProperty('presence_id')) {
 					user.presence_id = '';
 				}
+
 				sortedUsers.push(user);
 			});
+
 			//Default sort by presence_id
-				if(typeof _sortBy === 'undefined' ){
-					_sortBy = "first_name";
-				}
-				sortedUsers = self.sort(sortedUsers, _sortBy);
+			if (typeof _sortBy === 'undefined') {
+				_sortBy = 'first_name';
+			}
+
+			sortedUsers = self.sort(sortedUsers, _sortBy);
 
 			dataTemplate.users = sortedUsers;
 
@@ -452,10 +455,9 @@ define(function(require) {
 				},
 				result;
 
-			if(typeof secondArg === 'function') {
+			if (typeof secondArg === 'function') {
 				sortFunction = secondArg;
-			}
-			else if(typeof secondArg === 'string') {
+			} else if (typeof secondArg === 'string') {
 				fieldName = secondArg;
 			}
 
@@ -530,7 +532,7 @@ define(function(require) {
 			});
 
 			template.find('.grid-row.title .grid-cell.extension').on('click', function() {
-			self.usersRender({ sortBy: 'presence_id' });
+				self.usersRender({ sortBy: 'presence_id' });
 			});
 
 			template.find('.grid-row:not(.title) .grid-cell').on('click', function() {
