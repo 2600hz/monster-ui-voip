@@ -179,6 +179,15 @@
 					</label>
 				</div>
 
+				<div class="control-group">
+					<label class="control-label checkbox">
+						{{#monsterCheckbox i18n.devices.popupSettings.miscellaneous.mediaWebrtc.label }}
+							<input type="checkbox" name="media.webrtc" id="media_webrtc" {{#if media.webrtc}}checked{{/if}} />
+						{{/monsterCheckbox}}
+						<i class="help-popover fa fa-question-circle fa-lg" data-original-title="{{i18n.devices.popupSettings.miscellaneous.mediaWebrtc.help}}" data-placement="top" data-toggle="tooltip"></i>
+					</label>
+				</div>
+
 				<div class="rtp-line">
 					<div class="control-group">
 						<label class="control-label checkbox">
