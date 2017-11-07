@@ -16,12 +16,14 @@
 			</div>
 		</div>
 
-		<div class="control-group">
-			<label class="control-label" for="password"><i class="fa fa-unlock"></i></label>
-			<div class="controls">
-				<input required type="password" name="user.password" id="password" placeholder="{{i18n.users.dialogCreationUser.password}}"/>
+		{{#unless _whitelabel.hide_user_passwords}}
+			<div class="control-group">
+				<label class="control-label" for="password"><i class="fa fa-unlock"></i></label>
+				<div class="controls">
+					<input required type="password" name="user.password" id="password" placeholder="{{i18n.users.dialogCreationUser.password}}"/>
+				</div>
 			</div>
-		</div>
+		{{/unless}}
 	</div>
 
 	<div>
