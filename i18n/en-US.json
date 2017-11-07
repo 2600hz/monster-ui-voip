@@ -226,6 +226,12 @@
 					"label": "Allow Reprovision",
 					"button": "Unlock",
 					"success": "This device is unlocked for the next 24 hours"
+				},
+				"__comment": "UI-1917: Add button to unlock device on SmartPBX app",
+				"__version": "3.22",
+				"mediaWebrtc": {
+					"help": "If checked, forces a WebRTC compatible SDP on the INVITE.",
+					"label": "WebRTC"
 				}
 			},
 			"restrictions": {
