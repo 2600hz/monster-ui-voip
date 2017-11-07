@@ -442,7 +442,7 @@
 			"password": "Password",
 			"confirmPassword": "Re-type Password",
 			"passwordPlaceholder": "Password (Min. 6 characters)",
-			"title": "Update Email and password",
+			"title": "Update Credentials",
 			"username": "User's Email address",
 			"resetPassword": {
 				"linkTitle": "here",
