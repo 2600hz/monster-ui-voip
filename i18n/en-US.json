@@ -225,6 +225,12 @@
 					"label": "Allow Reprovision",
 					"button": "Unlock",
 					"success": "This device is unlocked for the next 24 hours"
+				},
+				"__comment": "UI-1917: Add button to unlock device on SmartPBX app",
+				"__version": "3.22",
+				"mediaWebrtc": {
+					"help": "If checked, forces a WebRTC compatible SDP on the INVITE.",
+					"label": "WebRTC"
 				}
 			},
 			"restrictions": {
@@ -435,7 +441,7 @@
 			"password": "Password",
 			"confirmPassword": "Re-type Password",
 			"passwordPlaceholder": "Password (Min. 6 characters)",
-			"title": "Update Email and password",
+			"title": "Update Credentials",
 			"username": "User's Email address",
 			"resetPassword": {
 				"linkTitle": "here",
