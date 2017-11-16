@@ -391,6 +391,7 @@ define(function(require) {
 
 				if (userId in mapUsers) {
 					var isRegistered = device.enabled && (['sip_device', 'smartphone', 'softphone', 'fax', 'ata'].indexOf(device.device_type) >= 0 ? registeredDevices.indexOf(device.id) >= 0 : true);
+					var isEnabled = device.enabled;
 
 					if (mapUsers[userId].extra.devices.length >= 2) {
 						if (mapUsers[userId].extra.additionalDevices === 0) {
@@ -401,7 +402,7 @@ define(function(require) {
 						}
 
 						mapUsers[userId].extra.additionalDevices.count++;
-						mapUsers[userId].extra.additionalDevices.tooltip += '<i class="device-popover-icon ' + self.deviceIcons[device.device_type] + (isRegistered ? ' monster-green' : ' monster-red') + '"></i>'
+						mapUsers[userId].extra.additionalDevices.tooltip += '<i class="device-popover-icon ' + self.deviceIcons[device.device_type] + (isEnabled ? (isRegistered ? ' monster-green' : ' monster-red') : ' monster-grey') + '"></i>'
 																			+ device.name + ' (' + device.device_type.replace('_', ' ') + ')<br>';
 					}
 
@@ -410,6 +411,7 @@ define(function(require) {
 						name: device.name + ' (' + device.device_type.replace('_', ' ') + ')',
 						type: device.device_type,
 						registered: isRegistered,
+						enabled: isEnabled,
 						icon: self.deviceIcons[device.device_type]
 					};
 
