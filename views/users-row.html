@@ -26,7 +26,7 @@
 		<div class="devices grid-cell" data-type="devices">
 			{{#each extra.devices}}
 				{{#compare @index "<" 2}}
-					<i class="{{this.icon}} {{#if this.registered}}monster-green{{else}}monster-red{{/if}} help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ this.name }}"></i>
+					<i class="{{this.icon}} {{#if this.enabled}}{{#if this.registered}}monster-green{{else}}monster-red{{/if}}{{else}}monster-grey{{/if}} help-popover" data-toggle="tooltip" data-placement="top" data-original-title="{{ this.name }}"></i>
 				{{/compare}}
 			{{else}}
 				{{ i18n.users.noUserDevices }}
