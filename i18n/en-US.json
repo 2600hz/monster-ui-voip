@@ -559,7 +559,7 @@
 			"deskphone": "A Desk Phone",
 			"number": "This number",
 			"placeholder": "+14157283992",
-			"requireKeyPress": "Require Key Press",
+			"requireKeyPress": "Leave voicemails on forwarded numbers",
 			"title": "Call Forwarding",
 			"timeoutWarning": "In order to leave voicemails on forwarded numbers, your ringing timeout needs to be set to at least 30sec. By saving now, you will automatically be redirected to the user edition where you can update the ringing timeout.",
 			"__comment": ": Now add a mode for failover for call forward",
