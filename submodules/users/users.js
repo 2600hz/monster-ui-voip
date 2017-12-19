@@ -232,6 +232,11 @@ define(function(require) {
 							icon: 'fa fa-microphone',
 							iconColor: 'monster-blue',
 							title: self.i18n.active().users.callRecording.title
+						},
+						do_not_disturb: {
+							icon: 'fa fa-ban',
+							iconColor: 'monster-red',
+							title: self.i18n.active().users.do_not_disturb.title
 						}
 					}
 				};
@@ -1372,6 +1377,10 @@ define(function(require) {
 				self.usersRenderCallerId(currentUser);
 			});
 
+			template.on('click', '.feature[data-feature="do_not_disturb"]', function() {
+				self.usersRenderDoNotDisturb(currentUser);
+			});
+
 			template.on('click', '.feature[data-feature="call_forward"]', function() {
 				if (currentUser.features.indexOf('find_me_follow_me') < 0) {
 					var featureUser = $.extend(true, {}, currentUser);
@@ -2163,6 +2172,53 @@ define(function(require) {
 			});
 
 			popup.find('.monster-button').blur();
+		},
+
+		usersRenderDoNotDisturb: function(featureUser) {
+			var self = this,
+				featureTemplate = $(monster.template(self, 'users-feature-do_not_disturb', featureUser)),
+				switchFeature = featureTemplate.find('#checkbox_do_not_disturb');
+
+			featureTemplate.find('.cancel-link').on('click', function() {
+				popup.dialog('close').remove();
+			});
+			featureTemplate.find('.save').on('click', function() {
+				var userToSave = featureUser;
+				//update data.data.do_not_disturb depending on the switch status
+				if (typeof userToSave.do_not_disturb === 'undefined') {
+					userToSave.do_not_disturb = {};
+				}
+				if (typeof userToSave.do_not_disturb.enabled === 'undefined') {
+					userToSave.do_not_disturb.enabled = false;
+				}
+				userToSave.do_not_disturb.enabled = switchFeature.prop('checked');
+
+				self.usersUpdateUser(userToSave, function(data) {
+					self.callApi({
+						resource: 'user.updatePresence',
+						data: {
+							accountId: self.accountId,
+							userId: userToSave.id,
+							data: {
+								action: 'set',
+								state: userToSave.do_not_disturb.enabled ? 'confirmed' : 'terminated'
+							}
+						},
+						error: function() {
+							console.log('Failed to update presence state');
+						}
+					});
+					popup.dialog('close').remove();
+					self.usersRender({
+						userId: userToSave.id,
+						openedTab: 'features'
+					});
+				});
+			});
+			var popup = monster.ui.dialog(featureTemplate, {
+				title: featureUser && featureUser.extra && featureUser.extra.mapFeatures.do_not_disturb.title,
+				position: ['center', 20]
+			});
 		},
 
 		usersRenderFindMeFollowMe: function(params) {
