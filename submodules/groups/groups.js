@@ -1566,7 +1566,8 @@ define(function(require) {
 
 			data.group.extra = {
 				ringGroup: endpoints,
-				remainingUsers: mapUsers
+				remainingUsers: mapUsers,
+				repeats: flow.data.repeats
 			};
 
 			return data.group;
@@ -1892,8 +1893,12 @@ define(function(require) {
 		},
 
 		groupsUpdateBaseRingGroup: function(groupId, endpoints, callback) {
-			var self = this;
-
+			var self = this,
+				repeats = $('#numberRepeat').val();
+			if(_.isEmpty(repeats)) {
+				monster.ui.alert('warning', self.i18n.active().groups.repeatAlert);
+				return;
+			}
 			monster.parallel({
 				group: function(callback) {
 					self.groupsGetGroup(groupId, function(data) {
@@ -1931,6 +1936,7 @@ define(function(require) {
 					self.groupsGetBaseRingGroup(groupId, function(ringGroup) {
 						ringGroup.flow.data.endpoints = endpoints;
 						ringGroup.flow.data.timeout = self.groupsComputeTimeout(endpoints);
+						ringGroup.flow.data.repeats = repeats;
 
 						self.groupsUpdateCallflow(ringGroup, function(data) {
 							callback && callback(null, data);
