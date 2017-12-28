@@ -1034,11 +1034,6 @@ define(function(require) {
 		devicesFormatNumber: function(value) {
 			var self = this;
 
-			if ('locality' in value) {
-				value.isoCountry = value.locality.country || '';
-				value.friendlyLocality = 'city' in value.locality ? value.locality.city + ('state' in value.locality ? ', ' + value.locality.state : '') : '';
-			}
-
 			return value;
 		},
 
