@@ -19,6 +19,8 @@
 	},
 
 	"groups": {
+		"repeat":"Repeat",
+		"repeatAlert":"Please enter a number in Repeat Field",
 		"addFromSpare": "Add from Spare Numbers",
 		"add": "Add Group",
 		"addExtension": "Add Extension",
