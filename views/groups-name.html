@@ -3,7 +3,13 @@
 		<div class="control-group">
 			<label class="control-label" for="inputName">{{ i18n.groups.name }}</label>
 			<div class="controls">
-				<input required type="text" name="name" id="inputName" placeholder="" value="{{name}}"></input>
+				<input type="text" name="group.name" id="inputName" placeholder="" value="{{group.name}}"></input>
+			</div>
+		</div>
+		<div class="control-group">
+			<label for="repeats" class="control-label">{{ i18n.groups.repeats }}</label>
+			<div class="controls">
+				<input type="number" name="callflow.flow.data.repeats" id="repeats" value="{{callflow.flow.data.repeats}}">
 			</div>
 		</div>
 	</form>
