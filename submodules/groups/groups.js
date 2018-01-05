@@ -403,7 +403,7 @@ define(function(require) {
 			var self = this;
 
 			if (type === 'name') {
-				self.groupsGetNameTemplate(groupId, callbackAfterData);
+				self.groupsGetSettingsTemplate(groupId, callbackAfterData);
 			} else if (type === 'numbers') {
 				self.groupsGetNumbersTemplate(groupId, callbackAfterData);
 			} else if (type === 'extensions') {
@@ -427,13 +427,13 @@ define(function(require) {
 			});
 		},
 
-		groupsGetNameTemplate: function(groupId, callback) {
+		groupsGetSettingsTemplate: function(groupId, callback) {
 			var self = this;
 
-			self.groupsGetNameData(groupId, function(data) {
+			self.groupsGetSettingsData(groupId, function(data) {
 				var template = $(monster.template(self, 'groups-name', data));
 
-				self.groupsBindName(template, data);
+				self.groupsBindSettings(template, data);
 
 				callback && callback(template, data);
 			});
@@ -964,11 +964,22 @@ define(function(require) {
 			});
 		},
 
-		groupsBindName: function(template, data) {
+		groupsBindSettings: function(template, data) {
 			var self = this,
 				nameForm = template.find('#form-name');
 
-			monster.ui.validate(nameForm);
+			monster.ui.validate(nameForm, {
+				rules: {
+					'group.name': {
+						required: true
+					},
+					'callflow.flow.data.repeats': {
+						required: true,
+						digits: true,
+						min: 0
+					}
+				}
+			});
 
 			template.find('.save-group').on('click', function() {
 				if (monster.ui.valid(nameForm)) {
@@ -978,8 +989,19 @@ define(function(require) {
 
 					data = $.extend(true, {}, data, formData);
 
-					self.groupsUpdate(data, function(data) {
-						self.groupsRender({ groupId: data.id });
+					monster.parallel([
+						function(callback) {
+							self.groupsUpdate(data.group, function(data) {
+								callback(null);
+							});
+						},
+						function(callback) {
+							self.groupsUpdateCallflow(data.callflow, function(data) {
+								callback(null);
+							});
+						}
+					], function(err, results) {
+						self.groupsRender({ groupId: data.group.id });
 					});
 				}
 			});
@@ -1422,11 +1444,22 @@ define(function(require) {
 			});
 		},
 
-		groupsGetNameData: function(groupId, callback) {
+		groupsGetSettingsData: function(groupId, globalCallback) {
 			var self = this;
 
-			self.groupsGetGroup(groupId, function(data) {
-				callback && callback(data);
+			monster.parallel({
+				group: function(callback) {
+					self.groupsGetGroup(groupId, function(data) {
+						callback(null, data);
+					});
+				},
+				callflow: function(callback) {
+					self.groupsGetBaseRingGroup(groupId, function(data) {
+						callback(null, data);
+					});
+				}
+			}, function(err, results) {
+				globalCallback && globalCallback(results);
 			});
 		},
 
