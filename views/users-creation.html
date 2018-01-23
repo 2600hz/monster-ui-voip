@@ -24,6 +24,20 @@
 				</div>
 			</div>
 		{{/unless}}
+
+		{{#if licensedUserRoles}}
+			<div class="control-group">
+				<label for="licensed_role" class="control-label"><i class="fa fa-user"></i></label>
+				<div class="controls">
+					<select id="licensed_role" name="user.extra.licensedRole" data-placeholder="{{ i18n.users.licensedUserRoles.selectPlaceholder }}">
+						<option value></option>
+						{{#each licensedUserRoles}}
+							<option value="{{id}}">{{name}}</option>
+						{{/each}}
+					</select>
+				</div>
+			</div>
+		{{/if}}
 	</div>
 
 	<div>
