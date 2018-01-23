@@ -16,9 +16,12 @@
 		</span>
 	</div>
 
-	<div class="users-grid">
+	<div class="users-grid{{#if showLicensedUserRoles}} additional-column{{/if}}">
 		<div class="grid-row title">
 			<div class="grid-cell name">{{ i18n.users.titleGrid.users }}</div>
+			{{#if showLicensedUserRoles}}
+				<div class="grid-cell licensed-user-role">{{ i18n.users.titleGrid.userLicensedRoles }}</div>
+			{{/if}}
 			<div class="grid-cell extension">{{ i18n.users.titleGrid.extensions }}</div>
 			<div class="grid-cell phone-number">{{ i18n.users.titleGrid.phoneNumbers }}</div>
 			<div class="grid-cell devices">{{ i18n.users.titleGrid.devices }}</div>

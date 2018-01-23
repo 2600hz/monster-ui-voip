@@ -192,6 +192,21 @@
 	width: 15%;
 }
 
+/* With 6 columns, shorter width on all other columns */
+#users_container .users-grid.additional-column .grid-row .grid-cell.phone-number {
+	width: 18%;
+}
+
+#users_container .users-grid.additional-column .grid-row .grid-cell.devices,
+#users_container .users-grid.additional-column .grid-row .grid-cell.extension {
+	width: 12%;
+}
+
+#users_container .users-grid.additional-column .grid-row .grid-cell.licensed-user-role {
+	width: 13%;
+}
+/* end 6th columns mode */
+
 #users_container .user-rows .grid-row {
 	margin-bottom: 10px;
 	border-radius: 2px;
@@ -267,6 +282,12 @@
 
 #users_container .actions .buy-dropdown {
 	margin-top: 2px;
+}
+
+/* Detail User */
+#users_container .detail-user-role .user-role-wrapper {
+	display: inline-block;
+	margin-top: 15px;
 }
 
 /* Detail User */

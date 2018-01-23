@@ -17,7 +17,8 @@ define(function(require) {
 			users: {
 				smartPBXCallflowString: ' SmartPBX\'s Callflow',
 				smartPBXConferenceString: ' SmartPBX Conference',
-				smartPBXVMBoxString: '\'s VMBox'
+				smartPBXVMBoxString: '\'s VMBox',
+				servicePlansRole: {}
 			}
 		},
 
@@ -174,6 +175,8 @@ define(function(require) {
 					extension: dataUser.hasOwnProperty('presence_id') ? dataUser.presence_id : '',
 					hasFeatures: false,
 					isAdmin: dataUser.priv_level === 'admin',
+					showLicensedUserRoles: _.size(self.appFlags.users.servicePlansRole) > 0,
+					licensedUserRole: self.i18n.active().users.licensedUserRoles.none,
 					listCallerId: [],
 					listExtensions: [],
 					listNumbers: [],
@@ -236,6 +239,21 @@ define(function(require) {
 
 			if (!('extra' in dataUser)) {
 				dataUser.extra = formattedUser;
+			}
+
+			if (dataUser.hasOwnProperty('service') && dataUser.service.hasOwnProperty('plans') && _.size(dataUser.service.plans) > 0) {
+				var planId;
+
+				for (var key in dataUser.service.plans) {
+					if (dataUser.service.plans.hasOwnProperty(key)) {
+						planId = key;
+						break;
+					}
+				}
+
+				if (self.appFlags.users.servicePlansRole.hasOwnProperty(planId)) {
+					dataUser.extra.licensedUserRole = self.appFlags.users.servicePlansRole[planId].name;
+				}
 			}
 
 			dataUser.extra.countFeatures = 0;
@@ -332,11 +350,16 @@ define(function(require) {
 		usersFormatListData: function(data, _sortBy) {
 			var self = this,
 				dataTemplate = {
+					showLicensedUserRoles: false,
 					existingExtensions: [],
 					countUsers: data.users.length
 				},
 				mapUsers = {},
 				registeredDevices = _.map(data.deviceStatus, function(device) { return device.device_id; });
+
+			if (_.size(self.appFlags.users.servicePlansRole) > 0) {
+				dataTemplate.showLicensedUserRoles = true;
+			}
 
 			_.each(data.users, function(user) {
 				mapUsers[user.id] = self.usersFormatUserData(user);
@@ -612,6 +635,8 @@ define(function(require) {
 							setTimeout(function() { template.find('.search-query').focus(); });
 							currentUser = userId;
 							unassignedDevices = {};
+						} else if (type === 'licensed-user-role') {
+							currentUser = data;
 						}
 
 						row.find('.edit-user').append(template).slideDown(400, function() {
@@ -656,6 +681,8 @@ define(function(require) {
 						userTemplate = $(monster.template(self, 'users-creation', originalData));
 
 					monster.ui.mask(userTemplate.find('#extension'), 'extension');
+
+					userTemplate.find('#licensed_role').chosen({search_contains: true, width: '220px'});
 
 					monster.ui.validate(userTemplate.find('#form_user_creation'), {
 						rules: {
@@ -1068,6 +1095,24 @@ define(function(require) {
 
 			template.on('focus', '.ringing-timeout.disabled #ringing_timeout', function() {
 				$(this).blur();
+			});
+
+			/* Events for License Roles */
+			template.on('click', '.save-user-role', function() {
+				var planId = template.find('#licensed_role').val();
+				/*currentUser.service = currentUser.service || {};
+				currentUser.service.plans = {};
+				currentUser.service.plans[planId] = {
+					account_id: monster.config.resellerId,
+					overrides: {}
+				};*/
+				currentUser.extra = currentUser.extra || {};
+				currentUser.extra.licensedRole = planId;
+
+				self.usersUpdateUser(currentUser, function(userData) {
+					toastr.success(monster.template(self, '!' + toastrMessages.userUpdated, { name: userData.data.first_name + ' ' + userData.data.last_name }));
+					self.usersRender({ userId: userData.data.id });
+				});
 			});
 
 			/* Events for Devices in Users */
@@ -1628,6 +1673,10 @@ define(function(require) {
 				arrayExtensions = [],
 				arrayVMBoxes = [],
 				allNumbers = [];
+
+			if (_.size(self.appFlags.users.servicePlansRole) > 0) {
+				formattedData.licensedUserRoles = self.appFlags.users.servicePlansRole;
+			}
 
 			_.each(data.callflows, function(callflow) {
 				_.each(callflow.numbers, function(number) {
@@ -2760,6 +2809,15 @@ define(function(require) {
 						delete userData.language;
 					}
 				}
+
+				if (userData.extra.hasOwnProperty('licensedRole')) {
+					userData.service = userData.service || {};
+					userData.service.plans = {};
+					userData.service.plans[userData.extra.licensedRole] = {
+						account_id: monster.config.resellerId,
+						overrides: {}
+					};
+				}
 			}
 
 			if (userData.hasOwnProperty('call_forward')) {
@@ -2805,6 +2863,8 @@ define(function(require) {
 				self.usersGetFeaturesTemplate(userId, listUsers, callbackAfterData);
 			} else if (type === 'devices') {
 				self.usersGetDevicesTemplate(userId, callbackAfterData);
+			} else if (type === 'licensed-user-role') {
+				self.usersGetLicensedRoleTemplate(userId, callbackAfterData);
 			}
 		},
 
@@ -3041,6 +3101,36 @@ define(function(require) {
 				});
 			});
 		},
+		usersGetLicensedRoleTemplate: function(userId, callback) {
+			var self = this;
+
+			self.usersGetUser(userId, function(user) {
+				var formattedData = self.usersFormatLicensedRolesData(user),
+					template = $(monster.template(self, 'users-licensed-roles', formattedData));
+
+				template.find('#licensed_role').chosen({search_contains: true, width: '220px'});
+
+				callback && callback(template, user);
+			});
+		},
+		usersFormatLicensedRolesData: function(user) {
+			var self = this,
+				formattedData = {
+					selectedRole: undefined,
+					availableRoles: self.appFlags.users.servicePlansRole
+				};
+
+			if (user.hasOwnProperty('service') && user.service.hasOwnProperty('plans') && _.size(user.service.plans) > 0) {
+				for (var key in user.service.plans) {
+					if (user.service.plans.hasOwnProperty(key)) {
+						formattedData.selectedRole = key;
+						break;
+					}
+				}
+			}
+
+			return formattedData;
+		},
 		usersFormatDevicesData: function(userId, data) {
 			var self = this,
 				formattedData = {
@@ -3197,6 +3287,19 @@ define(function(require) {
 					},
 					extra: data.extra
 				};
+
+			if (formattedData.user.extra) {
+				if (formattedData.user.extra.hasOwnProperty('licensedRole')) {
+					formattedData.user.service = formattedData.user.service || {};
+					formattedData.user.service.plans = {};
+					formattedData.user.service.plans[formattedData.user.extra.licensedRole] = {
+						account_id: monster.config.resellerId,
+						overrides: {}
+					};
+				}
+			}
+
+			delete formattedData.user.extra;
 
 			return formattedData;
 		},
@@ -4184,6 +4287,27 @@ define(function(require) {
 							callback(null, data.data);
 						}
 					});
+				},
+				availableLicensedUserRoles: function(callback) {
+					if (monster.config.hasOwnProperty('resellerId') && monster.config.resellerId.length) {
+						self.callApi({
+							resource: 'servicePlan.list',
+							data: {
+								accountId: self.accountId,
+								filters: {
+									paginate: false,
+									'filter_merge.strategy': 'cumulative'
+								}
+							},
+							success: function(data, status) {
+								self.appFlags.users.servicePlansRole = _.keyBy(data.data, 'id');
+
+								callback(null, self.appFlags.users.servicePlansRole);
+							}
+						});
+					} else {
+						callback(null, {});
+					}
 				}
 			}, function(err, results) {
 				callback && callback(results);

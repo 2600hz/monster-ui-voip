@@ -532,7 +532,10 @@
 			"extensions": "Extensions",
 			"phoneNumbers": "Phone Numbers",
 			"devices": "Devices",
-			"features": "User Features"
+			"features": "User Features",
+			"__comment": "UI-2994: add licensed user service plans as a listing category",
+			"__version": "4.1",
+			"userLicensedRoles": "User Type"
 		},
 		"toastrMessages": {
 			"devicesUpdated": "You successfully updated the devices assigned to {{ name }}.",
@@ -746,7 +749,15 @@
 
 		"__comment": "UI-2921: Delete User new Dialog",
 		"__version": "4.2",
-		"impersonate": "Impersonate"
+		"impersonate": "Impersonate",
+
+		"__comment": "UI-2994: adding licensed user roles",
+		"__version": "4.1",
+		"licensedUserRoles": {
+			"none": "- Not Set -",
+			"label": "User Type",
+			"selectPlaceholder": "Select a User Type"
+		}
 	},
 
 	"strategy": {
