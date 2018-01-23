@@ -39,7 +39,8 @@
 			"findExtension": "Find one"
 		},
 		"groupDeleted": "You successfully deleted {{name}}'s Group",
-		"name": "Group Name",
+		"name": "Name",
+		"repeats": "Dialing repeats",
 		"noAssignedExtensions": "There are currently no extension assigned to this group.",
 		"noExtension": "None",
 		"noFeatures": "None",
@@ -59,7 +60,7 @@
 		"maxDurationTooltip": "Click this box to change the maximum duration for your ring group. You must enter a number between 30 and 999.",
 		"title": "Total Groups",
 		"titleGrid": {
-			"groups": "Group Name",
+			"groups": "Group Settings",
 			"members": "Members",
 			"extensions": "Extension",
 			"phoneNumbers": "Phone Numbers",
