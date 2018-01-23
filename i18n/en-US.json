@@ -533,7 +533,10 @@
 			"extensions": "Extensions",
 			"phoneNumbers": "Phone Numbers",
 			"devices": "Devices",
-			"features": "User Features"
+			"features": "User Features",
+			"__comment": "UI-2994: add licensed user service plans as a listing category",
+			"__version": "4.1",
+			"userLicensedRoles": "User Type"
 		},
 		"toastrMessages": {
 			"devicesUpdated": "You successfully updated the devices assigned to {{ name }}.",
@@ -743,6 +746,14 @@
 			"__version": "4.0",
 			"deleteConferences": "Also remove this user's conferences from the system",
 			"deleteConferencesHelp": "If you leave this option unchecked, you won't be able to use the user's conference number anywhere else, as it will still be used by that conference."
+		},
+
+		"__comment": "UI-2994: adding licensed user roles",
+		"__version": "4.1",
+		"licensedUserRoles": {
+			"none": "- Not Set -",
+			"label": "User Type",
+			"selectPlaceholder": "Select a User Type"
 		}
 	},
 

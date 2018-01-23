@@ -1,0 +1,24 @@
+<div class="detail-user-role">
+	<form class="form form-horizontal user-fields" id="form_update_license_role">
+		<div class="user-role-wrapper">
+			<label for="new_password" class="control-label">{{ i18n.users.licensedUserRoles.label }}</label>
+			<div class="controls">
+				<select id="licensed_role" name="extra.licensedRole" data-placeholder="{{ i18n.users.licensedUserRoles.selectPlaceholder }}">
+					<option value></option>
+					{{#select selectedRole}}
+						{{#each availableRoles}}
+							<option value="{{id}}">{{name}}</option>
+						{{/each}}
+					{{/select}}
+				</select>
+			</div>
+		</div>
+	</form>
+
+	<div class="actions">
+		<div class="pull-right">
+			<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
+			<button type="button" class="monster-button monster-button-success save-user-role">{{ i18n.saveChanges }}</button>
+		</div>
+	</div>
+</div>
