@@ -34,9 +34,30 @@
 					<span class="number">{{totalUsers}}</span>
 				</div>
 				<div class="left-section-content users-section-content">
-					{{#times totalUsers}}
-					<div class="users-element"><i class="fa-2x fa fa-male{{#compare this '<' ../totalChannels}} monster-primary-color{{/compare}}"></i></div>
-					{{/times}}
+					{{#if showUserTypes}}
+						<div class="users-chart">
+							<div class="users-canvas-wrapper pull-left">
+								<canvas id="dashboard_user_type_chart"></canvas>
+							</div>
+							<div class="users-chart-legend">
+								<ul>
+									{{#each usersList}}
+										{{#if label}}
+											<li class="legend-element{{#unless count}} no-user{{/unless}}">
+												<i class="fa fa-circle legend-color" style="color: {{color}};"></i>
+												<span class="legend-label">{{label}}</span>
+												<span class="legend-number">{{count}}</span>
+											</li>
+										{{/if}}
+									{{/each}}
+								</ul>
+							</div>
+						</div>
+					{{else}}
+						{{#times totalUsers}}
+						<div class="users-element"><i class="fa-2x fa fa-male{{#compare this '<' ../totalChannels}} monster-primary-color{{/compare}}"></i></div>
+						{{/times}}
+					{{/if}}
 				</div>
 			</div>
 			<div class="dashboard-left-section clearfix">

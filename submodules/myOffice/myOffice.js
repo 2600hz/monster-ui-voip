@@ -60,11 +60,13 @@ define(function(require) {
 						faxNumbers: myOfficeData.faxNumbers || [],
 						topMessage: myOfficeData.topMessage,
 						devicesList: _.toArray(myOfficeData.devicesData).sort(function(a, b) { return b.count - a.count; }),
+						usersList: _.toArray(myOfficeData.usersData).sort(function(a, b) { return b.count - a.count ; }),
 						assignedNumbersList: _.toArray(myOfficeData.assignedNumbersData).sort(function(a, b) { return b.count - a.count; }),
 						// numberTypesList: _.toArray(myOfficeData.numberTypesData).sort(function(a, b) { return b.count - a.count ; }),
 						classifiedNumbers: myOfficeData.classifiedNumbers,
 						directoryUsers: myOfficeData.directory.users && myOfficeData.directory.users.length || 0,
-						directoryLink: myOfficeData.directoryLink
+						directoryLink: myOfficeData.directoryLink,
+						showUserTypes: _.size(self.appFlags.global.servicePlansRole) > 0
 					},
 					template = $(monster.template(self, 'myOffice-layout', dataTemplate)),
 					$devicesCanvas = template.find('#dashboard_devices_chart'),
@@ -77,6 +79,7 @@ define(function(require) {
 						}
 					],
 					devicesDataSet = _.chain(myOfficeData.devicesData).omit('totalCount').sortBy('count').value(),
+					usersDataSet = _.chain(myOfficeData.usersData).omit('totalCount').sortBy('count').value(),
 					assignedNumbersDataSet = _.chain(myOfficeData.assignedNumbersData).omit('totalCount').sortBy('count').value(),
 					classifiedNumbersDataSet = _.chain(myOfficeData.classifiedNumbers).sortBy('count').value(),
 					createDoughnutCanvas = function createDoughnutCanvas($target) {
@@ -110,6 +113,7 @@ define(function(require) {
 					};
 
 				devicesDataSet = _.isEmpty(devicesDataSet) ? emptyDataSet : devicesDataSet;
+				usersDataSet = _.isEmpty(usersDataSet) ? emptyDataSet : usersDataSet;
 				assignedNumbersDataSet = _.isEmpty(assignedNumbersDataSet) ? emptyDataSet : assignedNumbersDataSet;
 				classifiedNumbersDataSet = _.isEmpty(classifiedNumbersDataSet) ? emptyDataSet : classifiedNumbersDataSet;
 
@@ -145,6 +149,16 @@ define(function(require) {
 					backgroundColor: _.map(classifiedNumbersDataSet, 'color'),
 					borderWidth: 0
 				});
+
+				if (dataTemplate.showUserTypes) {
+					var $usersCanvas = template.find('#dashboard_user_type_chart');
+
+					createDoughnutCanvas($usersCanvas, {
+						data: _.map(usersDataSet, 'count'),
+						backgroundColor: _.map(usersDataSet, 'color'),
+						borderWidth: 0
+					});
+				}
 
 				self.myOfficeCheckWalkthrough();
 
@@ -451,6 +465,13 @@ define(function(require) {
 					},
 					totalCount: 0
 				},
+				users = {
+					"_unassigned": {
+						label: self.i18n.active().myOffice.userChartLegend.none,
+						count: 0,
+						color: self.chartColors[8]
+					}
+				},
 				// numberTypes = {
 				// 	local: {
 				// 		label: self.i18n.active().myOffice.numberChartLegend.local,
@@ -474,6 +495,17 @@ define(function(require) {
 				classifiedNumbers = {},
 				registeredDevices = _.map(data.devicesStatus, function(device) { return device.device_id; }),
 				unregisteredDevices = 0;
+
+			if (_.size(self.appFlags.global.servicePlansRole) > 0) {
+				var i = 7; // start from the end of chart colors so all the charts don't look the same
+				_.each(self.appFlags.global.servicePlansRole, function(role, id) {
+					users[id] = {
+						label: role.name,
+						count: 0,
+						color: self.chartColors[i >= 1 ? i-- : 8]
+					};
+				});
+			}
 
 			_.each(data.numbers, function(numData, num) {
 				_.find(data.classifiers, function(classifier, classifierKey) {
@@ -540,7 +572,22 @@ define(function(require) {
 			});
 
 			_.each(data.users, function(val) {
-				if (val.features.indexOf('conferencing') >= 0) {
+				if (val.hasOwnProperty('service') && val.service.hasOwnProperty('plans') && !_.isEmpty(val.service.plans)) {
+					var planId;
+
+					for (var key in val.service.plans) {
+						if (val.service.plans.hasOwnProperty(key)) {
+							planId = key;
+							break;
+						}
+					}
+
+					users[planId].count++;
+				} else {
+					users._unassigned.count++;
+				}
+
+				if (val.features.indexOf("conferencing") >= 0) {
 					totalConferences++;
 				}
 			});
@@ -601,6 +648,7 @@ define(function(require) {
 
 			data.totalChannels = channelsArray.length;
 			data.devicesData = devices;
+			data.usersData = users;
 			data.assignedNumbersData = assignedNumbers;
 			// data.numberTypesData = numberTypes;
 			data.totalConferences = totalConferences;

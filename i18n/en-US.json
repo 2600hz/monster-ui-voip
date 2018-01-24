@@ -1130,7 +1130,11 @@
 		"__version": "3.23",
 		"missingCnamE911Message": "Please setup your Company Caller ID and e911 on a Main Number.",
 		"missingCnamMessage": "Please setup your Company Caller ID on a Main Number.",
-		"missingE911Message": "Please setup your e911 on a Main Number."
+		"missingE911Message": "Please setup your e911 on a Main Number.",
+
+		"userChartLegend": {
+			"none": "No Role"
+		}
 	},
 
 	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SmartPBX.",
