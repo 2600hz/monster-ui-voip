@@ -29,6 +29,9 @@ define(function(require){
 
 		requests: {},
 		subscribe: {},
+		appFlags: {
+			global: {}
+		},
 
 		subModules: ['devices', 'groups', 'numbers', 'strategy', 'callLogs', 'users', 'myOffice', 'featureCodes', 'vmboxes'],
 
@@ -54,9 +57,11 @@ define(function(require){
 				parent = container || $('#monster_content'),
 				template = $(monster.template(self, 'app'));
 
-			/* On first Load, load my office */
-			template.find('.category#myOffice').addClass('active');
-			monster.pub('voip.myOffice.render', { parent: template.find('.right-content') });
+			self.loadGlobalData(function() {
+				/* On first Load, load my office */
+				template.find('.category#myOffice').addClass('active');
+				monster.pub('voip.myOffice.render', { parent: template.find('.right-content') });
+			});
 
 			self.bindEvents(template);
 
@@ -67,6 +72,38 @@ define(function(require){
 
 		formatData: function(data) {
 			var self = this;
+		},
+
+		loadGlobalData: function(callback) {
+			var self = this;
+
+			monster.parallel({
+				servicePlansRole: function(callback) {
+					if (monster.config.hasOwnProperty('resellerId') && monster.config.resellerId.length) {
+						self.callApi({
+							resource: 'servicePlan.list',
+							data: {
+								accountId: self.accountId,
+								filters: {
+									paginate: false,
+									'filter_merge.strategy': 'cumulative'
+								}
+							},
+							success: function(data, status) {
+								var formattedData = _.indexBy(data.data, 'id');
+
+								callback(null, formattedData);
+							}
+						});
+					} else {
+						callback(null, {});
+					}
+				}
+			}, function(err, results) {
+				self.appFlags.global = results;
+
+				callback && callback(self.appFlags.global);
+			});
 		},
 
 		bindEvents: function(parent) {

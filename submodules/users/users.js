@@ -17,8 +17,7 @@ define(function(require) {
 			users: {
 				smartPBXCallflowString: ' SmartPBX\'s Callflow',
 				smartPBXConferenceString: ' SmartPBX Conference',
-				smartPBXVMBoxString: '\'s VMBox',
-				servicePlansRole: {}
+				smartPBXVMBoxString: '\'s VMBox'
 			}
 		},
 
@@ -174,7 +173,7 @@ define(function(require) {
 					extension: dataUser.hasOwnProperty('presence_id') ? dataUser.presence_id : '',
 					hasFeatures: false,
 					isAdmin: dataUser.priv_level === 'admin',
-					showLicensedUserRoles: _.size(self.appFlags.users.servicePlansRole) > 0,
+					showLicensedUserRoles: _.size(self.appFlags.global.servicePlansRole) > 0,
 					licensedUserRole: self.i18n.active().users.licensedUserRoles.none,
 					listCallerId: [],
 					listExtensions: [],
@@ -250,8 +249,8 @@ define(function(require) {
 					}
 				}
 
-				if (self.appFlags.users.servicePlansRole.hasOwnProperty(planId)) {
-					dataUser.extra.licensedUserRole = self.appFlags.users.servicePlansRole[planId].name;
+				if (self.appFlags.global.servicePlansRole.hasOwnProperty(planId)) {
+					dataUser.extra.licensedUserRole = self.appFlags.global.servicePlansRole[planId].name;
 				}
 			}
 
@@ -353,7 +352,7 @@ define(function(require) {
 				},
 				mapUsers = {};
 
-			if (_.size(self.appFlags.users.servicePlansRole) > 0) {
+			if (_.size(self.appFlags.global.servicePlansRole) > 0) {
 				dataTemplate.showLicensedUserRoles = true;
 			}
 
@@ -1617,8 +1616,8 @@ define(function(require) {
 				arrayVMBoxes = [],
 				allNumbers = [];
 
-			if (_.size(self.appFlags.users.servicePlansRole) > 0) {
-				formattedData.licensedUserRoles = self.appFlags.users.servicePlansRole;
+			if (_.size(self.appFlags.global.servicePlansRole) > 0) {
+				formattedData.licensedUserRoles = self.appFlags.global.servicePlansRole;
 			}
 
 			_.each(data.callflows, function(callflow) {
@@ -3060,7 +3059,7 @@ define(function(require) {
 			var self = this,
 				formattedData = {
 					selectedRole: undefined,
-					availableRoles: self.appFlags.users.servicePlansRole
+					availableRoles: self.appFlags.global.servicePlansRole
 				};
 
 			if (user.hasOwnProperty('service') && user.service.hasOwnProperty('plans') && _.size(user.service.plans) > 0) {
@@ -4230,27 +4229,6 @@ define(function(require) {
 							callback(null, data.data);
 						}
 					});
-				},
-				availableLicensedUserRoles: function(callback) {
-					if (monster.config.hasOwnProperty('resellerId') && monster.config.resellerId.length) {
-						self.callApi({
-							resource: 'servicePlan.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									paginate: false,
-									'filter_merge.strategy': 'cumulative'
-								}
-							},
-							success: function(data, status) {
-								self.appFlags.users.servicePlansRole = _.indexBy(data.data, 'id');
-
-								callback(null, self.appFlags.users.servicePlansRole);
-							}
-						});
-					} else {
-						callback(null, {});
-					}
 				}
 			}, function(err, results) {
 				callback && callback(results);
