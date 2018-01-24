@@ -78,6 +78,9 @@
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 }
+#myoffice_container .dashboard-left-section {
+	margin-bottom: 20px;
+}
 #myoffice_container .dashboard-content-div.dashboard-left-content {
 	padding-right: 10px;
 }
@@ -108,9 +111,6 @@
 	color: #22a5ff;
 	float: right;
 }
-#myoffice_container .dashboard-left-content .left-section-content {
-	margin-bottom: 20px;
-}
 #myoffice_container .dashboard-left-content .users-section-content .users-element {
 	display: inline-block;
 	padding: 5px;
@@ -130,6 +130,38 @@
 	width: 100px;
 	height: 120px;
 	float: left;
+}
+
+#myoffice_container .users-section-content {
+	display: block;
+}
+
+#myoffice_container .users-section-content .users-canvas-wrapper {
+	width: 130px;
+	height: 130px;
+}
+
+#myoffice_container .users-section-content .users-chart-legend {
+	margin-left: 150px;
+	margin-right: 10px;
+}
+#myoffice_container .users-section-content .users-chart-legend ul {
+	list-style: none;
+	margin: 0px;
+}
+#myoffice_container .users-section-content .users-chart-legend .legend-element {
+	font-size: 12px;
+	line-height: 18px;
+}
+#myoffice_container .users-section-content .users-chart-legend .legend-element.no-user {
+	opacity: 0.5;
+}
+#myoffice_container .users-section-content .users-chart-legend .legend-number {
+	float: right;
+}
+#myoffice_container .users-section-content .users-chart-legend .legend-color {
+	margin-right: 10px;
+	font-size: 14px;
 }
 
 #myoffice_container .devices-section-content .devices-chart-legend {
