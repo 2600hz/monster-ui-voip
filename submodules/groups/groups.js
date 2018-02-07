@@ -158,6 +158,11 @@ define(function(require) {
 							icon: 'fa fa-file-text-o',
 							iconColor: 'monster-pink',
 							title: self.i18n.active().groups.prepend.title
+						},
+						ring_group_toggle: {
+							icon: 'fa fa-sign-out',
+							iconColor: 'monster-orange',
+							title: self.i18n.active().groups.ringGroupToggle.title
 						}
 					},
 					hasFeatures: false
@@ -522,6 +527,10 @@ define(function(require) {
 
 			template.find('.feature[data-feature="prepend"]').on('click', function() {
 				self.groupsRenderPrepend(data);
+			});
+
+			template.find('.feature[data-feature="ring_group_toggle"]').on('click', function() {
+				self.groupsRenderRingGroupToggle(data);
 			});
 		},
 
@@ -2152,7 +2161,330 @@ define(function(require) {
 					callback && callback(savedUser.data);
 				}
 			});
+		},
+
+		groupsRenderRingGroupToggle: function(data) {
+			var self = this,
+				featureTemplate = $(monster.template(self, 'groups-feature-login-logout', data)),
+				switchFeature = featureTemplate.find('.switch-state'),
+				popup;
+
+			//Helper function to check if a given extension is valid
+			var findNumberMatchingExtensionRegex = function(numbersList) {
+				var extensionRegex = /^[0-9]{4}\*{0,2}$/,
+					match;
+				_.each(numbersList, function(number) {
+					var matches = extensionRegex.exec(number);
+					if (matches && matches.length > 0) {
+						match = matches[0];
+					}
+				});
+				return match;
+			};
+
+			//Enforce that user can only enter a valid extension containing at least 4 numbers and optionally 1-2 *s at the end
+			var extensionInputs = featureTemplate.find('.loginlogout-extension');
+			extensionInputs.on('input', function(evt) {
+				evt.preventDefault();
+				var $this = $(this);
+				var currentValue = $this.val();
+				if (currentValue.length > 4 && currentValue.length <= 6) {
+					if (currentValue.charAt(4) !== '*' || (currentValue.charAt(5) && currentValue.charAt(5) !== '*')) {
+						$this.val(currentValue.substr(0, currentValue.length - 1));
+					}
+				} else if (currentValue.length <= 4) {
+					if (isNaN(currentValue.charAt(currentValue.length - 1))) {
+						$this.val(currentValue.substr(0, currentValue.length - 1));
+					}
+				} else {
+					$this.val(currentValue.substr(0, currentValue.length - 1));
+				}
+			});
+
+			//Set up default values in login/logout extension fields
+			switchFeature.on('change', function() {
+				//Function used to get the default default value for login and logout extension numbers matches against a regex defining a valid extension
+				if (switchFeature.prop('checked')) {
+					var defaultDefaultExtension = findNumberMatchingExtensionRegex(data.callflow.numbers),
+						defaultLoginExtension,
+						defaultLogoutExtension;
+					if (defaultDefaultExtension) {
+						defaultLoginExtension = defaultDefaultExtension + '*';
+						defaultLogoutExtension = defaultDefaultExtension + '**';
+					}
+					featureTemplate.find('#extension_zone').slideDown();
+					featureTemplate.find('#login_extension').val(data.group.loginExtension || defaultLoginExtension || '');
+					featureTemplate.find('#logout_extension').val(data.group.logoutExtension || defaultLogoutExtension || '');
+				} else {
+					featureTemplate.find('#extension_zone').slideUp();
+					featureTemplate.find('.loginlogout-extension').val('');
+				}
+			});
+
+			featureTemplate.find('.cancel-link').on('click', function() {
+				popup.dialog('close').remove();
+			});
+
+			featureTemplate.find('.save').on('click', function() {
+				var enabled = switchFeature.prop('checked'),
+					ignore_ring_group_toggle = !enabled,
+					enabled_login = enabled,
+					loginExtension = featureTemplate.find('#login_extension').val(),
+					logoutExtension = featureTemplate.find('#logout_extension').val();
+
+				data.group.smartpbx = data.group.smartpbx || {};
+				data.group.smartpbx.ring_group_toggle = data.group.smartpbx.ring_group_toggle || {};
+				data.group.smartpbx.ring_group_toggle.enabled = enabled;
+				data.group.enabled_login = enabled_login;
+				data.baseCallflow.flow.data.ignore_ring_group_toggle = ignore_ring_group_toggle;
+				data.loginExtension = loginExtension;
+				data.logoutExtension = logoutExtension;
+
+				//Save old extension so that we can delete the callflows if the user is changing the extensions
+				data.oldLoginExtension = data.group.loginExtension;
+				data.oldLogoutExtension = data.group.logoutExtension;
+
+				var doRingGroupToggle = function(data, dataCopy) {
+					dataCopy = dataCopy ? dataCopy : data;
+					monster.parallel({
+						groups: function(callback) {
+							self.groupsUpdate(data.group, function(updatedGroup) {
+								callback(null, updatedGroup);
+							});
+						},
+						ringGroup: function(callback) {
+							self.groupsUpdateCallflow(dataCopy.baseCallflow, function(callflow) {
+								callback(null, callflow);
+							});
+						},
+
+						ring_group_toggle: function(callback) {
+							self.groupsGetRingGroup(dataCopy.group.id, function(callflow) {
+								callback(null, callflow);
+							});
+							self.allowRingGroupToggle(dataCopy, function(callflow) {
+								callback(null, callflow);
+							});
+						}
+					},
+					function(err, results) {
+						// popup.dialog('close').remove() - caused console errors as dialog() not created?
+						popup.remove();
+						self.groupsRender({ groupId: results.groups.id });
+						if (err) {
+							console.log(err);
+						}
+					});
+				};
+
+				if (enabled) {
+					//Check if the callflows the user has chosen already exist.
+					self.checkAllowUpdate(data.loginExtension, data.oldLoginExtension, function() {
+						toastr.error(self.i18n.active().groups.ringGroupToggle.flowTaken1 + data.loginExtension + self.i18n.active().groups.ringGroupToggle.flowTaken2);
+					}, function() {
+						self.checkAllowUpdate(data.logoutExtension, data.oldLogoutExtension, function() {
+							toastr.error(self.i18n.active().groups.ringGroupToggle.flowTaken1 + data.logoutExtension + self.i18n.active().groups.ringGroupToggle.flowTaken2);
+						}, function() {
+							//If user is enabling feature, register the extension they want to use with the group. Necessary so that we know what callflows to delete when they disable this feature.
+							data.group.loginExtension = enabled ? data.loginExtension : data.group.loginExtension;
+							data.group.logoutExtension = enabled ? data.logoutExtension : data.group.logoutExtension;
+
+							//If they are activating login/logout, make sure login and logout extension are different
+							if (data.group.loginExtension === data.group.logoutExtension) {
+								toastr.error(self.i18n.active().groups.ringGroupToggle.numbersSame);
+								return;
+							}
+							//If they are activating login/logout, make sure the extensions are valid extensions
+							if (!findNumberMatchingExtensionRegex([data.group.loginExtension]) || !findNumberMatchingExtensionRegex([data.group.logoutExtension])) {
+								toastr.error(self.i18n.active().groups.ringGroupToggle.invalidExtension);
+								return;
+							}
+							doRingGroupToggle(data);
+						});
+					});
+				} else {
+					var dataCopy = $.extend(true, {}, data);
+					delete data.group.loginExtension;
+					delete data.group.logoutExtension;
+					doRingGroupToggle(data, dataCopy);
+				}
+			});
+
+			if (data.group.enabled_login) {
+				featureTemplate.find('#extension_zone').show();
+				switchFeature.trigger('change');
+			}
+
+			monster.ui.tooltips(featureTemplate);
+			popup = monster.ui.dialog(featureTemplate, {
+				title: data.group.extra.mapFeatures.ring_group_toggle.title,
+				position: ['center', 20]
+			});
+		},
+
+		checkAllowUpdate: function(ringGroupToggleExtension, oldRingGroupToggleExtension, callbackDisallow, callbackAllow) {
+			var self = this;
+			self.findCallflowByNumber(ringGroupToggleExtension, function(searchData) {
+				var flowExists = self.checkNumberInFlowSearchResults(ringGroupToggleExtension, searchData);
+				//allow to continue if the number is already being used for login/logout
+				if (flowExists && ringGroupToggleExtension === oldRingGroupToggleExtension) {
+					flowExists = false;
+				}
+				if (flowExists) {
+					callbackDisallow && callbackDisallow();
+				} else {
+					callbackAllow && callbackAllow();
+				}
+			});
+		},
+
+		findCallflowByNumber: function(number, callback) {
+			var self = this;
+			self.callApi({
+				resource: 'callflow.searchByNumber',
+				data: {
+					accountId: self.accountId,
+					value: number.indexOf('*') > -1 ? number.substring(0, 4) : number // workaround for asterisk causing no results to be returned
+				},
+				success: function(data, status) {
+					// Leave only the result we want before continuing, i.e. remove all results that are not exact match with asterisks
+					_.remove(data.data, function(searchResult) {
+						return searchResult.numbers[0] !== number;
+					});
+					callback && callback(data.data, status);
+				}
+			});
+		},
+
+		checkNumberInFlowSearchResults: function(checkNumber, searchData) {
+			var self = this,
+				flowExists = false;
+
+			if (searchData.length > 0) {
+				_.each(searchData, function(flow) {
+					_.each(flow.numbers, function(number) {
+						if (number === checkNumber) {
+							flowExists = true;
+						}
+					});
+				});
+			}
+			return flowExists;
+		},
+
+		allowRingGroupToggle: function(data, callback) {
+			var self = this;
+			if (data.group.enabled_login === true) {
+				var dataLogin = {
+					flow: {
+						data: {
+							callflow_id: data.baseCallflow.id,
+							action: 'login'
+						},
+						module: 'ring_group_toggle',
+						children: {}
+					},
+					numbers: [data.loginExtension],
+					patterns: [],
+					contactlist: {
+						exclude: false
+					},
+					metadata: {}
+				};
+
+				var dataLogout = {
+					flow: {
+						data: {
+							callflow_id: data.baseCallflow.id,
+							action: 'logout'
+						},
+						module: 'ring_group_toggle',
+						children: {}
+					},
+					numbers: [data.logoutExtension],
+					patterns: [],
+					contactlist: {
+						exclude: false
+					},
+					metadata: {}
+				};
+
+				//If the user is changing the extension for login/logout, the old callflow will still exist. We need to check for them and delete them.
+				self.maybeDeleteOldRingGroupToggleFlow(data.loginExtension, data.oldLoginExtension);
+				self.maybeDeleteOldRingGroupToggleFlow(data.logoutExtension, data.oldLogoutExtension);
+
+				//Create new login/logout callflows
+				if (data.oldLoginExtension !== data.loginExtension) {
+					self.callApi({
+						resource: 'callflow.create',
+						data: {
+							accountId: self.accountId,
+							data: dataLogin
+						},
+						success: function(data) {
+							callback && callback(data);
+						}
+					});
+				}
+
+				if (data.oldLogoutExtension !== data.logoutExtension) {
+					self.callApi({
+						resource: 'callflow.create',
+						data: {
+							accountId: self.accountId,
+							data: dataLogout
+						},
+						success: function(data) {
+							callback && callback(data);
+						}
+					});
+				}
+			} else {
+				//If login is not enabled delete the callflows used to do login/logout
+				self.deleteOldRingGroupToggleFlow(data.group.loginExtension);
+				self.deleteOldRingGroupToggleFlow(data.group.logoutExtension, callback);
+			}
+		},
+
+		maybeDeleteOldRingGroupToggleFlow: function(ringGroupToggleExtension, oldRingGroupToggleExtension) {
+			var self = this;
+			if (oldRingGroupToggleExtension && oldRingGroupToggleExtension !== ringGroupToggleExtension) {
+				self.findCallflowByNumber(oldRingGroupToggleExtension, function(searchData) {
+					_.each(searchData, function(flow) {
+						if (flow.numbers[0] === oldRingGroupToggleExtension) {
+							self.callFlowsDelete(flow);
+						}
+					});
+				});
+			}
+		},
+
+		deleteOldRingGroupToggleFlow: function(ringGroupToggleExtension, callback) {
+			var self = this;
+
+			self.findCallflowByNumber(ringGroupToggleExtension, function(searchData) {
+				_.each(searchData, function(flow) {
+					if (flow.numbers[0] === ringGroupToggleExtension) {
+						self.callFlowsDelete(flow, callback);
+					}
+				});
+			});
+		},
+
+		callFlowsDelete: function(data, callback) {
+			var self = this;
+			self.callApi({
+				resource: 'callflow.delete',
+				data: {
+					accountId: self.accountId,
+					callflowId: data.id
+				},
+				success: function(data) {
+					callback && callback(data);
+				}
+			});
 		}
+
 	};
 
 	return app;
