@@ -57,6 +57,35 @@
 							</div>
 						</div>
 					</div>
+					<div class="greeting-option accordion-group {{#compare greeting.media_source '===' 'existing'}}active{{/compare}}">
+						<div class="greeting-option-header" data-toggle="collapse"
+							data-parent="#strategy_menu_popup_accordion"
+							data-target="#strategy_menu_popup_choose_existing">
+							<div class="pull-right"><i class="fa fa-file-audio-o"></i></div>
+							<div>{{i18n.strategy.popup.chooseExistingGreetingTitle}}</div>
+						</div>
+						<div class="collapse" id="strategy_menu_popup_choose_existing">
+							<div class="greeting-option-content">
+								{{#monsterText}}
+									{{i18n.strategy.popup.greetingsHelp}}
+								{{/monsterText}}
+								{{#if greetingFiles}}
+								<select class="choose-input">
+									{{#each greetingFiles}}
+										<option class="media-file-option" value="{{this.id}}">{{this.name}}</option>
+									{{/each}}
+								</select>
+								<div class="greeting-option-actions clearfix">
+									<button class="update-greeting pull-right monster-button-mini monster-button-primary">{{i18n.update}}</button>
+									<button class="cancel-greeting pull-right monster-button-mini">{{i18n.cancel}}</button>
+								</div>
+								{{/if}}
+								{{#if noGreetingFiles}}
+									{{i18n.strategy.popup.noExistingGreetings}}
+								{{/if}}
+							</div>
+						</div>
+					</div>
 					<div class="greeting-option accordion-group {{#compare greeting.media_source '===' 'recording'}}active{{/compare}}">
 						<div class="greeting-option-header" data-toggle="collapse" 
 							 data-parent="#strategy_menu_popup_accordion" 
