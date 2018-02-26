@@ -1375,11 +1375,11 @@ define(function(require) {
 							phoneNumber;
 						for (phoneNumber in numberChoices) {
 							numberChoices[monster.util.formatPhoneNumber(phoneNumber)] = $.extend(true, {}, numberChoices[phoneNumber]);
-							if(phoneNumber !== monster.util.formatPhoneNumber(phoneNumber)) {
+							if (phoneNumber !== monster.util.formatPhoneNumber(phoneNumber)) {
 								delete numberChoices[phoneNumber];
 							}
 						}
-						if(currentUser.caller_id && currentUser.caller_id.external && currentUser.caller_id.external.number) {
+						if (currentUser.caller_id && currentUser.caller_id.external && currentUser.caller_id.external.number) {
 							currentUser.caller_id.external.number = monster.util.formatPhoneNumber(currentUser.caller_id.external.number);
 						}
 						self.usersRenderCallerId(currentUser, numberChoices);
@@ -2067,7 +2067,7 @@ define(function(require) {
 				});
 			});
 
-			if(currentUser.extra.listCallerId.length > 0 || monster.config.whitelabel && monster.config.whitelabel.allowAnyOwnedNumberAsCallerID) {
+			if (currentUser.extra.listCallerId.length > 0 || monster.config.whitelabel && monster.config.whitelabel.allowAnyOwnedNumberAsCallerID) {
 				var popup = monster.ui.dialog(featureTemplate, {
 					title: currentUser.extra.mapFeatures.caller_id.title,
 					position: ['center', 20]
