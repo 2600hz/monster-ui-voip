@@ -2067,7 +2067,7 @@ define(function(require) {
 				});
 			});
 
-			if (currentUser.extra.listCallerId.length > 0 || monster.config.whitelabel && monster.config.whitelabel.allowAnyOwnedNumberAsCallerID) {
+			if (currentUser.extra.listCallerId.length > 0 || (monster.config.whitelabel && monster.config.whitelabel.allowAnyOwnedNumberAsCallerID)) {
 				var popup = monster.ui.dialog(featureTemplate, {
 					title: currentUser.extra.mapFeatures.caller_id.title,
 					position: ['center', 20]
