@@ -11,11 +11,21 @@
 		</div>
 	</div>
 	<div class="content{{#unless extra.mapFeatures.caller_id.active}} disabled{{/unless}}">
+		{{#if allowAnyOwnedNumberAsCallerID }}
+			{{ i18n.users.caller_id.currentCallerIdLabel }}
+			{{#if caller_id.external.number }}{{ caller_id.external.number }}{{else}}{{i18n.users.caller_id.none}}{{/if}}<br />
+		{{/if}}
 		{{ i18n.users.caller_id.dropdownLabel }}
 		<select class="caller-id-select">
-			{{#each extra.listCallerId}}
-				<option{{#compare ../this.caller_id.external.number "===" this}} selected{{/compare}} value="{{this}}">{{this}}</option>
-			{{/each}}
+			{{#if allowAnyOwnedNumberAsCallerID }}
+				{{#each caller_id.numberChoices}}
+					<option{{#compare ../caller_id.external.number "===" @key}} selected{{/compare}} value="{{@key}}">{{@key}}</option>
+				{{/each}}
+			{{else}}
+				{{#each extra.listCallerId}}
+					<option{{#compare ../this.caller_id.external.number "===" this}} selected{{/compare}} value="{{this}}">{{this}}</option>
+				{{/each}}
+			{{/if}}
 		</select>
 
 		{{#monsterText}}
