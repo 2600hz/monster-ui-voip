@@ -168,7 +168,7 @@ define(function(require){
 
 		// we check if we have to display the walkthrough:
 		// first make sure it's not a trial, then
-		// only show it if we've already shown the walkthrough in myaccount 
+		// only show it if we've already shown the walkthrough in myaccount
 		myOfficeCheckWalkthrough: function() {
 			var self = this;
 
@@ -380,7 +380,10 @@ define(function(require){
 										resource: 'directory.get',
 										data: {
 											accountId: self.accountId,
-											directoryId: mainDirectory.id
+											directoryId: mainDirectory.id,
+											filters: {
+												paginate: false
+											}
 										},
 										success: function(data, status) {
 											parallelCallback && parallelCallback(null, data.data);
@@ -653,7 +656,7 @@ define(function(require){
 			data.totalConferences = totalConferences;
 
 			if(data.directory && data.directory.id) {
-				data.directoryLink = self.apiUrl + 'accounts/' + self.accountId +'/directories/' + data.directory.id + '?accept=pdf&auth_token=' + self.getAuthToken();
+				data.directoryLink = self.apiUrl + 'accounts/' + self.accountId +'/directories/' + data.directory.id + '?accept=pdf&paginate=false&auth_token=' + self.getAuthToken();
 			}
 
 			return data;
