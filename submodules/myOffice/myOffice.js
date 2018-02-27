@@ -379,7 +379,10 @@ define(function(require) {
 									resource: 'directory.get',
 									data: {
 										accountId: self.accountId,
-										directoryId: mainDirectory.id
+										directoryId: mainDirectory.id,
+										filters: {
+											paginate: false
+										}
 									},
 									success: function(data, status) {
 										parallelCallback && parallelCallback(null, data.data);
@@ -655,7 +658,7 @@ define(function(require) {
 			data.unregisteredDevices = unregisteredDevices;
 
 			if (data.directory && data.directory.id) {
-				data.directoryLink = self.apiUrl + 'accounts/' + self.accountId + '/directories/' + data.directory.id + '?accept=pdf&auth_token=' + self.getAuthToken();
+				data.directoryLink = self.apiUrl + 'accounts/' + self.accountId + '/directories/' + data.directory.id + '?accept=pdf&paginate=false&auth_token=' + self.getAuthToken();
 			}
 
 			return data;
