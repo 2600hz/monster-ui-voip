@@ -1696,6 +1696,8 @@ define(function(require) {
 			allNumbers = arrayExtensions.concat(arrayVMBoxes);
 			formattedData.nextExtension = parseInt(monster.util.getNextExtension(allNumbers)) + '';
 
+			formattedData.showSendEmailOnCreation = monster.config.whitelabel && monster.config.whitelabel.showSendUserEmailOnCreation ? true : false;
+
 			return formattedData;
 		},
 
@@ -3257,6 +3259,7 @@ define(function(require) {
 						},
 						presence_id: data.callflow.extension,
 						email: data.extra.differentEmail ? data.extra.email : data.user.username,
+						send_email_on_creation: data.send_email_on_creation || false,
 						priv_level: 'user'
 					}, data.user),
 					vmbox: {

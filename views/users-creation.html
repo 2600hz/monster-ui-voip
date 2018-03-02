@@ -73,6 +73,7 @@
 				<input type="email" name="extra.email" id="email" placeholder="{{i18n.users.dialogCreationUser.notificationEmail}}">
 			</div>
 		</div>
+		{{#if showSendEmailOnCreation}}
 		<div class="control-group hack-left">
 			<label class="control-label" for="send_email_on_creation"></label>
 			<div class="controls">
@@ -81,6 +82,7 @@
 				{{/monsterCheckbox}}
 			</div>
 		</div>
+		{{/if}}
 	</div>
 	</form>
 	<div class="dialog-buttons-wrapper">
