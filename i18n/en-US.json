@@ -78,6 +78,21 @@
 			"urlPlaceholder": "http://your.server.com/place/to/store/recordings",
 			"timeLimitLabel": "Time Limit (sec):"
 		},
+		"ringGroupToggle": {
+			"title": "Allow Login-Logout",
+			"headline": "Allow Login-Logout",
+			"loginNameLabel": "Login Allow",
+			"logoutNumberLabel": "Logout Allow",
+			"loginExtension": "Login Extension",
+			"logoutExtension": "Logout Extension",
+			"featureDescription": "Enables the option to login or logout of this ring group by dialling an extension of your choice.",
+			"description": "Enable this option",
+			"extension": "Extension",
+			"flowTaken1": "The number: ",
+			"flowTaken2": " Is already being used somewhere, you will need to use a different extension for login/logout",
+			"invalidExtension": "The extensions to login or logout must be at least 4 numbers, and optionally 1-2 *'s on the end",
+			"numbersSame": "The login extension must be different to the logout extension"
+		},
 		"ringback": {
 			"title": "Ringback",
 			"headline": "Group Ringback Settings",

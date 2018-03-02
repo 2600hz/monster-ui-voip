@@ -593,3 +593,17 @@
 	margin-bottom: 0;
 	width: 100px;
 }
+
+/* Login/logout feature */
+#extension_zone {
+	display: none;
+	padding-left: 10px;
+}
+
+.login-logout-extension-container {
+	margin-left: 18px;
+}
+
+.loginlogout-extension {
+	padding: 0px;
+}

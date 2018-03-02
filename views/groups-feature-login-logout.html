@@ -1,0 +1,33 @@
+<div class="monster-feature-popup-container" data-feature="ring_group_toggle">
+	<div class="feature-popup-title">
+		<div class="feature-fa-wrapper">
+			<i class="{{group.extra.mapFeatures.ring_group_toggle.icon}}"></i>
+		</div>
+		{{ i18n.groups.ringGroupToggle.headline }}
+		<div class="switch">
+			{{#monsterSwitch}}
+				<input class="switch-state" type="checkbox" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if group.extra.mapFeatures.ring_group_toggle.active}} checked="checked"{{/if}}></input>
+			{{/monsterSwitch}}
+		</div>
+		<i class="fa fa-question-circle" data-original-title="{{i18n.groups.ringGroupToggle.featureDescription}}" data-placement="right" data-toggle="tooltip"></i>
+	</div>
+	<div id="extension_zone">
+		<form class="login-logout-extension-container">
+			<div>
+				<label class="control-label" for="login_extension">{{i18n.groups.ringGroupToggle.loginExtension}}</label>
+				<input type="text" class="loginlogout-extension" id="login_extension"></input>
+			</div>
+			<div>
+				<label class="control-label" for="logout_extension">{{i18n.groups.ringGroupToggle.logoutExtension}}</label>
+				<input type="text" class="loginlogout-extension" id="logout_extension"></input>
+			</div>
+		</form>
+	</div>
+
+	<div class="actions clearfix">
+		<div class="pull-right">
+			<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
+			<button type="button" class="monster-button monster-button-success save">{{ i18n.saveChanges }}</button>
+		</div>
+	</div>
+</div>
