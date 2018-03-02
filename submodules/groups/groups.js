@@ -158,6 +158,11 @@ define(function(require) {
 							icon: 'fa fa-file-text-o',
 							iconColor: 'monster-pink',
 							title: self.i18n.active().groups.prepend.title
+						},
+						distinctive_ring: {
+							icon: 'fa fa-music',
+							iconColor: 'monster-green',
+							title: self.i18n.active().groups.distinctiveRing.title
 						}
 					},
 					hasFeatures: false
@@ -522,6 +527,10 @@ define(function(require) {
 
 			template.find('.feature[data-feature="prepend"]').on('click', function() {
 				self.groupsRenderPrepend(data);
+			});
+
+			template.find('.feature[data-feature="distinctive_ring"]').on('click', function() {
+				self.groupsRenderDistinctiveRing(data);
 			});
 		},
 
@@ -960,6 +969,68 @@ define(function(require) {
 
 			popup = monster.ui.dialog(featureTemplate, {
 				title: data.group.extra.mapFeatures.prepend.title,
+				position: ['center', 20]
+			});
+		},
+
+		groupsRenderDistinctiveRing(data) {
+			var self = this,
+				distinctiveRingNode = data.baseCallflow.flow,
+				templateData = $.extend(true, {
+					group: data.group
+				},
+				(data.group.extra.mapFeatures.distinctive_ring.active && distinctiveRingNode ? {
+					external: distinctiveRingNode.data.ringtones.external,
+					internal: distinctiveRingNode.data.ringtones.internal
+				} : {})),
+
+				featureTemplate = $(monster.template(self, 'groups-feature-distinctive-ring', templateData)),
+				popup;
+
+			while(distinctiveRingNode.module !== 'distinctive_ring' && '_' in distinctiveRingNode.children) {
+				distinctiveRingNode = distinctiveRingNode.children['_'];
+			}
+
+			featureTemplate.find('.cancel-link').on('click', function() {
+				popup.dialog('close').remove();
+			});
+
+			featureTemplate.find('.save').on('click', function() {
+				var distinctiveRingData = monster.ui.getFormData('distinctive_ring_form');
+				distinctiveRingNode.data.ringtones = distinctiveRingData;
+
+				if(!('smartpbx' in data.group)) { data.group.smartpbx = {}; }
+				if(distinctiveRingData.external && distinctiveRingData.internal) {
+					data.group.smartpbx.distinctive_ring = {
+						enabled: true
+					};
+				} else if((!distinctiveRingData.external && distinctiveRingData.internal) || (!distinctiveRingData.internal && distinctiveRingData.external)) {
+					//Only one of the two distinctive ring ringtones is set. Leave the other as undefined when sending request.
+					data.group.smartpbx.distinctive_ring = {
+						enabled: true
+					};
+					if (distinctiveRingData.external) {
+						delete distinctiveRingData.internal;
+					} else {
+						delete distinctiveRingData.external;
+					}
+				} else {
+					delete distinctiveRingNode.data.ringtones;
+					data.group.smartpbx.distinctive_ring = {
+						enabled: false
+					};
+				}
+
+				self.groupsUpdateCallflow(data.baseCallflow, function() {
+					self.groupsUpdate(data.group, function() {
+						popup.dialog('close').remove();
+						self.groupsRender({ groupId: data.group.id });
+					});
+				});
+			});
+
+			popup = monster.ui.dialog(featureTemplate, {
+				title: data.group.extra.mapFeatures.distinctive_ring.title,
 				position: ['center', 20]
 			});
 		},
