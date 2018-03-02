@@ -2504,66 +2504,41 @@ define(function(require) {
 			ttsGreeting.find('.update-greeting').on('click', function(e) {
 				var text = ttsGreeting.find('textarea').val();
 				if (text) {
-					if (greeting && greeting.id) {
-						greeting.type = 'virtual_receptionist';
-						greeting.description = '<Text to Speech>';
-						greeting.media_source = 'tts';
-						greeting.tts = {
-							voice: 'female/en-US',
-							text: text
-						};
-						self.callApi({
-							resource: 'media.update',
+					self.callApi({
+						resource: 'media.create',
+						data: {
+							accountId: self.accountId,
 							data: {
-								accountId: self.accountId,
-								mediaId: greeting.id,
-								data: greeting
-							},
-							success: function(data, status) {
-								greeting = data.data;
-								container.find('.greeting-option').removeClass('active');
-								ttsGreeting.parents('.greeting-option').addClass('active');
-								ttsGreeting.collapse('hide');
-							}
-						});
-					} else {
-						self.callApi({
-							resource: 'media.create',
-							data: {
-								accountId: self.accountId,
-								data: {
-									streamable: true,
-									name: callflowName,
-									type: 'virtual_receptionist',
-									media_source: 'tts',
-									description: '<Text to Speech>',
-									tts: {
-										voice: 'female/en-US',
-										text: text
-									}
+								streamable: true,
+								name: callflowName + 'TTS',
+								media_source: 'tts',
+								description: '<Text to Speech>',
+								tts: {
+									voice: 'female/en-US',
+									text: text
 								}
-							},
-							success: function(data, status) {
-								greeting = data.data;
-								menu.media.greeting = data.data.id;
-								self.callApi({
-									resource: 'menu.update',
-									data: {
-										accountId: self.accountId,
-										menuId: menu.id,
-										data: menu
-									},
-									success: function(data, status) {
-										menu = data.data;
-									}
-								});
-
-								container.find('.greeting-option').removeClass('active');
-								ttsGreeting.parents('.greeting-option').addClass('active');
-								ttsGreeting.collapse('hide');
 							}
-						});
-					}
+						},
+						success: function(data, status) {
+							greeting = data.data;
+							menu.media.greeting = data.data.id;
+							self.callApi({
+								resource: 'menu.update',
+								data: {
+									accountId: self.accountId,
+									menuId: menu.id,
+									data: menu
+								},
+								success: function(data, status) {
+									menu = data.data;
+								}
+							});
+
+							container.find('.greeting-option').removeClass('active');
+							ttsGreeting.parents('.greeting-option').addClass('active');
+							ttsGreeting.collapse('hide');
+						}
+					});
 				} else {
 					monster.ui.alert(self.i18n.active().strategy.alertMessages.emptyTtsGreeting);
 				}
@@ -2585,64 +2560,39 @@ define(function(require) {
 				};
 
 				if (mediaToUpload) {
-					if (greeting && greeting.id) {
-						greeting.type = 'virtual_receptionist';
-						greeting.description = mediaToUpload.name;
-						greeting.media_source = 'upload';
-						delete greeting.tts;
-
-						self.callApi({
-							resource: 'media.update',
+					self.callApi({
+						resource: 'media.create',
+						data: {
+							accountId: self.accountId,
 							data: {
-								accountId: self.accountId,
-								mediaId: greeting.id,
-								data: greeting
-							},
-							success: function(data, status) {
-								greeting = data.data;
-								uploadFile(mediaToUpload.file, greeting.id, function() {
-									container.find('.greeting-option').removeClass('active');
-									uploadGreeting.parents('.greeting-option').addClass('active');
-									uploadGreeting.collapse('hide');
-								});
+								streamable: true,
+								name: mediaToUpload.name,
+								media_source: 'upload',
+								description: mediaToUpload.name
 							}
-						});
-					} else {
-						self.callApi({
-							resource: 'media.create',
-							data: {
-								accountId: self.accountId,
+						},
+						success: function(data, status) {
+							greeting = data.data;
+							menu.media.greeting = greeting.id;
+							self.callApi({
+								resource: 'menu.update',
 								data: {
-									streamable: true,
-									name: callflowName,
-									type: 'virtual_receptionist',
-									media_source: 'upload',
-									description: mediaToUpload.name
+									accountId: self.accountId,
+									menuId: menu.id,
+									data: menu
+								},
+								success: function(data, status) {
+									menu = data.data;
 								}
-							},
-							success: function(data, status) {
-								greeting = data.data;
-								menu.media.greeting = greeting.id;
-								self.callApi({
-									resource: 'menu.update',
-									data: {
-										accountId: self.accountId,
-										menuId: menu.id,
-										data: menu
-									},
-									success: function(data, status) {
-										menu = data.data;
-									}
-								});
+							});
 
-								uploadFile(mediaToUpload.file, greeting.id, function() {
-									container.find('.greeting-option').removeClass('active');
-									uploadGreeting.parents('.greeting-option').addClass('active');
-									uploadGreeting.collapse('hide');
-								});
-							}
-						});
-					}
+							uploadFile(mediaToUpload.file, greeting.id, function() {
+								container.find('.greeting-option').removeClass('active');
+								uploadGreeting.parents('.greeting-option').addClass('active');
+								uploadGreeting.collapse('hide');
+							});
+						}
+					});
 				} else {
 					monster.ui.alert(self.i18n.active().strategy.alertMessages.emptyUploadGreeting);
 				}
