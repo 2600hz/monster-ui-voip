@@ -2313,35 +2313,51 @@ define(function(require) {
 				label = params.label,
 				template, menu, greeting,
 				showPopup = function() {
-					template = $(monster.template(self, 'strategy-menuPopup', { menu: menu, greeting: greeting }));
+					self.callApi({
+						resource: 'media.list',
+						data: {
+							accountId: self.accountId
+						},
+						success: function(response) {
+							var greetingFiles,
+								noGreetingFiles;
+							if(response.data.length > 0) {
+								greetingFiles = response.data;
+							} else {
+								noGreetingFiles = true;
+							}
 
-					var popup = monster.ui.dialog(template, {
-						title: self.i18n.active().strategy.popup.title + ' - ' + label,
-						dialogClass: 'overflow-visible'
+							template = $(monster.template(self, 'strategy-menuPopup', { menu: menu, greeting: greeting, greetingFiles: greetingFiles, noGreetingFiles: noGreetingFiles }));
+
+							var popup = monster.ui.dialog(template, {
+								title: self.i18n.active().strategy.popup.title + ' - ' + label,
+								dialogClass: 'overflow-visible'
+							});
+
+							var menuLineContainer = template.find('.menu-block .left .content'),
+								popupCallEntities = $.extend(true, {}, strategyData.callEntities, { voicemail: strategyData.voicemails }, { directory: strategyData.directories }),
+								dropdownCallEntities = self.strategyGetCallEntitiesDropdownData(popupCallEntities);
+
+							_.each(strategyData.callflows[name].flow.children, function(val, key) {
+								menuLineContainer.append(monster.template(self, 'strategy-menuLine', {
+									number: key,
+									callEntities: dropdownCallEntities,
+									selectedId: val.data.id || val.data.endpoints[0].id
+								}));
+							});
+
+							$.each(menuLineContainer.find('.target-input'), function() {
+								var $this = $(this),
+									icon = $this.find('.target-select option:selected').parents('optgroup').data('icon');
+								$this.find('.target-icon').addClass(icon);
+							});
+
+							self.strategyBindMenuPopupEvents(popup, $.extend({
+								menu: menu,
+								greeting: greeting
+							}, params));
+						}
 					});
-
-					var menuLineContainer = template.find('.menu-block .left .content'),
-						popupCallEntities = $.extend(true, {}, strategyData.callEntities, { voicemail: strategyData.voicemails }, { directory: strategyData.directories }),
-						dropdownCallEntities = self.strategyGetCallEntitiesDropdownData(popupCallEntities);
-
-					_.each(strategyData.callflows[name].flow.children, function(val, key) {
-						menuLineContainer.append(monster.template(self, 'strategy-menuLine', {
-							number: key,
-							callEntities: dropdownCallEntities,
-							selectedId: val.data.id || val.data.endpoints[0].id
-						}));
-					});
-
-					$.each(menuLineContainer.find('.target-input'), function() {
-						var $this = $(this),
-							icon = $this.find('.target-select option:selected').parents('optgroup').data('icon');
-						$this.find('.target-icon').addClass(icon);
-					});
-
-					self.strategyBindMenuPopupEvents(popup, $.extend({
-						menu: menu,
-						greeting: greeting
-					}, params));
 				};
 
 			if (name in strategyData.callflows) {
@@ -2439,6 +2455,7 @@ define(function(require) {
 				container = popup.find('#strategy_menu_popup'),
 				ttsGreeting = container.find('#strategy_menu_popup_tts_greeting'),
 				uploadGreeting = container.find('#strategy_menu_popup_upload_greeting'),
+				chooseExisting = container.find('#strategy_menu_popup_choose_existing'),
 				mediaToUpload;
 
 			container.find('.target-select').chosen({ search_contains: true, width: '150px' });
@@ -2631,7 +2648,28 @@ define(function(require) {
 				}
 			});
 
-			container.find('.cancel-greeting').on('click', function(e) {
+			chooseExisting.find('.update-greeting').on('click', function(ev) {
+				ev.preventDefault();
+
+				var greetingId = chooseExisting.find('.choose-input').find(':selected').val();
+				menu.media.greeting = greetingId;
+				self.callApi({
+					resource: 'menu.update',
+					data: {
+						accountId: self.accountId,
+						menuId: menu.id,
+						data: menu
+					},
+					success: function(data, status) {
+						menu = data.data;
+						container.find('.greeting-option').removeClass('active');
+						chooseExisting.parents('.greeting-option').addClass('active');
+						chooseExisting.collapse('hide');
+					}
+				});
+			});
+
+			container.find('.cancel-greeting').on('click', function() {
 				$(this).parents('.collapse').collapse('hide');
 			});
 
