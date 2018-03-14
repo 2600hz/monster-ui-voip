@@ -495,14 +495,14 @@
 			"nameHelp": "Type the User's First Name in the first input, and the User's Last Name in the second one",
 			"loginHelp": "This is the Username of this user, used to login to the application",
 			"vmboxHelp": "This is the Voicemail Box Number of this user, click on Change PIN to reset the PIN of the Voicemail box of this user",
-			"roleHelp": "The \"Admin\" will have rights to access the App Exchange and add apps to this accoutn, whereas the \"User\" will only be able to access the apps that are enabled for him",
+			"roleHelp": "The \"Admin\" will have rights to access the App Exchange and add apps to this accoutn, whereas the \"User\" will only be able to access the apps that are enabled for them",
 			"languageHelp": "This will change the language of the text displayed in the UI",
 			"timezoneHelp": "This will set the Timezone used for this User's devices and Voicemail Box",
 			"ringingHelp": "This will set the Ringing Timeout for this User and his Devices. For example, if you set it to 20, this user will be rung for 20 seconds before the system moves to his Voicemail Box",
 			"mainExtensionHelp": "This will define the Caller-ID used for this User for calls inside the system, as well as setting his Presence ID to that number"
 		},
 		"delete": "Delete User",
-		"errorCallerId": "Before configuring the Caller-ID of this user, you need to assign him a number",
+		"errorCallerId": "Before configuring the Caller-ID of this user, you need to assign them a number",
 		"errorNumberFaxing": "Before configuring the Faxing number of this user, you need to get some spare numbers on your account (You can buy new numbers in the Numbers section on the left menu).",
 		"featureOn": "ON",
 		"includeInDirectory": "Include User in the Company Directory",
@@ -522,7 +522,7 @@
 		"noUnassignedNumbers": "There are no available number left to assign to this user.",
 		"noUserDevices": "None",
 		"noUserFeatures": "None",
-		"noUserCallflow": "An error occured. There are no Callflow assigned to this user, so you can't add him to the Company directory",
+		"noUserCallflow": "An error occured. There are no Callflow assigned to this user, so you can't add them to the Company directory",
 		"port": "Port Numbers",
 		"resetPassword": "Reset Password",
 		"resendInstructions": "Resend Instructions",
@@ -547,7 +547,7 @@
 			"pinUpdated": "You successfully updated the PIN of {{ name }}.",
 			"__comment": "UI-1033: Now properly remove the Caller-ID Feature if we remove a number that was set as that Caller-ID Number",
 			"__version": "3.20",
-			"callerIDDeleted": "The Caller-ID Number of this user was set to a number that was no longer assigned to him, so we disabled the Caller-ID Feature.",
+			"callerIDDeleted": "The Caller-ID Number of this user was set to a number that was no longer assigned to them, so we disabled the Caller-ID Feature.",
 			"__comment": ": Now offer admin the option to send an email to reset the password of a user",
 			"__version": "4.0",
 			"successResetPassword": "Success! {{ name }} will be receiving an e-mail with instructions on how to reset his password shortly."
@@ -578,7 +578,7 @@
 			"urlLabel": "URL:",
 			"urlPlaceholder": "http://your.server.com/place/to/store/recordings",
 			"timeLimitLabel": "Time Limit (sec):",
-			"noNumber": "Before configuring the Customized Call Recording feature for this user, you need to assign him a number or an extension",
+			"noNumber": "Before configuring the Customized Call Recording feature for this user, you need to assign them a number or an extension",
 			"__comment": "UI-2578: adding call-recording toggles to smart pbx",
 			"__version": "4.1",
 			"toggleValues": {
@@ -665,7 +665,7 @@
 			"disableDevice": "Do not ring",
 			"ringThisPhoneFor": "Ring this phone for",
 			"noDevice": "You need at least one device to enable this feature.",
-			"noNumber": "Before configuring the Find-Me Follow-Me feature for this user, you need to assign him a number or an extension",
+			"noNumber": "Before configuring the Find-Me Follow-Me feature for this user, you need to assign them a number or an extension",
 			"distribute": "Distribute"
 		},
 		"caller_id": {
@@ -734,7 +734,7 @@
 		"__version": "3.22",
 		"deleteDialog": {
 			"title": "Remove {{ name }} from the system",
-			"headerAdmin": "You're about to delete an ADMIN! Deleting an admin will delete his user, voicemail boxes and unassign his devices. It will also prevent him from managing this UI. Do you want to continue?",
+			"headerAdmin": "You're about to delete an ADMIN! Deleting an admin will delete his user, voicemail boxes and unassign his devices. It will also prevent them from managing this UI. Do you want to continue?",
 			"headerUser": "Deleting a user will delete this user and his Voicemail Box, and unassign the devices and numbers that were assigned to this user. Do you want to continue?",
 			"deleteUser": "Delete",
 			"deleteUserName": "Delete \"{{variable}}\"",
