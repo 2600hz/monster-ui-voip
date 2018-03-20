@@ -1369,7 +1369,24 @@ define(function(require) {
 			});
 
 			template.on('click', '.feature[data-feature="caller_id"]', function() {
-				self.usersRenderCallerId(currentUser);
+				if (monster.config.whitelabel && monster.config.whitelabel.allowAnyOwnedNumberAsCallerID) {
+					self.usersListNumbers(function(accountNumbers) {
+						var numberChoices = accountNumbers.numbers,
+							phoneNumber;
+						for (phoneNumber in numberChoices) {
+							numberChoices[monster.util.formatPhoneNumber(phoneNumber)] = $.extend(true, {}, numberChoices[phoneNumber]);
+							if (phoneNumber !== monster.util.formatPhoneNumber(phoneNumber)) {
+								delete numberChoices[phoneNumber];
+							}
+						}
+						if (currentUser.caller_id && currentUser.caller_id.external && currentUser.caller_id.external.number) {
+							currentUser.caller_id.external.number = monster.util.formatPhoneNumber(currentUser.caller_id.external.number);
+						}
+						self.usersRenderCallerId(currentUser, numberChoices);
+					});
+				} else {
+					self.usersRenderCallerId(currentUser);
+				}
 			});
 
 			template.on('click', '.feature[data-feature="call_forward"]', function() {
@@ -1999,10 +2016,19 @@ define(function(require) {
 			});
 		},
 
-		usersRenderCallerId: function(currentUser) {
+		usersRenderCallerId: function(currentUser, numberChoices) {
 			var self = this,
-				featureTemplate = $(monster.template(self, 'users-feature-caller_id', currentUser)),
-				switchFeature = featureTemplate.find('.switch-state');
+				allowAnyOwnedNumberAsCallerID = monster.config.whitelabel && monster.config.whitelabel.allowAnyOwnedNumberAsCallerID ? true : false,
+				templateUser = $.extend(true, {allowAnyOwnedNumberAsCallerID: allowAnyOwnedNumberAsCallerID}, currentUser),
+				featureTemplate,
+				switchFeature;
+
+			if (numberChoices && monster.config.whitelabel && monster.config.whitelabel.allowAnyOwnedNumberAsCallerID) {
+				templateUser.caller_id.numberChoices = numberChoices;
+			}
+
+			featureTemplate = $(monster.template(self, 'users-feature-caller_id', templateUser));
+			switchFeature = featureTemplate.find('.switch-state');
 
 			featureTemplate.find('.cancel-link').on('click', function() {
 				popup.dialog('close').remove();
@@ -2041,7 +2067,7 @@ define(function(require) {
 				});
 			});
 
-			if (currentUser.extra.listCallerId.length > 0) {
+			if (currentUser.extra.listCallerId.length > 0 || (monster.config.whitelabel && monster.config.whitelabel.allowAnyOwnedNumberAsCallerID)) {
 				var popup = monster.ui.dialog(featureTemplate, {
 					title: currentUser.extra.mapFeatures.caller_id.title,
 					position: ['center', 20]

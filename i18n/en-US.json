@@ -671,6 +671,8 @@
 		"caller_id": {
 			"title": "Caller-ID Number",
 			"dropdownLabel": "Show my Caller-Id Number as",
+			"currentCallerIdLabel": "Current Caller-ID: ",
+			"none": "None",
 			"headline": "User Caller-ID Number Settings",
 			"help": "If you don't enable this feature, the Caller-ID displayed by default will be the one configured on the Main Number of this account."
 		},
