@@ -3394,6 +3394,10 @@ define(function(require) {
 						advancedCallflows: results.advancedCallflows
 					};
 
+					_.forEach(callEntities.qubicle, function(queue) {
+						queue.module = 'callflow';
+					});
+
 					_.each(callEntities.play, function(media) {
 						media.module = 'play';
 					});
