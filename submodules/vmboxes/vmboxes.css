@@ -240,8 +240,9 @@
 	padding: 0 20px;
 }
 
-.edit-vmbox .tabs-section[data-section="greeting"] .greeting-container {
-	padding: 0 40px;
+.edit-vmbox .tabs-section[data-section="greeting"] .greeting-container,
+.edit-vmbox .tabs-section[data-section="greeting"] .temporary-greeting-container {
+	padding: 0 90px 25px
 }
 .edit-vmbox .tabs-section[data-section="greeting"] .greeting-container .media-dropdown {
 	margin-bottom: 0px;
