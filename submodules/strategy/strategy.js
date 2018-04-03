@@ -53,7 +53,7 @@ define(function(require) {
 			{
 				name: 'call_forward[action=activate]',
 				number: '72',
-				callflowNumber: '*72',
+				pattern: '\\*72([0-9]*)$',
 				moduleName: 'call_forward',
 				actionName: 'activate'
 			},
@@ -3381,6 +3381,10 @@ define(function(require) {
 						}),
 						advancedCallflows: results.advancedCallflows
 					};
+
+					_.forEach(callEntities.qubicle, function(queue) {
+						queue.module = 'callflow';
+					});
 
 					_.each(callEntities.play, function(media) {
 						media.module = 'play';
