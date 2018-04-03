@@ -115,6 +115,7 @@ define(function(require) {
 				mode = data.id ? 'edit' : 'add',
 				popupTitle = mode === 'edit' ? monster.template(self, '!' + self.i18n.active().vmboxes.editTitle, { name: data.name }) : self.i18n.active().vmboxes.addTitle,
 				templateVMBox = $(monster.template(self, 'vmboxes-edit', data)),
+				popup,
 				callbacks = {
 					afterSave: function(vmbox) {
 						popup.dialog('close').remove();
@@ -137,16 +138,34 @@ define(function(require) {
 						.append(monster.template(self, 'vmboxes-emailRow', { name: recipient }));
 			});
 
-			self.vmboxesEditBindEvents(templateVMBox, data, callbacks);
+			monster.pub('common.mediaSelect.render', {
+				container: templateVMBox.find('.greeting-container'),
+				name: 'media.unavailable',
+				options: data.extra.mediaList,
+				selectedOption: (data.media || {}).unavailable,
+				label: self.i18n.active().vmboxes.popupSettings.greeting.dropdownLabel,
+				callback: function(greeting) {
+					monster.pub('common.mediaSelect.render', {
+						container: templateVMBox.find('.temporary-greeting-container'),
+						name: 'media.temporary_unavailable',
+						options: data.extra.mediaList,
+						selectedOption: (data.media || {}).temporary_unavailable,
+						label: self.i18n.active().vmboxes.popupSettings.greeting.temporary.label,
+						callback: function(temporaryGreeting) {
+							self.vmboxesEditBindEvents(templateVMBox, data, greeting, temporaryGreeting, callbacks);
 
-			var popup = monster.ui.dialog(templateVMBox, {
-				position: ['center', 20],
-				title: popupTitle,
-				width: '700'
+							popup = monster.ui.dialog(templateVMBox, {
+								position: ['center', 20],
+								title: popupTitle,
+								width: '700'
+							});
+						}
+					});
+				}
 			});
 		},
 
-		vmboxesEditBindEvents: function(templateVMBox, data, callbacks) {
+		vmboxesEditBindEvents: function(templateVMBox, data, greetingControl, temporaryGreetingControl, callbacks) {
 			var self = this,
 				vmboxForm = templateVMBox.find('#form_vmbox');
 
@@ -170,7 +189,7 @@ define(function(require) {
 
 			templateVMBox.find('.actions .save').on('click', function() {
 				if (monster.ui.valid(vmboxForm)) {
-					var dataToSave = self.vmboxesMergeData(data, templateVMBox);
+					var dataToSave = self.vmboxesMergeData(data, templateVMBox, greetingControl, temporaryGreetingControl);
 
 					self.vmboxesSaveVmbox(dataToSave, function(data) {
 						callbacks.afterSave && callbacks.afterSave(data);
@@ -240,99 +259,9 @@ define(function(require) {
 			templateVMBox.find('.saved-entities').on('click', '.delete-entity', function() {
 				$(this).parents('.entity-wrapper').remove();
 			});
-
-			//Greeting Media stuff
-			var mediaToUpload,
-				greetingContainer = templateVMBox.find('.greeting-container'),
-				closeUploadDiv = function(newMedia) {
-					mediaToUpload = undefined;
-					greetingContainer.find('.upload-div input').val('');
-					greetingContainer.find('.upload-div').slideUp(function() {
-						greetingContainer.find('.upload-toggle').removeClass('active');
-					});
-					if (newMedia) {
-						var mediaSelect = greetingContainer.find('.media-dropdown');
-						mediaSelect.append('<option value="' + newMedia.id + '">' + newMedia.name + '</option>');
-						mediaSelect.val(newMedia.id);
-					}
-				};
-
-			greetingContainer.find('.upload-input').fileUpload({
-				inputOnly: true,
-				wrapperClass: 'file-upload input-append',
-				btnText: self.i18n.active().vmboxes.popupSettings.greeting.audioUploadButton,
-				btnClass: 'monster-button',
-				maxSize: 5,
-				success: function(results) {
-					mediaToUpload = results[0];
-				},
-				error: function(errors) {
-					if (errors.hasOwnProperty('size') && errors.size.length > 0) {
-						monster.ui.alert(self.i18n.active().vmboxes.popupSettings.greeting.fileTooBigAlert);
-					}
-					greetingContainer.find('.upload-div input').val('');
-					mediaToUpload = undefined;
-				}
-			});
-
-			greetingContainer.find('.upload-toggle').on('click', function() {
-				if ($(this).hasClass('active')) {
-					greetingContainer.find('.upload-div').stop(true, true).slideUp();
-				} else {
-					greetingContainer.find('.upload-div').stop(true, true).slideDown();
-				}
-			});
-
-			greetingContainer.find('.upload-cancel').on('click', function() {
-				closeUploadDiv();
-			});
-
-			greetingContainer.find('.upload-submit').on('click', function() {
-				if (mediaToUpload) {
-					self.callApi({
-						resource: 'media.create',
-						data: {
-							accountId: self.accountId,
-							data: {
-								streamable: true,
-								name: mediaToUpload.name,
-								media_source: 'upload',
-								description: mediaToUpload.name
-							}
-						},
-						success: function(data, status) {
-							var media = data.data;
-							self.callApi({
-								resource: 'media.upload',
-								data: {
-									accountId: self.accountId,
-									mediaId: media.id,
-									data: mediaToUpload.file
-								},
-								success: function(data, status) {
-									closeUploadDiv(media);
-								},
-								error: function(data, status) {
-									self.callApi({
-										resource: 'media.delete',
-										data: {
-											accountId: self.accountId,
-											mediaId: media.id,
-											data: {}
-										},
-										success: function(data, status) {}
-									});
-								}
-							});
-						}
-					});
-				} else {
-					monster.ui.alert(self.i18n.active().vmboxes.popupSettings.greeting.emptyUploadAlert);
-				}
-			});
 		},
 
-		vmboxesMergeData: function(originalData, template) {
+		vmboxesMergeData: function(originalData, template, greetingControl, temporaryGreetingControl) {
 			var self = this,
 				formData = monster.ui.getFormData('form_vmbox'),
 				mergedData = $.extend(true, {}, originalData, formData);
@@ -358,8 +287,14 @@ define(function(require) {
 				delete mergedData.timezone;
 			}
 
+			mergedData.media.unavailable = greetingControl.getValue();
 			if (mergedData.media && mergedData.media.unavailable === 'none') {
 				delete mergedData.media.unavailable;
+			}
+
+			mergedData.media.temporary_unavailable = temporaryGreetingControl.getValue();
+			if (mergedData.media && mergedData.media.temporary_unavailable === 'none') {
+				delete mergedData.media.temporary_unavailable;
 			}
 
 			if (mergedData.media_extension && mergedData.media_extension === 'default') {

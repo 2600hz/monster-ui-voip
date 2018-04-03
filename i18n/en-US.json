@@ -1294,7 +1294,11 @@
 				"noGreeting": "- None -",
 				"audioUploadButton": "Browse...",
 				"fileTooBigAlert": "You can not upload a file with a size exceeding 5MB",
-				"emptyUploadAlert": "Please select a file to upload"
+				"emptyUploadAlert": "Please select a file to upload",
+
+				"temporary": {
+					"label": "Temporary:"
+				}
 			}
 		}
 	},
