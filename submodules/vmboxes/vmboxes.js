@@ -161,10 +161,7 @@ define(function(require) {
 			monster.ui.tabs(templateVMBox);
 
 			timezone.populateDropdown(templateVMBox.find('#timezone'), data.timezone || 'inherit', {inherit: self.i18n.active().defaultTimezone});
-			templateVMBox.find('#timezone').chosen({
-				search_contains: true,
-				width: '220px'
-			});
+			monster.ui.chosen(templateVMBox.find('#timezone'));
 
 			monster.ui.tooltips(templateVMBox);
 

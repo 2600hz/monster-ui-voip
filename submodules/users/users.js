@@ -610,7 +610,7 @@ define(function(require) {
 						if (type === 'name') {
 							currentUser = data;
 
-							template.find('#user_timezone').chosen({ search_contains: true, width: '220px' });
+							monster.ui.chosen(template.find('#user_timezone'));
 
 							data.extra.differentEmail ? template.find('.email-group').show() : template.find('.email-group').hide();
 						} else if (type === 'numbers') {
@@ -686,7 +686,7 @@ define(function(require) {
 
 					monster.ui.mask(userTemplate.find('#extension'), 'extension');
 
-					userTemplate.find('#licensed_role').chosen({search_contains: true, width: '220px'});
+					monster.ui.chosen(userTemplate.find('#licensed_role'));
 
 					monster.ui.validate(userTemplate.find('#form_user_creation'), {
 						rules: {
@@ -3189,7 +3189,7 @@ define(function(require) {
 				var formattedData = self.usersFormatLicensedRolesData(user),
 					template = $(monster.template(self, 'users-licensed-roles', formattedData));
 
-				template.find('#licensed_role').chosen({search_contains: true, width: '220px'});
+				monster.ui.chosen(template.find('#licensed_role'));
 
 				callback && callback(template, user);
 			});
