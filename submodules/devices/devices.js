@@ -414,7 +414,9 @@ define(function(require) {
 			monster.ui.tooltips(templateDevice);
 			monster.ui.mask(templateDevice.find('#mac_address'), 'macAddress');
 			monster.ui.mask(templateDevice.find('[name="call_forward.number"]'), 'phoneNumber');
-			templateDevice.find('.chosen-feature-key-user').chosen({ search_contains: true, width: 'inherit' });
+			monster.ui.chosen(templateDevice.find('.chosen-feature-key-user'), {
+				width: 'inherit'
+			});
 
 			if (!(data.media.encryption.enforce_security)) {
 				templateDevice.find('#rtp_method').hide();

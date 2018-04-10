@@ -782,17 +782,19 @@ define(function(require) {
 
 					$.each(template.find('.user-select select'), function() {
 						var $this = $(this);
-						$this.chosen({ search_contains: true, width: '160px' });
+						monster.ui.chosen($this, {
+							width: '160px'
+						});
 						$this.siblings('.title').text($this.find('option:selected').closest('optgroup').prop('label'));
 					});
 
-					template
-						.find('.voicemail-select select')
-							.chosen({ search_contains: true, width: '160px' });
+					monster.ui.chosen(template.find('.voicemail-select select'), {
+						width: '160px'
+					});
 
-					template
-						.find('.advancedCallflows-select select')
-							.chosen({ search_contains: true, width: '160px' });
+					monster.ui.chosen(template.find('.advancedCallflows-select select'), {
+						width: '160px'
+					});
 
 					callback && callback();
 
@@ -2458,7 +2460,9 @@ define(function(require) {
 				chooseExisting = container.find('#strategy_menu_popup_choose_existing'),
 				mediaToUpload;
 
-			container.find('.target-select').chosen({ search_contains: true, width: '150px' });
+			monster.ui.chosen(container.find('.target-select'), {
+				width: '150px'
+			});
 
 			container.find('.upload-input').fileUpload({
 				inputOnly: true,
