@@ -785,7 +785,7 @@ define(function(require) {
 				switchFeature = featureTemplate.find('.switch-state'),
 				popup;
 
-			featureTemplate.find('.next-action-select').chosen({ search_contains: true, width: '220px' });
+			monster.ui.chosen(featureTemplate.find('.next-action-select'));
 
 			featureTemplate.find('.cancel-link').on('click', function() {
 				popup.dialog('close').remove();
