@@ -337,6 +337,20 @@ define(function(require) {
 					});
 				});
 
+				$(function() {
+					templateDevice.find('.keys').sortable({
+						items: '.control-group',
+						update: function() {
+							templateDevice
+								.find('.feature-key-index')
+									.each(function(idx, el) {
+										$(el).text(idx + 1);
+									});
+						}
+					});
+					templateDevice.find('.keys').disableSelection();
+				});
+
 				templateDevice
 					.find('.feature-key-index')
 						.each(function(idx, el) {
