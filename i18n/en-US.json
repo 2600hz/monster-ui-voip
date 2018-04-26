@@ -1151,43 +1151,138 @@
 		"noFeatureCodeMessage": "There are no feature codes enabled on your account yet. Feature codes are automatically created when you load the Main Number page.",
 		"mainNumberLink": "Go to Main Number",
 		"labels": {
-			"qubicle login": "Agent Login",
-			"qubicle set ready": "Set Agent Ready",
-			"qubicle set away": "Set Agent Away",
-			"qubicle logout": "Agent Logout",
-			"call_forward[action=activate]": "Enable Call-Forward",
-			"call_forward[action=deactivate]": "Disable Call-Forward",
-			"call_forward[action=toggle]": "Toggle Call-Forward",
-			"call_forward[action=update]": "Update Call-Forward",
-			"call_forward[action=on_busy_enable]": "Enable Call-Forward on Busy",
-			"call_forward[action=on_busy_disable]": "Disable Call-Forward on Busy",
-			"call_forward[action=no_answer_enable]": "Enable Call-Forward No Answer",
-			"call_forward[action=no_answer_disable]": "Disable Call-Forward No Answer",
-			"hotdesk[action=login]": "Enable Hot Desking",
-			"hotdesk[action=logout]": "Disable Hot Desking",
-			"hotdesk[action=toggle]": "Toggle Hot Desking",
-			"voicemail[action=check]": "Check Voicemail",
-			"voicemail[action=\"direct\"]": "Direct to Voicemail",
-			"intercom": "Intercom",
-			"privacy[mode=full]": "Privacy",
-			"park_and_retrieve": "Park and Retrieve",
-			"valet": "Valet",
-			"retrieve": "Retrieve",
-			"donotdisturb[action=\"enable\"]": "Enable Do not disturb",
-			"donotdisturb[action=\"disable\"]": "Disable Do not disturb",
-			"donotdisturb[action=\"toggle\"]": "Toggle Do not disturb",
-			"directory": "Directory",
-			"time": "Check Time",
-			"call_waiting[action=enable]": "Enable Call-Waiting",
-			"call_waiting[action=disable]": "Disable Call-Waiting",
-			"sound_test_service": "Sound Test Service",
-			"call_recording": "Call Recording",
-			"__comment": "UI-1395: Added voicemail[single_mailbox_login] feature code",
-			"__version": "3.20",
-			"voicemail[single_mailbox_login]": "Check Voicemail (auto login)",
-			"__comment": "UI-2256: adding move feature code",
-			"__version": "4.0",
-			"move": "Move"
+			"qubicle login": {
+				"label": "Agent Login",
+				"tooltip": ""
+			},
+			"qubicle set ready": {
+				"label": "Set Agent Ready",
+				"tooltip": ""
+			},
+			"qubicle set away": {
+				"label": "Set Agent Away",
+				"tooltip": ""
+			},
+			"qubicle logout": {
+				"label": "Agent Logout",
+				"tooltip": ""
+			},
+			"call_forward[action=activate]": {
+				"label": "Enable Call-Forward",
+				"tooltip": ""
+			},
+			"call_forward[action=deactivate]": {
+				"label": "Disable Call-Forward",
+				"tooltip": ""
+			},
+			"call_forward[action=toggle]": {
+				"label": "Toggle Call-Forward",
+				"tooltip": ""
+			},
+			"call_forward[action=update]": {
+				"label": "Update Call-Forward",
+				"tooltip": ""
+			},
+			"call_forward[action=on_busy_enable]": {
+				"label": "Enable Call-Forward on Busy",
+				"tooltip": ""
+			},
+			"call_forward[action=on_busy_disable]": {
+				"label": "Disable Call-Forward on Busy",
+				"tooltip": ""
+			},
+			"call_forward[action=no_answer_enable]": {
+				"label": "Enable Call-Forward No Answer",
+				"tooltip": ""
+			},
+			"call_forward[action=no_answer_disable]": {
+				"label": "Disable Call-Forward No Answer",
+				"tooltip": ""
+			},
+			"hotdesk[action=login]": {
+				"label": "Enable Hot Desking",
+				"tooltip": ""
+			},
+			"hotdesk[action=logout]": {
+				"label": "Disable Hot Desking",
+				"tooltip": ""
+			},
+			"hotdesk[action=toggle]": {
+				"label": "Toggle Hot Desking",
+				"tooltip": ""
+			},
+			"voicemail[action=check]": {
+				"label": "Check Voicemail",
+				"tooltip": ""
+			},
+			"voicemail[action=\"direct\"]": {
+				"label": "Direct to Voicemail",
+				"tooltip": ""
+			},
+			"voicemail[single_mailbox_login]": {
+				"label": "Check Voicemail (auto login)",
+				"tooltip": ""
+			},
+			"intercom": {
+				"label": "Intercom",
+				"tooltip": ""
+			},
+			"privacy[mode=full]": {
+				"label": "Privacy",
+				"tooltip": ""
+			},
+			"park_and_retrieve": {
+				"label": "Park and Retrieve",
+				"tooltip": ""
+			},
+			"valet": {
+				"label": "Valet",
+				"tooltip": ""
+			},
+			"retrieve": {
+				"label": "Retrieve",
+				"tooltip": ""
+			},
+			"donotdisturb[action=\"enable\"]": {
+				"label": "Enable Do not disturb",
+				"tooltip": ""
+			},
+			"donotdisturb[action=\"disable\"]": {
+				"label": "Disable Do not disturb",
+				"tooltip": ""
+			},
+			"donotdisturb[action=\"toggle\"]": {
+				"label": "Toggle Do not disturb",
+				"tooltip": ""
+			},
+			"directory": {
+				"label": "Directory",
+				"tooltip": ""
+			},
+			"time": {
+				"label": "Check Time",
+				"tooltip": ""
+			},
+			"call_waiting[action=enable]": {
+				"label": "Enable Call-Waiting",
+				"tooltip": ""
+			},
+			"call_waiting[action=disable]": {
+				"label": "Disable Call-Waiting",
+				"tooltip": ""
+			},
+			"sound_test_service": {
+				"label": "Sound Test Service",
+				"tooltip": ""
+			},
+			"call_recording": {
+				"label": "Call Recording",
+				"tooltip": ""
+			},
+			"move": {
+				"label": "Move",
+				"tooltip": ""
+			}
 		},
 		"__comment": "UI-1028, v3.20_s0: Added categories for the feature codes.",
 		"categories": {

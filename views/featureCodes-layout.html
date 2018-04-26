@@ -11,6 +11,9 @@
 					<div class="feature-code-line">
 						<div class="feature-code-label">
 							{{name}}
+						{{#if tooltip}}
+							<i class="fa fa-question-circle" data-toggle="tooltip" title="{{tooltip}}"></i>
+						{{/if}}
 						</div>
 						<div class="feature-code">
 							<div class="code-prefix">{{#if hasStar}}*{{/if}}</div>
