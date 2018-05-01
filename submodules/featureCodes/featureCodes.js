@@ -67,6 +67,8 @@ define(function(require) {
 			self.featureCodesLoadData(function(featureCodesData) {
 				var template = $(monster.template(self, 'featureCodes-layout', { featureCodes: self.featureCodesFormatData(featureCodesData) }));
 
+				monster.ui.tooltips(template);
+
 				self.featureCodesBindEvents({
 					parent: parent,
 					template: template,
@@ -125,7 +127,8 @@ define(function(require) {
 
 					featureCodes[category].codes.push({
 						key: callflow.featurecode.name,
-						name: self.i18n.active().featureCodes.labels[callflow.featurecode.name] || callflow.featurecode.name,
+						name: self.i18n.active().featureCodes.labels[callflow.featurecode.name].label || callflow.featurecode.name,
+						tooltip: self.i18n.active().featureCodes.labels[callflow.featurecode.name].tooltip || undefined,
 						number: callflow.featurecode.number ? callflow.featurecode.number.replace(/\\/g, '') : '',
 						hasStar: hasStar
 					});

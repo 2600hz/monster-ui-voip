@@ -48,6 +48,13 @@
 	width: 200px;
 	text-align: right;
 	margin-right: 20px;
+	padding-right: 25px;
+	position: relative;
+}
+
+#feature_codes_container .feature-codes-content .feature-code-label i {
+	position: absolute;
+	right: 0;
 }
 
 #feature_codes_container .feature-code {
