@@ -1169,19 +1169,19 @@
 			},
 			"call_forward[action=activate]": {
 				"label": "Enable Call-Forward",
-				"tooltip": ""
+				"tooltip": "(Dial *72, then the number to forward to)"
 			},
 			"call_forward[action=deactivate]": {
 				"label": "Disable Call-Forward",
-				"tooltip": ""
+				"tooltip": "(Dial *73)"
 			},
 			"call_forward[action=toggle]": {
 				"label": "Toggle Call-Forward",
-				"tooltip": ""
+				"tooltip": "(Dial *74) The system forwards to that same number as previous forward."
 			},
 			"call_forward[action=update]": {
 				"label": "Update Call-Forward",
-				"tooltip": ""
+				"tooltip": "(Dial *56, then number to forward to) This will update where your calls are forwarded to."
 			},
 			"call_forward[action=on_busy_enable]": {
 				"label": "Enable Call-Forward on Busy",
@@ -1201,47 +1201,47 @@
 			},
 			"hotdesk[action=login]": {
 				"label": "Enable Hot Desking",
-				"tooltip": ""
+				"tooltip": "(Dial *11 + Hotdesk ID) Hotdesk ID can be configured in SmartPBX under User. All calls will be sent to this device."
 			},
 			"hotdesk[action=logout]": {
 				"label": "Disable Hot Desking",
-				"tooltip": ""
+				"tooltip": "(Dial *12) \"logout\" of this phone."
 			},
 			"hotdesk[action=toggle]": {
 				"label": "Toggle Hot Desking",
-				"tooltip": ""
+				"tooltip": "(Dial *13 + Hotdesk ID) To turn Hotdesk on/off from any device."
 			},
 			"voicemail[action=check]": {
 				"label": "Check Voicemail",
-				"tooltip": ""
+				"tooltip": "(Dial *97 + extension number) You can log into other Mailboxes."
 			},
 			"voicemail[action=\"direct\"]": {
 				"label": "Direct to Voicemail",
-				"tooltip": ""
+				"tooltip": "(Press transfer, then ** + extension number of recipient) Call will go straight to voicemail."
 			},
 			"voicemail[single_mailbox_login]": {
 				"label": "Check Voicemail (auto login)",
-				"tooltip": ""
+				"tooltip": "(Dial *98 then password) If auto-login is enabled, you do not require a password."
 			},
 			"intercom": {
 				"label": "Intercom",
-				"tooltip": ""
+				"tooltip": "(Dial *0 + the extension number) If the phone supports intercom it will answer hands-free and you can speak."
 			},
 			"privacy[mode=full]": {
 				"label": "Privacy",
-				"tooltip": ""
+				"tooltip": "(Dial *67 + the number you are calling) This will block your Caller ID."
 			},
 			"park_and_retrieve": {
 				"label": "Park and Retrieve",
-				"tooltip": ""
+				"tooltip": "(Dial *3) This will announce the next available 'Parking Spot #'. (Dial *3) again to complete Park the call."
 			},
 			"valet": {
 				"label": "Valet",
-				"tooltip": ""
+				"tooltip": "(Dial *4 plus a specific number) to park a call in a specific number. Example: *4 + 101 = call is parked in spot 101"
 			},
 			"retrieve": {
 				"label": "Retrieve",
-				"tooltip": ""
+				"tooltip": "(Dial *5 plus a specific parked number) to retrieve parked call. Example: *5+101 = call is picked up from parking spot 101"
 			},
 			"donotdisturb[action=\"enable\"]": {
 				"label": "Enable Do not disturb",
@@ -1281,7 +1281,7 @@
 			},
 			"move": {
 				"label": "Move",
-				"tooltip": ""
+				"tooltip": "(Dial from any phone not in use) The system will scan for a user's call on a different phone and \"move\" it to this phone."
 			}
 		},
 		"__comment": "UI-1028, v3.20_s0: Added categories for the feature codes.",
