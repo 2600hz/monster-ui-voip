@@ -149,7 +149,7 @@ define(function(require) {
 			template.find('.download-csv').on('click', function(e) {
 				var fromDateTimestamp = monster.util.dateToBeginningOfGregorianDay(fromDate),
 					toDateTimestamp = monster.util.dateToEndOfGregorianDay(toDate),
-					url = self.apiUrl + 'accounts/' + self.accountId + '/cdrs?created_from=' + fromDateTimestamp + '&created_to=' + toDateTimestamp + '&accept=text/csv&auth_token=' + self.getAuthToken();
+					url = self.apiUrl + 'accounts/' + self.accountId + '/cdrs?created_from=' + fromDateTimestamp + '&created_to=' + toDateTimestamp + '&paginate=false&accept=text/csv&auth_token=' + self.getAuthToken();
 
 				window.open(url, '_blank');
 			});
