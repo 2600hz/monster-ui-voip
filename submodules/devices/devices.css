@@ -62,8 +62,8 @@
 	color: #22a5ff;
 }
 
-#devices_container .devices-header .search-box { 
-	margin: 16px 0 16px 15px; 
+#devices_container .devices-header .search-box {
+	margin: 16px 0 16px 15px;
 }
 
 #devices_container .devices-grid {
@@ -384,6 +384,12 @@
 .voip-edit-device-popup .edit-device .feature-key-value label {
 	display: inline-block;
 	margin-right: 10px;
+}
+
+.voip-edit-device-popup .keys .fa {
+	display: inline-block;
+	padding-right: 15px;
+	cursor: move;
 }
 
 /* Codecs selector */
