@@ -2166,7 +2166,6 @@ define(function(require) {
 						formData.failover = true;
 					} else {
 						formData.enabled = true;
-						formData.failover = true;
 					}
 
 					formData.number = monster.util.unformatPhoneNumber(formData.number, 'keepPlus');
