@@ -118,7 +118,8 @@ define(function(require) {
 			});
 
 			_.each(mapGroups, function(group) {
-				arrayGroups.push(group);
+				// Only list groups created with SmartPBX (e.g. with an associated baseGroup callflow)
+				group.extra.hasOwnProperty('baseCallflowId') && arrayGroups.push(group);
 			});
 
 			arrayGroups.sort(function(a, b) {
