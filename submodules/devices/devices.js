@@ -606,7 +606,6 @@ define(function(require) {
 		devicesMergeData: function(originalData, template, audioCodecs, videoCodecs) {
 			var self = this,
 				hasCodecs = $.inArray(originalData.device_type, ['sip_device', 'landline', 'fax', 'ata', 'softphone', 'smartphone', 'mobile', 'sip_uri']) > -1,
-				hasSIP = $.inArray(originalData.device_type, ['sip_device', 'fax', 'ata', 'softphone', 'smartphone', 'mobile']) > -1,
 				hasCallForward = $.inArray(originalData.device_type, ['landline', 'cellphone', 'smartphone']) > -1,
 				hasRTP = $.inArray(originalData.device_type, ['sip_device', 'mobile', 'softphone']) > -1,
 				formData = monster.ui.getFormData('form_device');
@@ -640,14 +639,6 @@ define(function(require) {
 						codecs: []
 					}
 				}, formData.media);
-			}
-
-			if (hasSIP) {
-				formData.sip = $.extend(true, {
-					expire_seconds: 360,
-					invite_format: 'contact',
-					method: 'password'
-				}, formData.sip);
 			}
 
 			if ('call_restriction' in formData) {
