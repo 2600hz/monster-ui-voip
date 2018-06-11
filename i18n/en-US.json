@@ -1233,11 +1233,11 @@
 			},
 			"park_and_retrieve": {
 				"label": "Park and Retrieve",
-				"tooltip": "(Dial *3) This will announce the next available 'Parking Spot #'. (Dial *3) again to complete Park the call."
+				"tooltip": "(Dial *3 plus a specific number) to park a call in a specific number. Example: *3 + 101 = call is parked in spot 101"
 			},
 			"valet": {
 				"label": "Valet",
-				"tooltip": "(Dial *4 plus a specific number) to park a call in a specific number. Example: *4 + 101 = call is parked in spot 101"
+				"tooltip": "(Dial *4) This will announce the next available 'Parking Spot #'. (Dial *4) again to complete Park the call."
 			},
 			"retrieve": {
 				"label": "Retrieve",
