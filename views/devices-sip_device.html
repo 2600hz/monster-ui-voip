@@ -222,6 +222,19 @@
 					</label>
 				</div>
 
+				<div class="control-group">
+					<label class="control-label checkbox">
+						<span>{{ i18n.devices.popupSettings.miscellaneous.outbound_privacy.type }}</span>
+						<select class="input-small" name="caller_id_options.outbound_privacy">
+							<option value="default"{{#compare caller_id_options.outbound_privacy "===" "default"}} selected{{/compare}}>{{ i18n.devices.popupSettings.miscellaneous.outbound_privacy.default }}</option>
+							<option value="none"{{#compare caller_id_options.outbound_privacy "===" "none"}} selected{{/compare}}>{{ i18n.devices.popupSettings.miscellaneous.outbound_privacy.none }}</option>
+							<option value="number"{{#compare caller_id_options.outbound_privacy "===" "number"}} selected{{/compare}}>{{ i18n.devices.popupSettings.miscellaneous.outbound_privacy.number }}</option>
+							<option value="name"{{#compare caller_id_options.outbound_privacy "===" "name"}} selected{{/compare}}>{{ i18n.devices.popupSettings.miscellaneous.outbound_privacy.name }}</option>
+							<option value="full"{{#compare caller_id_options.outbound_privacy "===" "full"}} selected{{/compare}}>{{ i18n.devices.popupSettings.miscellaneous.outbound_privacy.full }}</option>
+						</select>
+					</label>
+				</div>
+
 				<div class="rtp-line clearfix">
 					<div class="control-group">
 						<label class="control-label checkbox">

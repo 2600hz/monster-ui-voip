@@ -200,6 +200,14 @@
 					"srtp": "SRTP",
 					"zrtp": "ZRTP"
 				},
+				"outbound_privacy": {
+					"type": "Caller-ID privacy ",
+					"default": "Default",
+					"none": "None",
+					"number": "Number",
+					"name": "Name",
+					"full": "Full"
+				},
 				"__comment": "UI-1119: Adding ignore_complete_elsewhere",
 				"__version": "3.19",
 				"ignoreCompletedElsewhere": {

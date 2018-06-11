@@ -728,6 +728,14 @@ define(function(require) {
 				delete mergedData.media.fax.option;
 			}
 
+			if (mergedData.hasOwnProperty('caller_id_options') && mergedData.caller_id_options.hasOwnProperty('outbound_privacy') && mergedData.caller_id_options.outbound_privacy === 'default') {
+				delete mergedData.caller_id_options.outbound_privacy;
+
+				if (_.isEmpty(mergedData.caller_id_options)) {
+					delete mergedData.caller_id_options;
+				}
+			}
+
 			if (mergedData.hasOwnProperty('caller_id') && mergedData.caller_id.hasOwnProperty('emergency') && mergedData.caller_id.emergency.hasOwnProperty('number') && mergedData.caller_id.emergency.number === '') {
 				delete mergedData.caller_id.emergency.number;
 
