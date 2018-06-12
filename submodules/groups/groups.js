@@ -1009,7 +1009,7 @@ define(function(require) {
 
 			template.find('.delete-group').on('click', function() {
 				monster.ui.confirm(self.i18n.active().groups.confirmDeleteGroup, function() {
-					self.groupsDelete(data.id, function(data) {
+					self.groupsDelete(data.group.id, function(data) {
 						toastr.success(monster.template(self, '!' + self.i18n.active().groups.groupDeleted, { name: data.group.name }));
 
 						self.groupsRender();
