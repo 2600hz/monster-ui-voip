@@ -108,6 +108,7 @@ define(function(require) {
 				// Some old callflows have been created with the feature code key, so we had the check to make sure they also have a name associated
 				if (callflow.featurecode.hasOwnProperty('name')) {
 					var category = 'misc',
+						i18nFeatureCode = self.i18n.active().featureCodes.labels[callflow.featurecode.name],
 						hasStar = (callflow.hasOwnProperty('numbers') && callflow.numbers.length && callflow.numbers[0].substr(0, 1) === '*') || (callflow.hasOwnProperty('patterns') && callflow.patterns.length && callflow.patterns[0].substr(0, 3) === '^\\*');
 
 					_.find(self.categories, function(cat, key) {
@@ -127,8 +128,12 @@ define(function(require) {
 
 					featureCodes[category].codes.push({
 						key: callflow.featurecode.name,
-						name: self.i18n.active().featureCodes.labels[callflow.featurecode.name].label || callflow.featurecode.name,
-						tooltip: self.i18n.active().featureCodes.labels[callflow.featurecode.name].tooltip || undefined,
+						name: i18nFeatureCode
+							? i18nFeatureCode.label
+							: _.capitalize(callflow.featurecode.name),
+						tooltip: i18nFeatureCode
+							? i18nFeatureCode.tooltip
+							: undefined,
 						number: callflow.featurecode.number ? callflow.featurecode.number.replace(/\\/g, '') : '',
 						hasStar: hasStar
 					});
