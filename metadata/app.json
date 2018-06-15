@@ -2,7 +2,7 @@
 	"name": "voip",
 	"i18n": {
 		"en-US": {
-			"label": "Smart PBX",
+			"label": "SmartPBX",
 			"description": "Hosted PBX gives you full control to set up and manage office phone system.",
 			"extended_description": "The SmartPBX app combines the most common PBX functionality with a beautiful user interface and an intuitive experience. An advanced set of features such as individual fax-to-email boxes, call forwarding and hot desking are easy to understand and utilize. A simple dashboard provides a quick but comprehensive overview of system configuration and status. Within this dashboard, review total users and devices, assign conference bridges and phone numbers. Create customized greetings and call routes to give businesses that professional touch. Set functionality with a beautiful user interface and an intuitive experience. Set up a main business phone number and utilize the pre-built Virtual Receptionist to handle inbound calls.",
 			"features": [
@@ -39,7 +39,7 @@
 		}
 	},
 	"tags": [
-		"reseller"
+		"admin"
 	],
 	"icon": "SmartPBX_app.png",
 	"api_url": "http://10.26.0.41:8000/v2",
@@ -58,5 +58,6 @@
 		"documentation": "{documentation_url}",
 		"howto": "{howto_video_url}"
 	},
+	"phase": "gold",
 	"pvt_type": "app"
 }
