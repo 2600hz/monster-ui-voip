@@ -4697,7 +4697,7 @@ define(function(require) {
 				});
 			} else {
 				var defaultFaxbox = {
-					retires: 3,
+					retries: 3,
 					name: user.first_name.concat(' ', user.last_name, self.i18n.active().users.faxing.defaultSettings.nameExtension),
 					caller_name: user.first_name.concat(' ', user.last_name),
 					fax_header: monster.config.whitelabel.companyName.concat(self.i18n.active().users.faxing.defaultSettings.headerExtension),
