@@ -200,6 +200,14 @@
 					"srtp": "SRTP",
 					"zrtp": "ZRTP"
 				},
+				"outbound_privacy": {
+					"type": "Caller-ID privacy ",
+					"default": "Default",
+					"none": "None",
+					"number": "Number",
+					"name": "Name",
+					"full": "Full"
+				},
 				"__comment": "UI-1119: Adding ignore_complete_elsewhere",
 				"__version": "3.19",
 				"ignoreCompletedElsewhere": {
@@ -499,7 +507,15 @@
 			"languageHelp": "This will change the language of the text displayed in the UI",
 			"timezoneHelp": "This will set the Timezone used for this User's devices and Voicemail Box",
 			"ringingHelp": "This will set the Ringing Timeout for this User and his Devices. For example, if you set it to 20, this user will be rung for 20 seconds before the system moves to his Voicemail Box",
-			"mainExtensionHelp": "This will define the Caller-ID used for this User for calls inside the system, as well as setting his Presence ID to that number"
+			"mainExtensionHelp": "This will define the Caller-ID used for this User for calls inside the system, as well as setting his Presence ID to that number",
+			"outbound_privacy": {
+				"type": "Caller-ID privacy ",
+				"default": "Default",
+				"none": "None",
+				"number": "Number",
+				"name": "Name",
+				"full": "Full"
+			}
 		},
 		"delete": "Delete User",
 		"errorCallerId": "Before configuring the Caller-ID of this user, you need to assign them a number",

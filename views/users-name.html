@@ -117,6 +117,17 @@
 					{{/select}}
 				</select>
 			</div>
+
+			<div class="row-fields">
+				<lavel class="fix-left">{{ i18n.users.editionForm.outbound_privacy.type }}</label>
+				<select id="privacy_type" name="caller_id_options.outbound_privacy">
+					<option value="default"{{#compare caller_id_options.outbound_privacy "===" "default"}} selected{{/compare}}>{{ i18n.users.editionForm.outbound_privacy.default }}</option>
+					<option value="none"{{#compare caller_id_options.outbound_privacy "===" "none"}} selected{{/compare}}>{{ i18n.users.editionForm.outbound_privacy.none }}</option>
+					<option value="number"{{#compare caller_id_options.outbound_privacy "===" "number"}} selected{{/compare}}>{{ i18n.users.editionForm.outbound_privacy.number }}</option>
+					<option value="name"{{#compare caller_id_options.outbound_privacy "===" "name"}} selected{{/compare}}>{{ i18n.users.editionForm.outbound_privacy.name }}</option>
+					<option value="full"{{#compare caller_id_options.outbound_privacy "===" "full"}} selected{{/compare}}>{{ i18n.users.editionForm.outbound_privacy.full }}</option>
+				</select>
+			</div>
 		</div>
 		<!--<div class="advanced-fields content-centered span3">
 			<a id="resend_instructions" href="javascript:void(0)">{{ i18n.users.resendInstructions }}</a>
