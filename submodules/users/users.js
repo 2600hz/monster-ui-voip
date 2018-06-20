@@ -2919,6 +2919,14 @@ define(function(require) {
 				userData.caller_id.internal.number = userData.presence_id + '';
 			}
 
+			if (userData.hasOwnProperty('caller_id_options') && userData.caller_id_options.hasOwnProperty('outbound_privacy') && userData.caller_id_options.outbound_privacy === 'default') {
+				delete userData.caller_id_options.outbound_privacy;
+
+				if (_.isEmpty(userData.caller_id_options)) {
+					delete userData.caller_id_options;
+				}
+			}
+
 			if (userData.timezone === 'inherit') {
 				delete userData.timezone;
 			}
