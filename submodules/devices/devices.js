@@ -735,6 +735,12 @@ define(function(require) {
 			var self = this,
 				defaults = {
 					extra: {
+						outboundPrivacy: _.map(self.appFlags.common.outboundPrivacy, function(strategy) {
+							return {
+								key: strategy,
+								value: self.i18n.active().commonMisc.outboundPrivacy.values[strategy]
+							};
+						}),
 						hasE911Numbers: !_.isEmpty(data.e911Numbers),
 						e911Numbers: data.e911Numbers,
 						restrictions: data.listClassifiers,

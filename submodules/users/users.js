@@ -233,7 +233,13 @@ define(function(require) {
 							iconColor: 'monster-blue',
 							title: self.i18n.active().users.callRecording.title
 						}
-					}
+					},
+					outboundPrivacy: _.map(self.appFlags.common.outboundPrivacy, function(item) {
+						return {
+							key: item,
+							value: self.i18n.active().commonMisc.outboundPrivacy.values[item]
+						};
+					})
 				};
 
 			if (!('extra' in dataUser)) {

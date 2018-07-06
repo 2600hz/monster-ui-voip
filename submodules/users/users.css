@@ -348,11 +348,6 @@
 	cursor: default !important;
 }
 
-#users_container .detail-user .row-fields .presence-id-select {
-	margin-left: 10px;
-	width: 72px;
-}
-
 #users_container .detail-user .row-fields .timeout-edit {
 	margin-left: 50px;
 }
@@ -369,6 +364,14 @@
 #users_container .detail-user .row-fields label.monster-invalid[for="ringing_timeout"] {
 	margin: 0px;
 	display: block;
+}
+
+#users_container .detail-user .row-fields .inline-block {
+	display: inline-block;
+}
+
+#users_container .detail-user .row-fields .inline-block select {
+	margin: 0 7px;
 }
 
 #users_container .detail-user .email-border {

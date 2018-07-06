@@ -30,6 +30,15 @@ define(function(require) {
 		requests: {},
 		subscribe: {},
 		appFlags: {
+			common: {
+				outboundPrivacy: [
+					'default',
+					'none',
+					'number',
+					'name',
+					'full'
+				]
+			},
 			global: {}
 		},
 
