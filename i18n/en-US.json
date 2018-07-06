@@ -1247,7 +1247,7 @@
 			},
 			"valet": {
 				"label": "Valet",
-				"tooltip": "(Dial *4) This will announce the next available 'Parking Spot #'. (Dial *4) again to complete Park the call."
+				"tooltip": "(Dial *4) This will announce the next available 'Parking Spot #'."
 			},
 			"retrieve": {
 				"label": "Retrieve",
