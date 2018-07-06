@@ -14,15 +14,6 @@ define(function(require) {
 		},
 
 		appFlags: {
-			common: {
-				outboundPrivacy: [
-					'default',
-					'none',
-					'number',
-					'name',
-					'full'
-				]
-			},
 			users: {
 				smartPBXCallflowString: ' SmartPBX\'s Callflow',
 				smartPBXConferenceString: ' SmartPBX Conference',

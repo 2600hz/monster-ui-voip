@@ -223,16 +223,21 @@
 				</div>
 
 				<div class="control-group">
-					<label class="control-label checkbox">
-						<span>{{ i18n.devices.popupSettings.miscellaneous.outbound_privacy.type }}</span>
-						<select class="input-small" name="caller_id_options.outbound_privacy">
-							<option value="default"{{#compare caller_id_options.outbound_privacy "===" "default"}} selected{{/compare}}>{{ i18n.devices.popupSettings.miscellaneous.outbound_privacy.default }}</option>
-							<option value="none"{{#compare caller_id_options.outbound_privacy "===" "none"}} selected{{/compare}}>{{ i18n.devices.popupSettings.miscellaneous.outbound_privacy.none }}</option>
-							<option value="number"{{#compare caller_id_options.outbound_privacy "===" "number"}} selected{{/compare}}>{{ i18n.devices.popupSettings.miscellaneous.outbound_privacy.number }}</option>
-							<option value="name"{{#compare caller_id_options.outbound_privacy "===" "name"}} selected{{/compare}}>{{ i18n.devices.popupSettings.miscellaneous.outbound_privacy.name }}</option>
-							<option value="full"{{#compare caller_id_options.outbound_privacy "===" "full"}} selected{{/compare}}>{{ i18n.devices.popupSettings.miscellaneous.outbound_privacy.full }}</option>
-						</select>
+					<label for="outbound_privacy" class="control-label checkbox">
+						{{i18n.commonMisc.outboundPrivacy.label}}
+						<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" title="{{i18n.commonMisc.outboundPrivacy.tooltip}}"></i>
 					</label>
+					<div class="controls">
+						<select name="caller_id_options.outbound_privacy" id="outbound_privacy" class="input-medium">
+						{{#select caller_id_options.outbound_privacy}}
+							{{#each extra.outboundPrivacy}}
+								<option value="{{key}}">
+									{{value}}
+								</option>
+							{{/each}}
+						{{/select}}
+						</select>
+					</div>
 				</div>
 
 				<div class="rtp-line clearfix">
