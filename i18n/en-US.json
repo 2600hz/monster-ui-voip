@@ -18,6 +18,20 @@
 		"vmboxes": "Voicemail Boxes"
 	},
 
+	"commonMisc": {
+		"outboundPrivacy": {
+			"label": "Caller-ID privacy",
+			"tooltip": "Determines what appears as Caller-ID for offnet outbound calls.",
+			"values": {
+				"default": "- Default -",
+				"none": "Hide nothing",
+				"number": "Hide number only",
+				"name": "Hide name only",
+				"full": "Hide name and number"
+			}
+		}
+	},
+
 	"groups": {
 		"addFromSpare": "Add from Spare Numbers",
 		"add": "Add Group",
@@ -507,15 +521,7 @@
 			"languageHelp": "This will change the language of the text displayed in the UI",
 			"timezoneHelp": "This will set the Timezone used for this User's devices and Voicemail Box",
 			"ringingHelp": "This will set the Ringing Timeout for this User and his Devices. For example, if you set it to 20, this user will be rung for 20 seconds before the system moves to his Voicemail Box",
-			"mainExtensionHelp": "This will define the Caller-ID used for this User for calls inside the system, as well as setting his Presence ID to that number",
-			"outbound_privacy": {
-				"type": "Caller-ID privacy ",
-				"default": "Default",
-				"none": "None",
-				"number": "Number",
-				"name": "Name",
-				"full": "Full"
-			}
+			"mainExtensionHelp": "This will define the Caller-ID used for this User for calls inside the system, as well as setting his Presence ID to that number"
 		},
 		"delete": "Delete User",
 		"errorCallerId": "Before configuring the Caller-ID of this user, you need to assign them a number",
