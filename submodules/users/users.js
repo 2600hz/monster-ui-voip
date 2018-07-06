@@ -238,7 +238,13 @@ define(function(require) {
 							iconColor: 'monster-red',
 							title: self.i18n.active().users.do_not_disturb.title
 						}
-					}
+					},
+					outboundPrivacy: _.map(self.appFlags.common.outboundPrivacy, function(item) {
+						return {
+							key: item,
+							value: self.i18n.active().commonMisc.outboundPrivacy.values[item]
+						};
+					})
 				};
 
 			if (!('extra' in dataUser)) {
