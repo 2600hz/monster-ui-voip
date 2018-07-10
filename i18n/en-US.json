@@ -154,11 +154,16 @@
 
 	"devices": {
 		"add": "Add Device",
+		"addOrEdit": {
+			"error": "Could not process device data. Please try again later."
+		},
 		"assigned": "Assigned",
+		"assignTo": "Assign To",
 		"createDevice": "Create Device",
 		"confirmDeleteDevice": "This device will be permanently deleted. Continue?",
 		"deleteDevice": "Delete Device",
 		"deletedDevice": "You successfully deleted the following device \"{{deviceName}}\".",
+		"noOwner": "- No Owner -",
 		"popupSettings": {
 			"advancedTitle": "Advanced",
 			"basicTitle": "Basic Settings",
