@@ -334,7 +334,7 @@ define(function(require) {
 							_.each(value.data, function(val, key) {
 								if (val) {
 									var groupSelector = '.control-group[data-id="' + key + '"] ',
-									valueSelector = '.feature-key-value[data-type="' + val.type + '"]';
+										valueSelector = '.feature-key-value[data-type="' + val.type + '"]';
 
 									templateDevice
 									.find(section.concat(groupSelector, valueSelector))
@@ -531,8 +531,8 @@ define(function(require) {
 								},
 								success: function(data, status) {
 									var matchedLine = templateDevice.find('.restriction-line[data-restriction="' + data.data.name + '"]'),
-									matchedSign = matchedLine.find('.restriction-matcher-sign'),
-									matchedMsg = templateDevice.find('.restriction-message');
+										matchedSign = matchedLine.find('.restriction-matcher-sign'),
+										matchedMsg = templateDevice.find('.restriction-message');
 
 									templateDevice.find('.restriction-matcher-sign').hide();
 									if (matchedLine.find('.restrictions-switch').prop('checked')) {
@@ -753,7 +753,7 @@ define(function(require) {
 			delete mergedData.extra;
 
 			//if there is no owner, do not add one.
-			if (mergedData.owner_id && mergedData.owner_id == self.i18n.active().devices.noOwner) {
+			if (mergedData.owner_id && mergedData.owner_id === self.i18n.active().devices.noOwner) {
 				delete mergedData.owner_id;
 			}
 
