@@ -752,6 +752,11 @@ define(function(require) {
 			delete mergedData.media.secure_rtp;
 			delete mergedData.extra;
 
+			//if there is no owner, do not add one.
+			if (mergedData.owner_id && mergedData.owner_id == self.i18n.active().Conversant.devices.noOwner) {
+				delete mergedData.owner_id;
+			}
+
 			return mergedData;
 		},
 
