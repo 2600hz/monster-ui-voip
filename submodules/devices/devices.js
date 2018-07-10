@@ -321,7 +321,11 @@ define(function(require) {
 							isProvisionerConfigured: monster.config.api.hasOwnProperty('provisioner'),
 							showEmergencyCnam: monster.util.isNumberFeatureEnabled('cnam') && monster.util.isNumberFeatureEnabled('e911')
 						}))),
-						deviceForm = templateDevice.find('#form_device');
+						deviceForm = templateDevice.find('#form_device'),
+						assignToTemplate = $(monster.template(self, 'devices-assign-to', data));
+					templateDevice.find('#form_device .tabs-section .control-group')
+						.first()
+						.after(assignToTemplate);
 
 					if (data.extra.hasOwnProperty('provision') && data.extra.provision.hasOwnProperty('keys')) {
 						_.each(data.extra.provision.keys, function(value) {
