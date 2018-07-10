@@ -347,10 +347,10 @@ define(function(require) {
 								valueSelector = '.feature-key-value[data-type="' + val.type + '"]';
 
 							templateDevice
-							.find(section.concat(groupSelector, valueSelector))
-							.addClass('active')
-							.find('[name="provision.keys.' + value.id + '[' + key + '].value"]')
-							.val(val.value);
+								.find(section.concat(groupSelector, valueSelector))
+									.addClass('active')
+								.find('[name="provision.keys.' + value.id + '[' + key + '].value"]')
+									.val(val.value);
 						}
 					});
 				});
@@ -359,19 +359,19 @@ define(function(require) {
 					items: '.control-group',
 					update: function() {
 						templateDevice
-							.find('.feature-key-index')
-							.each(function(idx, el) {
-								$(el).text(idx + 1);
-							});
+								.find('.feature-key-index')
+									.each(function(idx, el) {
+										$(el).text(idx + 1);
+									});
 					}
 				});
 
 				templateDevice
 					.find('.feature-key-index')
-					.each(function(idx, el) {
-						$(el)
-						.text(parseInt($(el).text(), 10) + 1);
-					});
+						.each(function(idx, el) {
+							$(el)
+								.text(parseInt($(el).text(), 10) + 1);
+						});
 			}
 
 			if (data.extra.hasE911Numbers) {
@@ -381,10 +381,10 @@ define(function(require) {
 					currentNumber = data.caller_id.emergency.number;
 					self.devicesGetE911NumberAddress(data.caller_id.emergency.number, function(address) {
 						templateDevice
-							.find('.number-address')
-							.show()
-							.find('p')
-							.html(address);
+									.find('.number-address')
+									.show()
+									.find('p')
+									.html(address);
 					});
 				}
 
@@ -547,28 +547,28 @@ define(function(require) {
 							templateDevice.find('.restriction-matcher-sign').hide();
 							if (matchedLine.find('.restrictions-switch').prop('checked')) {
 								matchedSign
-								.removeClass('monster-red fa-times')
-								.addClass('monster-green fa-check')
-								.css('display', 'inline-block');
+									.removeClass('monster-red fa-times')
+									.addClass('monster-green fa-check')
+									.css('display', 'inline-block');
 
 								matchedMsg
-								.removeClass('red-box')
-								.addClass('green-box')
-								.css('display', 'inline-block')
-								.empty()
-								.text(monster.template(self, '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.allowMessage, { phoneNumber: monster.util.formatPhoneNumber(number) }));
+									.removeClass('red-box')
+									.addClass('green-box')
+									.css('display', 'inline-block')
+									.empty()
+									.text(monster.template(self, '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.allowMessage, { phoneNumber: monster.util.formatPhoneNumber(number) }));
 							} else {
 								matchedSign
-								.removeClass('monster-green fa-check')
-								.addClass('monster-red fa-times')
-								.css('display', 'inline-block');
+									.removeClass('monster-green fa-check')
+									.addClass('monster-red fa-times')
+									.css('display', 'inline-block');
 
 								matchedMsg
-								.removeClass('green-box')
-								.addClass('red-box')
-								.css('display', 'inline-block')
-								.empty()
-								.text(monster.template(self, '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.denyMessage, { phoneNumber: monster.util.formatPhoneNumber(number) }));
+									.removeClass('green-box')
+									.addClass('red-box')
+									.css('display', 'inline-block')
+									.empty()
+									.text(monster.template(self, '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.denyMessage, { phoneNumber: monster.util.formatPhoneNumber(number) }));
 							}
 						}
 					});
