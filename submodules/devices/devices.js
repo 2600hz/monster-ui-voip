@@ -309,278 +309,287 @@ define(function(require) {
 		},
 
 		devicesRenderDevice: function(data, callbackSave, callbackDelete) {
-			var self = this,
-				mode = data.id ? 'edit' : 'add',
-				type = data.device_type,
-				popupTitle = mode === 'edit' ? monster.template(self, '!' + self.i18n.active().devices[type].editTitle, { name: data.name }) : self.i18n.active().devices[type].addTitle,
-				templateDevice = $(monster.template(self, 'devices-' + type, $.extend(true, {}, data, {
-					isProvisionerConfigured: monster.config.api.hasOwnProperty('provisioner'),
-					showEmergencyCnam: monster.util.isNumberFeatureEnabled('cnam') && monster.util.isNumberFeatureEnabled('e911')
-				}))),
-				deviceForm = templateDevice.find('#form_device');
+			var self = this;
 
-			if (data.extra.hasOwnProperty('provision') && data.extra.provision.hasOwnProperty('keys')) {
-				_.each(data.extra.provision.keys, function(value) {
-					var section = '.tabs-section[data-section="' + value.type + '"] ';
+			self.devicesListUsers({
+				success: function(users, status) {
+					var mode = data.id ? 'edit' : 'add',
+						type = data.device_type;
+					data.usersData = users;
+					var popupTitle = mode === 'edit' ? monster.template(self, '!' + self.i18n.active().devices[type].editTitle, { name: data.name }) : self.i18n.active().devices[type].addTitle,
+						templateDevice = $(monster.template(self, 'devices-' + type, $.extend(true, {}, data, {
+							isProvisionerConfigured: monster.config.api.hasOwnProperty('provisioner'),
+							showEmergencyCnam: monster.util.isNumberFeatureEnabled('cnam') && monster.util.isNumberFeatureEnabled('e911')
+						}))),
+						deviceForm = templateDevice.find('#form_device');
 
-					_.each(value.data, function(val, key) {
-						if (val) {
-							var groupSelector = '.control-group[data-id="' + key + '"] ',
-								valueSelector = '.feature-key-value[data-type="' + val.type + '"]';
+					if (data.extra.hasOwnProperty('provision') && data.extra.provision.hasOwnProperty('keys')) {
+						_.each(data.extra.provision.keys, function(value) {
+							var section = '.tabs-section[data-section="' + value.type + '"] ';
 
-							templateDevice
-								.find(section.concat(groupSelector, valueSelector))
+							_.each(value.data, function(val, key) {
+								if (val) {
+									var groupSelector = '.control-group[data-id="' + key + '"] ',
+									valueSelector = '.feature-key-value[data-type="' + val.type + '"]';
+
+									templateDevice
+									.find(section.concat(groupSelector, valueSelector))
 									.addClass('active')
-								.find('[name="provision.keys.' + value.id + '[' + key + '].value"]')
+									.find('[name="provision.keys.' + value.id + '[' + key + '].value"]')
 									.val(val.value);
-						}
-					});
-				});
+								}
+							});
+						});
 
-				templateDevice.find('.keys').sortable({
-					items: '.control-group',
-					update: function() {
-						templateDevice
+						templateDevice.find('.keys').sortable({
+							items: '.control-group',
+							update: function() {
+								templateDevice
 								.find('.feature-key-index')
-									.each(function(idx, el) {
-										$(el).text(idx + 1);
-									});
-					}
-				});
+								.each(function(idx, el) {
+									$(el).text(idx + 1);
+								});
+							}
+						});
 
-				templateDevice
-					.find('.feature-key-index')
+						templateDevice
+						.find('.feature-key-index')
 						.each(function(idx, el) {
 							$(el)
-								.text(parseInt($(el).text(), 10) + 1);
+							.text(parseInt($(el).text(), 10) + 1);
 						});
-			}
-
-			if (data.extra.hasE911Numbers) {
-				var currentNumber;
-
-				if (data.caller_id && data.caller_id.emergency && data.caller_id.emergency.number) {
-					currentNumber = data.caller_id.emergency.number;
-					self.devicesGetE911NumberAddress(data.caller_id.emergency.number, function(address) {
-						templateDevice
-									.find('.number-address')
-									.show()
-									.find('p')
-									.html(address);
-					});
-				}
-
-				monster.pub('common.numberSelector.render', {
-					container: templateDevice.find('.emergency-number'),
-					inputName: 'caller_id.emergency.number',
-					number: currentNumber,
-					customNumbers: data.extra.e911Numbers,
-					noBuy: true,
-					noExtension: true,
-					labels: {
-						empty: self.i18n.active().devices.popupSettings.callerId.notSet,
-						remove: self.i18n.active().devices.popupSettings.callerId.useDefault,
-						spare: self.i18n.active().devices.popupSettings.callerId.selectNumber,
-						hideNumber: true
 					}
-				});
-			}
 
-			monster.ui.validate(deviceForm, {
-				rules: {
-					'name': {
-						required: true
-					},
-					'mac_address': {
-						required: true,
-						mac: true
-					},
-					'mobile.mdn': {
-						number: true
-					},
-					'sip.username': {
-						required: true
-					},
-					'sip.password': {
-						required: true
-					},
-					'call_forward.number': {
-						required: true
-					}
-				},
-				ignore: '' // Do not ignore hidden fields
-			});
+					if (data.extra.hasE911Numbers) {
+						var currentNumber;
 
-			if ($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone', 'fax', 'ata']) > -1) {
-				var audioCodecs = monster.ui.codecSelector('audio', templateDevice.find('#audio_codec_selector'), data.media.audio.codecs);
-			}
+						if (data.caller_id && data.caller_id.emergency && data.caller_id.emergency.number) {
+							currentNumber = data.caller_id.emergency.number;
+							self.devicesGetE911NumberAddress(data.caller_id.emergency.number, function(address) {
+								templateDevice
+								.find('.number-address')
+								.show()
+								.find('p')
+								.html(address);
+							});
+						}
 
-			if ($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone']) > -1) {
-				var videoCodecs = monster.ui.codecSelector('video', templateDevice.find('#video_codec_selector'), data.media.video.codecs);
-			}
-
-			monster.ui.tabs(templateDevice);
-			monster.ui.protectField(templateDevice.find('#sip_password'), templateDevice);
-
-			monster.ui.tooltips(templateDevice);
-			monster.ui.mask(templateDevice.find('#mac_address'), 'macAddress');
-			monster.ui.mask(templateDevice.find('[name="call_forward.number"]'), 'phoneNumber');
-			monster.ui.chosen(templateDevice.find('.chosen-feature-key-user'), {
-				width: 'inherit'
-			});
-
-			if (!(data.media.encryption.enforce_security)) {
-				templateDevice.find('#rtp_method').hide();
-			}
-
-			templateDevice.find('#secure_rtp').on('change', function() {
-				templateDevice.find('#rtp_method').toggle();
-			});
-
-			templateDevice.find('#restart_device').on('click', function() {
-				if (!$(this).hasClass('disabled')) {
-					self.devicesRestart(data.id, function() {
-						toastr.success(self.i18n.active().devices.popupSettings.miscellaneous.restart.success);
-					});
-				}
-			});
-
-			templateDevice.find('#unlock_device').on('click', function() {
-				self.devicesUnlock(data.mac_address.replace(/:/g, ''), function() {
-					toastr.success(self.i18n.active().devices.popupSettings.miscellaneous.unlock.success);
-				});
-			});
-
-			templateDevice.find('.actions .save').on('click', function() {
-				if (monster.ui.valid(deviceForm)) {
-					templateDevice.find('.feature-key-value:not(.active)').remove();
-
-					var dataToSave = self.devicesMergeData(data, templateDevice, audioCodecs, videoCodecs);
-
-					self.devicesSaveDevice(dataToSave, function(data) {
-						popup.dialog('close').remove();
-
-						callbackSave && callbackSave(data);
-					});
-				} else {
-					templateDevice.find('.tabs-selector[data-section="basic"]').click();
-				}
-			});
-
-			if (type !== 'mobile') {
-				templateDevice.find('#delete_device').on('click', function() {
-					var deviceId = $(this).parents('.edit-device').data('id');
-
-					monster.ui.confirm(self.i18n.active().devices.confirmDeleteDevice, function() {
-						self.devicesDeleteDevice(deviceId, function(device) {
-							popup.dialog('close').remove();
-
-							toastr.success(monster.template(self, '!' + self.i18n.active().devices.deletedDevice, { deviceName: device.name }));
-
-							callbackDelete && callbackDelete(device);
-						});
-					});
-				});
-			}
-
-			templateDevice.find('.actions .cancel-link').on('click', function() {
-				popup.dialog('close').remove();
-			});
-
-			templateDevice.on('change', '.caller-id-select', function() {
-				var selectedNumber = this.value;
-
-				var divAddress = templateDevice.find('.number-address');
-
-				divAddress.find('p').empty();
-
-				if (selectedNumber !== '') {
-					self.devicesGetE911NumberAddress(selectedNumber, function(address) {
-						divAddress.find('p').html(address);
-					});
-
-					divAddress.slideDown();
-				} else {
-					divAddress.slideUp();
-				}
-			});
-
-			templateDevice.find('.restrictions-switch').on('change', function() {
-				templateDevice.find('.restriction-matcher-sign').hide();
-				templateDevice.find('.restriction-message').hide();
-			});
-
-			templateDevice.find('.restriction-matcher-button').on('click', function(e) {
-				e.preventDefault();
-				var number = templateDevice.find('.restriction-matcher-input').val();
-
-				if (number) {
-					self.callApi({
-						resource: 'numbers.matchClassifier',
-						data: {
-							accountId: self.accountId,
-							phoneNumber: encodeURIComponent(number)
-						},
-						success: function(data, status) {
-							var matchedLine = templateDevice.find('.restriction-line[data-restriction="' + data.data.name + '"]'),
-								matchedSign = matchedLine.find('.restriction-matcher-sign'),
-								matchedMsg = templateDevice.find('.restriction-message');
-
-							templateDevice.find('.restriction-matcher-sign').hide();
-							if (matchedLine.find('.restrictions-switch').prop('checked')) {
-								matchedSign
-									.removeClass('monster-red fa-times')
-									.addClass('monster-green fa-check')
-									.css('display', 'inline-block');
-
-								matchedMsg
-									.removeClass('red-box')
-									.addClass('green-box')
-									.css('display', 'inline-block')
-									.empty()
-									.text(monster.template(self, '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.allowMessage, { phoneNumber: monster.util.formatPhoneNumber(number) }));
-							} else {
-								matchedSign
-									.removeClass('monster-green fa-check')
-									.addClass('monster-red fa-times')
-									.css('display', 'inline-block');
-
-								matchedMsg
-									.removeClass('green-box')
-									.addClass('red-box')
-									.css('display', 'inline-block')
-									.empty()
-									.text(monster.template(self, '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.denyMessage, { phoneNumber: monster.util.formatPhoneNumber(number) }));
+						monster.pub('common.numberSelector.render', {
+							container: templateDevice.find('.emergency-number'),
+							inputName: 'caller_id.emergency.number',
+							number: currentNumber,
+							customNumbers: data.extra.e911Numbers,
+							noBuy: true,
+							noExtension: true,
+							labels: {
+								empty: self.i18n.active().devices.popupSettings.callerId.notSet,
+								remove: self.i18n.active().devices.popupSettings.callerId.useDefault,
+								spare: self.i18n.active().devices.popupSettings.callerId.selectNumber,
+								hideNumber: true
 							}
+						});
+					}
+
+					monster.ui.validate(deviceForm, {
+						rules: {
+							'name': {
+								required: true
+							},
+							'mac_address': {
+								required: true,
+								mac: true
+							},
+							'mobile.mdn': {
+								number: true
+							},
+							'sip.username': {
+								required: true
+							},
+							'sip.password': {
+								required: true
+							},
+							'call_forward.number': {
+								required: true
+							}
+						},
+						ignore: '' // Do not ignore hidden fields
+					});
+
+					if ($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone', 'fax', 'ata']) > -1) {
+						var audioCodecs = monster.ui.codecSelector('audio', templateDevice.find('#audio_codec_selector'), data.media.audio.codecs);
+					}
+
+					if ($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone']) > -1) {
+						var videoCodecs = monster.ui.codecSelector('video', templateDevice.find('#video_codec_selector'), data.media.video.codecs);
+					}
+
+					monster.ui.tabs(templateDevice);
+					monster.ui.protectField(templateDevice.find('#sip_password'), templateDevice);
+
+					monster.ui.tooltips(templateDevice);
+					monster.ui.mask(templateDevice.find('#mac_address'), 'macAddress');
+					monster.ui.mask(templateDevice.find('[name="call_forward.number"]'), 'phoneNumber');
+					monster.ui.chosen(templateDevice.find('.chosen-feature-key-user'), {
+						width: 'inherit'
+					});
+
+					if (!(data.media.encryption.enforce_security)) {
+						templateDevice.find('#rtp_method').hide();
+					}
+
+					templateDevice.find('#secure_rtp').on('change', function() {
+						templateDevice.find('#rtp_method').toggle();
+					});
+
+					templateDevice.find('#restart_device').on('click', function() {
+						if (!$(this).hasClass('disabled')) {
+							self.devicesRestart(data.id, function() {
+								toastr.success(self.i18n.active().devices.popupSettings.miscellaneous.restart.success);
+							});
 						}
 					});
-				} else {
-					templateDevice.find('.restriction-matcher-sign').hide();
-					templateDevice.find('.restriction-message').hide();
+
+					templateDevice.find('#unlock_device').on('click', function() {
+						self.devicesUnlock(data.mac_address.replace(/:/g, ''), function() {
+							toastr.success(self.i18n.active().devices.popupSettings.miscellaneous.unlock.success);
+						});
+					});
+
+					templateDevice.find('.actions .save').on('click', function() {
+						if (monster.ui.valid(deviceForm)) {
+							templateDevice.find('.feature-key-value:not(.active)').remove();
+
+							var dataToSave = self.devicesMergeData(data, templateDevice, audioCodecs, videoCodecs);
+
+							self.devicesSaveDevice(dataToSave, function(data) {
+								popup.dialog('close').remove();
+
+								callbackSave && callbackSave(data);
+							});
+						} else {
+							templateDevice.find('.tabs-selector[data-section="basic"]').click();
+						}
+					});
+
+					if (type !== 'mobile') {
+						templateDevice.find('#delete_device').on('click', function() {
+							var deviceId = $(this).parents('.edit-device').data('id');
+
+							monster.ui.confirm(self.i18n.active().devices.confirmDeleteDevice, function() {
+								self.devicesDeleteDevice(deviceId, function(device) {
+									popup.dialog('close').remove();
+
+									toastr.success(monster.template(self, '!' + self.i18n.active().devices.deletedDevice, { deviceName: device.name }));
+
+									callbackDelete && callbackDelete(device);
+								});
+							});
+						});
+					}
+
+					templateDevice.find('.actions .cancel-link').on('click', function() {
+						popup.dialog('close').remove();
+					});
+
+					templateDevice.on('change', '.caller-id-select', function() {
+						var selectedNumber = this.value;
+
+						var divAddress = templateDevice.find('.number-address');
+
+						divAddress.find('p').empty();
+
+						if (selectedNumber !== '') {
+							self.devicesGetE911NumberAddress(selectedNumber, function(address) {
+								divAddress.find('p').html(address);
+							});
+
+							divAddress.slideDown();
+						} else {
+							divAddress.slideUp();
+						}
+					});
+
+					templateDevice.find('.restrictions-switch').on('change', function() {
+						templateDevice.find('.restriction-matcher-sign').hide();
+						templateDevice.find('.restriction-message').hide();
+					});
+
+					templateDevice.find('.restriction-matcher-button').on('click', function(e) {
+						e.preventDefault();
+						var number = templateDevice.find('.restriction-matcher-input').val();
+
+						if (number) {
+							self.callApi({
+								resource: 'numbers.matchClassifier',
+								data: {
+									accountId: self.accountId,
+									phoneNumber: encodeURIComponent(number)
+								},
+								success: function(data, status) {
+									var matchedLine = templateDevice.find('.restriction-line[data-restriction="' + data.data.name + '"]'),
+									matchedSign = matchedLine.find('.restriction-matcher-sign'),
+									matchedMsg = templateDevice.find('.restriction-message');
+
+									templateDevice.find('.restriction-matcher-sign').hide();
+									if (matchedLine.find('.restrictions-switch').prop('checked')) {
+										matchedSign
+										.removeClass('monster-red fa-times')
+										.addClass('monster-green fa-check')
+										.css('display', 'inline-block');
+
+										matchedMsg
+										.removeClass('red-box')
+										.addClass('green-box')
+										.css('display', 'inline-block')
+										.empty()
+										.text(monster.template(self, '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.allowMessage, { phoneNumber: monster.util.formatPhoneNumber(number) }));
+									} else {
+										matchedSign
+										.removeClass('monster-green fa-check')
+										.addClass('monster-red fa-times')
+										.css('display', 'inline-block');
+
+										matchedMsg
+										.removeClass('green-box')
+										.addClass('red-box')
+										.css('display', 'inline-block')
+										.empty()
+										.text(monster.template(self, '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.denyMessage, { phoneNumber: monster.util.formatPhoneNumber(number) }));
+									}
+								}
+							});
+						} else {
+							templateDevice.find('.restriction-matcher-sign').hide();
+							templateDevice.find('.restriction-message').hide();
+						}
+					});
+
+					templateDevice.find('.feature-key-type').on('change', function() {
+						var type = $(this).val();
+
+						$(this).siblings('.feature-key-value.active').removeClass('active');
+						$(this).siblings('.feature-key-value[data-type="' + type + '"]').addClass('active');
+					});
+
+					templateDevice.find('.tabs-section[data-section="featureKeys"] .type-info a').on('click', function() {
+						var $this = $(this);
+
+						setTimeout(function() {
+							var action = ($this.hasClass('collapsed') ? 'show' : 'hide').concat('Info');
+
+							$this.find('.text').text(self.i18n.active().devices.popupSettings.keys.info.link[action]);
+						});
+					});
+
+					var popup = monster.ui.dialog(templateDevice, {
+						position: ['center', 20],
+						title: popupTitle,
+						dialogClass: 'voip-edit-device-popup overflow-visible'
+					});
+				},
+				error: function(data, status) {
+					toastr.error(self.i18n.active().devices.addOrEdit.error);
 				}
-			});
-
-			templateDevice.find('.feature-key-type').on('change', function() {
-				var type = $(this).val();
-
-				$(this).siblings('.feature-key-value.active').removeClass('active');
-				$(this).siblings('.feature-key-value[data-type="' + type + '"]').addClass('active');
-			});
-
-			templateDevice.find('.tabs-section[data-section="featureKeys"] .type-info a').on('click', function() {
-				var $this = $(this);
-
-				setTimeout(function() {
-					var action = ($this.hasClass('collapsed') ? 'show' : 'hide').concat('Info');
-
-					$this.find('.text').text(self.i18n.active().devices.popupSettings.keys.info.link[action]);
-				});
-			});
-
-			var popup = monster.ui.dialog(templateDevice, {
-				position: ['center', 20],
-				title: popupTitle,
-				dialogClass: 'voip-edit-device-popup overflow-visible'
 			});
 		},
 
