@@ -753,7 +753,7 @@ define(function(require) {
 			delete mergedData.extra;
 
 			//if there is no owner, do not add one.
-			if (mergedData.owner_id && mergedData.owner_id == self.i18n.active().Conversant.devices.noOwner) {
+			if (mergedData.owner_id && mergedData.owner_id == self.i18n.active().devices.noOwner) {
 				delete mergedData.owner_id;
 			}
 
