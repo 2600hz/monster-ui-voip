@@ -65,7 +65,13 @@ define(function(require) {
 				callback = args.callback;
 
 			self.featureCodesLoadData(function(featureCodesData) {
-				var template = $(monster.template(self, 'featureCodes-layout', { featureCodes: self.featureCodesFormatData(featureCodesData) }));
+				var template = $(self.getTemplate({
+					name: 'layout',
+					data: {
+						featureCodes: self.featureCodesFormatData(featureCodesData)
+					},
+					submodule: 'featureCodes'
+				}));
 
 				monster.ui.tooltips(template);
 

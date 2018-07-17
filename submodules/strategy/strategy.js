@@ -203,7 +203,11 @@ define(function(require) {
 						customConfGreeting: results.callflows.MainConference && ('welcome_prompt' in results.callflows.MainConference.flow.data) ? true : false,
 						faxingNumbers: hasFaxingNumber ? results.callflows.MainFaxing.numbers : [self.i18n.active().strategy.noNumberTitle]
 					},
-					template = $(monster.template(self, 'strategy-layout', templateData));
+					template = $(self.getTemplate({
+						name: 'layout',
+						data: templateData,
+						submodule: 'strategy'
+					}));
 
 				self.strategyBindEvents(template, results);
 
@@ -336,7 +340,14 @@ define(function(require) {
 
 		strategyShowE911Choices: function(oldNumber, newNumbers) {
 			var self = this,
-				template = $(monster.template(self, 'strategy-changeE911Popup', { oldNumber: oldNumber, newNumbers: newNumbers })),
+				template = $(self.getTemplate({
+					name: 'changeE911Popup',
+					data: {
+						oldNumber: oldNumber,
+						newNumbers: newNumbers
+					},
+					submodule: 'strategy'
+				})),
 				$options = template.find('.choice');
 
 			$options.on('click', function() {
@@ -352,7 +363,12 @@ define(function(require) {
 					popup.dialog('close');
 				} else {
 					self.strategyChangeEmergencyCallerId(number, function() {
-						toastr.success(monster.template(self, '!' + self.i18n.active().strategy.updateE911Dialog.success, { number: monster.util.formatPhoneNumber(number) }));
+						toastr.success(self.getTemplate({
+							name: '!' + self.i18n.active().startegy.updateE911Dialog.success,
+							data: {
+								number: monster.util.formatPhoneNumber(number)
+							}
+						}));
 						popup.dialog('close');
 					});
 				}
@@ -479,7 +495,11 @@ define(function(require) {
 								}),
 								spareLinkEnabled: (_.countBy(accountNumbers, function(number) { return number.used_by ? 'assigned' : 'spare'; }).spare > 0)
 							},
-							template = $(monster.template(self, 'strategy-' + templateName, templateData));
+							template = $(self.getTemplate({
+								name: 'strategy-' + templateName,
+								data: templateData,
+								submodule: 'strategy'
+							}));
 
 						_.each(templateData.numbers, function(data) {
 							data.number.phoneNumber = data.number.id;
@@ -523,7 +543,11 @@ define(function(require) {
 								}),
 								spareLinkEnabled: (_.countBy(accountNumbers, function(number) { return number.used_by ? 'assigned' : 'spare'; }).spare > 0)
 							},
-							template = monster.template(self, 'strategy-' + templateName, templateData);
+							template = $(self.getTemplate({
+								name: 'strategy-' + templateName,
+								data: templateData,
+								submodule: 'strategy'
+							}));
 
 						container
 							.find('.element-content')
@@ -549,7 +573,11 @@ define(function(require) {
 								actionLinksEnabled: _.isEmpty(callflow.flow.data),
 								spareLinkEnabled: (_.countBy(accountNumbers, function(number) { return number.used_by ? 'assigned' : 'spare'; }).spare > 0)
 							},
-							template = monster.template(self, 'strategy-' + templateName, templateData);
+							template = $(self.getTemplate({
+								name: 'strategy-' + templateName,
+								data: templateData,
+								submodule: 'strategy'
+							}));
 
 						container
 							.find('.element-content')
@@ -612,7 +640,11 @@ define(function(require) {
 						});
 					}
 
-					template = $(monster.template(self, 'strategy-' + templateName, templateData));
+					template = $(self.getTemplate({
+						name: 'strategy-' + templateName,
+						data: templateData,
+						submodule: 'strategy'
+					}));
 
 					var validationOptions = {
 						rules: {
@@ -668,7 +700,11 @@ define(function(require) {
 					var templateData = {
 							enabled: !$.isEmptyObject(strategyData.temporalRules.holidays)
 						},
-						template = $(monster.template(self, 'strategy-' + templateName, templateData)),
+						template = $(self.getTemplate({
+							name: 'strategy-' + templateName,
+							data: templateData,
+							submodule: 'strategy'
+						})),
 						holidayList = template.find('.holidays-list');
 
 					container
@@ -733,7 +769,11 @@ define(function(require) {
 						}
 					});
 
-					template = $(monster.template(self, 'strategy-' + templateName, templateData));
+					template = $(self.getTemplate({
+						name: 'strategy-' + templateName,
+						data: templateData,
+						submodule: 'strategy'
+					}));
 
 					container
 						.find('.element-content')
@@ -777,7 +817,13 @@ define(function(require) {
 							tabData.menu = menuName;
 						}
 
-						$(this).empty().append(monster.template(self, 'strategy-callsTab', tabData));
+						$(this)
+							.empty()
+								.append($(self.getTemplate({
+									name: 'callsTab',
+									data: tabData,
+									submodule: 'strategy'
+								})));
 					});
 
 					$.each(template.find('.user-select select'), function() {
@@ -979,7 +1025,11 @@ define(function(require) {
 
 						if (featureList.length > 0) {
 							dataTemplate.featureList = featureList;
-							popupHtml = $(monster.template(self, 'strategy-popupRemoveFeatures', dataTemplate));
+							popupHtml = $(self.getTemplate({
+								name: 'popupRemoveFeatures',
+								data: dataTemplate,
+								submodule: 'strategy'
+							}));
 
 							popup = monster.ui.dialog(popupHtml, {
 								title: self.i18n.active().strategy.popupRemoveFeatures.title,
@@ -1066,9 +1116,15 @@ define(function(require) {
 				var confCallflow = strategyData.callflows.MainConference;
 				if (confCallflow) {
 					self.getMainConferenceGreetingMedia(function(greetingMedia) {
-						var greetingTemplate = $(monster.template(self, 'strategy-customConferenceGreeting', {
-								enabled: ('welcome_prompt' in confCallflow.flow.data),
-								greeting: greetingMedia && greetingMedia.tts ? greetingMedia.tts.text : ''
+						var greetingTemplate = $(self.getTemplate({
+								name: 'customConferenceGreeting',
+								data: {
+									enabled: ('welcome_prompt' in confCallflow.flow.data),
+									greeting: greetingMedia && greetingMedia.tts
+										? greetingMedia.tts.text
+										: ''
+								},
+								submodule: 'strategy'
 							})),
 							greetingPopup = monster.ui.dialog(greetingTemplate, {
 								title: self.i18n.active().strategy.customConferenceGreeting.title,
@@ -1253,7 +1309,10 @@ define(function(require) {
 						if (mainFaxing.flow.data.hasOwnProperty('id')) {
 							updateCallflow();
 						} else {
-							var template = $(monster.template(self, 'strategy-popupEditFaxbox')),
+							var template = $(self.getTemplate({
+									name: 'popupEditFaxbox',
+									submodule: 'strategy'
+								})),
 								popup = monster.ui.dialog(template, {
 									title: self.i18n.active().strategy.popupEditFaxbox.titles.create,
 									position: ['center', 20],
@@ -1346,8 +1405,14 @@ define(function(require) {
 								faxboxId: strategyData.callflows.MainFaxing.flow.data.id
 							},
 							success: function(faxbox) {
-								var template = $(monster.template(self, 'strategy-popupEditFaxbox', {
-										email: faxbox.hasOwnProperty('notifications') && faxbox.notifications.hasOwnProperty('inbound') && faxbox.notifications.inbound.hasOwnProperty('email') ? faxbox.notifications.inbound.email.send_to : ''
+								var template = $(self.getTemplate({
+										name: 'popupEditFaxbox',
+										data: {
+											email: faxbox.hasOwnProperty('notifications') && faxbox.notifications.hasOwnProperty('inbound') && faxbox.notifications.inbound.hasOwnProperty('email')
+													? faxbox.notifications.inbound.email.send_to
+													: ''
+										},
+										submodule: 'strategy'
 									})),
 									popup = monster.ui.dialog(template, {
 										title: self.i18n.active().strategy.popupEditFaxbox.titles.edit,
@@ -2305,7 +2370,12 @@ define(function(require) {
 				templateData.resources.days.push({ value: i });
 			}
 
-			container.append(monster.template(self, 'strategy-holidayLine', templateData));
+			container
+				.append($(self.getTemplate({
+					name: 'holidayLine',
+					data: templateData,
+					submodule: 'strategy'
+				})));
 		},
 
 		strategyShowMenuPopup: function(params) {
@@ -2323,13 +2393,22 @@ define(function(require) {
 						success: function(response) {
 							var greetingFiles,
 								noGreetingFiles;
-							if(response.data.length > 0) {
+							if (response.data.length > 0) {
 								greetingFiles = response.data;
 							} else {
 								noGreetingFiles = true;
 							}
 
-							template = $(monster.template(self, 'strategy-menuPopup', { menu: menu, greeting: greeting, greetingFiles: greetingFiles, noGreetingFiles: noGreetingFiles }));
+							template = $(self.getTemplate({
+								name: 'menuPopup',
+								data: {
+									menu: menu,
+									greeting: greeting,
+									greetingFiles: greetingFiles,
+									noGreetingFiles: noGreetingFiles
+								},
+								submodule: 'strategy'
+							}));
 
 							var popup = monster.ui.dialog(template, {
 								title: self.i18n.active().strategy.popup.title + ' - ' + label,
@@ -2341,11 +2420,16 @@ define(function(require) {
 								dropdownCallEntities = self.strategyGetCallEntitiesDropdownData(popupCallEntities);
 
 							_.each(strategyData.callflows[name].flow.children, function(val, key) {
-								menuLineContainer.append(monster.template(self, 'strategy-menuLine', {
-									number: key,
-									callEntities: dropdownCallEntities,
-									selectedId: val.data.id || val.data.endpoints[0].id
-								}));
+								menuLineContainer
+									.append($(self.getTemplate({
+										name: 'menuLine',
+										data: {
+											number: key,
+											callEntities: dropdownCallEntities,
+											selectedId: val.data.id || val.data.endpoints[0].id
+										},
+										submodule: 'strategy'
+									})));
 							});
 
 							$.each(menuLineContainer.find('.target-input'), function() {
@@ -2497,7 +2581,13 @@ define(function(require) {
 			container.find('.add-menu-line a').on('click', function(e) {
 				e.preventDefault();
 				var popupCallEntities = $.extend(true, {}, strategyData.callEntities, { voicemail: strategyData.voicemails }, { directory: strategyData.directories }),
-					menuLine = $(monster.template(self, 'strategy-menuLine', { callEntities: self.strategyGetCallEntitiesDropdownData(popupCallEntities) })),
+					menuLine = $(self.getTemplate({
+						name: 'menuLine',
+						data: {
+							callEntities: self.strategyGetCallEntitiesDropdownData(popupCallEntities)
+						},
+						submodule: 'strategy'
+					})),
 					icon = menuLine.find('.target-select option:selected').parents('optgroup').data('icon');
 
 				container.find('.menu-block .left .content').append(menuLine);

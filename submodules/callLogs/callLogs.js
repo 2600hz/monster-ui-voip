@@ -65,11 +65,22 @@ define(function(require) {
 				cdrs = self.callLogsFormatCdrs(cdrs);
 
 				dataTemplate.cdrs = cdrs;
-				template = $(monster.template(self, 'callLogs-layout', dataTemplate));
+				template = $(self.getTemplate({
+					name: 'layout',
+					data: dataTemplate,
+					submodule: 'callLogs'
+				}));
 				monster.ui.tooltips(template);
 
 				if (cdrs && cdrs.length) {
-					var cdrsTemplate = $(monster.template(self, 'callLogs-cdrsList', {cdrs: cdrs, showReport: monster.config.whitelabel.callReportEmail ? true : false}));
+					var cdrsTemplate = $(self.getTemplate({
+						name: 'cdrsList',
+						data: {
+							cdrs: cdrs,
+							showReport: monster.config.whitelabel.callReportEmail ? true : false
+						},
+						submodule: 'callLogs'
+					}));
 					template.find('.call-logs-grid .grid-row-container')
 							.append(cdrsTemplate);
 				}
@@ -210,7 +221,13 @@ define(function(require) {
 							rowGroup.find('.extra-legs')
 									.empty()
 									.addClass('data-loaded')
-									.append(monster.template(self, 'callLogs-interactionLegs', { cdrs: formattedCdrs }));
+									.append($(self.getTemplate({
+										name: 'interactionLegs',
+										data: {
+											cdrs: formattedCdrs
+										},
+										submodule: 'callLogs'
+									})));
 						});
 					}
 				}
@@ -235,9 +252,13 @@ define(function(require) {
 					loaderDiv.find('.loading-message > i').toggleClass('fa-spin');
 					self.callLogsGetCdrs(fromDate, toDate, function(newCdrs, nextStartKey) {
 						newCdrs = self.callLogsFormatCdrs(newCdrs);
-						cdrsTemplate = $(monster.template(self, 'callLogs-cdrsList', {
-							cdrs: newCdrs,
-							showReport: monster.config.whitelabel.callReportEmail ? true : false
+						cdrsTemplate = $(self.getTemplate({
+							name: 'cdrsList',
+							data: {
+								cdrs: newCdrs,
+								showReport: monster.config.whitelabel.callReportEmail ? true : false
+							},
+							submodule: 'callLogs'
 						}));
 
 						startKey = nextStartKey;
@@ -446,7 +467,10 @@ define(function(require) {
 					cdrId: callLogId
 				},
 				success: function(data, status) {
-					var template = $(monster.template(self, 'callLogs-detailsPopup'));
+					var template = $(self.getTemplate({
+						name: 'detailsPopup',
+						submodule: 'callLogs'
+					}));
 
 					monster.ui.renderJSON(data.data, template.find('#jsoneditor'));
 

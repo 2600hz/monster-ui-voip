@@ -68,7 +68,11 @@ define(function(require) {
 						directoryLink: myOfficeData.directoryLink,
 						showUserTypes: _.size(self.appFlags.global.servicePlansRole) > 0
 					},
-					template = $(monster.template(self, 'myOffice-layout', dataTemplate)),
+					template = $(self.getTemplate({
+						name: 'layout',
+						data: dataTemplate,
+						submodule: 'myOffice'
+					})),
 					$devicesCanvas = template.find('#dashboard_devices_chart'),
 					$assignedNumbersCanvas = template.find('#dashboard_assigned_numbers_chart'),
 					$classifiedNumbersCanvas = template.find('#dashboard_number_types_chart'),
@@ -731,7 +735,11 @@ define(function(require) {
 						mediaList: medias,
 						media: 'music_on_hold' in account && 'media_id' in account.music_on_hold ? account.music_on_hold.media_id : undefined
 					},
-					popupTemplate = $(monster.template(self, 'myOffice-musicOnHoldPopup', templateData)),
+					popupTemplate = $(self.getTemplate({
+						name: 'musicOnHoldPopup',
+						data: templateData,
+						submodule: 'myOffice'
+					})),
 					popup = monster.ui.dialog(popupTemplate, {
 						title: self.i18n.active().myOffice.musicOnHold.title,
 						position: ['center', 20]
@@ -871,7 +879,11 @@ define(function(require) {
 					mainNumbers: myOfficeData.mainNumbers,
 					selectedMainNumber: 'caller_id' in myOfficeData.account && 'external' in myOfficeData.account.caller_id ? myOfficeData.account.caller_id.external.number || 'none' : 'none'
 				},
-				popupTemplate = $(monster.template(self, 'myOffice-callerIdPopup', templateData)),
+				popupTemplate = $(self.getTemplate({
+					name: 'callerIdPopup',
+					data: templateData,
+					submodule: 'myOffice'
+				})),
 				popup = monster.ui.dialog(popupTemplate, {
 					title: self.i18n.active().myOffice.callerId.title,
 					position: ['center', 20]
