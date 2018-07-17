@@ -736,7 +736,7 @@ define(function(require) {
 						media: 'music_on_hold' in account && 'media_id' in account.music_on_hold ? account.music_on_hold.media_id : undefined
 					},
 					popupTemplate = $(self.getTemplate({
-						name: 'musicOnHold',
+						name: 'musicOnHoldPopup',
 						data: templateData,
 						submodule: 'myOffice'
 					})),

@@ -320,7 +320,14 @@ define(function(require) {
 			var self = this,
 				mode = data.id ? 'edit' : 'add',
 				type = data.device_type,
-				popupTitle = mode === 'edit' ? monster.template(self, '!' + self.i18n.active().devices[type].editTitle, { name: data.name }) : self.i18n.active().devices[type].addTitle,
+				popupTitle = mode === 'edit'
+					? self.getTemplate({
+						name: '!' + self.i18n.active().devices[type].editTitle,
+						data: {
+							name: data.name
+						}
+					})
+					: self.i18n.active().devices[type].addTitle,
 				templateDevice = $(self.getTemplate({
 					name: 'devices-' + type,
 					data: $.extend(true, {}, data, {
@@ -555,7 +562,12 @@ define(function(require) {
 									.addClass('green-box')
 									.css('display', 'inline-block')
 									.empty()
-									.text(monster.template(self, '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.allowMessage, { phoneNumber: monster.util.formatPhoneNumber(number) }));
+									.text(self.getTemplate({
+										name: '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.allowMessage,
+										data: {
+											phoneNumber: monster.util.formatPhoneNumber(number)
+										}
+									}));
 							} else {
 								matchedSign
 									.removeClass('monster-green fa-check')
@@ -567,7 +579,12 @@ define(function(require) {
 									.addClass('red-box')
 									.css('display', 'inline-block')
 									.empty()
-									.text(monster.template(self, '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.denyMessage, { phoneNumber: monster.util.formatPhoneNumber(number) }));
+									.text(self.getTemplate({
+										name: '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.denyMessage,
+										data: {
+											phoneNumber: monster.util.formatPhoneNumber(number)
+										}
+									}));
 							}
 						}
 					});

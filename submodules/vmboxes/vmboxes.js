@@ -121,7 +121,14 @@ define(function(require) {
 		vmboxesRenderVmbox: function(data, callback) {
 			var self = this,
 				mode = data.id ? 'edit' : 'add',
-				popupTitle = mode === 'edit' ? monster.template(self, '!' + self.i18n.active().vmboxes.editTitle, { name: data.name }) : self.i18n.active().vmboxes.addTitle,
+				popupTitle = mode === 'edit'
+					? self.getTemplate({
+						name: '!' + self.i18n.active().vmboxes.editTitle,
+						data: {
+							name: data.name
+						}
+					})
+					: self.i18n.active().vmboxes.addTitle,
 				templateVMBox = $(self.getTemplate({
 					name: 'edit',
 					data: data,
