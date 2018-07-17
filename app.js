@@ -3,17 +3,21 @@ define(function(require) {
 		_ = require('lodash'),
 		monster = require('monster');
 
-	require([
-		'./submodules/devices/devices',
-		'./submodules/groups/groups',
-		'./submodules/numbers/numbers',
-		'./submodules/strategy/strategy',
-		'./submodules/callLogs/callLogs',
-		'./submodules/users/users',
-		'./submodules/myOffice/myOffice',
-		'./submodules/featureCodes/featureCodes',
-		'./submodules/vmboxes/vmboxes'
-	]);
+	var appSubmodules = [
+		'callLogs',
+		'devices',
+		'featureCodes',
+		'groups',
+		'myOffice',
+		'numbers',
+		'strategy',
+		'users',
+		'vmboxes'
+	];
+
+	require(_.map(appSubmodules, function(name) {
+		return './submodules/' + name + '/' + name;
+	}));
 
 	var app = {
 		name: 'voip',
@@ -42,7 +46,7 @@ define(function(require) {
 			global: {}
 		},
 
-		subModules: ['devices', 'groups', 'numbers', 'strategy', 'callLogs', 'users', 'myOffice', 'featureCodes', 'vmboxes'],
+		subModules: appSubmodules,
 
 		load: function(callback) {
 			var self = this;
@@ -64,7 +68,9 @@ define(function(require) {
 		render: function(container) {
 			var self = this,
 				parent = container || $('#monster_content'),
-				template = $(monster.template(self, 'app'));
+				template = $(self.getTemplate({
+					name: 'app'
+				}));
 
 			self.loadGlobalData(function() {
 				/* On first Load, load my office */

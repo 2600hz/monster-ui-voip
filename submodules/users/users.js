@@ -48,11 +48,19 @@ define(function(require) {
 
 			self.usersGetData(function(data) {
 				var dataTemplate = self.usersFormatListData(data, _sortBy),
-					template = $(monster.template(self, 'users-layout', dataTemplate)),
+					template = $(self.getTemplate({
+						name: 'layout',
+						data: dataTemplate,
+						submodule: 'users'
+					})),
 					templateUser;
 
 				_.each(dataTemplate.users, function(user) {
-					templateUser = monster.template(self, 'users-row', user);
+					templateUser = $(self.getTemplate({
+						name: 'row',
+						data: user,
+						submodule: 'users'
+					}));
 
 					template.find('.user-rows').append(templateUser);
 				});
@@ -506,7 +514,11 @@ define(function(require) {
 				dataTemplate = {
 					user: user
 				},
-				dialogTemplate = $(monster.template(self, 'users-deleteDialog', dataTemplate));
+				dialogTemplate = $(self.getTemplate({
+					name: 'deleteDialog',
+					data: dataTemplate,
+					submodule: 'users'
+				}));
 
 			monster.ui.tooltips(dialogTemplate);
 
@@ -688,7 +700,11 @@ define(function(require) {
 					}
 				}, function(err, results) {
 					var originalData = self.usersFormatAddUser(results),
-						userTemplate = $(monster.template(self, 'users-creation', originalData));
+						userTemplate = $(self.getTemplate({
+							name: 'creation',
+							data: originalData,
+							submodule: 'users'
+						}));
 
 					monster.ui.mask(userTemplate.find('#extension'), 'extension');
 
@@ -791,7 +807,12 @@ define(function(require) {
 				if (numbers.length > 0) {
 					var updateCallflow = function() {
 						self.usersUpdateCallflowNumbers(userId, (currentCallflow || {}).id, numbers, function(callflowData) {
-							toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: name }));
+							toastr.success(self.getTemplate({
+								name: '!' + toastrMessages.numbersUpdated,
+								data: {
+									name: name
+								}
+							}));
 
 							self.usersRender({ userId: callflowData.owner_id });
 						});
@@ -825,7 +846,11 @@ define(function(require) {
 					dataTemplate = {
 						recommendedExtension: nextExtension
 					},
-					newLineTemplate = $(monster.template(self, 'users-newExtension', dataTemplate)),
+					newLineTemplate = $(self.getTemplate({
+						name: 'newExtension',
+						data: dataTemplate,
+						submodule: 'users'
+					})),
 					listExtensions = template.find('.extensions .list-assigned-items');
 
 				monster.ui.mask(newLineTemplate.find('.input-extension '), 'extension');
@@ -874,7 +899,12 @@ define(function(require) {
 				var dataUser = $(this).parents('.grid-row').data();
 
 				self.usersDeleteDialog(dataUser, function(data) {
-					toastr.success(monster.template(self, '!' + self.i18n.active().users.toastrMessages.userDelete, { name: data.first_name + ' ' + data.last_name }));
+					toastr.success(self.getTemplate({
+						name: '!' + self.i18n.active().users.toastrMessages.userDelete,
+						data: {
+							name: data.first_name + ' ' + data.last_name
+						}
+					}));
 					self.usersRender();
 				});
 			});
@@ -977,7 +1007,12 @@ define(function(require) {
 								}
 							}
 						}, function(error, results) {
-							toastr.success(monster.template(self, '!' + toastrMessages.userUpdated, { name: results.user.first_name + ' ' + results.user.last_name }));
+							toastr.success(self.getTemplate({
+								name: '!' + toastrMessages.userUpdated,
+								data: {
+									name: results.user.first_name + ' ' + results.user.last_name
+								}
+							}));
 
 							self.usersRender({ userId: results.user.id });
 						});
@@ -986,7 +1021,10 @@ define(function(require) {
 			});
 
 			template.on('click', '#change_pin', function() {
-				var pinTemplate = $(monster.template(self, 'users-changePin')),
+				var pinTemplate = $(self.getTemplate({
+						name: 'changePin',
+						submodule: 'users'
+					})),
 					form = pinTemplate.find('#form_new_pin');
 
 				//monster.ui.validate(form);
@@ -1009,7 +1047,12 @@ define(function(require) {
 						self.usersUpdateVMBox(vmboxData, function(data) {
 							popup.dialog('close').remove();
 
-							toastr.success(monster.template(self, '!' + toastrMessages.pinUpdated, { name: currentUser.first_name + ' ' + currentUser.last_name }));
+							toastr.success(self.getTemplate({
+								name: '!' + toastrMessages.pinUpdated,
+								data: {
+									name: currentUser.first_name + ' ' + currentUser.last_name
+								}
+							}));
 						});
 					}
 				});
@@ -1024,7 +1067,11 @@ define(function(require) {
 			});
 
 			template.on('click', '#change_username', function() {
-				var passwordTemplate = $(monster.template(self, 'users-changePassword', currentUser)),
+				var passwordTemplate = $(self.getTemplate({
+						name: 'changePassword',
+						data: currentUser,
+						submodule: 'users'
+					})),
 					form = passwordTemplate.find('#form_new_username');
 
 				monster.ui.showPasswordStrength(passwordTemplate.find('#inputPassword'));
@@ -1054,7 +1101,12 @@ define(function(require) {
 					self.usersResetPassword(dataReset, function() {
 						popup.dialog('close').remove();
 
-						toastr.success(monster.template(self, '!' + toastrMessages.successResetPassword, { name: dataReset.username }));
+						toastr.success(self.getTemplate({
+							name: '!' + toastrMessages.successResetPassword,
+							data: {
+								name: dataReset.username
+							}
+						}));
 					});
 				});
 
@@ -1082,7 +1134,12 @@ define(function(require) {
 
 							popup.dialog('close').remove();
 
-							toastr.success(monster.template(self, '!' + toastrMessages.userUpdated, { name: userData.data.first_name + ' ' + userData.data.last_name }));
+							toastr.success(self.getTemplate({
+								name: '!' + toastrMessages.userUpdated,
+								data: {
+									name: userData.data.first_name + ' ' + userData.data.last_name
+								}
+							}));
 						});
 					}
 				});
@@ -1120,7 +1177,12 @@ define(function(require) {
 				currentUser.extra.licensedRole = planId;
 
 				self.usersUpdateUser(currentUser, function(userData) {
-					toastr.success(monster.template(self, '!' + toastrMessages.userUpdated, { name: userData.data.first_name + ' ' + userData.data.last_name }));
+					toastr.success(self.getTemplate({
+						name: '!' + toastrMessages.userUpdated,
+						data: {
+							name: userData.data.first_name + ' ' + userData.data.last_name
+						}
+					}));
 					self.usersRender({ userId: userData.data.id });
 				});
 			});
@@ -1133,7 +1195,11 @@ define(function(require) {
 				monster.pub('voip.devices.renderAdd', {
 					type: type,
 					callback: function(device) {
-						var rowDevice = monster.template(self, 'users-rowSpareDevice', device),
+						var rowDevice = $(self.getTemplate({
+								name: 'rowSpareDevice',
+								data: device,
+								submodule: 'users'
+							})),
 							listAssigned = template.find('.list-assigned-items');
 
 						listAssigned.find('.empty-row').hide();
@@ -1157,7 +1223,11 @@ define(function(require) {
 						dataType: 'devices',
 						okCallback: function(devices) {
 							_.each(devices, function(device) {
-								var rowDevice = monster.template(self, 'users-rowSpareDevice', device),
+								var rowDevice = $(self.getTemplate({
+										name: 'rowSpareDevice',
+										data: device,
+										submodule: 'users'
+									})),
 									listAssigned = template.find('.list-assigned-items');
 
 								listAssigned.find('.empty-row').hide();
@@ -1186,7 +1256,12 @@ define(function(require) {
 				dataDevices.oldDevices = _.keys(unassignedDevices);
 
 				self.usersUpdateDevices(dataDevices, userId, function() {
-					toastr.success(monster.template(self, '!' + toastrMessages.devicesUpdated, { name: name }));
+					toastr.success(self.getTemplate({
+						name: '!' + toastrMessages.devicesUpdated,
+						data: {
+							name: name
+						}
+					}));
 					self.usersRender({ userId: userId });
 				});
 			});
@@ -1273,8 +1348,12 @@ define(function(require) {
 						_.each(numberList, function(val) {
 							template
 								.find('.list-assigned-items')
-								.append($(monster.template(self, 'users-numbersItemRow', {
-									number: val
+								.append($(self.getTemplate({
+									name: 'numbersItemRow',
+									data: {
+										number: val
+									},
+									submodule: 'users'
 								})));
 
 							var numberDiv = template.find('[data-id="' + val.phoneNumber + '"]'),
@@ -1312,8 +1391,12 @@ define(function(require) {
 							_.each(numbers, function(number) {
 								number.phoneNumber = number.id;
 
-								var rowTemplate = $(monster.template(self, 'users-numbersItemRow', {
-										number: number
+								var rowTemplate = $(self.getTemplate({
+										name: 'numbersItemRow',
+										data: {
+											number: number
+										},
+										submodule: 'users'
 									})),
 									argsFeatures = {
 										target: rowTemplate.find('.edit-features'),
@@ -1354,7 +1437,12 @@ define(function(require) {
 				if (dataNumbers.length > 0) {
 					self.usersUpdateCallflowNumbers(userId, (currentCallflow || {}).id, dataNumbers, function(callflowData) {
 						var afterUpdate = function() {
-							toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: name }));
+							toastr.success(self.getTemplate({
+								name: '!' + toastrMessages.numbersUpdated,
+								data: {
+									name: name
+								}
+							}));
 
 							self.usersRender({ userId: callflowData.owner_id });
 						};
@@ -1639,7 +1727,11 @@ define(function(require) {
 				dataTemplate = {
 					numbers: numbers
 				},
-				template = $(monster.template(self, 'users-changePresenceIDPopup', dataTemplate)),
+				template = $(self.getTemplate({
+					name: 'changePresenceIDPopup',
+					data: dataTemplate,
+					submodule: 'users'
+				})),
 				$options = template.find('.presence-id-option');
 
 			$options.on('click', function() {
@@ -1763,7 +1855,11 @@ define(function(require) {
 		usersRenderConferencing: function(data) {
 			var self = this,
 				data = self.usersFormatConferencingData(data),
-				featureTemplate = $(monster.template(self, 'users-feature-conferencing', data)),
+				featureTemplate = $(self.getTemplate({
+					name: 'feature-conferencing',
+					data: data,
+					submodule: 'users'
+				})),
 				switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#conferencing_form');
 
@@ -1818,7 +1914,11 @@ define(function(require) {
 		usersRenderFaxboxes: function(data) {
 			var self = this,
 				data = self.usersFormatFaxingData(data),
-				featureTemplate = $(monster.template(self, 'users-feature-faxing', data)),
+				featureTemplate = $(self.getTemplate({
+					name: 'feature-faxing',
+					data: data,
+					submodule: 'users'
+				})),
 				switchFeature = featureTemplate.find('.switch-state'),
 				popup = monster.ui.dialog(featureTemplate, {
 					title: data.user.extra.mapFeatures.faxing.title,
@@ -1888,7 +1988,11 @@ define(function(require) {
 
 		usersRenderHotdesk: function(currentUser) {
 			var self = this,
-				featureTemplate = $(monster.template(self, 'users-feature-hotdesk', currentUser)),
+				featureTemplate = $(self.getTemplate({
+					name: 'feature-hotdesk',
+					data: currentUser,
+					submodule: 'users'
+				})),
 				switchFeature = featureTemplate.find('.switch-state'),
 				requirePin = featureTemplate.find('[name="require_pin"]'),
 				featureForm = featureTemplate.find('#hotdesk_form');
@@ -1949,7 +2053,11 @@ define(function(require) {
 
 		usersRenderVMToEmail: function(currentUser) {
 			var self = this,
-				featureTemplate = $(monster.template(self, 'users-feature-vm_to_email', currentUser)),
+				featureTemplate = $(self.getTemplate({
+					name: 'feature-vm_to_email',
+					data: currentUser,
+					submodule: 'users'
+				})),
 				switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#vm_to_email_form');
 
@@ -2042,7 +2150,11 @@ define(function(require) {
 				templateUser.caller_id.numberChoices = numberChoices;
 			}
 
-			featureTemplate = $(monster.template(self, 'users-feature-caller_id', templateUser));
+			featureTemplate = $(self.getTemplate({
+				name: 'feature-caller_id',
+				data: templateUser,
+				submodule: 'users'
+			}));
 			switchFeature = featureTemplate.find('.switch-state');
 
 			featureTemplate.find('.cancel-link').on('click', function() {
@@ -2117,7 +2229,11 @@ define(function(require) {
 		usersRenderCallForward: function(currentUser) {
 			var self = this,
 				formattedCallForwardData = self.usersFormatCallForwardData(currentUser),
-				featureTemplate = $(monster.template(self, 'users-feature-call_forward', formattedCallForwardData)),
+				featureTemplate = $(self.getTemplate({
+					name: 'feature-call_forward',
+					data: formattedCallForwardData,
+					submodule: 'users'
+				})),
 				switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#call_forward_form'),
 				args = {
@@ -2208,7 +2324,11 @@ define(function(require) {
 
 		usersRenderDoNotDisturb: function(featureUser) {
 			var self = this,
-				featureTemplate = $(monster.template(self, 'users-feature-do_not_disturb', featureUser)),
+				featureTemplate = $(self.getTemplate({
+					name: 'feature-do_not_disturb',
+					data: featureUser,
+					submodule: 'users'
+				})),
 				switchFeature = featureTemplate.find('#checkbox_do_not_disturb');
 
 			featureTemplate.find('.cancel-link').on('click', function() {
@@ -2263,7 +2383,13 @@ define(function(require) {
 			} else {
 				var currentUser = params.currentUser,
 					userCallflow = params.userCallflow,
-					featureTemplate = $(monster.template(self, 'users-feature-find_me_follow_me', { currentUser: currentUser })),
+					featureTemplate = $(self.getTemplate({
+						name: 'feature-find_me_follow_me',
+						data: {
+							currentUser: currentUser
+						},
+						submodule: 'users'
+					})),
 					switchFeature = featureTemplate.find('.switch-state'),
 					featureForm = featureTemplate.find('#find_me_follow_me_form'),
 					args = {
@@ -2627,7 +2753,11 @@ define(function(require) {
 		usersRenderCallRecording: function(params) {
 			var self = this,
 				templateData = self.usersFormatCallRecording(params),
-				featureTemplate = $(monster.template(self, 'users-feature-call_recording', templateData)),
+				featureTemplate = $(self.getTemplate({
+					name: 'feature-call_recording',
+					data: templateData,
+					submodule: 'users'
+				})),
 				switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#call_recording_form'),
 				popup;
@@ -2717,7 +2847,11 @@ define(function(require) {
 						mediaList: medias,
 						media: 'music_on_hold' in currentUser && 'media_id' in currentUser.music_on_hold ? currentUser.music_on_hold.media_id : silenceMediaId
 					},
-					featureTemplate = $(monster.template(self, 'users-feature-music_on_hold', templateData)),
+					featureTemplate = $(self.getTemplate({
+						name: 'feature-music_on_hold',
+						data: templateData,
+						submodule: 'users'
+					})),
 					switchFeature = featureTemplate.find('.switch-state'),
 					popup,
 					closeUploadDiv = function(newMedia) {
@@ -2974,7 +3108,11 @@ define(function(require) {
 				});
 
 				var dataTemplate = self.usersFormatUserData(userData),
-					template = $(monster.template(self, 'users-features', dataTemplate));
+					template = $(self.getTemplate({
+						name: 'features',
+						data: dataTemplate,
+						submodule: 'users'
+					}));
 
 				callback && callback(template, dataTemplate);
 			});
@@ -3037,7 +3175,11 @@ define(function(require) {
 				});
 
 				var dataTemplate = self.usersFormatUserData(userData, results.mainDirectory, results.mainCallflow, results.vmboxes.userVM, results.vmboxes.listExisting),
-					template = $(monster.template(self, 'users-name', dataTemplate));
+					template = $(self.getTemplate({
+						name: 'name',
+						data: dataTemplate,
+						submodule: 'users'
+					}));
 
 				monster.ui.validate(template.find('form.user-fields'), {
 					rules: {
@@ -3153,7 +3295,11 @@ define(function(require) {
 
 			self.usersGetNumbersData(userId, function(results) {
 				self.usersFormatNumbersData(userId, results, function(results) {
-					template = $(monster.template(self, 'users-numbers', results));
+					template = $(self.getTemplate({
+						name: 'numbers',
+						data: results,
+						submodule: 'users'
+					}));
 
 					_.each(results.assignedNumbers, function(number) {
 						var numberDiv = template.find('[data-id="' + number.phoneNumber + '"]'),
@@ -3179,7 +3325,11 @@ define(function(require) {
 			self.usersGetDevicesData(function(results) {
 				var formattedResults = self.usersFormatDevicesData(userId, results);
 
-				template = $(monster.template(self, 'users-devices', formattedResults));
+				template = $(self.getTemplate({
+					name: 'devices',
+					data: formattedResults,
+					submodule: 'users'
+				}));
 
 				callback && callback(template, results);
 			});
@@ -3190,7 +3340,11 @@ define(function(require) {
 
 			self.usersGetNumbersData(userId, function(results) {
 				self.usersFormatNumbersData(userId, results, function(results) {
-					template = $(monster.template(self, 'users-extensions', results));
+					template = $(self.getTemplate({
+						name: 'extensions',
+						data: results,
+						submodule: 'users'
+					}));
 
 					callback && callback(template, results);
 				});
@@ -3201,7 +3355,11 @@ define(function(require) {
 
 			self.usersGetUser(userId, function(user) {
 				var formattedData = self.usersFormatLicensedRolesData(user),
-					template = $(monster.template(self, 'users-licensed-roles', formattedData));
+					template = $(self.getTemplate({
+						name: 'licensed-roles',
+						data: formattedData,
+						submodule: 'users'
+					}));
 
 				monster.ui.chosen(template.find('#licensed_role'));
 
