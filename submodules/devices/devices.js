@@ -1,8 +1,7 @@
 define(function(require) {
 	var $ = require('jquery'),
 		_ = require('lodash'),
-		monster = require('monster'),
-		toastr = require('toastr');
+		monster = require('monster');
 
 	var app = {
 
@@ -459,14 +458,20 @@ define(function(require) {
 			templateDevice.find('#restart_device').on('click', function() {
 				if (!$(this).hasClass('disabled')) {
 					self.devicesRestart(data.id, function() {
-						toastr.success(self.i18n.active().devices.popupSettings.miscellaneous.restart.success);
+						monster.ui.toast({
+							type: 'success',
+							message: self.i18n.active().devices.popupSettings.miscellaneous.restart.success
+						});
 					});
 				}
 			});
 
 			templateDevice.find('#unlock_device').on('click', function() {
 				self.devicesUnlock(data.mac_address.replace(/:/g, ''), function() {
-					toastr.success(self.i18n.active().devices.popupSettings.miscellaneous.unlock.success);
+					monster.ui.toast({
+						type: 'success',
+						message: self.i18n.active().devices.popupSettings.miscellaneous.unlock.success
+					});
 				});
 			});
 
@@ -494,12 +499,15 @@ define(function(require) {
 						self.devicesDeleteDevice(deviceId, function(device) {
 							popup.dialog('close').remove();
 
-							toastr.success(self.getTemplate({
-								name: '!' + self.i18n.active().devices.deletedDevice,
-								data: {
-									deviceName: device.name
-								}
-							}));
+							monster.ui.toast({
+								type: 'success',
+								message: self.getTemplate({
+									name: '!' + self.i18n.active().devices.deletedDevice,
+									data: {
+										deviceName: device.name
+									}
+								})
+							});
 
 							callbackDelete && callbackDelete(device);
 						});
