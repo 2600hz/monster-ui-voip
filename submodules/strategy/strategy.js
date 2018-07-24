@@ -2,8 +2,7 @@ define(function(require) {
 	var $ = require('jquery'),
 		_ = require('lodash'),
 		monster = require('monster'),
-		timezone = require('monster-timezone'),
-		toastr = require('toastr');
+		timezone = require('monster-timezone');
 
 	var app = {
 
@@ -363,12 +362,15 @@ define(function(require) {
 					popup.dialog('close');
 				} else {
 					self.strategyChangeEmergencyCallerId(number, function() {
-						toastr.success(self.getTemplate({
-							name: '!' + self.i18n.active().startegy.updateE911Dialog.success,
-							data: {
-								number: monster.util.formatPhoneNumber(number)
-							}
-						}));
+						monster.ui.toast({
+							type: 'success',
+							message: self.getTemplate({
+								name: '!' + self.i18n.active().startegy.updateE911Dialog.success,
+								data: {
+									number: monster.util.formatPhoneNumber(number)
+								}
+							})
+						});
 						popup.dialog('close');
 					});
 				}
@@ -938,10 +940,16 @@ define(function(require) {
 					callbacks: {
 						success: function(numbers) {
 							addNumbersToMainCallflow(_.keys(numbers));
-							toastr.success(self.i18n.active().strategy.toastrMessages.buyNumbersSuccess);
+							monster.ui.toast({
+								type: 'success',
+								message: self.i18n.active().strategy.toastrMessages.buyNumbersSuccess
+							});
 						},
 						error: function(error) {
-							toastr.error(self.i18n.active().strategy.toastrMessages.buyNumbersError);
+							monster.ui.toast({
+								type: 'error',
+								message: self.i18n.active().strategy.toastrMessages.buyNumbersError
+							});
 						}
 					}
 				});
@@ -978,7 +986,10 @@ define(function(require) {
 
 								self.strategyUpdateCallflow(strategyData.callflows.MainCallflow, function(updatedCallflow) {
 									var parentContainer = container.parents('.element-container');
-									toastr.success(self.i18n.active().strategy.toastrMessages.removeNumberSuccess);
+									monster.ui.toast({
+										type: 'success',
+										message: self.i18n.active().strategy.toastrMessages.removeNumberSuccess
+									});
 									strategyData.callflows.MainCallflow = updatedCallflow;
 									refreshNumbersHeader(parentContainer);
 									self.strategyRefreshTemplate(parentContainer, strategyData);
@@ -1221,10 +1232,16 @@ define(function(require) {
 					callbacks: {
 						success: function(numbers) {
 							addNumbersToMainConference(_.keys(numbers));
-							toastr.success(self.i18n.active().strategy.toastrMessages.buyNumbersSuccess);
+							monster.ui.toast({
+								type: 'success',
+								message: self.i18n.active().strategy.toastrMessages.buyNumbersSuccess
+							});
 						},
 						error: function(error) {
-							toastr.error(self.i18n.active().strategy.toastrMessages.buyNumbersError);
+							monster.ui.toast({
+								type: 'error',
+								message: self.i18n.active().strategy.toastrMessages.buyNumbersError
+							});
 						}
 					}
 				});
@@ -1244,7 +1261,10 @@ define(function(require) {
 
 					self.strategyUpdateCallflow(strategyData.callflows.MainConference, function(updatedCallflow) {
 						var parentContainer = container.parents('.element-container');
-						toastr.success(self.i18n.active().strategy.toastrMessages.removeNumberSuccess);
+						monster.ui.toast({
+							type: 'success',
+							message: self.i18n.active().strategy.toastrMessages.removeNumberSuccess
+						});
 						strategyData.callflows.MainConference = updatedCallflow;
 						refreshConfNumHeader(parentContainer);
 						self.strategyRefreshTemplate(parentContainer, strategyData);
@@ -1476,7 +1496,10 @@ define(function(require) {
 					}
 				], function(err, results) {
 					if (!err) {
-						toastr.success('Main Fabox Email Successfully Changed');
+						monster.ui.toast({
+							type: 'success',
+							message: 'Main Fabox Email Successfully Changed'
+						});
 					}
 				});
 			});
@@ -1489,10 +1512,16 @@ define(function(require) {
 					callbacks: {
 						success: function(numbers) {
 							addNumbersToMainFaxing(_.keys(numbers));
-							toastr.success(self.i18n.active().strategy.toastrMessages.buyNumbersSuccess);
+							monster.ui.toast({
+								type: 'success',
+								message: self.i18n.active().strategy.toastrMessages.buyNumbersSuccess
+							});
 						},
 						error: function(error) {
-							toastr.error(self.i18n.active().strategy.toastrMessages.buyNumbersError);
+							monster.ui.toast({
+								type: 'error',
+								message: self.i18n.active().strategy.toastrMessages.buyNumbersError
+							});
 						}
 					}
 				});
@@ -1517,7 +1546,10 @@ define(function(require) {
 							delete mainFaxing.flow.data.id;
 							self.strategyUpdateCallflow(mainFaxing, function(updatedCallflow) {
 								var parentContainer = container.parents('.element-container');
-								toastr.success(self.i18n.active().strategy.toastrMessages.removeNumberSuccess);
+								monster.ui.toast({
+									type: 'success',
+									message: self.i18n.active().strategy.toastrMessages.removeNumberSuccess
+								});
 								strategyData.callflows.MainFaxing = updatedCallflow;
 								refreshFaxingNumHeader(parentContainer);
 								self.strategyRefreshTemplate(parentContainer, strategyData);
@@ -1768,7 +1800,10 @@ define(function(require) {
 								strategyData.callflows.MainCallflow = updatedCallflow;
 								parent.find('.element-content').hide();
 								parent.removeClass('open');
-								toastr.success(self.i18n.active().strategy.toastrMessages.updateHolidaySuccess);
+								monster.ui.toast({
+									type: 'success',
+									message: self.i18n.active().strategy.toastrMessages.updateHolidaySuccess
+								});
 							});
 						});
 					}
@@ -1797,7 +1832,10 @@ define(function(require) {
 								strategyData.callflows.MainCallflow = updatedCallflow;
 								parent.find('.element-content').hide();
 								parent.removeClass('open');
-								toastr.success(self.i18n.active().strategy.toastrMessages.updateHolidaySuccess);
+								monster.ui.toast({
+									type: 'success',
+									message: self.i18n.active().strategy.toastrMessages.updateHolidaySuccess
+								});
 							});
 						});
 					});
@@ -2324,7 +2362,10 @@ define(function(require) {
 					monster.parallel(parallelRequests, function(err, results) {
 						container.hide();
 						container.parents('.element-container').removeClass('open');
-						toastr.success(self.i18n.active().strategy.toastrMessages.updateCallSuccess);
+						monster.ui.toast({
+							type: 'success',
+							message: self.i18n.active().strategy.toastrMessages.updateCallSuccess
+						});
 					});
 				}
 			});
@@ -2470,7 +2511,10 @@ define(function(require) {
 								error: function(data, status, globalHandler) {
 									if (data && data.error === '404') {
 										showPopup();
-										toastr.warning(self.i18n.active().strategy.greetingMissing);
+										monster.ui.toast({
+											type: 'warning',
+											message: self.i18n.active().strategy.greetingMissing
+										});
 									} else {
 										globalHandler(data, { generateError: true });
 									}

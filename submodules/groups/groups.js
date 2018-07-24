@@ -1,8 +1,7 @@
 define(function(require) {
 	var $ = require('jquery'),
 		_ = require('lodash'),
-		monster = require('monster'),
-		toastr = require('toastr');
+		monster = require('monster');
 
 	var app = {
 
@@ -1064,12 +1063,15 @@ define(function(require) {
 			template.find('.delete-group').on('click', function() {
 				monster.ui.confirm(self.i18n.active().groups.confirmDeleteGroup, function() {
 					self.groupsDelete(data.group.id, function(data) {
-						toastr.success(self.getTemplate({
-							name: '!' + self.i18n.active().groups.groupDeleted,
-							data: {
-								name: data.group.name
-							}
-						}));
+						monster.ui.toast({
+							type: 'success',
+							message: self.getTemplate({
+								name: '!' + self.i18n.active().groups.groupDeleted,
+								data: {
+									name: data.group.name
+								}
+							})
+						});
 
 						self.groupsRender();
 					});
@@ -1249,12 +1251,15 @@ define(function(require) {
 				});
 
 				self.groupsUpdateNumbers(callflowId, dataNumbers, function(callflowData) {
-					toastr.success(self.getTemplate({
-						name: '!' + toastrMessages.numbersUpdated,
-						data: {
-							name: name
-						}
-					}));
+					monster.ui.toast({
+						type: 'success',
+						message: self.getTemplate({
+							name: '!' + toastrMessages.numbersUpdated,
+							data: {
+								name: name
+							}
+						})
+					});
 					self.groupsRender({ groupId: callflowData.group_id });
 				});
 			});
@@ -1281,12 +1286,15 @@ define(function(require) {
 				});
 
 				self.groupsUpdateExtensions(callflowId, extensionsToSave, function(callflowData) {
-					toastr.success(self.getTemplate({
-						name: '!' + toastrMessages.numbersUpdated,
-						data: {
-							name: name
-						}
-					}));
+					monster.ui.toast({
+						type: 'success',
+						message: self.getTemplate({
+							name: '!' + toastrMessages.numbersUpdated,
+							data: {
+								name: name
+							}
+						})
+					});
 					self.groupsRender({ groupId: callflowData.group_id });
 				});
 			});
@@ -1951,7 +1959,10 @@ define(function(require) {
 					} else {
 						callbackError && callbackError(data);
 
-						toastr.error(self.i18n.active().groups.ringGroupMissing);
+						monster.ui.toast({
+							type: 'error',
+							message: self.i18n.active().groups.ringGroupMissing
+						});
 					}
 				},
 				error: function(data) {
@@ -1981,7 +1992,10 @@ define(function(require) {
 					} else {
 						callbackError && callbackError(data);
 
-						toastr.error(self.i18n.active().groups.ringGroupMissing);
+						monster.ui.toast({
+							type: 'error',
+							message: self.i18n.active().groups.ringGroupMissing
+						});
 					}
 				},
 				error: function(data) {
