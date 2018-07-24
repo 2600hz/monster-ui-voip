@@ -2,8 +2,7 @@ define(function(require) {
 	var $ = require('jquery'),
 		_ = require('lodash'),
 		monster = require('monster'),
-		timezone = require('monster-timezone'),
-		toastr = require('toastr');
+		timezone = require('monster-timezone');
 
 	var app = {
 
@@ -807,12 +806,15 @@ define(function(require) {
 				if (numbers.length > 0) {
 					var updateCallflow = function() {
 						self.usersUpdateCallflowNumbers(userId, (currentCallflow || {}).id, numbers, function(callflowData) {
-							toastr.success(self.getTemplate({
-								name: '!' + toastrMessages.numbersUpdated,
-								data: {
-									name: name
-								}
-							}));
+							monster.ui.toast({
+								type: 'success',
+								message: self.getTemplate({
+									name: '!' + toastrMessages.numbersUpdated,
+									data: {
+										name: name
+									}
+								})
+							});
 
 							self.usersRender({ userId: callflowData.owner_id });
 						});
@@ -899,12 +901,15 @@ define(function(require) {
 				var dataUser = $(this).parents('.grid-row').data();
 
 				self.usersDeleteDialog(dataUser, function(data) {
-					toastr.success(self.getTemplate({
-						name: '!' + self.i18n.active().users.toastrMessages.userDelete,
-						data: {
-							name: data.first_name + ' ' + data.last_name
-						}
-					}));
+					monster.ui.toast({
+						type: 'success',
+						message: self.getTemplate({
+							name: '!' + self.i18n.active().users.toastrMessages.userDelete,
+							data: {
+								name: data.first_name + ' ' + data.last_name
+							}
+						})
+					});
 					self.usersRender();
 				});
 			});
@@ -1007,12 +1012,15 @@ define(function(require) {
 								}
 							}
 						}, function(error, results) {
-							toastr.success(self.getTemplate({
-								name: '!' + toastrMessages.userUpdated,
-								data: {
-									name: results.user.first_name + ' ' + results.user.last_name
-								}
-							}));
+							monster.ui.toast({
+								type: 'success',
+								message: self.getTemplate({
+									name: '!' + toastrMessages.userUpdated,
+									data: {
+										name: results.user.first_name + ' ' + results.user.last_name
+									}
+								})
+							});
 
 							self.usersRender({ userId: results.user.id });
 						});
@@ -1047,12 +1055,15 @@ define(function(require) {
 						self.usersUpdateVMBox(vmboxData, function(data) {
 							popup.dialog('close').remove();
 
-							toastr.success(self.getTemplate({
-								name: '!' + toastrMessages.pinUpdated,
-								data: {
-									name: currentUser.first_name + ' ' + currentUser.last_name
-								}
-							}));
+							monster.ui.toast({
+								type: 'success',
+								message: self.getTemplate({
+									name: '!' + toastrMessages.pinUpdated,
+									data: {
+										name: currentUser.first_name + ' ' + currentUser.last_name
+									}
+								})
+							});
 						});
 					}
 				});
@@ -1101,12 +1112,15 @@ define(function(require) {
 					self.usersResetPassword(dataReset, function() {
 						popup.dialog('close').remove();
 
-						toastr.success(self.getTemplate({
-							name: '!' + toastrMessages.successResetPassword,
-							data: {
-								name: dataReset.username
-							}
-						}));
+						monster.ui.toast({
+							type: 'success',
+							message: self.getTemplate({
+								name: '!' + toastrMessages.successResetPassword,
+								data: {
+									name: dataReset.username
+								}
+							})
+						});
 					});
 				});
 
@@ -1134,12 +1148,15 @@ define(function(require) {
 
 							popup.dialog('close').remove();
 
-							toastr.success(self.getTemplate({
-								name: '!' + toastrMessages.userUpdated,
-								data: {
-									name: userData.data.first_name + ' ' + userData.data.last_name
-								}
-							}));
+							monster.ui.toast({
+								type: 'success',
+								message: self.getTemplate({
+									name: '!' + toastrMessages.userUpdated,
+									data: {
+										name: userData.data.first_name + ' ' + userData.data.last_name
+									}
+								})
+							});
 						});
 					}
 				});
@@ -1177,12 +1194,15 @@ define(function(require) {
 				currentUser.extra.licensedRole = planId;
 
 				self.usersUpdateUser(currentUser, function(userData) {
-					toastr.success(self.getTemplate({
-						name: '!' + toastrMessages.userUpdated,
-						data: {
-							name: userData.data.first_name + ' ' + userData.data.last_name
-						}
-					}));
+					monster.ui.toast({
+						type: 'success',
+						message: self.getTemplate({
+							name: '!' + toastrMessages.userUpdated,
+							data: {
+								name: userData.data.first_name + ' ' + userData.data.last_name
+							}
+						})
+					});
 					self.usersRender({ userId: userData.data.id });
 				});
 			});
@@ -1256,12 +1276,15 @@ define(function(require) {
 				dataDevices.oldDevices = _.keys(unassignedDevices);
 
 				self.usersUpdateDevices(dataDevices, userId, function() {
-					toastr.success(self.getTemplate({
-						name: '!' + toastrMessages.devicesUpdated,
-						data: {
-							name: name
-						}
-					}));
+					monster.ui.toast({
+						type: 'success',
+						message: self.getTemplate({
+							name: '!' + toastrMessages.devicesUpdated,
+							data: {
+								name: name
+							}
+						})
+					});
 					self.usersRender({ userId: userId });
 				});
 			});
@@ -1437,12 +1460,15 @@ define(function(require) {
 				if (dataNumbers.length > 0) {
 					self.usersUpdateCallflowNumbers(userId, (currentCallflow || {}).id, dataNumbers, function(callflowData) {
 						var afterUpdate = function() {
-							toastr.success(self.getTemplate({
-								name: '!' + toastrMessages.numbersUpdated,
-								data: {
-									name: name
-								}
-							}));
+							monster.ui.toast({
+								type: 'success',
+								message: self.getTemplate({
+									name: '!' + toastrMessages.numbersUpdated,
+									data: {
+										name: name
+									}
+								})
+							});
 
 							self.usersRender({ userId: callflowData.owner_id });
 						};
@@ -1456,7 +1482,10 @@ define(function(require) {
 							self.usersUpdateUser(currentUser, function() {
 								afterUpdate();
 
-								toastr.info(toastrMessages.callerIDDeleted);
+								monster.ui.toast({
+									type: 'info',
+									message: toastrMessages.callerIDDeleted
+								});
 							});
 						} else {
 							afterUpdate();
@@ -4019,7 +4048,10 @@ define(function(require) {
 				});
 
 				if (indexMain === -1) {
-					//toastr.error(self.i18n.active().users.noUserCallflow);
+					// monster.ui.toast({
+					// 	type: 'error',
+					// 	message: self.i18n.active().users.noUserCallflow
+					// });
 					callback(null);
 				} else {
 					self.callApi({
@@ -4713,11 +4745,17 @@ define(function(require) {
 							callback && callback(data);
 						});
 					} else {
-						toastr.error(self.i18n.active().users.needExtensionFirst);
+						monster.ui.toast({
+							type: 'error',
+							message: self.i18n.active().users.needExtensionFirst
+						});
 					}
 				}
 			} else {
-				toastr.error(self.i18n.active().users.noNumberCallflow);
+				monster.ui.toast({
+					type: 'error',
+					message: self.i18n.active().users.noNumberCallflow
+				});
 			}
 		},
 

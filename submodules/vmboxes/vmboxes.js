@@ -2,7 +2,6 @@ define(function(require) {
 	var $ = require('jquery'),
 		_ = require('lodash'),
 		monster = require('monster'),
-		toastr = require('toastr'),
 		timezone = require('monster-timezone');
 
 	var app = {
@@ -226,12 +225,15 @@ define(function(require) {
 
 				monster.ui.confirm(self.i18n.active().vmboxes.confirmDeleteVmbox, function() {
 					self.vmboxesDeleteVmbox(voicemailId, function(vmbox) {
-						toastr.succes(self.getTemplate({
-							name: '!' + self.i18n.active().vmboxes.deletedVmbox,
-							data: {
-								vmboxName: vmbox.name
-							}
-						}));
+						monster.ui.toast({
+							type: 'success',
+							message: self.getTemplate({
+								name: '!' + self.i18n.active().vmboxes.deletedVmbox,
+								data: {
+									vmboxName: vmbox.name
+								}
+							})
+						});
 
 						callbacks.afterDelete && callbacks.afterDelete(vmbox);
 					});
