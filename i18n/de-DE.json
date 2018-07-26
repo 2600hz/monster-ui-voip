@@ -1,0 +1,1427 @@
+﻿{
+	"callerId": "Anrufer-ID",
+	"e911": "E911",
+	"failover": "Failover",
+
+	"menuTitles": {
+		"myOffice": "Dashboard",
+		"users": "Benutzer",
+		"groups": "Gruppen",
+		"numbers": "Nummern",
+		"devices": "Geräte",
+		"mainNumber": "Hauptnummer",
+		"callLogs": "Anrufprotokolle",
+		"quickLinks": "Hilfethemen",
+		"featureCodes": "Funktionscodes",
+		"__comment": "UI-1220: VMBox-Modul hinzugefügt",
+		"__version": "3.19",
+		"vmboxes": "Voicemailboxen"
+	},
+
+	"groups": {
+		"addFromSpare": "Aus freien Nummern hinzufügen",
+		"add": "Gruppe hinzufügen",
+		"addExtension": "Nebenstelle hinzufügen",
+		"addNewExtension": "Nebenstellennummer: ",
+		"buy": "Nummern kaufen",
+		"confirmDeleteGroup": "Diese Gruppe wird dauerhaft gelöscht. Vorgang fortsetzen?",
+		"delete": "Gruppe löschen",
+		"dialogCreationGroup": {
+			"availableUsers": "Verfügbare Benutzer",
+			"createGroup": "Gruppe erstellen",
+			"extension": "Nebenstelle",
+			"name": "Gruppe benennen",
+			"selectedUsers": "Ausgewählte Benutzer",
+			"title": "Eine Gruppe erstellen",
+			"missingDataAlert": "Wählen Sie einen Namen und eine Nebenstelle für diese Gruppe",
+			"__comment": "UI-2666: VMBox-Modul hinzugefügt",
+			"__version": "4.1",
+			"findExtension": "Eine suchen"
+		},
+		"groupDeleted": "Sie haben die Gruppe von {{name}} erfolgreich gelöscht",
+		"name": "Name",
+		"repeats": "Wahlwiederholungen",
+		"noAssignedExtensions": "Derzeit ist dieser Gruppe keine Nebenstelle zugewiesen.",
+		"noExtension": "Keine",
+		"noFeatures": "Keine",
+		"noMatchingGroup": "Es konnten keine Gruppen gefunden werden, die Ihren Suchkriterien entsprechen.",
+		"noGroupsConfigured": "Fügen Sie der Gruppe zu Beginn einen Benutzer hinzu",
+		"noNumber": "Keine",
+		"noUnassignedNumbers": "Es sind keine Nummern verfügbar, die der Gruppe zugewiesen werden könnten.",
+		"noAssignedNumbers": "Dieser Gruppe sind derzeit keine Nummern zugewiesen.",
+		"noMoreSpareNumbers": "Es sind keine Nummern übrig. Sie können neue Nummern kaufen, indem Sie auf den untenstehenden Link klicken.",
+		"noMatchingNumbers": "Es konnten keine Nummern gefunden werden, die Ihren Suchkriterien entsprechen.",
+		"port": "Nummern portieren",
+		"ringThisMemberFor": "Dieses Mitglied aus folgendem Grund anrufen:",
+		"ringGroupMissing": "Für diese Gruppe sind keine Rufgruppen definiert (group_id fehlt in Callflow).",
+		"userDeleted": "Benutzer gelöscht",
+		"removeMember": "Mitglied entfernen",
+		"distribute": "Weiterleiten",
+		"maxDurationTooltip": "Klicken Sie in dieses Kästchen, um die maximale Zeitdauer für Ihre Rufgruppe zu ändern. Sie müssen eine Zahl zwischen 30 und 999 eingeben.",
+		"title": "Alle Gruppen",
+		"titleGrid": {
+			"groups": "Gruppeneinstellungen",
+			"members": "Mitglieder",
+			"extensions": "Nebenstelle",
+			"phoneNumbers": "Telefonnummern",
+			"features": "Gruppenfunktionen"
+		},
+		"toastrMessages": {
+			"numbersUpdated": "Die Telefonnummern von {{name}} wurden aktualisiert.",
+			"extensionsUpdated": "Die Nebenstellennummern von {{name}} wurden aktualisiert"
+		},
+		"callRecording": {
+			"title": "Call Recording (Anrufaufzeichnung)",
+			"headline": "Aufzeichnungseinstellungen für Gruppenanrufe",
+			"formatLabel": "Format:",
+			"urlLabel": "URL:",
+			"urlPlaceholder": "http://your.server.com/place/to/store/recordings",
+			"timeLimitLabel": "Zeitlimit (Sek.):"
+		},
+		"ringback": {
+			"title": "Ringback",
+			"headline": "Gruppen-Ringback-Einstellungen",
+			"dropdownLabel": "Ringback-Medien:",
+			"silence": "Keine",
+			"defaultRingback": "Standard-Ringback",
+			"emptyUploadAlert": "Wählen Sie eine Datei zum Hochladen aus",
+			"fileTooBigAlert": "Sie können keine Datei größer 5 MB hochladen",
+			"__comment": "UI-1025: Hochladen von Mediendateien über die UI aktualisiert",
+			"__version": "3.20_s3",
+			"audioUploadButton": "Durchsuchen …"
+		},
+		"nextAction": {
+			"title": "Nächste Aktion",
+			"headline": "Aktion hinzufügen, wenn Anruf nicht entgegengenommen wird",
+			"label": "Wenn Anruf nicht entgegengenommen wird, weiterleiten an:",
+			"menu": "Menü",
+			"mainMenu": "Hauptmenü (Öffnungszeiten)",
+			"voicemails": "Voicemailboxen",
+			"users": "Benutzer",
+			"__comment": "UI-2664: Hinzufügen von Geräten als nächste Aktion",
+			"__version": "4.1",
+			"devices": "Geräte"
+		},
+		"__comment": "UI-819, v3.19_s1: Anzeige eines Fehler-Pop-ups, wenn Gruppendaten veraltet sind.",
+		"outdatedGroupsError": "Die Daten Ihrer Gruppe sind veraltet und können nicht dargestellt werden. Wenden Sie sich an Ihren Administrator, um Ihre Daten aktualisieren zu lassen.",
+
+		"__comment": "UI-1352: Option zur Aktivierung/Deaktivierung von Anrufweiterleitungen für Rufgruppe hinzugefügt",
+		"__version": "3.20",
+		"forward": {
+			"title": "Anrufweiterleitung ermöglichen",
+			"headline": "Anrufweiterleitung ermöglichen",
+			"description": "Aktivieren Sie diese Option, wenn es Benutzern dieser Gruppe erlaubt sein soll, mittels der „Weiterleiten“-Taste auf ihrem Gerät einen Anruf aus dieser Rufgruppe weiterzuleiten."
+		},
+
+		"__comment": "UI-1604: Walkthrough für neue Benutzer hinzugefügt",
+		"__version": "3.21",
+		"walkthrough": {
+			"steps": {
+				"1": "Mit einem Klick auf diese Schaltfläche fügen Sie eine bestimmte Benutzergruppe hinzu. Ganz bequem per Drag&Drop können Sie Benutzer hinzufügen, einen Gruppennamen erstellen und eine Nebenstellennummer hinzufügen. Wenn Sie damit fertig sind, werden die einzelnen Benutzergruppen inklusive ihrer Einstellungen unten angezeigt.",
+				"2": "Nach Erstellung einer Benutzergruppe wird diese in dem Bereich hier angezeigt. Nehmen Sie alle erforderlichen Änderungen vor (z. B. Gruppennamen, Anzahl der Mitglieder und Nebenstellennummer).",
+				"3": "Kaufen, Portieren und Zuweisen von Nummern. Sobald der Vorgang abgeschlossen ist, wird die Nummer automatisch der spezifischen Benutzergruppe zugewiesen.",
+				"4": "Sie können alle Benutzerfunktionen der Benutzergruppe aktivieren und deaktivieren und sie nahtlos verwalten."
+			}
+		},
+
+		"__comment": "UI-1206: Funktion zum Hinzufügen einer Anrufer-ID, die Gruppen vorangestellt werden soll, hinzugefügt",
+		"__version": "3.22",
+		"prepend": {
+			"title": "Voranstellung Anrufer-ID",
+			"headline": "Voranstellung Anrufer-ID",
+			"cidNameLabel": "Namenspräfix Anrufer-ID",
+			"cidNumberLabel": "Nummerpräfix Anrufer-ID"
+		},
+
+		"__comment": "UI-2104: Warnung hinzugefügt, wenn eine Gruppe ohne Endpunkte hinzugefügt wird.",
+		"__version": "3.22",
+		"emptyEndpointsWarning": "Wählen Sie mindestens ein Mitglied aus, um eine Gruppe zu erstellen."
+	},
+
+	"devices": {
+		"add": "Gerät hinzufügen",
+		"assigned": "Zugewiesen",
+		"createDevice": "Gerät erstellen",
+		"confirmDeleteDevice": "Dieses Gerät wird dauerhaft gelöscht. Vorgang fortsetzen?",
+		"deleteDevice": "Gerät löschen",
+		"deletedDevice": "Das Gerät „{{deviceName}}“ wurde gelöscht.",
+		"popupSettings": {
+			"advancedTitle": "Erweitert",
+			"basicTitle": "Allgemeine Einstellungen",
+			"basicSectionTitle": "Allgemeine Einstellungen",
+			"dragAndDrop": "Um einen Codec auszuwählen, ziehen Sie diesen aus dem Feld „Verfügbare Codecs“ in das Feld „Ausgewählte Codecs“.",
+			"options": {
+				"menuTitle": "Optionen"
+			},
+			"sip": {
+				"menuTitle": "SIP",
+				"sectionTitle": "SIP-Infos"
+			},
+			"audio": {
+				"menuTitle": "Audio",
+				"sectionTitle": "Audioeinstellungen",
+				"selectedCodecs": "Ausgewählte Codecs",
+				"unselectedCodecs": "Verfügbare Codecs",
+				"codecs": {
+					"OPUS": "OPUS",
+					"CELT@32000h": "Siren @ 32 kHz",
+					"G7221@32000h": "G722.1 @ 32 kHz",
+					"G7221@16000h": "G722.1 @ 16 kHz",
+					"G722": "G722",
+					"speex@32000h": "Speex @ 32 kHz",
+					"speex@16000h": "Speex @ 16 kHz",
+					"speex": "Speex",
+					"PCMU": "G711u / PCMU – 64 kbps (n.v.)",
+					"PCMA": "G711a / PCMA – 64 kbps (andere)",
+					"G729":"G729 – 8 kbps (erfordert Lizenz)",
+					"GSM":"GSM",
+					"CELT@48000h": "Siren (HD) @ 48 kHz",
+					"CELT@64000h": "Siren (HD) @ 64 kHz"
+				}
+			},
+			"callerId": {
+				"menuTitle": "Notrufer-ID",
+				"sectionTitle": "Notrufer-ID",
+				"emergency": "Nummer",
+				"notSet": "- Account-Standard -",
+				"noE911Numbers": "Sie haben für keine Ihrer Nummern E911 eingerichtet. Bitte richten Sie E911 über den Nummernmanager ein und kehren Sie dann zu diesem Bildschirm zurück.",
+				"address": "Adresse",
+				"__comment": "UI-1386: Geräte für die Verwendung des allgemeinen Steuerelements „numberSelector“ aktualisiert",
+				"__version": "v3.20_s4",
+				"selectNumber": "e911-Nummer auswählen",
+				"useDefault": "Account-Standard verwenden"
+			},
+			"miscellaneous": {
+				"menuTitle": "Sonstiges",
+				"sectionTitle": "Sonstiges",
+				"rtp": {
+					"enable": "Audio verschlüsseln",
+					"type": "Verschlüsselungstyp: ",
+					"srtp": "SRTP",
+					"zrtp": "ZRTP"
+				},
+				"outbound_privacy": {
+					"type": "Datenschutz bei der Anrufer-ID ",
+					"default": "Standard",
+					"none": "Keine",
+					"number": "Nummer",
+					"name": "Name",
+					"full": "Vollständig"
+				},
+				"__comment": "UI-1119: „ignore_complete_elsewhere“ hinzugefügt",
+				"__version": "3.19",
+				"ignoreCompletedElsewhere": {
+					"label": "Annahme an anderem Gerät ignorieren",
+					"help": "Wenn aktiviert, zeigen Telefone mit dieser Funktion einen Anruf als verpasst an, wenn dieser Teil einer Rufgruppe war und an einem anderen Gerät angenommen wurde."
+				},
+				"__comment": "UI-377: Funktion für Geräteneustart hinzugefügt",
+				"__version": "3.21",
+				"restart": {
+					"label": "Neustartanfrage senden",
+					"button": "Neustarten",
+					"help": "Diese Aktion sendet eine Anforderung für einen Neustart des Gerätes. Sie ist nur verfügbar, wenn das Gerät derzeit auf der Plattform registriert ist.",
+					"success": "Dem Gerät wurde eine Neustartanfrage gesendet!"
+				},
+				"__comment": "UI-1818: Benachrichtigung bei Abmeldung hinzugefügt",
+				"__version": "3.22",
+				"unregisterNotifications": {
+					"label": "Bei Abmeldung benachrichtigen",
+					"help": "Möchten Sie den Administrator bei jeder Abmeldung dieses Geräts benachrichtigen?"
+				},
+				"__comment": "UI-1917: Schaltfläche für Entsperrung von Geräten in der SmartPBX-App hinzugefügt",
+				"__version": "3.22",
+				"unlock": {
+					"label": "Neubereitstellung ermöglichen",
+					"button": "Entsperren",
+					"success": "Dieses Gerät ist für die nächsten 24 Stunden entsperrt."
+				},
+				"__comment": "UI-1917: Schaltfläche für Entsperrung von Geräten in der SmartPBX-App hinzugefügt",
+				"__version": "3.22",
+				"mediaWebrtc": {
+					"help": "Wenn aktiviert, wird ein WebRTC-kompatibler SDP in der EINLADUNG erzwungen.",
+					"label": "WebRTC"
+				}
+			},
+			"restrictions": {
+				"menuTitle": "Einschränkungen",
+				"sectionTitle": "Einschränkungseinstellungen",
+				"inherit": "Übernehmen",
+				"deny": "Ablehnen",
+				"matcher": {
+					"help": "Geben Sie eine Nummer ein und klicken Sie auf „Test“, um festzustellen, ob der Anruf erlaubt wäre.",
+					"placeholder": "+18554443333",
+					"button": "Test",
+					"label": "Die oben angegebene Nummer entspricht dieser Regel.",
+					"__comment": "UI-727, v3.19_s2: Die Art und Weise aktualisiert, wie Anrufseinschränkungen auf Geräten angezeigt werden.",
+					"allowMessage": "Mit diesem Gerät darf ein Anruf an {{phoneNumber}} getätigt werden.",
+					"denyMessage": "Mit diesem Gerät darf kein Anruf an {{phoneNumber}} getätigt werden."
+				},
+				"__comment": "UI-727, v3.19_s2: Die Art und Weise aktualisiert, wie Anrufseinschränkungen auf Geräten angezeigt werden.",
+				"allow": "Zulassen",
+				"disabledRestrictionsInfo": "Einige Anruftypen wurden für Ihren gesamten Account eingeschränkt und können nicht per Gerät aktiviert werden."
+			},
+			"video": {
+				"menuTitle": "Video",
+				"sectionTitle": "Videoeinstellungen",
+				"selectedCodecs": "Ausgewählte Codecs",
+				"unselectedCodecs": "Verfügbare Codecs",
+				"codecs": {
+					"VP8": "VP8",
+					"H264": "H264",
+					"H263": "H263",
+					"H261": "H261"
+				}
+			},
+			"__comment": "UI-1351: Möglichkeit zur Konfiguration von Funktionstasten für SIP-Geräte in SmartPBX hinzugefügt",
+			"__version": "v3.20_s4",
+			"keys": {
+				"alertMessage": "In der Standardeinstellung wird diese Taste als Leitungstaste verwendet. Wir empfehlen, dies nicht zu ändern.",
+				"featureKeys": {
+					"title": "Funktionstasten",
+					"label": "Funktionstaste"
+				},
+				"comboKeys": {
+					"title": "Kombitasten",
+					"label": "Kombitaste"
+				},
+				"labels": {
+					"user": "Benutzer",
+					"parkingSpot": "Halteposition",
+					"value": "Wert"
+				},
+				"info": {
+					"link": {
+						"showInfo": "Infos anzeigen",
+						"hideInfo": "Infos verbergen"
+					},
+					"types": {
+						"line": "Als Leitungstaste verwenden.",
+						"presence": "Wird angezeigt, wenn ein Benutzer einen Anruf erhält oder gerade telefoniert. Die Anzeige kann zum Entgegennehmen von Anrufen oder als Kurzwahl zu diesem Benutzer verwendet werden.",
+						"parking": "Wird angezeigt, wenn ein Anruf eine Halteposition belegt, die für das gesamte Unternehmen zur Verfügung steht. Die Anzeige kann verwendet werden, um einen Anruf in die Halteposition zu verlegen oder um einen gehaltenen Anruf wieder abzurufen.",
+						"personal_parking": "Wird angezeigt, wenn ein Anruf eine Halteposition belegt, die für den ausgewählten Benutzer vorgesehen ist. Die Anzeige kann verwendet werden, um einen Anruf in die Halteposition zu verlegen oder um einen gehaltenen Anruf wieder abzurufen.",
+						"speed_dial": "Zeigt keine Anrufereignisse an, kann jedoch zum schnellen Anrufen der konfigurierten Nummer verwendet werden."
+					}
+				},
+				"types": {
+					"line": "Zeile",
+					"none": "Keine",
+					"presence": "Anwesenheit",
+					"parking": "Parken",
+					"personal_parking": "Persönliches Parken",
+					"speed_dial": "Kurzwahl"
+				}
+			}
+		},
+		"buy": "Gerät kaufen",
+		"classifiers": {
+			"unknown": {
+			    "name": "Sonstiges",
+			    "help": "Wählen Sie diese Option aus, wenn dieser Account Anrufe an ALLE ANDEREN NUMMERN außer an solche, die in dieser Liste aufgeführt sind, tätigen soll. (Wenn das Format der Nummer dem System unbekannt ist.)"
+			}
+		},
+		"noMatchingDevices": "Es konnten keine Geräte gefunden werden, die Ihren Suchkriterien entsprechen.",
+		"noDevicesConfigured": "Es wurden keine Geräte konfiguriert",
+		"provisionerPopup": {
+			"brandHeadline": "Wählen Sie den Gerätehersteller aus:",
+			"deviceHeadline": "Wählen Sie das Gerätemodell aus:",
+			"deviceSelected": "Sie haben das {{model}} {{brand}} ausgewählt",
+			"missingBrand": "Die Marke meines Geräts ist hier nicht aufgeführt",
+			"missingDevice": "Mein Gerät ist nicht aufgeführt",
+			"title": "Geräteauswahl"
+		},
+		"sip_device": {
+			"addTitle": "Hinzufügen eines SIP-Geräts",
+			"editTitle": "Bearbeiten des SIP-Geräts: {{name}}",
+			"macAddress": "MAC-Adresse",
+			"macAddressPlaceholder": "19:33:1A:B2:12:58",
+			"new": "Neues SIP-Gerät",
+			"deviceName": "Gerätename"
+		},
+		"sip_uri": {
+			"addTitle": "Hinzufügen eines SIP-URI",
+			"deviceName": "Name",
+			"editTitle": "Bearbeiten des SIP-URI: {{name}}",
+			"new": "Neuer SIP-URI",
+			"uri": "SIP-URI",
+			"uriPlaceholder": "sip:device@meine.firma.de",
+			"hideContactList": "In Kontaktliste ausblenden"
+		},
+		"landline": {
+			"addTitle": "Hinzufügen einer Festnetznummer",
+			"deviceName": "Gerätename",
+			"editTitle": "Bearbeiten der Festnetznummer: {{name}}",
+			"new": "Neue Festnetznummer",
+			"number": "Nummer",
+			"numberPlaceholder": "+14152231121",
+			"requireKeypress": "Voicemail der Festnetznummer nutzen",
+			"keepCallerId": "Ursprüngliche Anrufer-ID speichern",
+			"hideContactList": "In Kontaktliste ausblenden"
+		},
+		"cellphone": {
+			"addTitle": "Hinzufügen eines Mobiltelefons",
+			"deviceName": "Gerätename",
+			"editTitle": "Bearbeiten des Mobiltelefons: {{name}}",
+			"new": "Neues Mobiltelefon",
+			"number": "Nummer",
+			"numberPlaceholder": "+14152231121",
+			"requireKeypress": "Nutzung der Voicemail des Mobiltelefons erlauben",
+			"keepCallerId": "Ursprüngliche Anrufer-ID speichern",
+			"hideContactList": "In Kontaktliste ausblenden"
+		},
+		"mobile": {
+			"addTitle": "Hinzufügen eines geschäftlichen Mobiltelefons",
+			"deviceName": "Gerätename",
+			"editTitle": "Bearbeiten des geschäftlichen Mobiltelefons: {{name}}",
+			"mdn": "MDN",
+			"mdnPlaceholder": "Telefonnummer aus 10 Ziffern",
+			"new": "Neues geschäftliches Mobiltelefon"
+		},
+		"smartphone": {
+			"addTitle": "Hinzufügen eines Smartphones",
+			"deviceName": "Gerätename",
+			"editTitle": "Bearbeiten des Smartphones: {{name}}",
+			"new": "Neues Smartphone",
+			"requireKeypress": "Nutzung der Voicemail des Smartphones erlauben",
+			"keepCallerId": "Ursprüngliche Anrufer-ID speichern",
+			"hideContactList": "In Kontaktliste ausblenden"
+		},
+		"fax": {
+			"addTitle": "Hinzufügen eines Faxgeräts",
+			"editTitle": "Bearbeiten des Faxgeräts: {{name}}",
+			"macAddress": "MAC-Adresse",
+			"macAddressPlaceholder": "19:33:1A:B2:12:58",
+			"new": "Faxgerät",
+			"deviceName": "Gerätename",
+			"t38": "T38",
+			"disabled": "Deaktiviert",
+			"auto": "Automatische Erkennung",
+			"force": "Immer erzwingen"
+		},
+		"softphone": {
+			"addTitle": "Hinzufügen eines Softphones",
+			"editTitle": "Bearbeiten des Softphones: {{name}}",
+			"new": "Neues Softphone",
+			"deviceName": "Gerätename"
+		},
+		"ata": {
+			"addTitle": "Hinzufügen eines ATA",
+			"editTitle": "Bearbeiten des ATA: {{name}}",
+			"new": "Neuer ATA",
+			"deviceName": "Gerätename"
+		},
+		"sip": {
+			"username": "SIP-Benutzername",
+			"password": "SIP-Kennwort",
+			"realm": "Bereich"
+		},
+		"spare": "Frei",
+		"title": "Alle Geräte",
+		"titleGrid": {
+			"edit": "Bearbeiten",
+			"enable": "Aktivieren",
+			"user": "Benutzer",
+			"modelMacAddress": "Name/Mac-Adresse",
+			"type": "Typ"
+		},
+		"types": {
+			"cellphone": "Mobiltelefon",
+			"sip_device": "SIP-Telefon",
+			"smartphone": "Smartphone",
+			"mobile": "Geschäftliches Mobiltelefon",
+			"softphone": "Softphone",
+			"landline": "Festnetz",
+			"fax": "Fax",
+			"ata": "ATA",
+			"sip_uri": "SIP-URI"
+		},
+		"unassignedDevice": "–"
+	},
+
+	"users": {
+		"admin": "Admin",
+		"add": "Benutzer hinzufügen",
+		"addExtension": "Diesem Benutzer eine Nebenstelle hinzufügen",
+		"addNewExtension": "Nebenstellennummer: ",
+		"addFromSpare": "Aus freien Nummern hinzufügen",
+		"addFromSpareDevices": "Aus freien Geräten hinzufügen",
+		"buy": "Nummern kaufen",
+		"dialogChangePassword": {
+			"help": "Sie können ein neues Kennwort hinzufügen, indem Sie ein beliebiges Kennwort mit der E-Mail-Adresse eintippen!",
+			"password": "Kennwort",
+			"confirmPassword": "Kennwort wiederholen",
+			"passwordPlaceholder": "Kennwort (mind. 6 Zeichen)",
+			"title": "Anmeldeinformationen aktualisieren",
+			"username": "E-Mail-Adresse des Benutzers",
+			"resetPassword": {
+				"linkTitle": "hier",
+				"text": "Wenn Sie möchten, dass das System dem Benutzer eine E-Mail mit Anweisungen für das Zurücksetzen seines Kennwortes schickt, klicken Sie auf "
+			}
+		},
+		"dialogChangePin": {
+			"help": "Sie können diesen Pop-up beispielsweise verwenden, um eine temporäre PIN für einen Benutzer festzulegen, der seine PIN verloren hat.",
+			"pin": "PIN",
+			"pinPlaceholder": "Min. 4 Stellen",
+			"title": "PIN aktualisieren"
+		},
+		"dialogCreationUser": {
+			"createUser": "Benutzer erstellen",
+			"errorOnCreation": "Bei der Erstellung dieses Benutzers ist ein Fehler aufgetreten:",
+			"extension": "Hauptnebenstelle",
+			"extensionAlreadyExist": "Diese Nebenstelle ist bereits vergeben. Bitte wählen Sie eine andere Nebenstelle.",
+			"firstName": "Vorname",
+			"lastName": "Nachname",
+			"loginEmail": "Zur Anwendung verwendete E-Mail",
+			"notificationEmail": "Benachrichtigungs-E-Mail",
+			"password": "Kennwort (mind. 6 Zeichen)",
+			"sendToDifferentEmail": "E-Mails an andere Adresse senden",
+			"title": "Benutzer erstellen",
+			"vmboxAlreadyExist": "VMBox-Nummer ist bereits vergeben. Bitte wählen Sie eine andere Voicemailbox-Nummer.",
+			"vmboxNumber": "VM-Box Nr.",
+			"__comment": "UI-814: Option zur automatischen Versendung einer E-Mail bei Benutzererstellung hinzugefügt",
+			"__version": "3.20_s3",
+			"sendWelcomeEmail": "Anmeldedaten an diesen Benutzer senden"
+		},
+		"editionForm": {
+			"changePIN": "PIN ändern",
+			"changeUsername": "Anmeldeinformationen ändern",
+			"firstName": "Vorname",
+			"lastName": "Nachname",
+			"role": "Rolle",
+			"timezone": "Zeitzone",
+			"vmboxNumber": "VMBox Nr.",
+			"timeout": "Rufzeichen-Zeitüberschreitung",
+			"timeoutSec": "Sek.",
+			"timeoutEdit": "Bearbeitung in Find-Me/Follow-Me-Funktion",
+			"timeoutEditHint": "Die Rufzeichen-Zeitüberschreitung wird durch die „Find-Me/Follow-Me“-Funktion überschrieben. Klicken Sie auf den folgenden Link, um diese zu bearbeiten.",
+			"disabledTimeoutHint": "Sie benötigen mindestens eine Nummer oder Nebenstelle, um die Rufzeichen-Zeitüberschreitung festzulegen.",
+			"__comment": "UI-1109: Anwesenheits-ID-Einstellung im Benutzerdokument hinzugefügt",
+			"__version": "3.19",
+			"presenceId": "Hauptnebenstelle",
+			"noPresenceID": "Keine",
+			"__comment": "UI-1066: Hilfetext hinzugefügt, der eingeblendet wird, wenn der Mauszeiger über die Symbole im Benutzerformular bewegt wird",
+			"__version": "3.19",
+			"nameHelp": "Geben Sie den Vornamen des Benutzers in den ersten Eintrag und seinen Nachnamen in den zweiten Eintrag ein",
+			"loginHelp": "Dies ist der Benutzername dieses Benutzers. Er wird zur Anmeldung auf der Anwendung verwendet",
+			"vmboxHelp": "Dies ist die Voicemailbox-Nummer für diesen Benutzer. Klicken Sie auf „PIN ändern“, um die PIN der Voicemailbox für diesen Benutzer zurückzusetzen",
+			"roleHelp": "Der „Admin“ hat die Berechtigung, auf AppExchange zuzugreifen und diesem Konto Apps hinzuzufügen. Der „Benutzer“ dagegen kann nur auf die Apps zugreifen, die für ihn aktiviert wurden",
+			"languageHelp": "Ändert die Sprache der UI",
+			"timezoneHelp": "Legt die Zeitzone für die Geräte und die Voicemailbox dieses Benutzers fest",
+			"ringingHelp": "Legt die Rufzeichen-Zeitüberschreitung für diesen Benutzer und seine Geräte fest. Wenn Sie zum Beispiel den Wert 20 festlegen, klingelt es bei diesem Benutzer 20 Sekunden lang, bevor das System den Anruf auf dessen Voicemailbox umschaltet",
+			"mainExtensionHelp": "Definiert die Anrufer-ID für diesen Benutzer für Anrufe innerhalb des Systems und seine Anwesenheits-ID für diese Nummer",
+			"outbound_privacy": {
+				"type": "Datenschutz bei der Anrufer-ID ",
+				"default": "Standard",
+				"none": "Keine",
+				"number": "Nummer",
+				"name": "Name",
+				"full": "Vollständig"
+			}
+		},
+		"delete": "Benutzer löschen",
+		"errorCallerId": "Bevor Sie die Anrufer-ID dieses Benutzers konfigurieren, müssen Sie ihm eine Nummer zuweisen",
+		"errorNumberFaxing": "Bevor Sie die Faxnummer dieses Benutzers konfigurieren, benötigen Sie freie Nummern auf Ihrem Account (Sie können neue Nummern im Abschnitt „Nummern“ im linken Menü kaufen).",
+		"featureOn": "EIN",
+		"includeInDirectory": "Benutzer ins Unternehmensverzeichnis aufnehmen",
+		"noMatchingDevices": "Keine Geräte gefunden, die Ihrer Suche entsprachen",
+		"noMatchingNumbers": "Es konnten keine Nummern gefunden werden, die Ihren Suchkriterien entsprechen.",
+		"noMatchingUser": "Keine Daten gefunden, die Ihrer Suche entsprachen",
+		"noUsersConfigured": "Fügen Sie zu Beginn einen Benutzer hinzu",
+		"noMoreSpareDevices": "Es sind keine freien Geräte übrig. Sie können im Geräteinventar neue Geräte kaufen",
+		"noMoreSpareNumbers": "Es sind keine Nummern übrig. Sie können neue Nummern kaufen, indem Sie auf den untenstehenden Link klicken.",
+		"noAssignedDevices": "Derzeit sind diesem Benutzer keine Geräte zugewiesen.",
+		"noAssignedExtensions": "Derzeit sind diesem Benutzer keine Nebenstellen zugewiesen.",
+		"noNumber": "Keine",
+		"noNumberCallflow": "Sie müssen diesem Benutzer mindestens eine Nebenstelle oder Telefonnummer zuweisen, bevor Sie speichern",
+		"needExtensionFirst": "Benutzer benötigen eine Nebenstelle, bevor ihnen eine Telefonnummer zugewiesen werden kann. Bitte klicken Sie auf den Abschnitt „Nebenstelle“ und fügen Sie dort eine hinzu.",
+		"noExtension": "Keine",
+		"noAssignedNumbers": "Diesem Benutzer sind keine Nummern zugewiesen.",
+		"noUnassignedNumbers": "Es sind keine freien Nummern verfügbar, die dem Benutzer zugewiesen werden könnten.",
+		"noUserDevices": "Keine",
+		"noUserFeatures": "Keine",
+		"noUserCallflow": "Es ist ein Fehler aufgetreten. Da diesem Benutzer keine Callflows zugewiesen sind, können Sie ihn nicht dem Unternehmensverzeichnis hinzufügen",
+		"port": "Nummern portieren",
+		"resetPassword": "Kennwort zurücksetzen",
+		"resendInstructions": "Anweisungen erneut senden",
+		"title": "Benutzer insgesamt",
+		"titleGrid": {
+			"users": "Benutzereinstellungen",
+			"extensions": "Nebenstellen",
+			"phoneNumbers": "Telefonnummern",
+			"devices": "Geräte",
+			"features": "Benutzerfunktionen",
+			"__comment": "UI-2994: Lizenzierte Benutzerservicetarife als Listenkategorie hinzugefügt",
+			"__version": "4.1",
+			"userLicensedRoles": "Benutzertyp"
+		},
+		"toastrMessages": {
+			"devicesUpdated": "Die {{ name }} zugewiesenen Geräte wurden erfolgreich aktualisiert.",
+			"instructionsSent": "An {{ email }} wurde eine E-Mail gesendet, in der alle Benutzeranweisungen für die ersten Schritte mit der UI stehen!",
+			"numbersUpdated": "Die Telefonnummern von {{ name }} wurden erfolgreich aktualisiert.",
+			"passwordReseted": "Das Kennwort wurde zurückgesetzt und an {{ email }} wurde eine E-Mail gesendet, die Anweisungen zur Erstellung eines neuen Kennworts enthält.",
+			"userDelete": "{{ name }} wurde in Smart PBX erfolgreich gelöscht!",
+			"userUpdated": "{{ name }}s Einstellungen wurden erfolgreich aktualisiert.",
+			"pinUpdated": "Die PIN von {{ name }} wurde erfolgreich aktualisiert.",
+			"__comment": "UI-1033: Die Anrufer-ID-Funktion wird jetzt korrekt entfernt, wenn wir eine Nummer entfernen, die als diese Anrufer-ID-Nummer festgelegt war",
+			"__version": "3.20",
+			"callerIDDeleted": "Die Anrufer-ID-Nummer dieses Benutzers war für eine Nummer festgelegt, die dem Benutzer nicht mehr zugewiesen ist. Daher haben wir die Anrufer-ID-Funktion deaktiviert.",
+			"__comment": ": Dem Admin wird jetzt die Möglichkeit gegeben, eine E-Mail zum Zurücksetzen des Kennworts eines Benutzers zu versenden",
+			"__version": "4.0",
+			"successResetPassword": "Vorgang erfolgreich durchgeführt! {{ name }} wird in Kürze eine E-Mail erhalten, in der steht, wie er sein Kennwort zurücksetzen kann."
+		},
+		"uploadPicture": "Ein Bild hochladen",
+		"user": "Benutzer",
+		"call_forward": {
+			"directCallsOnly": "Nur Direktanrufe weiterleiten",
+			"headline": "Einstellungen zur Weiterleitung von Benutzeranrufen",
+			"keepCallerId": "Ursprüngliche Anrufer-ID speichern",
+			"label": "Alle Anrufe weiterleiten an" ,
+			"mobile": "Ein Mobiltelefon",
+			"deskphone": "Ein Festnetztelefon",
+			"number": "Diese Nummer",
+			"placeholder": "+14157283992",
+			"requireKeyPress": "Voicemails für weitergeleitete Nummern hinterlassen",
+			"title": "Anrufweiterleitung",
+			"timeoutWarning": "Um Voicemails für weitergeleitete Nummern zu hinterlassen, muss Ihre Rufzeichen-Zeitüberschreitung mindestens 30 Sekunden betragen. Wenn Sie jetzt speichern, werden Sie automatisch in die Benutzereinstellungen weitergeleitet, wo Sie die Rufzeichen-Zeitüberschreitung aktualisieren können.",
+			"__comment": ": Modus für Failover bei Anrufweiterleitung hinzugefügt",
+			"__version": "4.0",
+			"failoverWarning": "Im „Failover-Modus“ haben die Anrufweiterleitungseinstellungen nur dann Geltung, wenn keines der Geräte dieses Benutzers registriert ist.",
+			"failover_title": "Anrufweiterleitung (Failover-Modus)"
+		},
+		"callRecording": {
+			"title": "Angepasste Anrufaufzeichnung",
+			"headline": "Anpassungen für Anrufaufzeichnung des Benutzers",
+			"formatLabel": "Format:",
+			"urlLabel": "URL:",
+			"urlPlaceholder": "http://your.server.com/place/to/store/recordings",
+			"timeLimitLabel": "Zeitlimit (Sek.):",
+			"noNumber": "Bevor Sie die Funktion „Angepasste Anrufaufzeichnung“ für diesen Benutzer konfigurieren, müssen Sie ihm eine Nummer oder eine Nebenstelle zuweisen",
+			"__comment": "UI-2578: Ein-/Ausschalter für Anrufaufzeichnung in Smart PBX hinzugefügt",
+			"__version": "4.1",
+			"toggleValues": {
+				"inboundOnnet": {
+					"title": "Eingehend intern:",
+					"help": ""
+				},
+				"inboundOffnet": {
+					"title": "Eingehend extern:",
+					"help": ""
+				},
+				"outboundOnnet": {
+					"title": "Ausgehend intern:",
+					"help": ""
+				},
+				"outboundOffnet": {
+					"title": "Ausgehend extern:",
+					"help": ""
+				},
+				"on": "Ein",
+				"accountDefault": "Account-Standard",
+				"off": "Aus"
+			}
+		},
+		"conferencing": {
+			"title": "Konferenzbrücke",
+			"headline": "Persönliche Konferenzbrücke",
+			"pinLabel": "Nummer des persönlichen Konferenzraums",
+			"number": "Konferenztelefonnummer(n)",
+			"help": "Sie können einen Konferenzanruf erstellen, indem Sie den Teilnehmern eine Konferenztelefonnummer und Ihre persönliche Zimmernummer bereitstellen",
+			"noConfNumbers": "Sie müssen eine Haupt-Konferenznummer (Im Abschnitt „Hauptnummer“ auf der linken Seite des SmartPBX) hinzufügen, um die persönlichen Konferenzbrücken zu aktivieren"
+		},
+		"do_not_disturb": {
+			"headline": "Benutzereinstellungen für „Bitte nicht stören“",
+			"title": "Bitte nicht stören"
+		},
+		"faxing": {
+			"trialError": "Sie arbeiten derzeit mit einer Testversion der UI. Um auf die Faxfunktion zugreifen zu können, müssen Sie Ihren Account upgraden.",
+			"title": "Faxbox",
+			"headline": "Faxbox",
+			"defaultSettings": {
+				"nameExtension": "s Faxbox",
+				"headerExtension": " Faxdrucker"
+			},
+			"__comment": "UI-1354: Bessere Erklärung für die Faxbox-Funktion hinzugefügt",
+			"__version": "v3.20_s4",
+			"faxToEmail": {
+				"title": "Fax zu E-Mail",
+				"text1": "Faxe, die an",
+				"text2": "gesendet wurden, werden zu E-Mails konvertiert und gesendet an"
+			},
+			"emailToFax": {
+				"title": "E-Mail zu Fax",
+				"text1": "Bei E-Mails, die an ",
+				"text2": " gesendet werden und die einen Anhang (PDF oder TIFF) enthalten, wird der Anhang gefaxt an ",
+				"text3": "Die E-Mail muss kommen von ",
+				"default": "{ destination number }",
+				"help": {
+					"showHelp": "Hilfe anzeigen",
+					"hideHelp": "Hilfe verbergen",
+					"question": "An welche Nummer möchten Sie ein Fax senden?",
+					"placeholder": "Zielnummer"
+				}
+			},
+
+			"googlePrinter": {
+				"title": "Google Printer",
+				"text1": "Klicken Sie auf ",
+				"text2": " um den Google Cloud Printer zu aktivieren. Das Printer-Installationsprogramm erhalten Sie ",
+				"link": "hier"
+			},
+			"toastr": {
+				"error": {
+					"numberMissing": "Wählen Sie eine Nummer aus"
+				}
+			}
+		},
+		"vm_to_email": {
+			"deleteAfterNotify": "Nach dem Senden der Benachrichtigung Nachrichten aus Datenbank löschen.",
+			"headline": "Voicemail-zu-E-Mail-Einstellungen",
+			"help": "Wenn Sie das Sendeziel von E-Mail-Benachrichtigungen ändern möchten, bearbeiten Sie die E-Mail-Adresse des Benutzers im Abschnitt „Benutzeradministration“",
+			"label": "Für jede neue Voicemail wird eine E-Mail an {{variable}} gesendet",
+			"title": "Voicemails"
+		},
+		"find_me_follow_me": {
+			"title": "Find Me/Follow Me",
+			"headline": "Einstellungen für Find Me/Follow Me",
+			"disableDevice": "Kein Rufton",
+			"ringThisPhoneFor": "Dieses Telefon anrufen für",
+			"noDevice": "Um diese Funktion zu aktivieren, wird mindestens ein Gerät benötigt.",
+			"noNumber": "Bevor Sie die „Find Me/Follow Me“-Funktion für diesen Benutzer konfigurieren können, müssen Sie ihm eine Nummer oder eine Durchwahl zuweisen",
+			"distribute": "Weiterleiten"
+		},
+		"caller_id": {
+			"title": "Anrufer-ID-Nummer",
+			"dropdownLabel": "Meine Anrufer-ID-Nummer anzeigen als",
+			"currentCallerIdLabel": "Aktuelle Anrufer-ID: ",
+			"none": "Keine",
+			"headline": "Einstellungen für Benutzer-Anrufer-ID-Nummer",
+			"help": "Wenn Sie diese Funktion nicht aktivieren, wird die standardmäßig angezeigte Anrufer-ID diejenige sein, die auf der Hauptnummer dieses Accounts konfiguriert ist."
+		},
+		"music_on_hold": {
+			"title": "Warteschleifenmusik",
+			"headline": "Benutzereinstellungen Warteschleifenmusik",
+			"dropdownLabel": "Warteschleifenmusik:",
+			"silence": "Keine",
+			"emptyUploadAlert": "Wählen Sie eine Datei zum Hochladen aus",
+			"fileTooBigAlert": "Sie können keine Datei größer 5 MB hochladen",
+			"__comment": "UI-1025: Hochladen von Mediendateien über die UI aktualisiert",
+			"__version": "3.20_s3",
+			"audioUploadButton": "Durchsuchen …"
+		},
+		"hotdesk": {
+			"id": "Hotdesk-ID",
+			"label": "Wird eine PIN benötigt?",
+			"keep_logged_in_elsewhere": "Anmeldung auf mehreren Geräten ermöglichen",
+			"title": "Hotdesking",
+			"headline": "Hotdesking-Benutzereinstellungen",
+			"help": "Die Hotdesking-ID wird automatisch als die Nebenstelle des Benutzers festgelegt."
+		},
+		"__comment": "UI-1129: Migrationstool von Kazoo-UI nach Monster-UI",
+		"__version": "3.19",
+		"migration": {
+			"confirmMigration": "Für die Nummer, die Sie hinzufügen möchten, wurde ein Callflow gefunden. Offenbar können wir diesen Callflow nach SmartPBX migrieren. Bevor wir damit fortfahren, sollte Ihnen bewusst sein, dass Sie diesen Callflow nach dieser Änderung nicht mehr in der Kazoo-UI oder in der Monster-UI-Callflows-App aktualisieren können. Möchten Sie den Vorgang fortsetzen?",
+			"tooManyCallflows": "Offenbar gehören die Nummern, die Sie hinzufügen möchten, zu mehreren Kazoo-UI-Callflows. Diese Callflows können nicht ordnungsgemäß in die Monster-UI migriert werden. Bitte wenden Sie sich für Hilfe an den Support."
+		},
+		"__commment": "UI-1109: Pop-up für Änderung der Anwesenheits-ID hinzugefügt",
+		"__version": "3.19",
+		"presenceIDPopup": {
+			"title": "Auswahl Ihrer neuen Hauptnebenstelle",
+			"header": "Offenbar haben Sie keine gültige Hauptnebenstelle konfiguriert. Wählen Sie Ihre Hauptnebenstelle unter den folgenden Möglichkeiten aus:",
+			"none": "Ich möchte keine neue Hauptnebenstelle festlegen"
+		},
+		"__comment": "UI-1393: Benutzergeräte zur Verwendung des allgemeinen Steuerelements „monsterListing“ aktualisiert",
+		"__version": "v3.20_s4",
+		"devices": {
+			"newDevice": "Neues Gerät",
+			"spareDevice": "Aus freien Geräten hinzufügen"
+		},
+
+		"__comment": "UI-1604: Walkthrough für neue Benutzer hinzugefügt",
+		"__version": "3.21",
+		"walkthrough": {
+			"steps": {
+				"1": "Fügen Sie einen bestimmten Benutzer hinzu, indem Sie auf die Schaltfläche klicken und seine Angaben ausfüllen. Sobald dies abgeschlossen ist, werden alle Benutzer und ihre Einstellungen unten eingetragen angezeigt.",
+				"2": "Sobald ein Benutzer erstellt wurde, wird dieser Bereich aktualisiert. Nehmen Sie alle erforderlichen Änderungen für diesen Benutzer in den Benutzereinstellungen vor",
+				"3": "Stellen Sie Benutzern ihre eigenen eindeutigen Direktwahl-Nebenstellen zur Verfügung.",
+				"4": "Klicken Sie auf die Schaltfläche zum Kaufen, Portieren und Zuweisen von Nummern. Sobald der Vorgang abgeschlossen ist, wird die Nummer automatisch dem bestimmten Benutzer zugewiesen.",
+				"5": "Autoprovisioning für eines unserer unterstützten Geräte. Die UI verfügt über eine Liste mit Herstellern und Geräten. Sobald der Vorgang abgeschlossen ist, wird es automatisch dem jeweiligen Benutzer zugewiesen.",
+				"6": "Verwalten Sie, auf welche Funktionen Benutzer zugreifen dürfen. Sie können alle spezifischen Benutzerfunktionen aktivieren, deaktivieren und verwalten."
+			}
+		},
+
+		"__comment": "UI-1888: ",
+		"__version": "4.0",
+		"confirmMobileUnAssignment": "Sie versuchen gerade, die Zuweisung eines mobilen Geräts aufzuheben. Beachten Sie, dass dadurch auch die Verknüpfung der zu diesem Gerät ({{variable}}) zugehörigen Telefonnummer mit diesem Benutzer aufgehoben wird. Möchten Sie den Vorgang fortsetzen?",
+
+		"__comment": "UI-2138: Neues Dialogfeld: Benutzer löschen",
+		"__version": "3.22",
+		"deleteDialog": {
+			"title": "Löschen von {{ name }} aus dem System",
+			"headerAdmin": "Sie versuchen gerade, einen ADMIN zu löschen! Wenn man einen Admin löscht, werden sein Benutzer und seine Voicemailbox gelöscht, und seine Geräte sind ihm nicht länger zugewiesen. Außerdem wird dieser Admin dann nicht mehr in der Lage sein, diese UI zu verwalten. Möchten Sie den Vorgang wirklich fortsetzen?",
+			"headerUser": "Durch das Löschen eines Benutzers werden dieser Benutzer und seine Voicemailboxen gelöscht. Seine Geräte und Nummern sind ihm nicht länger zugewiesen. Möchten Sie den Vorgang fortsetzen?",
+			"deleteUser": "Löschen",
+			"deleteUserName": "„{{variable}}“ löschen",
+			"proceed": "Fortfahren",
+			"deleteDevices": "Die Geräte dieses Benutzers ebenfalls entfernen",
+			"deleteDevicesHelp": "Wenn Sie diese Option nicht aktivieren, verlieren diese Geräte ihre Zuweisung und tauchen in der Liste freier Geräte auf.",
+			"__comment": "UI-2467: Beim Löschen eines Benutzers in Smart PBX werden auch Konferenzen entfernt",
+			"__version": "4.0",
+			"deleteConferences": "Die Konferenzen dieses Benutzers ebenfalls entfernen",
+			"deleteConferencesHelp": "Wenn Sie diese Option deaktiviert lassen, werden Sie die Konferenznummer des Benutzers nirgends anders verwenden können, da sie weiterhin von dieser Konferenz belegt sein wird."
+		},
+
+		"__comment": "UI-2921: Neues Dialogfeld: Benutzer löschen",
+		"__version": "4.2",
+		"impersonate": "Identität annehmen",
+
+		"__comment": "UI-2994: Lizenzierte Benutzerrollen hinzugefügt",
+		"__version": "4.1",
+		"licensedUserRoles": {
+			"none": "– Nicht festgelegt –",
+			"label": "Benutzertyp",
+			"selectPlaceholder": "Wählen Sie einen Benutzertyp aus"
+		}
+	},
+
+	"strategy": {
+		"noNumberHelp": "Hinweis: Fügen Sie Ihrem Account zuerst eine Haupt-Büronummer hinzu. Sobald Sie eine Hauptnummer hinzufügen, können Sie Bürozeiten, Feiertage und die Verarbeitung eingehender Anrufe (Callflow) für Ihr Büro einrichten.",
+		"sectionTitles": {
+			"numbers": "Haupt-Unternehmensnummern",
+			"confnum": "Haupt-Konferenznummer",
+			"hours": "Bürozeitenstrategie",
+			"holidays": "Feiertage",
+			"calls": "Verarbeitung eingehender Anrufe",
+			"__comment": "UI-1210",
+			"__version": "3.22",
+			"faxingnum": "Haupt-Faxboxnummer"
+		},
+		"noNumberTitle": "Hauptnummer hinzufügen",
+		"noNumberMessage": "Fügen Sie eine Nummer aus den untenstehenden Links hinzu oder kaufen Sie eine, um fortzufahren.",
+		"noConfNumMessage": "Fügen Sie eine Haupt-Konferenznummer hinzu.",
+		"numberLinks": {
+			"spare": "Aus freien Nummern hinzufügen",
+			"buy": {
+				"link": "Nummern kaufen",
+				"regular": "Lokal",
+				"tollfree": "Gebührenfrei",
+				"vanity": "Vanity"
+			},
+			"port": "Nummern portieren"
+		},
+		"hours": {
+			"alwaysOpenTitle": "Durchgehend geöffnet",
+			"alwaysOpenDescription": "Wählen Sie diese Option aus, wenn Sie möchten, dass eingehende Anrufe immer gleich verarbeitet werden.",
+			"customHoursTitle": "Benutzerdefinierte Bürozeiten",
+			"customHoursDescription": "Wählen Sie diese Option aus, wenn Sie möchten, dass eingehende Anrufe anders verarbeitet werden, wenn Ihr Büro geschlossen ist.",
+			"listTitle": "Benutzerdefinierte Zeiten",
+			"timezone": "Zeitzone des Unternehmens:",
+			"to": "bis",
+			"lunchbreakTitle": "Ist das Büro zur Mittagszeit geschlossen?",
+			"__comment": "UI-1250: Hilfsfelder hinzugefügt",
+			"__version": "3.20_s2",
+			"helpAfterHours": "Vergessen Sie nicht, Anrufweiterleitung für Feierabend festzulegen! Wechseln Sie dazu in den Abschnitt „Verarbeitung eingehender Anrufe“ auf dieser Seite und wählen Sie die Registerkarte „Außerhalb der Öffnungszeiten“ aus.",
+			"helpLunchHours": "Wenn Ihr Büro zur Mittagszeit geschlossen ist, müssen Sie hierzu ebenfalls die Anrufweiterleitung einrichten. Auch diesen Punkt können Sie im Abschnitt „Verarbeitung eingehender Anrufe“ auf der Registerkarte „Mittagszeit“ einrichten."
+		},
+		"holidays": {
+			"enableTitle": "Ist das Büro an Feiertagen geschlossen?",
+			"addLink": "Feiertag hinzufügen",
+			"singleLink": "Einzelner Tag",
+			"rangeLink": "Zeitraum",
+			"advancedLink": "Erweitert",
+			"__comment": "UI-1250: Hilfsfelder hinzugefügt",
+			"__version": "3.20_s2",
+			"helpHolidays": "Vergessen Sie nicht, Anrufweiterleitung für Feiertage festzulegen! Wechseln Sie dazu in den Abschnitt „Verarbeitung eingehender Anrufe“ auf dieser Seite und wählen Sie die Registerkarte „Feiertage“ aus."
+		},
+		"calls": {
+			"openHoursTitle": "Öffnungszeiten",
+			"lunchHoursTitle": "Mittagszeit",
+			"afterHoursTitle": "Außerhalb der Öffnungszeiten",
+			"holidaysTitle": "Feiertage",
+			"incomingCall": "Eingehender Anruf",
+			"virtualReceptionist": "Virtueller Empfang",
+			"voicemail": "Voicemail",
+			"groupOther": "Andere",
+			"optionNone": "Zu Voicemail übergehen",
+			"callTabsMessages": {
+				"MainOpenHours": "Legen Sie fest, wie Ihre Anrufer Sie erreichen sollen, wenn Ihr Büro geöffnet ist.",
+				"MainLunchHours": "Legen Sie fest, wie Ihre Anrufer Sie während der Mittagszeit erreichen sollen.",
+				"MainAfterHours": "Legen Sie fest, wie Ihre Anrufer Sie erreichen sollen, wenn Ihr Büro geschlossen ist.",
+				"MainHolidays": "Legen Sie fest, wie Ihre Anrufer Sie erreichen sollen, wenn Ihr Büro an Feiertagen geschlossen ist."
+			}
+		},
+		"popup": {
+			"title": "Virtueller Empfang",
+			"infoBlock": "Die Funktion „Virtueller Empfang“ nimmt eingehende Anrufe professionell entgegen und leitet sie automatisch an die entsprechende Abteilung oder Person weiter. Anrufumleitungen können Sie über das Hauptmenü festlegen. Geben Sie dort eine passende Ansage ein oder nehmen Sie eine solche auf.",
+			"menuTitle": "Hauptmenü",
+			"greetingsTitle": "Ansage",
+			"addRouteLink": "Umleitung hinzufügen",
+			"ttsGreetingTitle": "Text-zu-Sprache",
+			"ttsGreetingPlaceholder": "Geben Sie Ihre Ansage hier ein.",
+			"uploadGreetingTitle": "Eigene Datei hochladen",
+			"chooseExistingGreetingTitle": "Aus vorhandenen Aufnahmen auswählen",
+			"noExistingGreetings": "Sie haben noch keine Ansagen aufgenommen. Daher müssen Sie zuerst welche hochladen.",
+			"recordGreetingTitle": "Über das Telefon aufnehmen",
+			"recordGreetingInfo": "Um die Ansage über das Telefon aufzunehmen, halten Sie sich an die folgenden Anweisungen:",
+			"recordGreetingLines": {
+				"line1": "Nehmen Sie bei einem Telefon, das auf diesen Account registriert ist, den Hörer ab.",
+				"line2": "Geben Sie Ihre Haupt-Büronummer ein.",
+				"line3": "Geben Sie bei Aufforderung diese PIN ein:",
+				"line4": "Nehmen Sie Ihre Ansage/Menü auf."
+			},
+			"pressKey": "Drücken Sie",
+			"for": "für",
+			"__comment": "UI-1025: Hochladen von Mediendateien über die UI aktualisiert",
+			"__version": "3.20_s3",
+			"fileUploadButton": "Datei auswählen",
+			"__comment": "UI-1185: Eine Hilfsnachricht zu Ansagen hinzugefügt",
+			"__version": "3.20_s4",
+			"greetingsHelp": "Sie müssen auf die Schaltfläche „Aktualisieren“ klicken, damit die an der Ansage vorgenommenen Änderungen gespeichert werden.",
+			"__comment": "UI-1657: Übersetzung der Standardaktion hinzugefügt",
+			"__version": "v3.22",
+			"defaultAction": "Standardaktion"
+		},
+		"open": "Geöffnet",
+		"closed": "Geschlossen",
+		"weekdays": {
+			"monday": "Montag",
+			"tuesday": "Dienstag",
+			"wednesday": "Mittwoch",
+			"thursday": "Donnerstag",
+			"friday": "Freitag",
+			"saturday": "Samstag",
+			"sunday": "Sonntag"
+		},
+		"ordinals": {
+			"first": "Erste",
+			"second": "Zweite",
+			"third": "Dritte",
+			"fourth": "Vierte",
+			"fifth": "Fünfte",
+			"last": "Letzte"
+		},
+		"monthsShort": {
+			"january": "Jan",
+			"february": "Feb",
+			"march": "Mär",
+			"april": "Apr",
+			"may": "Mai",
+			"june": "Jun",
+			"july": "Jul",
+			"august": "Aug",
+			"september": "Sep",
+			"october": "Okt",
+			"november": "Nov",
+			"december": "Dez"
+		},
+		"callEntities": {
+			"qubicle": "Warteschleifen für Anrufe",
+			"user": "Benutzer",
+			"device": "Geräte",
+			"ring_group": "Gruppen",
+			"voicemail": "Voicemailboxen",
+			"__comment": "UI-1353: Verzeichnisunterstützung für den virtuellen Empfang hinzugefügt",
+			"__version": "v3.20_s4",
+			"directory": "Verzeichnis",
+			"__comment": "UI-1742: In „Hauptnummer“ kann nun ein Callflow ausgewählt werden, der unter „Erweiterte Callflows“ erstellt wurde",
+			"__version": "3.22",
+			"advancedCallflows": "Erweiterte Callflows",
+			"__comment": "UI-1886: In „Virtueller Empfang“ kann jetzt ein Medium ausgewählt werden",
+			"__version": "3.23",
+			"play": "Medien"
+		},
+		"confirmMessages": {
+			"deleteHoliday": "Dieser Feiertag wird dauerhaft gelöscht. Vorgang fortsetzen?",
+			"disableHolidays": "Alle vorhandenen Feiertage werden dauerhaft gelöscht. Vorgang fortsetzen?"
+		},
+		"alertMessages": {
+			"uniqueHoliday": "Jeder Feiertag benötigt einen eindeutigen Namen.",
+			"undefinedMenu": "Sie haben einen virtuellen Empfang ausgewählt, ohne ihn einzurichten. Richten Sie ihn ein, indem Sie auf seinen Link klicken, oder wählen Sie eine andere Option aus.",
+			"emptyTtsGreeting": "Um die Text-zu-Sprache-Funktion zu aktivieren, müssen Sie Ihre Ansage eingeben.",
+			"emptyUploadGreeting": "Wählen Sie eine Datei zum Hochladen aus",
+			"fileTooBigAlert": "Sie können keine Datei größer 5 MB hochladen",
+			"uniqueMenuNumbers": "Nummern im Menü müssen eindeutig und vollständig sein.",
+			"lastE911Error": "Sie müssen für mindestens eine Ihrer Hauptnummern die Notruffunktion (e911) eingerichtet haben. Daher müssen Sie erst e911 für eine andere Hauptnummer festlegen, bevor Sie diese löschen können."
+		},
+		"toastrMessages": {
+			"updateHolidaySuccess": "Feiertage wurden aktualisiert.",
+			"updateCallSuccess": "Anrufstrategie wurde aktualisiert.",
+			"buyNumbersSuccess": "Nummern wurden gekauft.",
+			"buyNumbersError": "Beim Kauf von Nummern ist ein Fehler aufgetreten.",
+			"removeNumberSuccess": "Nummer wurde aus dem Haupt-Callflow entfernt."
+		},
+		"popupRemoveFeatures": {
+			"title": "Funktionsmerkmale",
+			"questionPartOne": "Möchten Sie Funktionen aus",
+			"questionPartTwo": "verschieben?",
+			"featuresToRemove": "Wählen Sie die zu entfernende(n) Funktion(en) aus:",
+			"features": {
+				"cnam": "Anrufer-ID",
+				"e911": "e911"
+			}
+		},
+
+		"__comment": "UI-1604: Walkthrough-Dashboard",
+		"__version": "3.21",
+		"walkthrough": {
+			"first": {
+				"steps": {
+					"1": "Richten Sie Ihre Haupt-Unternehmensnummer in SmartPBX ein, indem Sie eine Nummer kaufen oder portieren. Diese Nummer unterscheidet sich von Benutzer-Telefonnummern, da sie die Haupt-Telefonnummer des gesamten Unternehmens repräsentiert."
+				}
+			},
+			"second": {
+				"steps": {
+					"1": "Richten Sie Ihre Telefonstrategie je nach Ihren Öffnungszeiten ein. Sie können eine Strategie für durchgehend geöffnete Bürozeiten einrichten. Oder Sie erstellen benutzerdefinierte Bürozeiten, wenn Ihr Büro zwischenzeitlich geschlossen sein sollte. Sie können Ihr Büro sogar zur Mittagszeit schließen.",
+					"2": "Ist Ihr Büro an Feiertagen geschlossen? Dann legen Sie bestimmte Zeitfenster (Datum und Uhrzeit) an, zu denen Ihr Büro geschlossen ist.",
+					"3": "Die Funktion „Virtueller Empfang“ ermöglicht es Ihnen, eingehende Anrufe unterbrechungsfrei entgegennehmen. Fügen Sie Anrufumleitungen hinzu, um die passende Abteilung oder Person im System zu kontaktieren. Sie können auch individuelle Ansagen per Text-zu-Sprache (TTS) erstellen, Ihre eigene Datei hochladen oder eine über das Telefon aufnehmen.",
+					"4": "Erstellen Sie eine Haupt-Konferenznummer für Ihr Unternehmen. Kaufen, portieren oder fügen Sie eine vorhandene Nummer hinzu und richten Sie im Handumdrehen eine Konferenznummer ein.",
+					"__comment": "UI-1210: Ein Schritt im Walkthrough hinzugefügt, der zur Erklärung der Haupt-Faxboxnummer dient",
+					"__version": "3.22",
+					"5": "Erstellen Sie eine Haupt-Faxboxnummer für Ihr Unternehmen. Kaufen, portieren oder fügen Sie eine vorhandene Nummer hinzu und richten Sie im Handumdrehen eine Faxboxnummer ein."
+				}
+			}
+		},
+		"__comment": "UI-17142: ",
+		"__version": "3.22",
+		"noFaxingNumMessage": "Fügen Sie eine Haupt-Faxboxnummer hinzu.",
+		"__comment": "UI-1210: ",
+		"__version": "3.22",
+		"faxing": {
+			"nameExtension": "s Haupt-Faxbox",
+			"headerExtension": " Faxdrucker",
+			"editFaxbox": "Faxbox bearbeiten"
+		},
+		"__comment": "UI-1774: Benutzerdefinierte Ansagen zu Konferenz hinzugefügt",
+		"__version": "3.22",
+		"customConferenceGreeting": {
+			"title": "Benutzerdefinierte Konferenzansage",
+			"link": "Benutzerdefinierte Ansage",
+			"info": "Passen Sie Ihre Konferenzansagen mit unserer TTS-Funktion (Text-zu-Sprache) an. Geben Sie dazu einfach den gewünschten Ansagetext in das unten gezeigte Eingabefeld ein.",
+			"mainConfMissing": "Ihre Haupt-Konferenznummer konnte nicht gefunden werden.",
+			"tooltip": "Ihre Haupt-Konferenznummer hat eine benutzerdefinierte Ansage."
+		},
+
+		"__comment": "UI-2499: Vorsichtsmaßnahme für den Fall, dass die Ansage gelöscht wurde",
+		"__version": "4.0",
+		"greetingMissing": "Die Ansage, die für diesen virtuellen Empfang konfiguriert wurde, ist nicht vorhanden. Bitte richten Sie eine neue Ansage ein.",
+
+		"__comment": "",
+		"__version": "3.22",
+		"popupEditFaxbox": {
+			"titles": {
+				"create": "Haupt-Faxbox erstellen",
+				"edit": "Haupt-Faxbox bearbeiten"
+			},
+			"text": "Haupt-Faxbox",
+			"labels": {
+				"inbound": "Eingehende Bestätigungs-E-Mail"
+			}
+		},
+
+		"__comment": "UI-2629: Optionen zum Anpassen der e911-Funktion hinzugefügt",
+		"__version": "4.0",
+		"updateE911Dialog": {
+			"title": "Anrufer-ID des Accounts für Notfälle",
+			"headerNewE911": "Sie haben gerade e911 für eine Ihrer Hauptnummern aktiviert. Bitte wählen Sie eine Nummer aus, die Sie für diesen Account als Ihre Anrufer-ID für Notfälle verwenden möchten.",
+			"headerNoE911": "Sie haben e911 für die Nummer deaktiviert, die als Ihre Anrufer-ID für Notfälle verwendet wurde. Bitte wählen Sie eine neue Nummer aus, die für diesen Account als Anrufer-ID für Notfälle dienen soll.",
+			"success": "e911 wurde für den Account erfolgreich geändert und lautet nun {{ number }}.",
+			"current": "Aktuelle"
+		}
+	},
+
+	"callLogs": {
+		"title": "Anrufprotokolle",
+		"dateRangeTo": "bis",
+		"noSearchMatch": "Ihre Suchkriterien treffen auf kein Anrufprotokoll zu.",
+		"detailsPopupTitle": "Anrufprotokolldetails",
+		"applyFilter": "Nach ausgewählten Daten filtern",
+		"resetFilter": "Filter auf Standarddaten zurücksetzen",
+		"gridHeaders": {
+			"inboundCall": "Eingehend",
+			"outboundCall": "Ausgehend",
+			"dateTime1": "Datum/Uhrzeit",
+			"from": "Von",
+			"to": "An",
+			"duration1": "Dauer",
+			"duration2": "(Min)",
+			"hangup1": "Gespräch beenden",
+			"hangup2": "Grund",
+			"details1": "Anruf",
+			"actions": "Aktionen"
+		},
+		"reportCall": "Anruf melden",
+		"loaderMessage": "Scrollen Sie nach unten oder klicken Sie hier, um weitere Anrufprotokolle zu laden.",
+		"loadingMessage": "Weitere Anrufprotokolle werden geladen …",
+		"alertMessages": {
+			"getDetailsError": "Beim Aufrufen der Anrufprotokolldetails ist ein Fehler aufgetreten."
+		},
+		"key": "Taste",
+		"value": "Wert",
+		"__comment": "UI-1071: Neue „Bereich“-Schaltflächen zu Anrufprotokollen hinzugefügt",
+		"__version": "3.20",
+		"thisMonth": "Diesen Monat",
+		"thisWeek": "Diese Woche",
+		"thisDay": "Heute",
+		"custom": "Benutzerdefiniert",
+		"callsFrom": "Anrufe anzeigen von",
+		"callsTo": "bis",
+		"__comment": "UI-",
+		"__version": "v4.0",
+		"loading": "Weitere Informationen werden geladen …",
+		"actions": {
+			"report": "Anruf melden",
+			"details": "Technische Details"
+		},
+		"downloadTooltip": "Im benutzerdefinierten Modus müssen Sie erst auf „Filter“ klicken, bevor Sie auf „Download“ klicken."
+	},
+
+	"myOffice": {
+		"topBarLinks": {
+			"callerID": "Anrufer-ID",
+			"musicOnHold": "Warteschleifenmusik",
+			"callRecording": "Aufnehmen",
+			"hours": "Stunden"
+		},
+		"musicOnHold": {
+			"title": "Warteschleifenmusik",
+			"headline": "Warteschleifenmusik für Account einrichten",
+			"dropdownLabel": "Warteschleifenmusik:",
+			"silence": "Keine",
+			"default": "Standardmusik",
+			"emptyUploadAlert": "Wählen Sie eine Datei zum Hochladen aus",
+			"fileTooBigAlert": "Sie können keine Datei größer 5 MB hochladen",
+			"__comment": "UI-1025: Hochladen von Mediendateien über die UI aktualisiert",
+			"__version": "3.20_s3",
+			"audioUploadButton": "Durchsuchen …"
+		},
+		"callerId": {
+			"title": "Unternehmens-Anrufer-ID",
+			"headline": "Anrufer-ID für den Account auswählen",
+			"numberLabel": "Unternehmens-Anrufer-ID-Nummer",
+			"numberHelp": "Diese Nummer wird als Ihre Anrufer-ID angezeigt, wenn Sie ausgehende Anrufe tätigen. Die Nummer muss kürzer als 15 Zeichen sein (inklusive Leerzeichen).",
+			"nameLabel": "Unternehmens-Anrufer-ID-Name",
+			"nameHelp": "Dieser Name wird als Ihre Anrufer-ID angezeigt, wenn Sie ausgehende Anrufe tätigen.",
+			"emergencyLabel": "Notfalladresse des Unternehmens (E911)",
+			"emergencyZipcode": "PLZ",
+			"emergencyAddress1": "Adresszeile 1",
+			"emergencyAddress2": "Adresszeile 2",
+			"emergencyCity": "Ort",
+			"emergencyState": "Bundesland/Kanton",
+			"emergencyHelp1": "Diese Adresse wird als Ihre Anrufer-ID-Adresse angezeigt, wenn Sie einen ausgehenden Notruf an eine Behörde tätigen (z. B. 911 in den USA).",
+			"emergencyHelp2": "Hinweis: Sie können diese Funktion auch für Nummern von Benutzern festlegen, wenn sich diese an einem anderen Standort als oben angegeben befinden.",
+			"mandatoryE911Alert": "Sie müssen für Ihre Unternehmens-Anrufer-ID-Nummer e911-Informationen angeben."
+		},
+		"missingMainNumberForCallerId": "Bevor Sie die Anrufer-ID konfigurieren können, müssen Sie eine Hauptnummer zu Ihrem Büro hinzufügen!",
+		"missingMainNumberMessage": "Fügen Sie Ihrem Account eine Hauptnummer hinzu.",
+		"totalUsers": "Benutzer insgesamt",
+		"totalDevices": "Alle Geräte",
+		"totalConfs": "Konferenzbrücken",
+		"mainNumberLabel": "Hauptnummer",
+		"noMainNumber": "Hauptnummer hinzufügen",
+		"confNumberLabel": "Konferenznummer",
+		"faxNumberLabel": "Faxnummer",
+		"totalNumbers": "Nummern insgesamt",
+		"unregisteredDevices": "Nicht registrierte Geräte",
+		"accountId": "Account-ID:",
+		"accountRealm": "Account-Bereich:",
+		"numberChartLegend": {
+			"assigned": "Zugewiesene Nummern",
+			"spare": "Freie Nummern",
+			"local": "Ortsnummern",
+			"tollfree": "Gebührenfreie Nummern",
+			"international": "Internationale Nummern",
+			"noNumber": "Keine Nummer verfügbar"
+		},
+		"__comment": "UI-1220: Wenn jemand SmartPBX das erste Mal lädt und keine VMBox besitzt, wird automatisch eine Haupt-VMBox hinzugefügt",
+		"__version": "3.19",
+		"mainVMBoxName": "Haupt-Voicemailbox",
+		"__comment": "UI-1210: Haupt-Faxboxnummer wird im Dashboard angezeigt",
+		"__version": "3.22",
+		"faxingNumberLabel": "Faxboxnummer",
+		"__comment": "UI-1197: Unternehmensverzeichnis wird im Dashboard angezeigt",
+		"__version": "3.22",
+		"directoryLabel": "Unternehmensverzeichnis-Benutzer:",
+
+		"__comment": "UI-1851: Walkthrough-Dashboard-Text aktualisiert",
+		"__version": "3.23",
+		"walkthrough": {
+			"steps": {
+				"1": "Willkommen bei SmartPBX, der einfachen Methode, Ihr Bürotelefonsystem einzurichten! Dies ist das Haupt-Dashboard. Hier haben Sie einen Überblick über alle Benutzer, Geräte und Nummern!",
+				"2": "Mit SmartPBX ist die Einrichtung von Benutzern ein Kinderspiel. Den Großteil Ihrer Services können Sie über die Registerkarte „Benutzer“ erstellen und verwalten. Erstellen Sie neue Benutzer, weisen Sie Nummern zu, fügen Sie Geräte hinzu und verwalten Sie Benutzerfunktionen.",
+				"3": "Sobald Sie genügend Benutzer erstellt haben, können Sie Benutzergruppen erstellen. Das ist außerordentlich nützlich, wenn mehrere Benutzer in derselben Abteilung arbeiten, wie etwa ein Vertriebsteam.",
+				"4": "Hauptnummer-Services sind für Ihr Geschäft äußerst wichtig! Mit dem virtuellen Empfang können Sie die Anrufverarbeitung verwalten und Anrufe abhängig von Öffnungszeiten und Feiertagen umleiten."
+			}
+		},
+		"__comment": "UI-1856: Im Dashboard werden CNAM-Aktionen ausgeblendet, wenn die Funktion für den Account deaktiviert ist",
+		"__version": "3.23",
+		"missingCnamE911Message": "Richten Sie Ihre Unternehmens-Anrufer-ID und e911 für eine Hauptnummer ein.",
+		"missingCnamMessage": "Richten Sie Ihre Unternehmens-Anrufer-ID für eine Hauptnummer ein.",
+		"missingE911Message": "Richten Sie e911 für eine Hauptnummer ein.",
+
+		"userChartLegend": {
+			"none": "Keine Rolle"
+		}
+	},
+
+	"__comment": "UI-299, v3.19_s2: Registerkarte „Funktionscodes“ zu SmartPBX hinzugefügt.",
+	"featureCodes": {
+		"title": "Verfügbare Funktionscodes",
+		"noFeatureCodeMessage": "Für Ihren Account sind noch keine Funktionscodes aktiviert. Funktionscodes werden automatisch erstellt, wenn Sie die Seite „Hauptnummer“ laden.",
+		"mainNumberLink": "Gehe zu „Hauptnummer“",
+		"labels": {
+			"qubicle login": {
+				"label": "Agentenanmeldung",
+				"tooltip": ""
+			},
+			"qubicle set ready": {
+				"label": "Agent als bereit festlegen",
+				"tooltip": ""
+			},
+			"qubicle set away": {
+				"label": "Agent als abwesend festlegen",
+				"tooltip": ""
+			},
+			"qubicle logout": {
+				"label": "Agentenabmeldung",
+				"tooltip": ""
+			},
+			"call_forward[action=activate]": {
+				"label": "Anrufweiterleitung aktivieren",
+				"tooltip": "(Eingabe von *72 und dann der Nummer, an die weitergeleitet werden soll)"
+			},
+			"call_forward[action=deactivate]": {
+				"label": "Anrufweiterleitung deaktivieren",
+				"tooltip": "(Eingabe von *73)"
+			},
+			"call_forward[action=toggle]": {
+				"label": "Anrufweiterleitung umschalten",
+				"tooltip": "(Eingabe von *74) Das System leitet den Anruf an die gleiche Nummer wie schon zuvor weiter."
+			},
+			"call_forward[action=update]": {
+				"label": "Anrufweiterleitung aktualisieren",
+				"tooltip": "(Eingabe von *56 gefolgt von der Nummer, an die weitergeleitet werden soll) Dadurch wird aktualisiert, wohin Ihre Anrufe weitergeleitet werden."
+			},
+			"call_forward[action=on_busy_enable]": {
+				"label": "Anrufweiterleitung bei „Besetzt“ aktivieren",
+				"tooltip": ""
+			},
+			"call_forward[action=on_busy_disable]": {
+				"label": "Anrufweiterleitung bei „Besetzt“ deaktivieren",
+				"tooltip": ""
+			},
+			"call_forward[action=no_answer_enable]": {
+				"label": "Anrufweiterleitung bei „Keine Antwort“ aktivieren",
+				"tooltip": ""
+			},
+			"call_forward[action=no_answer_disable]": {
+				"label": "Anrufweiterleitung bei „Keine Antwort“ deaktivieren",
+				"tooltip": ""
+			},
+			"hotdesk[action=login]": {
+				"label": "Hotdesking aktivieren",
+				"tooltip": "(Eingabe von *11 plus der Hotdesk-ID) Die Hotdesk-ID kann in SmartPBX unter „Benutzer“ konfiguriert werden. Alle Anrufe werden an dieses Gerät gesendet."
+			},
+			"hotdesk[action=logout]": {
+				"label": "Hotdesking deaktivieren",
+				"tooltip": "(Eingabe von *12) Dient zur „Abmeldung“ dieses Telefons."
+			},
+			"hotdesk[action=toggle]": {
+				"label": "Hotdesking ein/aus",
+				"tooltip": "(Eingabe von *13 plus der Hotdesk-ID) Damit wird der Hotdesk auf Geräten ein-/ausgeschaltet."
+			},
+			"voicemail[action=check]": {
+				"label": "Voicemail überprüfen",
+				"tooltip": "(Eingabe von *97 plus Nebenstellennummer) Damit können Sie sich in anderen Mailboxen anmelden."
+			},
+			"voicemail[action=\"direct\"]": {
+				"label": "An Voicemail weiterleiten",
+				"tooltip": "(Drücken Sie auf „Weiterleiten“, dann ** und die Nebenstellennummer des Empfängers) Der Anruf wird direkt zur Voicemail durchgestellt."
+			},
+			"voicemail[single_mailbox_login]": {
+				"label": "Voicemail überprüfen (automatische Anmeldung)",
+				"tooltip": "(Eingabe von *98 und des Kennworts) Wenn automatische Anmeldung aktiviert ist, benötigen Sie kein Kennwort."
+			},
+			"intercom": {
+				"label": "Gegensprechanlage",
+				"tooltip": "(Eingabe von *0 plus der Nebenstellennummer) Wenn das Telefon die Gegensprechanlagefunktion unterstützt, wird es den Anruf ohne manuelle Eingriffe entgegennehmen, und Sie können dann frei sprechen."
+			},
+			"privacy[mode=full]": {
+				"label": "Datenschutz",
+				"tooltip": "(Eingabe von *67 plus der Nummer, die Sie anrufen möchten) Dadurch wird Ihre Anrufer-ID unterdrückt."
+			},
+			"park_and_retrieve": {
+				"label": "Parken und holen",
+				"tooltip": "(Eingabe von *3 plus einer bestimmten Nummer). Dadurch wird ein Anruf in einer bestimmten Nummer geparkt. Beispiel: *3 + 101 => der Anruf wird in der Halteposition 101 geparkt"
+			},
+			"valet": {
+				"label": "Dienst",
+				"tooltip": "(Eingabe von *4) Zeigt die nächste freie Nummer für eine Halteposition. (Erneute Eingabe von *4) Damit wird der Anruf an dieser Halteposition geparkt."
+			},
+			"retrieve": {
+				"label": "Holen",
+				"tooltip": "(Eingabe von *5 plus einer bestimmten geparkten Nummer) Ruft einen geparkten Anruf ab. Beispiel: *5+101 => Anruf wird aus der Halteposition 101 entgegengenommen."
+			},
+			"donotdisturb[action=\"enable\"]": {
+				"label": "„Bitte nicht stören“-Funktion aktivieren",
+				"tooltip": ""
+			},
+			"donotdisturb[action=\"disable\"]": {
+				"label": "„Bitte nicht stören“-Funktion deaktivieren",
+				"tooltip": ""
+			},
+			"donotdisturb[action=\"toggle\"]": {
+				"label": "„Bitte nicht stören“-Funktion umschalten",
+				"tooltip": ""
+			},
+			"directory": {
+				"label": "Verzeichnis",
+				"tooltip": ""
+			},
+			"time": {
+				"label": "Zeit überprüfen",
+				"tooltip": ""
+			},
+			"call_waiting[action=enable]": {
+				"label": "Anklopfen-Funktion aktivieren",
+				"tooltip": ""
+			},
+			"call_waiting[action=disable]": {
+				"label": "Anklopfen-Funktion deaktivieren",
+				"tooltip": ""
+			},
+			"sound_test_service": {
+				"label": "Soundtest-Service",
+				"tooltip": ""
+			},
+			"call_recording": {
+				"label": "Call Recording (Anrufaufzeichnung)",
+				"tooltip": ""
+			},
+			"move": {
+				"label": "Verschieben",
+				"tooltip": "(Eingabe von einem beliebigen Telefon aus, das nicht in Verwendung ist) Das System scannt nach Anrufen, die für den Benutzer auf einem anderen Telefon vorliegen, und „verschiebt“ den Anruf dann auf das Telefon dieses Benutzers."
+			}
+		},
+		"__comment": "UI-1028, v3.20_s0: Kategorien für die Funktionscodes hinzugefügt.",
+		"categories": {
+			"qubicle": "Call-Center",
+			"call_forward": "Anrufweiterleitung",
+			"hotdesk": "Hotdesking",
+			"parking": "Parken",
+			"do_not_disturb": "Bitte nicht stören",
+			"misc": "Sonstiges"
+		}
+	},
+
+	"__comment": "UI-1220: VMBox-Modul hinzugefügt",
+	"__version": "3.19",
+	"vmboxes": {
+		"addTitle": "Hinzufügen einer Voicemailbox",
+		"editTitle": "Bearbeiten einer Voicemailbox: {{ name }}",
+		"title": "Alle Voicemailboxen",
+		"add": "Voicemailbox hinzufügen",
+		"new": "Neue Voicemailbox",
+		"createVmbox": "Neue Voicemailbox erstellen",
+		"deleteVmbox": "Voicemailbox löschen",
+		"deleteNotAllowed": "Voicemailbox kann nicht gelöscht werden, da sie zu einem Benutzer gehört",
+		"confirmDeleteVmbox": "Diese Voicemailbox wird dauerhaft gelöscht. Vorgang fortsetzen?",
+		"deletedVmbox": "Die Voicemailbox „{{vmboxName}}“ wurde erfolgreich gelöscht.",
+		"titleGrid": {
+			"name": "Name",
+			"number": "Nummer",
+			"owner": "Benutzer",
+			"edit": "Bearbeiten"
+		},
+		"noMatchingVMBoxes": "Es konnten keine Voicemailboxen gefunden werden, die Ihren Suchkriterien entsprechen",
+		"noVMBoxesConfigured": "Es wurden keine Voicemailboxen konfiguriert",
+		"popupSettings": {
+			"advancedTitle": "Erweitert",
+			"basicTitle": "Allgemeine Einstellungen",
+			"basicSectionTitle": "Allgemeine Einstellungen",
+			"basic": {
+				"name": {
+					"label": "Name"
+				},
+				"number": {
+					"label": "Voicemail-Nummer"
+				},
+				"pinNumber": {
+					"label": "PIN-Nummer"
+				}
+			},
+			"options": {
+				"menuTitle": "Optionen",
+				"sectionTitle": "Optionen",
+				"timezone": {
+					"label": "Zeitzone"
+				},
+				"unavailableMessage": {
+					"label": "Nachricht nicht verfügbar"
+				},
+				"alreadySetup": {
+					"label": "Bereits eingerichtet?",
+					"help": "Wurde diese Voicemailbox bereits initialisiert? Wenn nicht, wird der Benutzer bei seiner ersten Anmeldung dazu aufgefordert, seine PIN zu ändern und eine Ansage einzurichten."
+				},
+				"requirePIN": {
+					"label": "PIN benötigt?",
+					"help": "Überprüfen Sie, ob Voicemail eine PIN benötigt."
+				},
+				"autoLogin": {
+					"label": "Automatische Anmeldung aktiviert?",
+					"help": "Aktivieren, um automatische Anmeldung für diese Voicemailbox zu aktivieren. (Wenn der Benutzer seine eigene Voicemail anruft, gelangt er direkt zu seinen Nachrichten.)"
+				},
+				"skipGreetings": {
+					"label": "Ansagen überspringen?",
+					"help": "Aktivieren, um Ansagen immer zu überspringen"
+				},
+				"skipInstructions": {
+					"label": "Anweisungen überspringen?",
+					"help": "Aktivieren, um Anweisungen immer zu überspringen"
+				},
+				"deleteAfterNotify": {
+					"label": "Nach Benachrichtigung löschen?",
+					"help": "Voicemail löschen, nachdem die Benachrichtigung abgeschickt wurde"
+				},
+				"configurable": {
+					"label": "Über Menü konfigurierbar?",
+					"help": " Wenn deaktiviert, kann der Benutzer die Voicemail nicht über das Menü konfigurieren"
+				},
+				"__comment": "UI-2634: Unterstützung für WAV, MP4 und MP3 für Voicemail-Medienerweiterungen hinzugefügt",
+				"__version": "4.1",
+				"mediaExtension": {
+					"label": "Medien-Nebenstelle",
+					"mp3": "mp3",
+					"mp4": "mp4",
+					"wav": "wav",
+					"default": "Account-Standard"
+				}
+			},
+			"recipients": {
+				"menuTitle": "Empfänger",
+				"sectionTitle": "Empfänger",
+				"header": "In diesem Bereich können Sie verwalten, wer benachrichtigt werden soll, wenn in dieser Voicemailbox eine Nachricht eingeht. Klicken Sie auf „Neuen Empfänger hinzufügen“, um der Liste eine E-Mail-Adresse hinzuzufügen",
+				"create": "Neuen Empfänger hinzufügen"
+			},
+			"__comment": "UI-975: Voranstellen-Funktion („Prepend“) zu Nummern hinzugefügt",
+			"__version": "v3.22",
+			"greeting": {
+				"menuTitle": "Ansagen-Medien",
+				"sectionTitle": "Ansagen-Medien",
+				"dropdownLabel": "Medien:",
+				"noGreeting": "- Keine -",
+				"audioUploadButton": "Durchsuchen …",
+				"fileTooBigAlert": "Sie können keine Datei größer 5 MB hochladen",
+				"emptyUploadAlert": "Wählen Sie eine Datei zum Hochladen aus",
+
+				"temporary": {
+					"label": "Vorübergehend:"
+				}
+			}
+		}
+	},
+
+	"__comment": "UI-1219: Voranstellen-Funktion („Prepend“) zu Nummern hinzugefügt",
+	"__version": "v3.20_s1",
+	"numberPrepend": "Voranstellen",
+	"__comment": "UI-1153: Warnungssymbol neben Nummern einblenden, die weitergeleitet werden",
+	"__version": "v3.20_s3",
+	"portIconHelp": "Diese Nummer wird gerade portiert; und wenn die Portierung fehlschlägt, wird sie gelöscht. Das Symbol wird nur bei der Einrichtung angezeigt und hat keine Funktion bei der Anrufverarbeitung"
+}
