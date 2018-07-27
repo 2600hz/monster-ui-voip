@@ -2,7 +2,7 @@ define(function(require) {
 	var $ = require('jquery'),
 		_ = require('lodash'),
 		monster = require('monster'),
-		chart = require('chart');
+		Chart = require('chart');
 
 	var app = {
 
@@ -59,10 +59,26 @@ define(function(require) {
 						faxingNumbers: myOfficeData.faxingNumbers || [],
 						faxNumbers: myOfficeData.faxNumbers || [],
 						topMessage: myOfficeData.topMessage,
-						devicesList: _.toArray(myOfficeData.devicesData).sort(function(a, b) { return b.count - a.count; }),
-						usersList: _.toArray(myOfficeData.usersData).sort(function(a, b) { return b.count - a.count ; }),
-						assignedNumbersList: _.toArray(myOfficeData.assignedNumbersData).sort(function(a, b) { return b.count - a.count; }),
-						// numberTypesList: _.toArray(myOfficeData.numberTypesData).sort(function(a, b) { return b.count - a.count ; }),
+						devicesList: _
+							.chain(myOfficeData.devicesData)
+							.toArray()
+							.orderBy('count', 'desc')
+							.value(),
+						usersList: _
+							.chain(myOfficeData.usersData)
+							.toArray()
+							.orderBy('count', 'desc')
+							.value(),
+						assignedNumbersList: _
+							.chain(myOfficeData.assignedNumbersData)
+							.toArray()
+							.orderBy('count', 'desc')
+							.value(),
+						// numberTypesList: _
+						// 	.chain(myOfficeData.numberTypesData)
+						// 	.toArray()
+						// 	.orderBy('count', 'desc')
+						// 	.value(),
 						classifiedNumbers: myOfficeData.classifiedNumbers,
 						directoryUsers: myOfficeData.directory.users && myOfficeData.directory.users.length || 0,
 						directoryLink: myOfficeData.directoryLink,
@@ -473,7 +489,7 @@ define(function(require) {
 					totalCount: 0
 				},
 				users = {
-					"_unassigned": {
+					_unassigned: {
 						label: self.i18n.active().myOffice.userChartLegend.none,
 						count: 0,
 						color: self.chartColors[8]
@@ -594,7 +610,7 @@ define(function(require) {
 					users._unassigned.count++;
 				}
 
-				if (val.features.indexOf("conferencing") >= 0) {
+				if (val.features.indexOf('conferencing') >= 0) {
 					totalConferences++;
 				}
 			});
