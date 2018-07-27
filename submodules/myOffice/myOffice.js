@@ -82,7 +82,7 @@ define(function(require) {
 						classifiedNumbers: myOfficeData.classifiedNumbers,
 						directoryUsers: myOfficeData.directory.users && myOfficeData.directory.users.length || 0,
 						directoryLink: myOfficeData.directoryLink,
-						showUserTypes: _.size(self.appFlags.global.servicePlansRole) > 0
+						showUserTypes: self.appFlags.global.showUserTypes
 					},
 					template = $(self.getTemplate({
 						name: 'layout',
@@ -519,7 +519,7 @@ define(function(require) {
 				registeredDevices = _.map(data.devicesStatus, function(device) { return device.device_id; }),
 				unregisteredDevices = 0;
 
-			if (_.size(self.appFlags.global.servicePlansRole) > 0) {
+			if (self.appFlags.global.showUserTypes) {
 				var i = 7; // start from the end of chart colors so all the charts don't look the same
 				_.each(self.appFlags.global.servicePlansRole, function(role, id) {
 					users[id] = {
@@ -595,7 +595,10 @@ define(function(require) {
 			});
 
 			_.each(data.users, function(val) {
-				if (val.hasOwnProperty('service') && val.service.hasOwnProperty('plans') && !_.isEmpty(val.service.plans)) {
+				if (self.appFlags.global.showUserTypes
+					&& val.hasOwnProperty('service')
+					&& val.service.hasOwnProperty('plans')
+					&& !_.isEmpty(val.service.plans)) {
 					var planId;
 
 					for (var key in val.service.plans) {

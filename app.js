@@ -116,7 +116,8 @@ define(function(require) {
 					}
 				}
 			}, function(err, results) {
-				self.appFlags.global = results;
+				self.appFlags.global.servicePlansRole = results.servicePlansRole;
+				self.appFlags.global.showUserTypes = !_.isEmpty(results.servicePlansRole);
 
 				callback && callback(self.appFlags.global);
 			});
