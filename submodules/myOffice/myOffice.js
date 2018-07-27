@@ -605,7 +605,11 @@ define(function(require) {
 						}
 					}
 
-					users[planId].count++;
+					if (users.hasOwnProperty(planId)) {
+						users[planId].count += 1;
+					} else {
+						users._unassigned.count += 1;
+					}
 				} else {
 					users._unassigned.count++;
 				}
