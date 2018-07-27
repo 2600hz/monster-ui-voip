@@ -2,7 +2,7 @@ define(function(require) {
 	var $ = require('jquery'),
 		_ = require('lodash'),
 		monster = require('monster'),
-		chart = require('chart');
+		Chart = require('chart');
 
 	var app = {
 
@@ -59,14 +59,30 @@ define(function(require) {
 						faxingNumbers: myOfficeData.faxingNumbers || [],
 						faxNumbers: myOfficeData.faxNumbers || [],
 						topMessage: myOfficeData.topMessage,
-						devicesList: _.toArray(myOfficeData.devicesData).sort(function(a, b) { return b.count - a.count; }),
-						usersList: _.toArray(myOfficeData.usersData).sort(function(a, b) { return b.count - a.count ; }),
-						assignedNumbersList: _.toArray(myOfficeData.assignedNumbersData).sort(function(a, b) { return b.count - a.count; }),
-						// numberTypesList: _.toArray(myOfficeData.numberTypesData).sort(function(a, b) { return b.count - a.count ; }),
+						devicesList: _
+							.chain(myOfficeData.devicesData)
+							.toArray()
+							.orderBy('count', 'desc')
+							.value(),
+						usersList: _
+							.chain(myOfficeData.usersData)
+							.toArray()
+							.orderBy('count', 'desc')
+							.value(),
+						assignedNumbersList: _
+							.chain(myOfficeData.assignedNumbersData)
+							.toArray()
+							.orderBy('count', 'desc')
+							.value(),
+						// numberTypesList: _
+						// 	.chain(myOfficeData.numberTypesData)
+						// 	.toArray()
+						// 	.orderBy('count', 'desc')
+						// 	.value(),
 						classifiedNumbers: myOfficeData.classifiedNumbers,
 						directoryUsers: myOfficeData.directory.users && myOfficeData.directory.users.length || 0,
 						directoryLink: myOfficeData.directoryLink,
-						showUserTypes: _.size(self.appFlags.global.servicePlansRole) > 0
+						showUserTypes: self.appFlags.global.showUserTypes
 					},
 					template = $(self.getTemplate({
 						name: 'layout',
@@ -473,7 +489,7 @@ define(function(require) {
 					totalCount: 0
 				},
 				users = {
-					"_unassigned": {
+					_unassigned: {
 						label: self.i18n.active().myOffice.userChartLegend.none,
 						count: 0,
 						color: self.chartColors[8]
@@ -503,7 +519,7 @@ define(function(require) {
 				registeredDevices = _.map(data.devicesStatus, function(device) { return device.device_id; }),
 				unregisteredDevices = 0;
 
-			if (_.size(self.appFlags.global.servicePlansRole) > 0) {
+			if (self.appFlags.global.showUserTypes) {
 				var i = 7; // start from the end of chart colors so all the charts don't look the same
 				_.each(self.appFlags.global.servicePlansRole, function(role, id) {
 					users[id] = {
@@ -579,7 +595,10 @@ define(function(require) {
 			});
 
 			_.each(data.users, function(val) {
-				if (val.hasOwnProperty('service') && val.service.hasOwnProperty('plans') && !_.isEmpty(val.service.plans)) {
+				if (self.appFlags.global.showUserTypes
+					&& val.hasOwnProperty('service')
+					&& val.service.hasOwnProperty('plans')
+					&& !_.isEmpty(val.service.plans)) {
 					var planId;
 
 					for (var key in val.service.plans) {
@@ -589,12 +608,16 @@ define(function(require) {
 						}
 					}
 
-					users[planId].count++;
+					if (users.hasOwnProperty(planId)) {
+						users[planId].count += 1;
+					} else {
+						users._unassigned.count += 1;
+					}
 				} else {
 					users._unassigned.count++;
 				}
 
-				if (val.features.indexOf("conferencing") >= 0) {
+				if (val.features.indexOf('conferencing') >= 0) {
 					totalConferences++;
 				}
 			});
