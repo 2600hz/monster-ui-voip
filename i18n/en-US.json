@@ -162,9 +162,6 @@
 		"deletedDevice": "You successfully deleted the following device \"{{deviceName}}\".",
 		"noOwner": "- No Owner -",
 		"popupSettings": {
-			"addOrEdit": {
-				"error": "Could not process device data. Please try again later."
-			},
 			"advancedTitle": "Advanced",
 			"basicTitle": "Basic Settings",
 			"basicSectionTitle": "Basic Settings",

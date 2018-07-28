@@ -1148,11 +1148,8 @@ define(function(require) {
 					self.devicesListUsers({
 						success: function(users, status) {
 							callback(null, users);
-						},
-						error: function(data, status) {
-							toastr.error(self.i18n.active().devices.popupSettings.addOrEdit.error);
 						}
-					})
+					});
 				}
 			}, function(error, results) {
 				var formattedData = self.devicesFormatData(results, dataDevice);
