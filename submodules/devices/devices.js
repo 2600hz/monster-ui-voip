@@ -250,30 +250,17 @@ define(function(require) {
 
 									dataDevice.extra = dataDevice.hasOwnProperty('extra') ? $.extend(true, {}, dataDevice.extra, extra) : extra;
 
-									self.devicesRenderDeviceGetUsersList(dataDevice, callbackSave, callbackDelete);
+									self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
 								}
 							});
 						} else {
-							self.devicesRenderDeviceGetUsersList(dataDevice, callbackSave, callbackDelete);
+							self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
 						}
 					}, function() {
-						self.devicesRenderDeviceGetUsersList(dataDevice, callbackSave, callbackDelete);
+						self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
 					});
 				} else {
-					self.devicesRenderDeviceGetUsersList(dataDevice, callbackSave, callbackDelete);
-				}
-			});
-		},
-
-		devicesRenderDeviceGetUsersList: function(dataDevice, callbackSave, callbackDelete) {
-			var self = this;
-			self.devicesListUsers({
-				success: function(users, status) {
-					dataDevice.usersData = users;
 					self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
-				},
-				error: function(data, status) {
-					toastr.error(self.i18n.active().devices.popupSettings.addOrEdit.error);
 				}
 			});
 		},
@@ -802,7 +789,8 @@ define(function(require) {
 							codecs: []
 						}
 					},
-					suppress_unregister_notifications: true
+					suppress_unregister_notifications: true,
+					usersData: data.usersData
 				},
 				typedDefaults = {
 					sip_device: {
@@ -1111,6 +1099,16 @@ define(function(require) {
 							callback(null, data.data);
 						}
 					});
+				},
+				usersData: function(callback) {
+					self.devicesListUsers({
+						success: function(users, status) {
+							callback(null, users);
+						},
+						error: function(data, status) {
+							toastr.error(self.i18n.active().devices.popupSettings.addOrEdit.error);
+						}
+					})
 				}
 			}, function(error, results) {
 				var formattedData = self.devicesFormatData(results, dataDevice);
