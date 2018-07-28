@@ -1,8 +1,7 @@
 define(function(require) {
 	var $ = require('jquery'),
 		_ = require('lodash'),
-		monster = require('monster'),
-		toastr = require('toastr');
+		monster = require('monster');
 
 	var app = {
 
@@ -34,11 +33,21 @@ define(function(require) {
 				} else {
 					var dataTemplate = self.groupsFormatListData(data),
 						countGroups = _.size(dataTemplate.groups),
-						template = $(monster.template(self, 'groups-layout', { countGroups: countGroups })),
+						template = $(self.getTemplate({
+							name: 'layout',
+							data: {
+								countGroups: countGroups
+							},
+							submodule: 'groups'
+						})),
 						templateGroup;
 
 					_.each(dataTemplate.groups, function(group) {
-						templateGroup = monster.template(self, 'groups-row', group);
+						templateGroup = $(self.getTemplate({
+							name: 'row',
+							data: group,
+							submodule: 'groups'
+						}));
 
 						template.find('.groups-rows').append(templateGroup);
 					});
@@ -274,7 +283,11 @@ define(function(require) {
 
 			template.find('.groups-header .add-group').on('click', function() {
 				self.groupsGetCreationData(function(data) {
-					var groupTemplate = $(monster.template(self, 'groups-creation', data)),
+					var groupTemplate = $(self.getTemplate({
+							name: 'creation',
+							data: data,
+							submodule: 'groups'
+						})),
 						groupForm = groupTemplate.find('#form_group_creation');
 
 					monster.ui.validate(groupForm);
@@ -420,7 +433,11 @@ define(function(require) {
 			var self = this;
 
 			self.groupsGetFeaturesData(groupId, function(data) {
-				var template = $(monster.template(self, 'groups-features', data.group));
+				var template = $(self.getTemplate({
+					name: 'features',
+					data: data.group,
+					submodule: 'groups'
+				}));
 
 				self.groupsBindFeatures(template, data);
 
@@ -432,7 +449,11 @@ define(function(require) {
 			var self = this;
 
 			self.groupsGetSettingsData(groupId, function(data) {
-				var template = $(monster.template(self, 'groups-name', data));
+				var template = $(self.getTemplate({
+					name: 'name',
+					data: data,
+					submodule: 'groups'
+				}));
 
 				self.groupsBindSettings(template, data);
 
@@ -445,7 +466,11 @@ define(function(require) {
 
 			self.groupsGetNumbersData(groupId, function(data) {
 				self.groupsFormatNumbersData(data, function(data) {
-					var template = $(monster.template(self, 'groups-numbers', data));
+					var template = $(self.getTemplate({
+						name: 'numbers',
+						data: data,
+						submodule: 'groups'
+					}));
 
 					_.each(data.assignedNumbers, function(numberData, numberId) {
 						numberData.phoneNumber = numberId;
@@ -474,7 +499,11 @@ define(function(require) {
 
 			self.groupsGetNumbersData(groupId, function(data) {
 				self.groupsFormatNumbersData(data, function(data) {
-					var template = $(monster.template(self, 'groups-extensions', data));
+					var template = $(self.getTemplate({
+						name: 'extensions',
+						data: data,
+						submodule: 'groups'
+					}));
 
 					self.groupsBindExtensions(template, data);
 
@@ -488,7 +517,11 @@ define(function(require) {
 
 			self.groupsGetMembersData(groupId, function(results) {
 				var results = self.groupsFormatMembersData(results),
-					template = $(monster.template(self, 'groups-members', results));
+					template = $(self.getTemplate({
+						name: 'members',
+						data: results,
+						submodule: 'groups'
+					}));
 
 				monster.pub('common.ringingDurationControl.render', {
 					container: template.find('.members-container'),
@@ -537,7 +570,11 @@ define(function(require) {
 					format: recordCallNode.data.format,
 					timeLimit: recordCallNode.data.time_limit
 				} : {})),
-				featureTemplate = $(monster.template(self, 'groups-feature-call_recording', templateData)),
+				featureTemplate = $(self.getTemplate({
+					name: 'feature-call_recording',
+					data: templateData,
+					submodule: 'groups'
+				})),
 				switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#call_recording_form'),
 				popup;
@@ -625,7 +662,11 @@ define(function(require) {
 						mediaList: medias,
 						media: ringGroupNode.data.ringback || ''
 					},
-					featureTemplate = $(monster.template(self, 'groups-feature-ringback', templateData)),
+					featureTemplate = $(self.getTemplate({
+						name: 'feature-ringback',
+						data: templateData,
+						submodule: 'groups'
+					})),
 					switchFeature = featureTemplate.find('.switch-state'),
 					popup,
 					closeUploadDiv = function(newMedia) {
@@ -782,7 +823,11 @@ define(function(require) {
 			} //Find the existing Next Action if there is one
 
 			var templateData = $.extend(true, {selectedEntity: selectedEntity}, data),
-				featureTemplate = $(monster.template(self, 'groups-feature-next_action', templateData)),
+				featureTemplate = $(self.getTemplate({
+					name: 'feature-next_action',
+					data: templateData,
+					submodule: 'groups'
+				})),
 				switchFeature = featureTemplate.find('.switch-state'),
 				popup;
 
@@ -853,7 +898,11 @@ define(function(require) {
 
 		groupsRenderForward: function(data) {
 			var self = this,
-				featureTemplate = $(monster.template(self, 'groups-feature-forward', data)),
+				featureTemplate = $(self.getTemplate({
+					name: 'feature-forward',
+					data: data,
+					submodule: 'groups'
+				})),
 				switchFeature = featureTemplate.find('.switch-state'),
 				popup;
 
@@ -904,7 +953,11 @@ define(function(require) {
 					caller_id_name_prefix: prependNode.data.caller_id_name_prefix,
 					caller_id_number_prefix: prependNode.data.caller_id_number_prefix
 				} : {})),
-				featureTemplate = $(monster.template(self, 'groups-feature-prepend', templateData)),
+				featureTemplate = $(self.getTemplate({
+					name: 'feature-prepend',
+					data: templateData,
+					submodule: 'groups'
+				})),
 				switchFeature = featureTemplate.find('.switch-state'),
 				popup;
 
@@ -1010,7 +1063,15 @@ define(function(require) {
 			template.find('.delete-group').on('click', function() {
 				monster.ui.confirm(self.i18n.active().groups.confirmDeleteGroup, function() {
 					self.groupsDelete(data.group.id, function(data) {
-						toastr.success(monster.template(self, '!' + self.i18n.active().groups.groupDeleted, { name: data.group.name }));
+						monster.ui.toast({
+							type: 'success',
+							message: self.getTemplate({
+								name: '!' + self.i18n.active().groups.groupDeleted,
+								data: {
+									name: data.group.name
+								}
+							})
+						});
 
 						self.groupsRender();
 					});
@@ -1108,8 +1169,12 @@ define(function(require) {
 						_.each(numberList, function(val) {
 							template
 								.find('.list-assigned-items')
-								.append($(monster.template(self, 'groups-numbersItemRow', {
-									number: val
+								.append($(self.getTemplate({
+									name: 'numbersItemRow',
+									data: {
+										number: val
+									},
+									submodule: 'groups'
 								})));
 
 							var numberDiv = template.find('[data-id="' + val.phoneNumber + '"]'),
@@ -1147,8 +1212,12 @@ define(function(require) {
 							_.each(numbers, function(number) {
 								number.phoneNumber = number.id;
 
-								var rowTemplate = $(monster.template(self, 'groups-numbersItemRow', {
-										number: number
+								var rowTemplate = $(self.getTemplate({
+										name: 'numbersItemRow',
+										data: {
+											number: number
+										},
+										submodule: 'numbersItemRow'
 									})),
 									argsFeatures = {
 										target: rowTemplate.find('.edit-features'),
@@ -1182,7 +1251,15 @@ define(function(require) {
 				});
 
 				self.groupsUpdateNumbers(callflowId, dataNumbers, function(callflowData) {
-					toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: name }));
+					monster.ui.toast({
+						type: 'success',
+						message: self.getTemplate({
+							name: '!' + toastrMessages.numbersUpdated,
+							data: {
+								name: name
+							}
+						})
+					});
 					self.groupsRender({ groupId: callflowData.group_id });
 				});
 			});
@@ -1209,7 +1286,15 @@ define(function(require) {
 				});
 
 				self.groupsUpdateExtensions(callflowId, extensionsToSave, function(callflowData) {
-					toastr.success(monster.template(self, '!' + toastrMessages.numbersUpdated, { name: name }));
+					monster.ui.toast({
+						type: 'success',
+						message: self.getTemplate({
+							name: '!' + toastrMessages.numbersUpdated,
+							data: {
+								name: name
+							}
+						})
+					});
 					self.groupsRender({ groupId: callflowData.group_id });
 				});
 			});
@@ -1220,7 +1305,11 @@ define(function(require) {
 						dataTemplate = {
 							recommendedExtension: lastExtension
 						},
-						newLineTemplate = $(monster.template(self, 'groups-newExtension', dataTemplate)),
+						newLineTemplate = $(self.getTemplate({
+							name: 'newExtension',
+							data: dataTemplate,
+							submodule: 'groups'
+						})),
 						$listExtensions = template.find('.list-assigned-items');
 
 					monster.ui.mask(newLineTemplate.find('.input-extension'), 'extension');
@@ -1870,7 +1959,10 @@ define(function(require) {
 					} else {
 						callbackError && callbackError(data);
 
-						toastr.error(self.i18n.active().groups.ringGroupMissing);
+						monster.ui.toast({
+							type: 'error',
+							message: self.i18n.active().groups.ringGroupMissing
+						});
 					}
 				},
 				error: function(data) {
@@ -1900,7 +1992,10 @@ define(function(require) {
 					} else {
 						callbackError && callbackError(data);
 
-						toastr.error(self.i18n.active().groups.ringGroupMissing);
+						monster.ui.toast({
+							type: 'error',
+							message: self.i18n.active().groups.ringGroupMissing
+						});
 					}
 				},
 				error: function(data) {

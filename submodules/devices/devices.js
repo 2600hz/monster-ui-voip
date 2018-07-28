@@ -1,8 +1,7 @@
 define(function(require) {
 	var $ = require('jquery'),
 		_ = require('lodash'),
-		monster = require('monster'),
-		toastr = require('toastr');
+		monster = require('monster');
 
 	var app = {
 
@@ -37,11 +36,19 @@ define(function(require) {
 
 			self.devicesGetData(function(data) {
 				var dataTemplate = self.devicesFormatListData(data),
-					template = $(monster.template(self, 'devices-layout', dataTemplate)),
+					template = $(self.getTemplate({
+						name: 'layout',
+						data: dataTemplate,
+						submodule: 'devices'
+					})),
 					templateDevice;
 
 				_.each(dataTemplate.devices, function(device) {
-					templateDevice = monster.template(self, 'devices-row', device);
+					templateDevice = $(self.getTemplate({
+						name: 'row',
+						data: device,
+						submodule: 'devices'
+					}));
 
 					template.find('.devices-rows').append(templateDevice);
 				});
@@ -312,11 +319,22 @@ define(function(require) {
 			var self = this,
 				mode = data.id ? 'edit' : 'add',
 				type = data.device_type,
-				popupTitle = mode === 'edit' ? monster.template(self, '!' + self.i18n.active().devices[type].editTitle, { name: data.name }) : self.i18n.active().devices[type].addTitle,
-				templateDevice = $(monster.template(self, 'devices-' + type, $.extend(true, {}, data, {
-					isProvisionerConfigured: monster.config.api.hasOwnProperty('provisioner'),
-					showEmergencyCnam: monster.util.isNumberFeatureEnabled('cnam') && monster.util.isNumberFeatureEnabled('e911')
-				}))),
+				popupTitle = mode === 'edit'
+					? self.getTemplate({
+						name: '!' + self.i18n.active().devices[type].editTitle,
+						data: {
+							name: data.name
+						}
+					})
+					: self.i18n.active().devices[type].addTitle,
+				templateDevice = $(self.getTemplate({
+					name: 'devices-' + type,
+					data: $.extend(true, {}, data, {
+						isProvisionerConfigured: monster.config.api.hasOwnProperty('provisioner'),
+						showEmergencyCnam: monster.util.isNumberFeatureEnabled('cnam') && monster.util.isNumberFeatureEnabled('e911')
+					}),
+					submodule: 'devices'
+				})),
 				deviceForm = templateDevice.find('#form_device'),
 				assignTemplate = $(self.getTemplate({
 					name: 'assign-to',
@@ -447,14 +465,20 @@ define(function(require) {
 			templateDevice.find('#restart_device').on('click', function() {
 				if (!$(this).hasClass('disabled')) {
 					self.devicesRestart(data.id, function() {
-						toastr.success(self.i18n.active().devices.popupSettings.miscellaneous.restart.success);
+						monster.ui.toast({
+							type: 'success',
+							message: self.i18n.active().devices.popupSettings.miscellaneous.restart.success
+						});
 					});
 				}
 			});
 
 			templateDevice.find('#unlock_device').on('click', function() {
 				self.devicesUnlock(data.mac_address.replace(/:/g, ''), function() {
-					toastr.success(self.i18n.active().devices.popupSettings.miscellaneous.unlock.success);
+					monster.ui.toast({
+						type: 'success',
+						message: self.i18n.active().devices.popupSettings.miscellaneous.unlock.success
+					});
 				});
 			});
 
@@ -482,7 +506,15 @@ define(function(require) {
 						self.devicesDeleteDevice(deviceId, function(device) {
 							popup.dialog('close').remove();
 
-							toastr.success(monster.template(self, '!' + self.i18n.active().devices.deletedDevice, { deviceName: device.name }));
+							monster.ui.toast({
+								type: 'success',
+								message: self.getTemplate({
+									name: '!' + self.i18n.active().devices.deletedDevice,
+									data: {
+										deviceName: device.name
+									}
+								})
+							});
 
 							callbackDelete && callbackDelete(device);
 						});
@@ -545,7 +577,12 @@ define(function(require) {
 									.addClass('green-box')
 									.css('display', 'inline-block')
 									.empty()
-									.text(monster.template(self, '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.allowMessage, { phoneNumber: monster.util.formatPhoneNumber(number) }));
+									.text(self.getTemplate({
+										name: '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.allowMessage,
+										data: {
+											phoneNumber: monster.util.formatPhoneNumber(number)
+										}
+									}));
 							} else {
 								matchedSign
 									.removeClass('monster-green fa-check')
@@ -557,7 +594,12 @@ define(function(require) {
 									.addClass('red-box')
 									.css('display', 'inline-block')
 									.empty()
-									.text(monster.template(self, '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.denyMessage, { phoneNumber: monster.util.formatPhoneNumber(number) }));
+									.text(self.getTemplate({
+										name: '!' + self.i18n.active().devices.popupSettings.restrictions.matcher.denyMessage,
+										data: {
+											phoneNumber: monster.util.formatPhoneNumber(number)
+										}
+									}));
 							}
 						}
 					});

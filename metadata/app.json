@@ -1,6 +1,24 @@
 {
 	"name": "voip",
 	"i18n": {
+		"de-DE": {
+			"label": "SmartPBX",
+			"description": "Eine gehostete Telefonanlage (PBX) gibt Ihnen die volle Kontrolle beim Einrichten und Verwalten einer TK-Anlage für Ihr Büro.",
+			"extended_description": "Die SmartPBX-App kombiniert die gängigsten PBX-Funktionen mit einer übersichtlichen und intuitiven Benutzeroberfläche. Die App enthält eine erweiterte Auswahl an Funktionen (wie individuelle Fax-zu-E-Mail-Boxen, Anrufweiterleitung und Hotdesking), die leicht zu verstehen und zu bedienen sind. Ein einfaches Dashboard bietet einen übersichtlichen und umfassenden Überblick über Systemkonfiguration und -status. In diesem Dashboard können Sie alle Benutzer und Geräte überprüfen sowie Konferenzbrücken und Telefonnummern zuweisen. Mit maßgeschneiderten Ansagen und Anrufumleitungen verleihen Sie Ihrem Unternehmen ein professionelles Image. Legen Sie Funktionen mithilfe einer übersichtlichen und intuitiven Benutzeroberfläche fest. Richten Sie eine geschäftliche Hauptnummer ein und nutzen Sie den vorgefertigten Virtual Receptionist, um eingehende Anrufe zu managen.",
+			"features": [
+				"Callflows",
+				"Uneingeschränkt viele Nebenstellen",
+				"Auto-Provisioner für Telefone",
+				"Konferenzschaltung",
+				"Funktionscodes",
+				"Geräte für alle Benutzer verwalten",
+				"Weiterleitung je nach der Uhrzeit",
+				"Anrufliste",
+				"Alle Standardfunktionen für den Umgang mit Anrufen",
+				"Verzeichnis",
+				"Voicemailboxen"
+			]
+		},
 		"en-US": {
 			"label": "SmartPBX",
 			"description": "Hosted PBX gives you full control to set up and manage office phone system.",

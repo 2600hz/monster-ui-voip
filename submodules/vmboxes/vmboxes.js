@@ -2,7 +2,6 @@ define(function(require) {
 	var $ = require('jquery'),
 		_ = require('lodash'),
 		monster = require('monster'),
-		toastr = require('toastr'),
 		timezone = require('monster-timezone');
 
 	var app = {
@@ -24,11 +23,19 @@ define(function(require) {
 
 			self.vmboxesGetData(function(data) {
 				var dataTemplate = self.vmboxesFormatListData(data),
-					template = $(monster.template(self, 'vmboxes-layout', dataTemplate)),
+					template = $(self.getTemplate({
+						name: 'layout',
+						data: dataTemplate,
+						submodule: 'vmboxes'
+					})),
 					templateVMBox;
 
 				_.each(dataTemplate.vmboxes, function(vmbox) {
-					templateVMBox = monster.template(self, 'vmboxes-row', vmbox);
+					templateVMBox = $(self.getTemplate({
+						name: 'row',
+						data: vmbox,
+						submodule: 'vmboxes'
+					}));
 
 					template.find('.vmboxes-rows').append(templateVMBox);
 				});
@@ -113,8 +120,19 @@ define(function(require) {
 		vmboxesRenderVmbox: function(data, callback) {
 			var self = this,
 				mode = data.id ? 'edit' : 'add',
-				popupTitle = mode === 'edit' ? monster.template(self, '!' + self.i18n.active().vmboxes.editTitle, { name: data.name }) : self.i18n.active().vmboxes.addTitle,
-				templateVMBox = $(monster.template(self, 'vmboxes-edit', data)),
+				popupTitle = mode === 'edit'
+					? self.getTemplate({
+						name: '!' + self.i18n.active().vmboxes.editTitle,
+						data: {
+							name: data.name
+						}
+					})
+					: self.i18n.active().vmboxes.addTitle,
+				templateVMBox = $(self.getTemplate({
+					name: 'edit',
+					data: data,
+					submodule: 'vmboxes'
+				})),
 				popup,
 				callbacks = {
 					afterSave: function(vmbox) {
@@ -135,7 +153,13 @@ define(function(require) {
 			_.each(data.notify_email_addresses, function(recipient) {
 				templateVMBox
 					.find('.saved-entities')
-						.append(monster.template(self, 'vmboxes-emailRow', { name: recipient }));
+						.append($(self.getTemplate({
+							name: 'emailRow',
+							data: {
+								name: recipient
+							},
+							submodule: 'vmboxes'
+						})));
 			});
 
 			monster.pub('common.mediaSelect.render', {
@@ -201,7 +225,15 @@ define(function(require) {
 
 				monster.ui.confirm(self.i18n.active().vmboxes.confirmDeleteVmbox, function() {
 					self.vmboxesDeleteVmbox(voicemailId, function(vmbox) {
-						toastr.success(monster.template(self, '!' + self.i18n.active().vmboxes.deletedVmbox, { vmboxName: vmbox.name }));
+						monster.ui.toast({
+							type: 'success',
+							message: self.getTemplate({
+								name: '!' + self.i18n.active().vmboxes.deletedVmbox,
+								data: {
+									vmboxName: vmbox.name
+								}
+							})
+						});
 
 						callbacks.afterDelete && callbacks.afterDelete(vmbox);
 					});
@@ -218,7 +250,13 @@ define(function(require) {
 
 				var inputName = templateVMBox.find('#entity_name'),
 					name = inputName.val(),
-					templateFlag = monster.template(self, 'vmboxes-emailRow', { name: name });
+					templateFlag = $(self.getTemplate({
+						name: 'emailRow',
+						data: {
+							name: name
+						},
+						submodule: 'vmboxes'
+					}));
 
 				templateVMBox.find('.saved-entities').prepend(templateFlag);
 
