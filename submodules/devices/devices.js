@@ -834,7 +834,7 @@ define(function(require) {
 						}
 					},
 					suppress_unregister_notifications: true,
-					usersData: data.usersData
+					users: data.users
 				},
 				typedDefaults = {
 					sip_device: {
@@ -1144,7 +1144,7 @@ define(function(require) {
 						}
 					});
 				},
-				usersData: function(callback) {
+				users: function(callback) {
 					self.devicesListUsers({
 						success: function(users, status) {
 							callback(null, users);

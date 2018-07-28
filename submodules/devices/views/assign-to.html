@@ -3,7 +3,7 @@
 	<div class="controls">
 		<select name="owner_id">
 			<option value="none">{{ i18n.devices.noOwner }}</option>
-			{{#each usersData}}
+			{{#each users}}
 			<option {{#compare id '===' @root.owner_id}}selected{{/compare}} value="{{id}}">{{first_name}} {{last_name}}</option>
 			{{/each}}
 		</select>
