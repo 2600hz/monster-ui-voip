@@ -273,7 +273,7 @@ define(function(require) {
 					self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
 				},
 				error: function(data, status) {
-					toastr.error(self.i18n.active().devices.addOrEdit.error);
+					toastr.error(self.i18n.active().devices.popupSettings.addOrEdit.error);
 				}
 			});
 		},
