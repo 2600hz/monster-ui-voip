@@ -318,11 +318,13 @@ define(function(require) {
 					showEmergencyCnam: monster.util.isNumberFeatureEnabled('cnam') && monster.util.isNumberFeatureEnabled('e911')
 				}))),
 				deviceForm = templateDevice.find('#form_device'),
-				assignToTemplate = $(monster.template(self, 'devices-assign-to', data));
+				assignTemplate = $(self.getTemplate({
+					name: 'assign-to',
+					data: data,
+					submodule: 'devices'
+				}));
 
-			templateDevice.find('#form_device .tabs-section .control-group')
-				.first()
-				.after(assignToTemplate);
+			deviceForm.find('.tabs-section[data-section="basic"]').append(assignTemplate);
 
 			if (data.extra.hasOwnProperty('provision') && data.extra.provision.hasOwnProperty('keys')) {
 				_.each(data.extra.provision.keys, function(value) {
