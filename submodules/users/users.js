@@ -3067,6 +3067,8 @@ define(function(require) {
 						account_id: monster.config.resellerId,
 						overrides: {}
 					};
+				} else {
+					delete userData.service;
 				}
 			}
 
