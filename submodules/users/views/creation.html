@@ -30,7 +30,9 @@
 				<label for="licensed_role" class="control-label"><i class="fa fa-user"></i></label>
 				<div class="controls">
 					<select id="licensed_role" name="user.extra.licensedRole" data-placeholder="{{ i18n.users.licensedUserRoles.selectPlaceholder }}">
-						<option value></option>
+						<option value="none">
+							{{ i18n.users.licensedUserRoles.licensedUserRoles.none }}
+						</option>
 						{{#each licensedUserRoles}}
 							<option value="{{id}}">{{name}}</option>
 						{{/each}}
