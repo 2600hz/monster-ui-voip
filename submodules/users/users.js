@@ -3571,7 +3571,7 @@ define(function(require) {
 				};
 
 			if (formattedData.user.extra) {
-				if (formattedData.user.extra.hasOwnProperty('licensedRole')) {
+				if (formattedData.user.extra.hasOwnProperty('licensedRole') && formattedData.user.extra.licensedRole !== 'none') {
 					formattedData.user.service = formattedData.user.service || {};
 					formattedData.user.service.plans = {};
 					formattedData.user.service.plans[formattedData.user.extra.licensedRole] = {
