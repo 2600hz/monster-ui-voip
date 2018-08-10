@@ -1181,6 +1181,23 @@ define(function(require) {
 				$(this).blur();
 			});
 
+			template.on('change', '#licensed_role', function(event) {
+				event.preventDefault();
+
+				var planId = $(this).val();
+
+				if (!currentUser.hasOwnProperty('service')
+					|| planId !== Object.keys(currentUser.service.plans)[0]) {
+					template
+						.find('.save-user-role')
+							.prop('disabled', false);
+				} else {
+					template
+						.find('.save-user-role')
+							.prop('disabled', true);
+				}
+			});
+
 			/* Events for License Roles */
 			template.on('click', '.save-user-role', function() {
 				var planId = template.find('#licensed_role').val();
