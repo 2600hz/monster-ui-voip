@@ -3551,6 +3551,9 @@ define(function(require) {
 				callerIdName = fullName.substring(0, 15),
 				formattedData = {
 					user: $.extend(true, {}, {
+						service: {
+							plans: {}
+						},
 						caller_id: {
 							internal: {
 								name: callerIdName,
@@ -3589,15 +3592,19 @@ define(function(require) {
 					extra: data.extra
 				};
 
-			if (formattedData.user.extra) {
-				if (formattedData.user.extra.hasOwnProperty('licensedRole') && formattedData.user.extra.licensedRole !== 'none') {
-					formattedData.user.service = formattedData.user.service || {};
-					formattedData.user.service.plans = {};
-					formattedData.user.service.plans[formattedData.user.extra.licensedRole] = {
-						account_id: monster.config.resellerId,
-						overrides: {}
-					};
-				}
+			/**
+			 * Only set the `service` property if a user type (e.g. service plan)
+			 * is selected
+			 */
+			if (formattedData.user.hasOwnProperty('extra')
+				&& formattedData.user.extra.hasOwnProperty('licensedRole')
+				&& formattedData.user.extra.licensedRole !== 'none') {
+				formattedData.user.service.plans[formattedData.user.extra.licensedRole] = {
+					accountId: monster.config.resellerId,
+					overrides: {}
+				};
+			} else {
+				delete formattedData.user.service;
 			}
 
 			delete formattedData.user.extra;
