@@ -1181,15 +1181,27 @@ define(function(require) {
 				$(this).blur();
 			});
 
+			template.on('change', '#licensed_role', function(event) {
+				event.preventDefault();
+
+				var planId = $(this).val();
+
+				if (!currentUser.hasOwnProperty('service')
+					|| planId !== Object.keys(currentUser.service.plans)[0]) {
+					template
+						.find('.save-user-role')
+							.prop('disabled', false);
+				} else {
+					template
+						.find('.save-user-role')
+							.prop('disabled', true);
+				}
+			});
+
 			/* Events for License Roles */
 			template.on('click', '.save-user-role', function() {
 				var planId = template.find('#licensed_role').val();
-				/*currentUser.service = currentUser.service || {};
-				currentUser.service.plans = {};
-				currentUser.service.plans[planId] = {
-					account_id: monster.config.resellerId,
-					overrides: {}
-				};*/
+
 				currentUser.extra = currentUser.extra || {};
 				currentUser.extra.licensedRole = planId;
 
@@ -3060,15 +3072,20 @@ define(function(require) {
 					}
 				}
 
+				/**
+				 * When updating the user type, override existing one with new
+				 * user type selected.
+				 * Once set the `service` prop should not be removed by the UI.
+				 *
+				 */
 				if (userData.extra.hasOwnProperty('licensedRole')) {
-					userData.service = userData.service || {};
-					userData.service.plans = {};
+					userData.service = {
+						plans: {}
+					};
 					userData.service.plans[userData.extra.licensedRole] = {
 						account_id: monster.config.resellerId,
 						overrides: {}
 					};
-				} else {
-					delete userData.service;
 				}
 			}
 
@@ -3534,6 +3551,9 @@ define(function(require) {
 				callerIdName = fullName.substring(0, 15),
 				formattedData = {
 					user: $.extend(true, {}, {
+						service: {
+							plans: {}
+						},
 						caller_id: {
 							internal: {
 								name: callerIdName,
@@ -3572,15 +3592,19 @@ define(function(require) {
 					extra: data.extra
 				};
 
-			if (formattedData.user.extra) {
-				if (formattedData.user.extra.hasOwnProperty('licensedRole') && formattedData.user.extra.licensedRole !== 'none') {
-					formattedData.user.service = formattedData.user.service || {};
-					formattedData.user.service.plans = {};
-					formattedData.user.service.plans[formattedData.user.extra.licensedRole] = {
-						account_id: monster.config.resellerId,
-						overrides: {}
-					};
-				}
+			/**
+			 * Only set the `service` property if a user type (e.g. service plan)
+			 * is selected
+			 */
+			if (formattedData.user.hasOwnProperty('extra')
+				&& formattedData.user.extra.hasOwnProperty('licensedRole')
+				&& formattedData.user.extra.licensedRole !== 'none') {
+				formattedData.user.service.plans[formattedData.user.extra.licensedRole] = {
+					accountId: monster.config.resellerId,
+					overrides: {}
+				};
+			} else {
+				delete formattedData.user.service;
 			}
 
 			delete formattedData.user.extra;
