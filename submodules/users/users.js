@@ -1201,12 +1201,7 @@ define(function(require) {
 			/* Events for License Roles */
 			template.on('click', '.save-user-role', function() {
 				var planId = template.find('#licensed_role').val();
-				/*currentUser.service = currentUser.service || {};
-				currentUser.service.plans = {};
-				currentUser.service.plans[planId] = {
-					account_id: monster.config.resellerId,
-					overrides: {}
-				};*/
+
 				currentUser.extra = currentUser.extra || {};
 				currentUser.extra.licensedRole = planId;
 
@@ -3077,15 +3072,20 @@ define(function(require) {
 					}
 				}
 
+				/**
+				 * When updating the user type, override existing one with new
+				 * user type selected.
+				 * Once set the `service` prop should not be removed by the UI.
+				 *
+				 */
 				if (userData.extra.hasOwnProperty('licensedRole')) {
-					userData.service = userData.service || {};
-					userData.service.plans = {};
+					userData.service = {
+						plans: {}
+					};
 					userData.service.plans[userData.extra.licensedRole] = {
 						account_id: monster.config.resellerId,
 						overrides: {}
 					};
-				} else {
-					delete userData.service;
 				}
 			}
 
