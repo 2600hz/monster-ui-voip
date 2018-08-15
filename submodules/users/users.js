@@ -3345,7 +3345,11 @@ define(function(require) {
 				self.usersFormatNumbersData(userId, results, function(results) {
 					template = $(self.getTemplate({
 						name: 'numbers',
-						data: results,
+						data: _.merge({
+							hideBuyNumbers: monster.config.whitelabel.hasOwnProperty('hideBuyNumbers')
+								? monster.config.whitelabel.hideBuyNumbers
+								: false
+						}, results),
 						submodule: 'users'
 					}));
 

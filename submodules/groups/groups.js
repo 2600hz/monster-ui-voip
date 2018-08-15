@@ -468,7 +468,11 @@ define(function(require) {
 				self.groupsFormatNumbersData(data, function(data) {
 					var template = $(self.getTemplate({
 						name: 'numbers',
-						data: data,
+						data: _.merge({
+							hideBuyNumbers: monster.config.whitelabel.hasOwnProperty('hideBuyNumbers')
+								? monster.config.whitelabel.hideBuyNumbers
+								: false
+						}, data),
 						submodule: 'groups'
 					}));
 
