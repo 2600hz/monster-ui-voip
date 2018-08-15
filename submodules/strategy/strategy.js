@@ -480,6 +480,9 @@ define(function(require) {
 						var callflow = strategyData.callflows.MainCallflow,
 							numbers = callflow.numbers,
 							templateData = {
+								hideBuyNumbers: monster.config.whitelabel.hasOwnProperty('hideBuyNumbers')
+									? monster.config.whitelabel.hideBuyNumbers
+									: false,
 								numbers: $.map(numbers, function(val, key) {
 									if (val !== '0' && val !== 'undefinedMainNumber') {
 										var ret = {
@@ -536,6 +539,9 @@ define(function(require) {
 						var callflow = strategyData.callflows.MainConference,
 							numbers = callflow.numbers,
 							templateData = {
+								hideBuyNumbers: monster.config.whitelabel.hasOwnProperty('hideBuyNumbers')
+									? monster.config.whitelabel.hideBuyNumbers
+									: false,
 								numbers: $.map(numbers, function(val, key) {
 									if (val !== 'undefinedconf') {
 										return {
@@ -565,6 +571,9 @@ define(function(require) {
 						var callflow = strategyData.callflows.MainFaxing,
 							numbers = callflow.numbers,
 							templateData = {
+								hideBuyNumbers: monster.config.whitelabel.hasOwnProperty('hideBuyNumbers')
+									? monster.config.whitelabel.hideBuyNumbers
+									: false,
 								numbers: $.map(numbers, function(val, key) {
 									if (val !== 'undefinedfaxing') {
 										return {

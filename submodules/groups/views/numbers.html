@@ -30,6 +30,7 @@
 		<a href="#" class="spare-link monster-link pull-left{{#if emptySpare}} disabled{{/if}}">
 			<i class="fa fa-plus monster-green fa-lg"></i>{{ i18n.groups.addFromSpare }}
 		</a>
+	{{#unless hideBuyNumbers}}
 		<ul class="nav pull-left">
 			<li class="dropdown">
 				<a href="#" class="dropdown-toggle buy-dropdown monster-link" data-toggle="dropdown" data-target="#"><i class="fa fa-shopping-cart monster-green fa-lg"></i>{{ i18n.strategy.numberLinks.buy.link }}</a>
@@ -40,6 +41,7 @@
 				</ul>
 			</li>
 		</ul>
+	{{/unless}}
 
 		<div class="pull-right">
 			<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
