@@ -24,6 +24,7 @@
 		<a href="#" class="cancel-link pull-right monster-link blue">{{ i18n.close }}</a>
 		<div class="action-links nav-bar clearfix">
 			<a href="#" class="spare-link monster-link pull-left{{#unless spareLinkEnabled}} disabled{{/unless}}"><i class="fa fa-file-text-o monster-orange fa-lg"></i>{{ i18n.strategy.numberLinks.spare }}</a>
+		{{#unless @root.hideBuyNumbers}}
 			<ul class="nav pull-left">
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle buy-dropdown monster-link" data-toggle="dropdown" data-target="#"><i class="fa fa-shopping-cart monster-green fa-lg"></i>{{ i18n.strategy.numberLinks.buy.link }}</a>
@@ -34,6 +35,7 @@
 					</ul>
 				</li>
 			</ul>
+		{{/unless}}
 		</div>
 	</div>
 </div>
