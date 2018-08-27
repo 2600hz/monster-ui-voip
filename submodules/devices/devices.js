@@ -784,14 +784,14 @@ define(function(require) {
 				}
 			}
 
-			/* Migration clean-up */
-			delete mergedData.media.secure_rtp;
-			delete mergedData.extra;
-
 			//if there is no owner, do not add one.
 			if (mergedData.owner_id && mergedData.owner_id === 'none') {
 				delete mergedData.owner_id;
 			}
+
+			/* Migration clean-up */
+			delete mergedData.media.secure_rtp;
+			delete mergedData.extra;
 
 			return mergedData;
 		},
