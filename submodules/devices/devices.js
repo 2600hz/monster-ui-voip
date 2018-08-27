@@ -817,7 +817,8 @@ define(function(require) {
 						availableCodecs: {
 							audio: [],
 							video: []
-						}
+						},
+						users: data.users
 					},
 					call_restriction: {},
 					device_type: 'sip_device',
@@ -833,8 +834,7 @@ define(function(require) {
 							codecs: []
 						}
 					},
-					suppress_unregister_notifications: true,
-					users: data.users
+					suppress_unregister_notifications: true
 				},
 				typedDefaults = {
 					sip_device: {
@@ -1189,10 +1189,6 @@ define(function(require) {
 		devicesCreateDevice: function(deviceData, callback) {
 			var self = this;
 
-			if (deviceData.users) {
-				delete deviceData.users;
-			}
-
 			self.callApi({
 				resource: 'device.create',
 				data: {
@@ -1207,10 +1203,6 @@ define(function(require) {
 
 		devicesUpdateDevice: function(deviceData, callbackSuccess, callbackError) {
 			var self = this;
-
-			if (deviceData.users) {
-				delete deviceData.users;
-			}
 
 			self.callApi({
 				resource: 'device.update',
