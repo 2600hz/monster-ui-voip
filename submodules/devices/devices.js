@@ -335,7 +335,14 @@ define(function(require) {
 					}),
 					submodule: 'devices'
 				})),
-				deviceForm = templateDevice.find('#form_device');
+				deviceForm = templateDevice.find('#form_device'),
+				assignTemplate = $(self.getTemplate({
+					name: 'assign-to',
+					data: data,
+					submodule: 'devices'
+				}));
+
+			deviceForm.find('.tabs-section[data-section="basic"]').append(assignTemplate);
 
 			if (data.extra.hasOwnProperty('provision') && data.extra.provision.hasOwnProperty('keys')) {
 				_.each(data.extra.provision.keys, function(value) {
@@ -777,6 +784,11 @@ define(function(require) {
 				}
 			}
 
+			//if there is no owner, do not add one.
+			if (mergedData.owner_id && mergedData.owner_id === 'none') {
+				delete mergedData.owner_id;
+			}
+
 			/* Migration clean-up */
 			delete mergedData.media.secure_rtp;
 			delete mergedData.extra;
@@ -805,7 +817,8 @@ define(function(require) {
 						availableCodecs: {
 							audio: [],
 							video: []
-						}
+						},
+						users: data.users
 					},
 					call_restriction: {},
 					device_type: 'sip_device',
@@ -1128,6 +1141,13 @@ define(function(require) {
 						},
 						success: function(data, status) {
 							callback(null, data.data);
+						}
+					});
+				},
+				users: function(callback) {
+					self.devicesListUsers({
+						success: function(users, status) {
+							callback(null, users);
 						}
 					});
 				}
