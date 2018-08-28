@@ -160,10 +160,12 @@
 		"deleteDevice": "Delete Device",
 		"deletedDevice": "You successfully deleted the following device \"{{deviceName}}\".",
 		"popupSettings": {
+			"assignTo": "Assign To",
 			"advancedTitle": "Advanced",
 			"basicTitle": "Basic Settings",
 			"basicSectionTitle": "Basic Settings",
 			"dragAndDrop": "To select a codec, drag and drop from the available codecs box to selected codecs box",
+			"noOwner": "- No Owner -",
 			"options": {
 				"menuTitle": "Options"
 			},
