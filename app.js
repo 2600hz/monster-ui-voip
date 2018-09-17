@@ -97,7 +97,7 @@ define(function(require) {
 				servicePlansRole: function(callback) {
 					if (monster.config.hasOwnProperty('resellerId') && monster.config.resellerId.length) {
 						self.callApi({
-							resource: 'servicePlan.listAvailable',
+							resource: 'services.listAvailable',
 							data: {
 								accountId: self.accountId,
 								filters: {
