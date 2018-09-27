@@ -115,7 +115,7 @@ define(function(require) {
 				if (callflow.featurecode.hasOwnProperty('name')) {
 					var category = 'misc',
 						i18nFeatureCode = self.i18n.active().featureCodes.labels[callflow.featurecode.name],
-						hasStar = (callflow.hasOwnProperty('numbers') && callflow.numbers.length && callflow.numbers[0].substr(0, 1) === '*') || (callflow.hasOwnProperty('patterns') && callflow.patterns.length && callflow.patterns[0].substr(0, 3) === '^\\*');
+						hasStar = (callflow.hasOwnProperty('numbers') && callflow.numbers.length && callflow.numbers[0].substr(0, 1) === '*') || (callflow.hasOwnProperty('patterns') && callflow.patterns.length && (_.startsWith(callflow.patterns[0], '^\\*') || _.startsWith(callflow.patterns[0], '\\*')));
 
 					_.find(self.categories, function(cat, key) {
 						if (cat.indexOf(callflow.featurecode.name) >= 0) {
