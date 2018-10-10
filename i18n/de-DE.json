@@ -1,4 +1,4 @@
-﻿{
+{
 	"callerId": "Anrufer-ID",
 	"e911": "E911",
 	"failover": "Failover",
@@ -571,6 +571,7 @@
 		"uploadPicture": "Ein Bild hochladen",
 		"user": "Benutzer",
 		"call_forward": {
+			"failoverMode": "Im Fehlerfall",
 			"directCallsOnly": "Nur Direktanrufe weiterleiten",
 			"headline": "Einstellungen zur Weiterleitung von Benutzeranrufen",
 			"keepCallerId": "Ursprüngliche Anrufer-ID speichern",
