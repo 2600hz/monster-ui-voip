@@ -56,7 +56,7 @@
 		"ringGroupMissing": "Für diese Gruppe sind keine Rufgruppen definiert (group_id fehlt in Callflow).",
 		"userDeleted": "Benutzer gelöscht",
 		"removeMember": "Mitglied entfernen",
-		"distribute": "Weiterleiten",
+		"distribute": "Verteilen",
 		"maxDurationTooltip": "Klicken Sie in dieses Kästchen, um die maximale Zeitdauer für Ihre Rufgruppe zu ändern. Sie müssen eine Zahl zwischen 30 und 999 eingeben.",
 		"title": "Alle Gruppen",
 		"titleGrid": {
@@ -79,11 +79,11 @@
 			"timeLimitLabel": "Zeitlimit (Sek.):"
 		},
 		"ringback": {
-			"title": "Ringback",
-			"headline": "Gruppen-Ringback-Einstellungen",
-			"dropdownLabel": "Ringback-Medien:",
+			"title": "Warteschleifenmusik",
+			"headline": "Gruppen-Warteschleifenmusik-Einstellungen",
+			"dropdownLabel": "Warteschleifenmusik-Medien:",
 			"silence": "Keine",
-			"defaultRingback": "Standard-Ringback",
+			"defaultRingback": "Standard-Warteschleifenmusik",
 			"emptyUploadAlert": "Wählen Sie eine Datei zum Hochladen aus",
 			"fileTooBigAlert": "Sie können keine Datei größer 5 MB hochladen",
 			"__comment": "UI-1025: Hochladen von Mediendateien über die UI aktualisiert",
@@ -686,7 +686,7 @@
 			"ringThisPhoneFor": "Dieses Telefon anrufen für",
 			"noDevice": "Um diese Funktion zu aktivieren, wird mindestens ein Gerät benötigt.",
 			"noNumber": "Bevor Sie die „Find Me/Follow Me“-Funktion für diesen Benutzer konfigurieren können, müssen Sie ihm eine Nummer oder eine Durchwahl zuweisen",
-			"distribute": "Weiterleiten"
+			"distribute": "Verteilen"
 		},
 		"caller_id": {
 			"title": "Anrufer-ID-Nummer",
