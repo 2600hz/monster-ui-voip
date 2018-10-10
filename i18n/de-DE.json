@@ -71,7 +71,7 @@
 			"extensionsUpdated": "Die Nebenstellennummern von {{name}} wurden aktualisiert"
 		},
 		"callRecording": {
-			"title": "Call Recording (Anrufaufzeichnung)",
+			"title": "Anrufaufzeichnung",
 			"headline": "Aufzeichnungseinstellungen für Gruppenanrufe",
 			"formatLabel": "Format:",
 			"urlLabel": "URL:",
@@ -1292,7 +1292,7 @@
 				"tooltip": ""
 			},
 			"call_recording": {
-				"label": "Call Recording (Anrufaufzeichnung)",
+				"label": "Anrufaufzeichnung",
 				"tooltip": ""
 			},
 			"move": {
