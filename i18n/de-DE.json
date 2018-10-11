@@ -18,6 +18,20 @@
 		"vmboxes": "Anrufbeantworter"
 	},
 
+	"commonMisc": {
+		"outboundPrivacy": {
+			"label": "Anrufer-ID Unterdrückung",
+			"tooltip": "Bestimmt, was als Anrufer-ID für ausgehende Offnet-Anrufe angezeigt wird.",
+			"values": {
+				"default": "Standard",
+				"none": "Nichts verbergen",
+				"number": "Nummer verbergen",
+				"name": "Name verbergen",
+				"full": "Name und Nummer verbergen"
+			}
+		}
+	},
+
 	"groups": {
 		"addFromSpare": "Aus freien Nummern hinzufügen",
 		"add": "Gruppe hinzufügen",
