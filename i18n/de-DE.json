@@ -579,7 +579,7 @@
 			"deskphone": "Ein Festnetztelefon",
 			"number": "Diese Nummer",
 			"placeholder": "+49 123 4567890",
-			"requireKeyPress": Sprachnachricht für weitergeleitete Nummern hinterlassen",
+			"requireKeyPress": "Sprachnachricht für weitergeleitete Nummern hinterlassen",
 			"title": "Anrufweiterleitung",
 			"timeoutWarning": "Um Sprachnachrichten für weitergeleitete Nummern zu hinterlassen, muss Ihre Rufzeichen-Zeitüberschreitung mindestens 30 Sekunden betragen. Wenn Sie jetzt speichern, werden Sie automatisch in die Benutzereinstellungen weitergeleitet, wo Sie die Rufzeichen-Zeitüberschreitung aktualisieren können.",
 			"__comment": ": Modus für Failover bei Anrufweiterleitung hinzugefügt",
