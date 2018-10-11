@@ -1,4 +1,4 @@
-﻿{
+{
 	"callerId": "Anrufer-ID",
 	"e911": "E911",
 	"failover": "Failover",
@@ -15,7 +15,7 @@
 		"featureCodes": "Funktionscodes",
 		"__comment": "UI-1220: VMBox-Modul hinzugefügt",
 		"__version": "3.19",
-		"vmboxes": "Voicemailboxen"
+		"vmboxes": "Anrufbeantworter"
 	},
 
 	"groups": {
@@ -56,7 +56,7 @@
 		"ringGroupMissing": "Für diese Gruppe sind keine Rufgruppen definiert (group_id fehlt in Callflow).",
 		"userDeleted": "Benutzer gelöscht",
 		"removeMember": "Mitglied entfernen",
-		"distribute": "Weiterleiten",
+		"distribute": "Verteilen",
 		"maxDurationTooltip": "Klicken Sie in dieses Kästchen, um die maximale Zeitdauer für Ihre Rufgruppe zu ändern. Sie müssen eine Zahl zwischen 30 und 999 eingeben.",
 		"title": "Alle Gruppen",
 		"titleGrid": {
@@ -71,7 +71,7 @@
 			"extensionsUpdated": "Die Nebenstellennummern von {{name}} wurden aktualisiert"
 		},
 		"callRecording": {
-			"title": "Call Recording (Anrufaufzeichnung)",
+			"title": "Anrufaufzeichnung",
 			"headline": "Aufzeichnungseinstellungen für Gruppenanrufe",
 			"formatLabel": "Format:",
 			"urlLabel": "URL:",
@@ -79,11 +79,11 @@
 			"timeLimitLabel": "Zeitlimit (Sek.):"
 		},
 		"ringback": {
-			"title": "Ringback",
-			"headline": "Gruppen-Ringback-Einstellungen",
-			"dropdownLabel": "Ringback-Medien:",
+			"title": "Warteschleifenmusik",
+			"headline": "Gruppen-Warteschleifenmusik-Einstellungen",
+			"dropdownLabel": "Warteschleifenmusik-Medien:",
 			"silence": "Keine",
-			"defaultRingback": "Standard-Ringback",
+			"defaultRingback": "Standard-Warteschleifenmusik",
 			"emptyUploadAlert": "Wählen Sie eine Datei zum Hochladen aus",
 			"fileTooBigAlert": "Sie können keine Datei größer 5 MB hochladen",
 			"__comment": "UI-1025: Hochladen von Mediendateien über die UI aktualisiert",
@@ -249,7 +249,7 @@
 				"deny": "Ablehnen",
 				"matcher": {
 					"help": "Geben Sie eine Nummer ein und klicken Sie auf „Test“, um festzustellen, ob der Anruf erlaubt wäre.",
-					"placeholder": "+18554443333",
+					"placeholder": "+49 123 4567890",
 					"button": "Test",
 					"label": "Die oben angegebene Nummer entspricht dieser Regel.",
 					"__comment": "UI-727, v3.19_s2: Die Art und Weise aktualisiert, wie Anrufseinschränkungen auf Geräten angezeigt werden.",
@@ -352,7 +352,7 @@
 			"editTitle": "Bearbeiten der Festnetznummer: {{name}}",
 			"new": "Neue Festnetznummer",
 			"number": "Nummer",
-			"numberPlaceholder": "+14152231121",
+			"numberPlaceholder": "+49 123 4567890",
 			"requireKeypress": "Voicemail der Festnetznummer nutzen",
 			"keepCallerId": "Ursprüngliche Anrufer-ID speichern",
 			"hideContactList": "In Kontaktliste ausblenden"
@@ -363,7 +363,7 @@
 			"editTitle": "Bearbeiten des Mobiltelefons: {{name}}",
 			"new": "Neues Mobiltelefon",
 			"number": "Nummer",
-			"numberPlaceholder": "+14152231121",
+			"numberPlaceholder": "+49 123 4567890",
 			"requireKeypress": "Nutzung der Voicemail des Mobiltelefons erlauben",
 			"keepCallerId": "Ursprüngliche Anrufer-ID speichern",
 			"hideContactList": "In Kontaktliste ausblenden"
@@ -488,7 +488,7 @@
 			"lastName": "Nachname",
 			"role": "Rolle",
 			"timezone": "Zeitzone",
-			"vmboxNumber": "VMBox Nr.",
+			"vmboxNumber": "Nummer des Anrufbeantworters",
 			"timeout": "Rufzeichen-Zeitüberschreitung",
 			"timeoutSec": "Sek.",
 			"timeoutEdit": "Bearbeitung in Find-Me/Follow-Me-Funktion",
@@ -502,10 +502,10 @@
 			"__version": "3.19",
 			"nameHelp": "Geben Sie den Vornamen des Benutzers in den ersten Eintrag und seinen Nachnamen in den zweiten Eintrag ein",
 			"loginHelp": "Dies ist der Benutzername dieses Benutzers. Er wird zur Anmeldung auf der Anwendung verwendet",
-			"vmboxHelp": "Dies ist die Voicemailbox-Nummer für diesen Benutzer. Klicken Sie auf „PIN ändern“, um die PIN der Voicemailbox für diesen Benutzer zurückzusetzen",
+			"vmboxHelp": "Dies ist die Nummer des Anrufbeantworters für diesen Benutzer. Klicken Sie auf „PIN ändern“, um die PIN der Voicemailbox für diesen Benutzer zurückzusetzen",
 			"roleHelp": "Der „Admin“ hat die Berechtigung, auf AppExchange zuzugreifen und diesem Konto Apps hinzuzufügen. Der „Benutzer“ dagegen kann nur auf die Apps zugreifen, die für ihn aktiviert wurden",
 			"languageHelp": "Ändert die Sprache der UI",
-			"timezoneHelp": "Legt die Zeitzone für die Geräte und die Voicemailbox dieses Benutzers fest",
+			"timezoneHelp": "Legt die Zeitzone für die Geräte und die Nummer des Anrufbeantworters dieses Benutzers fest",
 			"ringingHelp": "Legt die Rufzeichen-Zeitüberschreitung für diesen Benutzer und seine Geräte fest. Wenn Sie zum Beispiel den Wert 20 festlegen, klingelt es bei diesem Benutzer 20 Sekunden lang, bevor das System den Anruf auf dessen Voicemailbox umschaltet",
 			"mainExtensionHelp": "Definiert die Anrufer-ID für diesen Benutzer für Anrufe innerhalb des Systems und seine Anwesenheits-ID für diese Nummer",
 			"outbound_privacy": {
@@ -578,10 +578,10 @@
 			"mobile": "Ein Mobiltelefon",
 			"deskphone": "Ein Festnetztelefon",
 			"number": "Diese Nummer",
-			"placeholder": "+14157283992",
-			"requireKeyPress": "Voicemails für weitergeleitete Nummern hinterlassen",
+			"placeholder": "+49 123 4567890",
+			"requireKeyPress": "Sprachnachricht für weitergeleitete Nummern hinterlassen",
 			"title": "Anrufweiterleitung",
-			"timeoutWarning": "Um Voicemails für weitergeleitete Nummern zu hinterlassen, muss Ihre Rufzeichen-Zeitüberschreitung mindestens 30 Sekunden betragen. Wenn Sie jetzt speichern, werden Sie automatisch in die Benutzereinstellungen weitergeleitet, wo Sie die Rufzeichen-Zeitüberschreitung aktualisieren können.",
+			"timeoutWarning": "Um Sprachnachrichten für weitergeleitete Nummern zu hinterlassen, muss Ihre Rufzeichen-Zeitüberschreitung mindestens 30 Sekunden betragen. Wenn Sie jetzt speichern, werden Sie automatisch in die Benutzereinstellungen weitergeleitet, wo Sie die Rufzeichen-Zeitüberschreitung aktualisieren können.",
 			"__comment": ": Modus für Failover bei Anrufweiterleitung hinzugefügt",
 			"__version": "4.0",
 			"failoverWarning": "Im „Failover-Modus“ haben die Anrufweiterleitungseinstellungen nur dann Geltung, wenn keines der Geräte dieses Benutzers registriert ist.",
@@ -686,7 +686,7 @@
 			"ringThisPhoneFor": "Dieses Telefon anrufen für",
 			"noDevice": "Um diese Funktion zu aktivieren, wird mindestens ein Gerät benötigt.",
 			"noNumber": "Bevor Sie die „Find Me/Follow Me“-Funktion für diesen Benutzer konfigurieren können, müssen Sie ihm eine Nummer oder eine Durchwahl zuweisen",
-			"distribute": "Weiterleiten"
+			"distribute": "Verteilen"
 		},
 		"caller_id": {
 			"title": "Anrufer-ID-Nummer",
@@ -917,7 +917,7 @@
 			"user": "Benutzer",
 			"device": "Geräte",
 			"ring_group": "Gruppen",
-			"voicemail": "Voicemailboxen",
+			"voicemail": "Anrufbeantworter",
 			"__comment": "UI-1353: Verzeichnisunterstützung für den virtuellen Empfang hinzugefügt",
 			"__version": "v3.20_s4",
 			"directory": "Verzeichnis",
@@ -981,13 +981,13 @@
 		},
 		"__comment": "UI-17142: ",
 		"__version": "3.22",
-		"noFaxingNumMessage": "Fügen Sie eine Haupt-Faxboxnummer hinzu.",
+		"noFaxingNumMessage": "Fügen Sie eine Haupt-Faxnummer hinzu.",
 		"__comment": "UI-1210: ",
 		"__version": "3.22",
 		"faxing": {
-			"nameExtension": "s Haupt-Faxbox",
+			"nameExtension": "s Haupt-Faxnummer",
 			"headerExtension": " Faxdrucker",
-			"editFaxbox": "Faxbox bearbeiten"
+			"editFaxbox": "Faxnummer bearbeiten"
 		},
 		"__comment": "UI-1774: Benutzerdefinierte Ansagen zu Konferenz hinzugefügt",
 		"__version": "3.22",
@@ -1007,10 +1007,10 @@
 		"__version": "3.22",
 		"popupEditFaxbox": {
 			"titles": {
-				"create": "Haupt-Faxbox erstellen",
-				"edit": "Haupt-Faxbox bearbeiten"
+				"create": "Haupt-Faxnummer erstellen",
+				"edit": "Haupt-Faxnummer bearbeiten"
 			},
-			"text": "Haupt-Faxbox",
+			"text": "Haupt-Faxnummer",
 			"labels": {
 				"inbound": "Eingehende Bestätigungs-E-Mail"
 			}
@@ -1130,12 +1130,12 @@
 			"international": "Internationale Nummern",
 			"noNumber": "Keine Nummer verfügbar"
 		},
-		"__comment": "UI-1220: Wenn jemand SmartPBX das erste Mal lädt und keine VMBox besitzt, wird automatisch eine Haupt-VMBox hinzugefügt",
+		"__comment": "UI-1220: Wenn jemand SmartPBX das erste Mal lädt und keinen Anrufbeantworter besitzt, wird automatisch ein zentraler Anrufbeantworter hinzugefügt",
 		"__version": "3.19",
-		"mainVMBoxName": "Haupt-Voicemailbox",
-		"__comment": "UI-1210: Haupt-Faxboxnummer wird im Dashboard angezeigt",
+		"mainVMBoxName": "Haupt-Anrufbeantworter",
+		"__comment": "UI-1210: Haupt-Faxnummer wird im Dashboard angezeigt",
 		"__version": "3.22",
-		"faxingNumberLabel": "Faxboxnummer",
+		"faxingNumberLabel": "Faxnummer",
 		"__comment": "UI-1197: Unternehmensverzeichnis wird im Dashboard angezeigt",
 		"__version": "3.22",
 		"directoryLabel": "Unternehmensverzeichnis-Benutzer:",
@@ -1292,7 +1292,7 @@
 				"tooltip": ""
 			},
 			"call_recording": {
-				"label": "Call Recording (Anrufaufzeichnung)",
+				"label": "Anrufaufzeichnung",
 				"tooltip": ""
 			},
 			"move": {
@@ -1314,24 +1314,24 @@
 	"__comment": "UI-1220: VMBox-Modul hinzugefügt",
 	"__version": "3.19",
 	"vmboxes": {
-		"addTitle": "Hinzufügen einer Voicemailbox",
-		"editTitle": "Bearbeiten einer Voicemailbox: {{ name }}",
-		"title": "Alle Voicemailboxen",
-		"add": "Voicemailbox hinzufügen",
-		"new": "Neue Voicemailbox",
-		"createVmbox": "Neue Voicemailbox erstellen",
-		"deleteVmbox": "Voicemailbox löschen",
-		"deleteNotAllowed": "Voicemailbox kann nicht gelöscht werden, da sie zu einem Benutzer gehört",
-		"confirmDeleteVmbox": "Diese Voicemailbox wird dauerhaft gelöscht. Vorgang fortsetzen?",
-		"deletedVmbox": "Die Voicemailbox „{{vmboxName}}“ wurde erfolgreich gelöscht.",
+		"addTitle": "Hinzufügen eines Anrufbeantworters",
+		"editTitle": "Bearbeiten eines Anrufbeantworters: {{ name }}",
+		"title": "Alle Anrufbeantworter",
+		"add": "Anrufbeantworter hinzufügen",
+		"new": "Neuer Anrufbeantworter",
+		"createVmbox": "Neuen Anrufbeantworter erstellen",
+		"deleteVmbox": "Anrufbeantworter löschen",
+		"deleteNotAllowed": "Anrufbeantworter kann nicht gelöscht werden, da sie zu einem Benutzer gehört",
+		"confirmDeleteVmbox": "Dieser Anrufbeantworter wird dauerhaft gelöscht. Vorgang fortsetzen?",
+		"deletedVmbox": "Der Anrufbeantworter„{{vmboxName}}“ wurde erfolgreich gelöscht.",
 		"titleGrid": {
 			"name": "Name",
 			"number": "Nummer",
 			"owner": "Benutzer",
 			"edit": "Bearbeiten"
 		},
-		"noMatchingVMBoxes": "Es konnten keine Voicemailboxen gefunden werden, die Ihren Suchkriterien entsprechen",
-		"noVMBoxesConfigured": "Es wurden keine Voicemailboxen konfiguriert",
+		"noMatchingVMBoxes": "Es konnten keine Anrufbeantworter gefunden werden, die Ihren Suchkriterien entsprechen",
+		"noVMBoxesConfigured": "Es wurden keine Anrufbeantworter konfiguriert",
 		"popupSettings": {
 			"advancedTitle": "Erweitert",
 			"basicTitle": "Allgemeine Einstellungen",
@@ -1341,7 +1341,7 @@
 					"label": "Name"
 				},
 				"number": {
-					"label": "Voicemail-Nummer"
+					"label": "Anrufbeantworter-Nummer"
 				},
 				"pinNumber": {
 					"label": "PIN-Nummer"
@@ -1358,15 +1358,15 @@
 				},
 				"alreadySetup": {
 					"label": "Bereits eingerichtet?",
-					"help": "Wurde diese Voicemailbox bereits initialisiert? Wenn nicht, wird der Benutzer bei seiner ersten Anmeldung dazu aufgefordert, seine PIN zu ändern und eine Ansage einzurichten."
+					"help": "Wurde dieser Anrufbeantworter bereits initialisiert? Wenn nicht, wird der Benutzer bei seiner ersten Anmeldung dazu aufgefordert, seine PIN zu ändern und eine Ansage einzurichten."
 				},
 				"requirePIN": {
 					"label": "PIN benötigt?",
-					"help": "Überprüfen Sie, ob Voicemail eine PIN benötigt."
+					"help": "Überprüfen Sie, ob der Anrufbeantworter eine PIN benötigt."
 				},
 				"autoLogin": {
 					"label": "Automatische Anmeldung aktiviert?",
-					"help": "Aktivieren, um automatische Anmeldung für diese Voicemailbox zu aktivieren. (Wenn der Benutzer seine eigene Voicemail anruft, gelangt er direkt zu seinen Nachrichten.)"
+					"help": "Aktivieren, um automatische Anmeldung für diese Voicemailbox zu aktivieren. (Wenn der Benutzer seinen eigenen Anrufbeantworter anruft, gelangt er direkt zu seinen Nachrichten.)"
 				},
 				"skipGreetings": {
 					"label": "Ansagen überspringen?",
@@ -1378,13 +1378,13 @@
 				},
 				"deleteAfterNotify": {
 					"label": "Nach Benachrichtigung löschen?",
-					"help": "Voicemail löschen, nachdem die Benachrichtigung abgeschickt wurde"
+					"help": "Sprachnachricht löschen, nachdem die Benachrichtigung abgeschickt wurde"
 				},
 				"configurable": {
 					"label": "Über Menü konfigurierbar?",
-					"help": " Wenn deaktiviert, kann der Benutzer die Voicemail nicht über das Menü konfigurieren"
+					"help": " Wenn deaktiviert, kann der Benutzer den Anrufbeantworter nicht über das Menü konfigurieren"
 				},
-				"__comment": "UI-2634: Unterstützung für WAV, MP4 und MP3 für Voicemail-Medienerweiterungen hinzugefügt",
+				"__comment": "UI-2634: Unterstützung für WAV, MP4 und MP3 für die Anrufbeantworter-Medienerweiterungen hinzugefügt",
 				"__version": "4.1",
 				"mediaExtension": {
 					"label": "Medien-Nebenstelle",
