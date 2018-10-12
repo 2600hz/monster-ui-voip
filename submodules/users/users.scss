@@ -931,15 +931,6 @@
 	display: none;
 }
 
-/*** Call recording popup ***/
-.monster-feature-popup-container[data-feature="call_recording"] .btn-group-wrapper button {
-	font-size: 14px;
-}
-
-.monster-feature-popup-container[data-feature="call_recording"] .btn-group-wrapper .btn-group {
-	margin-left: 10px;
-}
-
 .monster-feature-popup-container {
 	.feature-popup-title {
 		display: flex;
@@ -957,6 +948,16 @@
 
 		.popup-action {
 			margin: 0 25px 0 20px;
+		}
+	}
+
+	&[data-feature="call_recording"] .btn-group-wrapper {
+		button {
+			font-size: 14px;
+		}
+
+		.btn-group {
+			margin-left: 10px;
 		}
 	}
 }
