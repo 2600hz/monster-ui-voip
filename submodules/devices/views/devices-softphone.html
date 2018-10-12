@@ -14,20 +14,48 @@
 
 		<ul class="nav nav-pills pull-right">
 			<li class="tabs-main-selector main-section active">
-				<a class="tabs-selector change-section" data-section="basic" href="javascript:void(0)">{{ i18n.devices.popupSettings.basicTitle }}</a>
+				<a class="tabs-selector change-section" data-section="basic" href="javascript:void(0)">
+					{{ i18n.devices.popupSettings.basicTitle }}
+				</a>
 			</li>
 			<li class="tabs-main-selector main-section dropdown">
-				<a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">{{ i18n.devices.popupSettings.advancedTitle }}
+				<a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+					{{ i18n.devices.popupSettings.advancedTitle }}
 					<b class="caret"></b>
 				</a>
 				<ul class="dropdown-menu pull-right">
-					<li><a class="tabs-selector change-section" data-section="audio" href="javascript:void(0)"><i class="fa fa-music"></i>{{ i18n.devices.popupSettings.audio.menuTitle }}</a></li>
-					<li><a class="tabs-selector change-section" data-section="video" href="javascript:void(0)"><i class="fa fa-video-camera"></i>{{ i18n.devices.popupSettings.video.menuTitle }}</a></li>
-					<li><a class="tabs-selector change-section" data-section="restrictions" href="javascript:void(0)"><i class="fa fa-ban"></i>{{ i18n.devices.popupSettings.restrictions.menuTitle }}</a></li>
-					{{#if showEmergencyCnam}}
-						<li><a class="tabs-selector change-section" data-section="callerId" href="javascript:void(0)"><i class="fa fa-ambulance"></i>{{ i18n.devices.popupSettings.callerId.menuTitle }}</a></li>
-					{{/if}}
-					<li><a class="tabs-selector change-section" data-section="miscellaneous" href="javascript:void(0)"><i class="fa fa-cogs"></i>{{ i18n.devices.popupSettings.miscellaneous.menuTitle }}</a></li>
+					<li>
+						<a class="tabs-selector change-section" data-section="audio" href="javascript:void(0)">
+							<i class="fa fa-music"></i>
+							{{ i18n.devices.popupSettings.audio.menuTitle }}
+						</a>
+					</li>
+					<li>
+						<a class="tabs-selector change-section" data-section="video" href="javascript:void(0)">
+							<i class="fa fa-video-camera"></i>
+							{{ i18n.devices.popupSettings.video.menuTitle }}
+						</a>
+					</li>
+					<li>
+						<a class="tabs-selector change-section" data-section="restrictions" href="javascript:void(0)">
+							<i class="fa fa-ban"></i>
+							{{ i18n.devices.popupSettings.restrictions.menuTitle }}
+						</a>
+					</li>
+				{{#if showEmergencyCnam}}
+					<li>
+						<a class="tabs-selector change-section" data-section="callerId" href="javascript:void(0)">
+							<i class="fa fa-ambulance"></i>
+							{{ i18n.devices.popupSettings.callerId.menuTitle }}
+						</a>
+					</li>
+				{{/if}}
+					<li>
+						<a class="tabs-selector change-section" data-section="miscellaneous" href="javascript:void(0)">
+							<i class="fa fa-cogs"></i>
+							{{ i18n.devices.popupSettings.miscellaneous.menuTitle }}
+						</a>
+					</li>
 				</ul>
 			</li>
 		</ul>
