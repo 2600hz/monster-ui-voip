@@ -687,17 +687,6 @@
 	margin-top: 25px;
 }
 
-/* VM To Email User Feature Popup */
-.monster-feature-popup-container[data-feature="vm_to_email"] #email {
-	margin-top: 8px;
-}
-
-.monster-feature-popup-container[data-feature="vm_to_email"] .main-line {
-	height: auto;
-	line-height: 20px;
-	margin: 10px 0 30px 0;
-}
-
 /* Change Password Popup */
 .smart-edit-popup {
 	width: 430px;
@@ -962,6 +951,18 @@
 					width: 192px;
 				}
 			}
+		}
+	}
+
+	&[data-feature="vm_to_email"] {
+		#email {
+			margin-top: 8px;
+		}
+
+		.main-line {
+			height: auto;
+			line-height: 20px;
+			margin: 10px 0 30px 0;
 		}
 	}
 }
