@@ -1,10 +1,14 @@
 <div class="monster-feature-popup-container" data-feature="find_me_follow_me">
 	<div class="feature-popup-title">
-		<div class="feature-fa-wrapper">
-			<i class="{{currentUser.extra.mapFeatures.find_me_follow_me.icon}}"></i>
+		<div class="popup-title">
+			<div class="feature-fa-wrapper">
+				<i class="{{currentUser.extra.mapFeatures.find_me_follow_me.icon}}"></i>
+			</div>
+			<div class="feature-title">
+				{{ i18n.users.find_me_follow_me.headline }}
+			</div>
 		</div>
-		{{ i18n.users.find_me_follow_me.headline }}
-		<div class="switch">
+		<div class="switch popup-action">
 		{{#monsterSwitch}}
 			<input class="switch-state" type="checkbox" id="checkbox_find_me_follow_me" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if currentUser.extra.mapFeatures.find_me_follow_me.active}} checked="checked"{{/if}}></input>
 		{{/monsterSwitch}}

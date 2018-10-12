@@ -1,3 +1,5 @@
+@import '../../../../css/partials/base';
+
 #users_container_overlay {
 	position: fixed;
 	top: 0;
@@ -555,7 +557,7 @@
 .monster-feature-popup-container .feature-fa-wrapper{
 	display: inline-block;
 	margin: 20px;
-	width: 60px;
+	min-width: 60px;
 	height: 60px;
 
 	border: 5px solid #DDDDDD;
@@ -685,130 +687,6 @@
 	margin-top: 25px;
 }
 
-/* Caller-ID User Feature Popup */
-.monster-feature-popup-container[data-feature="caller_id"] {
-	width: 525px;
-}
-
-.monster-feature-popup-container .caller-id-select {
-	margin-top: 5px;
-}
-
-/* Hot Desking User Feature Popup */
-.monster-feature-popup-container[data-feature="hotdesk"] #pin {
-	margin-top: 10px;
-}
-
-/* VM To Email User Feature Popup */
-.monster-feature-popup-container[data-feature="vm_to_email"] #email {
-	margin-top: 8px;
-}
-
-.monster-feature-popup-container[data-feature="vm_to_email"] .main-line {
-	height: auto;
-	line-height: 20px;
-	margin: 10px 0 30px 0;
-}
-
-/* Conferencing */
-.monster-feature-popup-container[data-feature="conferencing"] form {
-	margin-bottom: 0;
-}
-
-.monster-feature-popup-container[data-feature="conferencing"] form .list-numbers {
-	display: inline-block;
-	font-weight: 600;
-	height: 65px;
-	line-height: 15px;
-	margin-left: 25px;
-	overflow: auto;
-	vertical-align: middle;
-	width: 180px;
-}
-
-.monster-feature-popup-container[data-feature="conferencing"] form .list-numbers[data-count="1"] {
-	line-height: 61px;
-}
-
-.monster-feature-popup-container[data-feature="conferencing"] form .list-numbers[data-count="2"] {
-	line-height: 32px;
-}
-
-.monster-feature-popup-container[data-feature="conferencing"] form .list-numbers[data-count="3"] {
-	line-height: 20px;
-}
-
-/* Music-On-Hold Feature */
-.monster-feature-popup-container[data-feature="music_on_hold"] .media-dropdown {
-	margin-bottom: 0px;
-}
-.monster-feature-popup-container[data-feature="music_on_hold"] .upload-toggle {
-	margin-left: 10px;
-	min-width: 117px;
-}
-.monster-feature-popup-container[data-feature="music_on_hold"] .upload-div {
-	display: none;
-	margin-top: 20px;
-}
-.monster-feature-popup-container[data-feature="music_on_hold"] .upload-div .upload-input {
-	margin: 0;
-	width: 330px;
-}
-.monster-feature-popup-container[data-feature="music_on_hold"] .upload-div button.upload-action {
-	margin-left: 10px;
-	padding-left: 19px;
-	padding-right: 19px;
-}
-
-.monster-feature-popup-container[data-feature="music_on_hold"] .upload-div button > i {
-	margin-right: 0;
-	padding-right: 0;
-}
-
-.monster-feature-popup-container[data-feature="music_on_hold"] .upload-div .file-upload {
-	margin: 0;
-}
-.monster-feature-popup-container[data-feature="music_on_hold"] .upload-div .file-upload > input {
-	margin: 0;
-	padding: 6px;
-	width: 192px;
-}
-
-/* Faxing Feature Popup */
-.monster-feature-popup-container[data-feature='faxing'] {
-	overflow: hidden;
-}
-
-.monster-feature-popup-container[data-feature='faxing'] #faxbox_form {
-	margin-bottom: 0;
-}
-
-.monster-feature-popup-container[data-feature='faxing'] #faxbox_form a {
-	color: #22a5ff;
-	text-decoration: underline;
-}
-
-.monster-feature-popup-container[data-feature='faxing'] #faxbox_form a:hover {
-	text-decoration: none;
-}
-
-.monster-feature-popup-container[data-feature='faxing'] #faxbox_form p {
-	line-height: 30px;
-}
-
-.monster-feature-popup-container[data-feature='faxing'] #faxbox_form .monster-primary-color {
-	color: #22a5ff;
-}
-
-.monster-feature-popup-container[data-feature='faxing'] #faxbox_form .number-selector {
-	display: inline-block;
-	margin: 0 10px;
-}
-
-.monster-feature-popup-container[data-feature='faxing'] #faxbox_form #helper_content {
-	margin-top: 10px;
-}
-
 /* Change Password Popup */
 .smart-edit-popup {
 	width: 430px;
@@ -830,39 +708,6 @@
 
 .smart-edit-popup .actions .cancel-link {
 	margin-right: 10px;
-}
-
-/* Find me Follow me feature popup */
-.monster-feature-popup-container[data-feature="find_me_follow_me"] {
-	width: 620px;
-}
-
-#find_me_follow_me_form {
-	margin: 0;
-}
-
-#find_me_follow_me_form .no-device {
-	color: red;
-	font-size: 18px;
-	padding: 10px;
-}
-
-#find_me_follow_me_form .grid-time .grid-time-row {
-	background-color: inherit;
-}
-#find_me_follow_me_form .grid-time .grid-time-row .name {
-	width: 25%;
-}
-#find_me_follow_me_form .grid-time .grid-time-row .times {
-	width: 65%;
-}
-#find_me_follow_me_form .grid-time .grid-time-row .scale-container {
-	right: 10%;
-	left: 25%;
-}
-#find_me_follow_me_form .grid-time .grid-time-row-placeholder {
-	height: 52px;
-	background-color: inherit;
 }
 
 /********* CSS for device popovers (appended directly on the body) *********/
@@ -913,30 +758,211 @@
 	margin-top: 10px;
 }
 
-.monster-feature-popup-container[data-feature="call_forward"] {
-	width: 600px;
-}
+.monster-feature-popup-container {
+	.feature-popup-title {
+		display: flex;
+		align-items: center;
 
-.monster-feature-popup-container[data-feature="call_forward"] .btn-group {
-	float: right;
-	font-size: 14px;
-	margin-right: 25px;
-	margin-top: 40px;
-}
+		.popup-title {
+			display: flex;
+			align-items: center;
 
-.monster-feature-popup-container[data-feature="call_forward"] .failover-info {
-	margin-bottom: 25px;
-}
+			.feature-title {
+				max-height: 4em;
+				overflow-y: hidden;
+			}
+		}
 
-.monster-feature-popup-container[data-feature="call_forward"] .failover-info.disabled {
-	display: none;
-}
+		.popup-action {
+			margin: 0 25px 0 20px;
+		}
+	}
 
-/*** Call recording popup ***/
-.monster-feature-popup-container[data-feature="call_recording"] .btn-group-wrapper button {
-	font-size: 14px;
-}
+	&[data-feature="call_recording"] .btn-group-wrapper {
+		button {
+			font-size: 14px;
+		}
 
-.monster-feature-popup-container[data-feature="call_recording"] .btn-group-wrapper .btn-group {
-	margin-left: 10px;
+		.btn-group {
+			margin-left: 10px;
+		}
+	}
+
+	&[data-feature="forward"] {
+		width: 600px;
+
+		.btn-group {
+			font-size: 14px;
+		}
+
+		.failover-info {
+			margin-bottom: 25px;
+
+			&.disabled {
+				display: none;
+			}
+		}
+	}
+
+	&[data-feature="caller_id"] {
+		width: 525px;
+
+		.caller-id-select {
+			margin-top: 5px;
+		}
+	}
+
+	&[data-feature="conferencing"] {
+		form {
+			margin-bottom: 0;
+
+			.list-numbers {
+				display: inline-block;
+				font-weight: 600;
+				height: 65px;
+				line-height: 15px;
+				margin-left: 25px;
+				overflow: auto;
+				vertical-align: middle;
+				width: 180px;
+
+				&[data-count="1"] {
+					line-height: 61px;
+				}
+
+				&[data-count="2"] {
+					line-height: 32px;
+				}
+
+				&[data-count="3"] {
+					line-height: 20px;
+				}
+			}
+		}
+	}
+
+	&[data-feature='faxing'] {
+		overflow: hidden;
+
+		#faxbox_form {
+			margin-bottom: 0;
+
+			a {
+				color: #22a5ff;
+				text-decoration: underline;
+
+				&:hover {
+					text-decoration: none;
+				}
+			}
+
+			p {
+				line-height: 30px;
+			}
+
+			.monster-primary-color {
+				color: $primary-color;
+			}
+
+			.number-selector {
+				display: inline-block;
+				margin: 0 10px;
+			}
+
+			#helper_content {
+				margin-top: 10px;
+			}
+		}
+	}
+
+	&[data-feature="find_me_follow_me"] {
+		width: 620px;
+
+		#find_me_follow_me_form {
+			margin: 0;
+
+			.no-device {
+				color: red;
+				font-size: 18px;
+				padding: 10px;
+			}
+
+			.grid-time {
+				.grid-time-row {
+					background-color: inherit;
+
+					.name {
+						width: 25%;
+					}
+					.times {
+						width: 65%;
+					}
+					.scale-container {
+						right: 10%;
+						left: 25%;
+					}
+				}
+
+				.grid-time-row-placeholder {
+					height: 52px;
+					background-color: inherit;
+				}
+			}
+		}
+	}
+
+	&[data-feature="hotdesk"] {
+		#pin {
+			margin-top: 10px;
+		}
+	}
+
+	&[data-feature="music_on_hold"] {
+		.media-dropdown {
+			margin-bottom: 0px;
+		}
+		.upload-toggle {
+			margin-left: 10px;
+			min-width: 117px;
+		}
+		.upload-div {
+			display: none;
+			margin-top: 20px;
+
+			.upload-input {
+				margin: 0;
+				width: 330px;
+			}
+			button.upload-action {
+				margin-left: 10px;
+				padding-left: 19px;
+				padding-right: 19px;
+			}
+			button > i {
+				margin-right: 0;
+				padding-right: 0;
+			}
+			.file-upload {
+				margin: 0;
+
+				& > input {
+					margin: 0;
+					padding: 6px;
+					width: 192px;
+				}
+			}
+		}
+	}
+
+	&[data-feature="vm_to_email"] {
+		#email {
+			margin-top: 8px;
+		}
+
+		.main-line {
+			height: auto;
+			line-height: 20px;
+			margin: 10px 0 30px 0;
+		}
+	}
 }
