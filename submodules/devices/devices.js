@@ -331,7 +331,7 @@ define(function(require) {
 					name: 'devices-' + type,
 					data: $.extend(true, {}, data, {
 						isProvisionerConfigured: monster.config.api.hasOwnProperty('provisioner'),
-						showEmergencyCnam: monster.util.isNumberFeatureEnabled('cnam') && monster.util.isNumberFeatureEnabled('e911')
+						showEmergencyCallerId: monster.util.isNumberFeatureEnabled('e911')
 					}),
 					submodule: 'devices'
 				})),
