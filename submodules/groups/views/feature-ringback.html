@@ -1,10 +1,14 @@
 <div class="monster-feature-popup-container" data-feature="ringback">
 	<div class="feature-popup-title">
-		<div class="feature-fa-wrapper">
-			<i class="{{group.extra.mapFeatures.ringback.icon}}"></i>
+		<div class="popup-title">
+			<div class="feature-fa-wrapper">
+				<i class="{{group.extra.mapFeatures.ringback.icon}}"></i>
+			</div>
+			<div class="feature-title">
+				{{ i18n.groups.ringback.headline }}
+			</div>
 		</div>
-		{{ i18n.groups.ringback.headline }}
-		<div class="switch">
+		<div class="switch popup-action">
 		{{#monsterSwitch}}
 			<input class="switch-state" type="checkbox" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if group.extra.mapFeatures.ringback.active}} checked="checked"{{/if}}></input>
 		{{/monsterSwitch}}
