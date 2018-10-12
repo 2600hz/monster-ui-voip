@@ -758,22 +758,6 @@
 	margin-top: 10px;
 }
 
-.monster-feature-popup-container[data-feature="call_forward"] {
-	width: 600px;
-}
-
-.monster-feature-popup-container[data-feature="call_forward"] .btn-group {
-	font-size: 14px;
-}
-
-.monster-feature-popup-container[data-feature="call_forward"] .failover-info {
-	margin-bottom: 25px;
-}
-
-.monster-feature-popup-container[data-feature="call_forward"] .failover-info.disabled {
-	display: none;
-}
-
 .monster-feature-popup-container {
 	.feature-popup-title {
 		display: flex;
@@ -801,6 +785,22 @@
 
 		.btn-group {
 			margin-left: 10px;
+		}
+	}
+
+	&[data-feature="forward"] {
+		width: 600px;
+
+		.btn-group {
+			font-size: 14px;
+		}
+
+		.failover-info {
+			margin-bottom: 25px;
+
+			&.disabled {
+				display: none;
+			}
 		}
 	}
 
