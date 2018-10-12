@@ -48,12 +48,14 @@
 							{{ i18n.devices.popupSettings.restrictions.menuTitle }}
 						</a>
 					</li>
+				{{#if showEmergencyCallerId}}
 					<li>
 						<a class="tabs-selector change-section" data-section="callerId" href="javascript:void(0)">
 							<i class="fa fa-ambulance"></i>
 							{{ i18n.devices.popupSettings.callerId.menuTitle }}
 						</a>
 					</li>
+				{{/if}}
 				</ul>
 			</li>
 		</ul>
