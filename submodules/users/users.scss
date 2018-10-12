@@ -703,34 +703,6 @@
 	margin: 10px 0 30px 0;
 }
 
-/* Conferencing */
-.monster-feature-popup-container[data-feature="conferencing"] form {
-	margin-bottom: 0;
-}
-
-.monster-feature-popup-container[data-feature="conferencing"] form .list-numbers {
-	display: inline-block;
-	font-weight: 600;
-	height: 65px;
-	line-height: 15px;
-	margin-left: 25px;
-	overflow: auto;
-	vertical-align: middle;
-	width: 180px;
-}
-
-.monster-feature-popup-container[data-feature="conferencing"] form .list-numbers[data-count="1"] {
-	line-height: 61px;
-}
-
-.monster-feature-popup-container[data-feature="conferencing"] form .list-numbers[data-count="2"] {
-	line-height: 32px;
-}
-
-.monster-feature-popup-container[data-feature="conferencing"] form .list-numbers[data-count="3"] {
-	line-height: 20px;
-}
-
 /* Music-On-Hold Feature */
 .monster-feature-popup-container[data-feature="music_on_hold"] .media-dropdown {
 	margin-bottom: 0px;
@@ -957,6 +929,35 @@
 
 		.caller-id-select {
 			margin-top: 5px;
+		}
+	}
+
+	&[data-feature="conferencing"] {
+		form {
+			margin-bottom: 0;
+
+			.list-numbers {
+				display: inline-block;
+				font-weight: 600;
+				height: 65px;
+				line-height: 15px;
+				margin-left: 25px;
+				overflow: auto;
+				vertical-align: middle;
+				width: 180px;
+
+				&[data-count="1"] {
+					line-height: 61px;
+				}
+
+				&[data-count="2"] {
+					line-height: 32px;
+				}
+
+				&[data-count="3"] {
+					line-height: 20px;
+				}
+			}
 		}
 	}
 }
