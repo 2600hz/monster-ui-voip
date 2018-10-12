@@ -762,39 +762,6 @@
 	margin-right: 10px;
 }
 
-/* Find me Follow me feature popup */
-.monster-feature-popup-container[data-feature="find_me_follow_me"] {
-	width: 620px;
-}
-
-#find_me_follow_me_form {
-	margin: 0;
-}
-
-#find_me_follow_me_form .no-device {
-	color: red;
-	font-size: 18px;
-	padding: 10px;
-}
-
-#find_me_follow_me_form .grid-time .grid-time-row {
-	background-color: inherit;
-}
-#find_me_follow_me_form .grid-time .grid-time-row .name {
-	width: 25%;
-}
-#find_me_follow_me_form .grid-time .grid-time-row .times {
-	width: 65%;
-}
-#find_me_follow_me_form .grid-time .grid-time-row .scale-container {
-	right: 10%;
-	left: 25%;
-}
-#find_me_follow_me_form .grid-time .grid-time-row-placeholder {
-	height: 52px;
-	background-color: inherit;
-}
-
 /********* CSS for device popovers (appended directly on the body) *********/
 .device-popover-icon {
 	margin-right: 10px;
@@ -956,6 +923,42 @@
 
 			#helper_content {
 				margin-top: 10px;
+			}
+		}
+	}
+
+	&[data-feature="find_me_follow_me"] {
+		width: 620px;
+
+		#find_me_follow_me_form {
+			margin: 0;
+
+			.no-device {
+				color: red;
+				font-size: 18px;
+				padding: 10px;
+			}
+
+			.grid-time {
+				.grid-time-row {
+					background-color: inherit;
+
+					.name {
+						width: 25%;
+					}
+					.times {
+						width: 65%;
+					}
+					.scale-container {
+						right: 10%;
+						left: 25%;
+					}
+				}
+
+				.grid-time-row-placeholder {
+					height: 52px;
+					background-color: inherit;
+				}
 			}
 		}
 	}
