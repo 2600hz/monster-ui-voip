@@ -1,3 +1,5 @@
+@import '../../../../css/partials/base';
+
 #users_container_overlay {
 	position: fixed;
 	top: 0;
@@ -555,7 +557,7 @@
 .monster-feature-popup-container .feature-fa-wrapper{
 	display: inline-block;
 	margin: 20px;
-	width: 60px;
+	min-width: 60px;
 	height: 60px;
 
 	border: 5px solid #DDDDDD;
@@ -918,10 +920,7 @@
 }
 
 .monster-feature-popup-container[data-feature="call_forward"] .btn-group {
-	float: right;
 	font-size: 14px;
-	margin-right: 25px;
-	margin-top: 40px;
 }
 
 .monster-feature-popup-container[data-feature="call_forward"] .failover-info {
@@ -939,4 +938,25 @@
 
 .monster-feature-popup-container[data-feature="call_recording"] .btn-group-wrapper .btn-group {
 	margin-left: 10px;
+}
+
+.monster-feature-popup-container {
+	.feature-popup-title {
+		display: flex;
+		align-items: center;
+
+		.popup-title {
+			display: flex;
+			align-items: center;
+
+			.feature-title {
+				max-height: 4em;
+				overflow-y: hidden;
+			}
+		}
+
+		.popup-action {
+			margin: 0 25px 0 20px;
+		}
+	}
 }
