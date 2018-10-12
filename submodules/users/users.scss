@@ -739,41 +739,6 @@
 	width: 192px;
 }
 
-/* Faxing Feature Popup */
-.monster-feature-popup-container[data-feature='faxing'] {
-	overflow: hidden;
-}
-
-.monster-feature-popup-container[data-feature='faxing'] #faxbox_form {
-	margin-bottom: 0;
-}
-
-.monster-feature-popup-container[data-feature='faxing'] #faxbox_form a {
-	color: #22a5ff;
-	text-decoration: underline;
-}
-
-.monster-feature-popup-container[data-feature='faxing'] #faxbox_form a:hover {
-	text-decoration: none;
-}
-
-.monster-feature-popup-container[data-feature='faxing'] #faxbox_form p {
-	line-height: 30px;
-}
-
-.monster-feature-popup-container[data-feature='faxing'] #faxbox_form .monster-primary-color {
-	color: #22a5ff;
-}
-
-.monster-feature-popup-container[data-feature='faxing'] #faxbox_form .number-selector {
-	display: inline-block;
-	margin: 0 10px;
-}
-
-.monster-feature-popup-container[data-feature='faxing'] #faxbox_form #helper_content {
-	margin-top: 10px;
-}
-
 /* Change Password Popup */
 .smart-edit-popup {
 	width: 430px;
@@ -957,6 +922,40 @@
 				&[data-count="3"] {
 					line-height: 20px;
 				}
+			}
+		}
+	}
+
+	&[data-feature='faxing'] {
+		overflow: hidden;
+
+		#faxbox_form {
+			margin-bottom: 0;
+
+			a {
+				color: #22a5ff;
+				text-decoration: underline;
+
+				&:hover {
+					text-decoration: none;
+				}
+			}
+
+			p {
+				line-height: 30px;
+			}
+
+			.monster-primary-color {
+				color: $primary-color;
+			}
+
+			.number-selector {
+				display: inline-block;
+				margin: 0 10px;
+			}
+
+			#helper_content {
+				margin-top: 10px;
 			}
 		}
 	}
