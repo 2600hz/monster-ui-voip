@@ -1,10 +1,14 @@
 <div class="monster-feature-popup-container" data-feature="hotdesk">
 	<div class="feature-popup-title">
-		<div class="feature-fa-wrapper">
-			<i class="{{extra.mapFeatures.hotdesk.icon}}"></i>
+		<div class="popup-title">
+			<div class="feature-fa-wrapper">
+				<i class="{{extra.mapFeatures.hotdesk.icon}}"></i>
+			</div>
+			<div class="feature-title">
+				{{ i18n.users.hotdesk.headline }}
+			</div>
 		</div>
-		{{ i18n.users.hotdesk.headline }}
-		<div class="switch">
+		<div class="switch popup-action">
 		{{#monsterSwitch}}
 			<input class="switch-state" type="checkbox" name="enabled" id="checkbox_hotdesk" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if extra.mapFeatures.hotdesk.active}} checked="checked"{{/if}}></input>
 		{{/monsterSwitch}}
