@@ -1221,7 +1221,7 @@ define(function(require) {
 										data: {
 											number: number
 										},
-										submodule: 'numbersItemRow'
+										submodule: 'groups'
 									})),
 									argsFeatures = {
 										target: rowTemplate.find('.edit-features'),
