@@ -687,15 +687,6 @@
 	margin-top: 25px;
 }
 
-/* Caller-ID User Feature Popup */
-.monster-feature-popup-container[data-feature="caller_id"] {
-	width: 525px;
-}
-
-.monster-feature-popup-container .caller-id-select {
-	margin-top: 5px;
-}
-
 /* Hot Desking User Feature Popup */
 .monster-feature-popup-container[data-feature="hotdesk"] #pin {
 	margin-top: 10px;
@@ -958,6 +949,14 @@
 
 		.btn-group {
 			margin-left: 10px;
+		}
+	}
+
+	&[data-feature="caller_id"] {
+		width: 525px;
+
+		.caller-id-select {
+			margin-top: 5px;
 		}
 	}
 }
