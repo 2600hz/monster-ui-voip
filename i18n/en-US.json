@@ -461,6 +461,7 @@
 		"addFromSpare": "Add from Spare Numbers",
 		"addFromSpareDevices": "Add from Spare Devices",
 		"buy": "Buy Numbers",
+		"createVmbox": "Create Voicemail Box for User",
 		"dialogChangePassword": {
 			"help": "You can set a new password by just typing any password you want, along with the Email address!",
 			"password": "Password",

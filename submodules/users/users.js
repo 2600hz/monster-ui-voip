@@ -1832,6 +1832,7 @@ define(function(require) {
 					sendToSameEmail: true,
 					nextExtension: '',
 					listExtensions: {},
+					createVmbox: true,
 					listVMBoxes: {}
 				},
 				arrayExtensions = [],
