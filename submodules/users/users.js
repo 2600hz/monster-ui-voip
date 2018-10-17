@@ -3569,10 +3569,7 @@ define(function(require) {
 						email: data.extra.differentEmail ? data.extra.email : data.user.username,
 						priv_level: 'user'
 					}, data.user),
-					vmbox: {
-						mailbox: data.callflow.extension,
-						name: fullName + self.appFlags.users.smartPBXVMBoxString
-					},
+					vmbox: { },
 					callflow: {
 						contact_list: {
 							exclude: false
@@ -3610,6 +3607,13 @@ define(function(require) {
 				};
 			} else {
 				delete formattedData.user.service;
+			}
+
+			if (data.vmbox.create) {
+				formattedData.vmbox = {
+					mailbox: data.callflow.extension,
+					name: fullName + self.appFlags.users.smartPBXVMBoxString
+				};
 			}
 
 			delete formattedData.user.extra;
@@ -3858,14 +3862,16 @@ define(function(require) {
 					});
 				},
 				function(_dataUser, callback) {
-					self.usersCreateVMBox(data.vmbox, function(_dataVM) {
-						var userId = _dataUser.id;
-						data.callflow.owner_id = userId;
-						data.callflow.type = 'mainUserCallflow';
-						data.callflow.flow.data.id = userId;
-						data.callflow.flow.children._.data.id = _dataVM.id;
-						callback(null, _dataUser);
-					});
+					if (!_.isEmpty(data.vmbox)) {
+						self.usersCreateVMBox(data.vmbox, function(_dataVM) {
+							var userId = _dataUser.id;
+							data.callflow.owner_id = userId;
+							data.callflow.type = 'mainUserCallflow';
+							data.callflow.flow.data.id = userId;
+							data.callflow.flow.children._.data.id = _dataVM.id;
+							callback(null, _dataUser);
+						});
+					}
 				},
 				function(_dataUser, callback) {
 					self.usersCreateCallflow(data.callflow, function(_dataCF) {

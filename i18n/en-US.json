@@ -461,7 +461,6 @@
 		"addFromSpare": "Add from Spare Numbers",
 		"addFromSpareDevices": "Add from Spare Devices",
 		"buy": "Buy Numbers",
-		"createVmbox": "Create Voicemail Box for User",
 		"dialogChangePassword": {
 			"help": "You can set a new password by just typing any password you want, along with the Email address!",
 			"password": "Password",
@@ -482,6 +481,7 @@
 		},
 		"dialogCreationUser": {
 			"createUser": "Create User",
+			"createVmbox": "Create Voicemail Box for User",
 			"errorOnCreation": "An error occured while trying to create this user:",
 			"extension": "Main Extension Number",
 			"extensionAlreadyExist": "This Extension is already taken, please choose a different Extension Number.",
