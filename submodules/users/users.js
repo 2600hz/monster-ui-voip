@@ -3840,36 +3840,55 @@ define(function(require) {
 		usersCreate: function(data, success, error) {
 			var self = this;
 
-			self.callApi({
-				resource: 'user.create',
-				data: {
-					accountId: self.accountId,
-					data: data.user
+			monster.waterfall([
+				function(callback) {
+					self.callApi({
+						resource: 'user.create',
+						data: {
+							accountId: self.accountId,
+							data: data.user
+						},
+						success: function(_dataUser) {
+							var userId = _dataUser.data.id;
+							data.user.id = userId;
+							data.vmbox.owner_id = userId;
+							callback(null, _dataUser);
+						},
+						error: function(parsedError) {
+							callback(parsedError);
+						}
+					});
 				},
-				success: function(_dataUser) {
-					var userId = _dataUser.data.id;
-					data.user.id = userId;
-					data.vmbox.owner_id = userId;
-
+				function(_dataUser, callback) {
 					self.usersCreateVMBox(data.vmbox, function(_dataVM) {
+						var userId = _dataUser.data.id;
 						data.callflow.owner_id = userId;
 						data.callflow.type = 'mainUserCallflow';
 						data.callflow.flow.data.id = userId;
 						data.callflow.flow.children._.data.id = _dataVM.id;
-
-						self.usersCreateCallflow(data.callflow, function(_dataCF) {
-							if (data.extra.includeInDirectory) {
-								self.usersAddUserToMainDirectory(_dataUser.data, _dataCF.id, function(dataDirectory) {
-									success(data);
-								});
-							} else {
-								success(data);
-							}
-						});
+						callback(null, _dataUser);
 					});
 				},
-				error: function() {
+				function(_dataUser, callback) {
+					self.usersCreateCallflow(data.callflow, function(_dataCF) {
+						callback(null, _dataUser, _dataCF);
+					});
+				},
+				function(_dataUser, _dataCF, callback) {
+					if (data.extra.includeInDirectory) {
+						self.usersAddUserToMainDirectory(_dataUser.data, _dataCF.id, function(dataDirectory) {
+							callback(null, data);
+						});
+					} else {
+						callback(null, data);
+					}
+				}
+			],
+			function(err, data) {
+				if (err) {
 					error();
+				} else {
+					success(data);
 				}
 			});
 		},
