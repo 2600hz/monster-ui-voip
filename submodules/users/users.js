@@ -3842,14 +3842,12 @@ define(function(require) {
 
 			monster.waterfall([
 				function(callback) {
-					self.callApi({
-						resource: 'user.create',
+					self.usersCreateUser({
 						data: {
-							accountId: self.accountId,
 							data: data.user
 						},
 						success: function(_dataUser) {
-							var userId = _dataUser.data.id;
+							var userId = _dataUser.id;
 							data.user.id = userId;
 							data.vmbox.owner_id = userId;
 							callback(null, _dataUser);
@@ -3861,7 +3859,7 @@ define(function(require) {
 				},
 				function(_dataUser, callback) {
 					self.usersCreateVMBox(data.vmbox, function(_dataVM) {
-						var userId = _dataUser.data.id;
+						var userId = _dataUser.id;
 						data.callflow.owner_id = userId;
 						data.callflow.type = 'mainUserCallflow';
 						data.callflow.flow.data.id = userId;
@@ -3876,7 +3874,7 @@ define(function(require) {
 				},
 				function(_dataUser, _dataCF, callback) {
 					if (data.extra.includeInDirectory) {
-						self.usersAddUserToMainDirectory(_dataUser.data, _dataCF.id, function(dataDirectory) {
+						self.usersAddUserToMainDirectory(_dataUser, _dataCF.id, function(dataDirectory) {
 							callback(null, data);
 						});
 					} else {
@@ -5215,6 +5213,23 @@ define(function(require) {
 				},
 				success: function(data) {
 					callback && callback(data.data);
+				}
+			});
+		},
+
+		usersCreateUser: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'user.create',
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
+				success: function(data, status) {
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(parsedError) {
+					args.hasOwnProperty('error') && args.error(parsedError);
 				}
 			});
 		}
