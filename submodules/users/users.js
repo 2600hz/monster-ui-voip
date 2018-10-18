@@ -3569,7 +3569,7 @@ define(function(require) {
 						email: data.extra.differentEmail ? data.extra.email : data.user.username,
 						priv_level: 'user'
 					}, data.user),
-					vmbox: { },
+					vmbox: {},
 					callflow: {
 						contact_list: {
 							exclude: false
@@ -3609,7 +3609,7 @@ define(function(require) {
 				delete formattedData.user.service;
 			}
 
-			if (data.vmbox.create) {
+			if (data.extra.createVmbox) {
 				formattedData.vmbox = {
 					mailbox: data.callflow.extension,
 					name: fullName + self.appFlags.users.smartPBXVMBoxString
@@ -3855,9 +3855,6 @@ define(function(require) {
 							data.user.id = userId;
 							data.vmbox.owner_id = userId;
 							callback(null, _dataUser);
-						},
-						error: function(parsedError) {
-							callback(parsedError);
 						}
 					});
 				},
@@ -3871,6 +3868,8 @@ define(function(require) {
 							data.callflow.flow.children._.data.id = _dataVM.id;
 							callback(null, _dataUser);
 						});
+					} else {
+						callback(null, _dataUser);
 					}
 				},
 				function(_dataUser, callback) {
@@ -3881,14 +3880,14 @@ define(function(require) {
 				function(_dataUser, _dataCF, callback) {
 					if (data.extra.includeInDirectory) {
 						self.usersAddUserToMainDirectory(_dataUser, _dataCF.id, function(dataDirectory) {
-							callback(null, data);
+							callback(null);
 						});
 					} else {
-						callback(null, data);
+						callback(null);
 					}
 				}
 			],
-			function(err, data) {
+			function(err) {
 				if (err) {
 					error();
 				} else {
