@@ -3862,7 +3862,7 @@ define(function(require) {
 					});
 				},
 				function(_dataUser, callback) {
-					if (!_.isEmpty(data.vmbox)) {
+					if (data.extra.createVmbox) {
 						self.usersCreateVMBox(data.vmbox, function(_dataVM) {
 							var userId = _dataUser.id;
 							data.callflow.owner_id = userId;
