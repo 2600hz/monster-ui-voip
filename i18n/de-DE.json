@@ -479,6 +479,7 @@
 		},
 		"dialogCreationUser": {
 			"createUser": "Benutzer erstellen",
+			"createVmbox": "Erstellen Sie eine Voicemail-Box für den Benutzer",
 			"errorOnCreation": "Bei der Erstellung dieses Benutzers ist ein Fehler aufgetreten:",
 			"extension": "Hauptnebenstelle",
 			"extensionAlreadyExist": "Diese Nebenstelle ist bereits vergeben. Bitte wählen Sie eine andere Nebenstelle.",

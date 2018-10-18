@@ -407,6 +407,7 @@
 		},
 		"dialogCreationUser": {
 			"createUser": "Crear usuario",
+			"createVmbox": "Crear buzón de voz para el usuario",
 			"errorOnCreation": "Se ha producido un error al intentar crear este usuario:",
 			"extension": "Número de la extensión principal",
 			"extensionAlreadyExist": "Esta extensión ya está tomada, por favor, elija un número diferente extensión.",
