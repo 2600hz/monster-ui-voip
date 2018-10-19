@@ -3853,12 +3853,11 @@ define(function(require) {
 							data: data.user
 						},
 						success: function(_dataUser) {
-							var userId = _dataUser.id;
-							data.user.id = userId;
+							data.user.id = _dataUser.id;
 							callback(null, _dataUser);
 						},
 						error: function(parsedError) {
-							callback(parsedError);
+							callback(true);
 						},
 						onChargesCancelled: function() {
 							callback(true);

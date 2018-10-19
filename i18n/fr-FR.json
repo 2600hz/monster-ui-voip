@@ -383,7 +383,6 @@
 		},
 		"dialogCreationUser": {
 			"createUser": "Créer utilisateur",
-			"createVmbox": "Créer une boîte vocale pour l'utilisateur",
 			"errorOnCreation": "Une erreur est survenue lors de la création de l'utilisateur:",
 			"extension": "Num. Extension",
 			"extensionAlreadyExist": "Cette extension est déjà prise, veuillez choisir un numéro différent.",
