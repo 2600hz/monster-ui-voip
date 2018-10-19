@@ -3949,7 +3949,12 @@ define(function(require) {
 					user: user,
 					needVMUpdate: false,
 					callback: function(_dataVM) {
-						callflow.flow.children._.data.id = _dataVM.id;
+						if (_.isEmpty(_dataVM)) {
+							// Remove VMBox from callflow if there is none
+							callflow.flow.children = {};
+						} else {
+							callflow.flow.children._.data.id = _dataVM.id;
+						}
 
 						self.usersCreateCallflow(callflow,
 							function(_dataCF) {
@@ -4883,12 +4888,20 @@ define(function(require) {
 				user = args.user,
 				needVMUpdate = args.needVMUpdate || true,
 				callback = args.callback,
-				oldPresenceId = args.oldPresenceId || undefined,
-				userExtension = args.userExtension;
+				oldPresenceId = args.oldPresenceId || undefined;
 
 			self.usersListVMBoxesUser(user.id, function(vmboxes) {
-				if (vmboxes.length > 0) {
-					if (needVMUpdate) {
+				if (vmboxes.length === 0) {
+					callback && callback(null);
+					return;
+				}
+				if (!needVMUpdate) {
+					callback && callback(vmboxes[0]);
+					return;
+				}
+
+				monster.waterfall([
+					function(wfCallback) {
 						self.usersGetVMBox(vmboxes[0].id, function(vmbox) {
 							vmbox.name = user.first_name + ' ' + user.last_name + self.appFlags.users.smartPBXVMBoxString;
 							// We only want to update the vmbox number if it was already synced with the presenceId (and if the presenceId was not already set)
@@ -4898,24 +4911,17 @@ define(function(require) {
 								vmbox.mailbox = (user.presence_id && user.presence_id !== 'unset') ? user.presence_id + '' : vmbox.mailbox;
 							}
 
-							self.usersUpdateVMBox(vmbox, function(vmboxSaved) {
-								callback && callback(vmboxSaved);
-							});
+							wfCallback(null, vmbox);
 						});
-					} else {
-						callback && callback(vmboxes[0]);
+					},
+					function(vmbox, wfCallback) {
+						self.usersUpdateVMBox(vmbox, function(vmboxSaved) {
+							wfCallback(null, vmboxSaved);
+						});
 					}
-				} else {
-					var vmbox = {
-						owner_id: user.id,
-						mailbox: user.presence_id || userExtension || user.extra.vmbox.mailbox,
-						name: user.first_name + ' ' + user.last_name + self.appFlags.users.smartPBXVMBoxString
-					};
-
-					self.usersCreateVMBox(vmbox, function(vmbox) {
-						callback && callback(vmbox);
-					});
-				}
+				], function(err, vmboxSaved) {
+					callback && callback(vmboxSaved);
+				});
 			});
 		},
 
