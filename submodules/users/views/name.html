@@ -13,14 +13,16 @@
 				<a href="javascript:void(0);" id="change_username" class="monster-link blue">{{i18n.users.editionForm.changeUsername}}</a>
 			</div>
 
-			<div class="row-fields vmbox">
-				<div class="fa fa-wrapper" data-original-title="{{i18n.users.editionForm.vmboxHelp}}" data-placement="top" data-toggle="tooltip"><i class="icon-telicon-voicemail"></i></div>
-				<label for="vmbox_number">
-					{{ i18n.users.editionForm.vmboxNumber }}
-				</label>
-				{{extra.vmbox.mailbox}}
-				<a href="javascript:void(0);" id="change_pin" class="monster-link blue">{{i18n.users.editionForm.changePIN}}</a>
-			</div>
+			{{#if extra.vmbox.id}}
+				<div class="row-fields vmbox">
+					<div class="fa fa-wrapper" data-original-title="{{i18n.users.editionForm.vmboxHelp}}" data-placement="top" data-toggle="tooltip"><i class="icon-telicon-voicemail"></i></div>
+					<label for="vmbox_number">
+						{{ i18n.users.editionForm.vmboxNumber }}
+					</label>
+					{{extra.vmbox.mailbox}}
+					<a href="javascript:void(0);" id="change_pin" class="monster-link blue">{{i18n.users.editionForm.changePIN}}</a>
+				</div>
+			{{/if}}
 
 			<div class="email-border{{#if extra.differentEmail }} open{{/if}}">
 				<div class="row-fields email-checkbox">

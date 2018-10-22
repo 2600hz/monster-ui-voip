@@ -1832,6 +1832,7 @@ define(function(require) {
 					sendToSameEmail: true,
 					nextExtension: '',
 					listExtensions: {},
+					createVmbox: true,
 					listVMBoxes: {}
 				},
 				arrayExtensions = [],
@@ -3611,6 +3612,12 @@ define(function(require) {
 				delete formattedData.user.service;
 			}
 
+			if (!data.extra.createVmbox) {
+				// Remove vmbox from formatted data and user callflow
+				delete formattedData.vmbox;
+				delete formattedData.callflow.flow.children._;
+			}
+
 			delete formattedData.user.extra;
 
 			return formattedData;
@@ -3839,37 +3846,63 @@ define(function(require) {
 		usersCreate: function(data, success, error) {
 			var self = this;
 
-			self.callApi({
-				resource: 'user.create',
-				data: {
-					accountId: self.accountId,
-					data: data.user
-				},
-				success: function(_dataUser) {
-					var userId = _dataUser.data.id;
-					data.user.id = userId;
-					data.vmbox.owner_id = userId;
-
-					self.usersCreateVMBox(data.vmbox, function(_dataVM) {
-						data.callflow.owner_id = userId;
-						data.callflow.type = 'mainUserCallflow';
-						data.callflow.flow.data.id = userId;
-						data.callflow.flow.children._.data.id = _dataVM.id;
-
-						self.usersCreateCallflow(data.callflow, function(_dataCF) {
-							if (data.extra.includeInDirectory) {
-								self.usersAddUserToMainDirectory(_dataUser.data, _dataCF.id, function(dataDirectory) {
-									success(data);
-								});
-							} else {
-								success(data);
-							}
-						});
+			monster.waterfall([
+				function(callback) {
+					self.usersCreateUser({
+						data: {
+							data: data.user
+						},
+						success: function(_dataUser) {
+							data.user.id = _dataUser.id;
+							callback(null, _dataUser);
+						},
+						error: function(parsedError) {
+							callback(true);
+						},
+						onChargesCancelled: function() {
+							callback(true);
+						}
 					});
 				},
-				error: function() {
-					error();
+				function(_dataUser, callback) {
+					if (!data.extra.createVmbox) {
+						callback(null, _dataUser);
+						return;
+					}
+
+					data.vmbox.owner_id = _dataUser.id;
+					self.usersCreateVMBox(data.vmbox, function(_dataVM) {
+						data.callflow.flow.children._.data.id = _dataVM.id;
+						callback(null, _dataUser);
+					});
+				},
+				function(_dataUser, callback) {
+					var userId = _dataUser.id;
+					data.callflow.owner_id = userId;
+					data.callflow.type = 'mainUserCallflow';
+					data.callflow.flow.data.id = userId;
+
+					self.usersCreateCallflow(data.callflow, function(_dataCF) {
+						callback(null, _dataUser, _dataCF);
+					});
+				},
+				function(_dataUser, _dataCF, callback) {
+					if (!data.extra.includeInDirectory) {
+						callback(null);
+						return;
+					}
+
+					self.usersAddUserToMainDirectory(_dataUser, _dataCF.id, function(dataDirectory) {
+						callback(null);
+					});
 				}
+			],
+			function(err) {
+				if (err) {
+					error();
+					return;
+				}
+				success(data);
 			});
 		},
 
@@ -3915,7 +3948,12 @@ define(function(require) {
 					user: user,
 					needVMUpdate: false,
 					callback: function(_dataVM) {
-						callflow.flow.children._.data.id = _dataVM.id;
+						if (_.isEmpty(_dataVM)) {
+							// Remove VMBox from callflow if there is none
+							callflow.flow.children = {};
+						} else {
+							callflow.flow.children._.data.id = _dataVM.id;
+						}
 
 						self.usersCreateCallflow(callflow,
 							function(_dataCF) {
@@ -4849,39 +4887,40 @@ define(function(require) {
 				user = args.user,
 				needVMUpdate = args.needVMUpdate || true,
 				callback = args.callback,
-				oldPresenceId = args.oldPresenceId || undefined,
-				userExtension = args.userExtension;
+				oldPresenceId = args.oldPresenceId || undefined;
 
 			self.usersListVMBoxesUser(user.id, function(vmboxes) {
-				if (vmboxes.length > 0) {
-					if (needVMUpdate) {
-						self.usersGetVMBox(vmboxes[0].id, function(vmbox) {
-							vmbox.name = user.first_name + ' ' + user.last_name + self.appFlags.users.smartPBXVMBoxString;
-							// We only want to update the vmbox number if it was already synced with the presenceId (and if the presenceId was not already set)
-							// This allows us to support old clients who have mailbox number != than their extension number
-							if (oldPresenceId === vmbox.mailbox) {
-								// If it's synced, then we update the vmbox number as long as the main extension is set to something different than 'unset' in which case we don't update the vmbox number value
-								vmbox.mailbox = (user.presence_id && user.presence_id !== 'unset') ? user.presence_id + '' : vmbox.mailbox;
-							}
-
-							self.usersUpdateVMBox(vmbox, function(vmboxSaved) {
-								callback && callback(vmboxSaved);
-							});
-						});
-					} else {
-						callback && callback(vmboxes[0]);
-					}
-				} else {
-					var vmbox = {
-						owner_id: user.id,
-						mailbox: user.presence_id || userExtension || user.extra.vmbox.mailbox,
-						name: user.first_name + ' ' + user.last_name + self.appFlags.users.smartPBXVMBoxString
-					};
-
-					self.usersCreateVMBox(vmbox, function(vmbox) {
-						callback && callback(vmbox);
-					});
+				if (_.isEmpty(vmboxes)) {
+					callback && callback({});
+					return;
 				}
+				if (!needVMUpdate) {
+					callback && callback(vmboxes[0]);
+					return;
+				}
+
+				monster.waterfall([
+					function(wfCallback) {
+						self.usersGetVMBox(vmboxes[0].id, function(vmbox) {
+							wfCallback(null, vmbox);
+						});
+					},
+					function(vmbox, wfCallback) {
+						vmbox.name = user.first_name + ' ' + user.last_name + self.appFlags.users.smartPBXVMBoxString;
+						// We only want to update the vmbox number if it was already synced with the presenceId (and if the presenceId was not already set)
+						// This allows us to support old clients who have mailbox number != than their extension number
+						if (oldPresenceId === vmbox.mailbox) {
+							// If it's synced, then we update the vmbox number as long as the main extension is set to something different than 'unset' in which case we don't update the vmbox number value
+							vmbox.mailbox = (user.presence_id && user.presence_id !== 'unset') ? user.presence_id + '' : vmbox.mailbox;
+						}
+
+						self.usersUpdateVMBox(vmbox, function(vmboxSaved) {
+							wfCallback(null, vmboxSaved);
+						});
+					}
+				], function(err, vmboxSaved) {
+					callback && callback(vmboxSaved);
+				});
 			});
 		},
 
@@ -5195,6 +5234,30 @@ define(function(require) {
 				},
 				success: function(data) {
 					callback && callback(data.data);
+				}
+			});
+		},
+
+		usersCreateUser: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'user.create',
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
+				success: function(data, status) {
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(parsedError) {
+					if (parsedError.error === '402') {
+						return;
+					}
+
+					args.hasOwnProperty('error') && args.error(parsedError);
+				},
+				onChargesCancelled: function() {
+					args.hasOwnProperty('onChargesCancelled') && args.onChargesCancelled();
 				}
 			});
 		}

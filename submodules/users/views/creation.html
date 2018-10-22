@@ -54,6 +54,14 @@
 
 	<div>
 		<div class="control-group hack-left">
+			<label class="control-label" for="create_vmbox"></label>
+			<div class="controls">
+				{{#monsterCheckbox i18n.users.dialogCreationUser.createVmbox }}
+					<input id="create_vmbox" type="checkbox" name="extra.createVmbox"{{#if createVmbox}} checked="checked"{{/if}}></input>
+				{{/monsterCheckbox}}
+			</div>
+		</div>
+		<div class="control-group hack-left">
 			<label class="control-label" for="include_directory"></label>
 			<div class="controls">
 				{{#monsterCheckbox i18n.users.includeInDirectory }}

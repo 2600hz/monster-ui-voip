@@ -481,6 +481,7 @@
 		},
 		"dialogCreationUser": {
 			"createUser": "Create User",
+			"createVmbox": "Create a voicemail box for this user",
 			"errorOnCreation": "An error occured while trying to create this user:",
 			"extension": "Main Extension Number",
 			"extensionAlreadyExist": "This Extension is already taken, please choose a different Extension Number.",
