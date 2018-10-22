@@ -3900,9 +3900,9 @@ define(function(require) {
 			function(err) {
 				if (err) {
 					error();
-				} else {
-					success(data);
+					return;
 				}
+				success(data);
 			});
 		},
 
@@ -4890,8 +4890,8 @@ define(function(require) {
 				oldPresenceId = args.oldPresenceId || undefined;
 
 			self.usersListVMBoxesUser(user.id, function(vmboxes) {
-				if (vmboxes.length === 0) {
-					callback && callback(null);
+				if (_.isEmpty(vmboxes)) {
+					callback && callback({});
 					return;
 				}
 				if (!needVMUpdate) {
@@ -4902,18 +4902,18 @@ define(function(require) {
 				monster.waterfall([
 					function(wfCallback) {
 						self.usersGetVMBox(vmboxes[0].id, function(vmbox) {
-							vmbox.name = user.first_name + ' ' + user.last_name + self.appFlags.users.smartPBXVMBoxString;
-							// We only want to update the vmbox number if it was already synced with the presenceId (and if the presenceId was not already set)
-							// This allows us to support old clients who have mailbox number != than their extension number
-							if (oldPresenceId === vmbox.mailbox) {
-								// If it's synced, then we update the vmbox number as long as the main extension is set to something different than 'unset' in which case we don't update the vmbox number value
-								vmbox.mailbox = (user.presence_id && user.presence_id !== 'unset') ? user.presence_id + '' : vmbox.mailbox;
-							}
-
 							wfCallback(null, vmbox);
 						});
 					},
 					function(vmbox, wfCallback) {
+						vmbox.name = user.first_name + ' ' + user.last_name + self.appFlags.users.smartPBXVMBoxString;
+						// We only want to update the vmbox number if it was already synced with the presenceId (and if the presenceId was not already set)
+						// This allows us to support old clients who have mailbox number != than their extension number
+						if (oldPresenceId === vmbox.mailbox) {
+							// If it's synced, then we update the vmbox number as long as the main extension is set to something different than 'unset' in which case we don't update the vmbox number value
+							vmbox.mailbox = (user.presence_id && user.presence_id !== 'unset') ? user.presence_id + '' : vmbox.mailbox;
+						}
+
 						self.usersUpdateVMBox(vmbox, function(vmboxSaved) {
 							wfCallback(null, vmboxSaved);
 						});
