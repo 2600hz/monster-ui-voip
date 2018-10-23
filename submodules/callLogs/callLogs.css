@@ -195,14 +195,20 @@
 
 #call_logs_container .sub-cell {
 	height: 20px;
-	overflow: visible;
+	overflow: hidden;
 	text-overflow: ellipsis;
 }
 #call_logs_container .sub-cell.single-cell {
 	height: 40px;
+	line-height: 40px;
+}
+
+#call_logs_container .hangup .sub-cell.single-cell {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	line-height: normal;
+    overflow: visible;
 }
 
 #call_logs_container .call-logs-loader {
