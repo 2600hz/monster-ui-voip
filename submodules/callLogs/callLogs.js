@@ -405,7 +405,6 @@ define(function(require) {
 						duration: durationMin + ':' + durationSec,
 						hangupCause: _.chain(self.i18n.active().hangupCauses[cdr.hangup_cause])
 							.get('label', cdr.hangup_cause)
-							.replace('_', ' ')
 							.lowerCase()
 							.value(),
 						hangupHelp: hangupHelp,
