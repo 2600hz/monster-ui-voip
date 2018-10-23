@@ -181,7 +181,7 @@
 	width: 100%;
 }
 #call_logs_container .grid-row:not(.header-row) .grid-cell.hangup .cause-title {
-	text-transform: lowercase;
+	text-transform: capitalize;
 	font-size: 12px;
 	font-style: italic;
 }

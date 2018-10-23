@@ -403,7 +403,11 @@ define(function(require) {
 						toName: cdr.callee_id_name,
 						toNumber: cdr.callee_id_number || ('request' in cdr) ? cdr.request.replace(/@.*/, '') : cdr.to.replace(/@.*/, ''),
 						duration: durationMin + ':' + durationSec,
-						hangupCause: cdr.hangup_cause,
+						hangupCause: _.chain(self.i18n.active().hangupCauses[cdr.hangup_cause])
+							.get('label', cdr.hangup_cause)
+							.replace('_', ' ')
+							.lowerCase()
+							.value(),
 						hangupHelp: hangupHelp,
 						isOutboundCall: isOutboundCall,
 						mailtoLink: 'mailto:' + monster.config.whitelabel.callReportEmail
