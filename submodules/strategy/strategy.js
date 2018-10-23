@@ -2378,6 +2378,15 @@ define(function(require) {
 					});
 				}
 			});
+
+			container.on('click', '.reset-button', function(e) {
+				e.preventDefault();
+
+				monster.ui.confirm(self.i18n.active().strategy.confirmMessages.resetCalls, function() {
+					// TODO: Delete callflows and menus. See line 3044 to understand how default menus and callflows are created.
+					console.log('Reset!!!!');
+				});
+			});
 		},
 
 		strategyRenderHolidayLine: function(container, holidayType, holiday) {
