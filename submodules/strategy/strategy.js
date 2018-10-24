@@ -4065,6 +4065,7 @@ define(function(require) {
 		},
 
 		strategyDeleteMenu: function(args) {
+			var self = this;
 			self.callApi({
 				resource: 'menu.delete',
 				data: {
@@ -4081,6 +4082,7 @@ define(function(require) {
 		},
 
 		strategyDeleteCallflow: function(args) {
+			var self = this;
 			self.callApi({
 				resource: 'callflow.delete',
 				data: {
