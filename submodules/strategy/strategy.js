@@ -2383,8 +2383,15 @@ define(function(require) {
 				e.preventDefault();
 
 				monster.ui.confirm(self.i18n.active().strategy.confirmMessages.resetCalls, function() {
-					// TODO: Delete callflows and menus. See line 3044 to understand how default menus and callflows are created.
-					console.log('Reset!!!!');
+					// TODO: Reload call strategy data
+					self.strategyDeleteCalls({
+						success: function() {
+							monster.ui.toast({
+								type: 'success',
+								message: self.i18n.active().strategy.toastrMessages.resetCallSuccess
+							});
+						}
+					});
 				});
 			});
 		},
@@ -2950,16 +2957,12 @@ define(function(require) {
 
 		strategyGetMainCallflows: function(callback) {
 			var self = this;
-			self.callApi({
-				resource: 'callflow.list',
-				data: {
-					accountId: self.accountId,
-					filters: {
-						'has_value': 'type',
-						'key_missing': ['owner_id', 'group_id']
-					}
+			self.strategyListCallflows({
+				filters: {
+					'has_value': 'type',
+					'key_missing': ['owner_id', 'group_id']
 				},
-				success: function(data, status) {
+				success: function(data) {
 					var parallelRequests = {},
 						menuRequests = {};
 
@@ -3232,15 +3235,17 @@ define(function(require) {
 		},
 
 		strategyGetFeatureCodes: function(callback) {
-			var self = this,
-				filters = {
+			var self = this;
+
+			self.strategyListCallflows({
+				filters: {
 					paginate: 'false',
 					has_key: 'featurecode'
-				};
-
-			self.strategyGetCallflows(function(listFeatureCodes) {
-				callback && callback(listFeatureCodes);
-			}, filters);
+				},
+				success: function(listFeatureCodes) {
+					callback && callback(listFeatureCodes);
+				}
+			});
 		},
 
 		strategyGetAllRules: function(globalCallback) {
@@ -3413,10 +3418,13 @@ define(function(require) {
 			monster.parallel(
 				{
 					callQueues: function(_callback) {
-						self.strategyGetCallflows(function(callQueuesData) {
-							_callback(null, callQueuesData);
-						}, {
-							'filter_flow.module': 'qubicle'
+						self.strategyListCallflows({
+							filters: {
+								'filter_flow.module': 'qubicle'
+							},
+							success: function(callQueuesData) {
+								_callback(null, callQueuesData);
+							}
 						});
 					},
 					users: function(_callback) {
@@ -3514,10 +3522,13 @@ define(function(require) {
 						});
 					},
 					advancedCallflows: function(_callback) {
-						self.strategyGetCallflows(function(advancedCallflowsData) {
-							_callback(null, advancedCallflowsData);
-						}, {
-							'filter_ui_is_main_number_cf': true
+						self.strategyListCallflows({
+							filters: {
+								'filter_ui_is_main_number_cf': true
+							},
+							success: function(advancedCallflowsData) {
+								_callback(null, advancedCallflowsData);
+							}
 						});
 					}
 				},
@@ -3673,17 +3684,20 @@ define(function(require) {
 			mainCallflow.flow.data.rules = ruleArray;
 		},
 
-		strategyGetCallflows: function(callback, filters) {
+		strategyListCallflows: function(args) {
 			var self = this;
 
 			self.callApi({
 				resource: 'callflow.list',
 				data: {
 					accountId: self.accountId,
-					filters: filters || {}
+					filters: args.filters || {}
 				},
 				success: function(callflowData) {
-					callback && callback(callflowData.data);
+					args.hasOwnProperty('success') && args.success(callflowData.data);
+				},
+				error: function(parsedError) {
+					args.hasOwnProperty('error') && args.error(parsedError);
 				}
 			});
 		},
@@ -3871,6 +3885,192 @@ define(function(require) {
 				},
 				error: function(data, status) {
 					args.hasOwnProperty('error') && args.error();
+				}
+			});
+		},
+
+		strategyGetCallflow: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'callflow.get',
+				data: {
+					accountId: self.accountId,
+					callflowId: args.data.id
+				},
+				success: function(data, status) {
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(data, status) {
+					args.hasOwnProperty('error') && args.error();
+				}
+			});
+		},
+
+		strategyDeleteCalls: function(args) {
+			var self = this;
+
+			monster.waterfall([
+				// Get main callflows
+				function(callback) {
+					self.strategyListCallflows({
+						filters: {
+							'paginate': false,
+							'has_value': 'type',
+							'filter_type': 'main',
+							'key_missing': [
+								'owner_id',
+								'group_id'
+							],
+							'filter_ui_metadata.origin': [
+								'voip'
+							]
+						},
+						success: function(data) {
+							callback(null,
+								_.reduce(data, function(obj, callflow) {
+									var label = callflow.name || callflow.numbers[0];
+									obj[label] = callflow;
+								}, {}));
+						},
+						error: function(parsedError) {
+							callback(parsedError);
+						}
+					});
+				},
+				// Delete menus and callflows
+				function(mainCallflows, callback) {
+					monster.parallel(
+						_.reduce(self.subCallflowsLabel, function(parallelCalls, label) {
+							var deleteSequence = self.strategyCreateSingleCallStrategyDeleteSequence(label, mainCallflows);
+
+							if (_.isEmpty(deleteSequence)) {
+								return;
+							}
+
+							parallelCalls.push(function(callback) {
+								monster.waterfall(deleteSequence, function(err, results) {
+									callback(null);
+								});
+							});
+						}, []),
+						function(err, results) {
+							callback(null);
+						});
+				}
+			], function(err, results) {
+				if (err) {
+					args.hasOwnProperty('error') && args.error(err);
+					return;
+				}
+				args.hasOwnProperty('success') && args.success(results);
+			});
+		},
+
+		strategyCreateSingleCallStrategyDeleteSequence: function(label, mainCallflows) {
+			var deleteSequence = [],
+				strategyCallflow = mainCallflows[label],
+				menuCallflow = mainCallflows[label + 'Menu'];
+
+			if (strategyCallflow) {
+				// Add function to delete call strategy callflow
+				deleteSequence.push(function(callback) {
+					self.strategyDeleteCallflow({
+						data: {
+							id: strategyCallflow.id
+						},
+						success: function() {
+							callback(null);
+						},
+						error: function() {
+							callback(true);
+						}
+					});
+				});
+			}
+
+			if (!menuCallflow) {
+				return deleteSequence;
+			}
+
+			// Has menu, so create functions to...
+
+			// ...get callflow details (to get menu ID),...
+			deleteSequence.push(function(callback) {
+				self.strategyGetCallflow({
+					data: {
+						id: menuCallflow.id
+					},
+					success: function(menuCallflowDetails) {
+						callback(null, menuCallflowDetails);
+					},
+					error: function() {
+						callback(true);
+					}
+				});
+			});
+
+			// ...then delete menu callflow
+			deleteSequence.push(function(callback) {
+				self.strategyDeleteCallflow({
+					data: {
+						id: menuCallflow.id
+					},
+					success: function() {
+						callback(null);
+					},
+					error: function() {
+						callback(true);
+					}
+				});
+			});
+
+			// ...and finally delete menu
+			deleteSequence.push(function(menuCallflowDetails, callback) {
+				self.strategyDeleteMenu({
+					data: {
+						id: menuCallflowDetails.flow.data.id
+					},
+					success: function() {
+						callback(null);
+					},
+					error: function() {
+						callback(true);
+					}
+				});
+			});
+
+			return deleteSequence;
+		},
+
+		strategyDeleteMenu: function(args) {
+			self.callApi({
+				resource: 'menu.delete',
+				data: {
+					accountId: self.accountId,
+					menuId: args.data.id
+				},
+				success: function(data, status) {
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(parsedError) {
+					args.hasOwnProperty('error') && args.error(parsedError);
+				}
+			});
+		},
+
+		strategyDeleteCallflow: function(args) {
+			self.callApi({
+				resource: 'callflow.delete',
+				data: {
+					accountId: self.accountId,
+					callflowId: args.data.id
+				},
+				success: function(data, status) {
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(parsedError) {
+					args.hasOwnProperty('error') && args.error(parsedError);
 				}
 			});
 		}
