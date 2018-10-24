@@ -2383,14 +2383,31 @@ define(function(require) {
 				e.preventDefault();
 
 				monster.ui.confirm(self.i18n.active().strategy.confirmMessages.resetCalls, function() {
-					// TODO: Reload call strategy data
-					self.strategyDeleteCalls({
-						success: function() {
-							monster.ui.toast({
-								type: 'success',
-								message: self.i18n.active().strategy.toastrMessages.resetCallSuccess
+					monster.waterfall([
+						function(callback) {
+							self.strategyDeleteCalls({
+								success: function() {
+									callback(null);
+								}
+							});
+						},
+						function(callback) {
+							self.strategyGetMainCallflows(function(callflows) {
+								strategyData.callflows = callflows;
+								callback(null, callflows);
 							});
 						}
+					], function(err, result) {
+						if (err) {
+							return;
+						}
+
+						container.hide();
+						container.parents('.element-container').removeClass('open');
+						monster.ui.toast({
+							type: 'success',
+							message: self.i18n.active().strategy.toastrMessages.resetCallSuccess
+						});
 					});
 				});
 			});
