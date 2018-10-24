@@ -2966,7 +2966,7 @@ define(function(require) {
 					var parallelRequests = {},
 						menuRequests = {};
 
-					_.each(data.data, function(val, key) {
+					_.each(data, function(val, key) {
 						if (val.type === 'main' || val.type === 'conference' || val.type === 'faxing') {
 							var name = val.name || val.numbers[0];
 							if (val.type === 'conference') {
@@ -3931,6 +3931,7 @@ define(function(require) {
 								_.reduce(data, function(obj, callflow) {
 									var label = callflow.name || callflow.numbers[0];
 									obj[label] = callflow;
+									return obj;
 								}, {}));
 						},
 						error: function(parsedError) {
@@ -3953,6 +3954,8 @@ define(function(require) {
 									callback(null);
 								});
 							});
+
+							return parallelCalls;
 						}, []),
 						function(err, results) {
 							callback(null);
@@ -3968,7 +3971,8 @@ define(function(require) {
 		},
 
 		strategyCreateSingleCallStrategyDeleteSequence: function(label, mainCallflows) {
-			var deleteSequence = [],
+			var self = this,
+				deleteSequence = [],
 				strategyCallflow = mainCallflows[label],
 				menuCallflow = mainCallflows[label + 'Menu'];
 
@@ -4011,13 +4015,13 @@ define(function(require) {
 			});
 
 			// ...then delete menu callflow
-			deleteSequence.push(function(callback) {
+			deleteSequence.push(function(menuCallflowDetails, callback) {
 				self.strategyDeleteCallflow({
 					data: {
 						id: menuCallflow.id
 					},
 					success: function() {
-						callback(null);
+						callback(null, menuCallflowDetails);
 					},
 					error: function() {
 						callback(true);
