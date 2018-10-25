@@ -2388,6 +2388,9 @@ define(function(require) {
 							self.strategyDeleteCalls({
 								success: function() {
 									callback(null);
+								},
+								error: function() {
+									callback(true);
 								}
 							});
 						},
@@ -3918,8 +3921,8 @@ define(function(require) {
 				success: function(data, status) {
 					args.hasOwnProperty('success') && args.success(data.data);
 				},
-				error: function(data, status) {
-					args.hasOwnProperty('error') && args.error();
+				error: function(parsedError) {
+					args.hasOwnProperty('error') && args.error(parsedError);
 				}
 			});
 		},
@@ -3928,7 +3931,7 @@ define(function(require) {
 			var self = this;
 
 			monster.waterfall([
-				// Get main callflows
+				// Get main callflows created via SmartPBX
 				function(callback) {
 					self.strategyListCallflows({
 						filters: {
@@ -3944,6 +3947,7 @@ define(function(require) {
 							]
 						},
 						success: function(data) {
+							// Convert callflows array to map object, then send to next step
 							callback(null,
 								_.reduce(data, function(obj, callflow) {
 									var label = callflow.name || callflow.numbers[0];
@@ -3963,7 +3967,7 @@ define(function(require) {
 							var deleteSequence = self.strategyCreateSingleCallStrategyDeleteSequence(label, mainCallflows);
 
 							if (_.isEmpty(deleteSequence)) {
-								return;
+								return parallelCalls;
 							}
 
 							parallelCalls.push(function(callback) {
@@ -3975,6 +3979,10 @@ define(function(require) {
 							return parallelCalls;
 						}, []),
 						function(err, results) {
+							if (err) {
+								callback(err);
+								return;
+							}
 							callback(null);
 						});
 				}
@@ -4014,7 +4022,7 @@ define(function(require) {
 				return deleteSequence;
 			}
 
-			// Has menu, so create functions to...
+			// There is a menu callflow, so create functions to...
 
 			// ...get callflow details (to get menu ID),...
 			deleteSequence.push(function(callback) {
