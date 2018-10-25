@@ -3009,14 +3009,12 @@ define(function(require) {
 						}
 
 						parallelRequests[name] = function(callback) {
-							self.callApi({
-								resource: 'callflow.get',
+							self.strategyGetCallflow({
 								data: {
-									accountId: self.accountId,
-									callflowId: val.id
+									id: val.id
 								},
-								success: function(data, status) {
-									callback(null, data.data);
+								success: function(data) {
+									callback(null, data);
 								}
 							});
 						};
@@ -3024,10 +3022,8 @@ define(function(require) {
 
 					if (!parallelRequests.MainConference) {
 						parallelRequests.MainConference = function(callback) {
-							self.callApi({
-								resource: 'callflow.create',
+							self.strategyCreateCallflow({
 								data: {
-									accountId: self.accountId,
 									data: {
 										contact_list: {
 											exclude: false
@@ -3042,8 +3038,8 @@ define(function(require) {
 										}
 									}
 								},
-								success: function(data, status) {
-									callback(null, data.data);
+								success: function(data) {
+									callback(null, data);
 								}
 							});
 						};
@@ -3051,10 +3047,8 @@ define(function(require) {
 
 					if (!parallelRequests.MainFaxing) {
 						parallelRequests.MainFaxing = function(callback) {
-							self.callApi({
-								resource: 'callflow.create',
+							self.strategyCreateCallflow({
 								data: {
-									accountId: self.accountId,
 									data: {
 										contact_list: {
 											exclude: false
@@ -3069,8 +3063,8 @@ define(function(require) {
 										}
 									}
 								},
-								success: function(data, status) {
-									callback(null, data.data);
+								success: function(data) {
+									callback(null, data);
 								}
 							});
 						};
@@ -3118,10 +3112,8 @@ define(function(require) {
 									});
 								},
 								function(menuData, innerCallback) {
-									self.callApi({
-										resource: 'callflow.create',
+									self.strategyCreateCallflow({
 										data: {
-											accountId: self.accountId,
 											data: {
 												contact_list: {
 													exclude: false
@@ -3137,8 +3129,8 @@ define(function(require) {
 												}
 											}
 										},
-										success: function(data, status) {
-											innerCallback(null, data.data);
+										success: function(data) {
+											innerCallback(null, data);
 										},
 										error: function(parsedError) {
 											innerCallback(true);
@@ -3159,10 +3151,8 @@ define(function(require) {
 							}
 
 							parallelRequests[val] = function(callback) {
-								self.callApi({
-									resource: 'callflow.create',
+								self.strategyCreateCallflow({
 									data: {
-										accountId: self.accountId,
 										data: {
 											contact_list: {
 												exclude: false
@@ -3178,8 +3168,8 @@ define(function(require) {
 											}
 										}
 									},
-									success: function(data, status) {
-										callback(null, data.data);
+									success: function(data) {
+										callback(null, data);
 									}
 								});
 							};
@@ -3202,10 +3192,8 @@ define(function(require) {
 								return;
 							}
 
-							self.callApi({
-								resource: 'callflow.create',
+							self.strategyCreateCallflow({
 								data: {
-									accountId: self.accountId,
 									data: {
 										contact_list: {
 											exclude: false
@@ -3228,8 +3216,8 @@ define(function(require) {
 										}
 									}
 								},
-								success: function(data, status) {
-									results.MainCallflow = data.data;
+								success: function(data) {
+									results.MainCallflow = data;
 									waterfallCallback(null, $.extend(true, mainCallflows, results));
 								}
 							});
@@ -3279,8 +3267,13 @@ define(function(require) {
 						}
 
 						listRequests.push(function(localCallback) {
-							self.strategyCreateCallflow(callflow, function(data) {
-								localCallback && localCallback(null, data);
+							self.strategyCreateCallflow({
+								data: {
+									data: callflow
+								},
+								success: function(data) {
+									localCallback && localCallback(null, data);
+								}
 							});
 						});
 					}
@@ -3764,17 +3757,17 @@ define(function(require) {
 			});
 		},
 
-		strategyCreateCallflow: function(callflow, callback) {
+		strategyCreateCallflow: function(args) {
 			var self = this;
 
 			self.callApi({
 				resource: 'callflow.create',
 				data: {
 					accountId: self.accountId,
-					data: callflow
+					data: args.data.data
 				},
 				success: function(callflowData) {
-					callback && callback(callflowData.data);
+					args.hasOwnProperty('success') && args.success(callflowData.data);
 				}
 			});
 		},
