@@ -3086,10 +3086,8 @@ define(function(require) {
 						menuRequests[menuName] = function(callback) {
 							monster.waterfall([
 								function(innerCallback) {
-									self.callApi({
-										resource: 'menu.create',
+									self.strategyCreateMenu({
 										data: {
-											accountId: self.accountId,
 											data: {
 												name: menuName,
 												record_pin: monster.util.randomString(4, '1234567890'),
@@ -3123,7 +3121,7 @@ define(function(require) {
 												flow: {
 													children: {},
 													data: {
-														id: menuData.data.id
+														id: menuData.id
 													},
 													module: 'menu'
 												}
@@ -3143,8 +3141,7 @@ define(function(require) {
 						};
 					});
 
-					monster.parallel(menuRequests, function(err, results) {
-						var mainCallflows = results;
+					monster.parallel(menuRequests, function(err, mainCallflows) {
 						_.each(self.subCallflowsLabel, function(val) {
 							if (parallelRequests[val]) {
 								return;
@@ -4105,6 +4102,23 @@ define(function(require) {
 			});
 
 			return deleteSequence;
+		},
+
+		strategyCreateMenu: function(args) {
+			var self = this;
+			self.callApi({
+				resource: 'menu.create',
+				data: {
+					accountId: self.accountId,
+					data: args.data.data
+				},
+				success: function(data, status) {
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(parsedError) {
+					args.hasOwnProperty('error') && args.error(parsedError);
+				}
+			});
 		},
 
 		strategyDeleteMenu: function(args) {
