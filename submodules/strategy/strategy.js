@@ -2975,38 +2975,51 @@ define(function(require) {
 			});
 		},
 
-		strategyGetMainCallflows: function(callback) {
+		strategyGetMainCallflows: function(mainCallback) {
 			var self = this;
-			self.strategyListCallflows({
-				filters: {
-					'has_value': 'type',
-					'key_missing': ['owner_id', 'group_id']
+			monster.waterfall([
+				function(waterfallCallback) {
+					self.strategyListCallflows({
+						filters: {
+							'has_value': 'type',
+							'key_missing': ['owner_id', 'group_id']
+						},
+						success: function(data) {
+							waterfallCallback(null, data);
+						},
+						error: function() {
+							waterfallCallback(true);
+						}
+					});
 				},
-				success: function(data) {
+				function(data, waterfallCallback) {
 					var parallelRequests = {},
 						menuRequests = {};
 
 					_.each(data, function(val, key) {
-						if (val.type === 'main' || val.type === 'conference' || val.type === 'faxing') {
-							var name = val.name || val.numbers[0];
-							if (val.type === 'conference') {
-								name = 'MainConference';
-							} else if (val.type === 'faxing') {
-								name = 'MainFaxing';
-							}
-							parallelRequests[name] = function(callback) {
-								self.callApi({
-									resource: 'callflow.get',
-									data: {
-										accountId: self.accountId,
-										callflowId: val.id
-									},
-									success: function(data, status) {
-										callback(null, data.data);
-									}
-								});
-							};
+						if (!_.includes(['main', 'conference', 'faxing'], val.type)) {
+							return;
 						}
+
+						var name = val.name || val.numbers[0];
+						if (val.type === 'conference') {
+							name = 'MainConference';
+						} else if (val.type === 'faxing') {
+							name = 'MainFaxing';
+						}
+
+						parallelRequests[name] = function(callback) {
+							self.callApi({
+								resource: 'callflow.get',
+								data: {
+									accountId: self.accountId,
+									callflowId: val.id
+								},
+								success: function(data, status) {
+									callback(null, data.data);
+								}
+							});
+						};
 					});
 
 					if (!parallelRequests.MainConference) {
@@ -3066,63 +3079,45 @@ define(function(require) {
 					_.each(self.subCallflowsLabel, function(val) {
 						var menuName = val + 'Menu';
 
-						if (!parallelRequests[menuName]) {
-							menuRequests[menuName] = function(callback) {
-								self.callApi({
-									resource: 'menu.create',
-									data: {
-										accountId: self.accountId,
-										data: {
-											name: menuName,
-											record_pin: monster.util.randomString(4, '1234567890'),
-											media: {
-												exit_media: true,
-												invalid_media: true,
-												transfer_media: true
-											},
-											retries: 3,
-											max_extension_length: 4,
-											type: 'main'
-										}
-									},
-									success: function(menuData, status) {
-										self.callApi({
-											resource: 'callflow.create',
-											data: {
-												accountId: self.accountId,
-												data: {
-													contact_list: {
-														exclude: false
-													},
-													numbers: [menuName],
-													type: 'main',
-													flow: {
-														children: {},
-														data: {
-															id: menuData.data.id
-														},
-														module: 'menu'
-													}
-												}
-											},
-											success: function(data, status) {
-												callback && callback(null, data.data);
-											}
-										});
-									}
-								});
-							};
-						} else if (!parallelRequests[val]) {
+						if (parallelRequests[menuName]) {
+							if (parallelRequests[val]) {
+								return;
+							}
+
 							menuRequests[menuName] = parallelRequests[menuName];
 							delete parallelRequests[menuName];
+							return;
 						}
-					});
 
-					monster.parallel(menuRequests, function(err, results) {
-						var mainCallflows = results;
-						_.each(self.subCallflowsLabel, function(val) {
-							if (!parallelRequests[val]) {
-								parallelRequests[val] = function(callback) {
+						menuRequests[menuName] = function(callback) {
+							monster.waterfall([
+								function(innerCallback) {
+									self.callApi({
+										resource: 'menu.create',
+										data: {
+											accountId: self.accountId,
+											data: {
+												name: menuName,
+												record_pin: monster.util.randomString(4, '1234567890'),
+												media: {
+													exit_media: true,
+													invalid_media: true,
+													transfer_media: true
+												},
+												retries: 3,
+												max_extension_length: 4,
+												type: 'main'
+											}
+										},
+										success: function(menuData) {
+											innerCallback(null, menuData);
+										},
+										error: function(parsedError) {
+											innerCallback(true);
+										}
+									});
+								},
+								function(menuData, innerCallback) {
 									self.callApi({
 										resource: 'callflow.create',
 										data: {
@@ -3131,27 +3126,39 @@ define(function(require) {
 												contact_list: {
 													exclude: false
 												},
-												numbers: [val],
+												numbers: [menuName],
 												type: 'main',
 												flow: {
 													children: {},
 													data: {
-														id: mainCallflows[val + 'Menu'].id
+														id: menuData.data.id
 													},
-													module: 'callflow'
+													module: 'menu'
 												}
 											}
 										},
 										success: function(data, status) {
-											callback(null, data.data);
+											innerCallback(null, data.data);
+										},
+										error: function(parsedError) {
+											innerCallback(true);
 										}
 									});
-								};
-							}
-						});
+								}
+							], function(err, result) {
+								!err && callback && callback(null, result);
+							});
+						};
+					});
 
-						monster.parallel(parallelRequests, function(err, results) {
-							if (!parallelRequests.MainCallflow) {
+					monster.parallel(menuRequests, function(err, results) {
+						var mainCallflows = results;
+						_.each(self.subCallflowsLabel, function(val) {
+							if (parallelRequests[val]) {
+								return;
+							}
+
+							parallelRequests[val] = function(callback) {
 								self.callApi({
 									resource: 'callflow.create',
 									data: {
@@ -3160,45 +3167,80 @@ define(function(require) {
 											contact_list: {
 												exclude: false
 											},
-											numbers: ['undefinedMainNumber'],
-											name: 'MainCallflow',
+											numbers: [val],
 											type: 'main',
 											flow: {
-												children: {
-													'_': {
-														children: {},
-														data: {
-															id: results.MainOpenHours.id
-														},
-														module: 'callflow'
-													}
+												children: {},
+												data: {
+													id: mainCallflows[val + 'Menu'].id
 												},
-												data: {},
-												module: 'temporal_route'
+												module: 'callflow'
 											}
 										}
 									},
 									success: function(data, status) {
-										results.MainCallflow = data.data;
-										callback($.extend(true, mainCallflows, results));
+										callback(null, data.data);
 									}
 								});
-							} else {
+							};
+						});
+
+						monster.parallel(parallelRequests, function(err, results) {
+							if (parallelRequests.MainCallflow) {
 								// For users who had undesired callflow with only "0" in it, we migrate it to our new empty main callflow "undefinedMainNumber"
 								if (results.MainCallflow.numbers && results.MainCallflow.numbers.length === 1 && results.MainCallflow.numbers[0] === '0') {
 									results.MainCallflow.numbers[0] = 'undefinedMainNumber';
 
 									self.strategyUpdateCallflow(results.MainCallflow, function(updatedCallflow) {
 										results.MainCallflow = updatedCallflow;
-										callback($.extend(true, mainCallflows, results));
+										waterfallCallback(null, $.extend(true, mainCallflows, results));
 									});
-								} else {
-									callback($.extend(true, mainCallflows, results));
+									return;
 								}
+
+								waterfallCallback(null, $.extend(true, mainCallflows, results));
+								return;
 							}
+
+							self.callApi({
+								resource: 'callflow.create',
+								data: {
+									accountId: self.accountId,
+									data: {
+										contact_list: {
+											exclude: false
+										},
+										numbers: ['undefinedMainNumber'],
+										name: 'MainCallflow',
+										type: 'main',
+										flow: {
+											children: {
+												'_': {
+													children: {},
+													data: {
+														id: results.MainOpenHours.id
+													},
+													module: 'callflow'
+												}
+											},
+											data: {},
+											module: 'temporal_route'
+										}
+									}
+								},
+								success: function(data, status) {
+									results.MainCallflow = data.data;
+									waterfallCallback(null, $.extend(true, mainCallflows, results));
+								}
+							});
 						});
 					});
 				}
+			], function(err, result) {
+				if (err) {
+					return;
+				}
+				mainCallback(result);
 			});
 		},
 
