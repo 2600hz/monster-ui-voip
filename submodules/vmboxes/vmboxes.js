@@ -224,52 +224,82 @@ define(function(require) {
 				var voicemailId = $(this).parents('.edit-vmbox').data('id');
 				var voicemailOwnerId = $(this).parents('.edit-vmbox').data('owner-id');
 
-				monster.waterfall([
-					function(callback) {
-						self.callApi({
-							resource: 'callflow.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									filter_owner_id: voicemailOwnerId,
-									filter_type: 'mainUserCallflow'
+				monster.ui.confirm(self.i18n.active().vmboxes.confirmDeleteVmbox, function() {
+					monster.waterfall([
+						function(callback) {
+							self.callApi({
+								resource: 'callflow.list',
+								data: {
+									accountId: self.accountId,
+									filters: {
+										filter_owner_id: voicemailOwnerId,
+										filter_type: 'mainUserCallflow'
+									}
+								},
+								success: function(callflowData) {
+									callback(null, callflowData);
 								}
-							},
-							success: function(callflowData) {
-								callback(null, callflowData);
-							}
-						});
-					},
-					function(callflowData, callback) {
-						var callflowId = _.get(_.head(callflowData.data), 'id', null);
+							});
+						},
+						function(callflowData, callback) {
+							var callflowId = _.get(_.head(callflowData.data), 'id', null);
 
-						self.callApi({
-							resource: 'callflow.get',
-							data: {
-								accountId: self.accountId,
-								callflowId: callflowId
-							},
-							success: function(callflowData) {
-								callback(null, callflowData);
-							}
-						});
-					},
-					function(callflowData, callback) {
-						var callflow = callflowData.data.flow;
-						self.recursiveSearch(voicemailId, callflow, 1, callflow);
+							self.callApi({
+								resource: 'callflow.get',
+								data: {
+									accountId: self.accountId,
+									callflowId: callflowId
+								},
+								success: function(callflowData) {
+									callback(null, callflowData);
+								}
+							});
+						},
+						function(callflowData, callback) {
+							var callflow = callflowData.data.flow;
+							self.recursiveSearch(voicemailId, callflow, 1, callflow);
 
-						callback(null, callflow);
-					}
-				], function(err, data) {
-					if (err) {
-						console.log('error', err);
-					}
+							callflowData.data.flow = callflow;
 
-					console.log('data', data);
-				});
+							callback(null, callflowData);
+						},
+						function(callflowData, callback) {
+							self.callApi({
+								resource: 'voicemail.delete',
+								data: {
+									accountId: self.accountId,
+									voicemailId: voicemailId,
+									data: {}
+								},
+								success: function(data) {
+									callback(null, data.data, callflowData);
+								},
+								error: function() {
+									callback(true);
+								}
+							});
+						},
+						function(vmbox, callflowData, callback) {
+							self.callApi({
+								resource: 'callflow.update',
+								data: {
+									accountId: self.accountId,
+									callflowId: callflowData.data.id,
+									data: callflowData.data
+								},
+								success: function() {
+									callback(null, vmbox, callflowData);
+								},
+								error: function() {
+									callback(true);
+								}
+							});
+						}
+					], function(error, vmbox) {
+						if (error) {
+							return;
+						}
 
-				/*monster.ui.confirm(self.i18n.active().vmboxes.confirmDeleteVmbox, function() {
-					self.vmboxesDeleteVmbox(voicemailId, function(vmbox) {
 						monster.ui.toast({
 							type: 'success',
 							message: self.getTemplate({
@@ -282,7 +312,7 @@ define(function(require) {
 
 						callbacks.afterDelete && callbacks.afterDelete(vmbox);
 					});
-				});*/
+				});
 			});
 
 			templateVMBox.find('.actions .cancel-link').on('click', function() {
@@ -446,12 +476,12 @@ define(function(require) {
 
 			if (_.get(children, 'data.id') === voicemailId && _.get(children, 'module', null) === 'voicemail') {
 				next = false;
-				var toRetriveData = {
-					children: {}
-				};
+				var toRetriveData = {};
 
-				if (!_.isEmpty(children, 'children._')) {
+				if (!_.isEmpty(children.children)) {
 					toRetriveData = _.get(children, 'children._', {});
+				} else {
+					objectPath = objectPath.slice(0, -2);
 				}
 
 				self.updateObject(callflow, objectPath, toRetriveData);
