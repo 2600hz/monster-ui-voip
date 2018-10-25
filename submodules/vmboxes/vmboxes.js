@@ -471,23 +471,23 @@ define(function(require) {
 			var self = this;
 			var objectPath = 'children._.'.repeat(level).slice(0, -1);
 
-			var children = _.get(callflow, objectPath, {});
+			var child = _.get(callflow, objectPath, {});
 			var next = true;
 
-			if (_.get(children, 'data.id') === voicemailId && _.get(children, 'module', null) === 'voicemail') {
+			if (_.get(child, 'data.id') === voicemailId && _.get(child, 'module') === 'voicemail') {
 				next = false;
 				var toRetriveData = {};
 
-				if (!_.isEmpty(children.children)) {
-					toRetriveData = _.get(children, 'children._', {});
+				if (!_.isEmpty(child.children)) {
+					toRetriveData = _.get(child, 'children._', {});
 				} else {
 					objectPath = objectPath.slice(0, -2);
 				}
 
 				self.updateObject(callflow, objectPath, toRetriveData);
-			} else if (!_.isEmpty(children) && next) {
+			} else if (!_.isEmpty(child) && next) {
 				level += 1;
-				self.recursiveSearch(voicemailId, children, level, callflow);
+				self.recursiveSearch(voicemailId, child, level, callflow);
 			}
 		},
 
