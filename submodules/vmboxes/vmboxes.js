@@ -222,8 +222,53 @@ define(function(require) {
 
 			templateVMBox.find('#delete_vmbox').on('click', function() {
 				var voicemailId = $(this).parents('.edit-vmbox').data('id');
+				var voicemailOwnerId = $(this).parents('.edit-vmbox').data('owner-id');
 
-				monster.ui.confirm(self.i18n.active().vmboxes.confirmDeleteVmbox, function() {
+				monster.waterfall([
+					function(callback) {
+						self.callApi({
+							resource: 'callflow.list',
+							data: {
+								accountId: self.accountId,
+								filters: {
+									filter_owner_id: voicemailOwnerId,
+									filter_type: 'mainUserCallflow'
+								}
+							},
+							success: function(callflowData) {
+								callback(null, callflowData);
+							}
+						});
+					},
+					function(callflowData, callback) {
+						var callflowId = _.get(_.head(callflowData.data), 'id', null);
+
+						self.callApi({
+							resource: 'callflow.get',
+							data: {
+								accountId: self.accountId,
+								callflowId: callflowId
+							},
+							success: function(callflowData) {
+								callback(null, callflowData);
+							}
+						});
+					},
+					function(callflowData, callback) {
+						var callflow = callflowData.data.flow;
+						self.recursiveSearch(voicemailId, callflow, 1, callflow);
+
+						callback(null, callflow);
+					}
+				], function(err, data) {
+					if (err) {
+						console.log('error', err);
+					}
+
+					console.log('data', data);
+				});
+
+				/*monster.ui.confirm(self.i18n.active().vmboxes.confirmDeleteVmbox, function() {
 					self.vmboxesDeleteVmbox(voicemailId, function(vmbox) {
 						monster.ui.toast({
 							type: 'success',
@@ -237,7 +282,7 @@ define(function(require) {
 
 						callbacks.afterDelete && callbacks.afterDelete(vmbox);
 					});
-				});
+				});*/
 			});
 
 			templateVMBox.find('.actions .cancel-link').on('click', function() {
@@ -384,6 +429,38 @@ define(function(require) {
 		},
 
 		/* Utils */
+		updateObject: function(object, path, value) {
+			var stack = path.split('.');
+			while (stack.length > 1) {
+				object = object[stack.shift()];
+			}
+			object[stack.shift()] = value;
+		},
+
+		recursiveSearch: function(voicemailId, item, level, callflow) {
+			var self = this;
+			var objectPath = 'children._.'.repeat(level).slice(0, -1);
+
+			var children = _.get(callflow, objectPath, {});
+			var next = true;
+
+			if (_.get(children, 'data.id') === voicemailId && _.get(children, 'module', null) === 'voicemail') {
+				next = false;
+				var toRetriveData = {
+					children: {}
+				};
+
+				if (!_.isEmpty(children, 'children._')) {
+					toRetriveData = _.get(children, 'children._', {});
+				}
+
+				self.updateObject(callflow, objectPath, toRetriveData);
+			} else if (!_.isEmpty(children) && next) {
+				level += 1;
+				self.recursiveSearch(voicemailId, children, level, callflow);
+			}
+		},
+
 		vmboxesDeleteVmbox: function(voicemailId, callback) {
 			var self = this;
 
