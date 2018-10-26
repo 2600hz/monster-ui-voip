@@ -471,12 +471,9 @@ define(function(require) {
 			var self = this,
 				objectPath = 'children._.'.repeat(level).slice(0, -1),
 				child = _.get(callflow, objectPath, {}),
-				next = true,
 				toRetriveData = {};
 
 			if (_.get(child, 'data.id') === voicemailId && _.get(child, 'module') === 'voicemail') {
-				next = false;
-
 				if (!_.isEmpty(child.children)) {
 					toRetriveData = _.get(child, 'children._', {});
 				} else {
@@ -484,7 +481,7 @@ define(function(require) {
 				}
 
 				self.updateObject(callflow, objectPath, toRetriveData);
-			} else if (!_.isEmpty(child) && next) {
+			} else {
 				level += 1;
 				self.recursiveSearch(voicemailId, child, level, callflow);
 			}
