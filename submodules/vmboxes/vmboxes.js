@@ -225,81 +225,7 @@ define(function(require) {
 				var voicemailOwnerId = $(this).parents('.edit-vmbox').data('owner-id');
 
 				monster.ui.confirm(self.i18n.active().vmboxes.confirmDeleteVmbox, function() {
-					monster.waterfall([
-						function(callback) {
-							self.callApi({
-								resource: 'callflow.list',
-								data: {
-									accountId: self.accountId,
-									filters: {
-										filter_owner_id: voicemailOwnerId,
-										filter_type: 'mainUserCallflow'
-									}
-								},
-								success: function(callflowData) {
-									callback(null, callflowData);
-								}
-							});
-						},
-						function(callflowData, callback) {
-							var callflowId = _.get(_.head(callflowData.data), 'id', null);
-
-							self.callApi({
-								resource: 'callflow.get',
-								data: {
-									accountId: self.accountId,
-									callflowId: callflowId
-								},
-								success: function(callflowData) {
-									callback(null, callflowData);
-								}
-							});
-						},
-						function(callflowData, callback) {
-							var callflow = callflowData.data.flow;
-							self.recursiveSearch(voicemailId, callflow, 1, callflow);
-
-							callflowData.data.flow = callflow;
-
-							callback(null, callflowData);
-						},
-						function(callflowData, callback) {
-							self.callApi({
-								resource: 'voicemail.delete',
-								data: {
-									accountId: self.accountId,
-									voicemailId: voicemailId,
-									data: {}
-								},
-								success: function(data) {
-									callback(null, data.data, callflowData);
-								},
-								error: function() {
-									callback(true);
-								}
-							});
-						},
-						function(vmbox, callflowData, callback) {
-							self.callApi({
-								resource: 'callflow.update',
-								data: {
-									accountId: self.accountId,
-									callflowId: callflowData.data.id,
-									data: callflowData.data
-								},
-								success: function() {
-									callback(null, vmbox, callflowData);
-								},
-								error: function() {
-									callback(true);
-								}
-							});
-						}
-					], function(error, vmbox) {
-						if (error) {
-							return;
-						}
-
+					self.vmboxesDeleteVmbox(voicemailId, voicemailOwnerId, function(vmbox) {
 						monster.ui.toast({
 							type: 'success',
 							message: self.getTemplate({
@@ -487,19 +413,85 @@ define(function(require) {
 			}
 		},
 
-		vmboxesDeleteVmbox: function(voicemailId, callback) {
+		vmboxesDeleteVmbox: function(voicemailId, voicemailOwnerId, callbackDelete) {
 			var self = this;
 
-			self.callApi({
-				resource: 'voicemail.delete',
-				data: {
-					accountId: self.accountId,
-					voicemailId: voicemailId,
-					data: {}
+			monster.waterfall([
+				function(callback) {
+					self.callApi({
+						resource: 'callflow.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								filter_owner_id: voicemailOwnerId,
+								filter_type: 'mainUserCallflow'
+							}
+						},
+						success: function(callflowData) {
+							callback(null, callflowData);
+						}
+					});
 				},
-				success: function(data) {
-					callback(data.data);
+				function(callflowData, callback) {
+					var callflowId = _.get(_.head(callflowData.data), 'id', null);
+
+					self.callApi({
+						resource: 'callflow.get',
+						data: {
+							accountId: self.accountId,
+							callflowId: callflowId
+						},
+						success: function(callflowData) {
+							callback(null, callflowData);
+						}
+					});
+				},
+				function(callflowData, callback) {
+					var callflow = callflowData.data.flow;
+					self.recursiveSearch(voicemailId, callflow, 1, callflow);
+
+					callflowData.data.flow = callflow;
+
+					callback(null, callflowData);
+				},
+				function(callflowData, callback) {
+					self.callApi({
+						resource: 'voicemail.delete',
+						data: {
+							accountId: self.accountId,
+							voicemailId: voicemailId,
+							data: {}
+						},
+						success: function(data) {
+							callback(null, data.data, callflowData);
+						},
+						error: function() {
+							callback(true);
+						}
+					});
+				},
+				function(vmbox, callflowData, callback) {
+					self.callApi({
+						resource: 'callflow.update',
+						data: {
+							accountId: self.accountId,
+							callflowId: callflowData.data.id,
+							data: callflowData.data
+						},
+						success: function() {
+							callback(null, vmbox, callflowData);
+						},
+						error: function() {
+							callback(true);
+						}
+					});
 				}
+			], function(error, vmbox) {
+				if (error) {
+					return;
+				}
+
+				callbackDelete(vmbox);
 			});
 		},
 
