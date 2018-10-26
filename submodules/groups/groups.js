@@ -1054,7 +1054,14 @@ define(function(require) {
 							});
 						},
 						function(callback) {
+							data.callflow.name = data.group.name + ' Base Group';
 							self.groupsUpdateCallflow(data.callflow, function(data) {
+								callback(null);
+							});
+						},
+						function(callback) {
+							data.callflowRingGroup.name = data.group.name + ' Ring Group';
+							self.groupsUpdateCallflow(data.callflowRingGroup, function(data) {
 								callback(null);
 							});
 						}
@@ -1549,6 +1556,11 @@ define(function(require) {
 				},
 				callflow: function(callback) {
 					self.groupsGetBaseRingGroup(groupId, function(data) {
+						callback(null, data);
+					});
+				},
+				callflowRingGroup: function(callback) {
+					self.groupsGetRingGroup(groupId, function(data) {
 						callback(null, data);
 					});
 				}
@@ -2099,11 +2111,13 @@ define(function(require) {
 			delete callflow.metadata;
 
 			self.callApi({
-				resource: 'callflow.update',
+				resource: 'callflow.patch',
 				data: {
 					accountId: self.accountId,
 					callflowId: callflow.id,
-					data: callflow
+					data: {
+						name: callflow.name
+					}
 				},
 				success: function(data) {
 					callback && callback(data.data);
