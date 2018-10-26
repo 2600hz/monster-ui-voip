@@ -208,7 +208,6 @@
 	justify-content: center;
 	align-items: center;
 	line-height: normal;
-	overflow: visible;
 }
 
 #call_logs_container .call-logs-loader {
