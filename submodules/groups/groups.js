@@ -1046,6 +1046,8 @@ define(function(require) {
 					//formData = self.groupsCleanNameData(formData);
 
 					data = $.extend(true, {}, data, formData);
+					var baseGroupName = data.group.name + ' Base Group';
+					var ringGroupName = data.group.name + ' Ring Group';
 
 					monster.parallel([
 						function(callback) {
@@ -1054,16 +1056,24 @@ define(function(require) {
 							});
 						},
 						function(callback) {
-							data.callflow.name = data.group.name + ' Base Group';
-							self.groupsUpdateCallflow(data.callflow, function(data) {
+							if (baseGroupName !== data.callflow.name) {
+								data.callflow.name = baseGroupName;
+								self.groupsUpdateCallflow(data.callflow, function(data) {
+									callback(null);
+								});
+							} else {
 								callback(null);
-							});
+							}
 						},
 						function(callback) {
-							data.callflowRingGroup.name = data.group.name + ' Ring Group';
-							self.groupsUpdateCallflow(data.callflowRingGroup, function(data) {
+							if (ringGroupName !== data.callflowRingGroup.name) {
+								data.callflowRingGroup.name = ringGroupName;
+								self.groupsUpdateCallflow(data.callflowRingGroup, function(data) {
+									callback(null);
+								});
+							} else {
 								callback(null);
-							});
+							}
 						}
 					], function(err, results) {
 						self.groupsRender({ groupId: data.group.id });
