@@ -221,11 +221,12 @@ define(function(require) {
 			});
 
 			templateVMBox.find('#delete_vmbox').on('click', function() {
-				var voicemailId = $(this).parents('.edit-vmbox').data('id');
-				var voicemailOwnerId = $(this).parents('.edit-vmbox').data('owner-id');
+				var $this = $(this);
+				var $voicemailId = $this.parents('.edit-vmbox').data('id');
+				var $voicemailOwnerId = $this.parents('.edit-vmbox').data('owner-id');
 
 				monster.ui.confirm(self.i18n.active().vmboxes.confirmDeleteVmbox, function() {
-					self.vmboxesDeleteVmbox(voicemailId, voicemailOwnerId, function(vmbox) {
+					self.vmboxesDeleteVmbox($voicemailId, $voicemailOwnerId, function(vmbox) {
 						monster.ui.toast({
 							type: 'success',
 							message: self.getTemplate({
