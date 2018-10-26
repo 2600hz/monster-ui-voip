@@ -181,7 +181,7 @@
 	width: 100%;
 }
 #call_logs_container .grid-row:not(.header-row) .grid-cell.hangup .cause-title {
-	text-transform: lowercase;
+	text-transform: capitalize;
 	font-size: 12px;
 	font-style: italic;
 }
@@ -201,6 +201,13 @@
 #call_logs_container .sub-cell.single-cell {
 	height: 40px;
 	line-height: 40px;
+}
+
+#call_logs_container .hangup .sub-cell.single-cell {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	line-height: normal;
 }
 
 #call_logs_container .call-logs-loader {
