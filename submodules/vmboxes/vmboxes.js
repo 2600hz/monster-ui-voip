@@ -468,15 +468,14 @@ define(function(require) {
 		},
 
 		recursiveSearch: function(voicemailId, item, level, callflow) {
-			var self = this;
-			var objectPath = 'children._.'.repeat(level).slice(0, -1);
-
-			var child = _.get(callflow, objectPath, {});
-			var next = true;
+			var self = this,
+				objectPath = 'children._.'.repeat(level).slice(0, -1),
+				child = _.get(callflow, objectPath, {}),
+				next = true,
+				toRetriveData = {};
 
 			if (_.get(child, 'data.id') === voicemailId && _.get(child, 'module') === 'voicemail') {
 				next = false;
-				var toRetriveData = {};
 
 				if (!_.isEmpty(child.children)) {
 					toRetriveData = _.get(child, 'children._', {});
