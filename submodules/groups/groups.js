@@ -1046,8 +1046,19 @@ define(function(require) {
 					//formData = self.groupsCleanNameData(formData);
 
 					data = $.extend(true, {}, data, formData);
-					var baseGroupName = data.group.name + ' Base Group';
-					var ringGroupName = data.group.name + ' Ring Group';
+
+					var baseGroupName = self.getTemplate({
+							name: '!' + self.i18n.active().groups.baseGroup,
+							data: {
+								name: data.group.name
+							}
+						}),
+						ringGroupName = self.getTemplate({
+							name: '!' + self.i18n.active().groups.ringGroup,
+							data: {
+								name: data.group.name
+							}
+						});
 
 					monster.parallel([
 						function(callback) {
@@ -1056,24 +1067,26 @@ define(function(require) {
 							});
 						},
 						function(callback) {
-							if (baseGroupName !== data.callflow.name) {
-								data.callflow.name = baseGroupName;
-								self.groupsUpdateCallflow(data.callflow, function(data) {
-									callback(null);
-								});
-							} else {
+							if (baseGroupName === data.callflow.name) {
 								callback(null);
+								return;
 							}
+
+							data.callflow.name = baseGroupName;
+							self.groupsPatchCallflow(data.callflow, function(data) {
+								callback(null);
+							});
 						},
 						function(callback) {
-							if (ringGroupName !== data.callflowRingGroup.name) {
-								data.callflowRingGroup.name = ringGroupName;
-								self.groupsUpdateCallflow(data.callflowRingGroup, function(data) {
-									callback(null);
-								});
-							} else {
+							if (ringGroupName === data.callflowRingGroup.name) {
 								callback(null);
+								return;
 							}
+
+							data.callflowRingGroup.name = ringGroupName;
+							self.groupsPatchCallflow(data.callflowRingGroup, function(data) {
+								callback(null);
+							});
 						}
 					], function(err, results) {
 						self.groupsRender({ groupId: data.group.id });
@@ -2116,6 +2129,26 @@ define(function(require) {
 		},
 
 		groupsUpdateCallflow: function(callflow, callback) {
+			var self = this;
+
+			delete callflow.metadata;
+
+			self.callApi({
+				resource: 'callflow.update',
+				data: {
+					accountId: self.accountId,
+					callflowId: callflow.id,
+					data: {
+						name: callflow.name
+					}
+				},
+				success: function(data) {
+					callback && callback(data.data);
+				}
+			});
+		},
+
+		groupsPatchCallflow: function(callflow, callback) {
 			var self = this;
 
 			delete callflow.metadata;

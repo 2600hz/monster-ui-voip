@@ -149,7 +149,9 @@
 
 		"__comment": "UI-2104: Adding a warning when adding a group with no endpoints",
 		"__version": "3.22",
-		"emptyEndpointsWarning": "You need to select at least one member to create a group"
+		"emptyEndpointsWarning": "You need to select at least one member to create a group",
+		"ringGroup": "{{name}} Ring Group",
+		"baseGroup": "{{name}} Base Group"
 	},
 
 	"devices": {
