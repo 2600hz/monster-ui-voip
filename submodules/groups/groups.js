@@ -1072,9 +1072,17 @@ define(function(require) {
 								return;
 							}
 
-							data.callflow.name = baseGroupName;
-							self.groupsPatchCallflow(data.callflow, function(data) {
-								callback(null);
+							self.groupsPatchCallflow({
+								data: {
+									callflowId: data.callflow.id,
+									data: {
+										name: baseGroupName,
+										repeats: data.repeats
+									}
+								},
+								success: function() {
+									callback(null);
+								}
 							});
 						},
 						function(callback) {
@@ -1083,9 +1091,16 @@ define(function(require) {
 								return;
 							}
 
-							data.callflowRingGroup.name = ringGroupName;
-							self.groupsPatchCallflow(data.callflowRingGroup, function(data) {
-								callback(null);
+							self.groupsPatchCallflow({
+								data: {
+									callflowId: data.callflowRingGroup.id,
+									data: {
+										name: ringGroupName
+									}
+								},
+								success: function() {
+									callback(null);
+								}
 							});
 						}
 					], function(err, results) {
@@ -2138,9 +2153,7 @@ define(function(require) {
 				data: {
 					accountId: self.accountId,
 					callflowId: callflow.id,
-					data: {
-						name: callflow.name
-					}
+					data: callflow
 				},
 				success: function(data) {
 					callback && callback(data.data);
@@ -2148,22 +2161,16 @@ define(function(require) {
 			});
 		},
 
-		groupsPatchCallflow: function(callflow, callback) {
+		groupsPatchCallflow: function(args) {
 			var self = this;
-
-			delete callflow.metadata;
 
 			self.callApi({
 				resource: 'callflow.patch',
-				data: {
-					accountId: self.accountId,
-					callflowId: callflow.id,
-					data: {
-						name: callflow.name
-					}
-				},
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
 				success: function(data) {
-					callback && callback(data.data);
+					args.success(data.data);
 				}
 			});
 		},
