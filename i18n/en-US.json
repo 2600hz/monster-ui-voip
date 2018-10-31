@@ -940,7 +940,8 @@
 		},
 		"confirmMessages": {
 			"deleteHoliday": "This holiday will be permanently deleted. Continue?",
-			"disableHolidays": "All existing holidays will be permanently deleted. Continue?"
+			"disableHolidays": "All existing holidays will be permanently deleted. Continue?",
+			"resetCalls": "All incoming call handling strategies will be reset. Continue?"
 		},
 		"alertMessages": {
 			"uniqueHoliday": "Every holiday must have a unique name.",
@@ -952,8 +953,9 @@
 			"lastE911Error": "You need e911 set up on at least one of your Main Numbers. Please set up e911 on another Main Number before deleting this one."
 		},
 		"toastrMessages": {
-			"updateHolidaySuccess": "Holidays sucessfully updated.",
-			"updateCallSuccess": "Call strategy sucessfully updated.",
+			"updateHolidaySuccess": "Holidays successfully updated.",
+			"updateCallSuccess": "Call strategy successfully updated.",
+			"resetCallSuccess": "Call strategy successfully reset.",
 			"buyNumbersSuccess": "The numbers have been purchased.",
 			"buyNumbersError": "An error occured while purchasing numbers.",
 			"removeNumberSuccess": "Number successfully removed from the main callflow."
@@ -1034,6 +1036,10 @@
 			"headerNoE911": "You've disabled E911 on the number that was used for your Emergency Caller-ID, please select a new number to use as this Account Emergency Caller-ID.",
 			"success": "You successfully updated the E911 on the account to be {{ number }}.",
 			"current": "Current one"
+		},
+
+		"buttons": {
+			"reset": "Reset"
 		}
 	},
 
