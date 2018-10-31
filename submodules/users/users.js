@@ -703,36 +703,50 @@ define(function(require) {
 							name: 'creation',
 							data: originalData,
 							submodule: 'users'
-						}));
+						})),
+						validationOptions = {
+							ignore: ':hidden:not(select)',
+							rules: {
+								'callflow.extension': {
+									checkList: originalData.listExtensions
+								},
+								'vmbox.number': {
+									checkList: originalData.listVMBoxes
+								},
+								'user.password': {
+									minlength: 6
+								},
+								'user.extra.licensedRole': {
+									checkList: [ 'none' ]
+								}
+							},
+							messages: {
+								'user.first_name': {
+									required: self.i18n.active().validation.required
+								},
+								'user.last_name': {
+									required: self.i18n.active().validation.required
+								},
+								'user.extra.licensedRole': {
+									checkList: self.i18n.active().validation.required
+								},
+								'callflow.extension': {
+									required: self.i18n.active().validation.required
+								}
+							}
+						};
+
+					// TODO: Check if it is really necessary to remove unused validation properties
+					if (!originalData.licensedUserRoles) {
+						delete validationOptions.rules['user.extra.licensedRole'];
+						delete validationOptions.messages['user.extra.licensedRole'];
+					}
 
 					monster.ui.mask(userTemplate.find('#extension'), 'extension');
 
 					monster.ui.chosen(userTemplate.find('#licensed_role'));
 
-					monster.ui.validate(userTemplate.find('#form_user_creation'), {
-						rules: {
-							'callflow.extension': {
-								checkList: originalData.listExtensions
-							},
-							'vmbox.number': {
-								checkList: originalData.listVMBoxes
-							},
-							'user.password': {
-								minlength: 6
-							}
-						},
-						messages: {
-							'user.first_name': {
-								required: self.i18n.active().validation.required
-							},
-							'user.last_name': {
-								required: self.i18n.active().validation.required
-							},
-							'callflow.extension': {
-								required: self.i18n.active().validation.required
-							}
-						}
-					});
+					monster.ui.validate(userTemplate.find('#form_user_creation'), validationOptions);
 
 					monster.ui.showPasswordStrength(userTemplate.find('#password'));
 
