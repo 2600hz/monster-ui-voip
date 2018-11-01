@@ -704,6 +704,7 @@ define(function(require) {
 							data: originalData,
 							submodule: 'users'
 						})),
+						userCreationForm = userTemplate.find('#form_user_creation'),
 						validationOptions = {
 							ignore: ':hidden:not(select)',
 							rules: {
@@ -743,7 +744,15 @@ define(function(require) {
 
 					monster.ui.chosen(userTemplate.find('#licensed_role'));
 
-					monster.ui.validate(userTemplate.find('#form_user_creation'), validationOptions);
+					monster.ui.validate(userCreationForm, validationOptions);
+
+					// Force select element validation on change event
+					// (Not handled by jQuery Validation plugin because the select
+					// element is hidden by the Chosen jQuery plugin. For more info, see:
+					// https://github.com/jquery-validation/jquery-validation/issues/997)
+					userCreationForm.find('select').on('change', function() {
+						userCreationForm.validate().element(this);
+					});
 
 					monster.ui.showPasswordStrength(userTemplate.find('#password'));
 
