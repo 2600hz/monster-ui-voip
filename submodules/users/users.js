@@ -715,9 +715,6 @@ define(function(require) {
 								},
 								'user.password': {
 									minlength: 6
-								},
-								'user.extra.licensedRole': {
-									checkList: [ 'none' ]
 								}
 							},
 							messages: {
@@ -727,19 +724,19 @@ define(function(require) {
 								'user.last_name': {
 									required: self.i18n.active().validation.required
 								},
-								'user.extra.licensedRole': {
-									checkList: self.i18n.active().validation.required
-								},
 								'callflow.extension': {
 									required: self.i18n.active().validation.required
 								}
 							}
 						};
 
-					// TODO: Check if it is really necessary to remove unused validation properties
-					if (!originalData.licensedUserRoles) {
-						delete validationOptions.rules['user.extra.licensedRole'];
-						delete validationOptions.messages['user.extra.licensedRole'];
+					if (originalData.licensedUserRoles) {
+						validationOptions.rules['user.extra.licensedRole'] = {
+							checkList: [ 'none' ]
+						};
+						validationOptions.messages['user.extra.licensedRole'] = {
+							checkList: self.i18n.active().validation.required
+						};
 					}
 
 					monster.ui.mask(userTemplate.find('#extension'), 'extension');
