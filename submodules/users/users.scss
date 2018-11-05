@@ -623,16 +623,22 @@
 	margin-left: 30px;
 }
 
-#creation_user_dialog label.monster-invalid[for="user.last_name"] {
-	margin-left: 113px;
-}
+#creation_user_dialog label.monster-invalid{
+	&[for="user.last_name"] {
+		margin-left: 113px;
+	}
 
-#creation_user_dialog label.monster-invalid[for="extension"] {
-	margin-left: 160px;
-}
+	&[for="extension"] {
+		margin-left: 160px;
+	}
 
-#creation_user_dialog label.monster-invalid[for="password"] {
-	margin-top: 25px;
+	&[for="password"] {
+		margin-top: 25px;
+	}
+
+	&[for="licensed_role"] {
+		margin-top: 30px;
+	}
 }
 
 #creation_user_dialog .control-group.hack-left .control-label{

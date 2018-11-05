@@ -703,35 +703,55 @@ define(function(require) {
 							name: 'creation',
 							data: originalData,
 							submodule: 'users'
-						}));
+						})),
+						userCreationForm = userTemplate.find('#form_user_creation'),
+						validationOptions = {
+							ignore: ':hidden:not(select)',
+							rules: {
+								'callflow.extension': {
+									checkList: originalData.listExtensions
+								},
+								'vmbox.number': {
+									checkList: originalData.listVMBoxes
+								},
+								'user.password': {
+									minlength: 6
+								}
+							},
+							messages: {
+								'user.first_name': {
+									required: self.i18n.active().validation.required
+								},
+								'user.last_name': {
+									required: self.i18n.active().validation.required
+								},
+								'callflow.extension': {
+									required: self.i18n.active().validation.required
+								}
+							}
+						};
+
+					if (originalData.licensedUserRoles) {
+						validationOptions.rules['user.extra.licensedRole'] = {
+							checkList: [ 'none' ]
+						};
+						validationOptions.messages['user.extra.licensedRole'] = {
+							checkList: self.i18n.active().validation.required
+						};
+					}
 
 					monster.ui.mask(userTemplate.find('#extension'), 'extension');
 
 					monster.ui.chosen(userTemplate.find('#licensed_role'));
 
-					monster.ui.validate(userTemplate.find('#form_user_creation'), {
-						rules: {
-							'callflow.extension': {
-								checkList: originalData.listExtensions
-							},
-							'vmbox.number': {
-								checkList: originalData.listVMBoxes
-							},
-							'user.password': {
-								minlength: 6
-							}
-						},
-						messages: {
-							'user.first_name': {
-								required: self.i18n.active().validation.required
-							},
-							'user.last_name': {
-								required: self.i18n.active().validation.required
-							},
-							'callflow.extension': {
-								required: self.i18n.active().validation.required
-							}
-						}
+					monster.ui.validate(userCreationForm, validationOptions);
+
+					// Force select element validation on change event
+					// (Not handled by jQuery Validation plugin because the select
+					// element is hidden by the Chosen jQuery plugin. For more info, see:
+					// https://github.com/jquery-validation/jquery-validation/issues/997)
+					userCreationForm.find('select').on('change', function() {
+						userCreationForm.validate().element(this);
 					});
 
 					monster.ui.showPasswordStrength(userTemplate.find('#password'));
