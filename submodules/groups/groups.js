@@ -1045,6 +1045,8 @@ define(function(require) {
 
 					//formData = self.groupsCleanNameData(formData);
 
+					var repeats = _.get(data.callflow, 'flow.data.repeats');
+
 					data = $.extend(true, {}, data, formData);
 
 					var baseGroupName = self.getTemplate({
@@ -1062,12 +1064,17 @@ define(function(require) {
 
 					monster.parallel([
 						function(callback) {
+							if (self.isGroupEdited(data, baseGroupName, repeats)) {
+								callback(null);
+								return;
+							}
+
 							self.groupsUpdate(data.group, function(data) {
 								callback(null);
 							});
 						},
 						function(callback) {
-							if (baseGroupName === data.callflow.name) {
+							if (self.isGroupEdited(data, baseGroupName, repeats)) {
 								callback(null);
 								return;
 							}
@@ -1077,7 +1084,7 @@ define(function(require) {
 									callflowId: data.callflow.id,
 									data: {
 										name: baseGroupName,
-										repeats: data.repeats
+										flow: data.callflow.flow
 									}
 								},
 								success: function() {
@@ -1126,6 +1133,10 @@ define(function(require) {
 					});
 				});
 			});
+		},
+
+		isGroupEdited: function(data, baseGroupName, repeats) {
+			return baseGroupName === data.callflow.name && repeats === parseInt(_.get(data.callflow, 'flow.data.repeats'));
 		},
 
 		groupsBindNumbers: function(template, data) {
