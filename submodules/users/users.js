@@ -508,8 +508,9 @@ define(function(require) {
 			return result;
 		},
 
-		usersDeleteDialog: function(user, callback) {
+		usersDeleteDialog: function(args) {
 			var self = this,
+				user = args.user,
 				dataTemplate = {
 					user: user
 				},
@@ -528,7 +529,7 @@ define(function(require) {
 				self.usersDelete(user.id, removeDevices, removeConferences, function(data) {
 					popup.dialog('close').remove();
 
-					callback && callback(data);
+					args.hasOwnProperty('success') && args.success(data);
 				});
 			});
 
@@ -920,17 +921,20 @@ define(function(require) {
 			template.on('click', '#delete_user', function() {
 				var dataUser = $(this).parents('.grid-row').data();
 
-				self.usersDeleteDialog(dataUser, function(data) {
-					monster.ui.toast({
-						type: 'success',
-						message: self.getTemplate({
-							name: '!' + self.i18n.active().users.toastrMessages.userDelete,
-							data: {
-								name: data.first_name + ' ' + data.last_name
-							}
-						})
-					});
-					self.usersRender();
+				self.usersDeleteDialog({
+					user: dataUser,
+					success: function(data) {
+						monster.ui.toast({
+							type: 'success',
+							message: self.getTemplate({
+								name: '!' + self.i18n.active().users.toastrMessages.userDelete,
+								data: {
+									name: data.first_name + ' ' + data.last_name
+								}
+							})
+						});
+						self.usersRender();
+					}
 				});
 			});
 
