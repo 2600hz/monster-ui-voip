@@ -9,7 +9,8 @@ define(function(require) {
 		requests: {},
 
 		subscribe: {
-			'voip.users.render': 'usersRender'
+			'voip.users.render': 'usersRender',
+			'voip.users.delete': 'usersDeleteDialog'
 		},
 
 		appFlags: {
@@ -526,10 +527,17 @@ define(function(require) {
 				var removeDevices = dialogTemplate.find('#delete_devices').is(':checked'),
 					removeConferences = dialogTemplate.find('#delete_conferences').is(':checked');
 
-				self.usersDelete(user.id, removeDevices, removeConferences, function(data) {
-					popup.dialog('close').remove();
+				self.usersDelete({
+					data: _.merge({
+						userId: user.id
+					}, args.data),
+					removeDevices: removeDevices,
+					removeConferences: removeConferences,
+					success: function(data) {
+						popup.dialog('close').remove();
 
-					args.hasOwnProperty('success') && args.success(data);
+						args.hasOwnProperty('callback') && args.callback(data);
+					}
 				});
 			});
 
@@ -923,7 +931,7 @@ define(function(require) {
 
 				self.usersDeleteDialog({
 					user: dataUser,
-					success: function(data) {
+					callback: function(data) {
 						monster.ui.toast({
 							type: 'success',
 							message: self.getTemplate({
@@ -3648,8 +3656,11 @@ define(function(require) {
 		},
 
 		/* Utils */
-		usersDelete: function(userId, removeDevices, removeConferences, callback) {
-			var self = this;
+		usersDelete: function(args) {
+			var self = this,
+				userId = args.data.userId,
+				removeDevices = args.removeDevices,
+				removeConferences = args.removeConferences;
 
 			monster.parallel({
 				devices: function(callback) {
@@ -3751,8 +3762,11 @@ define(function(require) {
 				});
 
 				monster.parallel(listFnDelete, function(err, resultsDelete) {
-					self.usersDeleteUser(userId, function(data) {
-						callback && callback(data);
+					self.usersDeleteUser({
+						data: args.data,
+						success: function(data) {
+							args.hasOwnProperty('success') && args.success(data);
+						}
 					});
 				});
 			});
@@ -3792,18 +3806,17 @@ define(function(require) {
 			});
 		},
 
-		usersDeleteUser: function(userId, callback) {
+		usersDeleteUser: function(args) {
 			var self = this;
 
 			self.callApi({
 				resource: 'user.delete',
-				data: {
-					userId: userId,
+				data: _.merge({
 					accountId: self.accountId,
 					data: {}
-				},
+				}, args.data),
 				success: function(data) {
-					callback(data.data);
+					args.hasOwnProperty('success') && args.success(data.data);
 				}
 			});
 		},
