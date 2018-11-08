@@ -1,4 +1,6 @@
-This is a sub application of 2600hz/monster-ui.
+# monster-ui-voip
+
+This is a sub application of [2600hz/monster-ui](https://github.com/2600hz/monster-ui).
 
 Users should clone into `/monster-ui/src/apps/` such as:
 
