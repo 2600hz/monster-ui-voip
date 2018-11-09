@@ -9,8 +9,7 @@ define(function(require) {
 		requests: {},
 
 		subscribe: {
-			'voip.users.render': 'usersRender',
-			'voip.users.delete': 'usersDeleteDialog'
+			'voip.users.render': 'usersRender'
 		},
 
 		appFlags: {
@@ -886,7 +885,7 @@ define(function(require) {
 			template.on('click', '#delete_user', function() {
 				var dataUser = $(this).parents('.grid-row').data();
 
-				self.usersDeleteDialog({
+				monster.pub('common.deleteSmartUser.showDeleteDialog', {
 					user: dataUser,
 					callback: function(data) {
 						monster.ui.toast({
