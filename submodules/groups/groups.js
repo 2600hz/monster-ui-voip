@@ -1045,17 +1045,69 @@ define(function(require) {
 
 					//formData = self.groupsCleanNameData(formData);
 
+					var repeats = _.get(data.callflow, 'flow.data.repeats');
+
 					data = $.extend(true, {}, data, formData);
+
+					var baseGroupName = self.getTemplate({
+							name: '!' + self.i18n.active().groups.baseGroup,
+							data: {
+								name: data.group.name
+							}
+						}),
+						ringGroupName = self.getTemplate({
+							name: '!' + self.i18n.active().groups.ringGroup,
+							data: {
+								name: data.group.name
+							}
+						});
 
 					monster.parallel([
 						function(callback) {
+							if (self.isGroupEdited(data, baseGroupName, repeats)) {
+								callback(null);
+								return;
+							}
+
 							self.groupsUpdate(data.group, function(data) {
 								callback(null);
 							});
 						},
 						function(callback) {
-							self.groupsUpdateCallflow(data.callflow, function(data) {
+							if (self.isGroupEdited(data, baseGroupName, repeats)) {
 								callback(null);
+								return;
+							}
+
+							self.groupsPatchCallflow({
+								data: {
+									callflowId: data.callflow.id,
+									data: {
+										name: baseGroupName,
+										flow: data.callflow.flow
+									}
+								},
+								success: function() {
+									callback(null);
+								}
+							});
+						},
+						function(callback) {
+							if (ringGroupName === data.callflowRingGroup.name) {
+								callback(null);
+								return;
+							}
+
+							self.groupsPatchCallflow({
+								data: {
+									callflowId: data.callflowRingGroup.id,
+									data: {
+										name: ringGroupName
+									}
+								},
+								success: function() {
+									callback(null);
+								}
 							});
 						}
 					], function(err, results) {
@@ -1081,6 +1133,10 @@ define(function(require) {
 					});
 				});
 			});
+		},
+
+		isGroupEdited: function(data, baseGroupName, repeats) {
+			return baseGroupName === data.callflow.name && repeats === parseInt(_.get(data.callflow, 'flow.data.repeats'));
 		},
 
 		groupsBindNumbers: function(template, data) {
@@ -1549,6 +1605,11 @@ define(function(require) {
 				},
 				callflow: function(callback) {
 					self.groupsGetBaseRingGroup(groupId, function(data) {
+						callback(null, data);
+					});
+				},
+				callflowRingGroup: function(callback) {
+					self.groupsGetRingGroup(groupId, function(data) {
 						callback(null, data);
 					});
 				}
@@ -2107,6 +2168,20 @@ define(function(require) {
 				},
 				success: function(data) {
 					callback && callback(data.data);
+				}
+			});
+		},
+
+		groupsPatchCallflow: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'callflow.patch',
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
+				success: function(data) {
+					args.success(data.data);
 				}
 			});
 		},
