@@ -1640,19 +1640,19 @@ define(function(require) {
 						if (customHours.lunchbreak.enabled) {
 							var lunchbreakRule = strategyData.temporalRules.lunchbreak;
 
-							// make sure the lunch rule is only valid on days the business is open
-							delete lunchbreakRule.wdays;							
-							var lunchwdays = [];							
-							_.each(customHours.opendays, function(val) {
-								lunchwdays.push(val.substring(4).toLowerCase());
+							_.assign(lunchbreakRule, {
+								wdays: _.map(customHours.opendays, function(item) {
+									// make sure the lunch rule is only valid on days the business is open
+									return _
+										.chain(item)
+										.lowerCase()
+										.replace(/^main/, '')
+										.value();
+								}),
+								time_window_start: monster.util.timeToSeconds(customHours.lunchbreak.from),
+								time_window_end: monster.util.timeToSeconds(customHours.lunchbreak.to)
 							});
-														
-							lunchbreakRule = $.extend(true, {
-								wdays: lunchwdays
-							}, lunchbreakRule);
 
-							lunchbreakRule.time_window_start = monster.util.timeToSeconds(customHours.lunchbreak.from);
-							lunchbreakRule.time_window_stop = monster.util.timeToSeconds(customHours.lunchbreak.to);
 							tmpRulesRequests.lunchbreak = function(callback) {
 								self.callApi({
 									resource: 'temporalRule.update',
