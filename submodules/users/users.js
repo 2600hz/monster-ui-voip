@@ -2900,7 +2900,8 @@ define(function(require) {
 		usersRenderMusicOnHold: function(currentUser) {
 			var self = this,
 				silenceMediaId = 'silence_stream://300000',
-				mediaToUpload;
+				mediaToUpload,
+				media_id = _.get(currentUser, 'music_on_hold.media_id', null);
 
 			self.usersListMedias(function(medias) {
 				var templateData = {
@@ -2928,6 +2929,17 @@ define(function(require) {
 							mediaSelect.val(newMedia.id);
 						}
 					};
+
+				var media = _.find(medias, function(media) {
+					return media.id === media_id;
+				});
+
+				monster.pub('common.mediaSelector.render', {
+					container: featureTemplate.find('.media-selector'),
+					inputName: 'media_id',
+					media: media,
+					medias: medias
+				});
 
 				featureTemplate.find('.upload-input').fileUpload({
 					inputOnly: true,
@@ -3012,7 +3024,7 @@ define(function(require) {
 				});
 
 				featureTemplate.find('.save').on('click', function() {
-					var selectedMedia = featureTemplate.find('.media-dropdown option:selected').val(),
+					var media_id = featureTemplate.find('input[name="media_id"]').val(),
 						enabled = switchFeature.prop('checked');
 
 					if (!('music_on_hold' in currentUser)) {
@@ -3022,7 +3034,7 @@ define(function(require) {
 					if ('media_id' in currentUser.music_on_hold || enabled) {
 						if (enabled) {
 							currentUser.music_on_hold = {
-								media_id: selectedMedia
+								media_id: media_id
 							};
 						} else {
 							currentUser.music_on_hold = {};

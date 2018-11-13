@@ -15,24 +15,9 @@
 		</div>
 	</div>
 
-	<div class="content{{#unless user.extra.mapFeatures.music_on_hold.active}} disabled{{/unless}}">
-		<div>
-			<span>{{ i18n.users.music_on_hold.dropdownLabel }}</span>
-			<select name="format" class="media-dropdown">
-				<option value="{{silenceMedia}}" {{#compare media '===' silenceMedia}}selected{{/compare}}>{{ i18n.users.music_on_hold.silence }}</option>
-				{{#each mediaList}}
-					<option value="{{this.id}}" {{#compare ../media '===' this.id}}selected{{/compare}}>{{this.name}}</option>
-				{{/each}}
-			</select>
-			<button type="button" class="monster-button monster-button-primary non-fixed upload-toggle" data-toggle="button">
-				{{ i18n.upload }}
-			</button>
-		</div>
-		<div class="upload-div">
-			<input type="file" class="upload-input" accept="audio/*">
-			<button type="button" class="monster-button monster-button-success non-fixed upload-action upload-submit"><i class="fa fa-upload"></i></button>
-			<button type="button" class="monster-button monster-button-danger non-fixed upload-action upload-cancel"><i class="fa fa-times"></i></button>
-		</div>
+	<div class="content{{#unless user.extra.mapFeatures.music_on_hold.active}} disabled{{/unless}} content-select-media">
+		{{ i18n.users.music_on_hold.dropdownLabel }}
+		<span class="media-selector"></span>
 	</div>
 
 	<div class="actions clearfix">

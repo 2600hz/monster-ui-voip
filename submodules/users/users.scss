@@ -784,6 +784,14 @@
 		}
 	}
 
+	.content {
+		padding: 25px;
+		&.content-select-media {
+			display: flex;
+			align-items: center;
+		}
+	}
+
 	&[data-feature="call_recording"] .btn-group-wrapper {
 		button {
 			font-size: 14px;
@@ -924,6 +932,12 @@
 	}
 
 	&[data-feature="music_on_hold"] {
+		.content {
+			.media-selector {
+				display: inline-block;
+				margin: 0 10px;
+			}
+		}
 		.media-dropdown {
 			margin-bottom: 0px;
 		}
