@@ -2964,7 +2964,10 @@ define(function(require) {
 				});
 
 				switchFeature.on('change', function() {
-					$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+					var $this = $(this),
+						$content = featureTemplate.find('.content');
+
+					$this.prop('checked') ? $content.slideDown() : $content.slideUp();
 				});
 
 				featureTemplate.find('.upload-toggle').on('click', function() {

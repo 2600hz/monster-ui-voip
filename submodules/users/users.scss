@@ -933,8 +933,11 @@
 
 	&[data-feature="music_on_hold"] {
 		.content {
-			.media-selector {
-				display: inline-block;
+			p, span.media-selector{
+				line-height: 30px;
+			}
+			div.media-selector {
+				display: inline-flex;
 				margin: 0 10px;
 			}
 		}

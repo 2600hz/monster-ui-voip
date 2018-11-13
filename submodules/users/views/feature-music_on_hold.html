@@ -15,9 +15,11 @@
 		</div>
 	</div>
 
-	<div class="content{{#unless user.extra.mapFeatures.music_on_hold.active}} disabled{{/unless}} content-select-media">
-		{{ i18n.users.music_on_hold.dropdownLabel }}
-		<span class="media-selector"></span>
+	<div class="content{{#unless user.extra.mapFeatures.music_on_hold.active}} disabled{{/unless}}">
+		<p>
+			{{ i18n.users.music_on_hold.dropdownLabel }}
+			<span class="media-selector"></span>
+		</p>
 	</div>
 
 	<div class="actions clearfix">
