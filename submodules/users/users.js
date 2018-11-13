@@ -2116,7 +2116,7 @@ define(function(require) {
 		usersRenderVMToEmail: function(currentUser) {
 			var self = this,
 				featureTemplate = $(self.getTemplate({
-					name: 'feature-vm_to_email',
+					name: 'feature-vmbox',
 					data: currentUser,
 					submodule: 'users'
 				})),
