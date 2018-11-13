@@ -684,12 +684,13 @@
 				}
 			}
 		},
-		"vm_to_email": {
+		"vmbox": {
 			"deleteAfterNotify": "Delete messages from database after sending the notification.",
-			"headline": "Voicemail-to-Email Settings",
-			"help": "If you want to change where email notifications go to, please edit the user's email address in the User Administration section",
-			"label": "An e-mail will be sent to {{variable}} for every new voicemail",
-			"title": "Voicemails"
+			"headline": "Voicemail Box",
+			"label": "A voicemail box will be available for this user.",
+			"sendVmToEmail": "Send an e-mail to {{variable}} for every new voicemail.",
+			"title": "Voicemails",
+			"vmToEmailHelp": "An e-mail will be sent to {{variable}} for every new voicemail. If you want to change where email notifications go to, please edit the user's email address in the User Administration section."
 		},
 		"find_me_follow_me": {
 			"title": "Find me, Follow me",

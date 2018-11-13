@@ -210,10 +210,10 @@ define(function(require) {
 							iconColor: 'monster-orange',
 							title: self.i18n.active().users.hotdesk.title
 						},
-						vm_to_email: {
+						vmbox: {
 							icon: 'icon-telicon-voicemail',
 							iconColor: 'monster-green',
-							title: self.i18n.active().users.vm_to_email.title
+							title: self.i18n.active().users.vmbox.title
 						},
 						faxing: {
 							icon: 'icon-telicon-fax',
@@ -1595,7 +1595,7 @@ define(function(require) {
 				self.usersRenderMusicOnHold(currentUser);
 			});
 
-			template.on('click', '.feature[data-feature="vm_to_email"]', function() {
+			template.on('click', '.feature[data-feature="vmbox"]', function() {
 				self.usersListVMBoxesUser(currentUser.id, function(vmboxes) {
 					currentUser.extra.deleteAfterNotify = true;
 					if (vmboxes.length > 0) {
@@ -2121,7 +2121,8 @@ define(function(require) {
 					submodule: 'users'
 				})),
 				switchFeature = featureTemplate.find('.switch-state'),
-				featureForm = featureTemplate.find('#vm_to_email_form');
+				featureForm = featureTemplate.find('#vmbox_form'),
+				switchVmToEmail = featureForm.find('#vm_to_email');
 
 			monster.ui.validate(featureForm);
 
@@ -2133,8 +2134,12 @@ define(function(require) {
 				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
 			});
 
+			switchVmToEmail.on('change', function() {
+				$(this).prop('checked') ? featureForm.find('.extra-content').slideDown() : featureForm.find('.extra-content').slideUp();
+			});
+
 			featureTemplate.find('.save').on('click', function() {
-				var formData = monster.ui.getFormData('vm_to_email_form'),
+				var formData = monster.ui.getFormData('vmbox_form'),
 					userToSave = $.extend(true, {}, currentUser),
 					enabled = switchFeature.prop('checked'),
 					args = {
@@ -2196,7 +2201,7 @@ define(function(require) {
 			});
 
 			var popup = monster.ui.dialog(featureTemplate, {
-				title: currentUser.extra.mapFeatures.vm_to_email.title,
+				title: currentUser.extra.mapFeatures.vmbox.title,
 				position: ['center', 20]
 			});
 		},

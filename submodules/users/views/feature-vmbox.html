@@ -1,36 +1,49 @@
-<div class="monster-feature-popup-container" data-feature="vm_to_email">
+<div class="monster-feature-popup-container" data-feature="vmbox">
 	<div class="feature-popup-title">
 		<div class="popup-title">
 			<div class="feature-fa-wrapper">
-				<i class="{{extra.mapFeatures.vm_to_email.icon}}"></i>
+				<i class="{{extra.mapFeatures.vmbox.icon}}"></i>
 			</div>
 			<div class="feature-title">
-				{{ i18n.users.vm_to_email.headline }}
+				{{ i18n.users.vmbox.headline }}
 			</div>
 		</div>
 		<div class="switch popup-action">
 		{{#monsterSwitch}}
-			<input class="switch-state" type="checkbox" id="checkbox_vm_to_email" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if extra.mapFeatures.vm_to_email.active}} checked="checked"{{/if}}></input>
+			<input class="switch-state" type="checkbox" id="checkbox_vmbox" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if extra.mapFeatures.vmbox.active}} checked="checked"{{/if}}></input>
 		{{/monsterSwitch}}
 		</div>
 	</div>
 
-	<div class="content{{#unless extra.mapFeatures.vm_to_email.active}} disabled{{/unless}}">
-		<form id="vm_to_email_form">
+	<div class="content{{#unless extra.mapFeatures.vmbox.active}} disabled{{/unless}}">
+		<form id="vmbox_form">
+
 			<div class="main-line">
-				{{replaceVar i18n.users.vm_to_email.label email}}
+				{{i18n.users.vmbox.label}}
 			</div>
 
-			<label class="fix-left">
-				{{#monsterCheckbox i18n.users.vm_to_email.deleteAfterNotify}}
-					<input type="checkbox" name="delete_after_notify"{{#if extra.deleteAfterNotify}} checked{{/if}}></input>
-				{{/monsterCheckbox}}
-			</label>
-		</form>
+			<div class="control-group main">
+				<label class="title">Voicemail to e-mail:</label>
+				{{#monsterSwitch}}
+					<input type="checkbox" name="vm_to_email" id="vm_to_email" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if extra.mapFeatures.vmbox.vm_to_email_active}} checked="checked"{{/if}}></input>
+				{{/monsterSwitch}}
+			</div>
 
-		{{#monsterText}}
-			{{i18n.users.vm_to_email.help}}
-		{{/monsterText}}
+			<div class="extra-content disabled">
+				<div class="control-group extra">
+					<label class="fix-left">
+						{{#monsterCheckbox i18n.users.vmbox.deleteAfterNotify}}
+							<input type="checkbox" name="delete_after_notify"{{#if extra.deleteAfterNotify}} checked{{/if}}></input>
+						{{/monsterCheckbox}}
+					</label>
+				</div>
+
+				{{#monsterText}}
+					{{replaceVar i18n.users.vmbox.vmToEmailHelp email}}
+				{{/monsterText}}
+			</div>
+
+		</form>
 	</div>
 
 	<div class="actions clearfix">
