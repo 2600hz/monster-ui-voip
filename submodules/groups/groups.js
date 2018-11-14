@@ -673,34 +673,55 @@ define(function(require) {
 					})),
 					switchFeature = featureTemplate.find('.switch-state'),
 					popup,
-					closeUploadDiv = function(newMedia) {
-						mediaToUpload = undefined;
-						featureTemplate.find('.upload-div input').val('');
-						featureTemplate.find('.upload-div').slideUp(function() {
-							featureTemplate.find('.upload-toggle').removeClass('active');
+					bindMediaDialogEvent = function(control) {
+						featureTemplate.find('.save').on('click', function() {
+							var selectedMedia = control.getValue(),
+								enabled = switchFeature.prop('checked');
+
+							if (!('smartpbx' in data.group)) {
+								data.group.smartpbx = {};
+							}
+
+							if (enabled) {
+								ringGroupNode.data.ringback = selectedMedia;
+								if ('ringback' in data.group.smartpbx) {
+									data.group.smartpbx.ringback.enabled = true;
+								} else {
+									data.group.smartpbx.ringback = {
+										enabled: true
+									};
+								}
+
+								self.groupsUpdateCallflow(data.baseCallflow, function() {
+									self.groupsUpdate(data.group, function() {
+										popup.dialog('close').remove();
+										self.groupsRender({ groupId: data.group.id });
+									});
+								});
+							} else if (ringGroupNode.data.ringback || (data.group.smartpbx.ringback && data.group.smartpbx.ringback.enabled)) {
+								delete ringGroupNode.data.ringback;
+								if ('ringback' in data.group.smartpbx) {
+									data.group.smartpbx.ringback.enabled = false;
+								}
+
+								self.groupsUpdateCallflow(data.baseCallflow, function() {
+									self.groupsUpdate(data.group, function() {
+										popup.dialog('close').remove();
+										self.groupsRender({ groupId: data.group.id });
+									});
+								});
+							}
 						});
-						if (newMedia) {
-							var mediaSelect = featureTemplate.find('.media-dropdown');
-							mediaSelect.append('<option value="' + newMedia.id + '">' + newMedia.name + '</option>');
-							mediaSelect.val(newMedia.id);
-						}
 					};
 
-				featureTemplate.find('.upload-input').fileUpload({
-					inputOnly: true,
-					wrapperClass: 'file-upload input-append',
-					btnText: self.i18n.active().groups.ringback.audioUploadButton,
-					btnClass: 'monster-button',
-					maxSize: 5,
-					success: function(results) {
-						mediaToUpload = results[0];
-					},
-					error: function(errors) {
-						if (errors.hasOwnProperty('size') && errors.size.length > 0) {
-							monster.ui.alert(self.i18n.active().groups.ringback.fileTooBigAlert);
-						}
-						featureTemplate.find('.upload-div input').val('');
+				monster.pub('common.mediaSelect.render', {
+					container: featureTemplate.find('.media-wrapper'),
+					options: medias,
+					selectedOption: ringGroupNode.data.ringback || '',
+					skin: 'tabs',
+					callback: function(mediaControl) {
 						mediaToUpload = undefined;
+						bindMediaDialogEvent(mediaControl);
 					}
 				});
 
@@ -710,101 +731,6 @@ define(function(require) {
 
 				switchFeature.on('change', function() {
 					$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
-				});
-
-				featureTemplate.find('.upload-toggle').on('click', function() {
-					if ($(this).hasClass('active')) {
-						featureTemplate.find('.upload-div').stop(true, true).slideUp();
-					} else {
-						featureTemplate.find('.upload-div').stop(true, true).slideDown();
-					}
-				});
-
-				featureTemplate.find('.upload-cancel').on('click', function() {
-					closeUploadDiv();
-				});
-
-				featureTemplate.find('.upload-submit').on('click', function() {
-					if (mediaToUpload) {
-						self.callApi({
-							resource: 'media.create',
-							data: {
-								accountId: self.accountId,
-								data: {
-									streamable: true,
-									name: mediaToUpload.name,
-									media_source: 'upload',
-									description: mediaToUpload.name
-								}
-							},
-							success: function(data, status) {
-								var media = data.data;
-								self.callApi({
-									resource: 'media.upload',
-									data: {
-										accountId: self.accountId,
-										mediaId: media.id,
-										data: mediaToUpload.file
-									},
-									success: function(data, status) {
-										closeUploadDiv(media);
-									},
-									error: function(data, status) {
-										self.callApi({
-											resource: 'media.delete',
-											data: {
-												accountId: self.accountId,
-												mediaId: media.id,
-												data: {}
-											},
-											success: function(data, status) {}
-										});
-									}
-								});
-							}
-						});
-					} else {
-						monster.ui.alert(self.i18n.active().groups.ringback.emptyUploadAlert);
-					}
-				});
-
-				featureTemplate.find('.save').on('click', function() {
-					var selectedMedia = featureTemplate.find('.media-dropdown option:selected').val(),
-						enabled = switchFeature.prop('checked');
-
-					if (!('smartpbx' in data.group)) {
-						data.group.smartpbx = {};
-					}
-
-					if (enabled) {
-						ringGroupNode.data.ringback = selectedMedia;
-						if ('ringback' in data.group.smartpbx) {
-							data.group.smartpbx.ringback.enabled = true;
-						} else {
-							data.group.smartpbx.ringback = {
-								enabled: true
-							};
-						}
-
-						self.groupsUpdateCallflow(data.baseCallflow, function() {
-							self.groupsUpdate(data.group, function(updatedGroup) {
-								popup.dialog('close').remove();
-								self.groupsRender({ groupId: data.group.id });
-							});
-						});
-					} else if (ringGroupNode.data.ringback || (data.group.smartpbx.ringback && data.group.smartpbx.ringback.enabled)) {
-						delete ringGroupNode.data.ringback;
-						if ('ringback' in data.group.smartpbx) {
-							data.group.smartpbx.ringback.enabled = false;
-						}
-
-						self.groupsUpdateCallflow(data.baseCallflow, function() {
-							self.groupsUpdate(data.group, function(updatedGroup) {
-								popup.dialog('close').remove();
-								self.groupsRender({ groupId: data.group.id });
-							});
-						});
-					}
 				});
 
 				popup = monster.ui.dialog(featureTemplate, {

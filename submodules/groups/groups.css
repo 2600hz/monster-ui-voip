@@ -523,33 +523,6 @@
 	margin-left: 10px;
 	width: 117px;
 }
-.monster-feature-popup-container[data-feature="ringback"] .upload-div {
-	display: none;
-	margin-top: 20px;
-}
-.monster-feature-popup-container[data-feature="ringback"] .upload-div .upload-input {
-	margin: 0;
-	width: 330px;
-}
-.monster-feature-popup-container[data-feature="ringback"] .upload-div button.upload-action {
-	margin-left: 10px;
-	padding-left: 19px;
-	padding-right: 19px;
-}
-
-.monster-feature-popup-container[data-feature="ringback"] .upload-div button > i {
-	margin-right: 0;
-	padding-right: 0;
-}
-
-.monster-feature-popup-container[data-feature="ringback"] .upload-div .file-upload {
-	margin: 0;
-}
-.monster-feature-popup-container[data-feature="ringback"] .upload-div .file-upload > input {
-	margin: 0;
-	width: 205px;
-	padding: 6px;
-}
 
 /* Next Action Feature */
 .monster-feature-popup-container[data-feature="next_action"] {
