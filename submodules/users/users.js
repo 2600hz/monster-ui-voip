@@ -693,8 +693,10 @@ define(function(require) {
 						});
 					},
 					vmboxes: function(callback) {
-						self.usersListVMBoxes(function(vmboxes) {
-							callback(null, vmboxes);
+						self.usersListVMBoxes({
+							success: function(vmboxes) {
+								callback(null, vmboxes);
+							}
 						});
 					}
 				}, function(err, results) {
@@ -1596,17 +1598,39 @@ define(function(require) {
 			});
 
 			template.on('click', '.feature[data-feature="vmbox"]', function() {
-				self.usersListVMBoxesUser(currentUser.id, function(vmboxes) {
-					currentUser.extra.deleteAfterNotify = true;
-					if (vmboxes.length > 0) {
+				monster.waterfall([
+					function(callback) {
+						self.usersListVMBoxesSmartUser({
+							userId: currentUser.id,
+							success: function(vmboxes) {
+								callback(null, vmboxes);
+							},
+							error: function() {
+								callback(true);
+							}
+						});
+					},
+					function(vmboxes, callback) {
+						currentUser.extra.deleteAfterNotify = true;
+						currentUser.extra.hasVmBox = (vmboxes.length === 0);
+						if (currentUser.extra.hasVmBox) {
+							currentUser.extra.deleteAfterNotify = false;
+							callback(null);
+							return;
+						}
+
 						self.usersGetVMBox(vmboxes[0].id, function(data) {
 							currentUser.extra.deleteAfterNotify = data.delete_after_notify;
 
-							self.usersRenderVMToEmail(currentUser);
+							callback(null);
 						});
-					} else {
-						self.usersRenderVMToEmail(currentUser);
 					}
+				], function(err, result) {
+					if (err) {
+						return;
+					}
+
+					self.usersRenderVMBox(currentUser);
 				});
 			});
 
@@ -2113,7 +2137,7 @@ define(function(require) {
 			});
 		},
 
-		usersRenderVMToEmail: function(currentUser) {
+		usersRenderVMBox: function(currentUser) {
 			var self = this,
 				featureTemplate = $(self.getTemplate({
 					name: 'feature-vmbox',
@@ -2139,6 +2163,75 @@ define(function(require) {
 			});
 
 			featureTemplate.find('.save').on('click', function() {
+				var ErrorTypes = {
+						FormInvalid: 0,
+						ApiError: 1
+					},
+					enabled = switchFeature.prop('checked'),
+					formData = monster.ui.getFormData('vmbox_form');
+
+				monster.waterfall([
+					function(callback) {
+						if (monster.ui.valid(featureForm)) {
+							callback(null);
+							return;
+						}
+						callback({ type: ErrorTypes.FormInvalid });
+					},
+					function(callback) {
+						// Get first VMBox for smart user
+						self.usersListVMBoxesSmartUser({
+							userId: currentUser.id,
+							success: function(vmboxes) {
+								callback(null, vmboxes[0]);
+							},
+							error: function() {
+								callback({ type: ErrorTypes.ApiError });
+							}
+						});
+					},
+					function(vmbox, callback) {
+						if (vmbox && !enabled) {
+							// TODO: VMBox exist, but shouldn't. Remove VMBox.
+							return;
+						}
+
+						if (!vmbox && enabled) {
+							// TODO: VMBox does not exist, but should. Create VMBox.
+						}
+					},
+					function(callback) {
+						// Update user (patch)
+						// TODO: Should we update user's e-mail (check on original code)
+						self.usersPatchUser({
+							data: {
+								data: {
+									vm_to_email_enabled: formData.vm_to_email_enabled
+								}
+							},
+							success: function(userData) {
+								callback(userData);
+							},
+							error: function() {
+								callback({ type: ErrorTypes.ApiError });
+							}
+						});
+					}
+				], function(err, userData) {
+					if (err.type === ErrorTypes.FormInvalid) {
+						return;
+					}
+
+					self.usersRender({
+						userId: userData.id,
+						openedTab: 'features',
+						callback: function() {
+							popup.dialog('close').remove();
+						}
+					});
+				});
+
+				// TODO: Remove from here to the end of the current function
 				var formData = monster.ui.getFormData('vmbox_form'),
 					userToSave = $.extend(true, {}, currentUser),
 					enabled = switchFeature.prop('checked'),
@@ -3211,29 +3304,31 @@ define(function(require) {
 					});
 				},
 				vmboxes: function(callback) {
-					self.usersListVMBoxes(function(vmboxes) {
-						var firstVmboxId,
-							results = {
-								listExisting: [],
-								userVM: {}
-							};
+					self.usersListVMBoxes({
+						success: function(vmboxes) {
+							var firstVmboxId,
+								results = {
+									listExisting: [],
+									userVM: {}
+								};
 
-						_.each(vmboxes, function(vmbox) {
-							results.listExisting.push(vmbox.mailbox);
+							_.each(vmboxes, function(vmbox) {
+								results.listExisting.push(vmbox.mailbox);
 
-							if (vmbox.owner_id === userId && !firstVmboxId) {
-								firstVmboxId = vmbox.id;
-							}
-						});
-
-						if (firstVmboxId) {
-							self.usersGetVMBox(firstVmboxId, function(vmbox) {
-								results.userVM = vmbox;
-
-								callback(null, results);
+								if (vmbox.owner_id === userId && !firstVmboxId) {
+									firstVmboxId = vmbox.id;
+								}
 							});
-						} else {
-							callback(null, results);
+
+							if (firstVmboxId) {
+								self.usersGetVMBox(firstVmboxId, function(vmbox) {
+									results.userVM = vmbox;
+
+									callback(null, results);
+								});
+							} else {
+								callback(null, results);
+							}
 						}
 					});
 				}
@@ -3896,9 +3991,14 @@ define(function(require) {
 					}
 
 					data.vmbox.owner_id = _dataUser.id;
-					self.usersCreateVMBox(data.vmbox, function(_dataVM) {
-						data.callflow.flow.children._.data.id = _dataVM.id;
-						callback(null, _dataUser);
+					self.usersCreateVMBox({
+						data: {
+							data: data.vmbox
+						},
+						success: function(_dataVM) {
+							data.callflow.flow.children._.data.id = _dataVM.id;
+							callback(null, _dataUser);
+						}
 					});
 				},
 				function(_dataUser, callback) {
@@ -4279,19 +4379,29 @@ define(function(require) {
 			});
 		},
 
-		usersListVMBoxes: function(callback) {
+		/**
+		 * Gets the list of vmboxes
+		 * @param  {Object}   args
+		 * @param  {Object}   args.data     Data to be used by the SDK to query the API
+		 * @param  {Function} args.success  Success callback
+		 * @param  {Function} args.error    Error callback
+		 */
+		usersListVMBoxes: function(args) {
 			var self = this;
 
 			self.callApi({
 				resource: 'voicemail.list',
-				data: {
+				data: _.merge({
 					accountId: self.accountId,
 					filters: {
 						paginate: 'false'
 					}
-				},
+				}, args.data),
 				success: function(data) {
-					callback(data.data);
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(parsedError) {
+					args.hasOwnProperty('error') && args.error(parsedError);
 				}
 			});
 		},
@@ -4299,18 +4409,35 @@ define(function(require) {
 		usersListVMBoxesUser: function(userId, callback) {
 			var self = this;
 
-			self.callApi({
-				resource: 'voicemail.list',
+			self.usersListVMBoxes({
 				data: {
-					accountId: self.accountId,
 					filters: {
-						filter_owner_id: userId,
-						paginate: 'false'
+						filter_owner_id: userId
 					}
 				},
-				success: function(data) {
-					callback(data.data);
-				}
+				success: callback
+			});
+		},
+
+		/**
+		 * Gets the list of vmboxes for a user, that has been created through Smart PBX app
+		 * @param  {Object}   args
+		 * @param  {String}   args.userId   User ID
+		 * @param  {Function} args.success  Success callback
+		 * @param  {Function} args.error    Error callback
+		 */
+		usersListVMBoxesSmartUser: function(args) {
+			// TODO: Maybe modify this to get a single vmbox
+			var self = this;
+
+			self.usersListVMBoxes({
+				data: {
+					filters: {
+						filter_owner_id: args.userId,
+						'filter_ui_metadata.origin': 'voip'
+					}
+				},
+				success: args.success
 			});
 		},
 
@@ -4329,17 +4456,27 @@ define(function(require) {
 			});
 		},
 
-		usersCreateVMBox: function(vmData, callback) {
+		/**
+		 * Creates a Voicemail Box
+		 * @param  {Object}   args
+		 * @param  {Object}   args.data       Data to be sent by the SDK to the API
+		 * @param  {Object}   args.data.data  Data provided for the Voicemail Box to be created
+		 * @param  {Function} args.success    Success callback
+		 * @param  {Function} args.error      Error callback
+		 */
+		usersCreateVMBox: function(args) {
 			var self = this;
 
 			self.callApi({
 				resource: 'voicemail.create',
-				data: {
-					accountId: self.accountId,
-					data: vmData
-				},
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
 				success: function(data) {
-					callback(data.data);
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(parsedError) {
+					args.hasOwnProperty('error') && args.error(parsedError);
 				}
 			});
 		},
@@ -5283,6 +5420,31 @@ define(function(require) {
 				},
 				onChargesCancelled: function() {
 					args.hasOwnProperty('onChargesCancelled') && args.onChargesCancelled();
+				}
+			});
+		},
+
+		/**
+		 * Update specific values of a user
+		 * @param  {Object}   args
+		 * @param  {Object}   args.data       Data to be sent by the SDK to the API
+		 * @param  {Object}   args.data.data  User data to be patched
+		 * @param  {Function} args.success    Success callback
+		 * @param  {Function} args.error      Error callback
+		 */
+		usersPatchUser: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'user.patch',
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
+				success: function(data, status) {
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(parsedError) {
+					args.hasOwnProperty('error') && args.error(parsedError);
 				}
 			});
 		}

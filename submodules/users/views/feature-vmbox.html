@@ -25,7 +25,7 @@
 			<div class="control-group main">
 				<label class="title">Voicemail to e-mail:</label>
 				{{#monsterSwitch}}
-					<input type="checkbox" name="vm_to_email" id="vm_to_email" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if extra.mapFeatures.vmbox.vm_to_email_active}} checked="checked"{{/if}}></input>
+					<input type="checkbox" name="vm_to_email_enabled" id="vm_to_email_enabled" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if extra.vmToEmail}} checked="checked"{{/if}}></input>
 				{{/monsterSwitch}}
 			</div>
 
