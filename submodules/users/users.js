@@ -928,7 +928,7 @@ define(function(require) {
 						message: self.getTemplate({
 							name: '!' + self.i18n.active().users.toastrMessages.userDelete,
 							data: {
-								name: data.first_name + ' ' + data.last_name
+								name: self.usersGetUserFullName(data)
 							}
 						})
 					});
@@ -956,8 +956,8 @@ define(function(require) {
 
 						var oldPresenceId = currentUser.presence_id,
 							userToSave = $.extend(true, {}, currentUser, formData),
-							newName = userToSave.first_name + ' ' + userToSave.last_name,
-							oldName = currentUser.first_name + ' ' + currentUser.last_name,
+							newName = self.usersGetUserFullName(userToSave),
+							oldName = self.usersGetUserFullName(currentUser),
 							isUserNameDifferent = newName !== oldName,
 							hasTimeout = userToSave.extra.ringingTimeout && userToSave.features.indexOf('find_me_follow_me') < 0,
 							shouldUpdateTimeout = hasTimeout ? parseInt(currentUser.extra.ringingTimeout) !== parseInt(userToSave.extra.ringingTimeout) : false;
@@ -1039,7 +1039,7 @@ define(function(require) {
 								message: self.getTemplate({
 									name: '!' + toastrMessages.userUpdated,
 									data: {
-										name: results.user.first_name + ' ' + results.user.last_name
+										name: self.usersGetUserFullName(results.user)
 									}
 								})
 							});
@@ -1082,7 +1082,7 @@ define(function(require) {
 								message: self.getTemplate({
 									name: '!' + toastrMessages.pinUpdated,
 									data: {
-										name: currentUser.first_name + ' ' + currentUser.last_name
+										name: self.usersGetUserFullName(currentUser)
 									}
 								})
 							});
@@ -1175,7 +1175,7 @@ define(function(require) {
 								message: self.getTemplate({
 									name: '!' + toastrMessages.userUpdated,
 									data: {
-										name: userData.data.first_name + ' ' + userData.data.last_name
+										name: self.usersGetUserFullName(userData.data)
 									}
 								})
 							});
@@ -1233,7 +1233,7 @@ define(function(require) {
 						message: self.getTemplate({
 							name: '!' + toastrMessages.userUpdated,
 							data: {
-								name: userData.data.first_name + ' ' + userData.data.last_name
+								name: self.usersGetUserFullName(userData.data)
 							}
 						})
 					});
@@ -2168,7 +2168,8 @@ define(function(require) {
 						ApiError: 1
 					},
 					enabled = switchFeature.prop('checked'),
-					formData = monster.ui.getFormData('vmbox_form');
+					formData = monster.ui.getFormData('vmbox_form'),
+					userId = currentUser.id;
 
 				monster.waterfall([
 					function(callback) {
@@ -2181,7 +2182,7 @@ define(function(require) {
 					function(callback) {
 						// Get first VMBox for smart user
 						self.usersListVMBoxesSmartUser({
-							userId: currentUser.id,
+							userId: userId,
 							success: function(vmboxes) {
 								callback(null, vmboxes[0]);
 							},
@@ -2197,13 +2198,15 @@ define(function(require) {
 						}
 
 						if (!vmbox && enabled) {
-							// TODO: VMBox does not exist, but should. Create VMBox.
+							self.usersAddMainVMBoxToUser({
+								user: currentUser,
+								callback: callback
+							});
 						}
 					},
 					function(callback) {
-						// Update user (patch)
-						// TODO: Should we update user's e-mail (check on original code)
 						self.usersPatchUser({
+							userId: userId,
 							data: {
 								data: {
 									vm_to_email_enabled: formData.vm_to_email_enabled
@@ -3150,7 +3153,7 @@ define(function(require) {
 
 		usersCleanUserData: function(userData) {
 			var userData = $.extend(true, {}, userData),
-				fullName = userData.first_name + ' ' + userData.last_name,
+				fullName = self.usersGetUserFullName(userData),
 				defaultCallerIdName = fullName.substring(0, 15),
 				newCallerIDs = {
 					caller_id: {
@@ -3672,7 +3675,7 @@ define(function(require) {
 
 		usersFormatCreationData: function(data) {
 			var self = this,
-				fullName = data.user.first_name + ' ' + data.user.last_name,
+				fullName = self.usersGetUserFullName(data.user),
 				callerIdName = fullName.substring(0, 15),
 				formattedData = {
 					user: $.extend(true, {}, {
@@ -3689,10 +3692,7 @@ define(function(require) {
 						email: data.extra.differentEmail ? data.extra.email : data.user.username,
 						priv_level: 'user'
 					}, data.user),
-					vmbox: {
-						mailbox: data.callflow.extension,
-						name: fullName + self.appFlags.users.smartPBXVMBoxString
-					},
+					vmbox: self.usersNewMainVMBox(data.callflow.extension, fullName),
 					callflow: {
 						contact_list: {
 							exclude: false
@@ -4042,7 +4042,7 @@ define(function(require) {
 					}
 				};
 
-				var fullName = user.first_name + ' ' + user.last_name,
+				var fullName = self.usersGetUserFullName(user),
 					callflow = {
 						contact_list: {
 							exclude: false
@@ -5068,7 +5068,7 @@ define(function(require) {
 						});
 					},
 					function(vmbox, wfCallback) {
-						vmbox.name = user.first_name + ' ' + user.last_name + self.appFlags.users.smartPBXVMBoxString;
+						vmbox.name = self.usersGetMainVMBoxName(self.usersGetUserFullName(user));
 						// We only want to update the vmbox number if it was already synced with the presenceId (and if the presenceId was not already set)
 						// This allows us to support old clients who have mailbox number != than their extension number
 						if (oldPresenceId === vmbox.mailbox) {
@@ -5092,7 +5092,7 @@ define(function(require) {
 			monster.parallel({
 				conference: function(callback) {
 					var baseConference = {
-						name: data.user.first_name + ' ' + data.user.last_name + self.appFlags.users.smartPBXConferenceString,
+						name: self.usersGetUserFullName(data.user) + self.appFlags.users.smartPBXConferenceString,
 						owner_id: data.user.id,
 						play_name_on_join: true,
 						member: {
@@ -5447,6 +5447,92 @@ define(function(require) {
 					args.hasOwnProperty('error') && args.error(parsedError);
 				}
 			});
+		},
+
+		/**
+		 * Adds a main VMBox to an existing user
+		 * @param  {Object}    args
+		 * @param  {String}    args.user      User
+		 * @param  {Function}  args.callback  Callback for monster.waterfall
+		 */
+		usersAddMainVMBoxToUser: function(args) {
+			var self = this,
+				user = args.user,
+				// TODO: Get these values
+				userId = user.id,
+				userName = self.usersGetUserFullName(user),
+				mailbox = user.presence_id || extension;	// TODO: Get user's extension from somewhere. If presence_id
+
+			monster.parallel({
+				vmbox: function(callback) {
+					self.usersCreateVMBox({
+						data: {
+							data: self.usersNewMainVMBox(mailbox, userName, userId)
+						},
+						success: function(vmbox) {
+							callback(null, vmbox);
+						}
+					});
+				},
+				callflow: function(callback) {
+					self.usersGetMainCallflow(args.userId, function(mainCallflow) {
+						callback(null, mainCallflow);
+					});
+				}
+			}, function(err, results) {
+				if (err) {
+					args.hasOwnProperty('callback') && args.callback(err);
+					return;
+				}
+
+				var mainCallflow = results.callflow,
+					mainVMBox = results.vmbox;
+
+				if (mainCallflow) {
+					// TODO: Update callflow
+				} else {
+					// TODO: Create callflow
+				}
+
+				args.hasOwnProperty('callback') && args.callback(null);
+			});
+		},
+
+		/**
+		 * Gets a new Voicemail Box object
+		 * @param    {Number} mailbox   Mailbox
+		 * @param    {String} userName  User full name
+		 * @param    {String} userId    User ID
+		 * @returns  {Object} Voicemail Box object
+		 */
+		usersNewMainVMBox: function(mailbox, userName, userId = undefined) {
+			var self = this;
+
+			return {
+				owner_id: userId,
+				mailbox: mailbox,
+				name: self.usersGetMainVMBoxName(userName)
+			};
+		},
+
+		/**
+		 * Builds the user full name, from the user data provided
+		 * @param    {Object} user  User data object
+		 * @returns  {String} User's full name
+		 */
+		usersGetUserFullName: function(user) {
+			return user.first_name + ' ' + user.last_name;
+		},
+
+		/**
+		 * Builds the name for the user's main voicemail box
+		 * @param    {String} userName  User full name
+		 * @returns  {String} Name for the user's main voicemail box
+		 */
+		usersGetMainVMBoxName: function(userName) {
+			var self = this;
+
+			return userName + self.appFlags.users.smartPBXVMBoxString;
 		}
 	};
 
