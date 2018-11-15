@@ -885,7 +885,7 @@ define(function(require) {
 			template.on('click', '#delete_user', function() {
 				var dataUser = $(this).parents('.grid-row').data();
 
-				monster.pub('common.deleteSmartUser.showDeleteDialog', {
+				monster.pub('common.deleteSmartUser.renderPopup', {
 					user: dataUser,
 					callback: function(data) {
 						monster.ui.toast({
