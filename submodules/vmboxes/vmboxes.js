@@ -148,7 +148,14 @@ define(function(require) {
 					afterCancel: function() {
 						popup.dialog('close').remove();
 					}
-				};
+				},
+				medias = _.get(data, 'extra.mediaList'),
+				mediaUnavailable = _.find(medias, function(media) {
+					return media.id === (data.media || {}).unavailable;
+				}),
+				mediaTemporaryUnavailable = _.find(medias, function(media) {
+					return media.id === (data.media || {}).temporary_unavailable;
+				});
 
 			_.each(data.notify_email_addresses, function(recipient) {
 				templateVMBox
@@ -162,7 +169,31 @@ define(function(require) {
 						})));
 			});
 
-			monster.pub('common.mediaSelect.render', {
+			monster.pub('common.mediaSelector.render', {
+				container: templateVMBox.find('.greeting-container'),
+				inputName: 'media.unavailable',
+				media: mediaUnavailable,
+				medias: medias,
+				callback: function(greeting) {
+					monster.pub('common.mediaSelector.render', {
+						container: templateVMBox.find('.temporary-greeting-container'),
+						inputName: 'media.temporary_unavailable',
+						media: mediaTemporaryUnavailable,
+						medias: medias,
+						callback: function(temporaryGreeting) {
+							self.vmboxesEditBindEvents(templateVMBox, data, greeting, temporaryGreeting, callbacks);
+
+							popup = monster.ui.dialog(templateVMBox, {
+								position: ['center', 20],
+								title: popupTitle,
+								width: '700'
+							});
+						}
+					});
+				}
+			});
+
+			/*monster.pub('common.mediaSelect.render', {
 				container: templateVMBox.find('.greeting-container'),
 				name: 'media.unavailable',
 				options: data.extra.mediaList,
@@ -186,7 +217,7 @@ define(function(require) {
 						}
 					});
 				}
-			});
+			});*/
 		},
 
 		vmboxesEditBindEvents: function(templateVMBox, data, greetingControl, temporaryGreetingControl, callbacks) {
