@@ -5495,41 +5495,67 @@ define(function(require) {
 		 */
 		usersAddMainVMBoxToUser: function(args) {
 			var self = this,
-				user = args.user,
-				// TODO: Get these values
-				userId = user.id,
-				userName = self.usersGetUserFullName(user),
-				mailbox = user.presence_id || extension;	// TODO: Get user's extension from somewhere. If presence_id
+				userId = args.user.id;
 
-			monster.parallel({
-				vmbox: function(callback) {
-					self.usersCreateVMBox({
-						data: {
-							data: self.usersNewMainVMBox(mailbox, userName, userId)
-						},
-						success: function(vmbox) {
-							callback(null, vmbox);
+			monster.waterfall([
+				function(waterfallCallback) {
+					// Get user's numbers data
+					self.usersGetFormattedNumbersData({
+						userId: userId,
+						callback: function(userNumbersData) {
+							waterfallCallback(null, userNumbersData);
 						}
 					});
 				},
-				callflow: function(callback) {
-					self.usersGetMainCallflow(args.userId, function(mainCallflow) {
-						callback(null, mainCallflow);
+				function(userNumbersData, waterfallCallback) {
+					// Create voicemail box
+					var user = userNumbersData.user,
+						userFullName = self.usersGetUserFullName(user),
+						mailbox = user.presence_id || _.head(userNumbersData.extensions);
+
+					if (_.isNil(mailbox)) {
+						// There is no extension to set for the mailbox
+						waterfallCallback(true);
+						return;
+					}
+
+					self.usersCreateVMBox({
+						data: {
+							data: self.usersNewMainVMBox(mailbox, userFullName, userId)
+						},
+						success: function(userVMBox) {
+							waterfallCallback(null, userNumbersData, userVMBox);
+						}
+					});
+				},
+				function(userNumbersData, userVMBox, waterfallCallback) {
+					var mainUserCallflow = userNumbersData.callflow;
+
+					// Do not update main callflow if it does not have
+					// empty children at the root of the flow, which
+					// is the default main user callflow without vmbox
+					if (!_.isEmpty(mainUserCallflow.flow.children)) {
+						waterfallCallback(null);
+						return;
+					}
+
+					// Otherwise, add vmbox to callflow
+					mainUserCallflow.children._ = {
+						children: {},
+						data: {
+							id: userVMBox.id
+						},
+						module: 'voicemail'
+					};
+
+					self.usersUpdateCallflow(mainUserCallflow, function() {
+						waterfallCallback(null);
 					});
 				}
-			}, function(err, results) {
+			], function(err, result) {
 				if (err) {
 					args.hasOwnProperty('callback') && args.callback(err);
 					return;
-				}
-
-				var mainCallflow = results.callflow,
-					mainVMBox = results.vmbox;
-
-				if (mainCallflow) {
-					// TODO: Update callflow
-				} else {
-					// TODO: Create callflow
 				}
 
 				args.hasOwnProperty('callback') && args.callback(null);
@@ -5548,7 +5574,7 @@ define(function(require) {
 
 			return {
 				owner_id: userId,
-				mailbox: mailbox,
+				mailbox: mailbox.toString(),	// Force to string
 				name: self.usersGetMainVMBoxName(userName)
 			};
 		},
