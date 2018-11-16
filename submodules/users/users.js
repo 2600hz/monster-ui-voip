@@ -3398,17 +3398,37 @@ define(function(require) {
 			});
 		},
 
-		usersGetNumbersData: function(userId, callback, loadNumbersView) {
+		/**
+		 * Get user numbers data from API
+		 * @param  {Object}   args
+		 * @param  {String}   args.userId            User ID
+		 * @param  {Boolean}  args.loadAllCallflows  Indicates if all callflows should be loaded from API
+		 * @param  {Boolean}  args.loadUserDevices   Indicates if user devices should be loaded from API
+		 * @param  {Function} args.callback          Function to be called when data has been obtained
+		 */
+		usersGetNumbersData: function(args) {
 			var self = this,
+				userId = args.userId,
 				parallelRequests = {
 					user: function(callbackParallel) {
 						self.usersGetUser(userId, function(user) {
-							callbackParallel && callbackParallel(null, user);
+							callbackParallel(null, user);
 						});
 					},
 					callflow: function(callbackParallel) {
 						var response = {};
 
+						// If all callflows are not required, only get user main callflow
+						if (!args.loadAllCallflows) {
+							self.usersGetMainCallflow(userId, function(callflow) {
+								response.userCallflow = callflow;
+
+								callbackParallel(null, response);
+							});
+							return;
+						}
+
+						// Else, get all callflows along with the main user callflow
 						self.usersListCallflows(function(callflows) {
 							response.list = callflows;
 
@@ -3433,31 +3453,31 @@ define(function(require) {
 									success: function(callflow) {
 										response.userCallflow = callflow.data;
 
-										callbackParallel && callbackParallel(null, response);
+										callbackParallel(null, response);
 									}
 								});
 							} else {
-								callbackParallel && callbackParallel(null, response);
+								callbackParallel(null, response);
 							}
 						});
 					},
 					numbers: function(callbackParallel) {
 						self.usersListNumbers(function(listNumbers) {
-							callbackParallel && callbackParallel(null, listNumbers);
+							callbackParallel(null, listNumbers);
 						});
 					}
 				};
 
-			if (loadNumbersView) {
+			if (args.loadUserDevices) {
 				parallelRequests.devices = function(callbackParallel) {
 					self.usersListDeviceUser(userId, function(listDevices) {
-						callbackParallel && callbackParallel(null, listDevices);
+						callbackParallel(null, listDevices);
 					});
 				};
 			}
 
 			monster.parallel(parallelRequests, function(err, results) {
-				callback && callback(results);
+				args.hasOwnProperty('callback') && args.callback(results);
 			});
 		},
 
@@ -3465,8 +3485,10 @@ define(function(require) {
 			var self = this,
 				template;
 
-			self.usersGetNumbersData(userId, function(results) {
-				self.usersFormatNumbersData(userId, results, function(results) {
+			self.usersGetFormattedNumbersData({
+				userId: userId,
+				loadNumbersView: true,
+				callback: function(results) {
 					template = $(self.getTemplate({
 						name: 'numbers',
 						data: _.merge({
@@ -3491,8 +3513,8 @@ define(function(require) {
 					});
 
 					callback && callback(template, results);
-				});
-			}, true);
+				}
+			});
 		},
 		usersGetDevicesTemplate: function(userId, callback) {
 			var self = this,
@@ -3514,8 +3536,10 @@ define(function(require) {
 			var self = this,
 				template;
 
-			self.usersGetNumbersData(userId, function(results) {
-				self.usersFormatNumbersData(userId, results, function(results) {
+			self.usersGetFormattedNumbersData({
+				userId: userId,
+				loadAllExtensions: true,
+				callback: function(results) {
 					template = $(self.getTemplate({
 						name: 'extensions',
 						data: results,
@@ -3523,7 +3547,7 @@ define(function(require) {
 					}));
 
 					callback && callback(template, results);
-				});
+				}
 			});
 		},
 		usersGetLicensedRoleTemplate: function(userId, callback) {
@@ -3583,8 +3607,17 @@ define(function(require) {
 			return formattedData;
 		},
 
-		usersFormatNumbersData: function(userId, data, callback) {
+		/**
+		 * Format user numbers data
+		 * @param  {Object}   args
+		 * @param  {Object}   args.data               User, callflows and numbers data
+		 * @param  {Function} args.callback           Function to be called when the data has been formatted
+		 * @param  {Boolean}  args.includeAllExtensions  Indicates if all extensions should be included in the formatted data
+		 */
+		usersFormatNumbersData: function(args) {
 			var self = this,
+				data = args.data,
+				callback = args.callback,
 				response = {
 					countSpare: 0,
 					assignedNumbers: [],
@@ -3641,6 +3674,15 @@ define(function(require) {
 
 			response.assignedNumbers = _.sortBy(response.assignedNumbers, 'phoneNumber');
 
+			response.emptyAssigned = _.isEmpty(response.assignedNumbers);
+			response.emptySpare = _.isEmpty(response.unassignedNumbers);
+			response.emptyExtensions = _.isEmpty(response.extensions);
+
+			if (!args.includeAllExtensions) {
+				callback && callback(response);
+				return;
+			}
+
 			/* List of extensions */
 			response.allExtensions = [];
 
@@ -3665,10 +3707,6 @@ define(function(require) {
 
 				return result;
 			});
-
-			response.emptyAssigned = _.isEmpty(response.assignedNumbers);
-			response.emptySpare = _.isEmpty(response.unassignedNumbers);
-			response.emptyExtensions = _.isEmpty(response.extensions);
 
 			callback && callback(response);
 		},
@@ -5451,9 +5489,9 @@ define(function(require) {
 
 		/**
 		 * Adds a main VMBox to an existing user
-		 * @param  {Object}    args
-		 * @param  {String}    args.user      User
-		 * @param  {Function}  args.callback  Callback for monster.waterfall
+		 * @param  {Object}   args
+		 * @param  {String}   args.user      User
+		 * @param  {Function} args.callback  Callback for monster.waterfall
 		 */
 		usersAddMainVMBoxToUser: function(args) {
 			var self = this,
@@ -5533,6 +5571,33 @@ define(function(require) {
 			var self = this;
 
 			return userName + self.appFlags.users.smartPBXVMBoxString;
+		},
+
+		/**
+		 * Gets the numbers data assigned to a user, separated in phone numbers and extensions
+		 * @param  {Object}   args
+		 * @param  {String}   args.userId             User ID
+		 * @param  {Boolean}  args.loadAllExtensions  Indicates if all extensions should be loaded from API
+		 * @param  {Boolean}  args.loadNumbersView    Indicates if the numbers view should be loaded
+		 * @param  {Function} args.callback           Function to be called when the numbers data has been obtained and formatted
+		 */
+		usersGetFormattedNumbersData: function(args) {
+			var self = this,
+				loadAllExtensions = !!args.loadAllExtensions,
+				callback = args.callback;
+
+			self.usersGetNumbersData({
+				userId: args.userId,
+				loadUserDevices: !!args.loadNumbersView,
+				loadAllCallflows: loadAllExtensions,
+				callback: function(results) {
+					self.usersFormatNumbersData({
+						data: results,
+						includeAllExtensions: loadAllExtensions,
+						callback: callback
+					});
+				}
+			});
 		}
 	};
 
