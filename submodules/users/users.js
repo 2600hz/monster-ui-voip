@@ -2238,67 +2238,6 @@ define(function(require) {
 						}
 					});
 				});
-
-				// TODO: Remove from here to the end of the current function
-				var formData = monster.ui.getFormData('vmbox_form'),
-					userToSave = $.extend(true, {}, currentUser),
-					enabled = switchFeature.prop('checked'),
-					args = {
-						callback: function() {
-							popup.dialog('close').remove();
-						},
-						openedTab: 'features'
-					},
-					updateUser = function(user) {
-						self.usersUpdateUser(user, function(data) {
-							args.userId = data.data.id;
-
-							self.usersRender(args);
-						});
-					},
-					/* updates all the vmboxes with the new delete after notify setting, and then calls the callback*/
-					updateVMsDeleteAfterNotify = function(val, userId, callbackAfterUpdate) {
-						self.usersListVMBoxesUser(userId, function(vmboxes) {
-							var listFnParallel = [];
-
-							_.each(vmboxes, function(vm) {
-								listFnParallel.push(function(callback) {
-									self.usersGetVMBox(vm.id, function(data) {
-										/* Only update vms if the deleteAfterNotify value is different than before */
-										if (data.delete_after_notify !== val) {
-											data.delete_after_notify = val;
-
-											self.usersUpdateVMBox(data, function(data) {
-												callback(null, data);
-											});
-										} else {
-											callback(null, data);
-										}
-									});
-								});
-							});
-
-							monster.parallel(listFnParallel, function(err, results) {
-								callbackAfterUpdate && callbackAfterUpdate(results);
-							});
-						});
-					};
-
-				userToSave.vm_to_email_enabled = enabled;
-
-				/* Only update the email and the checkboxes if the setting is enabled */
-				if (enabled === true) {
-					if (monster.ui.valid(featureForm)) {
-						userToSave.email = formData.email;
-
-						/* Update VMBoxes, then update user and finally close the popup */
-						updateVMsDeleteAfterNotify(formData.delete_after_notify, userToSave.id, function() {
-							updateUser(userToSave);
-						});
-					}
-				} else {
-					updateUser(userToSave);
-				}
 			});
 
 			var popup = monster.ui.dialog(featureTemplate, {
