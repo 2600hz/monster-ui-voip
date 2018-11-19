@@ -2170,7 +2170,7 @@ define(function(require) {
 				})),
 				switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#vmbox_form'),
-				switchVmToEmail = featureForm.find('#vm_to_email');
+				switchVmToEmail = featureForm.find('#vm_to_email_enabled');
 
 			monster.ui.validate(featureForm);
 
@@ -2221,33 +2221,37 @@ define(function(require) {
 						if (!vmbox && enabled) {
 							self.usersAddMainVMBoxToUser({
 								userId: userId,
+								deleteAfterNotify: formData.delete_after_notify,
 								callback: callback
 							});
+							return;
 						}
+
+						callback(null);
 					},
 					function(callback) {
 						self.usersPatchUser({
-							userId: userId,
 							data: {
+								userId: userId,
 								data: {
 									vm_to_email_enabled: formData.vm_to_email_enabled
 								}
 							},
-							success: function(userData) {
-								callback(userData);
+							success: function() {
+								callback(null);
 							},
 							error: function() {
 								callback(true);
 							}
 						});
 					}
-				], function(err, userData) {
+				], function(err) {
 					if (err) {
 						return;
 					}
 
 					self.usersRender({
-						userId: userData.id,
+						userId: userId,
 						openedTab: 'features',
 						callback: function() {
 							popup.dialog('close').remove();
@@ -5473,7 +5477,7 @@ define(function(require) {
 			monster.waterfall([
 				function(waterfallCallback) {
 					self.usersGetMainCallflow(args.userId, function(mainUserCallflow) {
-						waterfallCallback(mainUserCallflow);
+						waterfallCallback(null, mainUserCallflow);
 					});
 				},
 				function(mainUserCallflow, waterfallCallback) {
@@ -5577,7 +5581,7 @@ define(function(require) {
 					}
 
 					// Otherwise, add vmbox to callflow
-					mainUserCallflow.children._ = {
+					mainUserCallflow.flow.children._ = {
 						children: {},
 						data: {
 							id: userVMBox.id
