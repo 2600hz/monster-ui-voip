@@ -2227,6 +2227,10 @@ define(function(require) {
 							return;
 						}
 
+						if (vmbox && vmbox.delete_after_notify !== formData.delete_after_notify) {
+							// TODO: Patch VMBox to set delete_after_notify. TEST THAT formData.delete_after_notify is a boolean.
+						}
+
 						callback(null);
 					},
 					function(callback) {
@@ -5532,8 +5536,9 @@ define(function(require) {
 		/**
 		 * Adds a main VMBox to an existing user
 		 * @param  {Object}   args
-		 * @param  {String}   args.userId    User ID
-		 * @param  {Function} args.callback  Callback for monster.waterfall
+		 * @param  {String}   args.userId             User ID
+		 * @param  {Boolean}  args.deleteAfterNotify  Delete after notify voicemail box flag
+		 * @param  {Function} args.callback           Callback for monster.waterfall
 		 */
 		usersAddMainVMBoxToUser: function(args) {
 			var self = this,
@@ -5563,7 +5568,7 @@ define(function(require) {
 
 					self.usersCreateVMBox({
 						data: {
-							data: self.usersNewMainVMBox(mailbox, userFullName, userId)
+							data: self.usersNewMainVMBox(mailbox, userFullName, userId, args.deleteAfterNotify)
 						},
 						success: function(userVMBox) {
 							waterfallCallback(null, userNumbersData, userVMBox);
@@ -5612,13 +5617,15 @@ define(function(require) {
 		 * @param    {String} userId    User ID
 		 * @returns  {Object} Voicemail Box object
 		 */
-		usersNewMainVMBox: function(mailbox, userName, userId = undefined) {
+		usersNewMainVMBox: function(mailbox, userName, userId = undefined, deleteAfterNotify = undefined) {
 			var self = this;
 
+			// TODO: Verify how the VMBox is created if delete_after_notify is undefined (i.e. when creating new user)
 			return {
 				owner_id: userId,
 				mailbox: mailbox.toString(),	// Force to string
-				name: self.usersGetMainVMBoxName(userName)
+				name: self.usersGetMainVMBoxName(userName),
+				delete_after_notify: deleteAfterNotify
 			};
 		},
 
