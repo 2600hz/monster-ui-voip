@@ -273,8 +273,13 @@ define(function(require) {
 				}
 			}
 
+			dataUser.extra.features = _.clone(dataUser.features);
+			if (_vmbox) {
+				dataUser.extra.features.push('vmbox');
+			}
+
 			dataUser.extra.countFeatures = 0;
-			_.each(dataUser.features, function(v) {
+			_.each(dataUser.extra.features, function(v) {
 				if (v in dataUser.extra.mapFeatures) {
 					dataUser.extra.countFeatures++;
 					dataUser.extra.mapFeatures[v].active = true;
@@ -302,7 +307,7 @@ define(function(require) {
 					var flow = _mainCallflow.flow,
 						module = 'user';
 
-					if (dataUser.features.indexOf('find_me_follow_me') >= 0) {
+					if (dataUser.extra.features.indexOf('find_me_follow_me') >= 0) {
 						module = 'ring_group';
 						dataUser.extra.groupTimeout = true;
 					}
@@ -959,7 +964,7 @@ define(function(require) {
 							newName = self.usersGetUserFullName(userToSave),
 							oldName = self.usersGetUserFullName(currentUser),
 							isUserNameDifferent = newName !== oldName,
-							hasTimeout = userToSave.extra.ringingTimeout && userToSave.features.indexOf('find_me_follow_me') < 0,
+							hasTimeout = userToSave.extra.ringingTimeout && userToSave.extra.features.indexOf('find_me_follow_me') < 0,
 							shouldUpdateTimeout = hasTimeout ? parseInt(currentUser.extra.ringingTimeout) !== parseInt(userToSave.extra.ringingTimeout) : false;
 
 						monster.parallel({
@@ -1556,7 +1561,7 @@ define(function(require) {
 			});
 
 			template.on('click', '.feature[data-feature="call_forward"]', function() {
-				if (currentUser.features.indexOf('find_me_follow_me') < 0) {
+				if (currentUser.extra.features.indexOf('find_me_follow_me') < 0) {
 					var featureUser = $.extend(true, {}, currentUser);
 					self.usersGetMainCallflow(featureUser.id, function(mainCallflow) {
 						if (mainCallflow && 'flow' in mainCallflow) {
@@ -1612,8 +1617,7 @@ define(function(require) {
 					},
 					function(vmboxes, callback) {
 						currentUser.extra.deleteAfterNotify = true;
-						currentUser.extra.hasVmBox = !_.isEmpty(vmboxes);
-						if (!currentUser.extra.hasVmBox) {
+						if (_.isEmpty(vmboxes)) {
 							currentUser.extra.deleteAfterNotify = false;
 							callback(null);
 							return;
