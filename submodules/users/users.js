@@ -171,8 +171,22 @@ define(function(require) {
 			});
 		},
 
-		usersFormatUserData: function(dataUser, _mainDirectory, _mainCallflow, _vmbox, _vmboxes) {
+		/**
+		 * Format user related data
+		 * @param  {Object} data
+		 * @param  {Object} data.user              User data
+		 * @param  {Object} data.userMainCallflow  User's main callflow
+		 * @param  {Object} data.userVMBox         User's main voicemail box
+		 * @param  {Object} data.existingVmboxes   Account's existing voicemail boxes
+		 * @param  {Object} data.mainDirectory     Account's main directory
+		 */
+		usersFormatUserData: function(data) {
 			var self = this,
+				dataUser = data.user,
+				_mainDirectory = data.mainDirectory,
+				_mainCallflow = data.userMainCallflow,
+				_vmbox = data.userVMBox,
+				_vmboxes = data.existingVmboxes,
 				formattedUser = {
 					additionalDevices: 0,
 					additionalExtensions: 0,
@@ -377,14 +391,20 @@ define(function(require) {
 					countUsers: data.users.length
 				},
 				mapUsers = {},
+				mapVMBoxes,
 				registeredDevices = _.map(data.deviceStatus, function(device) { return device.device_id; });
 
 			if (_.size(self.appFlags.global.servicePlansRole) > 0) {
 				dataTemplate.showLicensedUserRoles = true;
 			}
 
+			mapVMBoxes = _.groupBy(data.vmboxes, 'owner_id');
+
 			_.each(data.users, function(user) {
-				mapUsers[user.id] = self.usersFormatUserData(user);
+				mapUsers[user.id] = self.usersFormatUserData({
+					user: user,
+					userVMBox: self.usersGetUserMainVMBox(user, mapVMBoxes[user.id])
+				});
 			});
 
 			_.each(data.callflows, function(callflow) {
@@ -1605,25 +1625,25 @@ define(function(require) {
 			template.on('click', '.feature[data-feature="vmbox"]', function() {
 				monster.waterfall([
 					function(callback) {
-						self.usersListVMBoxesSmartUser({
-							userId: currentUser.id,
-							success: function(vmboxes) {
-								callback(null, vmboxes);
+						self.usersGetMainVMBoxSmartUser({
+							user: currentUser,
+							success: function(vmbox) {
+								callback(null, vmbox);
 							},
 							error: function() {
 								callback(true);
 							}
 						});
 					},
-					function(vmboxes, callback) {
+					function(vmbox, callback) {
 						currentUser.extra.deleteAfterNotify = true;
-						if (_.isEmpty(vmboxes)) {
+						if (!vmbox) {
 							currentUser.extra.deleteAfterNotify = false;
 							callback(null);
 							return;
 						}
 
-						self.usersGetVMBox(_.head(vmboxes).id, function(vmbox) {
+						self.usersGetVMBox(vmbox.id, function(vmbox) {
 							currentUser.extra.deleteAfterNotify = vmbox.delete_after_notify;
 
 							callback(null);
@@ -2178,10 +2198,10 @@ define(function(require) {
 				monster.waterfall([
 					function(callback) {
 						// Get first VMBox for smart user
-						self.usersListVMBoxesSmartUser({
-							userId: userId,
-							success: function(vmboxes) {
-								callback(null, _.head(vmboxes));
+						self.usersGetMainVMBoxSmartUser({
+							user: currentUser,
+							success: function(vmbox) {
+								callback(null, vmbox);
 							},
 							error: function() {
 								callback(true);
@@ -3218,7 +3238,9 @@ define(function(require) {
 					}
 				});
 
-				var dataTemplate = self.usersFormatUserData(userData),
+				var dataTemplate = self.usersFormatUserData({
+						user: userData
+					}),
 					template = $(self.getTemplate({
 						name: 'features',
 						data: dataTemplate,
@@ -3287,7 +3309,13 @@ define(function(require) {
 					}
 				});
 
-				var dataTemplate = self.usersFormatUserData(userData, results.mainDirectory, results.mainCallflow, results.vmboxes.userVM, results.vmboxes.listExisting),
+				var dataTemplate = self.usersFormatUserData({
+						user: userData,
+						userMainCallflow: results.mainCallflow,
+						userVMBox: results.vmboxes.userVM,
+						mainDirectory: results.mainDirectory,
+						existingVmboxes: results.vmboxes.listExisting
+					}),
 					template = $(self.getTemplate({
 						name: 'name',
 						data: dataTemplate,
@@ -4411,28 +4439,6 @@ define(function(require) {
 			});
 		},
 
-		/**
-		 * Gets the list of vmboxes for a user, that has been created through Smart PBX app
-		 * @param  {Object}   args
-		 * @param  {String}   args.userId   User ID
-		 * @param  {Function} args.success  Success callback
-		 * @param  {Function} args.error    Error callback
-		 */
-		usersListVMBoxesSmartUser: function(args) {
-			// TODO: Maybe modify this to get a single vmbox
-			var self = this;
-
-			self.usersListVMBoxes({
-				data: {
-					filters: {
-						filter_owner_id: args.userId,
-						'filter_ui_metadata.origin': 'voip'
-					}
-				},
-				success: args.success
-			});
-		},
-
 		usersGetVMBox: function(vmboxId, callback) {
 			var self = this;
 
@@ -4792,6 +4798,18 @@ define(function(require) {
 						},
 						success: function(data, status) {
 							callback(null, data.data);
+						}
+					});
+				},
+				vmboxes: function(callback) {
+					self.usersListVMBoxes({
+						data: {
+							filters: {
+								'filter_ui_metadata.origin': 'voip'
+							}
+						},
+						success: function(vmboxes) {
+							callback(null, vmboxes);
 						}
 					});
 				}
@@ -5641,6 +5659,70 @@ define(function(require) {
 						includeAllExtensions: loadAllExtensions,
 						callback: callback
 					});
+				}
+			});
+		},
+
+		/**
+		 * Gets the list of vmboxes for a user, that has been created through Smart PBX app
+		 * @param  {Object}   args
+		 * @param  {String}   args.userId   User ID
+		 * @param  {Function} args.success  Success callback
+		 * @param  {Function} args.error    Error callback
+		 */
+		usersListVMBoxesSmartUser: function(args) {
+			var self = this;
+
+			self.usersListVMBoxes({
+				data: {
+					filters: {
+						filter_owner_id: args.userId,
+						'filter_ui_metadata.origin': 'voip'
+					}
+				},
+				success: args.success
+			});
+		},
+
+		/**
+		 * Get the main VMBox for a user, from a list of voicemail boxes, which are assumed to
+		 * belong to it already
+		 * @param  {Object} user     User data
+		 * @param  {Array}  vmboxes  List of voicemail boxes that belong to the user
+		 */
+		usersGetUserMainVMBox: function(user, vmboxes) {
+			if (_.isEmpty(vmboxes)) {
+				return null;
+			}
+
+			var presenceId = user.presence_id ? user.presence_id.toString() : null,
+				mainUserVMBox = _.find(vmboxes, function(vmbox) {
+					return vmbox.mailbox === presenceId;
+				});
+
+			if (mainUserVMBox) {
+				return mainUserVMBox;
+			}
+
+			return _.head(mainUserVMBox);
+		},
+
+		/**
+		 * Gets the main voicemail box for a user, which has been created through Smart PBX app
+		 * @param  {Object}   args
+		 * @param  {Object}   args.user     User data
+		 * @param  {Function} args.success  Success callback
+		 * @param  {Function} args.error    Error callback
+		 */
+		usersGetMainVMBoxSmartUser: function(args) {
+			var self = this,
+				user = args.user;
+
+			self.usersListVMBoxesSmartUser({
+				userId: user.id,
+				success: function(vmboxes) {
+					args.hasOwnProperty('success')
+					&& args.success(self.usersGetUserMainVMBox(user, vmboxes));
 				}
 			});
 		}
