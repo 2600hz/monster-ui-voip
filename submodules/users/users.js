@@ -2173,6 +2173,7 @@ define(function(require) {
 
 				monster.waterfall([
 					function(callback) {
+						// Validate form
 						if (monster.ui.valid(featureForm)) {
 							callback(null);
 							return;
@@ -2193,13 +2194,17 @@ define(function(require) {
 					},
 					function(vmbox, callback) {
 						if (vmbox && !enabled) {
-							// TODO: VMBox exist, but shouldn't. Remove VMBox.
+							self.usersDeleteUserVMBox({
+								userId: userId,
+								voicemailId: vmbox.id,
+								callback: callback
+							});
 							return;
 						}
 
 						if (!vmbox && enabled) {
 							self.usersAddMainVMBoxToUser({
-								user: currentUser,
+								userId: userId,
 								callback: callback
 							});
 						}
@@ -3878,8 +3883,11 @@ define(function(require) {
 
 				_.each(results.vmbox, function(vmbox) {
 					listFnDelete.push(function(callback) {
-						self.usersDeleteVMBox(vmbox.id, function(data) {
-							callback(null, '');
+						self.usersDeleteVMBox({
+							voicemailId: vmbox.id,
+							success: function(data) {
+								callback(null, '');
+							}
 						});
 					});
 				});
@@ -3942,18 +3950,28 @@ define(function(require) {
 			});
 		},
 
-		usersDeleteVMBox: function(vmboxId, callback) {
+		/**
+		 * Deletes a Voicemail Box by ID
+		 * @param  {Object}   args
+		 * @param  {String}   args.voicemailId  Voicemail Box ID
+		 * @param  {Function} args.success      Success callback
+		 * @param  {Function} args.error        Error callback
+		 */
+		usersDeleteVMBox: function(args) {
 			var self = this;
 
 			self.callApi({
 				resource: 'voicemail.delete',
 				data: {
-					voicemailId: vmboxId,
+					voicemailId: args.voicemailId,
 					accountId: self.accountId,
 					data: {}
 				},
 				success: function(data) {
-					callback(data.data);
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(parsedError) {
+					args.hasOwnProperty('error') && args.error(parsedError);
 				}
 			});
 		},
@@ -5488,14 +5506,78 @@ define(function(require) {
 		},
 
 		/**
+		 * Deletes user's main Voicemail Box, and removes it from the main user callflow
+		 * @param  {Object}   args
+		 * @param  {String}   args.userId       User ID
+		 * @param  {String}   args.voicemailId  ID of the voicemail to delete
+		 * @param  {Function} args.callback     Callback for monster.waterfall
+		 */
+		usersDeleteUserVMBox: function(args) {
+			var self = this,
+				voicemailId = args.voicemailId;
+
+			monster.waterfall([
+				function(waterfallCallback) {
+					self.usersGetMainCallflow(args.userId, function(mainUserCallflow) {
+						waterfallCallback(mainUserCallflow);
+					});
+				},
+				function(mainUserCallflow, waterfallCallback) {
+					if (_.isNil(mainUserCallflow)) {
+						waterfallCallback(null);
+						return;
+					}
+
+					var flowChildren = mainUserCallflow.flow.children;
+
+					// Check if main user callflow has been created via the voip app, and it has
+					// the voicemail set in the default position. If it is not the case, do not
+					// modify.
+					if (mainUserCallflow.ui_metadata.origin !== 'voip'
+						|| _.isEmpty(flowChildren)
+						|| flowChildren._.module !== 'voicemail'
+						|| flowChildren._.data.id !== voicemailId) {
+						waterfallCallback(null);
+						return;
+					}
+
+					// Remove voicemail from callflow, and save
+					mainUserCallflow.flow.children = {};
+
+					self.usersUpdateCallflow(mainUserCallflow, function() {
+						waterfallCallback(null);
+					});
+				},
+				function(waterfallCallback) {
+					self.usersDeleteVMBox({
+						voicemailId: args.voicemailId,
+						success: function() {
+							waterfallCallback(null);
+						},
+						error: function() {
+							waterfallCallback(true);
+						}
+					});
+				}
+			], function(err, result) {
+				if (err) {
+					args.hasOwnProperty('callback') && args.callback(err);
+					return;
+				}
+
+				args.hasOwnProperty('callback') && args.callback(null);
+			});
+		},
+
+		/**
 		 * Adds a main VMBox to an existing user
 		 * @param  {Object}   args
-		 * @param  {String}   args.user      User
+		 * @param  {String}   args.userId    User ID
 		 * @param  {Function} args.callback  Callback for monster.waterfall
 		 */
 		usersAddMainVMBoxToUser: function(args) {
 			var self = this,
-				userId = args.user.id;
+				userId = args.userId;
 
 			monster.waterfall([
 				function(waterfallCallback) {
@@ -5531,10 +5613,11 @@ define(function(require) {
 				function(userNumbersData, userVMBox, waterfallCallback) {
 					var mainUserCallflow = userNumbersData.callflow;
 
-					// Do not update main callflow if it does not have
+					// Do not update main callflow if it does not has
+					// been created by the voip app, or if does not have
 					// empty children at the root of the flow, which
 					// is the default main user callflow without vmbox
-					if (!_.isEmpty(mainUserCallflow.flow.children)) {
+					if (mainUserCallflow.ui_metadata.origin !== 'voip' || !_.isEmpty(mainUserCallflow.flow.children)) {
 						waterfallCallback(null);
 						return;
 					}
