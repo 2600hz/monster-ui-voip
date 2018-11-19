@@ -25,11 +25,11 @@
 			<div class="control-group main">
 				<label class="title">Voicemail to e-mail:</label>
 				{{#monsterSwitch}}
-					<input type="checkbox" name="vm_to_email_enabled" id="vm_to_email_enabled" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if extra.vmToEmail}} checked="checked"{{/if}}></input>
+					<input type="checkbox" name="vm_to_email_enabled" id="vm_to_email_enabled" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if vm_to_email_enabled}} checked="checked"{{/if}}></input>
 				{{/monsterSwitch}}
 			</div>
 
-			<div class="extra-content disabled">
+			<div class="extra-content{{#unless vm_to_email_enabled}} disabled{{/unless}}">
 				<div class="control-group extra">
 					<label class="fix-left">
 						{{#monsterCheckbox i18n.users.vmbox.deleteAfterNotify}}
