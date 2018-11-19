@@ -1612,25 +1612,25 @@ define(function(require) {
 					},
 					function(vmboxes, callback) {
 						currentUser.extra.deleteAfterNotify = true;
-						currentUser.extra.hasVmBox = (vmboxes.length === 0);
-						if (currentUser.extra.hasVmBox) {
+						currentUser.extra.hasVmBox = !_.isEmpty(vmboxes);
+						if (!currentUser.extra.hasVmBox) {
 							currentUser.extra.deleteAfterNotify = false;
 							callback(null);
 							return;
 						}
 
-						self.usersGetVMBox(vmboxes[0].id, function(vmbox) {
+						self.usersGetVMBox(_.head(vmboxes).id, function(vmbox) {
 							currentUser.extra.deleteAfterNotify = vmbox.delete_after_notify;
 
-							callback(null, vmbox);
+							callback(null);
 						});
 					}
-				], function(err, vmbox) {
+				], function(err) {
 					if (err) {
 						return;
 					}
 
-					self.usersRenderVMBox(currentUser, vmbox);
+					self.usersRenderVMBox(currentUser);
 				});
 			});
 
@@ -2137,7 +2137,7 @@ define(function(require) {
 			});
 		},
 
-		usersRenderVMBox: function(currentUser, vmbox) {
+		usersRenderVMBox: function(currentUser) {
 			var self = this,
 				featureTemplate = $(self.getTemplate({
 					name: 'feature-vmbox',
@@ -2173,6 +2173,18 @@ define(function(require) {
 
 				monster.waterfall([
 					function(callback) {
+						// Get first VMBox for smart user
+						self.usersListVMBoxesSmartUser({
+							userId: userId,
+							success: function(vmboxes) {
+								callback(null, _.head(vmboxes));
+							},
+							error: function() {
+								callback(true);
+							}
+						});
+					},
+					function(vmbox, callback) {
 						if (vmbox && !enabled) {
 							self.usersDeleteUserVMBox({
 								userId: userId,
