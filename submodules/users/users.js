@@ -2163,23 +2163,15 @@ define(function(require) {
 			});
 
 			featureTemplate.find('.save').on('click', function() {
-				var ErrorTypes = {
-						FormInvalid: 0,
-						ApiError: 1
-					},
-					enabled = switchFeature.prop('checked'),
+				if (!monster.ui.valid(featureForm)) {
+					return;
+				}
+
+				var enabled = switchFeature.prop('checked'),
 					formData = monster.ui.getFormData('vmbox_form'),
 					userId = currentUser.id;
 
 				monster.waterfall([
-					function(callback) {
-						// Validate form
-						if (monster.ui.valid(featureForm)) {
-							callback(null);
-							return;
-						}
-						callback({ type: ErrorTypes.FormInvalid });
-					},
 					function(callback) {
 						// Get first VMBox for smart user
 						self.usersListVMBoxesSmartUser({
@@ -2188,7 +2180,7 @@ define(function(require) {
 								callback(null, vmboxes[0]);
 							},
 							error: function() {
-								callback({ type: ErrorTypes.ApiError });
+								callback(true);
 							}
 						});
 					},
@@ -2221,12 +2213,12 @@ define(function(require) {
 								callback(userData);
 							},
 							error: function() {
-								callback({ type: ErrorTypes.ApiError });
+								callback(true);
 							}
 						});
 					}
 				], function(err, userData) {
-					if (err.type === ErrorTypes.FormInvalid) {
+					if (err) {
 						return;
 					}
 
