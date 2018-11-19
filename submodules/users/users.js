@@ -3092,7 +3092,8 @@ define(function(require) {
 		},
 
 		usersCleanUserData: function(userData) {
-			var userData = $.extend(true, {}, userData),
+			var self = this,
+				userData = $.extend(true, {}, userData),
 				fullName = self.usersGetUserFullName(userData),
 				defaultCallerIdName = fullName.substring(0, 15),
 				newCallerIDs = {
