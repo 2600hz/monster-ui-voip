@@ -2900,7 +2900,6 @@ define(function(require) {
 		usersRenderMusicOnHold: function(currentUser) {
 			var self = this,
 				silenceMediaId = 'silence_stream://300000',
-				mediaToUpload,
 				media_id = _.get(currentUser, 'music_on_hold.media_id', null);
 
 			self.usersListMedias(function(medias) {
@@ -2916,19 +2915,10 @@ define(function(require) {
 						submodule: 'users'
 					})),
 					switchFeature = featureTemplate.find('.switch-state'),
-					popup,
-					closeUploadDiv = function(newMedia) {
-						mediaToUpload = undefined;
-						featureTemplate.find('.upload-div input').val('');
-						featureTemplate.find('.upload-div').slideUp(function() {
-							featureTemplate.find('.upload-toggle').removeClass('active');
-						});
-						if (newMedia) {
-							var mediaSelect = featureTemplate.find('.media-dropdown');
-							mediaSelect.append('<option value="' + newMedia.id + '">' + newMedia.name + '</option>');
-							mediaSelect.val(newMedia.id);
-						}
-					};
+					popup = monster.ui.dialog(featureTemplate, {
+						title: currentUser.extra.mapFeatures.music_on_hold.title,
+						position: ['center', 20]
+					});
 
 				var media = _.find(medias, function(media) {
 					return media.id === media_id;
@@ -2938,130 +2928,58 @@ define(function(require) {
 					container: featureTemplate.find('.media-selector'),
 					inputName: 'media_id',
 					media: media,
-					medias: medias
-				});
-
-				featureTemplate.find('.upload-input').fileUpload({
-					inputOnly: true,
-					wrapperClass: 'file-upload input-append',
-					btnText: self.i18n.active().users.music_on_hold.audioUploadButton,
-					btnClass: 'monster-button',
-					maxSize: 5,
-					success: function(results) {
-						mediaToUpload = results[0];
-					},
-					error: function(errors) {
-						if (errors.hasOwnProperty('size') && errors.size.length > 0) {
-							monster.ui.alert(self.i18n.active().users.music_on_hold.fileTooBigAlert);
-						}
-						featureTemplate.find('.upload-div input').val('');
-						mediaToUpload = undefined;
+					medias: medias,
+					callback: function(mediaControl) {
+						self.onHoldBindEvents(featureTemplate, switchFeature, currentUser, popup, mediaControl);
 					}
 				});
+			});
+		},
 
-				featureTemplate.find('.cancel-link').on('click', function() {
-					popup.dialog('close').remove();
-				});
+		onHoldBindEvents: function(featureTemplate, switchFeature, currentUser, popup, mediaControl) {
+			var self = this;
 
-				switchFeature.on('change', function() {
-					var $this = $(this),
-						$content = featureTemplate.find('.content');
+			switchFeature.on('change', function() {
+				var $this = $(this),
+					$content = featureTemplate.find('.content');
 
-					$this.prop('checked') ? $content.slideDown() : $content.slideUp();
-				});
+				$this.prop('checked') ? $content.slideDown() : $content.slideUp();
+			});
 
-				featureTemplate.find('.upload-toggle').on('click', function() {
-					if ($(this).hasClass('active')) {
-						featureTemplate.find('.upload-div').stop(true, true).slideUp();
+			featureTemplate.find('.cancel-link').on('click', function() {
+				popup.dialog('close').remove();
+			});
+
+			featureTemplate.find('.save').on('click', function() {
+				var media_id = mediaControl.getValue(),
+					enabled = switchFeature.prop('checked');
+
+				if (!('music_on_hold' in currentUser)) {
+					currentUser.music_on_hold = {};
+				}
+
+				if ('media_id' in currentUser.music_on_hold || enabled) {
+					if (enabled) {
+						currentUser.music_on_hold = {
+							media_id: media_id
+						};
 					} else {
-						featureTemplate.find('.upload-div').stop(true, true).slideDown();
-					}
-				});
-
-				featureTemplate.find('.upload-cancel').on('click', function() {
-					closeUploadDiv();
-				});
-
-				featureTemplate.find('.upload-submit').on('click', function() {
-					if (mediaToUpload) {
-						self.callApi({
-							resource: 'media.create',
-							data: {
-								accountId: self.accountId,
-								data: {
-									streamable: true,
-									name: mediaToUpload.name,
-									media_source: 'upload',
-									description: mediaToUpload.name
-								}
-							},
-							success: function(data, status) {
-								var media = data.data;
-								self.callApi({
-									resource: 'media.upload',
-									data: {
-										accountId: self.accountId,
-										mediaId: media.id,
-										data: mediaToUpload.file
-									},
-									success: function(data, status) {
-										closeUploadDiv(media);
-									},
-									error: function(data, status) {
-										self.callApi({
-											resource: 'media.delete',
-											data: {
-												accountId: self.accountId,
-												mediaId: media.id,
-												data: {}
-											},
-											success: function(data, status) {}
-										});
-									}
-								});
-							}
-						});
-					} else {
-						monster.ui.alert(self.i18n.active().users.music_on_hold.emptyUploadAlert);
-					}
-				});
-
-				featureTemplate.find('.save').on('click', function() {
-					var media_id = featureTemplate.find('input[name="media_id"]').val(),
-						enabled = switchFeature.prop('checked');
-
-					if (!('music_on_hold' in currentUser)) {
 						currentUser.music_on_hold = {};
 					}
-
-					if ('media_id' in currentUser.music_on_hold || enabled) {
-						if (enabled) {
-							currentUser.music_on_hold = {
-								media_id: media_id
-							};
-						} else {
-							currentUser.music_on_hold = {};
-						}
-						self.usersUpdateUser(currentUser, function(updatedUser) {
-							popup.dialog('close').remove();
-							self.usersRender({
-								userId: currentUser.id,
-								openedTab: 'features'
-							});
-						});
-					} else {
+					self.usersUpdateUser(currentUser, function(updatedUser) {
 						popup.dialog('close').remove();
 						self.usersRender({
 							userId: currentUser.id,
 							openedTab: 'features'
 						});
-					}
-				});
-
-				popup = monster.ui.dialog(featureTemplate, {
-					title: currentUser.extra.mapFeatures.music_on_hold.title,
-					position: ['center', 20]
-				});
+					});
+				} else {
+					popup.dialog('close').remove();
+					self.usersRender({
+						userId: currentUser.id,
+						openedTab: 'features'
+					});
+				}
 			});
 		},
 
