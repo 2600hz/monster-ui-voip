@@ -508,41 +508,6 @@ define(function(require) {
 			return result;
 		},
 
-		usersDeleteDialog: function(user, callback) {
-			var self = this,
-				dataTemplate = {
-					user: user
-				},
-				dialogTemplate = $(self.getTemplate({
-					name: 'deleteDialog',
-					data: dataTemplate,
-					submodule: 'users'
-				}));
-
-			monster.ui.tooltips(dialogTemplate);
-
-			dialogTemplate.find('#confirm_button').on('click', function() {
-				var removeDevices = dialogTemplate.find('#delete_devices').is(':checked'),
-					removeConferences = dialogTemplate.find('#delete_conferences').is(':checked');
-
-				self.usersDelete(user.id, removeDevices, removeConferences, function(data) {
-					popup.dialog('close').remove();
-
-					callback && callback(data);
-				});
-			});
-
-			dialogTemplate.find('#cancel_button').on('click', function() {
-				popup.dialog('close').remove();
-			});
-
-			var popup = monster.ui.dialog(dialogTemplate, {
-				title: '<i class="fa fa-question-circle monster-primary-color"></i>',
-				position: ['center', 20],
-				dialogClass: 'monster-alert'
-			});
-		},
-
 		usersBindEvents: function(template, parent, data) {
 			var self = this,
 				currentUser,
@@ -920,17 +885,20 @@ define(function(require) {
 			template.on('click', '#delete_user', function() {
 				var dataUser = $(this).parents('.grid-row').data();
 
-				self.usersDeleteDialog(dataUser, function(data) {
-					monster.ui.toast({
-						type: 'success',
-						message: self.getTemplate({
-							name: '!' + self.i18n.active().users.toastrMessages.userDelete,
-							data: {
-								name: data.first_name + ' ' + data.last_name
-							}
-						})
-					});
-					self.usersRender();
+				monster.pub('common.deleteSmartUser.renderPopup', {
+					user: dataUser,
+					callback: function(data) {
+						monster.ui.toast({
+							type: 'success',
+							message: self.getTemplate({
+								name: '!' + self.i18n.active().users.toastrMessages.userDelete,
+								data: {
+									name: data.first_name + ' ' + data.last_name
+								}
+							})
+						});
+						self.usersRender();
+					}
 				});
 			});
 
@@ -3644,209 +3612,6 @@ define(function(require) {
 		},
 
 		/* Utils */
-		usersDelete: function(userId, removeDevices, removeConferences, callback) {
-			var self = this;
-
-			monster.parallel({
-				devices: function(callback) {
-					self.usersListDeviceUser(userId, function(devices) {
-						callback(null, devices);
-					});
-				},
-				vmbox: function(callback) {
-					self.usersListVMBoxesUser(userId, function(data) {
-						callback(null, data);
-					});
-				},
-				callflows: function(callback) {
-					self.usersListCallflowsUser(userId, function(data) {
-						callback(null, data);
-					});
-				},
-				conferences: function(callback) {
-					self.usersListConferences(userId, function(data) {
-						callback(null, data);
-					});
-				}
-			}, function(error, results) {
-				var listFnDelete = [];
-
-				_.each(results.devices, function(device) {
-					listFnDelete.push(function(callback) {
-						if (removeDevices) {
-							self.usersDeleteDevice(device.id, function(data) {
-								callback(null, '');
-							});
-						} else {
-							self.usersUnassignDevice(device.id, function(data) {
-								callback(null, '');
-							});
-						}
-					});
-				});
-
-				listFnDelete.push(function(callback) {
-					self.usersRemoveBulkConferences(results.conferences, removeConferences, function() {
-						callback(null, '');
-					});
-				});
-
-				_.each(results.callflows, function(callflow) {
-					/*
-					Special case for users with mobile devices:
-					reassign mobile devices to their respective mobile callflow instead of just deleting the callflow
-					 */
-					if (callflow.type === 'mobile') {
-						listFnDelete.push(function(mainCallback) {
-							monster.parallel({
-								callflow: function(callback) {
-									self.usersGetCallflow(callflow.id, function(data) {
-										callback(null, data);
-									});
-								},
-								mobileDevice: function(callback) {
-									self.usersGetMobileDevice(callflow.numbers[0].slice(2), function(data) {
-										callback(null, data);
-									});
-								}
-							}, function(err, results) {
-								var fullCallflow = results.callflow,
-									mobileDeviceId = results.mobileDevice.id;
-
-								delete fullCallflow.owner_id;
-
-								$.extend(true, fullCallflow, {
-									flow: {
-										module: 'device',
-										data: {
-											id: mobileDeviceId
-										}
-									}
-								});
-
-								self.usersUpdateCallflow(fullCallflow, function(data) {
-									mainCallback(null, data);
-								});
-							});
-						});
-					} else {
-						listFnDelete.push(function(callback) {
-							self.usersDeleteCallflow(callflow.id, function(data) {
-								callback(null, '');
-							});
-						});
-					}
-				});
-
-				_.each(results.vmbox, function(vmbox) {
-					listFnDelete.push(function(callback) {
-						self.usersDeleteVMBox(vmbox.id, function(data) {
-							callback(null, '');
-						});
-					});
-				});
-
-				monster.parallel(listFnDelete, function(err, resultsDelete) {
-					self.usersDeleteUser(userId, function(data) {
-						callback && callback(data);
-					});
-				});
-			});
-		},
-
-		usersGetCallflow: function(callflowId, callback) {
-			var self = this;
-
-			self.callApi({
-				resource: 'callflow.get',
-				data: {
-					accountId: self.accountId,
-					callflowId: callflowId
-				},
-				success: function(data, status) {
-					callback(data.data);
-				}
-			});
-		},
-
-		usersGetMobileDevice: function(mdn, callback) {
-			var self = this;
-
-			self.callApi({
-				resource: 'device.list',
-				data: {
-					accountId: self.accountId,
-					data: {
-						filters: {
-							'filter_mobile.mdn': encodeURIComponent(mdn)
-						}
-					}
-				},
-				success: function(data, status) {
-					callback(data.data);
-				}
-			});
-		},
-
-		usersDeleteUser: function(userId, callback) {
-			var self = this;
-
-			self.callApi({
-				resource: 'user.delete',
-				data: {
-					userId: userId,
-					accountId: self.accountId,
-					data: {}
-				},
-				success: function(data) {
-					callback(data.data);
-				}
-			});
-		},
-
-		usersDeleteVMBox: function(vmboxId, callback) {
-			var self = this;
-
-			self.callApi({
-				resource: 'voicemail.delete',
-				data: {
-					voicemailId: vmboxId,
-					accountId: self.accountId,
-					data: {}
-				},
-				success: function(data) {
-					callback(data.data);
-				}
-			});
-		},
-
-		usersUnassignDevice: function(deviceId, callback) {
-			var self = this;
-
-			self.usersGetDevice(deviceId, function(deviceGet) {
-				delete deviceGet.owner_id;
-
-				self.usersUpdateDevice(deviceGet, function(updatedDevice) {
-					callback && callback(updatedDevice);
-				});
-			});
-		},
-
-		usersDeleteDevice: function(deviceId, callback) {
-			var self = this;
-
-			self.callApi({
-				resource: 'device.delete',
-				data: {
-					deviceId: deviceId,
-					accountId: self.accountId,
-					data: {}
-				},
-				success: function(data) {
-					callback(data.data);
-				}
-			});
-		},
 		usersDeleteCallflow: function(callflowId, callback) {
 			var self = this;
 
