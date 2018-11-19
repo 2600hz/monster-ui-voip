@@ -1619,18 +1619,18 @@ define(function(require) {
 							return;
 						}
 
-						self.usersGetVMBox(vmboxes[0].id, function(data) {
-							currentUser.extra.deleteAfterNotify = data.delete_after_notify;
+						self.usersGetVMBox(vmboxes[0].id, function(vmbox) {
+							currentUser.extra.deleteAfterNotify = vmbox.delete_after_notify;
 
-							callback(null);
+							callback(null, vmbox);
 						});
 					}
-				], function(err, result) {
+				], function(err, vmbox) {
 					if (err) {
 						return;
 					}
 
-					self.usersRenderVMBox(currentUser);
+					self.usersRenderVMBox(currentUser, vmbox);
 				});
 			});
 
@@ -2137,7 +2137,7 @@ define(function(require) {
 			});
 		},
 
-		usersRenderVMBox: function(currentUser) {
+		usersRenderVMBox: function(currentUser, vmbox) {
 			var self = this,
 				featureTemplate = $(self.getTemplate({
 					name: 'feature-vmbox',
@@ -2173,18 +2173,6 @@ define(function(require) {
 
 				monster.waterfall([
 					function(callback) {
-						// Get first VMBox for smart user
-						self.usersListVMBoxesSmartUser({
-							userId: userId,
-							success: function(vmboxes) {
-								callback(null, vmboxes[0]);
-							},
-							error: function() {
-								callback(true);
-							}
-						});
-					},
-					function(vmbox, callback) {
 						if (vmbox && !enabled) {
 							self.usersDeleteUserVMBox({
 								userId: userId,
