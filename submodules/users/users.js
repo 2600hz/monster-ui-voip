@@ -3701,7 +3701,8 @@ define(function(require) {
 						},
 						presence_id: data.callflow.extension,
 						email: data.extra.differentEmail ? data.extra.email : data.user.username,
-						priv_level: 'user'
+						priv_level: 'user',
+						vm_to_email_enabled: true
 					}, data.user),
 					vmbox: self.usersNewMainVMBox(data.callflow.extension, fullName),
 					callflow: {
@@ -3747,6 +3748,7 @@ define(function(require) {
 				// Remove vmbox from formatted data and user callflow
 				delete formattedData.vmbox;
 				delete formattedData.callflow.flow.children._;
+				formattedData.user.vm_to_email_enabled = false;
 			}
 
 			delete formattedData.user.extra;
