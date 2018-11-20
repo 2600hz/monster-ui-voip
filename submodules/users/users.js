@@ -5445,31 +5445,6 @@ define(function(require) {
 		},
 
 		/**
-		 * Update specific values of a user
-		 * @param  {Object}   args
-		 * @param  {Object}   args.data       Data to be sent by the SDK to the API
-		 * @param  {Object}   args.data.data  User data to be patched
-		 * @param  {Function} args.success    Success callback
-		 * @param  {Function} args.error      Error callback
-		 */
-		usersPatchUser: function(args) {
-			var self = this;
-
-			self.callApi({
-				resource: 'user.patch',
-				data: _.merge({
-					accountId: self.accountId
-				}, args.data),
-				success: function(data, status) {
-					args.hasOwnProperty('success') && args.success(data.data);
-				},
-				error: function(parsedError) {
-					args.hasOwnProperty('error') && args.error(parsedError);
-				}
-			});
-		},
-
-		/**
 		 * Deletes user's main Voicemail Box, and removes it from the main user callflow
 		 * @param  {Object}   args
 		 * @param  {String}   args.userId       User ID
@@ -5611,42 +5586,23 @@ define(function(require) {
 		},
 
 		/**
-		 * Gets a new Voicemail Box object
-		 * @param    {Number} mailbox   Mailbox
-		 * @param    {String} userName  User full name
-		 * @param    {String} userId    User ID
-		 * @returns  {Object} Voicemail Box object
+		 * Gets the main voicemail box for a user, which has been created through Smart PBX app
+		 * @param  {Object}   args
+		 * @param  {Object}   args.user     User data
+		 * @param  {Function} args.success  Success callback
+		 * @param  {Function} args.error    Error callback
 		 */
-		usersNewMainVMBox: function(mailbox, userName, userId = undefined, deleteAfterNotify = undefined) {
-			var self = this;
+		usersGetMainVMBoxSmartUser: function(args) {
+			var self = this,
+				user = args.user;
 
-			// TODO: Verify how the VMBox is created if delete_after_notify is undefined (i.e. when creating new user)
-			return {
-				owner_id: userId,
-				mailbox: mailbox.toString(),	// Force to string
-				name: self.usersGetMainVMBoxName(userName),
-				delete_after_notify: deleteAfterNotify
-			};
-		},
-
-		/**
-		 * Builds the user full name, from the user data provided
-		 * @param    {Object} user  User data object
-		 * @returns  {String} User's full name
-		 */
-		usersGetUserFullName: function(user) {
-			return user.first_name + ' ' + user.last_name;
-		},
-
-		/**
-		 * Builds the name for the user's main voicemail box
-		 * @param    {String} userName  User full name
-		 * @returns  {String} Name for the user's main voicemail box
-		 */
-		usersGetMainVMBoxName: function(userName) {
-			var self = this;
-
-			return userName + self.appFlags.users.smartPBXVMBoxString;
+			self.usersListVMBoxesSmartUser({
+				userId: user.id,
+				success: function(vmboxes) {
+					args.hasOwnProperty('success')
+					&& args.success(self.usersGetUserMainVMBox(user, vmboxes));
+				}
+			});
 		},
 
 		/**
@@ -5698,6 +5654,31 @@ define(function(require) {
 		},
 
 		/**
+		 * Update specific values of a user
+		 * @param  {Object}   args
+		 * @param  {Object}   args.data       Data to be sent by the SDK to the API
+		 * @param  {Object}   args.data.data  User data to be patched
+		 * @param  {Function} args.success    Success callback
+		 * @param  {Function} args.error      Error callback
+		 */
+		usersPatchUser: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'user.patch',
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
+				success: function(data, status) {
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(parsedError) {
+					args.hasOwnProperty('error') && args.error(parsedError);
+				}
+			});
+		},
+
+		/**
 		 * Get the main VMBox for a user, from a list of voicemail boxes, which are assumed to
 		 * belong to it already
 		 * @param  {Object} user     User data
@@ -5721,23 +5702,42 @@ define(function(require) {
 		},
 
 		/**
-		 * Gets the main voicemail box for a user, which has been created through Smart PBX app
-		 * @param  {Object}   args
-		 * @param  {Object}   args.user     User data
-		 * @param  {Function} args.success  Success callback
-		 * @param  {Function} args.error    Error callback
+		 * Gets a new Voicemail Box object
+		 * @param    {Number} mailbox   Mailbox
+		 * @param    {String} userName  User full name
+		 * @param    {String} userId    User ID
+		 * @returns  {Object} Voicemail Box object
 		 */
-		usersGetMainVMBoxSmartUser: function(args) {
-			var self = this,
-				user = args.user;
+		usersNewMainVMBox: function(mailbox, userName, userId = undefined, deleteAfterNotify = undefined) {
+			var self = this;
 
-			self.usersListVMBoxesSmartUser({
-				userId: user.id,
-				success: function(vmboxes) {
-					args.hasOwnProperty('success')
-					&& args.success(self.usersGetUserMainVMBox(user, vmboxes));
-				}
-			});
+			// TODO: Verify how the VMBox is created if delete_after_notify is undefined (i.e. when creating new user)
+			return {
+				owner_id: userId,
+				mailbox: mailbox.toString(),	// Force to string
+				name: self.usersGetMainVMBoxName(userName),
+				delete_after_notify: deleteAfterNotify
+			};
+		},
+
+		/**
+		 * Builds the user full name, from the user data provided
+		 * @param    {Object} user  User data object
+		 * @returns  {String} User's full name
+		 */
+		usersGetUserFullName: function(user) {
+			return user.first_name + ' ' + user.last_name;
+		},
+
+		/**
+		 * Builds the name for the user's main voicemail box
+		 * @param    {String} userName  User full name
+		 * @returns  {String} Name for the user's main voicemail box
+		 */
+		usersGetMainVMBoxName: function(userName) {
+			var self = this;
+
+			return userName + self.appFlags.users.smartPBXVMBoxString;
 		}
 	};
 
