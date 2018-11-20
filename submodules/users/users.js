@@ -5494,17 +5494,29 @@ define(function(require) {
 		/**
 		 * Adds a main VMBox to an existing user
 		 * @param  {Object}   args
-		 * @param  {String}   args.userId             User ID
+		 * @param  {String}   args.user               User
 		 * @param  {Boolean}  args.deleteAfterNotify  Delete after notify voicemail box flag
 		 * @param  {Function} args.callback           Callback for monster.waterfall
 		 */
 		usersAddMainVMBoxToUser: function(args) {
 			var self = this,
-				userId = args.userId;
+				user = args.user,
+				userId = user.id;
 
 			monster.waterfall([
 				function(waterfallCallback) {
-					// Get user's numbers data
+					// If user has presence_id, there is no need to get all numbers data, only main callflow
+					if (user.presence_id) {
+						self.usersGetMainCallflow(userId, function(mainCallflow) {
+							waterfallCallback(null, {
+								user: user,
+								callflow: mainCallflow
+							});
+						});
+						return;
+					}
+
+					// Otherwise, get user's numbers data
 					self.usersGetFormattedNumbersData({
 						userId: userId,
 						callback: function(userNumbersData) {
@@ -5512,11 +5524,11 @@ define(function(require) {
 						}
 					});
 				},
-				function(userNumbersData, waterfallCallback) {
+				function(userData, waterfallCallback) {
 					// Create voicemail box
-					var user = userNumbersData.user,
+					var user = userData.user,
 						userFullName = self.usersGetUserFullName(user),
-						mailbox = user.presence_id || _.head(userNumbersData.extensions);
+						mailbox = user.presence_id || _.head(userData.extensions);
 
 					if (_.isNil(mailbox)) {
 						// There is no extension to set for the mailbox
@@ -5529,12 +5541,12 @@ define(function(require) {
 							data: self.usersNewMainVMBox(mailbox, userFullName, userId, args.deleteAfterNotify)
 						},
 						success: function(userVMBox) {
-							waterfallCallback(null, userNumbersData, userVMBox);
+							waterfallCallback(null, userData, userVMBox);
 						}
 					});
 				},
-				function(userNumbersData, userVMBox, waterfallCallback) {
-					var mainUserCallflow = userNumbersData.callflow;
+				function(userData, userVMBox, waterfallCallback) {
+					var mainUserCallflow = userData.callflow;
 
 					// Do not update main callflow if it does not has
 					// been created by the voip app, or if does not have
