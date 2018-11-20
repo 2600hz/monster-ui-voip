@@ -2925,7 +2925,7 @@ define(function(require) {
 					name: 'media.unavailable',
 					options: medias,
 					selectedOption: media_id,
-					label: '',
+					skin: 'tabs',
 					callback: function(mediaControl) {
 						self.onHoldBindEvents(featureTemplate, switchFeature, currentUser, popup, mediaControl);
 					}
