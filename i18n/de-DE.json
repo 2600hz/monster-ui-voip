@@ -687,12 +687,8 @@
 				}
 			}
 		},
-		"vm_to_email": {
-			"deleteAfterNotify": "Nach dem Senden der Benachrichtigung Nachrichten aus Datenbank löschen.",
-			"headline": "Voicemail-zu-E-Mail-Einstellungen",
-			"help": "Wenn Sie das Sendeziel von E-Mail-Benachrichtigungen ändern möchten, bearbeiten Sie die E-Mail-Adresse des Benutzers im Abschnitt „Benutzeradministration“",
-			"label": "Für jede neue Voicemail wird eine E-Mail an {{variable}} gesendet",
-			"title": "Voicemails"
+		"vmbox": {
+			"deleteAfterNotify": "Nach dem Senden der Benachrichtigung Nachrichten aus Datenbank löschen."
 		},
 		"find_me_follow_me": {
 			"title": "Find Me/Follow Me",

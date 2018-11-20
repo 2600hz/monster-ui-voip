@@ -569,12 +569,8 @@
 				}
 			}
 		},
-		"vm_to_email": {
-			"deleteAfterNotify": "Eliminar los mensajes de la base de datos después de enviar la notificación.",
-			"headline": "Configuración de correo de voz a correo electrónico",
-			"help": "Si quiere cambiar a donde las notificaciones del correo electrónico van, por favor corrija la dirección de correo electrónico del usuario en la sección de la Administración del Usuario",
-			"label": "Se enviará un mensaje de correo electrónico a {{variable}} para cada nuevo mensaje de correo de voz",
-			"title": "correos de voz"
+		"vmbox": {
+			"deleteAfterNotify": "Eliminar los mensajes de la base de datos después de enviar la notificación."
 		},
 		"find_me_follow_me": {
 			"title": "Búscame, Sígueme ",
