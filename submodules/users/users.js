@@ -5662,10 +5662,11 @@ define(function(require) {
 		/**
 		 * Update specific values of a user
 		 * @param  {Object}   args
-		 * @param  {Object}   args.data       Data to be sent by the SDK to the API
-		 * @param  {Object}   args.data.data  User data to be patched
-		 * @param  {Function} args.success    Success callback
-		 * @param  {Function} args.error      Error callback
+		 * @param  {Object}   args.data         Data to be sent by the SDK to the API
+		 * @param  {String}   args.data.userId  ID of the user to be patched
+		 * @param  {Object}   args.data.data    User data to be patched
+		 * @param  {Function} args.success      Success callback
+		 * @param  {Function} args.error        Error callback
 		 */
 		usersPatchUser: function(args) {
 			var self = this;
@@ -5687,10 +5688,11 @@ define(function(require) {
 		/**
 		 * Update specific values of a voicemail box
 		 * @param  {Object}   args
-		 * @param  {Object}   args.data       Data to be sent by the SDK to the API
-		 * @param  {Object}   args.data.data  Voicemail data to be patched
-		 * @param  {Function} args.success    Success callback
-		 * @param  {Function} args.error      Error callback
+		 * @param  {Object}   args.data              Data to be sent by the SDK to the API
+		 * @param  {String}   args.data.voicemailId  ID of the voicemail box to be patched
+		 * @param  {Object}   args.data.data         Voicemail box data to be patched
+		 * @param  {Function} args.success           Success callback
+		 * @param  {Function} args.error             Error callback
 		 */
 		usersPatchVMBox: function(args) {
 			var self = this;
