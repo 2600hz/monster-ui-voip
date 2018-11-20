@@ -1623,38 +1623,12 @@ define(function(require) {
 			});
 
 			template.on('click', '.feature[data-feature="vmbox"]', function() {
-				monster.waterfall([
-					function(callback) {
-						self.usersGetMainVMBoxSmartUser({
-							user: currentUser,
-							success: function(vmbox) {
-								callback(null, vmbox);
-							},
-							error: function() {
-								callback(true);
-							}
-						});
-					},
-					function(vmbox, callback) {
-						currentUser.extra.deleteAfterNotify = true;
-						if (!vmbox) {
-							currentUser.extra.deleteAfterNotify = false;
-							callback(null);
-							return;
-						}
-
-						self.usersGetVMBox(vmbox.id, function(vmbox) {
-							currentUser.extra.deleteAfterNotify = vmbox.delete_after_notify;
-
-							callback(null);
-						});
+				self.usersGetMainVMBoxSmartUser({
+					user: currentUser,
+					success: function(vmbox) {
+						currentUser.extra.deleteAfterNotify = (vmbox && vmbox.delete_after_notify);
+						self.usersRenderVMBox(currentUser, vmbox);
 					}
-				], function(err) {
-					if (err) {
-						return;
-					}
-
-					self.usersRenderVMBox(currentUser);
 				});
 			});
 
@@ -2161,7 +2135,7 @@ define(function(require) {
 			});
 		},
 
-		usersRenderVMBox: function(currentUser) {
+		usersRenderVMBox: function(currentUser, vmbox) {
 			var self = this,
 				featureTemplate = $(self.getTemplate({
 					name: 'feature-vmbox',
@@ -2193,22 +2167,12 @@ define(function(require) {
 
 				var enabled = switchFeature.prop('checked'),
 					formData = monster.ui.getFormData('vmbox_form'),
-					userId = currentUser.id;
+					userId = currentUser.id,
+					vmToEmailEnabled = enabled && formData.vm_to_email_enabled,
+					deleteAfterNotify = vmToEmailEnabled && formData.delete_after_notify;
 
 				monster.waterfall([
 					function(callback) {
-						// Get first VMBox for smart user
-						self.usersGetMainVMBoxSmartUser({
-							user: currentUser,
-							success: function(vmbox) {
-								callback(null, vmbox);
-							},
-							error: function() {
-								callback(true);
-							}
-						});
-					},
-					function(vmbox, callback) {
 						if (vmbox && !enabled) {
 							self.usersDeleteUserVMBox({
 								userId: userId,
@@ -2221,24 +2185,43 @@ define(function(require) {
 						if (!vmbox && enabled) {
 							self.usersAddMainVMBoxToUser({
 								userId: userId,
-								deleteAfterNotify: formData.delete_after_notify,
+								deleteAfterNotify: deleteAfterNotify,
 								callback: callback
 							});
 							return;
 						}
 
-						if (vmbox && vmbox.delete_after_notify !== formData.delete_after_notify) {
-							// TODO: Patch VMBox to set delete_after_notify. TEST THAT formData.delete_after_notify is a boolean.
+						if (!vmbox || vmbox.delete_after_notify === deleteAfterNotify) {
+							callback(null);
+							return;
 						}
 
-						callback(null);
+						self.usersPatchVMBox({
+							data: {
+								voicemailId: vmbox.id,
+								data: {
+									delete_after_notify: deleteAfterNotify
+								}
+							},
+							success: function() {
+								callback(null);
+							},
+							error: function() {
+								callback(true);
+							}
+						});
 					},
 					function(callback) {
+						if (currentUser.vm_to_email_enabled === vmToEmailEnabled) {
+							callback(null);
+							return;
+						}
+
 						self.usersPatchUser({
 							data: {
 								userId: userId,
 								data: {
-									vm_to_email_enabled: formData.vm_to_email_enabled
+									vm_to_email_enabled: vmToEmailEnabled
 								}
 							},
 							success: function() {
@@ -5596,12 +5579,35 @@ define(function(require) {
 			var self = this,
 				user = args.user;
 
-			self.usersListVMBoxesSmartUser({
-				userId: user.id,
-				success: function(vmboxes) {
-					args.hasOwnProperty('success')
-					&& args.success(self.usersGetUserMainVMBox(user, vmboxes));
+			monster.waterfall([
+				function(callback) {
+					self.usersListVMBoxesSmartUser({
+						userId: user.id,
+						success: function(vmboxes) {
+							callback(null, self.usersGetUserMainVMBox(user, vmboxes));
+						},
+						error: function(parsedError) {
+							callback(parsedError);
+						}
+					});
+				},
+				function(vmboxLite, callback) {
+					if (!vmboxLite) {
+						callback(null, null);
+						return;
+					}
+
+					self.usersGetVMBox(vmboxLite.id, function(vmbox) {
+						callback(null, vmbox);
+					});
 				}
+			], function(err, vmbox) {
+				if (err) {
+					args.hasOwnProperty('error') && args.error(err);
+					return;
+				}
+
+				args.hasOwnProperty('success') && args.success(vmbox);
 			});
 		},
 
@@ -5679,6 +5685,31 @@ define(function(require) {
 		},
 
 		/**
+		 * Update specific values of a voicemail box
+		 * @param  {Object}   args
+		 * @param  {Object}   args.data       Data to be sent by the SDK to the API
+		 * @param  {Object}   args.data.data  Voicemail data to be patched
+		 * @param  {Function} args.success    Success callback
+		 * @param  {Function} args.error      Error callback
+		 */
+		usersPatchVMBox: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'voicemail.patch',
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
+				success: function(data, status) {
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(parsedError) {
+					args.hasOwnProperty('error') && args.error(parsedError);
+				}
+			});
+		},
+
+		/**
 		 * Get the main VMBox for a user, from a list of voicemail boxes, which are assumed to
 		 * belong to it already
 		 * @param  {Object} user     User data
@@ -5711,7 +5742,6 @@ define(function(require) {
 		usersNewMainVMBox: function(mailbox, userName, userId = undefined, deleteAfterNotify = undefined) {
 			var self = this;
 
-			// TODO: Verify how the VMBox is created if delete_after_notify is undefined (i.e. when creating new user)
 			return {
 				owner_id: userId,
 				mailbox: mailbox.toString(),	// Force to string
