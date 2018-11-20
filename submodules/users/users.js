@@ -4247,7 +4247,7 @@ define(function(require) {
 				var indexMain = -1;
 
 				_.each(listCallflows, function(callflow, index) {
-					if (callflow.owner_id === userId && callflow.type === 'mainUserCallflow' || !('type' in callflow)) {
+					if (callflow.type === 'mainUserCallflow' || !('type' in callflow)) {
 						indexMain = index;
 						return false;
 					}
