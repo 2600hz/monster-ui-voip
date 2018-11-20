@@ -2920,15 +2920,12 @@ define(function(require) {
 						position: ['center', 20]
 					});
 
-				var media = _.find(medias, function(media) {
-					return media.id === media_id;
-				});
-
-				monster.pub('common.mediaSelector.render', {
+				monster.pub('common.mediaSelect.render', {
 					container: featureTemplate.find('.media-selector'),
-					inputName: 'media_id',
-					media: media,
-					medias: medias,
+					name: 'media.unavailable',
+					options: medias,
+					selectedOption: media_id,
+					label: '',
 					callback: function(mediaControl) {
 						self.onHoldBindEvents(featureTemplate, switchFeature, currentUser, popup, mediaControl);
 					}
