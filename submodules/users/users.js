@@ -2184,7 +2184,7 @@ define(function(require) {
 
 						if (!vmbox && enabled) {
 							self.usersAddMainVMBoxToUser({
-								userId: userId,
+								user: currentUser,
 								deleteAfterNotify: deleteAfterNotify,
 								callback: callback
 							});
@@ -5743,7 +5743,7 @@ define(function(require) {
 				return mainUserVMBox;
 			}
 
-			return _.head(mainUserVMBox);
+			return _.head(vmboxes);
 		},
 
 		/**
