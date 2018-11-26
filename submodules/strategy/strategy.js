@@ -1645,7 +1645,7 @@ define(function(require) {
 									// make sure the lunch rule is only valid on days the business is open
 									return _
 										.chain(item)
-										.lowerCase()
+										.toLower()
 										.replace(/^main/, '')
 										.value();
 								}),
