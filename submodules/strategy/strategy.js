@@ -2396,20 +2396,11 @@ define(function(require) {
 
 				monster.ui.confirm(self.i18n.active().strategy.confirmMessages.resetCalls, function() {
 					monster.waterfall([
-						function(callback) {
-							self.strategyDeleteCalls({
-								success: function() {
-									callback(null);
-								},
-								error: function() {
-									callback(true);
-								}
-							});
-						},
-						function(callback) {
+						self.strategyDeleteCalls,
+						function(deletedCallflows, callback) {
 							self.strategyGetMainCallflows(function(callflows) {
 								strategyData.callflows = callflows;
-								callback(null, callflows);
+								callback(null);
 							});
 						}
 					], function(err, result) {
@@ -3192,12 +3183,12 @@ define(function(require) {
 
 									self.strategyUpdateCallflow(results.MainCallflow, function(updatedCallflow) {
 										results.MainCallflow = updatedCallflow;
-										waterfallCallback(null, $.extend(true, mainCallflows, results));
+										waterfallCallback(null, _.merge(mainCallflows, results));
 									});
 									return;
 								}
 
-								waterfallCallback(null, $.extend(true, mainCallflows, results));
+								waterfallCallback(null, _.merge(mainCallflows, results));
 								return;
 							}
 
@@ -3971,7 +3962,7 @@ define(function(require) {
 			});
 		},
 
-		strategyDeleteCalls: function(args) {
+		strategyDeleteCalls: function(mainCallback) {
 			var self = this;
 
 			monster.waterfall([
@@ -4014,36 +4005,40 @@ define(function(require) {
 								return parallelCalls;
 							}
 
-							parallelCalls.push(function(callback) {
-								monster.waterfall(deleteSequence, function(err, results) {
-									callback(null);
+							parallelCalls.push(function(parallelCallback) {
+								monster.waterfall(deleteSequence, function(err, deletedCallflows) {
+									parallelCallback(null, deletedCallflows);
 								});
 							});
 
 							return parallelCalls;
 						}, []),
-						function(err, results) {
+						function(err, deletedCallflows) {
 							if (err) {
 								callback(err);
 								return;
 							}
-							callback(null);
+
+							// Create a Map object with the deleted callflow IDs
+							var allDeletedCallflows = {};
+							_.each(deletedCallflows, function(deletedCallflowObject) {
+								_.each(deletedCallflowObject, function(callflowDetails, callflowLabel) {
+									allDeletedCallflows[callflowLabel] = { oldId: callflowDetails.id };
+								});
+							});
+
+							callback(null, allDeletedCallflows);
 						});
 				}
-			], function(err, results) {
-				if (err) {
-					args.hasOwnProperty('error') && args.error(err);
-					return;
-				}
-				args.hasOwnProperty('success') && args.success(results);
-			});
+			], mainCallback);
 		},
 
 		strategyCreateSingleCallStrategyDeleteSequence: function(label, mainCallflows) {
 			var self = this,
 				deleteSequence = [],
 				strategyCallflow = mainCallflows[label],
-				menuCallflow = mainCallflows[label + 'Menu'];
+				menuLabel = label + 'Menu',
+				menuCallflow = mainCallflows[menuLabel];
 
 			if (strategyCallflow) {
 				// Add function to delete call strategy callflow
@@ -4052,13 +4047,19 @@ define(function(require) {
 						data: {
 							id: strategyCallflow.id
 						},
-						success: function() {
-							callback(null);
+						success: function(strategyCallflowDetails) {
+							var deletedCallflows = {};
+							deletedCallflows[label] = strategyCallflowDetails;
+							callback(null, deletedCallflows);
 						},
 						error: function() {
 							callback(true);
 						}
 					});
+				});
+			} else {
+				deleteSequence.push(function(callback) {
+					callback(null, {});
 				});
 			}
 
@@ -4068,29 +4069,15 @@ define(function(require) {
 
 			// There is a menu callflow, so create functions to...
 
-			// ...get callflow details (to get menu ID),...
-			deleteSequence.push(function(callback) {
-				self.strategyGetCallflow({
-					data: {
-						id: menuCallflow.id
-					},
-					success: function(menuCallflowDetails) {
-						callback(null, menuCallflowDetails);
-					},
-					error: function() {
-						callback(true);
-					}
-				});
-			});
-
-			// ...then delete menu callflow
-			deleteSequence.push(function(menuCallflowDetails, callback) {
+			// ...delete menu callflow
+			deleteSequence.push(function(deletedCallflows, callback) {
 				self.strategyDeleteCallflow({
 					data: {
 						id: menuCallflow.id
 					},
-					success: function() {
-						callback(null, menuCallflowDetails);
+					success: function(menuCallflowDetails) {
+						deletedCallflows[menuLabel] = menuCallflowDetails;
+						callback(null, deletedCallflows);
 					},
 					error: function() {
 						callback(true);
@@ -4099,13 +4086,14 @@ define(function(require) {
 			});
 
 			// ...and finally delete menu
-			deleteSequence.push(function(menuCallflowDetails, callback) {
+			deleteSequence.push(function(deletedCallflows, callback) {
+				var menuCallflowDetails = deletedCallflows[menuLabel];
 				self.strategyDeleteMenu({
 					data: {
 						id: menuCallflowDetails.flow.data.id
 					},
 					success: function() {
-						callback(null);
+						callback(null, deletedCallflows);
 					},
 					error: function() {
 						callback(true);
