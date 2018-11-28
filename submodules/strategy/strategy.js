@@ -3934,8 +3934,8 @@ define(function(require) {
 					accountId: self.accountId,
 					filters: args.filters || {}
 				},
-				success: function(menuData) {
-					args.hasOwnProperty('success') && args.success(menuData.data);
+				success: function(data) {
+					args.hasOwnProperty('success') && args.success(data.data);
 				},
 				error: function(parsedError) {
 					args.hasOwnProperty('error') && args.error(parsedError);
@@ -3945,12 +3945,13 @@ define(function(require) {
 
 		strategyCreateMenu: function(args) {
 			var self = this;
+
 			self.callApi({
 				resource: 'menu.create',
 				data: _.merge({
 					accountId: self.accountId
 				}, args.data),
-				success: function(data, status) {
+				success: function(data) {
 					args.hasOwnProperty('success') && args.success(data.data);
 				},
 				error: function(parsedError) {
@@ -3961,12 +3962,13 @@ define(function(require) {
 
 		strategyUpdateMenu: function(args) {
 			var self = this;
+
 			self.callApi({
 				resource: 'menu.update',
 				data: _.merge({
 					accountId: self.accountId
 				}, args.data),
-				success: function(data, status) {
+				success: function(data) {
 					args.hasOwnProperty('success') && args.success(data.data);
 				},
 				error: function(parsedError) {
@@ -4025,6 +4027,8 @@ define(function(require) {
 		},
 
 		strategyGetSubCallStrategiesData: function(callback) {
+			var self = this;
+
 			monster.parallel({
 				callflows: function(parallelCallback) {
 					self.strategyListCallflows({
@@ -4062,10 +4066,11 @@ define(function(require) {
 							filter_type: 'main'
 						},
 						success: function(data) {
-							parallelCallback(null, _.reduce(data, function(obj, menu) {
-								obj[menu.name] = menu;
-								return obj;
-							}, {}));
+							parallelCallback(null,
+								_.reduce(data, function(obj, menu) {
+									obj[menu.name] = menu;
+									return obj;
+								}, {}));
 						},
 						error: function(parsedError) {
 							parallelCallback(parsedError);
@@ -4073,6 +4078,80 @@ define(function(require) {
 					});
 				}
 			}, callback);
+		},
+
+		/**
+		 * Helper function to create or update main sub callflow
+		 * @param  {Object}   args
+		 * @param  {Object}   args.mainMenus  Map object that contains the main menus
+		 * @param  {String}   args.menuLabel  Label of the menu to be saved
+		 * @param  {Function} args.callback   Callback function to be used by monster.waterfall
+		 */
+		strategySaveMainSubMenu: function(args) {
+			var self = this,
+				mainMenus = args.mainMenus,
+				menuLabel = args.menuLabel,
+				callback = args.callback;
+
+			var menuArgs = {
+				data: {
+					data: self.strategyGetDefaultMainSubMenu(menuLabel)
+				},
+				success: function(menu) {
+					callback(null, menu);
+				},
+				error: function(parsedError) {
+					callback(parsedError);
+				}
+			};
+
+			if (!mainMenus.hasOwnProperty(menuLabel)) {
+				self.strategyCreateMenu(menuArgs);
+				return;
+			}
+
+			var menuToUpdate = mainMenus[menuLabel];
+			menuArgs.data.menuId = menuArgs.data.data.id = menuToUpdate.id;
+			self.strategyUpdateMenu(menuArgs);
+		},
+
+		/**
+		 * Helper function to create or update main sub callflow
+		 * @param  {Object}   args
+		 * @param  {Object}   args.mainCallflows  Map object that contains the main callflows
+		 * @param  {String}   args.callflowLabel  Label of the callflow to be saved
+		 * @param  {Object}   args.callflow       Default callflow to be saved
+		 * @param  {Function} args.callback       Callback function to be used by monster.waterfall
+		 */
+		strategySaveMainSubCallflow: function(args) {
+			var self = this,
+				mainCallflows = args.mainCallflows,
+				callflowLabel = args.callflowLabel,
+				callflow = args.callflow,
+				callback = args.callback,
+				callflowArgs = {
+					data: {
+						data: callflow
+					},
+					success: function(savedCallflow) {
+						callback(null, savedCallflow);
+					},
+					error: function(parsedError) {
+						callback(parsedError);
+					}
+				};
+
+			if (!mainCallflows.hasOwnProperty(callflowLabel)) {
+				self.strategyCreateCallflow(callflowArgs);
+				return;
+			}
+
+			var callflowToUpdate = mainCallflows[callflowLabel];
+			callflow.id = callflowToUpdate.id;
+			self.strategyUpdateCallflow(callflow, function(savedCallflow) {
+				mainCallflows[callflowLabel] = savedCallflow;
+				callback(null, savedCallflow);
+			});
 		},
 
 		strategyResetSubCallStrategies: function(subCallStrategiesData, mainCallback) {
@@ -4085,84 +4164,33 @@ define(function(require) {
 
 					// Update or create sub menu
 					waterfallRequests.push(function(waterfallCallback) {
-						var menuArgs = {
-							data: {
-								data: self.strategyGetDefaultMainSubMenu(menuLabel)
-							},
-							success: function(menu) {
-								waterfallCallback(null, menu);
-							},
-							error: function(parsedError) {
-								waterfallCallback(parsedError);
-							}
-						};
-
-						if (!subCallStrategiesData.menus.hasOwnProperty(menuLabel)) {
-							self.strategyCreateMenu(menuArgs);
-							return;
-						}
-
-						var menuToUpdate = subCallStrategiesData.menus[menuLabel];
-						menuArgs.data.menuId = menuArgs.data.data.id = menuToUpdate.id;
-						self.strategyUpdateMenu(menuArgs);
+						self.strategySaveMainSubMenu({
+							mainMenus: subCallStrategiesData.menus,
+							menuLabel: menuLabel,
+							callback: waterfallCallback
+						});
 					});
 
 					// Update or create sub menu callflow
 					waterfallRequests.push(function(menu, waterfallCallback) {
-						var defaultCallflow = self.strategyGetDefaultMainSubMenuCallflow(menu),
-							callflowArgs = {
-								data: {
-									data: defaultCallflow
-								},
-								success: function(menu) {
-									waterfallCallback(null, menu);
-								},
-								error: function(parsedError) {
-									waterfallCallback(parsedError);
-								}
-							};
-
-						if (!subCallStrategiesData.callflows.hasOwnProperty(menuLabel)) {
-							self.strategyCreateCallflow(callflowArgs);
-							return;
-						}
-
-						var callflowToUpdate = subCallStrategiesData.callflows[menuLabel];
-						defaultCallflow.id = callflowToUpdate.id;
-						self.strategyUpdateCallflow(defaultCallflow, function(callflow) {
-							subCallStrategiesData.callflows[menuLabel] = callflow;
-							waterfallCallback(null, callflow);
+						self.strategySaveMainSubCallflow({
+							mainCallflows: subCallStrategiesData.callflows,
+							callflowLabel: menuLabel,
+							callflow: self.strategyGetDefaultMainSubMenuCallflow(menu),
+							callback: waterfallCallback
 						});
 					});
 
 					// Update or create sub callflow
 					waterfallRequests.push(function(menuCallflow, waterfallCallback) {
-						var defaultCallflow = self.strategyGetDefaultMainSubCallflow({
+						self.strategySaveMainSubCallflow({
+							mainCallflows: subCallStrategiesData.callflows,
+							callflowLabel: label,
+							callflow: self.strategyGetDefaultMainSubCallflow({
 								label: label,
 								subMenuCallflowId: menuCallflow.id
 							}),
-							callflowArgs = {
-								data: {
-									data: defaultCallflow
-								},
-								success: function(menu) {
-									waterfallCallback(null, menu);
-								},
-								error: function(parsedError) {
-									waterfallCallback(parsedError);
-								}
-							};
-
-						if (!subCallStrategiesData.callflows.hasOwnProperty(label)) {
-							self.strategyCreateCallflow(callflowArgs);
-							return;
-						}
-
-						var callflowToUpdate = subCallStrategiesData.callflows[label];
-						defaultCallflow.id = callflowToUpdate.id;
-						self.strategyUpdateCallflow(defaultCallflow, function(callflow) {
-							subCallStrategiesData.callflows[label] = callflow;
-							waterfallCallback(null, callflow);
+							callback: waterfallCallback
 						});
 					});
 
