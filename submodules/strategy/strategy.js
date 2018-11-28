@@ -2396,17 +2396,14 @@ define(function(require) {
 
 				monster.ui.confirm(self.i18n.active().strategy.confirmMessages.resetCalls, function() {
 					monster.waterfall([
-						self.strategyDeleteCalls,
-						function(deletedCallflows, callback) {
-							self.strategyGetMainCallflows(function(callflows) {
-								strategyData.callflows = callflows;
-								callback(null);
-							});
-						}
-					], function(err, result) {
+						self.strategyGetSubCallStrategiesData,
+						self.strategyResetSubCallStrategies
+					], function(err, callflows) {
 						if (err) {
 							return;
 						}
+
+						strategyData.callflows = callflows;
 
 						container.hide();
 						container.parents('.element-container').removeClass('open');
@@ -3091,18 +3088,7 @@ define(function(require) {
 								function(innerCallback) {
 									self.strategyCreateMenu({
 										data: {
-											data: {
-												name: menuName,
-												record_pin: monster.util.randomString(4, '1234567890'),
-												media: {
-													exit_media: true,
-													invalid_media: true,
-													transfer_media: true
-												},
-												retries: 3,
-												max_extension_length: 4,
-												type: 'main'
-											}
+											data: self.strategyGetDefaultMainSubMenu(menuName)
 										},
 										success: function(menuData) {
 											innerCallback(null, menuData);
@@ -3115,20 +3101,7 @@ define(function(require) {
 								function(menuData, innerCallback) {
 									self.strategyCreateCallflow({
 										data: {
-											data: {
-												contact_list: {
-													exclude: false
-												},
-												numbers: [menuName],
-												type: 'main',
-												flow: {
-													children: {},
-													data: {
-														id: menuData.id
-													},
-													module: 'menu'
-												}
-											}
+											data: self.strategyGetDefaultMainSubMenuCallflow(menuData)
 										},
 										success: function(data) {
 											innerCallback(null, data);
@@ -3153,20 +3126,10 @@ define(function(require) {
 							parallelRequests[val] = function(callback) {
 								self.strategyCreateCallflow({
 									data: {
-										data: {
-											contact_list: {
-												exclude: false
-											},
-											numbers: [val],
-											type: 'main',
-											flow: {
-												children: {},
-												data: {
-													id: mainCallflows[val + 'Menu'].id
-												},
-												module: 'callflow'
-											}
-										}
+										data: self.strategyGetDefaultMainSubCallflow({
+											label: val,
+											subMenuCallflowId: mainCallflows[val + 'Menu'].id
+										})
 									},
 									success: function(data) {
 										callback(null, data);
@@ -4104,14 +4067,47 @@ define(function(require) {
 			return deleteSequence;
 		},
 
+		strategyListMenus: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'menu.list',
+				data: {
+					accountId: self.accountId,
+					filters: args.filters || {}
+				},
+				success: function(menuData) {
+					args.hasOwnProperty('success') && args.success(menuData.data);
+				},
+				error: function(parsedError) {
+					args.hasOwnProperty('error') && args.error(parsedError);
+				}
+			});
+		},
+
 		strategyCreateMenu: function(args) {
 			var self = this;
 			self.callApi({
 				resource: 'menu.create',
-				data: {
-					accountId: self.accountId,
-					data: args.data.data
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
+				success: function(data, status) {
+					args.hasOwnProperty('success') && args.success(data.data);
 				},
+				error: function(parsedError) {
+					args.hasOwnProperty('error') && args.error(parsedError);
+				}
+			});
+		},
+
+		strategyUpdateMenu: function(args) {
+			var self = this;
+			self.callApi({
+				resource: 'menu.update',
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
 				success: function(data, status) {
 					args.hasOwnProperty('success') && args.success(data.data);
 				},
@@ -4153,6 +4149,219 @@ define(function(require) {
 					args.hasOwnProperty('error') && args.error(parsedError);
 				}
 			});
+		},
+
+		strategyGetDefaultMainSubMenu: function(menuName) {
+			return {
+				name: menuName,
+				record_pin: monster.util.randomString(4, '1234567890'),
+				media: {
+					exit_media: true,
+					invalid_media: true,
+					transfer_media: true
+				},
+				retries: 3,
+				max_extension_length: 4,
+				type: 'main'
+			};
+		},
+
+		strategyGetDefaultMainSubMenuCallflow: function(menuData) {
+			return {
+				contact_list: {
+					exclude: false
+				},
+				numbers: [menuData.name],
+				type: 'main',
+				flow: {
+					children: {},
+					data: {
+						id: menuData.id
+					},
+					module: 'menu'
+				}
+			};
+		},
+
+		strategyGetDefaultMainSubCallflow: function(args) {
+			return {
+				contact_list: {
+					exclude: false
+				},
+				numbers: [ args.label ],
+				type: 'main',
+				flow: {
+					children: {},
+					data: {
+						id: args.subMenuCallflowId
+					},
+					module: 'callflow'
+				}
+			};
+		},
+
+		strategyGetSubCallStrategiesData: function(callback) {
+			monster.parallel({
+				callflows: function(parallelCallback) {
+					self.strategyListCallflows({
+						filters: {
+							paginate: false,
+							has_value: 'type',
+							filter_type: 'main',
+							key_missing: [
+								'owner_id',
+								'group_id'
+							],
+							'filter_ui_metadata.origin': [
+								'voip'
+							]
+						},
+						success: function(data) {
+							// Convert callflows array to map object, then send to next step
+							parallelCallback(null,
+								_.reduce(data, function(obj, callflow) {
+									var label = callflow.name || callflow.numbers[0];
+									obj[label] = callflow;
+									return obj;
+								}, {}));
+						},
+						error: function(parsedError) {
+							parallelCallback(parsedError);
+						}
+					});
+				},
+				menus: function(parallelCallback) {
+					self.strategyListMenus({
+						filters: {
+							paginate: false,
+							has_value: 'type',
+							filter_type: 'main'
+						},
+						success: function(data) {
+							parallelCallback(null, _.reduce(data, function(obj, menu) {
+								obj[menu.name] = menu;
+								return obj;
+							}, {}));
+						},
+						error: function(parsedError) {
+							parallelCallback(parsedError);
+						}
+					});
+				}
+			}, callback);
+		},
+
+		strategyResetSubCallStrategies: function(subCallStrategiesData, mainCallback) {
+			var self = this;
+
+			monster.parallel(
+				_.map(self.subCallflowsLabel, function(label) {
+					var menuLabel = label + 'Menu',
+						waterfallRequests = [];
+
+					// Update or create sub menu
+					waterfallRequests.push(function(waterfallCallback) {
+						var menuArgs = {
+							data: {
+								data: self.strategyGetDefaultMainSubMenu(menuLabel)
+							},
+							success: function(menu) {
+								waterfallCallback(null, menu);
+							},
+							error: function(parsedError) {
+								waterfallCallback(parsedError);
+							}
+						};
+
+						if (!subCallStrategiesData.menus.hasOwnProperty(menuLabel)) {
+							self.strategyCreateMenu(menuArgs);
+							return;
+						}
+
+						var menuToUpdate = subCallStrategiesData.menus[menuLabel];
+						menuArgs.data.menuId = menuArgs.data.data.id = menuToUpdate.id;
+						self.strategyUpdateMenu(menuArgs);
+					});
+
+					// Update or create sub menu callflow
+					waterfallRequests.push(function(menu, waterfallCallback) {
+						var defaultCallflow = self.strategyGetDefaultMainSubMenuCallflow(menu),
+							callflowArgs = {
+								data: {
+									data: defaultCallflow
+								},
+								success: function(menu) {
+									waterfallCallback(null, menu);
+								},
+								error: function(parsedError) {
+									waterfallCallback(parsedError);
+								}
+							};
+
+						if (!subCallStrategiesData.callflows.hasOwnProperty(menuLabel)) {
+							self.strategyCreateCallflow(callflowArgs);
+							return;
+						}
+
+						var callflowToUpdate = subCallStrategiesData.callflows[menuLabel];
+						defaultCallflow.id = callflowToUpdate.id;
+						self.strategyUpdateCallflow(defaultCallflow, function(callflow) {
+							subCallStrategiesData.callflows[menuLabel] = callflow;
+							waterfallCallback(null, callflow);
+						});
+					});
+
+					// Update or create sub callflow
+					waterfallRequests.push(function(menuCallflow, waterfallCallback) {
+						var defaultCallflow = self.strategyGetDefaultMainSubCallflow({
+								label: label,
+								subMenuCallflowId: menuCallflow.id
+							}),
+							callflowArgs = {
+								data: {
+									data: defaultCallflow
+								},
+								success: function(menu) {
+									waterfallCallback(null, menu);
+								},
+								error: function(parsedError) {
+									waterfallCallback(parsedError);
+								}
+							};
+
+						if (!subCallStrategiesData.callflows.hasOwnProperty(label)) {
+							self.strategyCreateCallflow(callflowArgs);
+							return;
+						}
+
+						var callflowToUpdate = subCallStrategiesData.callflows[label];
+						defaultCallflow.id = callflowToUpdate.id;
+						self.strategyUpdateCallflow(defaultCallflow, function(callflow) {
+							subCallStrategiesData.callflows[label] = callflow;
+							waterfallCallback(null, callflow);
+						});
+					});
+
+					// Pack the waterfall process, and return for the outer parallel process
+					return function(parallelCallback) {
+						monster.waterfall(waterfallRequests, function(err, results) {
+							if (err) {
+								parallelCallback(err);
+								return;
+							}
+
+							parallelCallback(null);
+						});
+					};
+				}),
+				function(err, results) {
+					if (err) {
+						mainCallback(err);
+						return;
+					}
+
+					mainCallback(null, subCallStrategiesData.callflows);
+				});
 		}
 	};
 
