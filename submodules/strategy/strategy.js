@@ -2411,9 +2411,7 @@ define(function(require) {
 						}
 
 						// Update modified callflows on strategyData
-						_.each(callflows, function(callflow, key) {
-							strategyData.callflows[key] = callflow;
-						});
+						_.assign(strategyData.callflows, callflows);
 
 						container.hide();
 						container.parents('.element-container').removeClass('open');
