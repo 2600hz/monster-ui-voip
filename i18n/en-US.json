@@ -150,8 +150,8 @@
 		"__comment": "UI-2104: Adding a warning when adding a group with no endpoints",
 		"__version": "3.22",
 		"emptyEndpointsWarning": "You need to select at least one member to create a group",
-		"ringGroup": "{{name}} Ring Group",
-		"baseGroup": "{{name}} Base Group"
+		"ringGroup": "{{{name}}} Ring Group",
+		"baseGroup": "{{{name}}} Base Group"
 	},
 
 	"devices": {
@@ -764,23 +764,6 @@
 		"__comment": "UI-1888: ",
 		"__version": "4.0",
 		"confirmMobileUnAssignment": "You are about to un-assign a Mobile device. Be aware the phone number associated with this device ({{variable}}) will also be un-assigned from this user. Are you sure?",
-
-		"__comment": "UI-2138: Delete User new Dialog",
-		"__version": "3.22",
-		"deleteDialog": {
-			"title": "Remove {{ name }} from the system",
-			"headerAdmin": "You're about to delete an ADMIN! Deleting an admin will delete his user, voicemail boxes and unassign his devices. It will also prevent them from managing this UI. Do you want to continue?",
-			"headerUser": "Deleting a user will delete this user and his Voicemail Box, and unassign the devices and numbers that were assigned to this user. Do you want to continue?",
-			"deleteUser": "Delete",
-			"deleteUserName": "Delete \"{{variable}}\"",
-			"proceed": "Proceed",
-			"deleteDevices": "Also remove this user's devices from the system",
-			"deleteDevicesHelp": "If you leave this option unchecked, we'll just unassign these devices and they will show up in the list of Spare Devices",
-			"__comment": "UI-2467: also remove conferences when deleting a user from smartpbx",
-			"__version": "4.0",
-			"deleteConferences": "Also remove this user's conferences from the system",
-			"deleteConferencesHelp": "If you leave this option unchecked, you won't be able to use the user's conference number anywhere else, as it will still be used by that conference."
-		},
 
 		"__comment": "UI-2921: Delete User new Dialog",
 		"__version": "4.2",
