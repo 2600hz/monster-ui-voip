@@ -3925,6 +3925,13 @@ define(function(require) {
 			});
 		},
 
+		/**
+		 * Gets a menu list from the API
+		 * @param  {Object} args
+		 * @param  {Object} args.filters  Filters to be applied to query the menus
+		 * @param  {Function} [args.success]    Success callback
+		 * @param  {Function} [args.error]      Error callback
+		 */
 		strategyListMenus: function(args) {
 			var self = this;
 
@@ -3943,6 +3950,14 @@ define(function(require) {
 			});
 		},
 
+		/**
+		 * Request the creation of a menu through the API
+		 * @param  {Object} args
+		 * @param  {Object} args.data
+		 * @param  {Object} args.data.data  Menu object to be created
+		 * @param  {Function} [args.success]    Success callback
+		 * @param  {Function} [args.error]      Error callback
+		 */
 		strategyCreateMenu: function(args) {
 			var self = this;
 
@@ -3960,6 +3975,15 @@ define(function(require) {
 			});
 		},
 
+		/**
+		 * Requests a menu update in the API
+		 * @param  {Object}   args
+		 * @param  {Object}   args.data
+		 * @param  {String}   args.data.menuId  ID of the menu to be updated
+		 * @param  {Object}   args.data.data    Menu object to update
+		 * @param  {Function} [args.success]    Success callback
+		 * @param  {Function} [args.error]      Error callback
+		 */
 		strategyUpdateMenu: function(args) {
 			var self = this;
 
@@ -3977,6 +4001,10 @@ define(function(require) {
 			});
 		},
 
+		/**
+		 * Gets a main sub menu for call handling strategies, with the default structure
+		 * @param  {String} menuName  Menu name
+		 */
 		strategyGetDefaultMainSubMenu: function(menuName) {
 			return {
 				name: menuName,
@@ -3992,12 +4020,20 @@ define(function(require) {
 			};
 		},
 
+		/**
+		 * Gets a main callflow for a call handling strategy menu, with the default structure
+		 * and values
+		 * @param  {Object} menuData
+		 * @param  {String} menuData.name  Menu name
+		 * @param  {String} menuData.id    Menu ID
+		 * @returns  {Object}  Sub menu callflow
+		 */
 		strategyGetDefaultMainSubMenuCallflow: function(menuData) {
 			return {
 				contact_list: {
 					exclude: false
 				},
-				numbers: [menuData.name],
+				numbers: [ menuData.name ],
 				type: 'main',
 				flow: {
 					children: {},
@@ -4009,6 +4045,14 @@ define(function(require) {
 			};
 		},
 
+		/**
+		 * Gets a main callflow for call handling strategies, with the default structure and
+		 * values
+		 * @param  {Object} args
+		 * @param  {String} args.label              Callflow label, to be set as number
+		 * @param  {String} args.subMenuCallflowId  ID of the sub menu callflow
+		 * @returns  {Object}  Callflow for call handling strategy
+		 */
 		strategyGetDefaultMainSubCallflow: function(args) {
 			return {
 				contact_list: {
@@ -4026,6 +4070,10 @@ define(function(require) {
 			};
 		},
 
+		/**
+		 * Get data for call handling strategies
+		 * @param  {Function} callback  Callback function for monster async tasks
+		 */
 		strategyGetSubCallStrategiesData: function(callback) {
 			var self = this;
 
@@ -4085,7 +4133,7 @@ define(function(require) {
 		 * @param  {Object}   args
 		 * @param  {Object}   args.mainMenus  Map object that contains the main menus
 		 * @param  {String}   args.menuLabel  Label of the menu to be saved
-		 * @param  {Function} args.callback   Callback function to be used by monster.waterfall
+		 * @param  {Function} args.callback   Callback function for monster async tasks
 		 */
 		strategySaveMainSubMenu: function(args) {
 			var self = this,
@@ -4121,7 +4169,7 @@ define(function(require) {
 		 * @param  {Object}   args.mainCallflows  Map object that contains the main callflows
 		 * @param  {String}   args.callflowLabel  Label of the callflow to be saved
 		 * @param  {Object}   args.callflow       Default callflow to be saved
-		 * @param  {Function} args.callback       Callback function to be used by monster.waterfall
+		 * @param  {Function} args.callback       Callback function for monster async tasks
 		 */
 		strategySaveMainSubCallflow: function(args) {
 			var self = this,
@@ -4154,6 +4202,13 @@ define(function(require) {
 			});
 		},
 
+		/**
+		 * Reset call handling strategies
+		 * @param  {Object}   subCallStrategiesData            Call strategies data
+		 * @param  {Object}   subCallStrategiesData.callflows  Sub callflows for strategies
+		 * @param  {Object}   subCallStrategiesData.menus      Sub menus for strategies
+		 * @param  {Function} mainCallback                     Callback function for monster async tasks
+		 */
 		strategyResetSubCallStrategies: function(subCallStrategiesData, mainCallback) {
 			var self = this;
 
