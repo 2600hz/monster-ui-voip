@@ -5528,12 +5528,13 @@ define(function(require) {
 
 		/**
 		 * Gets a new Voicemail Box object
-		 * @param    {Number} mailbox   Mailbox
-		 * @param    {String} userName  User full name
-		 * @param    {String} userId    User ID
-		 * @returns  {Object} Voicemail Box object
+		 * @param    {Number}  mailbox              Mailbox
+		 * @param    {String}  userName             User full name
+		 * @param    {String}  [userId]             User ID
+		 * @param    {Boolean} [deleteAfterNotify]  Delete voicemail message after notify user
+		 * @returns  {Object}  Voicemail Box object
 		 */
-		usersNewMainVMBox: function(mailbox, userName, userId = undefined, deleteAfterNotify = undefined) {
+		usersNewMainVMBox: function(mailbox, userName, userId, deleteAfterNotify) {
 			var self = this;
 
 			return {
