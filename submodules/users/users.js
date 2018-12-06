@@ -193,6 +193,7 @@ define(function(require) {
 					additionalNumbers: 0,
 					devices: [],
 					extension: dataUser.hasOwnProperty('presence_id') ? dataUser.presence_id : '',
+					fullName: monster.util.getUserFullName(dataUser),
 					hasFeatures: false,
 					isAdmin: dataUser.priv_level === 'admin',
 					showLicensedUserRoles: _.size(self.appFlags.global.servicePlansRole) > 0,
@@ -949,8 +950,8 @@ define(function(require) {
 
 						var oldPresenceId = currentUser.presence_id,
 							userToSave = $.extend(true, {}, currentUser, formData),
-							newName = self.usersGetUserFullName(userToSave),
-							oldName = self.usersGetUserFullName(currentUser),
+							newName = monster.util.getUserFullName(userToSave),
+							oldName = monster.util.getUserFullName(currentUser),
 							isUserNameDifferent = newName !== oldName,
 							hasTimeout = userToSave.extra.ringingTimeout && userToSave.extra.features.indexOf('find_me_follow_me') < 0,
 							shouldUpdateTimeout = hasTimeout ? parseInt(currentUser.extra.ringingTimeout) !== parseInt(userToSave.extra.ringingTimeout) : false;
@@ -1032,7 +1033,7 @@ define(function(require) {
 								message: self.getTemplate({
 									name: '!' + toastrMessages.userUpdated,
 									data: {
-										name: self.usersGetUserFullName(results.user)
+										name: monster.util.getUserFullName(results.user)
 									}
 								})
 							});
@@ -1075,7 +1076,7 @@ define(function(require) {
 								message: self.getTemplate({
 									name: '!' + toastrMessages.pinUpdated,
 									data: {
-										name: self.usersGetUserFullName(currentUser)
+										name: monster.util.getUserFullName(currentUser)
 									}
 								})
 							});
@@ -1168,7 +1169,7 @@ define(function(require) {
 								message: self.getTemplate({
 									name: '!' + toastrMessages.userUpdated,
 									data: {
-										name: self.usersGetUserFullName(userData.data)
+										name: monster.util.getUserFullName(userData.data)
 									}
 								})
 							});
@@ -1226,7 +1227,7 @@ define(function(require) {
 						message: self.getTemplate({
 							name: '!' + toastrMessages.userUpdated,
 							data: {
-								name: self.usersGetUserFullName(userData.data)
+								name: monster.util.getUserFullName(userData.data)
 							}
 						})
 					});
@@ -3073,7 +3074,7 @@ define(function(require) {
 		usersCleanUserData: function(userData) {
 			var self = this,
 				userData = $.extend(true, {}, userData),
-				fullName = self.usersGetUserFullName(userData),
+				fullName = monster.util.getUserFullName(userData),
 				defaultCallerIdName = fullName.substring(0, 15),
 				newCallerIDs = {
 					caller_id: {
@@ -3641,7 +3642,7 @@ define(function(require) {
 
 		usersFormatCreationData: function(data) {
 			var self = this,
-				fullName = self.usersGetUserFullName(data.user),
+				fullName = monster.util.getUserFullName(data.user),
 				callerIdName = fullName.substring(0, 15),
 				formattedData = {
 					user: $.extend(true, {}, {
@@ -3834,7 +3835,7 @@ define(function(require) {
 					}
 				};
 
-				var fullName = self.usersGetUserFullName(user),
+				var fullName = monster.util.getUserFullName(user),
 					callflow = {
 						contact_list: {
 							exclude: false
@@ -4850,7 +4851,7 @@ define(function(require) {
 						});
 					},
 					function(vmbox, wfCallback) {
-						vmbox.name = self.usersGetMainVMBoxName(self.usersGetUserFullName(user));
+						vmbox.name = self.usersGetMainVMBoxName(monster.util.getUserFullName(user));
 						// We only want to update the vmbox number if it was already synced with the presenceId (and if the presenceId was not already set)
 						// This allows us to support old clients who have mailbox number != than their extension number
 						if (oldPresenceId === vmbox.mailbox) {
@@ -4874,7 +4875,7 @@ define(function(require) {
 			monster.parallel({
 				conference: function(callback) {
 					var baseConference = {
-						name: self.usersGetUserFullName(data.user) + self.appFlags.users.smartPBXConferenceString,
+						name: monster.util.getUserFullName(data.user) + self.appFlags.users.smartPBXConferenceString,
 						owner_id: data.user.id,
 						play_name_on_join: true,
 						member: {
@@ -5306,7 +5307,7 @@ define(function(require) {
 				function(userData, waterfallCallback) {
 					// Create voicemail box
 					var user = userData.user,
-						userFullName = self.usersGetUserFullName(user),
+						userFullName = monster.util.getUserFullName(user),
 						mailbox = user.presence_id || _.head(userData.extensions);
 
 					if (_.isNil(mailbox)) {
@@ -5527,12 +5528,13 @@ define(function(require) {
 
 		/**
 		 * Gets a new Voicemail Box object
-		 * @param    {Number} mailbox   Mailbox
-		 * @param    {String} userName  User full name
-		 * @param    {String} userId    User ID
-		 * @returns  {Object} Voicemail Box object
+		 * @param    {Number}  mailbox              Mailbox
+		 * @param    {String}  userName             User full name
+		 * @param    {String}  [userId]             User ID
+		 * @param    {Boolean} [deleteAfterNotify]  Delete voicemail message after notify user
+		 * @returns  {Object}  Voicemail Box object
 		 */
-		usersNewMainVMBox: function(mailbox, userName, userId = undefined, deleteAfterNotify = undefined) {
+		usersNewMainVMBox: function(mailbox, userName, userId, deleteAfterNotify) {
 			var self = this;
 
 			return {
@@ -5541,15 +5543,6 @@ define(function(require) {
 				name: self.usersGetMainVMBoxName(userName),
 				delete_after_notify: deleteAfterNotify
 			};
-		},
-
-		/**
-		 * Builds the user full name, from the user data provided
-		 * @param    {Object} user  User data object
-		 * @returns  {String} User's full name
-		 */
-		usersGetUserFullName: function(user) {
-			return user.first_name + ' ' + user.last_name;
 		},
 
 		/**
