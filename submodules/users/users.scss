@@ -759,11 +759,6 @@
 	margin-top: 10px;
 }
 
-/**** CSS for delete user dialog ****/
-.delete-user-wrapper .dialog-text {
-	margin-top: 10px;
-}
-
 .monster-feature-popup-container {
 	.feature-popup-title {
 		display: flex;
@@ -960,15 +955,45 @@
 		}
 	}
 
-	&[data-feature="vm_to_email"] {
-		#email {
-			margin-top: 8px;
+	&[data-feature="vmbox"] .content {
+		padding-bottom: 0px;
+
+		form {
+			margin-bottom: 0px;
 		}
 
 		.main-line {
 			height: auto;
 			line-height: 20px;
 			margin: 10px 0 30px 0;
+		}
+
+		.control-group {
+			&.main{
+				display: flex;
+				flex-direction: row;
+				justify-content: center;
+				align-items: center;
+				padding-bottom: 15px;
+
+				label.title {
+					font-size: 1em;
+					padding-right: 1em;
+					margin-bottom: 0px;
+				}
+			}
+
+			&.extra {
+				margin-bottom: 40px;
+			}
+		}
+
+		.extra-content {
+			padding-bottom: 15px;
+
+			&.disabled {
+				display: none;
+			}
 		}
 	}
 }
