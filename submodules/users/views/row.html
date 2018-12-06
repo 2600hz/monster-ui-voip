@@ -1,6 +1,6 @@
-<div class="grid-row" data-id="{{id}}" data-priv_level="{{priv_level}}" data-name="{{first_name}} {{last_name}}" data-search="{{first_name}} {{last_name}}{{#each extra.listCallerId}} {{formatPhoneNumber this}} {{this}}{{/each}}">
+<div class="grid-row" data-id="{{id}}" data-priv_level="{{priv_level}}" data-name="{{extra.fullName}}" data-search="{{extra.fullName}}{{#each extra.listCallerId}} {{formatPhoneNumber this}} {{this}}{{/each}}">
 	<div class="user-cells">
-		<div class="name grid-cell" data-type="name"><i class="{{#if extra.isAdmin}}icon-telicon-moderator monster-primary-color{{else}}icon-telicon-user monster-lightgrey{{/if}}"></i> {{ first_name }} {{ last_name }}</div>
+		<div class="name grid-cell" data-type="name"><i class="{{#if extra.isAdmin}}icon-telicon-moderator monster-primary-color{{else}}icon-telicon-user monster-lightgrey{{/if}}"></i> {{ extra.fullName }}</div>
 
 		{{#if extra.showLicensedUserRoles}}
 			<div class="licensed-user-role grid-cell" data-type="licensed-user-role">

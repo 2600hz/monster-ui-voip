@@ -350,7 +350,8 @@ define(function(require) {
 		},
 
 		groupsCreationMergeData: function(data, template) {
-			var formData = monster.ui.getFormData('form_group_creation'),
+			var self = this,
+				formData = monster.ui.getFormData('form_group_creation'),
 				fixedTimeout = '20',
 				fixedDelay = '0',
 				settings = {
@@ -376,7 +377,12 @@ define(function(require) {
 				},
 				baseCallflow: {
 					numbers: [ monster.util.randomString(25) ],
-					name: formData.name + ' Base Group',
+					name: self.getTemplate({
+						name: '!' + self.i18n.active().groups.baseGroup,
+						data: {
+							name: formData.name
+						}
+					}),
 					flow: {
 						module: 'ring_group',
 						children: {},
@@ -390,7 +396,12 @@ define(function(require) {
 				},
 				callflow: {
 					numbers: [ formData.extra.extension ],
-					name: formData.name + ' Ring Group',
+					name: self.getTemplate({
+						name: '!' + self.i18n.active().groups.ringGroup,
+						data: {
+							name: formData.name
+						}
+					}),
 					flow: {
 						module: 'callflow',
 						children: {

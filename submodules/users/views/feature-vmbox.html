@@ -1,0 +1,55 @@
+<div class="monster-feature-popup-container" data-feature="vmbox">
+	<div class="feature-popup-title">
+		<div class="popup-title">
+			<div class="feature-fa-wrapper">
+				<i class="{{extra.mapFeatures.vmbox.icon}}"></i>
+			</div>
+			<div class="feature-title">
+				{{ i18n.users.vmbox.headline }}
+			</div>
+		</div>
+		<div class="switch popup-action">
+		{{#monsterSwitch}}
+			<input class="switch-state" type="checkbox" id="checkbox_vmbox" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if extra.mapFeatures.vmbox.active}} checked="checked"{{/if}}></input>
+		{{/monsterSwitch}}
+		</div>
+	</div>
+
+	<div class="content{{#unless extra.mapFeatures.vmbox.active}} disabled{{/unless}}">
+		<form id="vmbox_form">
+
+			<div class="main-line">
+				{{i18n.users.vmbox.label}}
+			</div>
+
+			<div class="control-group main">
+				<label class="title">Voicemail to e-mail:</label>
+				{{#monsterSwitch}}
+					<input type="checkbox" name="vm_to_email_enabled" id="vm_to_email_enabled" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if vm_to_email_enabled}} checked="checked"{{/if}}></input>
+				{{/monsterSwitch}}
+			</div>
+
+			<div class="extra-content{{#unless vm_to_email_enabled}} disabled{{/unless}}">
+				<div class="control-group extra">
+					<label class="fix-left">
+						{{#monsterCheckbox i18n.users.vmbox.deleteAfterNotify}}
+							<input type="checkbox" name="delete_after_notify"{{#if extra.deleteAfterNotify}} checked{{/if}}></input>
+						{{/monsterCheckbox}}
+					</label>
+				</div>
+
+				{{#monsterText}}
+					{{replaceVar i18n.users.vmbox.vmToEmailHelp email}}
+				{{/monsterText}}
+			</div>
+
+		</form>
+	</div>
+
+	<div class="actions clearfix">
+		<div class="pull-right">
+			<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
+			<button type="button" class="monster-button monster-button-success save">{{ i18n.saveChanges }}</button>
+		</div>
+	</div>
+</div>

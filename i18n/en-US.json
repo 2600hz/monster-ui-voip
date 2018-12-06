@@ -150,8 +150,8 @@
 		"__comment": "UI-2104: Adding a warning when adding a group with no endpoints",
 		"__version": "3.22",
 		"emptyEndpointsWarning": "You need to select at least one member to create a group",
-		"ringGroup": "{{name}} Ring Group",
-		"baseGroup": "{{name}} Base Group"
+		"ringGroup": "{{{name}}} Ring Group",
+		"baseGroup": "{{{name}}} Base Group"
 	},
 
 	"devices": {
@@ -684,12 +684,13 @@
 				}
 			}
 		},
-		"vm_to_email": {
+		"vmbox": {
 			"deleteAfterNotify": "Delete messages from database after sending the notification.",
-			"headline": "Voicemail-to-Email Settings",
-			"help": "If you want to change where email notifications go to, please edit the user's email address in the User Administration section",
-			"label": "An e-mail will be sent to {{variable}} for every new voicemail",
-			"title": "Voicemails"
+			"headline": "User Voicemail Box",
+			"label": "A voicemail box will be available for this user.",
+			"sendVmToEmail": "Send an e-mail to {{variable}} for every new voicemail.",
+			"title": "Voicemail Box",
+			"vmToEmailHelp": "An e-mail will be sent to {{variable}} for every new voicemail. If you want to change where email notifications go to, please edit the user's email address in the User Administration section."
 		},
 		"find_me_follow_me": {
 			"title": "Find me, Follow me",
