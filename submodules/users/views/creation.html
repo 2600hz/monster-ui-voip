@@ -1,26 +1,32 @@
 <div id="creation_user_dialog">
-	<form class="form-horizontal small-labels" id="form_user_creation">
+	<form class="form-horizontal" id="form_user_creation">
 	<div>
 		<div class="control-group">
-			<label class="control-label" for="first_name"><i class="fa fa-user"></i></label>
+			<label class="control-label" for="first_name">{{i18n.users.dialogCreationUser.firstName}}</label>
 			<div class="controls">
-				<input required class="input-small" type="text" id="first_name" name="user.first_name" placeholder="{{i18n.users.dialogCreationUser.firstName}}"></input>
-				<input required class="same-line input-small" type="text" name="user.last_name" placeholder="{{i18n.users.dialogCreationUser.lastName}}"></input>
+				<input required type="text" id="first_name" name="user.first_name" placeholder="{{i18n.users.dialogCreationUser.firstName}}"></input>
 			</div>
 		</div>
 
 		<div class="control-group">
-			<label class="control-label" for="email"><i class="fa fa-key"></i></label>
+			<label class="control-label" for="first_name">{{i18n.users.dialogCreationUser.lastName}}</label>
 			<div class="controls">
-				<input required type="email" name="user.username" id="username" placeholder="{{i18n.users.dialogCreationUser.loginEmail}}"/>
+				<input required type="text" name="user.last_name" placeholder="{{i18n.users.dialogCreationUser.lastName}}"></input>
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label" for="email">{{i18n.users.dialogCreationUser.loginEmail}}</label>
+			<div class="controls">
+				<input required type="email" name="user.username" id="username" placeholder="{{i18n.users.dialogCreationUser.loginEmailPlaceholder}}"/>
 			</div>
 		</div>
 
 		{{#unless _whitelabel.hide_user_passwords}}
 			<div class="control-group">
-				<label class="control-label" for="password"><i class="fa fa-unlock"></i></label>
+				<label class="control-label" for="password">{{i18n.users.dialogCreationUser.password}}</label>
 				<div class="controls">
-					<input required type="password" name="user.password" id="password" placeholder="{{i18n.users.dialogCreationUser.password}}"/>
+					<input required type="password" name="user.password" id="password" placeholder="{{i18n.users.dialogCreationUser.passwordPlaceholder}}"/>
 				</div>
 			</div>
 		{{/unless}}
@@ -40,6 +46,16 @@
 				</div>
 			</div>
 		{{/if}}
+	</div>
+
+	<div>
+		<div class="control-group">
+			<label class="control-label" for="extension"><i class="icon-telicon-extensions"></i></label>
+			<div class="controls">
+				<span class="extension-label">{{ i18n.users.dialogCreationUser.extension }}</span>
+				<input required maxlength="6" type="text" name="callflow.extension" id="extension" value="{{nextExtension}}"/>
+			</div>
+		</div>
 	</div>
 
 	<div>

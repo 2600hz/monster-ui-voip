@@ -592,6 +592,9 @@
 /*	box-shadow: 1px 1px 15px #ddd inset;*/
 }
 
+#creation_user_dialog {
+	width: 600px;
+}
 #creation_user_dialog form > div {
 	padding: 20px 40px 0px 60px;
 	border-bottom: 1px solid #c1c1c1;
@@ -607,7 +610,7 @@
 }
 
 #creation_user_dialog .control-group .controls {
-	margin-left: 36px;
+	margin-left: 180px;
 }
 
 #creation_user_dialog input.same-line {
