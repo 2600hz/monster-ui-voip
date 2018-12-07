@@ -6,7 +6,14 @@ define(function(require) {
 
 	var app = {
 
-		requests: {},
+		requests: {
+			/* Provisioner */
+			'common.chooseModel.getProvisionerData': {
+				apiRoot: monster.config.api.provisioner,
+				url: 'phones',
+				verb: 'GET'
+			}
+		},
 
 		subscribe: {
 			'voip.users.render': 'usersRender'
@@ -689,6 +696,15 @@ define(function(require) {
 								callback(null, vmboxes);
 							}
 						});
+					},
+					provisioners: function(callback) {
+						monster.request({
+							resource: 'common.chooseModel.getProvisionerData',
+							data: {},
+							success: function(provisionerData) {
+								callback(null, provisionerData.data);
+							}
+						});
 					}
 				}, function(err, results) {
 					var originalData = self.usersFormatAddUser(results),
@@ -772,6 +788,8 @@ define(function(require) {
 					userTemplate.find('#notification_email').on('change', function() {
 						userTemplate.find('.email-group').toggleClass('hidden');
 					});
+
+					monster.ui.chosen(userTemplate.find('#device_brand'));
 
 					var popup = monster.ui.dialog(userTemplate, {
 						title: self.i18n.active().users.dialogCreationUser.title
@@ -1872,6 +1890,24 @@ define(function(require) {
 			// If for some reason a vmbox number exist without an extension, we still don't want to let them set their extension number to that number.
 			allNumbers = arrayExtensions.concat(arrayVMBoxes);
 			formattedData.nextExtension = parseInt(monster.util.getNextExtension(allNumbers)) + '';
+			formattedData.listProvisioners = _.map(data.provisioners, function(brand) {
+				var models = _.chain(brand.families)
+					.map(function(family) {
+						return _.reduce(family.models, function(prev, acc) {
+							return prev.concat(acc);
+						}, []);
+					})
+					.reduce(function(prev, acc) {
+						return prev.concat(acc);
+					}, [])
+					.value();
+
+				return {
+					id: brand.id,
+					name: brand.name,
+					models: models
+				};
+			});
 
 			return formattedData;
 		},

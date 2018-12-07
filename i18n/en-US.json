@@ -500,7 +500,18 @@
 			"vmboxNumber": "VM Box #",
 			"__comment": "UI-814: Adding the option to automatically send email on user creation",
 			"__version": "3.20_s3",
-			"sendWelcomeEmail": "Send credentials to this user"
+			"sendWelcomeEmail": "Send credentials to this user",
+			"addDevice": {
+				"title": "Add Device",
+				"deviceMake": {
+					"label": "Device Make",
+					"none": "-- No brand selected ---"
+				},
+				"deviceModel": {
+					"label": "Device Model",
+					"none": "-- No device selected --"
+				}
+			}
 		},
 		"editionForm": {
 			"changePIN": "Change PIN",
