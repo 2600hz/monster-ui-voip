@@ -3203,60 +3203,65 @@ define(function(require) {
 			});
 		},
 
-		strategyCreateFeatureCodes: function(callback) {
+		/**
+		 * @param  {Function} [args.callback]
+		 */
+		strategyCreateFeatureCodes: function(args) {
 			var self = this;
 
-			/* To complete with all feature codes */
-			self.strategyGetFeatureCodes(function(listFeatureCodes) {
-				var existingFeatureCodes = $.map(listFeatureCodes, function(val) { return val.featurecode.name; }),
-					listRequests = [];
-
-				_.each(self.featureCodes, function(featureCode) {
-					if (existingFeatureCodes.indexOf(featureCode.name) === -1) {
-						var callflow = {
-							flow: {
-								children: {},
-								data: featureCode.extraData || {},
-								module: featureCode.moduleName
-							},
-							featurecode: {
-								name: featureCode.name,
-								number: featureCode.number
-							}
-						};
-
-						if (featureCode.hasOwnProperty('actionName')) {
-							callflow.flow.data = $.extend(callflow.flow.data, {
-								action: featureCode.actionName
-							});
-						}
-
-						if ('pattern' in featureCode) {
-							callflow.patterns = [ featureCode.pattern ];
-						} else {
-							callflow.numbers = [ featureCode.callflowNumber ];
-						}
-
-						listRequests.push(function(localCallback) {
-							self.strategyCreateCallflow({
-								data: {
-									data: callflow
-								},
-								success: function(data) {
-									localCallback && localCallback(null, data);
-								}
-							});
-						});
-					}
-				});
-
-				if (listRequests.length > 0) {
-					monster.parallel(listRequests, function(err, results) {
-						callback && callback();
+			monster.waterfall([
+				function(callback) {
+					self.strategyGetFeatureCodes(function(featureCodes) {
+						callback(null, featureCodes);
 					});
-				} else {
-					callback && callback();
+				},
+				function(featureCodes, callback) {
+					var featureCodeNames = _.map(featureCodes, 'name');
+
+					monster.parallel(_
+						.chain(self.featureCodes)
+						.reject(function(featureCode) {
+							return _.includes(featureCodeNames, featureCode.name);
+						})
+						.map(function(featureCode) {
+							var defaults = {
+									flow: {
+										children: {},
+										data: _.get(featureCode, 'extraData', {}),
+										module: featureCode.moduleName
+									},
+									faeturecode: {
+										name: featureCode.name,
+										number: featureCode.number
+									}
+								},
+								callflow = {};
+
+							if (_.has(featureCode, 'actionName')) {
+								_.set(callflow, 'flow.data.action', featureCode.actionName);
+							}
+							if (_.has(featureCode, 'pattern')) {
+								_.set(callflow, 'patterns', [featureCode.pattern]);
+							} else {
+								_.set(callflow, 'numbers', [featureCode.callflowNumber]);
+							}
+
+							return function(parallelCallback) {
+								self.strategyCreateCallflow({
+									data: {
+										data: _.merge({}, defaults, callflow)
+									},
+									success: function() {
+										parallelCallback(null);
+									}
+								});
+							};
+						})
+						.value()
+					, callback);
 				}
+			], function() {
+				_.has(args, 'callback') && args.callback();
 			});
 		},
 
