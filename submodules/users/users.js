@@ -1003,8 +1003,23 @@ define(function(require) {
 								}
 							},
 							callflow: function(callback) {
-								if (isUserNameDifferent || shouldUpdateTimeout) {
-									self.usersGetMainCallflow(userToSave.id, function(mainCallflow) {
+								if (!isUserNameDifferent && !shouldUpdateTimeout) {
+									callback(null, null);
+									return;
+								}
+
+								monster.waterfall([
+									function(waterfallCallback) {
+										self.usersGetMainCallflow(userToSave.id, function(mainCallflow) {
+											waterfallCallback(null, mainCallflow);
+										});
+									},
+									function(mainCallflow, waterfallCallback) {
+										if (_.isNil(mainCallflow)) {
+											waterfallCallback(null, null);
+											return;
+										}
+
 										if (isUserNameDifferent) {
 											mainCallflow.name = newName + self.appFlags.users.smartPBXCallflowString;
 										}
@@ -1022,10 +1037,8 @@ define(function(require) {
 										self.usersUpdateCallflow(mainCallflow, function(updatedCallflow) {
 											callback(null, updatedCallflow);
 										});
-									});
-								} else {
-									callback(null, null);
-								}
+									}
+								], callback);
 							}
 						}, function(error, results) {
 							monster.ui.toast({
