@@ -763,66 +763,16 @@ define(function(require) {
 					});
 
 					monster.ui.showPasswordStrength(userTemplate.find('#password'));
-
-					userTemplate.find('#create_user').on('click', function() {
-						if (monster.ui.valid(userTemplate.find('#form_user_creation'))) {
-							var $this = $(this),
-								dataForm = _.merge(
-									monster.ui.getFormData('form_user_creation'),
-									{
-										user: {
-											device: {
-												family: userTemplate.find('#device_model').find(':selected').data('family')
-											}
-										}
-									}
-									),
-								formattedData = self.usersFormatCreationData(dataForm);
-
-							$this
-								.prop('disabled', true);
-
-							self.usersCreate(formattedData, function(data) {
-								popup.dialog('close').remove();
-
-								self.usersRender({ userId: data.user.id });
-							}, function() {
-								$this
-									.prop('disabled', false);
-							});
-						}
-					});
-
-					userTemplate.find('#notification_email').on('change', function() {
-						userTemplate.find('.email-group').toggleClass('hidden');
-					});
-
-					userTemplate.find('#device_brand').on('change', function() {
-						var $brand = $(this).val(),
-							selectedBrand = [];
-
-						if ($brand !== 'none') {
-							selectedBrand = _.find(originalData.listProvisioners, function(brand) {
-								return brand.name === $brand;
-							});
-						}
-
-						var deviceModelTemplate = $(self.getTemplate({
-							name: 'creationDeviceModelDropdown',
-							data: {
-								listModels: selectedBrand.models
-							},
-							submodule: 'users'
-						}));
-
-						userTemplate.find('.device-model-area').empty().append(deviceModelTemplate);
-						monster.ui.chosen(userTemplate.find('#device_model'));
-					});
-
 					monster.ui.chosen(userTemplate.find('#device_brand'));
 
 					var popup = monster.ui.dialog(userTemplate, {
 						title: self.i18n.active().users.dialogCreationUser.title
+					});
+
+					self.usersBindAddUserEvents({
+						template: userTemplate,
+						data: originalData,
+						popup: popup
 					});
 				});
 			});
@@ -1773,6 +1723,102 @@ define(function(require) {
 				template.find('.grid-cell.active').removeClass('active');
 				template.find('.grid-row.active').removeClass('active');
 			});
+		},
+
+		usersBindAddUserEvents: function(args) {
+			var self = this,
+				template = args.template,
+				data = args.data,
+				popup = args.popup;
+
+			template.find('#create_user').on('click', function() {
+				if (monster.ui.valid(template.find('#form_user_creation'))) {
+					var $this = $(this),
+						dataForm = _.merge(
+							monster.ui.getFormData('form_user_creation'),
+							{
+								user: {
+									device: {
+										family: template.find('#device_model').find(':selected').data('family')
+									}
+								}
+							}
+							),
+						formattedData = self.usersFormatCreationData(dataForm);
+
+					$this
+						.prop('disabled', true);
+
+					self.usersCreate(formattedData, function(data) {
+						popup.dialog('close').remove();
+
+						self.usersRender({ userId: data.user.id });
+					}, function() {
+						$this
+							.prop('disabled', false);
+					});
+				}
+			});
+
+			template.find('#notification_email').on('change', function() {
+				template.find('.email-group').toggleClass('hidden');
+			});
+
+			template.find('#device_brand').on('change', function() {
+				var $brand = $(this).val(),
+					selectedBrand = [],
+					$deviceModel = template.find('.device-model'),
+					$deviceName = template.find('.device-name'),
+					$deviceMac = template.find('.device-mac');
+
+				if ($brand !== 'none') {
+					self.usersDeviceFormReset(template);
+
+					selectedBrand = _.find(data.listProvisioners, function(brand) {
+						return brand.name === $brand;
+					});
+
+					var deviceModelTemplate = $(self.getTemplate({
+						name: 'creationDeviceModelDropdown',
+						data: {
+							listModels: selectedBrand.models
+						},
+						submodule: 'users'
+					}));
+
+					template.find('.device-model-area')
+						.empty()
+						.append(deviceModelTemplate);
+					monster.ui.chosen(template.find('#device_model'));
+					$deviceModel.slideDown();
+
+					template.find('#device_model').on('change', function() {
+						var $model = $(this).val();
+						if ($model !== 'none') {
+							$deviceName.slideDown();
+							$deviceMac.slideDown();
+							return;
+						}
+
+						$deviceName.slideUp();
+						$deviceMac.slideUp();
+					});
+
+					return;
+				}
+
+				self.usersDeviceFormReset(template);
+			});
+		},
+
+		usersDeviceFormReset: function(template) {
+			var $deviceModel = template.find('.device-model'),
+				$deviceName = template.find('.device-name'),
+				$deviceMac = template.find('.device-mac');
+
+			$deviceModel.slideUp();
+			$deviceName.slideUp();
+			$deviceMac.slideUp();
 		},
 
 		usersGetCallRecordingData: function(userId, globalCallback) {
