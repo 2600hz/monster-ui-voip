@@ -1734,16 +1734,14 @@ define(function(require) {
 			template.find('#create_user').on('click', function() {
 				if (monster.ui.valid(template.find('#form_user_creation'))) {
 					var $this = $(this),
-						dataForm = _.merge(
-							monster.ui.getFormData('form_user_creation'),
+						dataForm = _.merge(monster.ui.getFormData('form_user_creation'),
 							{
 								user: {
 									device: {
 										family: template.find('#device_model').find(':selected').data('family')
 									}
 								}
-							}
-							),
+							}),
 						formattedData = self.usersFormatCreationData(dataForm);
 
 					$this
