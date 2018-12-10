@@ -594,25 +594,52 @@
 
 #creation_user_dialog {
 	width: 600px;
-	.control-group {
-		&.device-model,
-		&.device-name,
-		&.device-mac {
+	padding: 10px;
+	.row-fluid {
+		margin-bottom: 8px;
+		&.user-section-title {
+			h3 {
+				padding-left: 30px;
+				font-weight: normal;
+				font-size: 20px;
+				margin: 0;
+			}
+		}
+		&.separator {
+			border-bottom: 1px solid #c1c1c1;
+			margin: 30px 0;
+		}
+		.control-label {
+			margin: 0;
+			text-align: left;
+		}
+		input {
+			margin: 0;
+		}
+		.monster-password-strength {
+			width: 220px;
+		}
+		div.to-left {
+			padding-left: 50px;
+		}
+		div.to-right {
+			padding-left: 20px;
+		}
+		.device-model,
+		.device-name,
+		.device-mac {
 			display: none;
 		}
-		.controls {
-			margin-left: 180px;
-		}
+	}
+	.user-options-area {
+		padding-left: 150px;
 	}
 	.add-user-actions {
+		margin-top: 30px;
 		button:not(:first-child) {
 			margin-left: 10px;
 		}
 	}
-}
-#creation_user_dialog form > div {
-	padding: 20px 40px 0px 60px;
-	border-bottom: 1px solid #c1c1c1;
 }
 
 #creation_user_dialog i {
@@ -689,17 +716,6 @@
 
 #creation_user_dialog .control-group-split input {
 	width: 74px;
-}
-
-#creation_user_dialog #extension {
-	width: 47px;
-	margin-left: 5px;
-}
-
-#creation_user_dialog .extension-label {
-	display: inline-block;
-	white-space: nowrap;
-	width: 153px;
 }
 
 /* Change Password Popup */
