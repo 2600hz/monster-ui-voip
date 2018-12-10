@@ -1024,14 +1024,12 @@ define(function(require) {
 											mainCallflow.name = newName + self.appFlags.users.smartPBXCallflowString;
 										}
 
-										if (shouldUpdateTimeout) {
-											if ('flow' in mainCallflow) {
-												var flow = mainCallflow.flow;
-												while (flow.module !== 'user' && '_' in flow.children) {
-													flow = flow.children._;
-												}
-												flow.data.timeout = parseInt(userToSave.extra.ringingTimeout);
+										if (shouldUpdateTimeout && 'flow' in mainCallflow) {
+											var flow = mainCallflow.flow;
+											while (flow.module !== 'user' && '_' in flow.children) {
+												flow = flow.children._;
 											}
+											flow.data.timeout = parseInt(userToSave.extra.ringingTimeout);
 										}
 
 										self.usersUpdateCallflow(mainCallflow, function(updatedCallflow) {
