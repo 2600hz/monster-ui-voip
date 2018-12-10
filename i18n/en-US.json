@@ -503,13 +503,17 @@
 			"sendWelcomeEmail": "Send credentials to this user",
 			"addDevice": {
 				"title": "Add Device",
+				"name": "Device Name",
+				"macAddress": "MAC Address",
 				"deviceMake": {
 					"label": "Device Make",
-					"none": "-- No brand selected ---"
+					"none": "None",
+					"placeholder": "-- No brand selected --"
 				},
 				"deviceModel": {
 					"label": "Device Model",
-					"none": "-- No device selected --"
+					"none": "None",
+					"placeholder": "-- No device selected --"
 				}
 			}
 		},

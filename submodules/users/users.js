@@ -769,6 +769,23 @@ define(function(require) {
 						if (monster.ui.valid(userTemplate.find('#form_user_creation'))) {
 							var $this = $(this),
 								dataForm = monster.ui.getFormData('form_user_creation'),
+								dataDevice = {
+									device_type: 'sip_device',
+									enabled: true,
+									mac_address: dataForm.uer.device.mac_address,
+									name: dataForm.uer.device.name,
+									provision: {
+										endpoint_brand: dataForm.uer.device.brand,
+										endpoint_family: userTemplate.find('#device_model').find(':selected').data('family'),
+										endpoint_model: dataForm.uer.device.model
+									},
+									sip: {
+										password: monster.util.randomString(12),
+										realm: monster.apps.auth.currentAccount.realm,
+										username: 'user_' + monster.util.randomString(10)
+									},
+									suppress_unregister_notifications: false
+								},
 								formattedData = self.usersFormatCreationData(dataForm);
 
 							$this
@@ -787,6 +804,28 @@ define(function(require) {
 
 					userTemplate.find('#notification_email').on('change', function() {
 						userTemplate.find('.email-group').toggleClass('hidden');
+					});
+
+					userTemplate.find('#device_brand').on('change', function() {
+						var $brand = $(this).val(),
+							selectedBrand = [];
+
+						if ($brand !== 'none') {
+							selectedBrand = _.find(originalData.listProvisioners, function(brand) {
+								return brand.name === $brand;
+							});
+						}
+
+						var deviceModelTemplate = $(self.getTemplate({
+							name: 'creationDeviceModelDropdown',
+							data: {
+								listModels: selectedBrand.models
+							},
+							submodule: 'users'
+						}));
+
+						userTemplate.find('.device-model-area').empty().append(deviceModelTemplate);
+						monster.ui.chosen(userTemplate.find('#device_model'));
 					});
 
 					monster.ui.chosen(userTemplate.find('#device_brand'));
@@ -1894,6 +1933,7 @@ define(function(require) {
 				var models = _.chain(brand.families)
 					.map(function(family) {
 						return _.reduce(family.models, function(prev, acc) {
+							acc.family = family.name;
 							return prev.concat(acc);
 						}, []);
 					})

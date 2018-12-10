@@ -65,14 +65,33 @@
 		<div class="control-group">
 			<label class="control-label" for="extension">{{ i18n.users.dialogCreationUser.addDevice.deviceMake.label }}</i></label>
 			<div class="controls">
-				<select id="device_brand" name="user.device.brand" data-placeholder="-- No brand selected --">
+				<select id="device_brand" name="user.device.brand">
 					<option value="none">
 						{{ i18n.users.dialogCreationUser.addDevice.deviceMake.none }}
 					</option>
 					{{#each listProvisioners}}
-						<option value="{{id}}">{{name}}</option>
+						<option value="{{name}}">{{name}}</option>
 					{{/each}}
 				</select>
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label" for="extension">{{ i18n.users.dialogCreationUser.addDevice.deviceModel.label }}</label>
+			<div class="controls device-model-area"></div>
+		</div>
+
+		<div class="control-group">
+			<label for="name" class="control-label" name="name">{{ i18n.users.dialogCreationUser.addDevice.name }}</label>
+			<div class="controls">
+				<input type="text" id="name" name="user.device.name">
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label for="mac_address" class="control-label">{{ i18n.users.dialogCreationUser.addDevice.macAddress }}</label>
+			<div class="controls">
+				<input type="text" id="mac_address" name="user.device.mac_address" placeholder="19:33:1A:B2:12:58">
 			</div>
 		</div>
 	</div>
