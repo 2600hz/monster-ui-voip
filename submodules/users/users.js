@@ -750,9 +750,8 @@ define(function(require) {
 					}
 
 					monster.ui.mask(userTemplate.find('#extension'), 'extension');
-
 					monster.ui.chosen(userTemplate.find('#licensed_role'));
-
+					monster.ui.mask(userTemplate.find('#mac_address'), 'macAddress');
 					monster.ui.validate(userCreationForm, validationOptions);
 
 					// Force select element validation on change event
@@ -768,24 +767,16 @@ define(function(require) {
 					userTemplate.find('#create_user').on('click', function() {
 						if (monster.ui.valid(userTemplate.find('#form_user_creation'))) {
 							var $this = $(this),
-								dataForm = monster.ui.getFormData('form_user_creation'),
-								dataDevice = {
-									device_type: 'sip_device',
-									enabled: true,
-									mac_address: dataForm.uer.device.mac_address,
-									name: dataForm.uer.device.name,
-									provision: {
-										endpoint_brand: dataForm.uer.device.brand,
-										endpoint_family: userTemplate.find('#device_model').find(':selected').data('family'),
-										endpoint_model: dataForm.uer.device.model
-									},
-									sip: {
-										password: monster.util.randomString(12),
-										realm: monster.apps.auth.currentAccount.realm,
-										username: 'user_' + monster.util.randomString(10)
-									},
-									suppress_unregister_notifications: false
-								},
+								dataForm = _.merge(
+									monster.ui.getFormData('form_user_creation'),
+									{
+										user: {
+											device: {
+												family: userTemplate.find('#device_model').find(':selected').data('family')
+											}
+										}
+									}
+									),
 								formattedData = self.usersFormatCreationData(dataForm);
 
 							$this
@@ -3783,6 +3774,24 @@ define(function(require) {
 				formattedData.user.vm_to_email_enabled = false;
 			}
 
+			formattedData.user.device = {
+				device_type: 'sip_device',
+				enabled: true,
+				mac_address: data.user.device.mac_address,
+				name: data.user.device.name,
+				provision: {
+					endpoint_brand: data.user.device.brand,
+					endpoint_family: data.user.device.family,
+					endpoint_model: data.user.device.model
+				},
+				sip: {
+					password: monster.util.randomString(12),
+					realm: monster.apps.auth.currentAccount.realm,
+					username: 'user_' + monster.util.randomString(10)
+				},
+				suppress_unregister_notifications: false
+			};
+
 			delete formattedData.user.extra;
 
 			return formattedData;
@@ -3882,11 +3891,23 @@ define(function(require) {
 				},
 				function(_dataUser, _dataCF, callback) {
 					if (!data.extra.includeInDirectory) {
-						callback(null);
+						callback(null, _dataUser);
 						return;
 					}
 
 					self.usersAddUserToMainDirectory(_dataUser, _dataCF.id, function(dataDirectory) {
+						callback(null, _dataUser);
+					});
+				},
+				function(_dataUser, callback) {
+					if (!data.user.device) {
+						callback(null);
+						return;
+					}
+
+					var deviceData = data.user.device;
+					deviceData.owner_id = _dataUser.id;
+					self.usersAddUserDevice(deviceData, function(_device) {
 						callback(null);
 					});
 				}
@@ -3896,6 +3917,7 @@ define(function(require) {
 					error();
 					return;
 				}
+
 				success(data);
 			});
 		},
@@ -4093,6 +4115,20 @@ define(function(require) {
 				self.usersUpdateUser(dataUser, function(data) {
 					callback && callback(data);
 				});
+			});
+		},
+
+		usersAddUserDevice: function(dataDevice, callback) {
+			var self = this;
+			self.callApi({
+				resource: 'device.create',
+				data: {
+					accountId: self.accountId,
+					data: dataDevice
+				},
+				success: function(device) {
+					callback && callback(device);
+				}
 			});
 		},
 
