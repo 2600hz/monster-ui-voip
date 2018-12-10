@@ -604,6 +604,11 @@
 			margin-left: 180px;
 		}
 	}
+	.add-user-actions {
+		button:not(:first-child) {
+			margin-left: 10px;
+		}
+	}
 }
 #creation_user_dialog form > div {
 	padding: 20px 40px 0px 60px;
