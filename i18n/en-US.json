@@ -483,7 +483,7 @@
 		},
 		"dialogCreationUser": {
 			"createUser": "Create User",
-			"createUserAndAddDevice": "Create User and Add Device",
+			"createUserAndAddAnother": "Create User and Add Another",
 			"createVmbox": "Create a voicemail box for this user",
 			"errorOnCreation": "An error occured while trying to create this user:",
 			"extension": "Main Extension Number",

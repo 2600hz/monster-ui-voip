@@ -1731,22 +1731,28 @@ define(function(require) {
 				data = args.data,
 				popup = args.popup;
 
-			template.find('#create_user').on('click', function() {
+			template.find('.create_user').on('click', function() {
+				var action = $(this).data('action');
+
 				if (monster.ui.valid(template)) {
-					var $this = $(this),
+					var $buttons = template.find('.create_user'),
 						dataForm = monster.ui.getFormData('form_user_creation'),
 						formattedData = self.usersFormatCreationData(dataForm);
 
-					$this
-						.prop('disabled', true);
+					$buttons.prop('disabled', true);
 
 					self.usersCreate(formattedData, function(data) {
 						popup.dialog('close').remove();
 
-						self.usersRender({ userId: data.user.id });
+						switch (action) {
+							case 'add_new':
+								$('.users-header .add-user').trigger('click');
+								break;
+							default:
+								self.usersRender({ userId: data.user.id });
+						}
 					}, function() {
-						$this
-							.prop('disabled', false);
+						$buttons.prop('disabled', false);
 					});
 				}
 			});
