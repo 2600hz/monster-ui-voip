@@ -621,6 +621,9 @@
 			input {
 				margin: 0;
 			}
+			.user-email-icon {
+				margin-right: 10px;
+			}
 			.monster-password-strength {
 				width: 220px;
 			}
@@ -638,6 +641,12 @@
 		}
 		.user-options-area {
 			padding-left: 150px;
+			.email-group {
+				padding-left: 10px;
+				#email {
+					margin-left: 10px;
+				}
+			}
 		}
 		.add-user-actions {
 			margin-top: 30px;
