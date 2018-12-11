@@ -1003,29 +1003,40 @@ define(function(require) {
 								}
 							},
 							callflow: function(callback) {
-								if (isUserNameDifferent || shouldUpdateTimeout) {
-									self.usersGetMainCallflow(userToSave.id, function(mainCallflow) {
+								if (!isUserNameDifferent && !shouldUpdateTimeout) {
+									callback(null, null);
+									return;
+								}
+
+								monster.waterfall([
+									function(waterfallCallback) {
+										self.usersGetMainCallflow(userToSave.id, function(mainCallflow) {
+											waterfallCallback(null, mainCallflow);
+										});
+									},
+									function(mainCallflow, waterfallCallback) {
+										if (_.isNil(mainCallflow)) {
+											waterfallCallback(null, null);
+											return;
+										}
+
 										if (isUserNameDifferent) {
 											mainCallflow.name = newName + self.appFlags.users.smartPBXCallflowString;
 										}
 
-										if (shouldUpdateTimeout) {
-											if ('flow' in mainCallflow) {
-												var flow = mainCallflow.flow;
-												while (flow.module !== 'user' && '_' in flow.children) {
-													flow = flow.children._;
-												}
-												flow.data.timeout = parseInt(userToSave.extra.ringingTimeout);
+										if (shouldUpdateTimeout && 'flow' in mainCallflow) {
+											var flow = mainCallflow.flow;
+											while (flow.module !== 'user' && '_' in flow.children) {
+												flow = flow.children._;
 											}
+											flow.data.timeout = parseInt(userToSave.extra.ringingTimeout);
 										}
 
 										self.usersUpdateCallflow(mainCallflow, function(updatedCallflow) {
 											callback(null, updatedCallflow);
 										});
-									});
-								} else {
-									callback(null, null);
-								}
+									}
+								], callback);
 							}
 						}, function(error, results) {
 							monster.ui.toast({
