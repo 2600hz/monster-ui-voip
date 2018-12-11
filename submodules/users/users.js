@@ -1732,16 +1732,9 @@ define(function(require) {
 				popup = args.popup;
 
 			template.find('#create_user').on('click', function() {
-				if (monster.ui.valid(template.find('#form_user_creation'))) {
+				if (monster.ui.valid(template)) {
 					var $this = $(this),
-						dataForm = _.merge(monster.ui.getFormData('form_user_creation'),
-							{
-								user: {
-									device: {
-										family: template.find('#device_model').find(':selected').data('family')
-									}
-								}
-							}),
+						dataForm = monster.ui.getFormData('form_user_creation'),
 						formattedData = self.usersFormatCreationData(dataForm);
 
 					$this
@@ -1787,6 +1780,7 @@ define(function(require) {
 					template.find('.device-model-area')
 						.empty()
 						.append(deviceModelTemplate);
+
 					monster.ui.chosen(template.find('#device_model'));
 					$deviceModel.slideDown();
 
@@ -3755,6 +3749,7 @@ define(function(require) {
 			var self = this,
 				fullName = monster.util.getUserFullName(data.user),
 				callerIdName = fullName.substring(0, 15),
+				deviceFamily = $('#device_model').find(':selected').data('family'),
 				formattedData = {
 					user: $.extend(true, {}, {
 						service: {
@@ -3818,23 +3813,32 @@ define(function(require) {
 				formattedData.user.vm_to_email_enabled = false;
 			}
 
-			formattedData.user.device = {
-				device_type: 'sip_device',
-				enabled: true,
-				mac_address: data.user.device.mac_address,
-				name: data.user.device.name,
-				provision: {
-					endpoint_brand: data.user.device.brand,
-					endpoint_family: data.user.device.family,
-					endpoint_model: data.user.device.model
-				},
-				sip: {
-					password: monster.util.randomString(12),
-					realm: monster.apps.auth.currentAccount.realm,
-					username: 'user_' + monster.util.randomString(10)
-				},
-				suppress_unregister_notifications: false
-			};
+			if (
+				_.get(data, 'user.device.brand', 'none') !== 'none'
+				&& _.get(data, 'user.device.model', 'none') !== 'none'
+				&& !_.isEmpty(deviceFamily)
+				) {
+				formattedData.user.device = {
+					device_type: 'sip_device',
+					enabled: true,
+					mac_address: data.user.device.mac_address,
+					name: data.user.device.name,
+					provision: {
+						endpoint_brand: data.user.device.brand,
+						endpoint_family: data.user.device.family,
+						endpoint_model: data.user.device.model
+					},
+					sip: {
+						password: monster.util.randomString(12),
+						realm: monster.apps.auth.currentAccount.realm,
+						username: 'user_' + monster.util.randomString(10)
+					},
+					suppress_unregister_notifications: false,
+					family: deviceFamily
+				};
+			} else {
+				delete formattedData.user.device;
+			}
 
 			delete formattedData.user.extra;
 
