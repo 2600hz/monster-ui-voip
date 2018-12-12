@@ -3816,7 +3816,8 @@ define(function(require) {
 			if (
 				_.get(data, 'user.device.brand', 'none') !== 'none'
 				&& _.get(data, 'user.device.model', 'none') !== 'none'
-				&& !_.isEmpty(deviceFamily)
+				&& !_.isEmpty(_.get(data, 'user.device.name'))
+				&& !_.isEmpty(_.get(data, 'user.device.brand'))
 				) {
 				formattedData.user.device = {
 					device_type: 'sip_device',

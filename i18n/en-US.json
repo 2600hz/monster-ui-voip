@@ -507,13 +507,10 @@
 				"macAddress": "MAC Address",
 				"deviceMake": {
 					"label": "Device Make",
-					"none": "None",
-					"placeholder": "-- No brand selected --"
+					"none": "None"
 				},
 				"deviceModel": {
-					"label": "Device Model",
-					"none": "None",
-					"placeholder": "-- No device selected --"
+					"label": "Device Model"
 				}
 			}
 		},
