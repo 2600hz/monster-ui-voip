@@ -1735,7 +1735,7 @@ define(function(require) {
 			template.find('.create_user').on('click', function() {
 				var action = $(this).data('action');
 
-				if (monster.ui.valid(template)) {
+				if (monster.ui.valid(template.find('#form_user_creation'))) {
 					var $buttons = template.find('.create_user'),
 						dataForm = monster.ui.getFormData('form_user_creation'),
 						formattedData = self.usersFormatCreationData(dataForm);
