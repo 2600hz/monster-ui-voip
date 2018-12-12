@@ -764,6 +764,7 @@ define(function(require) {
 
 					monster.ui.showPasswordStrength(userTemplate.find('#password'));
 					monster.ui.chosen(userTemplate.find('#device_brand'));
+					monster.ui.chosen(template.find('#device_model'));
 
 					var popup = monster.ui.dialog(userTemplate, {
 						title: self.i18n.active().users.dialogCreationUser.title
@@ -1766,41 +1767,34 @@ define(function(require) {
 					selectedBrand = [],
 					$deviceModel = template.find('.device-model'),
 					$deviceName = template.find('.device-name'),
-					$deviceMac = template.find('.device-mac');
+					$deviceMac = template.find('.device-mac'),
+					$deviceModelSelect = template.find('#device_model');
 
 				if ($brand !== 'none') {
 					self.usersDeviceFormReset(template);
+					$deviceModel.slideDown();
+					$deviceName.slideDown();
+					$deviceMac.slideDown();
 
 					selectedBrand = _.find(data.listProvisioners, function(brand) {
 						return brand.name === $brand;
 					});
 
-					var deviceModelTemplate = $(self.getTemplate({
-						name: 'creationDeviceModelDropdown',
-						data: {
-							listModels: selectedBrand.models
-						},
-						submodule: 'users'
-					}));
+					$deviceModelSelect
+						.find('option')
+						.remove()
+						.end();
 
-					template.find('.device-model-area')
-						.empty()
-						.append(deviceModelTemplate);
+					selectedBrand.models.map(function(model) {
+						var option = $('<option>', {
+							value: model.name,
+							text: model.name
+						}).attr('family', model.family);
 
-					monster.ui.chosen(template.find('#device_model'));
-					$deviceModel.slideDown();
-
-					template.find('#device_model').on('change', function() {
-						var $model = $(this).val();
-						if ($model !== 'none') {
-							$deviceName.slideDown();
-							$deviceMac.slideDown();
-							return;
-						}
-
-						$deviceName.slideUp();
-						$deviceMac.slideUp();
+						$deviceModelSelect.append(option);
 					});
+
+					$deviceModelSelect.trigger('chosen:updated');
 
 					return;
 				}
