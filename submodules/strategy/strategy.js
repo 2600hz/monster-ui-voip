@@ -3216,7 +3216,7 @@ define(function(require) {
 					});
 				},
 				function(featureCodes, callback) {
-					var featureCodeNames = _.map(featureCodes, 'name');
+					var featureCodeNames = _.map(featureCodes, 'featurecode.name');
 
 					monster.parallel(_
 						.chain(self.featureCodes)
@@ -3230,7 +3230,7 @@ define(function(require) {
 										data: _.get(featureCode, 'extraData', {}),
 										module: featureCode.moduleName
 									},
-									faeturecode: {
+									featurecode: {
 										name: featureCode.name,
 										number: featureCode.number
 									}
