@@ -3203,10 +3203,7 @@ define(function(require) {
 			});
 		},
 
-		/**
-		 * @param  {Function} [args.callback]
-		 */
-		strategyCreateFeatureCodes: function(args) {
+		strategyCreateFeatureCodes: function() {
 			var self = this;
 
 			monster.waterfall([
@@ -3224,32 +3221,31 @@ define(function(require) {
 							return _.includes(featureCodeNames, featureCode.name);
 						})
 						.map(function(featureCode) {
-							var defaults = {
-									flow: {
-										children: {},
-										data: _.get(featureCode, 'extraData', {}),
-										module: featureCode.moduleName
-									},
-									featurecode: {
-										name: featureCode.name,
-										number: featureCode.number
-									}
+							var newCallflow = {
+								flow: {
+									children: {},
+									data: _.get(featureCode, 'extraData', {}),
+									module: featureCode.moduleName
 								},
-								callflow = {};
+								featurecode: {
+									name: featureCode.name,
+									number: featureCode.number
+								}
+							};
 
 							if (_.has(featureCode, 'actionName')) {
-								_.set(callflow, 'flow.data.action', featureCode.actionName);
+								_.set(newCallflow, 'flow.data.action', featureCode.actionName);
 							}
 							if (_.has(featureCode, 'pattern')) {
-								_.set(callflow, 'patterns', [featureCode.pattern]);
+								_.set(newCallflow, 'patterns', [featureCode.pattern]);
 							} else {
-								_.set(callflow, 'numbers', [featureCode.callflowNumber]);
+								_.set(newCallflow, 'numbers', [featureCode.callflowNumber]);
 							}
 
 							return function(parallelCallback) {
 								self.strategyCreateCallflow({
 									data: {
-										data: _.merge({}, defaults, callflow)
+										data: newCallflow
 									},
 									success: function() {
 										parallelCallback(null);
@@ -3260,9 +3256,7 @@ define(function(require) {
 						.value()
 					, callback);
 				}
-			], function() {
-				_.has(args, 'callback') && args.callback();
-			});
+			]);
 		},
 
 		strategyGetFeatureCodes: function(callback) {
