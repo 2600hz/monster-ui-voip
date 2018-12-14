@@ -3813,35 +3813,36 @@ define(function(require) {
 				formattedData.user.vm_to_email_enabled = false;
 			}
 
+			delete formattedData.user.extra;
+
 			if (
-				_.get(data, 'user.device.brand', 'none') !== 'none'
-				&& _.get(data, 'user.device.model', 'none') !== 'none'
-				&& !_.isEmpty(_.get(data, 'user.device.name'))
-				&& !_.isEmpty(_.get(data, 'user.device.brand'))
+				_.get(data, 'user.device.brand', 'none') === 'none'
+				&& _.get(data, 'user.device.model', 'none') === 'none'
+				&& _.isEmpty(_.get(data, 'user.device.name'))
+				&& _.isEmpty(_.get(data, 'user.device.brand'))
 				) {
-				formattedData.user.device = {
-					device_type: 'sip_device',
-					enabled: true,
-					mac_address: data.user.device.mac_address,
-					name: data.user.device.name,
-					provision: {
-						endpoint_brand: data.user.device.brand,
-						endpoint_family: data.user.device.family,
-						endpoint_model: data.user.device.model
-					},
-					sip: {
-						password: monster.util.randomString(12),
-						realm: monster.apps.auth.currentAccount.realm,
-						username: 'user_' + monster.util.randomString(10)
-					},
-					suppress_unregister_notifications: false,
-					family: data.user.device.family
-				};
-			} else {
 				delete formattedData.user.device;
+				return formattedData;
 			}
 
-			delete formattedData.user.extra;
+			formattedData.user.device = {
+				device_type: 'sip_device',
+				enabled: true,
+				mac_address: data.user.device.mac_address,
+				name: data.user.device.name,
+				provision: {
+					endpoint_brand: data.user.device.brand,
+					endpoint_family: data.user.device.family,
+					endpoint_model: data.user.device.model
+				},
+				sip: {
+					password: monster.util.randomString(12),
+					realm: monster.apps.auth.currentAccount.realm,
+					username: 'user_' + monster.util.randomString(10)
+				},
+				suppress_unregister_notifications: false,
+				family: data.user.device.family
+			};
 
 			return formattedData;
 		},
