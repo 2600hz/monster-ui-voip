@@ -1737,7 +1737,13 @@ define(function(require) {
 
 				if (monster.ui.valid(template.find('#form_user_creation'))) {
 					var $buttons = template.find('.create_user'),
-						dataForm = monster.ui.getFormData('form_user_creation'),
+						dataForm = _.merge(monster.ui.getFormData('form_user_creation'), {
+							user: {
+								device: {
+									family: template.find('#device_model').find(':selected').data('family')
+								}
+							}
+						}),
 						formattedData = self.usersFormatCreationData(dataForm);
 
 					$buttons.prop('disabled', true);
@@ -1789,7 +1795,7 @@ define(function(require) {
 						var option = $('<option>', {
 							value: model.name,
 							text: model.name
-						}).attr('family', model.family);
+						}).attr('data-family', model.family);
 
 						$deviceModelSelect.append(option);
 					});
@@ -1959,7 +1965,7 @@ define(function(require) {
 			allNumbers = arrayExtensions.concat(arrayVMBoxes);
 			formattedData.nextExtension = parseInt(monster.util.getNextExtension(allNumbers)) + '';
 			formattedData.listProvisioners = _.map(data.provisioners, function(brand) {
-				var models = _.falMap(brand.families, function(family) {
+				var models = _.flatMap(brand.families, function(family) {
 					return _.map(family.models, function(model) {
 						model.family = family.name;
 						return model;
@@ -3744,7 +3750,6 @@ define(function(require) {
 			var self = this,
 				fullName = monster.util.getUserFullName(data.user),
 				callerIdName = fullName.substring(0, 15),
-				deviceFamily = $('#device_model').find(':selected').data('family'),
 				formattedData = {
 					user: $.extend(true, {}, {
 						service: {
@@ -3830,7 +3835,7 @@ define(function(require) {
 						username: 'user_' + monster.util.randomString(10)
 					},
 					suppress_unregister_notifications: false,
-					family: deviceFamily
+					family: data.user.device.family
 				};
 			} else {
 				delete formattedData.user.device;
