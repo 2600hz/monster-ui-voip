@@ -1763,21 +1763,21 @@ define(function(require) {
 			});
 
 			template.find('#device_brand').on('change', function() {
-				var $brand = $(this).val(),
+				var brand = $(this).val(),
 					selectedBrand = [],
 					$deviceModel = template.find('.device-model'),
 					$deviceName = template.find('.device-name'),
 					$deviceMac = template.find('.device-mac'),
 					$deviceModelSelect = template.find('#device_model');
 
-				if ($brand !== 'none') {
+				if (brand !== 'none') {
 					self.usersDeviceFormReset(template);
 					$deviceModel.slideDown();
 					$deviceName.slideDown();
 					$deviceMac.slideDown();
 
-					selectedBrand = _.find(data.listProvisioners, function(brand) {
-						return brand.name === $brand;
+					selectedBrand = _.find(data.listProvisioners, function(provisioner) {
+						return provisioner.name === brand;
 					});
 
 					$deviceModelSelect
@@ -1959,17 +1959,12 @@ define(function(require) {
 			allNumbers = arrayExtensions.concat(arrayVMBoxes);
 			formattedData.nextExtension = parseInt(monster.util.getNextExtension(allNumbers)) + '';
 			formattedData.listProvisioners = _.map(data.provisioners, function(brand) {
-				var models = _.chain(brand.families)
-					.map(function(family) {
-						return _.reduce(family.models, function(prev, acc) {
-							acc.family = family.name;
-							return prev.concat(acc);
-						}, []);
-					})
-					.reduce(function(prev, acc) {
-						return prev.concat(acc);
-					}, [])
-					.value();
+				var models = _.falMap(brand.families, function(family) {
+					return _.map(family.models, function(model) {
+						model.family = family.name;
+						return model;
+					});
+				});
 
 				return {
 					id: brand.id,
