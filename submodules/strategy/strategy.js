@@ -94,14 +94,14 @@ define(function(require) {
 			{
 				name: 'voicemail[action=check]',
 				number: '97',
-				callflowNumber: '*97',
+				pattern: '^\\*97(\\d*)$',
 				moduleName: 'voicemail',
 				actionName: 'check'
 			},
 			{
 				name: 'voicemail[single_mailbox_login]',
 				number: '98',
-				callflowNumber: '*98',
+				pattern: '^\\*98(\\d*)$',
 				moduleName: 'voicemail',
 				actionName: 'check',
 				extraData: {
