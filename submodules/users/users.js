@@ -3904,6 +3904,11 @@ define(function(require) {
 							callback(null, _dataUser);
 						},
 						error: function(parsedError) {
+							if (parsedError.error === '402') {
+								error();
+								return;
+							}
+
 							callback(true);
 						},
 						onChargesCancelled: function() {
