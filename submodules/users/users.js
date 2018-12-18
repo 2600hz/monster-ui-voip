@@ -3827,7 +3827,7 @@ define(function(require) {
 				_.get(data, 'user.device.brand', 'none') === 'none'
 				&& _.get(data, 'user.device.model', 'none') === 'none'
 				&& _.isEmpty(_.get(data, 'user.device.name'))
-				&& _.isEmpty(_.get(data, 'user.device.brand'))
+				&& _.isEmpty(_.get(data, 'user.device.mac_address'))
 				) {
 				delete formattedData.user.device;
 				return formattedData;
