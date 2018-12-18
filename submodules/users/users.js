@@ -1747,10 +1747,12 @@ define(function(require) {
 
 						switch (action) {
 							case 'add_new':
+								self.usersRender();
 								$('.users-header .add-user').trigger('click');
 								break;
 							default:
 								self.usersRender({ userId: data.user.id });
+								break;
 						}
 					}, function() {
 						$buttons.prop('disabled', false);
@@ -5361,10 +5363,6 @@ define(function(require) {
 					args.hasOwnProperty('success') && args.success(data.data);
 				},
 				error: function(parsedError) {
-					if (parsedError.error === '402') {
-						return;
-					}
-
 					args.hasOwnProperty('error') && args.error(parsedError);
 				},
 				onChargesCancelled: function() {
