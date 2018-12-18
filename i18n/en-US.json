@@ -502,16 +502,16 @@
 			"__version": "3.20_s3",
 			"sendWelcomeEmail": "Send credentials to this user",
 			"addDevice": {
-				"title": "Add Device",
-				"name": "Device Name",
-				"macAddress": "MAC Address",
 				"deviceMake": {
 					"label": "Device Make",
 					"none": "None"
 				},
 				"deviceModel": {
 					"label": "Device Model"
-				}
+				},
+				"macAddress": "MAC Address",
+				"name": "Device Name",
+				"title": "Add Device"
 			}
 		},
 		"editionForm": {

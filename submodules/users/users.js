@@ -684,98 +684,7 @@ define(function(require) {
 			});
 
 			template.find('.users-header .add-user').on('click', function() {
-				monster.parallel({
-					callflows: function(callback) {
-						self.usersListCallflows(function(callflows) {
-							callback(null, callflows);
-						});
-					},
-					vmboxes: function(callback) {
-						self.usersListVMBoxes({
-							success: function(vmboxes) {
-								callback(null, vmboxes);
-							}
-						});
-					},
-					provisioners: function(callback) {
-						monster.request({
-							resource: 'common.chooseModel.getProvisionerData',
-							data: {},
-							success: function(provisionerData) {
-								callback(null, provisionerData.data);
-							}
-						});
-					}
-				}, function(err, results) {
-					var originalData = self.usersFormatAddUser(results),
-						userTemplate = $(self.getTemplate({
-							name: 'creation',
-							data: originalData,
-							submodule: 'users'
-						})),
-						userCreationForm = userTemplate.find('#form_user_creation'),
-						validationOptions = {
-							ignore: ':hidden:not(select)',
-							rules: {
-								'callflow.extension': {
-									checkList: originalData.listExtensions
-								},
-								'vmbox.number': {
-									checkList: originalData.listVMBoxes
-								},
-								'user.password': {
-									minlength: 6
-								}
-							},
-							messages: {
-								'user.first_name': {
-									required: self.i18n.active().validation.required
-								},
-								'user.last_name': {
-									required: self.i18n.active().validation.required
-								},
-								'callflow.extension': {
-									required: self.i18n.active().validation.required
-								}
-							}
-						};
-
-					if (originalData.licensedUserRoles) {
-						validationOptions.rules['user.extra.licensedRole'] = {
-							checkList: [ 'none' ]
-						};
-						validationOptions.messages['user.extra.licensedRole'] = {
-							checkList: self.i18n.active().validation.required
-						};
-					}
-
-					monster.ui.mask(userTemplate.find('#extension'), 'extension');
-					monster.ui.chosen(userTemplate.find('#licensed_role'));
-					monster.ui.mask(userTemplate.find('#mac_address'), 'macAddress');
-					monster.ui.validate(userCreationForm, validationOptions);
-
-					// Force select element validation on change event
-					// (Not handled by jQuery Validation plugin because the select
-					// element is hidden by the Chosen jQuery plugin. For more info, see:
-					// https://github.com/jquery-validation/jquery-validation/issues/997)
-					userCreationForm.find('select').on('change', function() {
-						userCreationForm.validate().element(this);
-					});
-
-					monster.ui.showPasswordStrength(userTemplate.find('#password'));
-					monster.ui.chosen(userTemplate.find('#device_brand'));
-					monster.ui.chosen(template.find('#device_model'));
-
-					var popup = monster.ui.dialog(userTemplate, {
-						title: self.i18n.active().users.dialogCreationUser.title
-					});
-
-					self.usersBindAddUserEvents({
-						template: userTemplate,
-						data: originalData,
-						popup: popup
-					});
-				});
+				self.usersRenderAddModalDialog();
 			});
 
 			template.on('click', '.cancel-link', function() {
@@ -1737,7 +1646,13 @@ define(function(require) {
 
 				if (monster.ui.valid(template.find('#form_user_creation'))) {
 					var $buttons = template.find('.create_user'),
-						dataForm = monster.ui.getFormData('form_user_creation'),
+						dataForm = _.merge(monster.ui.getFormData('form_user_creation'), {
+							user: {
+								device: {
+									family: template.find('#device_model').find(':selected').data('family')
+								}
+							}
+						}),
 						formattedData = self.usersFormatCreationData(dataForm);
 
 					$buttons.prop('disabled', true);
@@ -1748,7 +1663,7 @@ define(function(require) {
 						switch (action) {
 							case 'add_new':
 								self.usersRender();
-								$('.users-header .add-user').trigger('click');
+								self.usersRenderAddModalDialog();
 								break;
 							default:
 								self.usersRender({ userId: data.user.id });
@@ -1765,21 +1680,21 @@ define(function(require) {
 			});
 
 			template.find('#device_brand').on('change', function() {
-				var $brand = $(this).val(),
+				var brand = $(this).val(),
 					selectedBrand = [],
 					$deviceModel = template.find('.device-model'),
 					$deviceName = template.find('.device-name'),
 					$deviceMac = template.find('.device-mac'),
 					$deviceModelSelect = template.find('#device_model');
 
-				if ($brand !== 'none') {
+				if (brand !== 'none') {
 					self.usersDeviceFormReset(template);
 					$deviceModel.slideDown();
 					$deviceName.slideDown();
 					$deviceMac.slideDown();
 
-					selectedBrand = _.find(data.listProvisioners, function(brand) {
-						return brand.name === $brand;
+					selectedBrand = _.find(data.listProvisioners, function(provisioner) {
+						return provisioner.name === brand;
 					});
 
 					$deviceModelSelect
@@ -1791,7 +1706,7 @@ define(function(require) {
 						var option = $('<option>', {
 							value: model.name,
 							text: model.name
-						}).attr('family', model.family);
+						}).attr('data-family', model.family);
 
 						$deviceModelSelect.append(option);
 					});
@@ -1802,6 +1717,103 @@ define(function(require) {
 				}
 
 				self.usersDeviceFormReset(template);
+			});
+		},
+
+		usersRenderAddModalDialog: function() {
+			var self = this;
+
+			monster.parallel({
+				callflows: function(callback) {
+					self.usersListCallflows(function(callflows) {
+						callback(null, callflows);
+					});
+				},
+				vmboxes: function(callback) {
+					self.usersListVMBoxes({
+						success: function(vmboxes) {
+							callback(null, vmboxes);
+						}
+					});
+				},
+				provisioners: function(callback) {
+					monster.request({
+						resource: 'common.chooseModel.getProvisionerData',
+						data: {},
+						success: function(provisionerData) {
+							callback(null, provisionerData.data);
+						}
+					});
+				}
+			}, function(err, results) {
+				var originalData = self.usersFormatAddUser(results),
+					userTemplate = $(self.getTemplate({
+						name: 'creation',
+						data: originalData,
+						submodule: 'users'
+					})),
+					userCreationForm = userTemplate.find('#form_user_creation'),
+					validationOptions = {
+						ignore: ':hidden:not(select)',
+						rules: {
+							'callflow.extension': {
+								checkList: originalData.listExtensions
+							},
+							'vmbox.number': {
+								checkList: originalData.listVMBoxes
+							},
+							'user.password': {
+								minlength: 6
+							}
+						},
+						messages: {
+							'user.first_name': {
+								required: self.i18n.active().validation.required
+							},
+							'user.last_name': {
+								required: self.i18n.active().validation.required
+							},
+							'callflow.extension': {
+								required: self.i18n.active().validation.required
+							}
+						}
+					};
+
+				if (originalData.licensedUserRoles) {
+					validationOptions.rules['user.extra.licensedRole'] = {
+						checkList: [ 'none' ]
+					};
+					validationOptions.messages['user.extra.licensedRole'] = {
+						checkList: self.i18n.active().validation.required
+					};
+				}
+
+				monster.ui.mask(userTemplate.find('#extension'), 'extension');
+				monster.ui.chosen(userTemplate.find('#licensed_role'));
+				monster.ui.mask(userTemplate.find('#mac_address'), 'macAddress');
+				monster.ui.validate(userCreationForm, validationOptions);
+
+				// Force select element validation on change event
+				// (Not handled by jQuery Validation plugin because the select
+				// element is hidden by the Chosen jQuery plugin. For more info, see:
+				// https://github.com/jquery-validation/jquery-validation/issues/997)
+				userCreationForm.find('select').on('change', function() {
+					userCreationForm.validate().element(this);
+				});
+
+				monster.ui.showPasswordStrength(userTemplate.find('#password'));
+				monster.ui.chosen(userTemplate.find('#device_brand'));
+				monster.ui.chosen(userTemplate.find('#device_model'));
+
+				var popup = monster.ui.dialog(userTemplate, {
+					title: self.i18n.active().users.dialogCreationUser.title
+				});
+
+				self.usersBindAddUserEvents({
+					template: userTemplate,
+					data: originalData,
+					popup: popup
+				});
 			});
 		},
 
@@ -1961,17 +1973,12 @@ define(function(require) {
 			allNumbers = arrayExtensions.concat(arrayVMBoxes);
 			formattedData.nextExtension = parseInt(monster.util.getNextExtension(allNumbers)) + '';
 			formattedData.listProvisioners = _.map(data.provisioners, function(brand) {
-				var models = _.chain(brand.families)
-					.map(function(family) {
-						return _.reduce(family.models, function(prev, acc) {
-							acc.family = family.name;
-							return prev.concat(acc);
-						}, []);
-					})
-					.reduce(function(prev, acc) {
-						return prev.concat(acc);
-					}, [])
-					.value();
+				var models = _.flatMap(brand.families, function(family) {
+					return _.map(family.models, function(model) {
+						model.family = family.name;
+						return model;
+					});
+				});
 
 				return {
 					id: brand.id,
@@ -3751,7 +3758,6 @@ define(function(require) {
 			var self = this,
 				fullName = monster.util.getUserFullName(data.user),
 				callerIdName = fullName.substring(0, 15),
-				deviceFamily = $('#device_model').find(':selected').data('family'),
 				formattedData = {
 					user: $.extend(true, {}, {
 						service: {
@@ -3815,35 +3821,36 @@ define(function(require) {
 				formattedData.user.vm_to_email_enabled = false;
 			}
 
+			delete formattedData.user.extra;
+
 			if (
-				_.get(data, 'user.device.brand', 'none') !== 'none'
-				&& _.get(data, 'user.device.model', 'none') !== 'none'
-				&& !_.isEmpty(_.get(data, 'user.device.name'))
-				&& !_.isEmpty(_.get(data, 'user.device.brand'))
+				_.get(data, 'user.device.brand', 'none') === 'none'
+				&& _.get(data, 'user.device.model', 'none') === 'none'
+				&& _.isEmpty(_.get(data, 'user.device.name'))
+				&& _.isEmpty(_.get(data, 'user.device.brand'))
 				) {
-				formattedData.user.device = {
-					device_type: 'sip_device',
-					enabled: true,
-					mac_address: data.user.device.mac_address,
-					name: data.user.device.name,
-					provision: {
-						endpoint_brand: data.user.device.brand,
-						endpoint_family: data.user.device.family,
-						endpoint_model: data.user.device.model
-					},
-					sip: {
-						password: monster.util.randomString(12),
-						realm: monster.apps.auth.currentAccount.realm,
-						username: 'user_' + monster.util.randomString(10)
-					},
-					suppress_unregister_notifications: false,
-					family: deviceFamily
-				};
-			} else {
 				delete formattedData.user.device;
+				return formattedData;
 			}
 
-			delete formattedData.user.extra;
+			formattedData.user.device = {
+				device_type: 'sip_device',
+				enabled: true,
+				mac_address: data.user.device.mac_address,
+				name: data.user.device.name,
+				provision: {
+					endpoint_brand: data.user.device.brand,
+					endpoint_family: data.user.device.family,
+					endpoint_model: data.user.device.model
+				},
+				sip: {
+					password: monster.util.randomString(12),
+					realm: monster.apps.auth.currentAccount.realm,
+					username: 'user_' + monster.util.randomString(10)
+				},
+				suppress_unregister_notifications: false,
+				family: data.user.device.family
+			};
 
 			return formattedData;
 		},
