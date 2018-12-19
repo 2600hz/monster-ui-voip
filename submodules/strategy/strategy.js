@@ -94,14 +94,14 @@ define(function(require) {
 			{
 				name: 'voicemail[action=check]',
 				number: '97',
-				pattern: '^\\*97(\\d*)$',
+				pattern: '\\^*97([0-9]*)$',
 				moduleName: 'voicemail',
 				actionName: 'check'
 			},
 			{
 				name: 'voicemail[single_mailbox_login]',
 				number: '98',
-				pattern: '^\\*98(\\d*)$',
+				pattern: '^\\*98([0-9]*)$',
 				moduleName: 'voicemail',
 				actionName: 'check',
 				extraData: {
@@ -3254,7 +3254,37 @@ define(function(require) {
 							};
 						})
 						.value()
-					, callback);
+					, callback(null, featureCodes));
+				},
+				function(featureCodes, callback) {
+					monster.parallel(
+						_.chain(featureCodes)
+						.filter(function(featureCode) {
+							return _.isEmpty(featureCode.patterns) && (featureCode.featurecode.name === 'voicemail[action=check]' || featureCode.featurecode.name === 'voicemail[single_mailbox_login]');
+						})
+						.map(function(featureCode) {
+							var selfCodePattern = _.find(self.featureCodes, function(selfCode) {
+								return selfCode.name === featureCode.featurecode.name;
+							});
+
+							return function(parallelCallback) {
+								self.strategyPatchCallflow({
+									data: {
+										callflowId: featureCode.id,
+										data: {
+											patterns: [selfCodePattern.pattern],
+											numbers: []
+										}
+									},
+									success: function(data) {
+										parallelCallback(null);
+									}
+								});
+							};
+						})
+						.value(),
+						callback
+					);
 				}
 			]);
 		},
@@ -3756,6 +3786,20 @@ define(function(require) {
 				},
 				success: function(data, status) {
 					callback(data.data);
+				}
+			});
+		},
+
+		strategyPatchCallflow: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'callflow.patch',
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
+				success: function(data) {
+					args.success(data.data);
 				}
 			});
 		},
