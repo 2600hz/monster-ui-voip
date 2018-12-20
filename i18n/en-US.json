@@ -483,6 +483,7 @@
 		},
 		"dialogCreationUser": {
 			"createUser": "Create User",
+			"createUserAndAddAnother": "Create User and Add Another",
 			"createVmbox": "Create a voicemail box for this user",
 			"errorOnCreation": "An error occured while trying to create this user:",
 			"extension": "Main Extension Number",
@@ -491,14 +492,27 @@
 			"lastName": "Last Name",
 			"loginEmail": "Email used for Login",
 			"notificationEmail": "Notification E-mail",
-			"password": "Password (Min. 6 characters)",
+			"password": "Password",
+			"passwordPlaceholder": "Password (Min. 6 characters)",
 			"sendToDifferentEmail": "Send emails to an alternate address",
-			"title": "Create User",
+			"title": "Add User and Device",
 			"vmboxAlreadyExist": "VMBox Number is already taken, please choose a different Voicemail Box Number.",
 			"vmboxNumber": "VM Box #",
 			"__comment": "UI-814: Adding the option to automatically send email on user creation",
 			"__version": "3.20_s3",
-			"sendWelcomeEmail": "Send credentials to this user"
+			"sendWelcomeEmail": "Send credentials to this user",
+			"addDevice": {
+				"deviceMake": {
+					"label": "Device Make",
+					"none": "None"
+				},
+				"deviceModel": {
+					"label": "Device Model"
+				},
+				"macAddress": "MAC Address",
+				"name": "Device Name",
+				"title": "Add Device"
+			}
 		},
 		"editionForm": {
 			"changePIN": "Change PIN",

@@ -1,34 +1,38 @@
 <div id="creation_user_dialog">
-	<form class="form-horizontal small-labels" id="form_user_creation">
-	<div>
-		<div class="control-group">
-			<label class="control-label" for="first_name"><i class="fa fa-user"></i></label>
-			<div class="controls">
-				<input required class="input-small" type="text" id="first_name" name="user.first_name" placeholder="{{i18n.users.dialogCreationUser.firstName}}"></input>
-				<input required class="same-line input-small" type="text" name="user.last_name" placeholder="{{i18n.users.dialogCreationUser.lastName}}"></input>
-			</div>
+	<form class="form-horizontal clearfix" id="form_user_creation">
+		<div class="row-fluid user-section-title">
+			<h3>{{i18n.users.dialogCreationUser.createUser}}</h3>
 		</div>
-
-		<div class="control-group">
-			<label class="control-label" for="email"><i class="fa fa-key"></i></label>
-			<div class="controls">
+		<div class="row-fluid">
+			<div class="span6 to-left">
+				<label class="control-label" for="first_name">{{i18n.users.dialogCreationUser.firstName}}</label>
+				<input required type="text" id="first_name" name="user.first_name" placeholder="{{i18n.users.dialogCreationUser.firstName}}" />
+			</div>
+			<div class="span6 to-right">
+				<label class="control-label" for="username">{{i18n.users.dialogCreationUser.loginEmail}}</label>
 				<input required type="email" name="user.username" id="username" placeholder="{{i18n.users.dialogCreationUser.loginEmail}}"/>
 			</div>
 		</div>
-
-		{{#unless _whitelabel.hide_user_passwords}}
-			<div class="control-group">
-				<label class="control-label" for="password"><i class="fa fa-unlock"></i></label>
-				<div class="controls">
-					<input required type="password" name="user.password" id="password" placeholder="{{i18n.users.dialogCreationUser.password}}"/>
-				</div>
+		<div class="row-fluid">
+			<div class="span6 to-left">
+				<label class="control-label" for="last_name">{{i18n.users.dialogCreationUser.lastName}}</label>
+				<input required type="text" id="last_name" name="user.last_name" placeholder="{{i18n.users.dialogCreationUser.lastName}}" />
 			</div>
-		{{/unless}}
-
-		{{#if licensedUserRoles}}
-			<div class="control-group">
-				<label for="licensed_role" class="control-label"><i class="fa fa-user"></i></label>
-				<div class="controls">
+			{{#unless _whitelabel.hide_user_passwords}}
+				<div class="span6 to-right">
+					<label class="control-label" for="password">{{i18n.users.dialogCreationUser.password}}</label>
+					<input required type="password" name="user.password" id="password" placeholder="{{i18n.users.dialogCreationUser.passwordPlaceholder}}"/>
+				</div>
+			{{/unless}}
+		</div>
+		<div class="row-fluid">
+			<div class="span6 to-left">
+				<label class="control-label" for="extension">{{ i18n.users.dialogCreationUser.extension }}</label>
+				<input required type="text" maxlength="6" name="callflow.extension" id="extension" value="{{nextExtension}}"/>
+			</div>
+			{{#if licensedUserRoles}}
+				<div class="span6 to-right">
+					<label class="control-label" for="licensed_role">{{ i18n.users.licensedUserRoles.selectPlaceholder }}</label>
 					<select id="licensed_role" name="user.extra.licensedRole" data-placeholder="{{ i18n.users.licensedUserRoles.selectPlaceholder }}">
 						<option value="none">
 							{{ i18n.users.licensedUserRoles.licensedUserRoles.none }}
@@ -38,62 +42,95 @@
 						{{/each}}
 					</select>
 				</div>
-			</div>
-		{{/if}}
-	</div>
+			{{/if}}
+		</div>
 
-	<div>
-		<div class="control-group">
-			<label class="control-label" for="extension"><i class="icon-telicon-extensions"></i></label>
-			<div class="controls">
-				<span class="extension-label">{{ i18n.users.dialogCreationUser.extension }}</span>
-				<input required maxlength="6" type="text" name="callflow.extension" id="extension" value="{{nextExtension}}"/>
-			</div>
-		</div>
-	</div>
+		<div class="row-fluid separator"></div>
 
-	<div>
-		<div class="control-group hack-left">
-			<label class="control-label" for="create_vmbox"></label>
-			<div class="controls">
-				{{#monsterCheckbox i18n.users.dialogCreationUser.createVmbox }}
-					<input id="create_vmbox" type="checkbox" name="extra.createVmbox"{{#if createVmbox}} checked="checked"{{/if}}></input>
-				{{/monsterCheckbox}}
+		<div class="user-options-area">
+			<div class="control-group hack-left">
+				<label class="control-label" for="create_vmbox"></label>
+				<div class="controls">
+					{{#monsterCheckbox i18n.users.dialogCreationUser.createVmbox }}
+						<input id="create_vmbox" type="checkbox" name="extra.createVmbox"{{#if createVmbox}} checked="checked"{{/if}}></input>
+					{{/monsterCheckbox}}
+				</div>
 			</div>
-		</div>
-		<div class="control-group hack-left">
-			<label class="control-label" for="include_directory"></label>
-			<div class="controls">
-				{{#monsterCheckbox i18n.users.includeInDirectory }}
-					<input id="include_directory" type="checkbox" name="extra.includeInDirectory"{{#if includeInDirectory}} checked="checked"{{/if}}></input>
-				{{/monsterCheckbox}}
+			<div class="control-group hack-left">
+				<label class="control-label" for="include_directory"></label>
+				<div class="controls">
+					{{#monsterCheckbox i18n.users.includeInDirectory }}
+						<input id="include_directory" type="checkbox" name="extra.includeInDirectory"{{#if includeInDirectory}} checked="checked"{{/if}}></input>
+					{{/monsterCheckbox}}
+				</div>
 			</div>
-		</div>
-		<div class="control-group hack-left">
-			<label class="control-label" for="notification_email"></label>
-			<div class="controls">
-				{{#monsterCheckbox i18n.users.dialogCreationUser.sendToDifferentEmail }}
-					<input id="notification_email" type="checkbox" name="extra.differentEmail"{{#if sendToDifferentEmail}} checked{{/if}}></input>
-				{{/monsterCheckbox}}
+			<div class="control-group hack-left">
+				<label class="control-label" for="notification_email"></label>
+				<div class="controls">
+					{{#monsterCheckbox i18n.users.dialogCreationUser.sendToDifferentEmail }}
+						<input id="notification_email" type="checkbox" name="extra.differentEmail"{{#if sendToDifferentEmail}} checked{{/if}}></input>
+					{{/monsterCheckbox}}
+				</div>
 			</div>
-		</div>
-		<div class="control-group email-group{{#unless sendToDifferentEmail}} hidden{{/unless}}">
-			<label class="control-label" for="email"><i class="fa fa-envelope"></i></label>
-			<div class="controls">
+			<div class="control-group email-group{{#unless sendToDifferentEmail}} hidden{{/unless}}">
+				<i class="fa fa-envelope"></i>
 				<input type="email" name="extra.email" id="email" placeholder="{{i18n.users.dialogCreationUser.notificationEmail}}">
 			</div>
-		</div>
-		<div class="control-group hack-left">
-			<label class="control-label" for="send_email_on_creation"></label>
-			<div class="controls">
-				{{#monsterCheckbox i18n.users.dialogCreationUser.sendWelcomeEmail }}
-					<input id="send_email_on_creation" type="checkbox" name="user.send_email_on_creation"></input>
-				{{/monsterCheckbox}}
+			<div class="control-group hack-left">
+				<label class="control-label" for="send_email_on_creation"></label>
+				<div class="controls">
+					{{#monsterCheckbox i18n.users.dialogCreationUser.sendWelcomeEmail }}
+						<input id="send_email_on_creation" type="checkbox" name="user.send_email_on_creation"></input>
+					{{/monsterCheckbox}}
+				</div>
 			</div>
 		</div>
-	</div>
+
+		<div class="row-fluid separator"></div>
+
+		<div class="row-fluid user-section-title">
+			<h3>{{ i18n.users.dialogCreationUser.addDevice.title }}</h3>
+		</div>
+
+		<div class="row-fluid">
+			<div class="span6 to-left">
+				<label class="control-label" for="device_brand">{{ i18n.users.dialogCreationUser.addDevice.deviceMake.label }}</i></label>
+				<select id="device_brand" name="user.device.brand">
+					<option value="none">
+						{{ i18n.users.dialogCreationUser.addDevice.deviceMake.none }}
+					</option>
+					{{#each listProvisioners}}
+						<option value="{{name}}">{{name}}</option>
+					{{/each}}
+				</select>
+			</div>
+			<div class="span6 device-name to-right">
+				<label for="device-name" class="control-label">{{ i18n.users.dialogCreationUser.addDevice.name }}</label>
+				<input required type="text" id="device-name" name="user.device.name" placeholder="{{ i18n.users.dialogCreationUser.addDevice.name }}">
+			</div>
+		</div>
+
+		<div class="row-fluid">
+			<div class="span6 to-left device-model">
+				<label class="control-label" for="device_model">{{ i18n.users.dialogCreationUser.addDevice.deviceModel.label }}</label>
+				<select id="device_model" name="user.device.model">
+					<option value="none">
+						{{ i18n.users.dialogCreationUser.addDevice.deviceMake.none }}
+					</option>
+				</select>
+			</div>
+			<div class="span6 device-mac to-right">
+				<label for="mac_address" class="control-label">{{ i18n.users.dialogCreationUser.addDevice.macAddress }}</label>
+				<input required type="text" id="mac_address" name="user.device.mac_address" placeholder="19:33:1A:B2:12:58">
+			</div>
+		</div>
+
+		<div>
+			<div class="dialog-buttons-wrapper add-user-actions">
+				<button class="monster-button monster-button-success create_user">{{ i18n.users.dialogCreationUser.createUser }}</button>
+				<button class="monster-button monster-button-success create_user" data-action="add_new">{{ i18n.users.dialogCreationUser.createUserAndAddAnother }}</button>
+			</div>
+		</div>
 	</form>
-	<div class="dialog-buttons-wrapper">
-		<button id="create_user" class="monster-button monster-button-success">{{ i18n.users.dialogCreationUser.createUser }}</button>
-	</div>
 </div>
+
