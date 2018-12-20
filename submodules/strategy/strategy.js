@@ -94,7 +94,7 @@ define(function(require) {
 			{
 				name: 'voicemail[action=check]',
 				number: '97',
-				pattern: '\\^*97([0-9]*)$',
+				pattern: '^\\*97([0-9]*)$',
 				moduleName: 'voicemail',
 				actionName: 'check'
 			},
