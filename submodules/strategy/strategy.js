@@ -242,7 +242,7 @@ define(function(require) {
 				callback && callback();
 			});
 
-			self.strategyCreateFeatureCodes();
+			self.strategyHandleFeatureCodes();
 		},
 
 		strategyCheckFirstWalkthrough: function() {
@@ -3203,8 +3203,13 @@ define(function(require) {
 			});
 		},
 
-		strategyCreateFeatureCodes: function() {
-			var self = this;
+		strategyHandleFeatureCodes: function() {
+			var self = this,
+				featureCodesToUpdate = [
+					'voicemail[action=check]',
+					'voicemail[single_mailbox_login]'
+				],
+				expectedFeaturedCodes = _.keyBy(self.featureCodes, 'name');
 
 			monster.waterfall([
 				function(callback) {
@@ -3254,29 +3259,27 @@ define(function(require) {
 							};
 						})
 						.value()
-					, callback(null, featureCodes));
+					, function() {
+						callback(null, featureCodes);
+					});
 				},
 				function(featureCodes, callback) {
 					monster.parallel(
 						_.chain(featureCodes)
 						.filter(function(featureCode) {
-							return _.isEmpty(featureCode.patterns) && (featureCode.featurecode.name === 'voicemail[action=check]' || featureCode.featurecode.name === 'voicemail[single_mailbox_login]');
+							return _.isEmpty(featureCode.patterns) && _.includes(featureCodesToUpdate, featureCode.featurecode.name);
 						})
 						.map(function(featureCode) {
-							var selfCodePattern = _.find(self.featureCodes, function(selfCode) {
-								return selfCode.name === featureCode.featurecode.name;
-							});
-
 							return function(parallelCallback) {
 								self.strategyPatchCallflow({
 									data: {
 										callflowId: featureCode.id,
 										data: {
-											patterns: [selfCodePattern.pattern],
+											patterns: [_.get(expectedFeaturedCodes, [featureCode.featurecode.name, 'pattern'])],
 											numbers: []
 										}
 									},
-									success: function(data) {
+									callback: function() {
 										parallelCallback(null);
 									}
 								});
@@ -3799,7 +3802,7 @@ define(function(require) {
 					accountId: self.accountId
 				}, args.data),
 				success: function(data) {
-					args.success(data.data);
+					args.callback(data.data);
 				}
 			});
 		},
