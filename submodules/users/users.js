@@ -6,7 +6,14 @@ define(function(require) {
 
 	var app = {
 
-		requests: {},
+		requests: {
+			/* Provisioner */
+			'common.chooseModel.getProvisionerData': {
+				apiRoot: monster.config.api.provisioner,
+				url: 'phones',
+				verb: 'GET'
+			}
+		},
 
 		subscribe: {
 			'voip.users.render': 'usersRender'
@@ -677,106 +684,7 @@ define(function(require) {
 			});
 
 			template.find('.users-header .add-user').on('click', function() {
-				monster.parallel({
-					callflows: function(callback) {
-						self.usersListCallflows(function(callflows) {
-							callback(null, callflows);
-						});
-					},
-					vmboxes: function(callback) {
-						self.usersListVMBoxes({
-							success: function(vmboxes) {
-								callback(null, vmboxes);
-							}
-						});
-					}
-				}, function(err, results) {
-					var originalData = self.usersFormatAddUser(results),
-						userTemplate = $(self.getTemplate({
-							name: 'creation',
-							data: originalData,
-							submodule: 'users'
-						})),
-						userCreationForm = userTemplate.find('#form_user_creation'),
-						validationOptions = {
-							ignore: ':hidden:not(select)',
-							rules: {
-								'callflow.extension': {
-									checkList: originalData.listExtensions
-								},
-								'vmbox.number': {
-									checkList: originalData.listVMBoxes
-								},
-								'user.password': {
-									minlength: 6
-								}
-							},
-							messages: {
-								'user.first_name': {
-									required: self.i18n.active().validation.required
-								},
-								'user.last_name': {
-									required: self.i18n.active().validation.required
-								},
-								'callflow.extension': {
-									required: self.i18n.active().validation.required
-								}
-							}
-						};
-
-					if (originalData.licensedUserRoles) {
-						validationOptions.rules['user.extra.licensedRole'] = {
-							checkList: [ 'none' ]
-						};
-						validationOptions.messages['user.extra.licensedRole'] = {
-							checkList: self.i18n.active().validation.required
-						};
-					}
-
-					monster.ui.mask(userTemplate.find('#extension'), 'extension');
-
-					monster.ui.chosen(userTemplate.find('#licensed_role'));
-
-					monster.ui.validate(userCreationForm, validationOptions);
-
-					// Force select element validation on change event
-					// (Not handled by jQuery Validation plugin because the select
-					// element is hidden by the Chosen jQuery plugin. For more info, see:
-					// https://github.com/jquery-validation/jquery-validation/issues/997)
-					userCreationForm.find('select').on('change', function() {
-						userCreationForm.validate().element(this);
-					});
-
-					monster.ui.showPasswordStrength(userTemplate.find('#password'));
-
-					userTemplate.find('#create_user').on('click', function() {
-						if (monster.ui.valid(userTemplate.find('#form_user_creation'))) {
-							var $this = $(this),
-								dataForm = monster.ui.getFormData('form_user_creation'),
-								formattedData = self.usersFormatCreationData(dataForm);
-
-							$this
-								.prop('disabled', true);
-
-							self.usersCreate(formattedData, function(data) {
-								popup.dialog('close').remove();
-
-								self.usersRender({ userId: data.user.id });
-							}, function() {
-								$this
-									.prop('disabled', false);
-							});
-						}
-					});
-
-					userTemplate.find('#notification_email').on('change', function() {
-						userTemplate.find('.email-group').toggleClass('hidden');
-					});
-
-					var popup = monster.ui.dialog(userTemplate, {
-						title: self.i18n.active().users.dialogCreationUser.title
-					});
-				});
+				self.usersRenderAddModalDialog();
 			});
 
 			template.on('click', '.cancel-link', function() {
@@ -1738,6 +1646,198 @@ define(function(require) {
 			});
 		},
 
+		usersBindAddUserEvents: function(args) {
+			var self = this,
+				template = args.template,
+				data = args.data,
+				popup = args.popup;
+
+			template.find('.create_user').on('click', function() {
+				var action = $(this).data('action');
+
+				if (monster.ui.valid(template.find('#form_user_creation'))) {
+					var $buttons = template.find('.create_user'),
+						dataForm = _.merge(monster.ui.getFormData('form_user_creation'), {
+							user: {
+								device: {
+									family: template.find('#device_model').find(':selected').data('family')
+								}
+							}
+						}),
+						formattedData = self.usersFormatCreationData(dataForm);
+
+					$buttons.prop('disabled', true);
+
+					self.usersCreate(formattedData, function(data) {
+						popup.dialog('close').remove();
+
+						switch (action) {
+							case 'add_new':
+								self.usersRender();
+								self.usersRenderAddModalDialog();
+								break;
+							default:
+								self.usersRender({ userId: data.user.id });
+								break;
+						}
+					}, function() {
+						$buttons.prop('disabled', false);
+					});
+				}
+			});
+
+			template.find('#notification_email').on('change', function() {
+				template.find('.email-group').toggleClass('hidden');
+			});
+
+			template.find('#device_brand').on('change', function() {
+				var brand = $(this).val(),
+					selectedBrand = [],
+					$deviceModel = template.find('.device-model'),
+					$deviceName = template.find('.device-name'),
+					$deviceMac = template.find('.device-mac'),
+					$deviceModelSelect = template.find('#device_model');
+
+				if (brand !== 'none') {
+					self.usersDeviceFormReset(template);
+					$deviceModel.slideDown();
+					$deviceName.slideDown();
+					$deviceMac.slideDown();
+
+					selectedBrand = _.find(data.listProvisioners, function(provisioner) {
+						return provisioner.name === brand;
+					});
+
+					$deviceModelSelect
+						.find('option')
+						.remove()
+						.end();
+
+					selectedBrand.models.map(function(model) {
+						var option = $('<option>', {
+							value: model.name,
+							text: model.name
+						}).attr('data-family', model.family);
+
+						$deviceModelSelect.append(option);
+					});
+
+					$deviceModelSelect.trigger('chosen:updated');
+
+					return;
+				}
+
+				self.usersDeviceFormReset(template);
+			});
+		},
+
+		usersRenderAddModalDialog: function() {
+			var self = this;
+
+			monster.parallel({
+				callflows: function(callback) {
+					self.usersListCallflows(function(callflows) {
+						callback(null, callflows);
+					});
+				},
+				vmboxes: function(callback) {
+					self.usersListVMBoxes({
+						success: function(vmboxes) {
+							callback(null, vmboxes);
+						}
+					});
+				},
+				provisioners: function(callback) {
+					monster.request({
+						resource: 'common.chooseModel.getProvisionerData',
+						data: {},
+						success: function(provisionerData) {
+							callback(null, provisionerData.data);
+						}
+					});
+				}
+			}, function(err, results) {
+				var originalData = self.usersFormatAddUser(results),
+					userTemplate = $(self.getTemplate({
+						name: 'creation',
+						data: originalData,
+						submodule: 'users'
+					})),
+					userCreationForm = userTemplate.find('#form_user_creation'),
+					validationOptions = {
+						ignore: ':hidden:not(select)',
+						rules: {
+							'callflow.extension': {
+								checkList: originalData.listExtensions
+							},
+							'vmbox.number': {
+								checkList: originalData.listVMBoxes
+							},
+							'user.password': {
+								minlength: 6
+							}
+						},
+						messages: {
+							'user.first_name': {
+								required: self.i18n.active().validation.required
+							},
+							'user.last_name': {
+								required: self.i18n.active().validation.required
+							},
+							'callflow.extension': {
+								required: self.i18n.active().validation.required
+							}
+						}
+					};
+
+				if (originalData.licensedUserRoles) {
+					validationOptions.rules['user.extra.licensedRole'] = {
+						checkList: [ 'none' ]
+					};
+					validationOptions.messages['user.extra.licensedRole'] = {
+						checkList: self.i18n.active().validation.required
+					};
+				}
+
+				monster.ui.mask(userTemplate.find('#extension'), 'extension');
+				monster.ui.chosen(userTemplate.find('#licensed_role'));
+				monster.ui.mask(userTemplate.find('#mac_address'), 'macAddress');
+				monster.ui.validate(userCreationForm, validationOptions);
+
+				// Force select element validation on change event
+				// (Not handled by jQuery Validation plugin because the select
+				// element is hidden by the Chosen jQuery plugin. For more info, see:
+				// https://github.com/jquery-validation/jquery-validation/issues/997)
+				userCreationForm.find('select').on('change', function() {
+					userCreationForm.validate().element(this);
+				});
+
+				monster.ui.showPasswordStrength(userTemplate.find('#password'));
+				monster.ui.chosen(userTemplate.find('#device_brand'));
+				monster.ui.chosen(userTemplate.find('#device_model'));
+
+				var popup = monster.ui.dialog(userTemplate, {
+					title: self.i18n.active().users.dialogCreationUser.title
+				});
+
+				self.usersBindAddUserEvents({
+					template: userTemplate,
+					data: originalData,
+					popup: popup
+				});
+			});
+		},
+
+		usersDeviceFormReset: function(template) {
+			var $deviceModel = template.find('.device-model'),
+				$deviceName = template.find('.device-name'),
+				$deviceMac = template.find('.device-mac');
+
+			$deviceModel.slideUp();
+			$deviceName.slideUp();
+			$deviceMac.slideUp();
+		},
+
 		usersGetCallRecordingData: function(userId, globalCallback) {
 			var self = this;
 
@@ -1883,6 +1983,20 @@ define(function(require) {
 			// If for some reason a vmbox number exist without an extension, we still don't want to let them set their extension number to that number.
 			allNumbers = arrayExtensions.concat(arrayVMBoxes);
 			formattedData.nextExtension = parseInt(monster.util.getNextExtension(allNumbers)) + '';
+			formattedData.listProvisioners = _.map(data.provisioners, function(brand) {
+				var models = _.flatMap(brand.families, function(family) {
+					return _.map(family.models, function(model) {
+						model.family = family.name;
+						return model;
+					});
+				});
+
+				return {
+					id: brand.id,
+					name: brand.name,
+					models: models
+				};
+			});
 
 			return formattedData;
 		},
@@ -3720,6 +3834,35 @@ define(function(require) {
 
 			delete formattedData.user.extra;
 
+			if (
+				_.get(data, 'user.device.brand', 'none') === 'none'
+				&& _.get(data, 'user.device.model', 'none') === 'none'
+				&& _.isEmpty(_.get(data, 'user.device.name'))
+				&& _.isEmpty(_.get(data, 'user.device.mac_address'))
+				) {
+				delete formattedData.user.device;
+				return formattedData;
+			}
+
+			formattedData.user.device = {
+				device_type: 'sip_device',
+				enabled: true,
+				mac_address: data.user.device.mac_address,
+				name: data.user.device.name,
+				provision: {
+					endpoint_brand: data.user.device.brand,
+					endpoint_family: data.user.device.family,
+					endpoint_model: data.user.device.model
+				},
+				sip: {
+					password: monster.util.randomString(12),
+					realm: monster.apps.auth.currentAccount.realm,
+					username: 'user_' + monster.util.randomString(10)
+				},
+				suppress_unregister_notifications: false,
+				family: data.user.device.family
+			};
+
 			return formattedData;
 		},
 
@@ -3781,6 +3924,11 @@ define(function(require) {
 							callback(null, _dataUser);
 						},
 						error: function(parsedError) {
+							if (parsedError.error === '402') {
+								error();
+								return;
+							}
+
 							callback(true);
 						},
 						onChargesCancelled: function() {
@@ -3817,11 +3965,23 @@ define(function(require) {
 				},
 				function(_dataUser, _dataCF, callback) {
 					if (!data.extra.includeInDirectory) {
-						callback(null);
+						callback(null, _dataUser);
 						return;
 					}
 
 					self.usersAddUserToMainDirectory(_dataUser, _dataCF.id, function(dataDirectory) {
+						callback(null, _dataUser);
+					});
+				},
+				function(_dataUser, callback) {
+					if (!data.user.device) {
+						callback(null);
+						return;
+					}
+
+					var deviceData = data.user.device;
+					deviceData.owner_id = _dataUser.id;
+					self.usersAddUserDevice(deviceData, function(_device) {
 						callback(null);
 					});
 				}
@@ -3831,6 +3991,7 @@ define(function(require) {
 					error();
 					return;
 				}
+
 				success(data);
 			});
 		},
@@ -4028,6 +4189,20 @@ define(function(require) {
 				self.usersUpdateUser(dataUser, function(data) {
 					callback && callback(data);
 				});
+			});
+		},
+
+		usersAddUserDevice: function(dataDevice, callback) {
+			var self = this;
+			self.callApi({
+				resource: 'device.create',
+				data: {
+					accountId: self.accountId,
+					data: dataDevice
+				},
+				success: function(device) {
+					callback && callback(device);
+				}
 			});
 		},
 
@@ -5206,10 +5381,6 @@ define(function(require) {
 					args.hasOwnProperty('success') && args.success(data.data);
 				},
 				error: function(parsedError) {
-					if (parsedError.error === '402') {
-						return;
-					}
-
 					args.hasOwnProperty('error') && args.error(parsedError);
 				},
 				onChargesCancelled: function() {
