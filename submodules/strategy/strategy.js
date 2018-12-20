@@ -3267,7 +3267,10 @@ define(function(require) {
 					monster.parallel(
 						_.chain(featureCodes)
 						.filter(function(featureCode) {
-							return _.isEmpty(featureCode.patterns) && _.includes(featureCodesToUpdate, featureCode.featurecode.name);
+							return !_.includes(
+								_.get(featureCode, 'patterns', []),
+								_.get(expectedFeaturedCodes, [featureCode.featurecode.name, 'pattern'])
+							) && _.includes(featureCodesToUpdate, featureCode.featurecode.name);
 						})
 						.map(function(featureCode) {
 							return function(parallelCallback) {
