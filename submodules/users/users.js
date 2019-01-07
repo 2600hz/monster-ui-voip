@@ -1653,22 +1653,26 @@ define(function(require) {
 				popup = args.popup;
 
 			template.find('.create_user').on('click', function() {
-				var action = $(this).data('action');
+				if (!monster.ui.valid(template.find('#form_user_creation'))) {
+					return;
+				}
 
-				if (monster.ui.valid(template.find('#form_user_creation'))) {
-					var $buttons = template.find('.create_user'),
-						dataForm = _.merge(monster.ui.getFormData('form_user_creation'), {
-							user: {
-								device: {
-									family: template.find('#device_model').find(':selected').data('family')
-								}
+				var action = $(this).data('action'),
+					$buttons = template.find('.create_user'),
+					dataForm = _.merge(monster.ui.getFormData('form_user_creation'), {
+						user: {
+							device: {
+								family: template.find('#device_model').find(':selected').data('family')
 							}
-						}),
-						formattedData = self.usersFormatCreationData(dataForm);
+						}
+					}),
+					formattedData = self.usersFormatCreationData(dataForm);
 
-					$buttons.prop('disabled', true);
+				$buttons.prop('disabled', true);
 
-					self.usersCreate(formattedData, function(data) {
+				self.usersCreate({
+					data: formattedData,
+					success: function(data) {
 						popup.dialog('close').remove();
 
 						switch (action) {
@@ -1680,10 +1684,11 @@ define(function(require) {
 								self.usersRender({ userId: data.user.id });
 								break;
 						}
-					}, function() {
+					},
+					error: function() {
 						$buttons.prop('disabled', false);
-					});
-				}
+					}
+				});
 			});
 
 			template.find('#notification_email').on('change', function() {
@@ -3920,8 +3925,16 @@ define(function(require) {
 			});
 		},
 
-		usersCreate: function(data, success, error) {
-			var self = this;
+		/**
+		 * Creates an user, with all its related components
+		 * @param  {Object}   args
+		 * @param  {Object}   args.data     User formatted data
+		 * @param  {Function} args.success  Success callback
+		 * @param  {Function} args.error    Error callback
+		 */
+		usersCreate: function(args) {
+			var self = this,
+				data = args.data;
 
 			monster.waterfall([
 				function(callback) {
@@ -3955,6 +3968,16 @@ define(function(require) {
 						success: function(_dataVM) {
 							data.callflow.flow.children._.data.id = _dataVM.id;
 							callback(null, _dataUser);
+						},
+						error: function() {
+							callback(true);
+						},
+						onChargesCancelled: function() {
+							// VMBox won't be created, so let's remove its data
+							data.extra.createVmbox = false;
+							delete data.vmbox;
+							delete data.callflow.flow.children._;
+							callback(null, _dataUser);
 						}
 					});
 				},
@@ -3986,18 +4009,30 @@ define(function(require) {
 
 					var deviceData = data.user.device;
 					deviceData.owner_id = _dataUser.id;
-					self.usersAddUserDevice(deviceData, function(_device) {
-						callback(null);
+					self.usersAddUserDevice({
+						data: {
+							data: deviceData
+						},
+						success: function(_device) {
+							callback(null);
+						},
+						error: function() {
+							callback(true);
+						},
+						onChargesCancelled: function() {
+							// Allow to complete without errors, although the device won't be created
+							callback(null);
+						}
 					});
 				}
 			],
 			function(err) {
 				if (err) {
-					error();
+					args.error();
 					return;
 				}
 
-				success(data);
+				args.success(data);
 			});
 		},
 
@@ -4197,16 +4232,31 @@ define(function(require) {
 			});
 		},
 
-		usersAddUserDevice: function(dataDevice, callback) {
+		/**
+		 * Creates a device for a user
+		 * @param  {Object}   args
+		 * @param  {Object}   args.data                  Data to be sent by the SDK to the API
+		 * @param  {Object}   args.data.data             Data provided for the device to be created
+		 * @param  {Function} [args.success]             Success callback
+		 * @param  {Function} [args.error]               Error callback
+		 * @param  {Function} [args.onChargesCancelled]  Callback to be executed when charges are
+		 *                                               not accepted
+		 */
+		usersAddUserDevice: function(args) {
 			var self = this;
 			self.callApi({
 				resource: 'device.create',
-				data: {
-					accountId: self.accountId,
-					data: dataDevice
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
+				success: function(data) {
+					args.hasOwnProperty('success') && args.success(data.data);
 				},
-				success: function(device) {
-					callback && callback(device);
+				error: function(parsedError) {
+					args.hasOwnProperty('error') && args.error(parsedError);
+				},
+				onChargesCancelled: function() {
+					args.hasOwnProperty('onChargesCancelled') && args.onChargesCancelled();
 				}
 			});
 		},
@@ -4421,10 +4471,13 @@ define(function(require) {
 		/**
 		 * Creates a Voicemail Box
 		 * @param  {Object}   args
-		 * @param  {Object}   args.data       Data to be sent by the SDK to the API
-		 * @param  {Object}   args.data.data  Data provided for the Voicemail Box to be created
-		 * @param  {Function} args.success    Success callback
-		 * @param  {Function} args.error      Error callback
+		 * @param  {Object}   args.data                  Data to be sent by the SDK to the API
+		 * @param  {Object}   args.data.data             Data provided for the Voicemail Box to be
+		 *                                               created
+		 * @param  {Function} [args.success]             Success callback
+		 * @param  {Function} [args.error]               Error callback
+		 * @param  {Function} [args.onChargesCancelled]  Callback to be executed when charges are
+		 *                                               not accepted
 		 */
 		usersCreateVMBox: function(args) {
 			var self = this;
@@ -4439,6 +4492,9 @@ define(function(require) {
 				},
 				error: function(parsedError) {
 					args.hasOwnProperty('error') && args.error(parsedError);
+				},
+				onChargesCancelled: function() {
+					args.hasOwnProperty('onChargesCancelled') && args.onChargesCancelled();
 				}
 			});
 		},
