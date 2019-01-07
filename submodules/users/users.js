@@ -3933,12 +3933,7 @@ define(function(require) {
 							data.user.id = _dataUser.id;
 							callback(null, _dataUser);
 						},
-						error: function(parsedError) {
-							if (parsedError.error === '402') {
-								error();
-								return;
-							}
-
+						error: function() {
 							callback(true);
 						},
 						onChargesCancelled: function() {
