@@ -1775,6 +1775,12 @@ define(function(require) {
 							},
 							'user.password': {
 								minlength: 6
+							},
+							'user.device.name': 'required',
+							'user.device.model': 'required',
+							'user.device.mac_address': {
+								required: true,
+								mac: true
 							}
 						},
 						messages: {
@@ -1785,6 +1791,15 @@ define(function(require) {
 								required: self.i18n.active().validation.required
 							},
 							'callflow.extension': {
+								required: self.i18n.active().validation.required
+							},
+							'user.device.model': {
+								required: self.i18n.active().validation.required
+							},
+							'user.device.name': {
+								required: self.i18n.active().validation.required
+							},
+							'user.device.mac_address': {
 								required: self.i18n.active().validation.required
 							}
 						}
@@ -3827,12 +3842,7 @@ define(function(require) {
 
 			delete formattedData.user.extra;
 
-			if (
-				_.get(data, 'user.device.brand', 'none') === 'none'
-				&& _.get(data, 'user.device.model', 'none') === 'none'
-				&& _.isEmpty(_.get(data, 'user.device.name'))
-				&& _.isEmpty(_.get(data, 'user.device.mac_address'))
-				) {
+			if (_.get(data, 'user.device.brand', 'none') === 'none') {
 				delete formattedData.user.device;
 				return formattedData;
 			}
