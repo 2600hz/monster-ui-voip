@@ -121,16 +121,15 @@
 			</div>
 			<div class="span6 device-mac to-right">
 				<label for="mac_address" class="control-label">{{ i18n.users.dialogCreationUser.addDevice.macAddress }}</label>
-				<input required type="text" id="mac_address" name="user.device.mac_address" placeholder="19:33:1A:B2:12:58">
-			</div>
-		</div>
-
-		<div>
-			<div class="dialog-buttons-wrapper add-user-actions">
-				<button class="monster-button monster-button-success create_user">{{ i18n.users.dialogCreationUser.createUser }}</button>
-				<button class="monster-button monster-button-success create_user" data-action="add_new">{{ i18n.users.dialogCreationUser.createUserAndAddAnother }}</button>
+				<input type="text" id="mac_address" name="user.device.mac_address" placeholder="19:33:1A:B2:12:58">
 			</div>
 		</div>
 	</form>
+	<div>
+		<div class="dialog-buttons-wrapper add-user-actions">
+			<button class="monster-button monster-button-success create_user">{{ i18n.users.dialogCreationUser.createUser }}</button>
+			<button class="monster-button monster-button-success create_user" data-action="add_new">{{ i18n.users.dialogCreationUser.createUserAndAddAnother }}</button>
+		</div>
+	</div>
 </div>
 
