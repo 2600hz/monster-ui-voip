@@ -3984,7 +3984,7 @@ define(function(require) {
 		/**
 		 * Gets a menu list from the API
 		 * @param  {Object}   args
-		 * @param  {Object}   args.filters    Filters to be applied to query the menus
+		 * @param  {Object}   [args.filters]  Filters to be applied to query the menus
 		 * @param  {Function} [args.success]  Success callback
 		 * @param  {Function} [args.error]    Error callback
 		 */
@@ -3995,7 +3995,7 @@ define(function(require) {
 				resource: 'menu.list',
 				data: {
 					accountId: self.accountId,
-					filters: args.filters || {}
+					filters: _.get(args, 'filters', {})
 				},
 				success: function(data) {
 					args.hasOwnProperty('success') && args.success(data.data);
@@ -4222,11 +4222,11 @@ define(function(require) {
 		/**
 		 * Helper function to create or update a main sub callflow
 		 * @param  {Object}   args
-		 * @param  {Object}   args.mainCallflows   Map object that contains the main callflows
-		 * @param  {String}   args.callflowLabel   Label of the callflow to be saved
-		 * @param  {String}   args.savedCallflows  Map object to which append the saved callflow
-		 * @param  {Object}   args.callflow        Default callflow to be saved
-		 * @param  {Function} args.callback        Callback function for monster async tasks
+		 * @param  {Object}   args.mainCallflows     Map object that contains the main callflows
+		 * @param  {String}   args.callflowLabel     Label of the callflow to be saved
+		 * @param  {String}   [args.savedCallflows]  Map object to which append the saved callflow
+		 * @param  {Object}   args.callflow          Default callflow to be saved
+		 * @param  {Function} args.callback          Callback function for monster async tasks
 		 */
 		strategySaveMainSubCallflow: function(args) {
 			var self = this,
@@ -4234,21 +4234,21 @@ define(function(require) {
 				callflowLabel = args.callflowLabel,
 				savedCallflows = _.get(args, 'savedCallflows', {}),
 				callflow = args.callflow,
-				callback = args.callback,
-				callflowArgs = {
+				callback = args.callback;
+
+			if (!mainCallflows.hasOwnProperty(callflowLabel)) {
+				self.strategyCreateCallflow({
 					data: {
 						data: callflow
 					},
 					success: function(savedCallflow) {
-						callback(null, savedCallflow);
+						savedCallflows[callflowLabel] = savedCallflow;
+						callback(null, savedCallflows);
 					},
 					error: function(parsedError) {
 						callback(parsedError);
 					}
-				};
-
-			if (!mainCallflows.hasOwnProperty(callflowLabel)) {
-				self.strategyCreateCallflow(callflowArgs);
+				});
 				return;
 			}
 
