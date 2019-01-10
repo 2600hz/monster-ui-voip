@@ -3921,7 +3921,10 @@ define(function(require) {
 		},
 
 		usersCreate: function(data, success, error) {
-			var self = this;
+			var self = this,
+				deviceData = _.get(data, 'user.device');
+
+			delete data.user.device;
 
 			monster.waterfall([
 				function(callback) {
@@ -3984,12 +3987,11 @@ define(function(require) {
 					});
 				},
 				function(_dataUser, callback) {
-					if (!data.user.device) {
+					if (!deviceData) {
 						callback(null);
 						return;
 					}
 
-					var deviceData = data.user.device;
 					deviceData.owner_id = _dataUser.id;
 					self.usersAddUserDevice(deviceData, function(_device) {
 						callback(null);
