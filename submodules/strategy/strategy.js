@@ -94,14 +94,14 @@ define(function(require) {
 			{
 				name: 'voicemail[action=check]',
 				number: '97',
-				callflowNumber: '*97',
+				pattern: '^\\*97([0-9]*)$',
 				moduleName: 'voicemail',
 				actionName: 'check'
 			},
 			{
 				name: 'voicemail[single_mailbox_login]',
 				number: '98',
-				callflowNumber: '*98',
+				pattern: '^\\*98([0-9]*)$',
 				moduleName: 'voicemail',
 				actionName: 'check',
 				extraData: {
@@ -242,7 +242,7 @@ define(function(require) {
 				callback && callback();
 			});
 
-			self.strategyCreateFeatureCodes();
+			self.strategyHandleFeatureCodes();
 		},
 
 		strategyCheckFirstWalkthrough: function() {
@@ -3203,61 +3203,96 @@ define(function(require) {
 			});
 		},
 
-		strategyCreateFeatureCodes: function(callback) {
-			var self = this;
+		strategyHandleFeatureCodes: function() {
+			var self = this,
+				featureCodesToUpdate = [
+					'voicemail[action=check]',
+					'voicemail[single_mailbox_login]'
+				],
+				expectedFeaturedCodes = _.keyBy(self.featureCodes, 'name');
 
-			/* To complete with all feature codes */
-			self.strategyGetFeatureCodes(function(listFeatureCodes) {
-				var existingFeatureCodes = $.map(listFeatureCodes, function(val) { return val.featurecode.name; }),
-					listRequests = [];
-
-				_.each(self.featureCodes, function(featureCode) {
-					if (existingFeatureCodes.indexOf(featureCode.name) === -1) {
-						var callflow = {
-							flow: {
-								children: {},
-								data: featureCode.extraData || {},
-								module: featureCode.moduleName
-							},
-							featurecode: {
-								name: featureCode.name,
-								number: featureCode.number
-							}
-						};
-
-						if (featureCode.hasOwnProperty('actionName')) {
-							callflow.flow.data = $.extend(callflow.flow.data, {
-								action: featureCode.actionName
-							});
-						}
-
-						if ('pattern' in featureCode) {
-							callflow.patterns = [ featureCode.pattern ];
-						} else {
-							callflow.numbers = [ featureCode.callflowNumber ];
-						}
-
-						listRequests.push(function(localCallback) {
-							self.strategyCreateCallflow({
-								data: {
-									data: callflow
-								},
-								success: function(data) {
-									localCallback && localCallback(null, data);
-								}
-							});
-						});
-					}
-				});
-
-				if (listRequests.length > 0) {
-					monster.parallel(listRequests, function(err, results) {
-						callback && callback();
+			monster.waterfall([
+				function(callback) {
+					self.strategyGetFeatureCodes(function(featureCodes) {
+						callback(null, featureCodes);
 					});
-				} else {
-					callback && callback();
+				},
+				function(featureCodes, callback) {
+					var featureCodeNames = _.map(featureCodes, 'featurecode.name');
+
+					monster.parallel(_
+						.chain(self.featureCodes)
+						.reject(function(featureCode) {
+							return _.includes(featureCodeNames, featureCode.name);
+						})
+						.map(function(featureCode) {
+							var newCallflow = {
+								flow: {
+									children: {},
+									data: _.get(featureCode, 'extraData', {}),
+									module: featureCode.moduleName
+								},
+								featurecode: {
+									name: featureCode.name,
+									number: featureCode.number
+								}
+							};
+
+							if (_.has(featureCode, 'actionName')) {
+								_.set(newCallflow, 'flow.data.action', featureCode.actionName);
+							}
+							if (_.has(featureCode, 'pattern')) {
+								_.set(newCallflow, 'patterns', [featureCode.pattern]);
+							} else {
+								_.set(newCallflow, 'numbers', [featureCode.callflowNumber]);
+							}
+
+							return function(parallelCallback) {
+								self.strategyCreateCallflow({
+									data: {
+										data: newCallflow
+									},
+									success: function() {
+										parallelCallback(null);
+									}
+								});
+							};
+						})
+						.value()
+					, function() {
+						callback(null, featureCodes);
+					});
+				},
+				function(featureCodes, callback) {
+					monster.parallel(
+						_.chain(featureCodes)
+						.filter(function(featureCode) {
+							return !_.includes(
+								_.get(featureCode, 'patterns', []),
+								_.get(expectedFeaturedCodes, [featureCode.featurecode.name, 'pattern'])
+							) && _.includes(featureCodesToUpdate, featureCode.featurecode.name);
+						})
+						.map(function(featureCode) {
+							return function(parallelCallback) {
+								self.strategyPatchCallflow({
+									data: {
+										callflowId: featureCode.id,
+										data: {
+											patterns: [_.get(expectedFeaturedCodes, [featureCode.featurecode.name, 'pattern'])],
+											numbers: []
+										}
+									},
+									callback: function() {
+										parallelCallback(null);
+									}
+								});
+							};
+						})
+						.value(),
+						callback
+					);
 				}
-			});
+			]);
 		},
 
 		strategyGetFeatureCodes: function(callback) {
@@ -3757,6 +3792,20 @@ define(function(require) {
 				},
 				success: function(data, status) {
 					callback(data.data);
+				}
+			});
+		},
+
+		strategyPatchCallflow: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'callflow.patch',
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
+				success: function(data) {
+					args.callback(data.data);
 				}
 			});
 		},

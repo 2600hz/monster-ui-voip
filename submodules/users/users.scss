@@ -591,10 +591,70 @@
 	background: #FFF;
 /*	box-shadow: 1px 1px 15px #ddd inset;*/
 }
-
-#creation_user_dialog form > div {
-	padding: 20px 40px 0px 60px;
-	border-bottom: 1px solid #c1c1c1;
+#creation_user_dialog {
+	width: 600px;
+	padding: 10px;
+	#form_user_creation {
+		margin: 0;
+	}
+	.row-fluid {
+		margin-bottom: 8px;
+		&.user-section-title {
+			h3 {
+				padding-left: 30px;
+				font-weight: normal;
+				font-size: 20px;
+				margin: 0;
+			}
+		}
+		&.separator {
+			border-bottom: 1px solid #c1c1c1;
+			margin: 20px 0;
+		}
+		.chosen-drop {
+			top: auto !important;
+			bottom: 100% !important;
+		}
+		.control-label {
+			margin: 0;
+			text-align: left;
+		}
+		input {
+			margin: 0;
+		}
+		.user-email-icon {
+			margin-right: 10px;
+		}
+		.monster-password-strength {
+			width: 220px;
+		}
+		div.to-left {
+			padding-left: 50px;
+		}
+		div.to-right {
+			padding-left: 20px;
+		}
+		.device-model,
+		.device-name,
+		.device-mac {
+			display: none;
+		}
+	}
+	.user-options-area {
+		padding-left: 150px;
+		.email-group {
+			padding-left: 10px;
+			#email {
+				margin-left: 10px;
+			}
+		}
+	}
+	.add-user-actions {
+		margin-top: 30px;
+		button:not(:first-child) {
+			margin-left: 10px;
+		}
+	}
 }
 
 #creation_user_dialog i {
@@ -604,10 +664,6 @@
 #creation_user_dialog div.dialog-buttons-wrapper {
 	padding-bottom: 20px;
 	text-align: center;
-}
-
-#creation_user_dialog .control-group .controls {
-	margin-left: 36px;
 }
 
 #creation_user_dialog input.same-line {
@@ -624,14 +680,6 @@
 }
 
 #creation_user_dialog label.monster-invalid{
-	&[for="user.last_name"] {
-		margin-left: 113px;
-	}
-
-	&[for="extension"] {
-		margin-left: 160px;
-	}
-
 	&[for="password"] {
 		margin-top: 25px;
 	}
@@ -675,17 +723,6 @@
 
 #creation_user_dialog .control-group-split input {
 	width: 74px;
-}
-
-#creation_user_dialog #extension {
-	width: 47px;
-	margin-left: 5px;
-}
-
-#creation_user_dialog .extension-label {
-	display: inline-block;
-	white-space: nowrap;
-	width: 153px;
 }
 
 /* Change Password Popup */
