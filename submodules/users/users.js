@@ -1946,20 +1946,13 @@ define(function(require) {
 			var self = this;
 
 			if (user.presence_id) {
-				var found = false,
-					formattedPresenceID = '' + user.presence_id;
+				var formattedPresenceID = '' + user.presence_id;
 
-				_.each(listNumbers, function(number) {
-					if (number === formattedPresenceID) {
-						found = true;
-					}
+				return _.some(listNumbers, function(number) {
+					return number === formattedPresenceID;
 				});
-
-				return found;
-			} else if (listNumbers.length) {
-				return false;
 			} else {
-				return true;
+				return !listNumbers.length;
 			}
 		},
 
