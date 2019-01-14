@@ -4,10 +4,10 @@
 	</div>
 
 	<div class="list-choices">
-		{{#each numbers}} 
-			<div class="presence-id-option" data-number="{{this}}">{{ formatPhoneNumber this }}</div>
+		{{#each numbers}}
+			<div class="presence-id-option{{#if @first}} active{{/if}}" data-number="{{this}}">{{ formatPhoneNumber this }}</div>
 		{{/each}}
-		<div class="presence-id-option" data-number="none"> 
+		<div class="presence-id-option{{#unless numbers.length}} active{{/unless}}" data-number="none">
 			{{ i18n.users.presenceIDPopup.none}}
 		</div>
 	</div>
