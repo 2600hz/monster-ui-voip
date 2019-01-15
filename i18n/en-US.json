@@ -927,7 +927,7 @@
 		"confirmMessages": {
 			"deleteHoliday": "This holiday will be permanently deleted. Continue?",
 			"disableHolidays": "All existing holidays will be permanently deleted. Continue?",
-			"resetCalls": "All incoming call handling strategies will be reset. Continue?"
+			"resetCalls": "All incoming call handling strategies will be reset to their default values. Continue?"
 		},
 		"alertMessages": {
 			"uniqueHoliday": "Every holiday must have a unique name.",
