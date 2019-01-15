@@ -1952,7 +1952,7 @@ define(function(require) {
 					return number === formattedPresenceID;
 				});
 			} else {
-				return !listNumbers.length;
+				return _.isEmpty(listNumbers);
 			}
 		},
 
