@@ -3914,7 +3914,10 @@ define(function(require) {
 		},
 
 		usersCreate: function(data, success, error) {
-			var self = this;
+			var self = this,
+				deviceData = _.get(data, 'user.device');
+
+			delete data.user.device;
 
 			monster.waterfall([
 				function(callback) {
@@ -3977,15 +3980,26 @@ define(function(require) {
 					});
 				},
 				function(_dataUser, callback) {
-					if (!data.user.device) {
+					if (!deviceData) {
 						callback(null);
 						return;
 					}
 
-					var deviceData = data.user.device;
 					deviceData.owner_id = _dataUser.id;
-					self.usersAddUserDevice(deviceData, function(_device) {
-						callback(null);
+
+					self.usersAddUserDevice({
+						data: deviceData,
+						success: function(_device) {
+							callback(null);
+						},
+						error: function(parsedError) {
+							if (parsedError.error === '402') {
+								error();
+								return;
+							}
+
+							callback(true);
+						}
 					});
 				}
 			],
@@ -4195,8 +4209,10 @@ define(function(require) {
 			});
 		},
 
-		usersAddUserDevice: function(dataDevice, callback) {
-			var self = this;
+		usersAddUserDevice: function(args) {
+			var self = this,
+				dataDevice = args.data;
+
 			self.callApi({
 				resource: 'device.create',
 				data: {
@@ -4204,7 +4220,10 @@ define(function(require) {
 					data: dataDevice
 				},
 				success: function(device) {
-					callback && callback(device);
+					args.hasOwnProperty('success') && args.success(device);
+				},
+				error: function(error) {
+					args.hasOwnProperty('error') && args.error(error);
 				}
 			});
 		},
