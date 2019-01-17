@@ -1951,20 +1951,13 @@ define(function(require) {
 			var self = this;
 
 			if (user.presence_id) {
-				var found = false,
-					formattedPresenceID = '' + user.presence_id;
+				var formattedPresenceID = '' + user.presence_id;
 
-				_.each(listNumbers, function(number) {
-					if (number === formattedPresenceID) {
-						found = true;
-					}
+				return _.some(listNumbers, function(number) {
+					return number === formattedPresenceID;
 				});
-
-				return found;
-			} else if (listNumbers.length) {
-				return false;
 			} else {
-				return true;
+				return _.isEmpty(listNumbers);
 			}
 		},
 
@@ -3934,7 +3927,10 @@ define(function(require) {
 		 */
 		usersCreate: function(args) {
 			var self = this,
-				data = args.data;
+				data = args.data,
+				deviceData = _.get(data, 'user.device');
+
+			delete data.user.device;
 
 			monster.waterfall([
 				function(callback) {
@@ -4002,12 +3998,11 @@ define(function(require) {
 					});
 				},
 				function(_dataUser, callback) {
-					if (!data.user.device) {
+					if (!deviceData) {
 						callback(null);
 						return;
 					}
 
-					var deviceData = data.user.device;
 					deviceData.owner_id = _dataUser.id;
 					self.usersAddUserDevice({
 						data: {

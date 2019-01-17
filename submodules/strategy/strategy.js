@@ -2397,13 +2397,12 @@ define(function(require) {
 				monster.ui.confirm(self.i18n.active().strategy.confirmMessages.resetCalls, function() {
 					monster.waterfall([
 						function(callback) {
-							self.strategyGetSubCallflows(callback);
+							self.strategyGetSubCallStrategiesData(callback);
 						},
-						function(mainSubCallflows, callback) {
-							self.strategyResetSubCallStrategies({
-								mainSubCallflows: mainSubCallflows,
+						function(currentStrategiesData, callback) {
+							self.strategyResetSubCallStrategies(_.merge({
 								callback: callback
-							});
+							}, currentStrategiesData));
 						}
 					], function(err, callflows) {
 						if (err) {
@@ -3983,6 +3982,31 @@ define(function(require) {
 		},
 
 		/**
+		 * Gets a menu list from the API
+		 * @param  {Object}   args
+		 * @param  {Object}   [args.filters]  Filters to be applied to query the menus
+		 * @param  {Function} [args.success]  Success callback
+		 * @param  {Function} [args.error]    Error callback
+		 */
+		strategyListMenus: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'menu.list',
+				data: {
+					accountId: self.accountId,
+					filters: _.get(args, 'filters', {})
+				},
+				success: function(data) {
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(parsedError) {
+					args.hasOwnProperty('error') && args.error(parsedError);
+				}
+			});
+		},
+
+		/**
 		 * Request the creation of a menu to the API
 		 * @param  {Object}   args
 		 * @param  {Object}   args.data
@@ -3995,6 +4019,32 @@ define(function(require) {
 
 			self.callApi({
 				resource: 'menu.create',
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
+				success: function(data) {
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(parsedError) {
+					args.hasOwnProperty('error') && args.error(parsedError);
+				}
+			});
+		},
+
+		/**
+		 * Requests a menu update in the API
+		 * @param  {Object}   args
+		 * @param  {Object}   args.data
+		 * @param  {String}   args.data.menuId  ID of the menu to be updated
+		 * @param  {Object}   args.data.data    Menu object to update
+		 * @param  {Function} [args.success]    Success callback
+		 * @param  {Function} [args.error]      Error callback
+		 */
+		strategyUpdateMenu: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'menu.update',
 				data: _.merge({
 					accountId: self.accountId
 				}, args.data),
@@ -4077,82 +4127,191 @@ define(function(require) {
 		},
 
 		/**
-		 * Get main callflows for call handling strategies
+		 * Get callflows and menus for call handling strategies
 		 * @param  {Function} callback  Callback function for monster async tasks
 		 */
-		strategyGetSubCallflows: function(callback) {
+		strategyGetSubCallStrategiesData: function(callback) {
 			var self = this;
 
-			self.strategyListCallflows({
-				filters: {
-					paginate: false,
-					has_value: 'type',
-					filter_type: 'main',
-					key_missing: [
-						'owner_id',
-						'group_id'
-					],
-					'filter_ui_metadata.origin': [
-						'voip'
-					]
+			monster.parallel({
+				callflows: function(parallelCallback) {
+					self.strategyListCallflows({
+						filters: {
+							paginate: false,
+							has_value: 'type',
+							filter_type: 'main',
+							key_missing: [
+								'owner_id',
+								'group_id'
+							],
+							'filter_ui_metadata.origin': [
+								'voip'
+							]
+						},
+						success: function(data) {
+							// Convert callflows array to map object, then send to next step
+							parallelCallback(null,
+								_.reduce(data, function(obj, callflow) {
+									var label = callflow.name || callflow.numbers[0];
+									obj[label] = callflow;
+									return obj;
+								}, {}));
+						},
+						error: function(parsedError) {
+							parallelCallback(parsedError);
+						}
+					});
 				},
-				success: function(data) {
-					// Convert callflows array to map object, then send to next step
-					callback(null,
-						_.reduce(data, function(obj, callflow) {
-							var label = callflow.name || callflow.numbers[0];
-							obj[label] = callflow;
-							return obj;
-						}, {}));
+				menus: function(parallelCallback) {
+					self.strategyListMenus({
+						filters: {
+							paginate: false,
+							has_value: 'type',
+							filter_type: 'main'
+						},
+						success: function(data) {
+							parallelCallback(null,
+								_.reduce(data, function(obj, menu) {
+									obj[menu.name] = menu;
+									return obj;
+								}, {}));
+						},
+						error: function(parsedError) {
+							parallelCallback(parsedError);
+						}
+					});
+				}
+			}, callback);
+		},
+
+		/**
+		 * Helper function to create or update a main menu
+		 * @param  {Object}   args
+		 * @param  {Object}   args.mainMenus  Map object that contains the main menus
+		 * @param  {String}   args.menuLabel  Label of the menu to be saved
+		 * @param  {Function} args.callback   Callback function for monster async tasks
+		 */
+		strategySaveMainSubMenu: function(args) {
+			var self = this,
+				mainMenus = args.mainMenus,
+				menuLabel = args.menuLabel,
+				callback = args.callback;
+
+			var menuArgs = {
+				data: {
+					data: self.strategyGetDefaultMainSubMenu(menuLabel)
+				},
+				success: function(menu) {
+					callback(null, menu);
 				},
 				error: function(parsedError) {
 					callback(parsedError);
 				}
+			};
+
+			if (!mainMenus.hasOwnProperty(menuLabel)) {
+				self.strategyCreateMenu(menuArgs);
+				return;
+			}
+
+			var menuToUpdate = mainMenus[menuLabel];
+			menuArgs.data.menuId = menuArgs.data.data.id = menuToUpdate.id;
+			self.strategyUpdateMenu(menuArgs);
+		},
+
+		/**
+		 * Helper function to create or update a main sub callflow
+		 * @param  {Object}   args
+		 * @param  {Object}   args.mainCallflows     Map object that contains the main callflows
+		 * @param  {String}   args.callflowLabel     Label of the callflow to be saved
+		 * @param  {String}   [args.savedCallflows]  Map object to which append the saved callflow
+		 * @param  {Object}   args.callflow          Default callflow to be saved
+		 * @param  {Function} args.callback          Callback function for monster async tasks
+		 */
+		strategySaveMainSubCallflow: function(args) {
+			var self = this,
+				mainCallflows = args.mainCallflows,
+				callflowLabel = args.callflowLabel,
+				savedCallflows = _.get(args, 'savedCallflows', {}),
+				callflow = args.callflow,
+				callback = args.callback;
+
+			if (!mainCallflows.hasOwnProperty(callflowLabel)) {
+				self.strategyCreateCallflow({
+					data: {
+						data: callflow
+					},
+					success: function(savedCallflow) {
+						savedCallflows[callflowLabel] = savedCallflow;
+						callback(null, savedCallflows);
+					},
+					error: function(parsedError) {
+						callback(parsedError);
+					}
+				});
+				return;
+			}
+
+			callflow.id = mainCallflows[callflowLabel].id;
+			self.strategyUpdateCallflow(callflow, function(savedCallflow) {
+				savedCallflows[callflowLabel] = savedCallflow;
+				callback(null, savedCallflows);
 			});
 		},
 
 		/**
 		 * Reset call handling strategies
-		 * @param  {Object}   args.mainSubCallflows  Account main callflows
-		 * @param  {Function} args.callback          Callback function for monster async tasks
+		 * @param  {Object}   args
+		 * @param  {Object}   args.callflows  Sub callflows for strategies
+		 * @param  {Object}   args.menus      Sub menus for strategies
+		 * @param  {Function} args.callback   Callback function for monster async tasks
 		 */
 		strategyResetSubCallStrategies: function(args) {
 			var self = this;
 
 			monster.parallel(
-				_.reduce(self.subCallflowsLabel, function(callflowRequests, label) {
-					callflowRequests[label] = function(callback) {
-						var mainSubCallflows = args.mainSubCallflows,
-							callflow = self.strategyGetDefaultMainSubCallflow({
-								label: label,
-								subMenuCallflowId: mainSubCallflows[label + 'Menu'].id
-							}),
-							callflowArgs = {
-								data: {
-									data: callflow
-								},
-								success: function(savedCallflow) {
-									callback(null, savedCallflow);
-								},
-								error: function(parsedError) {
-									callback(parsedError);
-								}
-							};
+				_.map(self.subCallflowsLabel, function(label) {
+					var menuLabel = label + 'Menu';
 
-						if (!mainSubCallflows.hasOwnProperty(label)) {
-							self.strategyCreateCallflow(callflowArgs);
-							return;
-						}
-
-						var callflowToUpdate = mainSubCallflows[label];
-						callflow.id = callflowToUpdate.id;
-						self.strategyUpdateCallflow(callflow, function(savedCallflow) {
-							callback(null, savedCallflow);
-						});
+					// Pack the waterfall process, and call for the outer parallel process
+					return function(parallelCallback) {
+						monster.waterfall([
+							function(waterfallCallback) {
+								// Update or create sub menu
+								self.strategySaveMainSubMenu({
+									mainMenus: args.menus,
+									menuLabel: menuLabel,
+									callback: waterfallCallback
+								});
+							},
+							function(savedMenu, waterfallCallback) {
+								// Update or create sub menu callflow
+								self.strategySaveMainSubCallflow({
+									mainCallflows: args.callflows,
+									callflowLabel: menuLabel,
+									callflow: self.strategyGetDefaultMainSubMenuCallflow(savedMenu),
+									callback: waterfallCallback
+								});
+							},
+							function(savedCallflows, waterfallCallback) {
+								// Update or create sub callflow
+								self.strategySaveMainSubCallflow({
+									mainCallflows: args.callflows,
+									callflowLabel: label,
+									savedCallflows: savedCallflows,
+									callflow: self.strategyGetDefaultMainSubCallflow({
+										label: label,
+										subMenuCallflowId: savedCallflows[menuLabel].id
+									}),
+									callback: waterfallCallback
+								});
+							}
+						], parallelCallback);
 					};
-
-					return callflowRequests;
-				}, {}), args.callback);
+				}),
+				function(err, results) {
+					args.callback(err, _.reduce(results, _.assign));
+				});
 		}
 	};
 
