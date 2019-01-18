@@ -1650,7 +1650,7 @@ define(function(require) {
 										.value();
 								}),
 								time_window_start: monster.util.timeToSeconds(customHours.lunchbreak.from),
-								time_window_end: monster.util.timeToSeconds(customHours.lunchbreak.to)
+								time_window_stop: monster.util.timeToSeconds(customHours.lunchbreak.to)
 							});
 
 							tmpRulesRequests.lunchbreak = function(callback) {
