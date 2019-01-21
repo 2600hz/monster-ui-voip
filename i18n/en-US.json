@@ -536,7 +536,7 @@
 			"nameHelp": "Type the User's First Name in the first input, and the User's Last Name in the second one",
 			"loginHelp": "This is the Username of this user, used to login to the application",
 			"vmboxHelp": "This is the Voicemail Box Number of this user, click on Change PIN to reset the PIN of the Voicemail box of this user",
-			"roleHelp": "The \"Admin\" will have rights to access the App Exchange and add apps to this accoutn, whereas the \"User\" will only be able to access the apps that are enabled for them",
+			"roleHelp": "The \"Admin\" will have rights to access the App Exchange and add apps to this account, whereas the \"User\" will only be able to access the apps that are enabled for them",
 			"languageHelp": "This will change the language of the text displayed in the UI",
 			"timezoneHelp": "This will set the Timezone used for this User's devices and Voicemail Box",
 			"ringingHelp": "This will set the Ringing Timeout for this User and his Devices. For example, if you set it to 20, this user will be rung for 20 seconds before the system moves to his Voicemail Box",
@@ -941,7 +941,7 @@
 		"confirmMessages": {
 			"deleteHoliday": "This holiday will be permanently deleted. Continue?",
 			"disableHolidays": "All existing holidays will be permanently deleted. Continue?",
-			"resetCalls": "All incoming call handling strategies will be reset. Continue?"
+			"resetCalls": "All incoming call handling strategies will be reset to their default values. Continue?"
 		},
 		"alertMessages": {
 			"uniqueHoliday": "Every holiday must have a unique name.",
