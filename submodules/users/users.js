@@ -1753,7 +1753,7 @@ define(function(require) {
 					});
 				},
 				provisioners: function(callback) {
-					if (!monster.config.api.provisioner) {
+					if (!self.appFlags.common.hasProvisioner) {
 						callback(null);
 						return;
 					}
@@ -1969,6 +1969,7 @@ define(function(require) {
 		usersFormatAddUser: function(data) {
 			var self = this,
 				formattedData = {
+					hasProvisioner: self.appFlags.common.hasProvisioner,
 					sendToSameEmail: true,
 					nextExtension: '',
 					listExtensions: {},
