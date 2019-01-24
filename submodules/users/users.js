@@ -1748,6 +1748,11 @@ define(function(require) {
 					});
 				},
 				provisioners: function(callback) {
+					if (!self.appFlags.common.hasProvisioner) {
+						callback(null);
+						return;
+					}
+
 					monster.request({
 						resource: 'common.chooseModel.getProvisionerData',
 						data: {},
@@ -1959,6 +1964,7 @@ define(function(require) {
 		usersFormatAddUser: function(data) {
 			var self = this,
 				formattedData = {
+					hasProvisioner: self.appFlags.common.hasProvisioner,
 					sendToSameEmail: true,
 					nextExtension: '',
 					listExtensions: {},
