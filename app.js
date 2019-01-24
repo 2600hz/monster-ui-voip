@@ -36,6 +36,7 @@ define(function(require) {
 		subscribe: {},
 		appFlags: {
 			common: {
+				hasProvisioner: false,
 				outboundPrivacy: [
 					'default',
 					'none',
@@ -59,6 +60,8 @@ define(function(require) {
 
 		initApp: function(callback) {
 			var self = this;
+
+			self.appFlags.common.hasProvisioner = _.isString(monster.config.api.provisioner);
 
 			monster.pub('auth.initApp', {
 				app: self,
