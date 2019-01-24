@@ -1753,14 +1753,16 @@ define(function(require) {
 					});
 				},
 				provisioners: function(callback) {
+					if (!monster.config.api.provisioner) {
+						callback(null);
+						return;
+					}
+
 					monster.request({
 						resource: 'common.chooseModel.getProvisionerData',
 						data: {},
 						success: function(provisionerData) {
 							callback(null, provisionerData.data);
-						},
-						error: function() {
-							callback(null);
 						}
 					});
 				}
