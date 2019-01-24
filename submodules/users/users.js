@@ -1758,6 +1758,9 @@ define(function(require) {
 						data: {},
 						success: function(provisionerData) {
 							callback(null, provisionerData.data);
+						},
+						error: function() {
+							callback(null);
 						}
 					});
 				}
