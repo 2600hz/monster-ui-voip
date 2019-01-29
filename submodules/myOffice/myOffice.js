@@ -700,7 +700,8 @@ define(function(require) {
 			template.find('.link-box').on('click', function(e) {
 				var $this = $(this),
 					category = $this.data('category'),
-					subcategory = $this.data('subcategory');
+					subcategory = $this.data('subcategory'),
+					action = $this.data('action');
 
 				$('.category').removeClass('active');
 				switch (category) {
@@ -718,7 +719,7 @@ define(function(require) {
 						break;
 					case 'strategy':
 						$('.category#strategy').addClass('active');
-						monster.pub('voip.strategy.render', { parent: parent, openElement: subcategory });
+						monster.pub('voip.strategy.render', { parent: parent, openElement: subcategory, action: action });
 						break;
 				}
 			});

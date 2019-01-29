@@ -70,6 +70,8 @@
 		opacity: 0.8;
 	}
 	.dashboard-top-message{
+		cursor: pointer;
+
 		&.link-box:hover {
 			background-color: #ff3b29;
 			background-image: -moz-linear-gradient(top, #ff3a28, #ff6161);

@@ -158,11 +158,20 @@ define(function(require) {
 			}
 		],
 
+		/**
+		 * Render main layout
+		 * @param  {Object}   args
+		 * @param  {jQuery}   args.parent         Parent template
+		 * @param  {String}   [args.openElement]  Name of the element to display on render
+		 * @param  {String}   [args.action]       Action to execute on render
+		 * @param  {Function} [args.callback]     Callback to execute after render
+		 */
 		strategyRender: function(args) {
 			var self = this,
 				args = args || {},
 				parent = args.parent || $('.right-content'),
 				openElement = args.openElement,
+				action = args.action,
 				callback = args.callback;
 
 			monster.parallel({
@@ -237,6 +246,12 @@ define(function(require) {
 							element.find('.element-content').show();
 						});
 					}
+				}
+
+				if (action) {
+					monster.pub(action, {
+						phoneNumber: '+19999999999'
+					});
 				}
 
 				callback && callback();
