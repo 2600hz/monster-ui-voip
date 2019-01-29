@@ -241,9 +241,13 @@ define(function(require) {
 				if (openElement) {
 					var element = template.find('.element-container.' + openElement + ':visible');
 					if (element.length > 0) {
-						self.strategyRefreshTemplate(element, results, function() {
-							element.addClass('open');
-							element.find('.element-content').show();
+						self.strategyRefreshTemplate({
+							container: element,
+							strategyData: results,
+							callback: function() {
+								element.addClass('open');
+								element.find('.element-content').show();
+							}
 						});
 					}
 				}
@@ -426,9 +430,13 @@ define(function(require) {
 						}
 					});
 
-					self.strategyRefreshTemplate(element, strategyData, function() {
-						element.addClass('open');
-						element.find('.element-content').slideDown();
+					self.strategyRefreshTemplate({
+						container: element,
+						strategyData: strategyData,
+						callback: function() {
+							element.addClass('open');
+							element.find('.element-content').slideDown();
+						}
 					});
 				}
 			});
@@ -485,9 +493,20 @@ define(function(require) {
 			}
 		},
 
-		strategyRefreshTemplate: function(container, strategyData, callback) {
+		/**
+		 * Refresh a strategy template
+		 * @param  {Object}   args
+		 * @param  {jQuery}   args.container     Container template
+		 * @param  {Object}   args.strategyData  Strategy data
+		 * @param  {String}   [args.action]      Action to execute
+		 * @param  {Function} [args.callback]    Optional callback to execute after refresh
+		 */
+		strategyRefreshTemplate: function(args) {
 			var self = this,
-				templateName = container.data('template');
+				$container = args.container,
+				strategyData = args.strategyData,
+				callback = args.callback,
+				templateName = $container.data('template');
 
 			switch (templateName) {
 				case 'numbers':
@@ -540,7 +559,7 @@ define(function(require) {
 
 						monster.ui.tooltips(template);
 
-						container
+						$container
 							.find('.element-content')
 								.empty()
 								.append(template);
@@ -572,7 +591,7 @@ define(function(require) {
 								submodule: 'strategy'
 							}));
 
-						container
+						$container
 							.find('.element-content')
 								.empty()
 								.append(template);
@@ -605,7 +624,7 @@ define(function(require) {
 								submodule: 'strategy'
 							}));
 
-						container
+						$container
 							.find('.element-content')
 								.empty()
 								.append(template);
@@ -712,7 +731,7 @@ define(function(require) {
 
 					monster.ui.validate(template.find('#strategy_custom_hours_form'), validationOptions);
 
-					container
+					$container
 						.find('.element-content')
 							.empty()
 							.append(template);
@@ -733,7 +752,7 @@ define(function(require) {
 						})),
 						holidayList = template.find('.holidays-list');
 
-					container
+					$container
 						.find('.element-content')
 							.empty()
 							.append(template);
@@ -801,7 +820,7 @@ define(function(require) {
 						submodule: 'strategy'
 					}));
 
-					container
+					$container
 						.find('.element-content')
 							.empty()
 							.append(template);
@@ -911,7 +930,10 @@ define(function(require) {
 							var parentContainer = container.parents('.element-container');
 							strategyData.callflows.MainCallflow = updatedCallflow;
 							refreshNumbersHeader(parentContainer);
-							self.strategyRefreshTemplate(parentContainer, strategyData);
+							self.strategyRefreshTemplate({
+								container: parentContainer,
+								strategyData: strategyData
+							});
 						});
 					}
 				},
@@ -1016,7 +1038,10 @@ define(function(require) {
 									});
 									strategyData.callflows.MainCallflow = updatedCallflow;
 									refreshNumbersHeader(parentContainer);
-									self.strategyRefreshTemplate(parentContainer, strategyData);
+									self.strategyRefreshTemplate({
+										container: parentContainer,
+										strategyData: strategyData
+									});
 
 									//Updating Company Caller ID if this was the selected number
 									self.callApi({
@@ -1110,7 +1135,10 @@ define(function(require) {
 							var parentContainer = container.parents('.element-container');
 							strategyData.callflows.MainConference = updatedCallflow;
 							refreshConfNumHeader(parentContainer);
-							self.strategyRefreshTemplate(parentContainer, strategyData);
+							self.strategyRefreshTemplate({
+								container: parentContainer,
+								strategyData: strategyData
+							});
 						});
 					}
 				},
@@ -1291,7 +1319,10 @@ define(function(require) {
 						});
 						strategyData.callflows.MainConference = updatedCallflow;
 						refreshConfNumHeader(parentContainer);
-						self.strategyRefreshTemplate(parentContainer, strategyData);
+						self.strategyRefreshTemplate({
+							container: parentContainer,
+							strategyData: strategyData
+						});
 					});
 				}
 			});
@@ -1342,7 +1373,10 @@ define(function(require) {
 									var parentContainer = container.parents('.element-container');
 									strategyData.callflows.MainFaxing = updatedCallflow;
 									refreshFaxingNumHeader(parentContainer);
-									self.strategyRefreshTemplate(parentContainer, strategyData);
+									self.strategyRefreshTemplate({
+										container: parentContainer,
+										strategyData: strategyData
+									});
 								});
 							};
 
@@ -1576,7 +1610,10 @@ define(function(require) {
 								});
 								strategyData.callflows.MainFaxing = updatedCallflow;
 								refreshFaxingNumHeader(parentContainer);
-								self.strategyRefreshTemplate(parentContainer, strategyData);
+								self.strategyRefreshTemplate({
+									container: parentContainer,
+									strategyData: strategyData
+								});
 							});
 						}
 					});
