@@ -62,14 +62,26 @@
 }
 
 /********** Content **********/
-#myoffice_container .dashboard-content .dashboard-top-message {
-	padding: 10px;
-	margin-bottom: 10px;
-	border-radius: 2px;
-	opacity: 0.8;
-}
-#myoffice_container .dashboard-content .dashboard-top-message i {
-	margin-right: 10px;
+#myoffice_container .dashboard-content {
+	.dashboard-top-message {
+		padding: 10px;
+		margin-bottom: 10px;
+		border-radius: 2px;
+		opacity: 0.8;
+	}
+	.dashboard-top-message{
+		&.link-box:hover {
+			background-color: #ff3b29;
+			background-image: -moz-linear-gradient(top, #ff3a28, #ff6161);
+			background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ff3a28), to(#ff6161));
+			background-image: -webkit-linear-gradient(top, #ff3a28, #ff6161);
+			background-image: -o-linear-gradient(top, #ff3a28, #ff6161);
+			background-image: linear-gradient(to bottom, #ff3a28, #ff6161);
+		}
+		i {
+			margin-right: 10px;
+		}
+	}
 }
 
 #myoffice_container .dashboard-content-div {
