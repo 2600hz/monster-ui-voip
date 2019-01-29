@@ -244,18 +244,13 @@ define(function(require) {
 						self.strategyRefreshTemplate({
 							container: element,
 							strategyData: results,
+							action: action,
 							callback: function() {
 								element.addClass('open');
 								element.find('.element-content').show();
 							}
 						});
 					}
-				}
-
-				if (action) {
-					monster.pub(action, {
-						phoneNumber: '+19999999999'
-					});
 				}
 
 				callback && callback();
@@ -506,6 +501,7 @@ define(function(require) {
 				$container = args.container,
 				strategyData = args.strategyData,
 				callback = args.callback,
+				action = args.action,
 				templateName = $container.data('template');
 
 			switch (templateName) {
@@ -563,6 +559,17 @@ define(function(require) {
 							.find('.element-content')
 								.empty()
 								.append(template);
+
+						if (action === 'checkMissingE911') {
+							// TODO: Cases:
+							// - Render popup for first number in list with E911 feature enabled,
+							//   if there are numbers with the E911 feature enabled, but none has it set
+							// - If no number has E911 feature enabled, show a warning toast to inform
+							//   the user of that fact (something like: "Please assign a main number with the E911 feature.")
+							monster.pub('common.e911.renderPopup', {
+								phoneNumber: '+19999999999'
+							});
+						}
 
 						callback && callback();
 					});
