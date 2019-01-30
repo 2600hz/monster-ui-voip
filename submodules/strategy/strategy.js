@@ -379,7 +379,7 @@ define(function(require) {
 						monster.ui.toast({
 							type: 'success',
 							message: self.getTemplate({
-								name: '!' + self.i18n.active().startegy.updateE911Dialog.success,
+								name: '!' + self.i18n.active().strategy.updateE911Dialog.success,
 								data: {
 									number: monster.util.formatPhoneNumber(number)
 								}
