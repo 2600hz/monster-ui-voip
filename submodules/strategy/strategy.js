@@ -493,7 +493,7 @@ define(function(require) {
 		 * @param  {Object}   args
 		 * @param  {jQuery}   args.container     Container template
 		 * @param  {Object}   args.strategyData  Strategy data
-		 * @param  {String}   [args.action]      Action to execute
+		 * @param  {String}   [args.action]      Action to execute before callback
 		 * @param  {Function} [args.callback]    Optional callback to execute after refresh
 		 */
 		strategyRefreshTemplate: function(args) {
@@ -534,9 +534,55 @@ define(function(require) {
 								name: 'strategy-' + templateName,
 								data: templateData,
 								submodule: 'strategy'
-							}));
+							})),
+							actions = {
+								checkMissingE911: function(numbers) {
+									var e911Active = false,
+										e911PhoneNumber = null;
+
+									// Cases:
+									// - Render popup for first number in list with E911 feature enabled,
+									//   if there are numbers with the E911 feature enabled, but none has it set
+									// - If no number has E911 feature enabled, show a warning toast to inform
+									//   the user of that fact.
+
+									_.each(numbers, function(data) {
+										var numberData = data.number,
+											availableFeatures = monster.util.getNumberFeatures(data.number);
+
+										if (!_.includes(availableFeatures, 'e911')) {
+											return;	// Continue loop
+										}
+
+										if (_.includes(numberData.features, 'e911')) {
+											e911Active = true;
+											return false;	// Break loop
+										}
+
+										if (_.isNull(e911PhoneNumber)) {
+											e911PhoneNumber = _.get(numberData, 'phoneNumber', numberData.id);
+										}
+									});
+
+									if (e911Active) {
+										return;
+									}
+
+									if (!_.isNull(e911PhoneNumber)) {
+										monster.pub('common.e911.renderPopup', {
+											phoneNumber: e911PhoneNumber
+										});
+									} else {
+										monster.ui.toast({
+											type: 'warning',
+											message: self.i18n.active().strategy.toastrMessages.noE911NumberAvailable
+										});
+									}
+								}
+							};
 
 						_.each(templateData.numbers, function(data) {
+							console.log(data);
 							data.number.phoneNumber = data.number.id;
 
 							var numberDiv = template.find('[data-phonenumber="' + data.number.id + '"]'),
@@ -560,15 +606,9 @@ define(function(require) {
 								.empty()
 								.append(template);
 
-						if (action === 'checkMissingE911') {
-							// TODO: Cases:
-							// - Render popup for first number in list with E911 feature enabled,
-							//   if there are numbers with the E911 feature enabled, but none has it set
-							// - If no number has E911 feature enabled, show a warning toast to inform
-							//   the user of that fact (something like: "Please assign a main number with the E911 feature.")
-							monster.pub('common.e911.renderPopup', {
-								phoneNumber: '+19999999999'
-							});
+						// Execute any additional action that has been requested
+						if (action && _.has(actions, action)) {
+							actions[action](templateData.numbers);
 						}
 
 						callback && callback();
