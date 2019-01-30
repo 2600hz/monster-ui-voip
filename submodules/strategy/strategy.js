@@ -862,24 +862,25 @@ define(function(require) {
 				var callflow = strategyData.callflows.MainCallflow,
 					numbers = callflow.numbers,
 					templateData = {
-						hideBuyNumbers: monster.config.whitelabel.hasOwnProperty('hideBuyNumbers')
+						hideBuyNumbers: _.has(monster.config.whitelabel, 'hideBuyNumbers')
 							? monster.config.whitelabel.hideBuyNumbers
 							: false,
-						numbers: $.map(numbers, function(val, key) {
-							if (val !== '0' && val !== 'undefinedMainNumber') {
+						numbers: _.chain(numbers)
+							.filter(function(val) {
+								return val !== '0' && val !== 'undefinedMainNumber';
+							}).map(function(val) {
 								var ret = {
 									number: {
 										id: val
 									}
 								};
 
-								if (accountNumbers.hasOwnProperty(val)) {
-									ret.number = $.extend(true, accountNumbers[val], ret.number);
+								if (_.has(accountNumbers, val)) {
+									ret.number = _.merge(accountNumbers[val], ret.number);
 								}
 
 								return ret;
-							}
-						}),
+							}).value(),
 						spareLinkEnabled: (_.countBy(accountNumbers, function(number) { return number.used_by ? 'assigned' : 'spare'; }).spare > 0)
 					},
 					template = $(self.getTemplate({
@@ -962,8 +963,8 @@ define(function(require) {
 
 				$container
 					.find('.element-content')
-						.empty()
-						.append(template);
+					.empty()
+					.append(template);
 
 				// Execute any additional action that has been requested
 				if (actionName && _.has(actions, actionName)) {
