@@ -898,11 +898,17 @@ define(function(require) {
 							var e911Active = false,
 								e911NumberData = null;
 
+							if (!monster.util.isNumberFeatureEnabled('e911')) {
+								// E911 feature is not enabled for the account, so there is
+								// nothing to do here
+								return;
+							}
+
 							// Cases:
 							// - Render popup for first number in list with E911 feature enabled,
 							//   if no number has this feature set
-							// - If no number has E911 feature enabled, show a warning toast to inform
-							//   the user of that fact
+							// - If no number has E911 feature enabled, show a warning toast to
+							//   inform the user of that fact
 
 							_.each(numbers, function(data) {
 								var numberData = data.number,

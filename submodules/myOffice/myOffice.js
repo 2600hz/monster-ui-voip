@@ -661,7 +661,8 @@ define(function(require) {
 				if (!hasValidCallerId && !hasValidE911) {
 					data.topMessage = {
 						cssClass: 'btn-danger',
-						message: self.i18n.active().myOffice.missingCnamE911Message
+						message: self.i18n.active().myOffice.missingCnamE911Message,
+						action: 'checkMissingE911'
 					};
 				} else if (!hasValidCallerId) {
 					data.topMessage = {
@@ -671,7 +672,8 @@ define(function(require) {
 				} else if (!hasValidE911) {
 					data.topMessage = {
 						cssClass: 'btn-danger',
-						message: self.i18n.active().myOffice.missingE911Message
+						message: self.i18n.active().myOffice.missingE911Message,
+						action: 'checkMissingE911'
 					};
 				}
 			}
