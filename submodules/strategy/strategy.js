@@ -895,9 +895,6 @@ define(function(require) {
 					},
 					actions = {
 						checkMissingE911: function(numbers) {
-							var e911Active = false,
-								e911NumberData = null;
-
 							if (!monster.util.isNumberFeatureEnabled('e911')) {
 								// E911 feature is not enabled for the account, so there is
 								// nothing to do here
@@ -910,42 +907,33 @@ define(function(require) {
 							// - If no number has E911 feature enabled, show a warning toast to
 							//   inform the user of that fact
 
-							_.each(numbers, function(data) {
-								var numberData = data.number,
-									availableFeatures = monster.util.getNumberFeatures(data.number);
+							var isE911Active = _.some(numbers, function(numberData) {
+									return _.includes(numberData.number.features, 'e911');
+								}),
+								e911NumberData
+									= isE911Active
+										? null
+										: _.find(numbers, function(numberData) {
+											var availableFeatures = monster.util.getNumberFeatures(numberData.number);
+											return _.includes(availableFeatures, 'e911');
+										});
 
-								if (!_.includes(availableFeatures, 'e911')) {
-									return;	// Continue loop
-								}
-
-								if (_.includes(numberData.features, 'e911')) {
-									e911Active = true;
-									return false;	// Break loop
-								}
-
+							if (!isE911Active) {
 								if (_.isNull(e911NumberData)) {
-									e911NumberData = numberData;
-								}
-							});
-
-							if (e911Active) {
-								return;
-							}
-
-							if (_.isNull(e911NumberData)) {
-								monster.ui.toast({
-									type: 'warning',
-									message: self.i18n.active().strategy.toastrMessages.noE911NumberAvailable
-								});
-							} else {
-								monster.pub('common.e911.renderPopup', {
-									phoneNumber: _.get(e911NumberData, 'phoneNumber', e911NumberData.id),
-									callbacks: {
-										success: function(data) {
-											afterFeatureUpdate(e911NumberData.id, data.data.features);
+									monster.ui.toast({
+										type: 'warning',
+										message: self.i18n.active().strategy.toastrMessages.noE911NumberAvailable
+									});
+								} else {
+									monster.pub('common.e911.renderPopup', {
+										phoneNumber: _.get(e911NumberData, 'phoneNumber', e911NumberData.id),
+										callbacks: {
+											success: function(data) {
+												afterFeatureUpdate(e911NumberData.id, data.data.features);
+											}
 										}
-									}
-								});
+									});
+								}
 							}
 						}
 					};
