@@ -161,10 +161,11 @@ define(function(require) {
 		/**
 		 * Render main layout
 		 * @param  {Object}   args
-		 * @param  {jQuery}   args.parent         Parent template
-		 * @param  {String}   [args.openElement]  Name of the element to display on render
-		 * @param  {String}   [args.action]       Action to execute on render
-		 * @param  {Function} [args.callback]     Callback to execute after render
+		 * @param  {jQuery}   args.parent                      Parent template
+		 * @param  {String}   [args.openElement]               Name of the element to display on render
+		 * @param  {Object}   [args.action]                    Action to execute on render
+		 * @param  {String}   [args.action.type]               Type of action to execute
+		 * @param  {Function} [args.callback]                  Callback to execute after render
 		 */
 		strategyRender: function(args) {
 			var self = this,
@@ -491,10 +492,11 @@ define(function(require) {
 		/**
 		 * Refresh a strategy template
 		 * @param  {Object}   args
-		 * @param  {jQuery}   args.container     Container template
-		 * @param  {Object}   args.strategyData  Strategy data
-		 * @param  {String}   [args.action]      Action to execute before callback
-		 * @param  {Function} [args.callback]    Optional callback to execute after refresh
+		 * @param  {jQuery}   args.container                   Container template
+		 * @param  {Object}   args.strategyData                Strategy data
+		 * @param  {Object}   [args.action]                    Action to execute
+		 * @param  {String}   [args.action.type]               Type of action to execute
+		 * @param  {Function} [args.callback]                  Optional callback to execute after refresh
 		 */
 		strategyRefreshTemplate: function(args) {
 			var self = this,
@@ -844,18 +846,20 @@ define(function(require) {
 		/**
 		 * Refresh main numbers strategy template
 		 * @param  {Object}   args
-		 * @param  {jQuery}   args.container     Container template
-		 * @param  {Object}   args.strategyData  Strategy data
-		 * @param  {Object}   args.templateName  Template name
-		 * @param  {String}   [args.action]      Action to execute before callback
-		 * @param  {Function} [args.callback]    Optional callback to execute after refresh
+		 * @param  {jQuery}   args.container                   Container template
+		 * @param  {Object}   args.strategyData                Strategy data
+		 * @param  {Object}   args.templateName                Template name
+		 * @param  {Object}   [args.action]                    Action to execute
+		 * @param  {String}   [args.action.type]               Type of action to execute
+		 * @param  {Function} [args.callback]                  Optional callback to execute after refresh
 		 */
 		strategyRefreshTemplateNumbers: function(args) {
 			var self = this,
 				$container = args.container,
 				strategyData = args.strategyData,
 				templateName = args.templateName,
-				actionName = args.action,
+				action = args.action,
+				actionType = _.get(action, 'type'),
 				callback = args.callback;
 
 			self.strategyListAccountNumbers(function(accountNumbers) {
@@ -961,8 +965,8 @@ define(function(require) {
 					.append(template);
 
 				// Execute any additional action that has been requested
-				if (actionName && _.has(actions, actionName)) {
-					actions[actionName](templateData.numbers);
+				if (_.has(actions, actionType)) {
+					actions[actionType](templateData.numbers);
 				}
 
 				callback && callback();

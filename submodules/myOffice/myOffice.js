@@ -703,7 +703,7 @@ define(function(require) {
 				var $this = $(this),
 					category = $this.data('category'),
 					subcategory = $this.data('subcategory'),
-					action = $this.data('action');
+					actionType = $this.data('action');
 
 				$('.category').removeClass('active');
 				switch (category) {
@@ -721,7 +721,13 @@ define(function(require) {
 						break;
 					case 'strategy':
 						$('.category#strategy').addClass('active');
-						monster.pub('voip.strategy.render', { parent: parent, openElement: subcategory, action: action });
+						monster.pub('voip.strategy.render', {
+							parent: parent,
+							openElement: subcategory,
+							action: {
+								type: actionType
+							}
+						});
 						break;
 				}
 			});
