@@ -497,12 +497,21 @@ define(function(require) {
 				}
 			});
 
-			var currAcc = monster.apps.auth.currentAccount,
-				hasEmergencyCallerId = _.get(currAcc, 'caller_id.emergency.number', '') !== '',
-				hasE911Feature = _.includes(features || [], 'e911');
-
 			monster.waterfall([
 				function(callback) {
+					self.strategyGetAccount({
+						success: function(currAcc) {
+							callback(null, currAcc);
+						},
+						error: function() {
+							callback(true);
+						}
+					});
+				},
+				function(currAcc, callback) {
+					var hasEmergencyCallerId = _.get(currAcc, 'caller_id.emergency.number', '') !== '',
+						hasE911Feature = _.includes(features || [], 'e911');
+
 					if (hasE911Feature && !hasEmergencyCallerId) {
 						self.strategyChangeEmergencyCallerId({
 							number: number,
@@ -516,10 +525,10 @@ define(function(require) {
 							}
 						});
 					} else {
-						callback(null);
+						callback(null, currAcc, hasEmergencyCallerId, hasE911Feature);
 					}
 				},
-				function(callback) {
+				function(currAcc, hasEmergencyCallerId, hasE911Feature, callback) {
 					if (!hasEmergencyCallerId) {
 						callback({});
 						return;
@@ -4139,6 +4148,12 @@ define(function(require) {
 			});
 		},
 
+		/**
+		 * Request the current account information
+		 * @param  {Object}   args
+		 * @param  {Function} [args.success]  Success callback
+		 * @param  {Fucntion} [args.error]    Error callback
+		 */
 		strategyGetAccount: function(args) {
 			var self = this;
 
@@ -4148,10 +4163,10 @@ define(function(require) {
 					accountId: self.accountId
 				},
 				success: function(data, status) {
-					args.hasOwnProperty('success') && args.success(data.data);
+					_.has(args, 'success') && args.success(data.data);
 				},
 				error: function(data, status) {
-					args.hasOwnProperty('error') && args.error();
+					_.has(args, 'error') && args.error();
 				}
 			});
 		},
