@@ -507,7 +507,12 @@ define(function(require) {
 						self.strategyChangeEmergencyCallerId({
 							number: number,
 							success: function() {
-								callback(false);
+								callback({});
+							},
+							error: function(parsedError) {
+								callback(_.merge({
+									isError: true
+								}, parsedError));
 							}
 						});
 					} else {
@@ -516,7 +521,7 @@ define(function(require) {
 				},
 				function(callback) {
 					if (!hasEmergencyCallerId) {
-						callback(false);
+						callback({});
 						return;
 					}
 
@@ -542,7 +547,7 @@ define(function(require) {
 					}
 
 					if (_.isUndefined(e911ChoicesArgs)) {
-						callback(false);
+						callback({});
 					} else {
 						callback(null, e911ChoicesArgs);
 					}
@@ -558,7 +563,7 @@ define(function(require) {
 					}, e911ChoicesArgs));
 				}
 			], function(err) {
-				if (!err) {
+				if (!err || _.isEmpty(err)) {
 					_.has(args, 'callbacks.success') && args.callbacks.success();
 				}
 			});
