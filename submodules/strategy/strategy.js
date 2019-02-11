@@ -546,11 +546,12 @@ define(function(require) {
 					} else {
 						if (currAcc.caller_id.emergency.number === number) {
 							e911ChoicesArgs = {
-								newNumbers: _.chain(templateNumbers, function(number) {
-									return _.includes(number.number.features || [], 'e911');
-								}).map(function(number) {
-									return number.number.id;
-								}).value()
+								newNumbers: _.chain(templateNumbers)
+									.filter(function(number) {
+										return _.includes(number.number.features || [], 'e911');
+									}).map(function(number) {
+										return number.number.id;
+									}).value()
 							};
 						}
 					}
