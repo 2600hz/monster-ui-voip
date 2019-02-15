@@ -1116,30 +1116,34 @@ define(function(require) {
 		strategyNumbersBindEvents: function(container, strategyData) {
 			var self = this,
 				addNumbersToMainCallflow = function(numbers) {
-					if (numbers.length) {
-						var mainCallflow = strategyData.callflows.MainCallflow,
-							indexPlaceholder = mainCallflow.numbers.indexOf('undefinedMainNumber');
-
-						if (indexPlaceholder >= 0) {
-							mainCallflow.numbers[indexPlaceholder] = '0';
-						}
-
-						mainCallflow.numbers = mainCallflow.numbers.concat(numbers);
-
-						self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
-							var parentContainer = container.parents('.element-container');
-							strategyData.callflows.MainCallflow = updatedCallflow;
-							refreshNumbersHeader(parentContainer);
-							self.strategyRefreshTemplate({
-								container: parentContainer,
-								strategyData: strategyData
-							});
-						});
+					if (_.isEmpty(numbers)) {
+						return;
 					}
-				},
-				refreshNumbersHeader = function(parentContainer) {
+
 					var mainCallflow = strategyData.callflows.MainCallflow,
+						indexPlaceholder = mainCallflow.numbers.indexOf('undefinedMainNumber');
+
+					if (indexPlaceholder >= 0) {
+						mainCallflow.numbers[indexPlaceholder] = '0';
+					}
+
+					mainCallflow.numbers = mainCallflow.numbers.concat(numbers);
+
+					self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
+						strategyData.callflows.MainCallflow = updatedCallflow;
+						refreshNumbersTemplate();
+						// TODO: Check/update account caller_id here. Notice that account is
+						// updated after refreshing template on number removal, so maybe we
+						// should do the same here. Just need to check if strategyRefreshTemplateNumbers,
+						// which is called eventually, does not perform an account get from the API
+					});
+				},
+				refreshNumbersTemplate = function() {
+					var mainCallflow = strategyData.callflows.MainCallflow,
+						parentContainer = container.parents('.element-container'),
 						headerSpan = parentContainer.find('.element-header-inner .summary > span');
+
+					// Refresh headers
 					if (mainCallflow.numbers.length > 1) {
 						headerSpan.html(monster.util.formatPhoneNumber(mainCallflow.numbers[1]));
 						if (mainCallflow.numbers.length > 3) {
@@ -1160,6 +1164,12 @@ define(function(require) {
 						container.parents('#strategy_container').find('.element-container.helper').show();
 						container.parents('#strategy_container').find('.element-container.main-number').css('margin-top', '10px');
 					}
+
+					// Refresh template
+					self.strategyRefreshTemplate({
+						container: parentContainer,
+						strategyData: strategyData
+					});
 				};
 
 			container.on('click', '.action-links .spare-link:not(.disabled)', function(e) {
@@ -1169,7 +1179,7 @@ define(function(require) {
 					accountName: monster.apps.auth.currentAccount.name,
 					accountId: self.accountId,
 					callback: function(numberList) {
-						var numbers = $.map(numberList, function(val) {
+						var numbers = _.map(numberList, function(val) {
 							return val.phoneNumber;
 						});
 						addNumbersToMainCallflow(numbers);
@@ -1231,17 +1241,12 @@ define(function(require) {
 								}
 
 								self.strategyUpdateCallflow(strategyData.callflows.MainCallflow, function(updatedCallflow) {
-									var parentContainer = container.parents('.element-container');
 									monster.ui.toast({
 										type: 'success',
 										message: self.i18n.active().strategy.toastrMessages.removeNumberSuccess
 									});
 									strategyData.callflows.MainCallflow = updatedCallflow;
-									refreshNumbersHeader(parentContainer);
-									self.strategyRefreshTemplate({
-										container: parentContainer,
-										strategyData: strategyData
-									});
+									refreshNumbersTemplate(updateCallflow);
 
 									//Updating Company Caller ID if this was the selected number
 									self.callApi({
@@ -1251,11 +1256,12 @@ define(function(require) {
 										},
 										success: function(accountData) {
 											var modified = false;
-											if ('caller_id' in accountData.data && 'external' in accountData.data.caller_id && accountData.data.caller_id.external.number === numberToRemove) {
+											// TODO: Maybe before unsetting external caller_id, ask user to choose another, if any other number is available
+											if (_.get(accountData.data, 'caller_id.external.number') === numberToRemove) {
 												delete accountData.data.caller_id.external;
 												modified = true;
 											}
-											if ('caller_id' in accountData.data && 'emergency' in accountData.data.caller_id && accountData.data.caller_id.emergency.number === numberToRemove) {
+											if (_.get(accountData.data, 'caller_id.emergency.number') === numberToRemove) {
 												delete accountData.data.caller_id.emergency;
 												modified = true;
 											}
