@@ -359,8 +359,7 @@ define(function(require) {
 		 * @param  {Object}   args
 		 * @param  {String}   args.oldNumber   Old E911 number
 		 * @param  {String[]} args.newNumbers  New E911 numbers
-		 * @param  {Function} [args.success]   Success callback
-		 * @param  {Function} [args.error]     Error callback
+		 * @param  {Function} [args.save]      Save callback
 		 * @param  {Function} [args.cancel]    Cancel callback
 		 */
 		strategyShowE911Choices: function(args) {
@@ -386,29 +385,12 @@ define(function(require) {
 				var number = template.find('.active').data('number');
 
 				if (number === oldNumber) {
-					popup.dialog('close');
+					_.has(args, 'cancel') && args.cancel();
 				} else {
-					self.strategyChangeEmergencyCallerId({
-						number: number,
-						success: function(number) {
-							monster.ui.toast({
-								type: 'success',
-								message: self.getTemplate({
-									name: '!' + self.i18n.active().strategy.updateE911Dialog.success,
-									data: {
-										number: monster.util.formatPhoneNumber(number)
-									}
-								})
-							});
-							popup.dialog('close');
-
-							_.has(args, 'success') && args.success(number);
-						},
-						error: function(parsedError) {
-							_.has(args, 'error') && args.error(parsedError);
-						}
-					});
+					_.has(args, 'save') && args.save(number);
 				}
+
+				popup.dialog('close');
 			});
 
 			template.find('.cancel-link').on('click', function() {
@@ -504,24 +486,19 @@ define(function(require) {
 						hasE911Feature = _.includes(features || [], 'e911');
 
 					if (hasE911Feature && !hasEmergencyCallerId) {
-						self.strategyChangeEmergencyCallerId({
-							number: number,
-							success: function() {
-								callback({});
-							},
-							error: function(parsedError) {
-								callback(_.merge({
-									isError: true
-								}, parsedError));
-							}
-						});
+						callback(null, number);
 					} else {
-						callback(null, currAcc, hasEmergencyCallerId, hasE911Feature);
+						callback(null, null, currAcc, hasEmergencyCallerId, hasE911Feature);
 					}
 				},
-				function(currAcc, hasEmergencyCallerId, hasE911Feature, callback) {
+				function(number, currAcc, hasEmergencyCallerId, hasE911Feature, callback) {
+					if (number) {
+						callback(null, number);
+						return;
+					}
+
 					if (!hasEmergencyCallerId) {
-						callback({});
+						callback('OK');
 						return;
 					}
 
@@ -548,25 +525,47 @@ define(function(require) {
 					}
 
 					if (_.isUndefined(e911ChoicesArgs)) {
-						callback({});
+						callback('OK');
 					} else {
-						callback(null, e911ChoicesArgs);
+						callback(null, null, e911ChoicesArgs);
 					}
 				},
-				function(e911ChoicesArgs, callback) {
-					var executeCallback = function() {
-						callback();
-					};
+				function(number, e911ChoicesArgs, callback) {
+					if (number) {
+						callback(null, number);
+						return;
+					}
 
 					self.strategyShowE911Choices(_.merge({
-						success: executeCallback,
-						cancel: executeCallback
+						save: function(number) {
+							callback(null, number);
+						},
+						cancel: function() {
+							callback(null);
+						}
 					}, e911ChoicesArgs));
 				}
-			], function(err) {
-				if (!err || _.isEmpty(err)) {
-					_.has(args, 'callbacks.success') && args.callbacks.success();
+			], function(err, number) {
+				if (err !== 'OK' || !number) {
+					return;
 				}
+
+				self.strategyChangeEmergencyCallerId({
+					number: number,
+					success: function() {
+						monster.ui.toast({
+							type: 'success',
+							message: self.getTemplate({
+								name: '!' + self.i18n.active().strategy.updateE911Dialog.success,
+								data: {
+									number: monster.util.formatPhoneNumber(number)
+								}
+							})
+						});
+
+						_.has(args, 'callbacks.success') && args.callbacks.success();
+					}
+				});
 			});
 		},
 
