@@ -1232,51 +1232,56 @@ define(function(require) {
 							popupHtml,
 							popup,
 							updateCallflow = function() {
-								strategyData.callflows.MainCallflow.numbers.splice(indexToRemove, 1);
+								monster.waterfall([
+									function(callback) {
+										strategyData.callflows.MainCallflow.numbers.splice(indexToRemove, 1);
 
-								// We don't want the '0' to stay in the routing system if they're no longer using SmartPBX.
-								// If they remove their last main number, we consider they don't use SmartPBX, so we reset the "0" to be the "undefinedMainNumber"
-								if (strategyData.callflows.MainCallflow.numbers.length === 1 && strategyData.callflows.MainCallflow.numbers[0] === '0') {
-									strategyData.callflows.MainCallflow.numbers[0] = 'undefinedMainNumber';
-								}
-
-								self.strategyUpdateCallflow(strategyData.callflows.MainCallflow, function(updatedCallflow) {
-									monster.ui.toast({
-										type: 'success',
-										message: self.i18n.active().strategy.toastrMessages.removeNumberSuccess
-									});
-									strategyData.callflows.MainCallflow = updatedCallflow;
-									refreshNumbersTemplate(updateCallflow);
-
-									//Updating Company Caller ID if this was the selected number
-									self.callApi({
-										resource: 'account.get',
-										data: {
-											accountId: self.accountId
-										},
-										success: function(accountData) {
-											var modified = false;
-											// TODO: Maybe before unsetting external caller_id, ask user to choose another, if any other number is available
-											if (_.get(accountData.data, 'caller_id.external.number') === numberToRemove) {
-												delete accountData.data.caller_id.external;
-												modified = true;
-											}
-											if (_.get(accountData.data, 'caller_id.emergency.number') === numberToRemove) {
-												delete accountData.data.caller_id.emergency;
-												modified = true;
-											}
-											if (modified) {
-												self.callApi({
-													resource: 'account.update',
-													data: {
-														accountId: self.accountId,
-														data: accountData.data
-													},
-													success: function(data) {}
-												});
-											}
+										// We don't want the '0' to stay in the routing system if they're no longer using SmartPBX.
+										// If they remove their last main number, we consider they don't use SmartPBX, so we reset the "0" to be the "undefinedMainNumber"
+										if (strategyData.callflows.MainCallflow.numbers.length === 1 && strategyData.callflows.MainCallflow.numbers[0] === '0') {
+											strategyData.callflows.MainCallflow.numbers[0] = 'undefinedMainNumber';
 										}
-									});
+
+										self.strategyUpdateCallflow(strategyData.callflows.MainCallflow, function(updatedCallflow) {
+											callback(null, updatedCallflow);
+										});
+									},
+									function(updatedCallflow, callback) {
+										monster.ui.toast({
+											type: 'success',
+											message: self.i18n.active().strategy.toastrMessages.removeNumberSuccess
+										});
+										strategyData.callflows.MainCallflow = updatedCallflow;
+										refreshNumbersTemplate(updateCallflow);
+
+										self.strategyGetAccount({
+											success: function(accountData) {
+												callback(null, accountData);
+											}
+										});
+									}
+								], function(err, accountData) {
+									if (err) {
+										return;
+									}
+
+									var modified = false;
+
+									// TODO: Maybe before unsetting external caller_id, ask user to choose another, if any other number is available
+									if (_.get(accountData, 'caller_id.external.number') === numberToRemove) {
+										delete accountData.caller_id.external;
+										modified = true;
+									}
+									if (_.get(accountData, 'caller_id.emergency.number') === numberToRemove) {
+										delete accountData.caller_id.emergency;
+										modified = true;
+									}
+
+									if (modified) {
+										self.strategyUpdateAccount({
+											data: accountData
+										});
+									}
 								});
 							};
 
