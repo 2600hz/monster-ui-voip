@@ -357,19 +357,22 @@ define(function(require) {
 		/**
 		 * Show e911 number choices
 		 * @param  {Object}   args
+		 * @param  {('emergency'|'external')}  args.callerIdType  Caller ID type: emergency, external
 		 * @param  {String}   args.oldNumber   Old E911 number
 		 * @param  {String[]} args.newNumbers  New E911 numbers
 		 * @param  {Function} [args.save]      Save callback
 		 * @param  {Function} [args.cancel]    Cancel callback
 		 */
-		strategyShowE911Choices: function(args) {
+		strategyShowNumberChoices: function(args) {
 			var self = this,
+				callerIdType = args.callerIdType,
 				oldNumber = args.oldNumber,
 				template = $(self.getTemplate({
-					name: 'changeE911Popup',
+					name: 'changeCallerIdPopup',
 					data: {
 						oldNumber: oldNumber,
-						newNumbers: args.newNumbers
+						newNumbers: args.newNumbers,
+						callerIdType: callerIdType
 					},
 					submodule: 'strategy'
 				})),
@@ -400,7 +403,7 @@ define(function(require) {
 			});
 
 			var popup = monster.ui.dialog(template, {
-				title: self.i18n.active().strategy.updateE911Dialog.title
+				title: self.i18n.active().strategy.updateCallerIdDialog.title[callerIdType]
 			});
 		},
 
@@ -458,7 +461,62 @@ define(function(require) {
 		},
 
 		/**
-		 *
+		 * Check if it is necessary to set the external caller ID for the account
+		 * @param  {Object}   args
+		 * @param  {String[]} args.numbers  Available phone numbers
+		 */
+		strategyCheckIfSetExternalCallerID: function(args) {
+			var self = this,
+				numbers = args.numbers,
+				currAcc = monster.apps.auth.currentAccount,
+				hasExternalCallerId = _.get(currAcc, 'caller_id.external.number', '') !== '';
+
+			if (hasExternalCallerId || _.isEmpty(numbers)) {
+				return;
+			}
+
+			monster.waterfall([
+				function(callback) {
+					if (numbers.length > 1) {
+						self.strategyShowNumberChoices({
+							callerIdType: 'external',
+							newNumbers: numbers,
+							save: function(number) {
+								callback(null, number);
+							},
+							cancel: function() {
+								callback(null);
+							}
+						});
+					} else {
+						callback(null, numbers[0]);
+					}
+				}
+			], function(err, number) {
+				if (err || !number) {
+					return;
+				}
+
+				self.strategyChangeCallerId({
+					callerIdType: 'external',
+					number: number,
+					success: function() {
+						monster.ui.toast({
+							type: 'success',
+							message: self.getTemplate({
+								name: '!' + self.i18n.active().strategy.updateCallerIdDialog.success.external,
+								data: {
+									number: monster.util.formatPhoneNumber(number)
+								}
+							})
+						});
+					}
+				});
+			});
+		},
+
+		/**
+		 * Check if it is necessary to update the emergency caller ID for the account
 		 * @param  {Object}   args
 		 * @param  {Object[]} args.templateNumbers      Template numbers
 		 * @param  {String[]} args.features             Number features
@@ -536,7 +594,8 @@ define(function(require) {
 						return;
 					}
 
-					self.strategyShowE911Choices(_.merge({
+					self.strategyShowNumberChoices(_.merge({
+						callerIdType: 'emergency',
 						save: function(number) {
 							callback(null, number);
 						},
@@ -550,13 +609,14 @@ define(function(require) {
 					return;
 				}
 
-				self.strategyChangeEmergencyCallerId({
+				self.strategyChangeCallerId({
+					callerIdType: 'emergency',
 					number: number,
 					success: function() {
 						monster.ui.toast({
 							type: 'success',
 							message: self.getTemplate({
-								name: '!' + self.i18n.active().strategy.updateE911Dialog.success,
+								name: '!' + self.i18n.active().strategy.updateCallerIdDialog.success.emergency,
 								data: {
 									number: monster.util.formatPhoneNumber(number)
 								}
@@ -948,27 +1008,25 @@ define(function(require) {
 
 			self.strategyListAccountNumbers(function(accountNumbers) {
 				var callflow = strategyData.callflows.MainCallflow,
-					numbers = callflow.numbers,
 					templateData = {
 						hideBuyNumbers: _.has(monster.config.whitelabel, 'hideBuyNumbers')
 							? monster.config.whitelabel.hideBuyNumbers
 							: false,
-						numbers: _.chain(numbers)
-							.filter(function(val) {
-								return val !== '0' && val !== 'undefinedMainNumber';
-							}).map(function(val) {
-								var ret = {
-									number: {
-										id: val
-									}
-								};
-
-								if (_.has(accountNumbers, val)) {
-									ret.number = _.merge(accountNumbers[val], ret.number);
+						numbers: _.map(self.strategyExtractMainNumbers({
+							mainCallflow: callflow
+						}), function(val) {
+							var ret = {
+								number: {
+									id: val
 								}
+							};
 
-								return ret;
-							}).value(),
+							if (_.has(accountNumbers, val)) {
+								ret.number = _.merge(accountNumbers[val], ret.number);
+							}
+
+							return ret;
+						}),
 						spareLinkEnabled: (_.countBy(accountNumbers, function(number) { return number.used_by ? 'assigned' : 'spare'; }).spare > 0)
 					},
 					template = $(self.getTemplate({
@@ -1067,14 +1125,16 @@ define(function(require) {
 		},
 
 		/**
-		 * Change the emergency caller ID for the current account
+		 * Changes a caller ID for the current account
 		 * @param  {Object}   args
+		 * @param  {('emergency'|'external')}  args.callerIdType  Caller ID type: emergency, external
 		 * @param  {String}   args.number     Number to be set for emergency calls
 		 * @param  {Function} [args.success]  Success callback
 		 * @param  {Function} [args.error]    Error callback
 		 */
-		strategyChangeEmergencyCallerId: function(args) {
+		strategyChangeCallerId: function(args) {
 			var self = this,
+				callerIdType = args.callerIdType,
 				number = args.number;
 
 			monster.waterfall([
@@ -1090,8 +1150,8 @@ define(function(require) {
 				},
 				function(data, callback) {
 					data.caller_id = data.caller_id || {};
-					data.caller_id.emergency = data.caller_id.emergency || {};
-					data.caller_id.emergency.number = number;
+					data.caller_id[callerIdType] = data.caller_id[callerIdType] || {};
+					data.caller_id[callerIdType].number = number;
 
 					self.strategyUpdateAccount({
 						data: data,
@@ -1131,10 +1191,12 @@ define(function(require) {
 					self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
 						strategyData.callflows.MainCallflow = updatedCallflow;
 						refreshNumbersTemplate();
-						// TODO: Check/update account caller_id here. Notice that account is
-						// updated after refreshing template on number removal, so maybe we
-						// should do the same here. Just need to check if strategyRefreshTemplateNumbers,
-						// which is called eventually, does not perform an account get from the API
+
+						self.strategyCheckIfSetExternalCallerID({
+							numbers: self.strategyExtractMainNumbers({
+								mainCallflow: updatedCallflow
+							})
+						});
 					});
 				},
 				refreshNumbersTemplate = function() {
@@ -4592,6 +4654,21 @@ define(function(require) {
 				function(err, results) {
 					args.callback(err, _.reduce(results, _.assign));
 				});
+		},
+
+		/**
+		 * Extracts the phone numbers from the main callflow
+		 * @param    {Object} args
+		 * @param    {Object} args.mainCallflow  Main callflow
+		 * @returns  {String[]}                  Phone numbers
+		 */
+		strategyExtractMainNumbers: function(args) {
+			var self = this,
+				mainCallflow = args.mainCallflow;
+
+			return _.filter(mainCallflow.numbers, function(val) {
+				return val !== '0' && val !== 'undefinedMainNumber';
+			});
 		}
 	};
 

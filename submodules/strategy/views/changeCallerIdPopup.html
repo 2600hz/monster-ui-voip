@@ -1,15 +1,15 @@
 <div class="e911-change-wrapper">
 	<div class="header">
 		{{#if oldNumber}}
-			{{ i18n.strategy.updateE911Dialog.headerNewE911 }}
+			{{ tryI18n i18n.strategy.updateCallerIdDialog.headerNewNumber callerIdType }}
 		{{else}}
-			{{ i18n.strategy.updateE911Dialog.headerNoE911 }}
+			{{ tryI18n i18n.strategy.updateCallerIdDialog.headerNoNumber callerIdType }}
 		{{/if}}
 	</div>
 
 	<div class="list-choices">
 		{{#if oldNumber}}
-			<div class="choice" data-number="{{oldNumber}}">{{ formatPhoneNumber oldNumber }} <span class="current">({{ i18n.strategy.updateE911Dialog.current }})</span></div>
+			<div class="choice" data-number="{{oldNumber}}">{{ formatPhoneNumber oldNumber }} <span class="current">({{ tryI18n i18n.strategy.updateCallerIdDialog.current callerIdType }})</span></div>
 		{{/if}}
 
 		{{#each newNumbers}}
