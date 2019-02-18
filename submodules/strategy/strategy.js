@@ -499,17 +499,8 @@ define(function(require) {
 
 			monster.waterfall([
 				function(callback) {
-					self.strategyGetAccount({
-						success: function(currAcc) {
-							callback(null, currAcc);
-						},
-						error: function() {
-							callback(true);
-						}
-					});
-				},
-				function(currAcc, callback) {
-					var hasEmergencyCallerId = _.get(currAcc, 'caller_id.emergency.number', '') !== '',
+					var currAcc = monster.apps.auth.currentAccount,
+						hasEmergencyCallerId = _.get(currAcc, 'caller_id.emergency.number', '') !== '',
 						hasE911Feature = _.includes(features || [], 'e911');
 
 					if (hasE911Feature && !hasEmergencyCallerId) {
