@@ -544,22 +544,14 @@ define(function(require) {
 						hasE911Feature = _.includes(features || [], 'e911');
 
 					if (hasE911Feature && !hasEmergencyCallerId) {
-						callback(null, number);
+						callback('OK', number);
+					} else if (!hasEmergencyCallerId) {
+						callback('OK');
 					} else {
-						callback(null, null, currAcc, hasEmergencyCallerId, hasE911Feature);
+						callback(null, currAcc, hasE911Feature);
 					}
 				},
-				function(number, currAcc, hasEmergencyCallerId, hasE911Feature, callback) {
-					if (number) {
-						callback(null, number);
-						return;
-					}
-
-					if (!hasEmergencyCallerId) {
-						callback('OK');
-						return;
-					}
-
+				function(currAcc, hasE911Feature, callback) {
 					var e911ChoicesArgs;
 
 					if (hasE911Feature) {
@@ -585,27 +577,23 @@ define(function(require) {
 					if (_.isUndefined(e911ChoicesArgs)) {
 						callback('OK');
 					} else {
-						callback(null, null, e911ChoicesArgs);
+						callback(null, e911ChoicesArgs);
 					}
 				},
-				function(number, e911ChoicesArgs, callback) {
-					if (number) {
-						callback(null, number);
-						return;
-					}
-
+				function(e911ChoicesArgs, callback) {
 					self.strategyShowNumberChoices(_.merge({
 						callerIdType: 'emergency',
 						save: function(number) {
 							callback(null, number);
 						},
 						cancel: function() {
-							callback(null);
+							callback('OK');
 						}
 					}, e911ChoicesArgs));
 				}
 			], function(err, number) {
-				if (err !== 'OK' || !number) {
+				console.log('NUMBER: ', number);
+				if ((err && err !== 'OK') || !number) {
 					return;
 				}
 
