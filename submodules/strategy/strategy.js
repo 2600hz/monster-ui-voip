@@ -592,7 +592,6 @@ define(function(require) {
 					}, e911ChoicesArgs));
 				}
 			], function(err, number) {
-				console.log('NUMBER: ', number);
 				if ((err && err !== 'OK') || !number) {
 					return;
 				}
