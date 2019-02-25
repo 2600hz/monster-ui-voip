@@ -1010,14 +1010,22 @@
 			}
 		},
 
-		"__comment": "UI-2629: Optionen zum Anpassen der e911-Funktion hinzugefügt",
-		"__version": "4.0",
-		"updateE911Dialog": {
-			"title": "Anrufer-ID des Accounts für Notfälle",
-			"headerNewE911": "Sie haben gerade e911 für eine Ihrer Hauptnummern aktiviert. Bitte wählen Sie eine Nummer aus, die Sie für diesen Account als Ihre Anrufer-ID für Notfälle verwenden möchten.",
-			"headerNoE911": "Sie haben e911 für die Nummer deaktiviert, die als Ihre Anrufer-ID für Notfälle verwendet wurde. Bitte wählen Sie eine neue Nummer aus, die für diesen Account als Anrufer-ID für Notfälle dienen soll.",
-			"success": "e911 wurde für den Account erfolgreich geändert und lautet nun {{ number }}.",
-			"current": "Aktuelle"
+		"updateCallerIdDialog": {
+			"title": {
+				"emergency": "Anrufer-ID des Accounts für Notfälle"
+			},
+			"headerNewNumber": {
+				"emergency": "Sie haben gerade e911 für eine Ihrer Hauptnummern aktiviert. Bitte wählen Sie eine Nummer aus, die Sie für diesen Account als Ihre Anrufer-ID für Notfälle verwenden möchten."
+			},
+			"headerNoNumber": {
+				"emergency": "Sie haben e911 für die Nummer deaktiviert, die als Ihre Anrufer-ID für Notfälle verwendet wurde. Bitte wählen Sie eine neue Nummer aus, die für diesen Account als Anrufer-ID für Notfälle dienen soll."
+			},
+			"success": {
+				"emergency": "e911 wurde für den Account erfolgreich geändert und lautet nun {{ number }}."
+			},
+			"current": {
+				"emergency": "Aktuelle"
+			}
 		}
 	},
 
