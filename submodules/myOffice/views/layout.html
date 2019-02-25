@@ -23,7 +23,7 @@
 
 	<div class="dashboard-content">
 		{{#if topMessage}}
-		<div class="dashboard-top-message {{topMessage.cssClass}}">
+		<div class="dashboard-top-message {{topMessage.cssClass}} link-box" data-category="strategy" data-subcategory="main-number"{{#if topMessage.action}} data-action="{{topMessage.action}}"{{/if}}>
 			<i class="fa fa-exclamation-triangle"></i>{{topMessage.message}}<!-- {{i18n.myOffice.missingE911Message}} -->
 		</div>
 		{{/if}}
@@ -123,7 +123,7 @@
 				{{else}}
 				<div class="dashboard-warning-row main-number-row link-box" data-category="strategy" data-subcategory="main-number">
 					<i class="fa fa-exclamation-triangle"></i>{{@root.i18n.myOffice.missingMainNumberMessage}}
-				</div>	
+				</div>
 				{{/if}}
 				<div class="dashboard-box-row conf-number-row link-box" data-category="strategy" data-subcategory="strategy-confnum">
 					<div class="row-title">
