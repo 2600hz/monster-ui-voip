@@ -158,11 +158,23 @@ define(function(require) {
 			}
 		],
 
+		/**
+		 * Render main layout
+		 * @param  {Object}   args
+		 * @param  {jQuery}   args.parent                      Parent template
+		 * @param  {String}   [args.openElement]               Name of the element to display on render
+		 * @param  {Object}   [args.action]                    Action to execute on render
+		 * @param  {String}   [args.action.type]               Type of action to execute
+		 * @param  {Object}   [args.action.callbacks]          Action callbacks
+		 * @param  {Function} [args.action.callbacks.success]  Action success callback
+		 * @param  {Function} [args.callback]                  Callback to execute after render
+		 */
 		strategyRender: function(args) {
 			var self = this,
 				args = args || {},
 				parent = args.parent || $('.right-content'),
 				openElement = args.openElement,
+				action = args.action,
 				callback = args.callback;
 
 			monster.parallel({
@@ -232,9 +244,14 @@ define(function(require) {
 				if (openElement) {
 					var element = template.find('.element-container.' + openElement + ':visible');
 					if (element.length > 0) {
-						self.strategyRefreshTemplate(element, results, function() {
-							element.addClass('open');
-							element.find('.element-content').show();
+						self.strategyRefreshTemplate({
+							container: element,
+							strategyData: results,
+							action: action,
+							callback: function() {
+								element.addClass('open');
+								element.find('.element-content').show();
+							}
 						});
 					}
 				}
@@ -337,13 +354,23 @@ define(function(require) {
 			});
 		},
 
-		strategyShowE911Choices: function(oldNumber, newNumbers) {
+		/**
+		 * Show e911 number choices
+		 * @param  {Object}   args
+		 * @param  {String}   args.oldNumber   Old E911 number
+		 * @param  {String[]} args.newNumbers  New E911 numbers
+		 * @param  {Function} [args.success]   Success callback
+		 * @param  {Function} [args.error]     Error callback
+		 * @param  {Function} [args.cancel]    Cancel callback
+		 */
+		strategyShowE911Choices: function(args) {
 			var self = this,
+				oldNumber = args.oldNumber,
 				template = $(self.getTemplate({
 					name: 'changeE911Popup',
 					data: {
 						oldNumber: oldNumber,
-						newNumbers: newNumbers
+						newNumbers: args.newNumbers
 					},
 					submodule: 'strategy'
 				})),
@@ -361,23 +388,33 @@ define(function(require) {
 				if (number === oldNumber) {
 					popup.dialog('close');
 				} else {
-					self.strategyChangeEmergencyCallerId(number, function() {
-						monster.ui.toast({
-							type: 'success',
-							message: self.getTemplate({
-								name: '!' + self.i18n.active().startegy.updateE911Dialog.success,
-								data: {
-									number: monster.util.formatPhoneNumber(number)
-								}
-							})
-						});
-						popup.dialog('close');
+					self.strategyChangeEmergencyCallerId({
+						number: number,
+						success: function(number) {
+							monster.ui.toast({
+								type: 'success',
+								message: self.getTemplate({
+									name: '!' + self.i18n.active().strategy.updateE911Dialog.success,
+									data: {
+										number: monster.util.formatPhoneNumber(number)
+									}
+								})
+							});
+							popup.dialog('close');
+
+							_.has(args, 'success') && args.success(number);
+						},
+						error: function(parsedError) {
+							_.has(args, 'error') && args.error(parsedError);
+						}
 					});
 				}
 			});
 
 			template.find('.cancel-link').on('click', function() {
 				popup.dialog('close');
+
+				_.has(args, 'cancel') && args.cancel();
 			});
 
 			var popup = monster.ui.dialog(template, {
@@ -411,9 +448,13 @@ define(function(require) {
 						}
 					});
 
-					self.strategyRefreshTemplate(element, strategyData, function() {
-						element.addClass('open');
-						element.find('.element-content').slideDown();
+					self.strategyRefreshTemplate({
+						container: element,
+						strategyData: strategyData,
+						callback: function() {
+							element.addClass('open');
+							element.find('.element-content').slideDown();
+						}
 					});
 				}
 			});
@@ -434,105 +475,127 @@ define(function(require) {
 			self.strategyCallsBindEvents(strategyCallsContainer, strategyData);
 		},
 
-		strategyCheckIfUpdateEmergencyCallerID: function(templateNumbers, features, number) {
-			var self = this;
+		/**
+		 *
+		 * @param  {Object}   args
+		 * @param  {Object[]} args.templateNumbers      Template numbers
+		 * @param  {String[]} args.features             Number features
+		 * @param  {String}   args.number               Number ID
+		 * @param  {Object}   [args.callbacks]          Function callbacks
+		 * @param  {Function} [args.callbacks.success]  Successs callback
+		 */
+		strategyCheckIfUpdateEmergencyCallerID: function(args) {
+			var self = this,
+				templateNumbers = args.templateNumbers,
+				features = args.features,
+				number = args.number;
 
 			// Update data we have about features for main numbers
-			_.each(templateNumbers, function(dataLoop, index) {
+			_.each(templateNumbers, function(dataLoop) {
 				if (dataLoop.number.id === number) {
 					dataLoop.number.features = features;
 				}
 			});
 
-			var e911Numbers = _.map(_.filter(templateNumbers, function(number) {
-				return (number.number.features || []).indexOf('e911') >= 0;
-			}), function(number) {
-				return number.number.id;
-			});
+			monster.waterfall([
+				function(callback) {
+					var currAcc = monster.apps.auth.currentAccount,
+						hasEmergencyCallerId = _.get(currAcc, 'caller_id.emergency.number', '') !== '',
+						hasE911Feature = _.includes(features || [], 'e911');
 
-			var currAcc = monster.apps.auth.currentAccount,
-				hasEmergencyCallerId = currAcc.hasOwnProperty('caller_id') && currAcc.caller_id.hasOwnProperty('emergency') && currAcc.caller_id.emergency.hasOwnProperty('number') && currAcc.caller_id.emergency.number !== '',
-				hasE911Feature = (features || []).indexOf('e911') >= 0;
-
-			if (hasE911Feature) {
-				if (hasEmergencyCallerId) {
-					if (currAcc.caller_id.emergency.number !== number) {
-						self.strategyShowE911Choices(currAcc.caller_id.emergency.number, [ number ]);
+					if (hasE911Feature && !hasEmergencyCallerId) {
+						self.strategyChangeEmergencyCallerId({
+							number: number,
+							success: function() {
+								callback({});
+							},
+							error: function(parsedError) {
+								callback(_.merge({
+									isError: true
+								}, parsedError));
+							}
+						});
+					} else {
+						callback(null, currAcc, hasEmergencyCallerId, hasE911Feature);
 					}
-				} else {
-					self.strategyChangeEmergencyCallerId(number);
+				},
+				function(currAcc, hasEmergencyCallerId, hasE911Feature, callback) {
+					if (!hasEmergencyCallerId) {
+						callback({});
+						return;
+					}
+
+					var e911ChoicesArgs;
+
+					if (hasE911Feature) {
+						if (currAcc.caller_id.emergency.number !== number) {
+							e911ChoicesArgs = {
+								oldNumber: currAcc.caller_id.emergency.number,
+								newNumbers: [ number ]
+							};
+						}
+					} else {
+						if (currAcc.caller_id.emergency.number === number) {
+							e911ChoicesArgs = {
+								newNumbers: _.chain(templateNumbers)
+									.filter(function(number) {
+										return _.includes(number.number.features || [], 'e911');
+									}).map(function(number) {
+										return number.number.id;
+									}).value()
+							};
+						}
+					}
+
+					if (_.isUndefined(e911ChoicesArgs)) {
+						callback({});
+					} else {
+						callback(null, e911ChoicesArgs);
+					}
+				},
+				function(e911ChoicesArgs, callback) {
+					var executeCallback = function() {
+						callback();
+					};
+
+					self.strategyShowE911Choices(_.merge({
+						success: executeCallback,
+						cancel: executeCallback
+					}, e911ChoicesArgs));
 				}
-			} else {
-				// If they removed e911 from their current emergency caller id number, then we let them select the new one from the list of numbers with e911 configured
-				if (hasEmergencyCallerId && currAcc.caller_id.emergency.number === number) {
-					self.strategyShowE911Choices(undefined, e911Numbers);
+			], function(err) {
+				if (!err || _.isEmpty(err)) {
+					_.has(args, 'callbacks.success') && args.callbacks.success();
 				}
-			}
+			});
 		},
 
-		strategyRefreshTemplate: function(container, strategyData, callback) {
+		/**
+		 * Refresh a strategy template
+		 * @param  {Object}   args
+		 * @param  {jQuery}   args.container                   Container template
+		 * @param  {Object}   args.strategyData                Strategy data
+		 * @param  {Object}   [args.action]                    Action to execute
+		 * @param  {String}   [args.action.type]               Type of action to execute
+		 * @param  {Object}   [args.action.callbacks]          Action callbacks
+		 * @param  {Function} [args.action.callbacks.success]  Action success callback
+		 * @param  {Function} [args.callback]                  Optional callback to execute after refresh
+		 */
+		strategyRefreshTemplate: function(args) {
 			var self = this,
-				templateName = container.data('template');
+				$container = args.container,
+				strategyData = args.strategyData,
+				callback = args.callback,
+				templateName = $container.data('template');
 
 			switch (templateName) {
 				case 'numbers':
-					self.strategyListAccountNumbers(function(accountNumbers) {
-						var callflow = strategyData.callflows.MainCallflow,
-							numbers = callflow.numbers,
-							templateData = {
-								hideBuyNumbers: monster.config.whitelabel.hasOwnProperty('hideBuyNumbers')
-									? monster.config.whitelabel.hideBuyNumbers
-									: false,
-								numbers: $.map(numbers, function(val, key) {
-									if (val !== '0' && val !== 'undefinedMainNumber') {
-										var ret = {
-											number: {
-												id: val
-											}
-										};
-
-										if (accountNumbers.hasOwnProperty(val)) {
-											ret.number = $.extend(true, accountNumbers[val], ret.number);
-										}
-
-										return ret;
-									}
-								}),
-								spareLinkEnabled: (_.countBy(accountNumbers, function(number) { return number.used_by ? 'assigned' : 'spare'; }).spare > 0)
-							},
-							template = $(self.getTemplate({
-								name: 'strategy-' + templateName,
-								data: templateData,
-								submodule: 'strategy'
-							}));
-
-						_.each(templateData.numbers, function(data) {
-							data.number.phoneNumber = data.number.id;
-
-							var numberDiv = template.find('[data-phonenumber="' + data.number.id + '"]'),
-								args = {
-									target: numberDiv.find('.edit-features'),
-									numberData: data.number,
-									afterUpdate: function(features) {
-										monster.ui.paintNumberFeaturesIcon(features, numberDiv.find('.features'));
-
-										self.strategyCheckIfUpdateEmergencyCallerID(templateData.numbers, features, data.number.id);
-									}
-								};
-
-							monster.pub('common.numberFeaturesMenu.render', args);
-						});
-
-						monster.ui.tooltips(template);
-
-						container
-							.find('.element-content')
-								.empty()
-								.append(template);
-
-						callback && callback();
-					});
-
+					self.strategyRefreshTemplateNumbers(
+						_.merge(
+							{
+								templateName: templateName
+							}, args)
+					);
 					break;
 				case 'confnum':
 					self.strategyListAccountNumbers(function(accountNumbers) {
@@ -557,7 +620,7 @@ define(function(require) {
 								submodule: 'strategy'
 							}));
 
-						container
+						$container
 							.find('.element-content')
 								.empty()
 								.append(template);
@@ -590,7 +653,7 @@ define(function(require) {
 								submodule: 'strategy'
 							}));
 
-						container
+						$container
 							.find('.element-content')
 								.empty()
 								.append(template);
@@ -697,7 +760,7 @@ define(function(require) {
 
 					monster.ui.validate(template.find('#strategy_custom_hours_form'), validationOptions);
 
-					container
+					$container
 						.find('.element-content')
 							.empty()
 							.append(template);
@@ -718,7 +781,7 @@ define(function(require) {
 						})),
 						holidayList = template.find('.holidays-list');
 
-					container
+					$container
 						.find('.element-content')
 							.empty()
 							.append(template);
@@ -786,7 +849,7 @@ define(function(require) {
 						submodule: 'strategy'
 					}));
 
-					container
+					$container
 						.find('.element-content')
 							.empty()
 							.append(template);
@@ -863,18 +926,189 @@ define(function(require) {
 			}
 		},
 
-		strategyChangeEmergencyCallerId: function(number, callback) {
-			var self = this;
+		/**
+		 * Refresh main numbers strategy template
+		 * @param  {Object}   args
+		 * @param  {jQuery}   args.container                   Container template
+		 * @param  {Object}   args.strategyData                Strategy data
+		 * @param  {Object}   args.templateName                Template name
+		 * @param  {Object}   [args.action]                    Action to execute
+		 * @param  {String}   [args.action.type]               Type of action to execute
+		 * @param  {Object}   [args.action.callbacks]          Action callbacks
+		 * @param  {Function} [args.action.callbacks.success]  Action success callback
+		 * @param  {Function} [args.callback]                  Optional callback to execute after refresh
+		 */
+		strategyRefreshTemplateNumbers: function(args) {
+			var self = this,
+				$container = args.container,
+				strategyData = args.strategyData,
+				templateName = args.templateName,
+				action = args.action,
+				actionType = _.get(action, 'type'),
+				callback = args.callback;
 
-			self.strategyGetAccount({
-				success: function(data) {
+			self.strategyListAccountNumbers(function(accountNumbers) {
+				var callflow = strategyData.callflows.MainCallflow,
+					numbers = callflow.numbers,
+					templateData = {
+						hideBuyNumbers: _.has(monster.config.whitelabel, 'hideBuyNumbers')
+							? monster.config.whitelabel.hideBuyNumbers
+							: false,
+						numbers: _.chain(numbers)
+							.filter(function(val) {
+								return val !== '0' && val !== 'undefinedMainNumber';
+							}).map(function(val) {
+								var ret = {
+									number: {
+										id: val
+									}
+								};
+
+								if (_.has(accountNumbers, val)) {
+									ret.number = _.merge(accountNumbers[val], ret.number);
+								}
+
+								return ret;
+							}).value(),
+						spareLinkEnabled: (_.countBy(accountNumbers, function(number) { return number.used_by ? 'assigned' : 'spare'; }).spare > 0)
+					},
+					template = $(self.getTemplate({
+						name: 'strategy-' + templateName,
+						data: templateData,
+						submodule: 'strategy'
+					})),
+					afterFeatureUpdate = function afterFeatureUpdate(numberId, numberFeatures, callbacks) {
+						monster.ui.paintNumberFeaturesIcon(numberFeatures, template.find('[data-phonenumber="' + numberId + '"] .features'));
+
+						self.strategyCheckIfUpdateEmergencyCallerID({
+							templateNumbers: templateData.numbers,
+							features: numberFeatures,
+							number: numberId,
+							callbacks: callbacks
+						});
+					},
+					actions = {
+						checkMissingE911: function(numbers) {
+							if (!monster.util.isNumberFeatureEnabled('e911')) {
+								// E911 feature is not enabled for the account, so there is
+								// nothing to do here
+								return;
+							}
+
+							// Cases:
+							// - Render popup for first number in list with E911 feature enabled,
+							//   if no number has this feature set
+							// - If no number has E911 feature enabled, show a warning toast to
+							//   inform the user of that fact
+
+							var isE911Active = _.some(numbers, function(numberData) {
+									return _.includes(numberData.number.features, 'e911');
+								}),
+								e911NumberData;
+
+							if (!isE911Active) {
+								e911NumberData = _.chain(numbers)
+									.find(function(numberData) {
+										var availableFeatures = monster.util.getNumberFeatures(numberData.number);
+										return _.includes(availableFeatures, 'e911');
+									}).get('number').value();
+
+								if (_.isUndefined(e911NumberData)) {
+									monster.ui.toast({
+										type: 'warning',
+										message: self.i18n.active().strategy.toastrMessages.noE911NumberAvailable
+									});
+								} else {
+									monster.pub('common.e911.renderPopup', {
+										phoneNumber: _.get(e911NumberData, 'phoneNumber', e911NumberData.id),
+										callbacks: {
+											success: function(data) {
+												afterFeatureUpdate(e911NumberData.id, data.data.features, action.callbacks);
+											},
+											error: function() {
+												_.has(action, 'callbacks.error')
+													&& action.callbacks.error();
+											}
+										}
+									});
+								}
+							}
+						}
+					};
+
+				_.each(templateData.numbers, function(data) {
+					data.number.phoneNumber = data.number.id;
+
+					var numberData = data.number,
+						args = {
+							target: template.find('[data-phonenumber="' + numberData.id + '"] .edit-features'),
+							numberData: numberData,
+							afterUpdate: function(features) {
+								afterFeatureUpdate(numberData.id, features);
+							}
+						};
+
+					monster.pub('common.numberFeaturesMenu.render', args);
+				});
+
+				monster.ui.tooltips(template);
+
+				$container
+					.find('.element-content')
+					.empty()
+					.append(template);
+
+				// Execute any additional action that has been requested
+				if (_.has(actions, actionType)) {
+					actions[actionType](templateData.numbers);
+				}
+
+				callback && callback();
+			});
+		},
+
+		/**
+		 * Change the emergency caller ID for the current account
+		 * @param  {Object}   args
+		 * @param  {String}   args.number     Number to be set for emergency calls
+		 * @param  {Function} [args.success]  Success callback
+		 * @param  {Function} [args.error]    Error callback
+		 */
+		strategyChangeEmergencyCallerId: function(args) {
+			var self = this,
+				number = args.number;
+
+			monster.waterfall([
+				function(callback) {
+					self.strategyGetAccount({
+						success: function(data) {
+							callback(null, data);
+						},
+						error: function(parsedError) {
+							callback(parsedError);
+						}
+					});
+				},
+				function(data, callback) {
 					data.caller_id = data.caller_id || {};
 					data.caller_id.emergency = data.caller_id.emergency || {};
 					data.caller_id.emergency.number = number;
 
-					self.strategyUpdateAccount(data, function() {
-						callback && callback(number);
+					self.strategyUpdateAccount({
+						data: data,
+						success: function() {
+							callback(null);
+						},
+						error: function(parsedError) {
+							callback(parsedError);
+						}
 					});
+				}
+			], function(err) {
+				if (err) {
+					_.has(args, 'error') && args.error(err);
+				} else {
+					_.has(args, 'success') && args.success(number);
 				}
 			});
 		},
@@ -896,7 +1130,10 @@ define(function(require) {
 							var parentContainer = container.parents('.element-container');
 							strategyData.callflows.MainCallflow = updatedCallflow;
 							refreshNumbersHeader(parentContainer);
-							self.strategyRefreshTemplate(parentContainer, strategyData);
+							self.strategyRefreshTemplate({
+								container: parentContainer,
+								strategyData: strategyData
+							});
 						});
 					}
 				},
@@ -1001,7 +1238,10 @@ define(function(require) {
 									});
 									strategyData.callflows.MainCallflow = updatedCallflow;
 									refreshNumbersHeader(parentContainer);
-									self.strategyRefreshTemplate(parentContainer, strategyData);
+									self.strategyRefreshTemplate({
+										container: parentContainer,
+										strategyData: strategyData
+									});
 
 									//Updating Company Caller ID if this was the selected number
 									self.callApi({
@@ -1095,7 +1335,10 @@ define(function(require) {
 							var parentContainer = container.parents('.element-container');
 							strategyData.callflows.MainConference = updatedCallflow;
 							refreshConfNumHeader(parentContainer);
-							self.strategyRefreshTemplate(parentContainer, strategyData);
+							self.strategyRefreshTemplate({
+								container: parentContainer,
+								strategyData: strategyData
+							});
 						});
 					}
 				},
@@ -1276,7 +1519,10 @@ define(function(require) {
 						});
 						strategyData.callflows.MainConference = updatedCallflow;
 						refreshConfNumHeader(parentContainer);
-						self.strategyRefreshTemplate(parentContainer, strategyData);
+						self.strategyRefreshTemplate({
+							container: parentContainer,
+							strategyData: strategyData
+						});
 					});
 				}
 			});
@@ -1327,7 +1573,10 @@ define(function(require) {
 									var parentContainer = container.parents('.element-container');
 									strategyData.callflows.MainFaxing = updatedCallflow;
 									refreshFaxingNumHeader(parentContainer);
-									self.strategyRefreshTemplate(parentContainer, strategyData);
+									self.strategyRefreshTemplate({
+										container: parentContainer,
+										strategyData: strategyData
+									});
 								});
 							};
 
@@ -1561,7 +1810,10 @@ define(function(require) {
 								});
 								strategyData.callflows.MainFaxing = updatedCallflow;
 								refreshFaxingNumHeader(parentContainer);
-								self.strategyRefreshTemplate(parentContainer, strategyData);
+								self.strategyRefreshTemplate({
+									container: parentContainer,
+									strategyData: strategyData
+								});
 							});
 						}
 					});
@@ -3861,8 +4113,17 @@ define(function(require) {
 			});
 		},
 
-		strategyUpdateAccount: function(data, callback) {
-			var self = this;
+		/**
+		 * Updates an account
+		 * @param  {Object}   args
+		 * @param  {Object}   args.data       Account data
+		 * @param  {String}   args.data.id    Account ID
+		 * @param  {Function} [args.success]  Success callback
+		 * @param  {Function} [args.error]    Error callback
+		 */
+		strategyUpdateAccount: function(args) {
+			var self = this,
+				data = args.data;
 
 			self.callApi({
 				resource: 'account.update',
@@ -3870,12 +4131,21 @@ define(function(require) {
 					accountId: data.id,
 					data: data
 				},
-				success: function(data, status) {
-					callback && callback(data.data);
+				success: function(data) {
+					_.has(args, 'success') && args.success(data.data);
+				},
+				error: function(parsedError) {
+					_.has(args, 'error') && args.error(parsedError);
 				}
 			});
 		},
 
+		/**
+		 * Request the current account information
+		 * @param  {Object}   args
+		 * @param  {Function} [args.success]  Success callback
+		 * @param  {Fucntion} [args.error]    Error callback
+		 */
 		strategyGetAccount: function(args) {
 			var self = this;
 
@@ -3885,10 +4155,10 @@ define(function(require) {
 					accountId: self.accountId
 				},
 				success: function(data, status) {
-					args.hasOwnProperty('success') && args.success(data.data);
+					_.has(args, 'success') && args.success(data.data);
 				},
 				error: function(data, status) {
-					args.hasOwnProperty('error') && args.error();
+					_.has(args, 'error') && args.error();
 				}
 			});
 		},

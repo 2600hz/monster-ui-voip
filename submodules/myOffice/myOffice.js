@@ -661,7 +661,8 @@ define(function(require) {
 				if (!hasValidCallerId && !hasValidE911) {
 					data.topMessage = {
 						cssClass: 'btn-danger',
-						message: self.i18n.active().myOffice.missingCnamE911Message
+						message: self.i18n.active().myOffice.missingCnamE911Message,
+						action: 'checkMissingE911'
 					};
 				} else if (!hasValidCallerId) {
 					data.topMessage = {
@@ -671,7 +672,8 @@ define(function(require) {
 				} else if (!hasValidE911) {
 					data.topMessage = {
 						cssClass: 'btn-danger',
-						message: self.i18n.active().myOffice.missingE911Message
+						message: self.i18n.active().myOffice.missingE911Message,
+						action: 'checkMissingE911'
 					};
 				}
 			}
@@ -700,7 +702,8 @@ define(function(require) {
 			template.find('.link-box').on('click', function(e) {
 				var $this = $(this),
 					category = $this.data('category'),
-					subcategory = $this.data('subcategory');
+					subcategory = $this.data('subcategory'),
+					actionType = $this.data('action');
 
 				$('.category').removeClass('active');
 				switch (category) {
@@ -718,7 +721,13 @@ define(function(require) {
 						break;
 					case 'strategy':
 						$('.category#strategy').addClass('active');
-						monster.pub('voip.strategy.render', { parent: parent, openElement: subcategory });
+						monster.pub('voip.strategy.render', {
+							parent: parent,
+							openElement: subcategory,
+							action: {
+								type: actionType
+							}
+						});
 						break;
 				}
 			});
