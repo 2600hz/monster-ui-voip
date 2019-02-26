@@ -112,43 +112,43 @@ define(function(require) {
 
 			_.each(featureCodeData, function(callflow) {
 				// Some old callflows have been created with the feature code key, so we had the check to make sure they also have a name associated
-				if (callflow.featurecode.hasOwnProperty('name')) {
-					var category = 'misc',
-						i18nFeatureCode = self.i18n.active().featureCodes.labels[callflow.featurecode.name],
-						hasStar = (callflow.hasOwnProperty('numbers') && callflow.numbers.length && callflow.numbers[0].substr(0, 1) === '*') || (callflow.hasOwnProperty('patterns') && callflow.patterns.length && (_.startsWith(callflow.patterns[0], '^\\*') || _.startsWith(callflow.patterns[0], '\\*')));
+				if (!callflow.featurecode.hasOwnProperty('name')) { return; }
 
-					_.find(self.categories, function(cat, key) {
-						if (cat.indexOf(callflow.featurecode.name) >= 0) {
-							category = key;
-							return true;
-						}
-						return false;
-					});
+				var category = 'misc',
+					i18nFeatureCode = self.i18n.active().featureCodes.labels[callflow.featurecode.name],
+					hasStar = (callflow.hasOwnProperty('numbers') && callflow.numbers.length && callflow.numbers[0].substr(0, 1) === '*') || (callflow.hasOwnProperty('patterns') && callflow.patterns.length && (_.startsWith(callflow.patterns[0], '^\\*') || _.startsWith(callflow.patterns[0], '\\*')));
 
-					if (!featureCodes.hasOwnProperty(category)) {
-						featureCodes[category] = {
-							category: self.i18n.active().featureCodes.categories[category],
-							codes: []
-						};
+				_.find(self.categories, function(cat, key) {
+					if (cat.indexOf(callflow.featurecode.name) >= 0) {
+						category = key;
+						return true;
 					}
+					return false;
+				});
 
-					featureCodes[category].codes.push({
-						key: callflow.featurecode.name,
-						name: i18nFeatureCode
-							? i18nFeatureCode.label
-							: _.capitalize(callflow.featurecode.name),
-						tooltip: i18nFeatureCode
-							? i18nFeatureCode.tooltip
-							: undefined,
-						number: callflow.featurecode.number ? callflow.featurecode.number.replace(/\\/g, '') : '',
-						hasStar: hasStar
-					});
+				if (!featureCodes.hasOwnProperty(category)) {
+					featureCodes[category] = {
+						category: self.i18n.active().featureCodes.categories[category],
+						codes: []
+					};
 				}
+
+				featureCodes[category].codes.push({
+					key: callflow.featurecode.name,
+					name: i18nFeatureCode
+						? i18nFeatureCode.label
+						: _.capitalize(callflow.featurecode.name),
+					tooltip: i18nFeatureCode
+						? i18nFeatureCode.tooltip
+						: undefined,
+					number: callflow.featurecode.number ? callflow.featurecode.number.replace(/\\/g, '') : '',
+					hasStar: hasStar
+				});
 			});
 
 			return _.chain(featureCodes)
 				.map(function(category) {
-					category.codes = _.sortBy(category.codes, 'number');
+					category.codes = _.sortBy(category.codes, 'name');
 					return category;
 				})
 				.sortBy('category')
