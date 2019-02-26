@@ -355,11 +355,11 @@ define(function(require) {
 		},
 
 		/**
-		 * Show e911 number choices
+		 * Show phone number choices
 		 * @param  {Object}   args
 		 * @param  {('emergency'|'external')}  args.callerIdType  Caller ID type: emergency, external
-		 * @param  {String}   args.oldNumber   Old E911 number
-		 * @param  {String[]} args.newNumbers  New E911 numbers
+		 * @param  {String}   args.oldNumber   Old number
+		 * @param  {String[]} args.newNumbers  New numbers
 		 * @param  {Function} [args.save]      Save callback
 		 * @param  {Function} [args.cancel]    Cancel callback
 		 */
@@ -562,14 +562,12 @@ define(function(require) {
 							};
 						}
 					} else {
-						if (currAcc.caller_id.emergency.number === number) {
+						if (!number || currAcc.caller_id.emergency.number === number) {
 							e911ChoicesArgs = {
-								newNumbers: _.chain(templateNumbers)
-									.filter(function(number) {
-										return _.includes(number.number.features || [], 'e911');
-									}).map(function(number) {
-										return number.number.id;
-									}).value()
+								newNumbers: self.strategyGetFeaturedNumbers({
+									numbers: templateNumbers,
+									feature: 'e911'
+								})
 							};
 						}
 					}
@@ -1022,7 +1020,9 @@ define(function(require) {
 						submodule: 'strategy'
 					})),
 					afterFeatureUpdate = function afterFeatureUpdate(numberId, numberFeatures, callbacks) {
-						monster.ui.paintNumberFeaturesIcon(numberFeatures, template.find('[data-phonenumber="' + numberId + '"] .features'));
+						if (numberId) {
+							monster.ui.paintNumberFeaturesIcon(numberFeatures, template.find('[data-phonenumber="' + numberId + '"] .features'));
+						}
 
 						self.strategyCheckIfUpdateEmergencyCallerID({
 							templateNumbers: templateData.numbers,
@@ -1039,44 +1039,75 @@ define(function(require) {
 								return;
 							}
 
-							// Cases:
-							// - Render popup for first number in list with E911 feature enabled,
-							//   if no number has this feature set
-							// - If no number has E911 feature enabled, show a warning toast to
-							//   inform the user of that fact
+							// TODO: Add comment to describe cases
+							monster.waterfall([
+								function(callback) {
+									var e911Numbers = _.filter(numbers, function(numberData) {
+										return _.includes(numberData.number.features, 'e911');
+									});
 
-							var isE911Active = _.some(numbers, function(numberData) {
-									return _.includes(numberData.number.features, 'e911');
-								}),
-								e911NumberData;
-
-							if (!isE911Active) {
-								e911NumberData = _.chain(numbers)
-									.find(function(numberData) {
+									if (_.isEmpty(e911Numbers)) {
+										callback(null);
+									} else {
+										callback('OK', { });
+									}
+								},
+								function(callback) {
+									var e911AvailableNumbers = _.filter(numbers, function(numberData) {
 										var availableFeatures = monster.util.getNumberFeatures(numberData.number);
 										return _.includes(availableFeatures, 'e911');
-									}).get('number').value();
-
-								if (_.isUndefined(e911NumberData)) {
-									monster.ui.toast({
-										type: 'warning',
-										message: self.i18n.active().strategy.toastrMessages.noE911NumberAvailable
 									});
-								} else {
+
+									if (_.isEmpty(e911AvailableNumbers)) {
+										callback('no_e911_numbers');
+									} else {
+										callback(null, e911AvailableNumbers);
+									}
+								},
+								function(e911AvailableNumbers, callback) {
+									if (e911AvailableNumbers.length === 1) {
+										callback(null, _.head(e911AvailableNumbers).number);
+										return;
+									}
+
+									self.strategyShowNumberChoices({
+										callerIdType: 'emergency',
+										newNumbers: e911AvailableNumbers.map('number.id'),
+										save: function(number) {
+											callback(null, number);
+										}
+									});
+								},
+								function(e911NumberData, callback) {
 									monster.pub('common.e911.renderPopup', {
 										phoneNumber: _.get(e911NumberData, 'phoneNumber', e911NumberData.id),
 										callbacks: {
 											success: function(data) {
-												afterFeatureUpdate(e911NumberData.id, data.data.features, action.callbacks);
+												callback(null, {
+													numberId: e911NumberData.id,
+													features: data.data.features
+												});
 											},
 											error: function() {
-												_.has(action, 'callbacks.error')
-													&& action.callbacks.error();
+												callback(true);
 											}
 										}
 									});
 								}
-							}
+							], function(err, results) {
+								if (err && err !== 'OK') {
+									if (err === 'no_e911_numbers') {
+										monster.ui.toast({
+											type: 'warning',
+											message: self.i18n.active().strategy.toastrMessages.noE911NumberAvailable
+										});
+									} else {
+										_.has(action, 'callbacks.error') && action.callbacks.error(err);
+									}
+								} else {
+									afterFeatureUpdate(results.numberId, results.features, action.callbacks);
+								}
+							});
 						}
 					};
 
@@ -4656,6 +4687,25 @@ define(function(require) {
 			return _.filter(mainCallflow.numbers, function(val) {
 				return val !== '0' && val !== 'undefinedMainNumber';
 			});
+		},
+
+		/**
+		 * Obtains the numbers that have the specified feature
+		 * @param    {Object}   args
+		 * @param    {Object[]} args.numbers  Array of numbers data
+		 * @param    {String}   args.feature  Feature code
+		 * @returns  {String[]}               Phone numbers
+		 */
+		strategyGetFeaturedNumbers: function(args) {
+			var self = this,
+				feature = args.feature;
+
+			return _.chain(args.numbers)
+				.filter(function(number) {
+					return _.includes(number.number.features || [], feature);
+				}).map(function(number) {
+					return number.number.id;
+				}).value()
 		}
 	};
 
