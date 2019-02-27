@@ -564,10 +564,12 @@ define(function(require) {
 					} else {
 						if (!number || currAcc.caller_id.emergency.number === number) {
 							e911ChoicesArgs = {
-								newNumbers: self.strategyGetFeaturedNumbers({
-									numbers: templateNumbers,
-									feature: 'e911'
-								})
+								newNumbers: _.chain(templateNumbers)
+									.filter(function(number) {
+										return _.includes(number.number.features, 'e911');
+									}).map(function(number) {
+										return number.number.id;
+									}).value()
 							};
 						}
 					}
@@ -4687,25 +4689,6 @@ define(function(require) {
 			return _.filter(mainCallflow.numbers, function(val) {
 				return val !== '0' && val !== 'undefinedMainNumber';
 			});
-		},
-
-		/**
-		 * Obtains the numbers that have the specified feature
-		 * @param    {Object}   args
-		 * @param    {Object[]} args.numbers  Array of numbers data
-		 * @param    {String}   args.feature  Feature code
-		 * @returns  {String[]}               Phone numbers
-		 */
-		strategyGetFeaturedNumbers: function(args) {
-			var self = this,
-				feature = args.feature;
-
-			return _.chain(args.numbers)
-				.filter(function(number) {
-					return _.includes(number.number.features || [], feature);
-				}).map(function(number) {
-					return number.number.id;
-				}).value()
 		}
 	};
 
