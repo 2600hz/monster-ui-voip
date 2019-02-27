@@ -357,11 +357,12 @@ define(function(require) {
 		/**
 		 * Show phone number choices
 		 * @param  {Object}   args
-		 * @param  {('emergency'|'external')}  args.callerIdType  Caller ID type: emergency, external
-		 * @param  {String}   args.oldNumber   Old number
-		 * @param  {String[]} args.newNumbers  New numbers
-		 * @param  {Function} [args.save]      Save callback
-		 * @param  {Function} [args.cancel]    Cancel callback
+		 * @param  {('emergency'|'external')}   args.callerIdType       Caller ID type: emergency, external
+		 * @param  {('choose'|'add'|'remove')}  [args.action='choose']  Action being done: Choose, add or remove a number
+		 * @param  {String}   [args.oldNumber]  Old number
+		 * @param  {String[]} args.newNumbers   New numbers
+		 * @param  {Function} [args.save]       Save callback
+		 * @param  {Function} [args.cancel]     Cancel callback
 		 */
 		strategyShowNumberChoices: function(args) {
 			var self = this,
@@ -370,6 +371,7 @@ define(function(require) {
 				template = $(self.getTemplate({
 					name: 'changeCallerIdPopup',
 					data: {
+						action: _.get(args, 'action', 'choose'),
 						oldNumber: oldNumber,
 						newNumbers: args.newNumbers,
 						callerIdType: callerIdType
@@ -540,36 +542,35 @@ define(function(require) {
 			monster.waterfall([
 				function(callback) {
 					var currAcc = monster.apps.auth.currentAccount,
-						hasEmergencyCallerId = _.get(currAcc, 'caller_id.emergency.number', '') !== '',
+						currentE911CallerId = _.get(currAcc, 'caller_id.emergency.number'),
+						hasEmergencyCallerId = currentE911CallerId !== '' && _.isUndefined(currentE911CallerId),
 						hasE911Feature = _.includes(features || [], 'e911');
 
 					if (hasE911Feature && !hasEmergencyCallerId) {
 						callback('OK', number);
-					} else if (!hasEmergencyCallerId) {
-						callback('OK');
 					} else {
-						callback(null, currAcc, hasE911Feature);
+						callback(null, currentE911CallerId, hasE911Feature);
 					}
 				},
-				function(currAcc, hasE911Feature, callback) {
+				function(currentE911CallerId, hasE911Feature, callback) {
 					var e911ChoicesArgs;
 
 					if (hasE911Feature) {
-						if (currAcc.caller_id.emergency.number !== number) {
+						if (currentE911CallerId !== number) {
 							e911ChoicesArgs = {
-								oldNumber: currAcc.caller_id.emergency.number,
+								action: 'add',
+								oldNumber: currentE911CallerId,
 								newNumbers: [ number ]
 							};
 						}
 					} else {
-						if (!number || currAcc.caller_id.emergency.number === number) {
+						if (!number || currentE911CallerId === number) {
 							e911ChoicesArgs = {
+								action: number ? 'remove' : 'choose',
 								newNumbers: _.chain(templateNumbers)
 									.filter(function(number) {
 										return _.includes(number.number.features, 'e911');
-									}).map(function(number) {
-										return number.number.id;
-									}).value()
+									}).map('number.id').value()
 							};
 						}
 					}
@@ -1041,17 +1042,30 @@ define(function(require) {
 								return;
 							}
 
-							// TODO: Add comment to describe cases
+							// Cases:
+							// * If there is one or more main numbers with E911 set:
+							//   - If there is one number, set that number as the emergency
+							//     caller ID for the account.
+							//   - If there are 2 or more, display dialog to choose number,
+							//     then set it as the account emergency caller ID.
+							// * If there are one or more numbers with E911 available (but not
+							//   set), then:
+							//   - If there is one number, select that number for E911.
+							//   - If there are 2 or more, display dialog to choose number.
+							//   Then display pop-up to set and save the info, and set the
+							//   selected number as the account emergency caller ID.
+							// * If there are no numbers with E911 feature available, display
+							//   toast to notify the user about it.
 							monster.waterfall([
 								function(callback) {
-									var e911Numbers = _.filter(numbers, function(numberData) {
+									var isE911Active = _.some(numbers, function(numberData) {
 										return _.includes(numberData.number.features, 'e911');
 									});
 
-									if (_.isEmpty(e911Numbers)) {
-										callback(null);
-									} else {
+									if (isE911Active) {
 										callback('OK', { });
+									} else {
+										callback(null);
 									}
 								},
 								function(callback) {
@@ -1068,25 +1082,25 @@ define(function(require) {
 								},
 								function(e911AvailableNumbers, callback) {
 									if (e911AvailableNumbers.length === 1) {
-										callback(null, _.head(e911AvailableNumbers).number);
+										callback(null, _.head(e911AvailableNumbers).number.id);
 										return;
 									}
 
 									self.strategyShowNumberChoices({
 										callerIdType: 'emergency',
-										newNumbers: e911AvailableNumbers.map('number.id'),
+										newNumbers: _.map(e911AvailableNumbers, 'number.id'),
 										save: function(number) {
 											callback(null, number);
 										}
 									});
 								},
-								function(e911NumberData, callback) {
+								function(numberId, callback) {
 									monster.pub('common.e911.renderPopup', {
-										phoneNumber: _.get(e911NumberData, 'phoneNumber', e911NumberData.id),
+										phoneNumber: numberId,
 										callbacks: {
 											success: function(data) {
 												callback(null, {
-													numberId: e911NumberData.id,
+													numberId: numberId,
 													features: data.data.features
 												});
 											},

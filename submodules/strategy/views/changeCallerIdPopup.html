@@ -1,10 +1,14 @@
 <div class="e911-change-wrapper">
 	<div class="header">
-		{{#if oldNumber}}
-			{{ tryI18n i18n.strategy.updateCallerIdDialog.headerNewNumber callerIdType }}
+		{{#compare action "===" "choose"}}
+			{{ tryI18n i18n.strategy.updateCallerIdDialog.headerChooseNumber callerIdType }}
 		{{else}}
-			{{ tryI18n i18n.strategy.updateCallerIdDialog.headerNoNumber callerIdType }}
-		{{/if}}
+			{{#compare action "===" "add"}}
+				{{ tryI18n i18n.strategy.updateCallerIdDialog.headerAddNumber callerIdType }}
+			{{else}}
+				{{ tryI18n i18n.strategy.updateCallerIdDialog.headerRemoveNumber callerIdType }}
+			{{/compare}}
+		{{/compare}}
 	</div>
 
 	<div class="list-choices">
