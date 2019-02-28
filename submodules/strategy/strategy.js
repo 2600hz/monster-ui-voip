@@ -1318,7 +1318,7 @@ define(function(require) {
 					isE911Enabled = monster.util.isNumberFeatureEnabled('e911'),
 					indexToRemove = strategyData.callflows.MainCallflow.numbers.indexOf(numberToRemove.toString());
 
-				if (e911Feature === 'active' && container.find('.number-element .remove-number[data-e911="active"]').length === 1 && isE911Enabled) {
+				if (e911Feature === 'active' && container.find('.number-element .features .feature-e911').length === 1 && isE911Enabled) {
 					monster.ui.alert('error', self.i18n.active().strategy.alertMessages.lastE911Error);
 				} else if (indexToRemove >= 0) {
 					self.strategyGetNumber(numberToRemove, function(dataNumber) {
