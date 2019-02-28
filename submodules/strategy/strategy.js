@@ -543,10 +543,9 @@ define(function(require) {
 				function(callback) {
 					var currAcc = monster.apps.auth.currentAccount,
 						currentE911CallerId = _.get(currAcc, 'caller_id.emergency.number'),
-						hasEmergencyCallerId = currentE911CallerId !== '' && _.isUndefined(currentE911CallerId),
 						hasE911Feature = _.includes(features || [], 'e911');
 
-					if (hasE911Feature && !hasEmergencyCallerId) {
+					if (hasE911Feature && _.isEmpty(currentE911CallerId)) {
 						callback('OK', number);
 					} else {
 						callback(null, currentE911CallerId, hasE911Feature);
