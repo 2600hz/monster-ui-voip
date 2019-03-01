@@ -355,13 +355,14 @@ define(function(require) {
 		},
 
 		/**
-		 * Show e911 number choices
+		 * Show phone number choices
 		 * @param  {Object}   args
-		 * @param  {('emergency'|'external')}  args.callerIdType  Caller ID type: emergency, external
-		 * @param  {String}   args.oldNumber   Old E911 number
-		 * @param  {String[]} args.newNumbers  New E911 numbers
-		 * @param  {Function} [args.save]      Save callback
-		 * @param  {Function} [args.cancel]    Cancel callback
+		 * @param  {('emergency'|'external')}   args.callerIdType       Caller ID type: emergency, external
+		 * @param  {('choose'|'add'|'remove')}  [args.action='choose']  Action being done: Choose, add or remove a number
+		 * @param  {String}   [args.oldNumber]  Old number
+		 * @param  {String[]} args.newNumbers   New numbers
+		 * @param  {Function} [args.save]       Save callback
+		 * @param  {Function} [args.cancel]     Cancel callback
 		 */
 		strategyShowNumberChoices: function(args) {
 			var self = this,
@@ -370,6 +371,7 @@ define(function(require) {
 				template = $(self.getTemplate({
 					name: 'changeCallerIdPopup',
 					data: {
+						action: _.get(args, 'action', 'choose'),
 						oldNumber: oldNumber,
 						newNumbers: args.newNumbers,
 						callerIdType: callerIdType
@@ -540,42 +542,45 @@ define(function(require) {
 			monster.waterfall([
 				function(callback) {
 					var currAcc = monster.apps.auth.currentAccount,
-						hasEmergencyCallerId = _.get(currAcc, 'caller_id.emergency.number', '') !== '',
+						currentE911CallerId = _.get(currAcc, 'caller_id.emergency.number'),
 						hasE911Feature = _.includes(features || [], 'e911');
 
-					if (hasE911Feature && !hasEmergencyCallerId) {
+					if (hasE911Feature && _.isEmpty(currentE911CallerId)) {
 						callback('OK', number);
-					} else if (!hasEmergencyCallerId) {
-						callback('OK');
 					} else {
-						callback(null, currAcc, hasE911Feature);
+						callback(null, currentE911CallerId, hasE911Feature);
 					}
 				},
-				function(currAcc, hasE911Feature, callback) {
-					var e911ChoicesArgs;
+				function(currentE911CallerId, hasE911Feature, callback) {
+					var e911ChoicesArgs,
+						e911Numbers = [];
 
 					if (hasE911Feature) {
-						if (currAcc.caller_id.emergency.number !== number) {
+						if (currentE911CallerId !== number) {
 							e911ChoicesArgs = {
-								oldNumber: currAcc.caller_id.emergency.number,
+								action: 'add',
+								oldNumber: currentE911CallerId,
 								newNumbers: [ number ]
 							};
 						}
 					} else {
-						if (currAcc.caller_id.emergency.number === number) {
-							e911ChoicesArgs = {
-								newNumbers: _.chain(templateNumbers)
-									.filter(function(number) {
-										return _.includes(number.number.features || [], 'e911');
-									}).map(function(number) {
-										return number.number.id;
-									}).value()
-							};
+						if (!number || currentE911CallerId === number) {
+							e911Numbers = _.chain(templateNumbers)
+								.filter(function(number) {
+									return _.includes(number.number.features, 'e911');
+								}).map('number.id').value();
+
+							if (e911Numbers.length > 1) {
+								e911ChoicesArgs = {
+									action: number ? 'remove' : 'choose',
+									newNumbers: e911Numbers
+								};
+							}
 						}
 					}
 
 					if (_.isUndefined(e911ChoicesArgs)) {
-						callback('OK');
+						callback('OK', _.head(e911Numbers));
 					} else {
 						callback(null, e911ChoicesArgs);
 					}
@@ -1022,7 +1027,9 @@ define(function(require) {
 						submodule: 'strategy'
 					})),
 					afterFeatureUpdate = function afterFeatureUpdate(numberId, numberFeatures, callbacks) {
-						monster.ui.paintNumberFeaturesIcon(numberFeatures, template.find('[data-phonenumber="' + numberId + '"] .features'));
+						if (numberId) {
+							monster.ui.paintNumberFeaturesIcon(numberFeatures, template.find('[data-phonenumber="' + numberId + '"] .features'));
+						}
 
 						self.strategyCheckIfUpdateEmergencyCallerID({
 							templateNumbers: templateData.numbers,
@@ -1040,43 +1047,87 @@ define(function(require) {
 							}
 
 							// Cases:
-							// - Render popup for first number in list with E911 feature enabled,
-							//   if no number has this feature set
-							// - If no number has E911 feature enabled, show a warning toast to
-							//   inform the user of that fact
+							// * If there is one or more main numbers with E911 set:
+							//   - If there is one number, set that number as the emergency
+							//     caller ID for the account.
+							//   - If there are 2 or more, display dialog to choose number,
+							//     then set it as the account emergency caller ID.
+							// * If there are one or more numbers with E911 available (but not
+							//   set), then:
+							//   - If there is one number, select that number for E911.
+							//   - If there are 2 or more, display dialog to choose number.
+							//   Then display pop-up to set and save the info, and set the
+							//   selected number as the account emergency caller ID.
+							// * If there are no numbers with E911 feature available, display
+							//   toast to notify the user about it.
+							monster.waterfall([
+								function(callback) {
+									var isE911Active = _.some(numbers, function(numberData) {
+										return _.includes(numberData.number.features, 'e911');
+									});
 
-							var isE911Active = _.some(numbers, function(numberData) {
-									return _.includes(numberData.number.features, 'e911');
-								}),
-								e911NumberData;
-
-							if (!isE911Active) {
-								e911NumberData = _.chain(numbers)
-									.find(function(numberData) {
+									if (isE911Active) {
+										callback('OK', { });
+									} else {
+										callback(null);
+									}
+								},
+								function(callback) {
+									var e911AvailableNumbers = _.filter(numbers, function(numberData) {
 										var availableFeatures = monster.util.getNumberFeatures(numberData.number);
 										return _.includes(availableFeatures, 'e911');
-									}).get('number').value();
-
-								if (_.isUndefined(e911NumberData)) {
-									monster.ui.toast({
-										type: 'warning',
-										message: self.i18n.active().strategy.toastrMessages.noE911NumberAvailable
 									});
-								} else {
+
+									if (_.isEmpty(e911AvailableNumbers)) {
+										callback('no_e911_numbers');
+									} else {
+										callback(null, e911AvailableNumbers);
+									}
+								},
+								function(e911AvailableNumbers, callback) {
+									if (e911AvailableNumbers.length === 1) {
+										callback(null, _.head(e911AvailableNumbers).number.id);
+										return;
+									}
+
+									self.strategyShowNumberChoices({
+										callerIdType: 'emergency',
+										newNumbers: _.map(e911AvailableNumbers, 'number.id'),
+										save: function(number) {
+											callback(null, number);
+										}
+									});
+								},
+								function(numberId, callback) {
 									monster.pub('common.e911.renderPopup', {
-										phoneNumber: _.get(e911NumberData, 'phoneNumber', e911NumberData.id),
+										phoneNumber: numberId,
 										callbacks: {
 											success: function(data) {
-												afterFeatureUpdate(e911NumberData.id, data.data.features, action.callbacks);
+												callback(null, {
+													numberId: numberId,
+													features: data.data.features
+												});
 											},
 											error: function() {
-												_.has(action, 'callbacks.error')
-													&& action.callbacks.error();
+												callback(true);
 											}
 										}
 									});
 								}
-							}
+							], function(err, results) {
+								if (err && err !== 'OK') {
+									if (err === 'no_e911_numbers') {
+										monster.ui.toast({
+											type: 'warning',
+											message: self.i18n.active().strategy.toastrMessages.noE911NumberAvailable
+										});
+									} else {
+										_.has(action, 'callbacks.error') && action.callbacks.error(err);
+									}
+								} else {
+									afterFeatureUpdate(results.numberId, results.features, action.callbacks);
+								}
+							});
 						}
 					};
 
@@ -1271,7 +1322,7 @@ define(function(require) {
 					isE911Enabled = monster.util.isNumberFeatureEnabled('e911'),
 					indexToRemove = strategyData.callflows.MainCallflow.numbers.indexOf(numberToRemove.toString());
 
-				if (e911Feature === 'active' && container.find('.number-element .remove-number[data-e911="active"]').length === 1 && isE911Enabled) {
+				if (e911Feature === 'active' && container.find('.number-element .features .feature-e911').length === 1 && isE911Enabled) {
 					monster.ui.alert('error', self.i18n.active().strategy.alertMessages.lastE911Error);
 				} else if (indexToRemove >= 0) {
 					self.strategyGetNumber(numberToRemove, function(dataNumber) {
