@@ -5,12 +5,12 @@
 	<div class="feature-codes-content">
 		{{#each featureCodes}}
 			<div class="feature-codes-category">
-				<div class="category-header">{{category}}</div>
+				<div class="category-header">{{label}}</div>
 				<div class="category-content">
-					{{#each codes}}
+					{{#each items}}
 					<div class="feature-code-line">
 						<div class="feature-code-label">
-							{{name}}
+							{{label}}
 						{{#if tooltip}}
 							<i class="fa fa-question-circle" data-toggle="tooltip" title="{{tooltip}}"></i>
 						{{/if}}
