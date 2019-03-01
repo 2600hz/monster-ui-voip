@@ -552,7 +552,8 @@ define(function(require) {
 					}
 				},
 				function(currentE911CallerId, hasE911Feature, callback) {
-					var e911ChoicesArgs;
+					var e911ChoicesArgs,
+						e911Numbers = [];
 
 					if (hasE911Feature) {
 						if (currentE911CallerId !== number) {
@@ -564,18 +565,22 @@ define(function(require) {
 						}
 					} else {
 						if (!number || currentE911CallerId === number) {
-							e911ChoicesArgs = {
-								action: number ? 'remove' : 'choose',
-								newNumbers: _.chain(templateNumbers)
-									.filter(function(number) {
-										return _.includes(number.number.features, 'e911');
-									}).map('number.id').value()
-							};
+							e911Numbers = _.chain(templateNumbers)
+								.filter(function(number) {
+									return _.includes(number.number.features, 'e911');
+								}).map('number.id').value();
+
+							if (e911Numbers.length > 1) {
+								e911ChoicesArgs = {
+									action: number ? 'remove' : 'choose',
+									newNumbers: e911Numbers
+								};
+							}
 						}
 					}
 
 					if (_.isUndefined(e911ChoicesArgs)) {
-						callback('OK');
+						callback('OK', _.head(e911Numbers));
 					} else {
 						callback(null, e911ChoicesArgs);
 					}
