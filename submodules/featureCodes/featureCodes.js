@@ -108,50 +108,63 @@ define(function(require) {
 
 		featureCodesFormatData: function(featureCodeData) {
 			var self = this,
-				featureCodes = {};
+				defaultCategories = _.map(self.categories, function(codecs, category) {
+					return {
+						key: category,
+						items: codecs
+					};
+				});
 
-			_.each(featureCodeData, function(callflow) {
-				// Some old callflows have been created with the feature code key, so we had the check to make sure they also have a name associated
-				if (callflow.featurecode.hasOwnProperty('name')) {
-					var category = 'misc',
-						i18nFeatureCode = self.i18n.active().featureCodes.labels[callflow.featurecode.name],
-						hasStar = (callflow.hasOwnProperty('numbers') && callflow.numbers.length && callflow.numbers[0].substr(0, 1) === '*') || (callflow.hasOwnProperty('patterns') && callflow.patterns.length && (_.startsWith(callflow.patterns[0], '^\\*') || _.startsWith(callflow.patterns[0], '\\*')));
-
-					_.find(self.categories, function(cat, key) {
-						if (cat.indexOf(callflow.featurecode.name) >= 0) {
-							category = key;
-							return true;
-						}
-						return false;
-					});
-
-					if (!featureCodes.hasOwnProperty(category)) {
-						featureCodes[category] = {
-							category: self.i18n.active().featureCodes.categories[category],
-							codes: []
-						};
-					}
-
-					featureCodes[category].codes.push({
-						key: callflow.featurecode.name,
-						name: i18nFeatureCode
-							? i18nFeatureCode.label
-							: _.capitalize(callflow.featurecode.name),
-						tooltip: i18nFeatureCode
-							? i18nFeatureCode.tooltip
-							: undefined,
-						number: callflow.featurecode.number ? callflow.featurecode.number.replace(/\\/g, '') : '',
-						hasStar: hasStar
-					});
-				}
-			});
-
-			return _.chain(featureCodes)
-				.map(function(category) {
-					category.codes = _.sortBy(category.codes, 'number');
-					return category;
+			return _
+				.chain(featureCodeData)
+				.filter(function(callflow) {
+					// Some old callflows have been created with the feature code key, so we check
+					// to make sure they also have a name associated
+					return _.has(callflow, 'featurecode.name');
 				})
-				.sortBy('category')
+				.groupBy(function(callflow) {
+					var string = callflow.featurecode.name.match(/^(\w+){1}/)[0],
+						category = _.has(self.categories, string)
+							? string
+							: 'misc',
+						defaultCategory = _.find(defaultCategories, function(category) {
+							return _.includes(category.items, string);
+						});
+
+					return _.get(defaultCategory, 'key', category);
+				})
+				.map(function(codes, category) {
+					return {
+						label: self.i18n.active().featureCodes.categories[category],
+						items: _
+							.chain(codes)
+							.map(function(code) {
+								var i18n = _.get(self.i18n.active().featureCodes.labels, code.featurecode.name);
+
+								return {
+									hasStar: (
+										!_.isEmpty(code.numbers)
+										&& _.startsWith(code.numbers[0], '*')
+									) || (
+										!_.isEmpty(code.patterns)
+										&& code.patterns[0].match(/^(\^?\\\*)/)
+									),
+									label: _.get(i18n, 'label', _.capitalize(code.featurecode.name)),
+									number: _.has(code.featurecode, 'number')
+										? _.replace(code.featurecode.number, /\\/g, '')
+										: '',
+									tooltip: _.get(i18n, 'tooltip')
+								};
+							})
+							.sortBy(function(code) {
+								var number = _.toNumber(code.number);
+
+								return _.isNaN(number) ? -1 : number;
+							})
+							.value()
+					};
+				})
+				.sortBy('label')
 				.value();
 		},
 
