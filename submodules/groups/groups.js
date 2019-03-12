@@ -672,6 +672,7 @@ define(function(require) {
 
 			self.groupsListMedias(function(medias) {
 				var templateData = {
+						showMediaUploadDisclosure: monster.config.whitelabel.showMediaUploadDisclosure,
 						group: data.group,
 						silenceMedia: silenceMediaId,
 						mediaList: medias,

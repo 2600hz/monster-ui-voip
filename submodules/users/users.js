@@ -3064,6 +3064,7 @@ define(function(require) {
 
 			self.usersListMedias(function(medias) {
 				var templateData = {
+						showMediaUploadDisclosure: monster.config.whitelabel.showMediaUploadDisclosure,
 						user: currentUser,
 						silenceMedia: silenceMediaId,
 						mediaList: medias,
