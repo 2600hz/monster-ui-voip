@@ -688,7 +688,11 @@
 			}
 		},
 		"vmbox": {
-			"deleteAfterNotify": "Nach dem Senden der Benachrichtigung Nachrichten aus Datenbank löschen."
+			"deleteAfterNotify": "Nach dem Senden der Benachrichtigung Nachrichten aus Datenbank löschen.",
+			"headline": "Anrufbeantworter für Benutzer",
+			"label": "Für diesen Benutzer steht ein Anrufbeantworter zur Verfügung.",
+			"sendVmToEmail": "Senden Sie für jede neue Sprachnachricht eine E-Mail.",
+			"title": "Anrufbeantworter"
 		},
 		"find_me_follow_me": {
 			"title": "Find Me/Follow Me",
