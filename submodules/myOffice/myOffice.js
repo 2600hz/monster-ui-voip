@@ -763,6 +763,7 @@ define(function(require) {
 
 			self.myOfficeListMedias(function(medias) {
 				var templateData = {
+						showMediaUploadDisclosure: monster.config.whitelabel.showMediaUploadDisclosure,
 						silenceMedia: silenceMediaId,
 						mediaList: medias,
 						media: 'music_on_hold' in account && 'media_id' in account.music_on_hold ? account.music_on_hold.media_id : undefined
