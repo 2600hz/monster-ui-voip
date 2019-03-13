@@ -49,6 +49,11 @@
 								{{#monsterText}}
 									{{i18n.strategy.popup.greetingsHelp}}
 								{{/monsterText}}
+							{{#if showMediaUploadDisclosure}}
+								{{#monsterText}}
+									{{i18n.mediaUploadDisclosure.text}}
+								{{/monsterText}}
+							{{/if}}
 								<input type="file" class="upload-input" accept="audio/*">
 								<div class="greeting-option-actions clearfix">
 									<button class="update-greeting pull-right monster-button-mini monster-button-primary">{{i18n.update}}</button>
