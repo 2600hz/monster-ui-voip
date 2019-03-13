@@ -2857,6 +2857,7 @@ define(function(require) {
 							template = $(self.getTemplate({
 								name: 'menuPopup',
 								data: {
+									showMediaUploadDisclosure: monster.config.whitelabel.showMediaUploadDisclosure,
 									menu: menu,
 									greeting: greeting,
 									greetingFiles: greetingFiles,
