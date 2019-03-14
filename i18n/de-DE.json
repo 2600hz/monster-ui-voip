@@ -690,9 +690,10 @@
 		"vmbox": {
 			"deleteAfterNotify": "Nach dem Senden der Benachrichtigung Nachrichten aus Datenbank löschen.",
 			"headline": "Anrufbeantworter für Benutzer",
-			"label": "Für diesen Benutzer steht ein Anrufbeantworter zur Verfügung.",
-			"sendVmToEmail": "Senden Sie für jede neue Sprachnachricht eine E-Mail.",
-			"title": "Anrufbeantworter"
+			"text": "Für diesen Benutzer steht ein Anrufbeantworter zur Verfügung.",
+			"label": "Voicemail-zu-Email",
+			"title": "Anrufbeantworter",
+			"vmToEmailHelp": "Für jede neue Sprachnachricht wird eine E-Mail an {{variable}} gesendet. Wenn Sie den Empfänger dieser E-Mail-Benachrichtigungen ändern möchten, bearbeiten Sie bitte die E-Mail-Adresse des Benutzers im Abschnitt Benutzerverwaltung."
 		},
 		"find_me_follow_me": {
 			"title": "Find Me/Follow Me",

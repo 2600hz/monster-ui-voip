@@ -19,11 +19,13 @@
 		<form id="vmbox_form">
 
 			<div class="main-line">
-				{{i18n.users.vmbox.label}}
+				{{i18n.users.vmbox.text}}
 			</div>
 
 			<div class="control-group main">
-				<label class="title">Voicemail to e-mail:</label>
+				<label class="title">
+					{{i18n.users.vmbox.label}}
+				</label>
 				{{#monsterSwitch}}
 					<input type="checkbox" name="vm_to_email_enabled" id="vm_to_email_enabled" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if vm_to_email_enabled}} checked="checked"{{/if}}></input>
 				{{/monsterSwitch}}
