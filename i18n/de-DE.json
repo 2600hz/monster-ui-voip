@@ -479,6 +479,7 @@
 		},
 		"dialogCreationUser": {
 			"createUser": "Benutzer erstellen",
+			"createUserAndAddAnother": "Benutzer erstellen und anderen hinzufügen",
 			"errorOnCreation": "Bei der Erstellung dieses Benutzers ist ein Fehler aufgetreten:",
 			"extension": "Hauptnebenstelle",
 			"extensionAlreadyExist": "Diese Nebenstelle ist bereits vergeben. Bitte wählen Sie eine andere Nebenstelle.",
@@ -486,14 +487,27 @@
 			"lastName": "Nachname",
 			"loginEmail": "Zur Anwendung verwendete E-Mail",
 			"notificationEmail": "Benachrichtigungs-E-Mail",
-			"password": "Kennwort (mind. 6 Zeichen)",
+			"password": "Kennwort",
+			"passwordPlaceholder": "Kennwort (mind. 6 Zeichen)",
 			"sendToDifferentEmail": "E-Mails an andere Adresse senden",
-			"title": "Benutzer erstellen",
+			"title": "Benutzer und Gerät hinzufügen",
 			"vmboxAlreadyExist": "VMBox-Nummer ist bereits vergeben. Bitte wählen Sie eine andere Anrufbeantworter-Nummer.",
 			"vmboxNumber": "VM-Box Nr.",
 			"__comment": "UI-814: Option zur automatischen Versendung einer E-Mail bei Benutzererstellung hinzugefügt",
 			"__version": "3.20_s3",
-			"sendWelcomeEmail": "Anmeldedaten an diesen Benutzer senden"
+			"sendWelcomeEmail": "Anmeldedaten an diesen Benutzer senden",
+			"addDevice": {
+				"deviceMake": {
+					"label": "Gerätemarke",
+					"none": "Keiner"
+				},
+				"deviceModel": {
+					"label": "Gerätemodell"
+				},
+				"macAddress": "MAC-Adresse",
+				"name": "Gerätename",
+				"title": "Gerät hinzufügen"
+			}
 		},
 		"editionForm": {
 			"changePIN": "PIN ändern",
