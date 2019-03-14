@@ -2250,6 +2250,7 @@ define(function(require) {
 
 		usersRenderVMBox: function(currentUser, vmbox) {
 			var self = this,
+				vmboxActive = currentUser.extra.mapFeatures.vmbox.active,	// TODO: Check how this value is set. It must be defined based on the presence of the vmbox in the user's main callflow.
 				featureTemplate = $(self.getTemplate({
 					name: 'feature-vmbox',
 					data: currentUser,
@@ -2286,25 +2287,33 @@ define(function(require) {
 
 				monster.waterfall([
 					function(callback) {
-						if (vmbox && !enabled) {
-							self.usersRemoveUserMainCallflowVMBox({
-								userId: userId,
-								voicemailId: vmbox.id,
-								callback: callback
-							});
+						if (vmboxActive === enabled) {
+							// VMBox has no changed its state, so there is no need to set/unset
+							// it for the user
+							callback(null);
 							return;
 						}
 
-						if (!vmbox && enabled) {
+						if (enabled) {
+							// TODO: Handle how to add existing vmbox to a main callflow user,
+							// or create a new one if there is none available
 							self.usersAddMainVMBoxToUser({
 								user: currentUser,
 								deleteAfterNotify: deleteAfterNotify,
 								callback: callback
 							});
-							return;
+						} else {
+							self.usersRemoveUserMainCallflowVMBox({
+								userId: userId,
+								voicemailId: vmbox.id,
+								callback: callback
+							});
 						}
-
-						if (!vmbox || vmbox.delete_after_notify === deleteAfterNotify) {
+					},
+					function(callback) {
+						if (!enabled || vmbox.delete_after_notify === deleteAfterNotify) {
+							// VMBox is not enabled, or delete_after_notify has not changed,
+							/// so there is nothing to do here
 							callback(null);
 							return;
 						}
