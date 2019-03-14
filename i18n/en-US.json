@@ -701,8 +701,8 @@
 		"vmbox": {
 			"deleteAfterNotify": "Delete messages from database after sending the notification.",
 			"headline": "User Voicemail Box",
-			"label": "A voicemail box will be available for this user.",
-			"sendVmToEmail": "Send an e-mail to {{variable}} for every new voicemail.",
+			"text": "A voicemail box will be available for this user.",
+			"label": "Voicemail to e-mail:",
 			"title": "Voicemail Box",
 			"vmToEmailHelp": "An e-mail will be sent to {{variable}} for every new voicemail. If you want to change where email notifications go to, please edit the user's email address in the User Administration section."
 		},
