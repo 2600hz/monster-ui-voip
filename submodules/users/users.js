@@ -1511,7 +1511,7 @@ define(function(require) {
 			});
 
 			template.on('click', '.feature[data-feature="vmbox"]', function() {
-				self.usersGetMainVMBoxSmartUser({
+				self.usersGetMainVMBoxUser({
 					user: currentUser,
 					success: function(vmbox) {
 						currentUser.extra.deleteAfterNotify = (vmbox && vmbox.delete_after_notify);
@@ -2287,7 +2287,7 @@ define(function(require) {
 				monster.waterfall([
 					function(callback) {
 						if (vmbox && !enabled) {
-							self.usersDeleteUserVMBox({
+							self.usersRemoveUserMainCallflowVMBox({
 								userId: userId,
 								voicemailId: vmbox.id,
 								callback: callback
@@ -3883,32 +3883,6 @@ define(function(require) {
 
 		/* Utils */
 
-		/**
-		 * Deletes a Voicemail Box by ID
-		 * @param  {Object}   args
-		 * @param  {String}   args.voicemailId  Voicemail Box ID
-		 * @param  {Function} args.success      Success callback
-		 * @param  {Function} args.error        Error callback
-		 */
-		usersDeleteVMBox: function(args) {
-			var self = this;
-
-			self.callApi({
-				resource: 'voicemail.delete',
-				data: {
-					voicemailId: args.voicemailId,
-					accountId: self.accountId,
-					data: {}
-				},
-				success: function(data) {
-					args.hasOwnProperty('success') && args.success(data.data);
-				},
-				error: function(parsedError) {
-					args.hasOwnProperty('error') && args.error(parsedError);
-				}
-			});
-		},
-
 		usersDeleteCallflow: function(callflowId, callback) {
 			var self = this;
 
@@ -4439,19 +4413,6 @@ define(function(require) {
 				error: function(parsedError) {
 					args.hasOwnProperty('error') && args.error(parsedError);
 				}
-			});
-		},
-
-		usersListVMBoxesUser: function(userId, callback) {
-			var self = this;
-
-			self.usersListVMBoxes({
-				data: {
-					filters: {
-						filter_owner_id: userId
-					}
-				},
-				success: callback
 			});
 		},
 
@@ -5083,38 +5044,44 @@ define(function(require) {
 				callback = args.callback,
 				oldPresenceId = args.oldPresenceId || undefined;
 
-			self.usersListVMBoxesUser(user.id, function(vmboxes) {
-				if (_.isEmpty(vmboxes)) {
-					callback && callback({});
-					return;
-				}
-				if (!needVMUpdate) {
-					callback && callback(vmboxes[0]);
-					return;
-				}
-
-				monster.waterfall([
-					function(wfCallback) {
-						self.usersGetVMBox(vmboxes[0].id, function(vmbox) {
-							wfCallback(null, vmbox);
-						});
-					},
-					function(vmbox, wfCallback) {
-						vmbox.name = self.usersGetMainVMBoxName(monster.util.getUserFullName(user));
-						// We only want to update the vmbox number if it was already synced with the presenceId (and if the presenceId was not already set)
-						// This allows us to support old clients who have mailbox number != than their extension number
-						if (oldPresenceId === vmbox.mailbox) {
-							// If it's synced, then we update the vmbox number as long as the main extension is set to something different than 'unset' in which case we don't update the vmbox number value
-							vmbox.mailbox = (user.presence_id && user.presence_id !== 'unset') ? user.presence_id + '' : vmbox.mailbox;
-						}
-
-						self.usersUpdateVMBox(vmbox, function(vmboxSaved) {
-							wfCallback(null, vmboxSaved);
-						});
+			self.usersListVMBoxesUser({
+				userId: user.id,
+				success: function(vmboxes) {
+					if (_.isEmpty(vmboxes)) {
+						callback && callback({});
+						return;
 					}
-				], function(err, vmboxSaved) {
-					callback && callback(vmboxSaved);
-				});
+
+					var userVMBox = self.usersGetUserMainVMBox(user, vmboxes);
+
+					if (!needVMUpdate) {
+						callback && callback(userVMBox);
+						return;
+					}
+
+					monster.waterfall([
+						function(wfCallback) {
+							self.usersGetVMBox(userVMBox.id, function(vmbox) {
+								wfCallback(null, vmbox);
+							});
+						},
+						function(vmbox, wfCallback) {
+							vmbox.name = self.usersGetMainVMBoxName(monster.util.getUserFullName(user));
+							// We only want to update the vmbox number if it was already synced with the presenceId (and if the presenceId was not already set)
+							// This allows us to support old clients who have mailbox number != than their extension number
+							if (oldPresenceId === vmbox.mailbox) {
+								// If it's synced, then we update the vmbox number as long as the main extension is set to something different than 'unset' in which case we don't update the vmbox number value
+								vmbox.mailbox = (user.presence_id && user.presence_id !== 'unset') ? user.presence_id + '' : vmbox.mailbox;
+							}
+
+							self.usersUpdateVMBox(vmbox, function(vmboxSaved) {
+								wfCallback(null, vmboxSaved);
+							});
+						}
+					], function(err, vmboxSaved) {
+						callback && callback(vmboxSaved);
+					});
+				}
 			});
 		},
 
@@ -5453,13 +5420,13 @@ define(function(require) {
 		},
 
 		/**
-		 * Deletes user's main Voicemail Box, and removes it from the main user callflow
+		 * Removes the voicemail box from a user's main callflow
 		 * @param  {Object}   args
 		 * @param  {String}   args.userId       User ID
 		 * @param  {String}   args.voicemailId  ID of the voicemail to delete
 		 * @param  {Function} args.callback     Callback for monster.waterfall
 		 */
-		usersDeleteUserVMBox: function(args) {
+		usersRemoveUserMainCallflowVMBox: function(args) {
 			var self = this,
 				voicemailId = args.voicemailId;
 
@@ -5477,11 +5444,9 @@ define(function(require) {
 
 					var flowChildren = mainUserCallflow.flow.children;
 
-					// Check if main user callflow has been created via the voip app, and it has
-					// the voicemail set in the default position. If it is not the case, do not
-					// modify.
-					if (mainUserCallflow.ui_metadata.origin !== 'voip'
-						|| _.isEmpty(flowChildren)
+					// Check if main user callflow has the voicemail set in the default position.
+					// If it is not the case, do not modify.
+					if (_.isEmpty(flowChildren)
 						|| flowChildren._.module !== 'voicemail'
 						|| flowChildren._.data.id !== voicemailId) {
 						waterfallCallback(null);
@@ -5494,19 +5459,8 @@ define(function(require) {
 					self.usersUpdateCallflow(mainUserCallflow, function() {
 						waterfallCallback(null);
 					});
-				},
-				function(waterfallCallback) {
-					self.usersDeleteVMBox({
-						voicemailId: args.voicemailId,
-						success: function() {
-							waterfallCallback(null);
-						},
-						error: function() {
-							waterfallCallback(true);
-						}
-					});
 				}
-			], function(err, result) {
+			], function(err) {
 				if (err) {
 					args.hasOwnProperty('callback') && args.callback(err);
 					return;
@@ -5612,13 +5566,13 @@ define(function(require) {
 		 * @param  {Function} args.success  Success callback
 		 * @param  {Function} args.error    Error callback
 		 */
-		usersGetMainVMBoxSmartUser: function(args) {
+		usersGetMainVMBoxUser: function(args) {
 			var self = this,
 				user = args.user;
 
 			monster.waterfall([
 				function(callback) {
-					self.usersListVMBoxesSmartUser({
+					self.usersListVMBoxesUser({
 						userId: user.id,
 						success: function(vmboxes) {
 							callback(null, self.usersGetUserMainVMBox(user, vmboxes));
@@ -5682,14 +5636,13 @@ define(function(require) {
 		 * @param  {Function} args.success  Success callback
 		 * @param  {Function} args.error    Error callback
 		 */
-		usersListVMBoxesSmartUser: function(args) {
+		usersListVMBoxesUser: function(args) {
 			var self = this;
 
 			self.usersListVMBoxes({
 				data: {
 					filters: {
-						filter_owner_id: args.userId,
-						'filter_ui_metadata.origin': 'voip'
+						filter_owner_id: args.userId
 					}
 				},
 				success: args.success
