@@ -21,6 +21,7 @@ define(function(require) {
 
 		appFlags: {
 			users: {
+				minNumberLength: 7,
 				smartPBXCallflowString: ' SmartPBX\'s Callflow',
 				smartPBXConferenceString: ' SmartPBX Conference',
 				smartPBXVMBoxString: '\'s VMBox'
@@ -296,8 +297,18 @@ define(function(require) {
 			}
 
 			dataUser.extra.features = _.clone(dataUser.features);
-			if (_vmbox) {
+
+			if (!_.isEmpty(_vmbox)) {
 				dataUser.extra.features.push('vmbox');
+				dataUser.extra.vmbox = _vmbox;
+
+				if (!_.isEmpty(_vmboxes)) {
+					var i = _vmboxes.indexOf(_vmbox.mailbox);
+
+					_vmboxes.splice(i, 1);
+
+					dataUser.extra.existingVmboxes = _vmboxes;
+				}
 			}
 
 			dataUser.extra.countFeatures = 0;
@@ -339,18 +350,6 @@ define(function(require) {
 					}
 					dataUser.extra.ringingTimeout = flow.data.timeout;
 				}
-			}
-
-			if (_vmbox) {
-				dataUser.extra.vmbox = _vmbox;
-			}
-
-			if (!_.isEmpty(_vmbox) && !_.isEmpty(_vmboxes)) {
-				var i = _vmboxes.indexOf(_vmbox.mailbox);
-
-				_vmboxes.splice(i, 1);
-
-				dataUser.extra.existingVmboxes = _vmboxes;
 			}
 
 			dataUser.extra.adminId = self.userId;
@@ -416,44 +415,49 @@ define(function(require) {
 			});
 
 			_.each(data.callflows, function(callflow) {
-				if (callflow.type !== 'faxing') {
-					var userId = callflow.owner_id;
+				if (callflow.type === 'faxing') {
+					return;
+				}
 
-					_.each(callflow.numbers, function(number) {
-						if (number && number.length < 7) {
-							dataTemplate.existingExtensions.push(number);
-						}
-					});
+				var userId = callflow.owner_id,
+					user;
 
-					if (userId in mapUsers) {
-						var user = mapUsers[userId];
+				_.each(callflow.numbers, function(number) {
+					if (number && number.length < self.appFlags.users.minNumberLength) {
+						dataTemplate.existingExtensions.push(number);
+					}
+				});
 
-						//User can only have one phoneNumber and one extension displayed with this code
-						_.each(callflow.numbers, function(number) {
-							if (number.length < 7) {
-								user.extra.listExtensions.push(number);
-							} else {
-								user.extra.listCallerId.push(number);
+				if (callflow.type !== 'mainUserCallflow' || !_.has(mapUsers, userId)) {
+					return;
+				}
 
-								user.extra.listNumbers.push(number);
+				user = mapUsers[userId];
 
-								if (user.extra.phoneNumber === '') {
-									user.extra.phoneNumber = number;
-								} else {
-									user.extra.additionalNumbers++;
-								}
-							}
-						});
+				//User can only have one phoneNumber and one extension displayed with this code
+				_.each(callflow.numbers, function(number) {
+					if (number.length < self.appFlags.users.minNumberLength) {
+						user.extra.listExtensions.push(number);
+					} else {
+						user.extra.listCallerId.push(number);
 
-						// The additional extensions show how many more extensions than 1 a user has.
-						// So if the user has at least 1 extension, then we count how many he has minus the one we already display, otherwise we display 0.
-						user.extra.additionalExtensions = user.extra.listExtensions.length >= 1 ? user.extra.listExtensions.length - 1 : 0;
+						user.extra.listNumbers.push(number);
 
-						// If the main extension hasn't been defined because the presence_id isn't set, just pick the first extension
-						if (user.extra.extension === '' && user.extra.listExtensions.length > 0) {
-							user.extra.extension = user.extra.listExtensions[0];
+						if (user.extra.phoneNumber === '') {
+							user.extra.phoneNumber = number;
+						} else {
+							user.extra.additionalNumbers++;
 						}
 					}
+				});
+
+				// The additional extensions show how many more extensions than 1 a user has.
+				// So if the user has at least 1 extension, then we count how many he has minus the one we already display, otherwise we display 0.
+				user.extra.additionalExtensions = user.extra.listExtensions.length >= 1 ? user.extra.listExtensions.length - 1 : 0;
+
+				// If the main extension hasn't been defined because the presence_id isn't set, just pick the first extension
+				if (user.extra.extension === '' && user.extra.listExtensions.length > 0) {
+					user.extra.extension = user.extra.listExtensions[0];
 				}
 			});
 
@@ -1986,7 +1990,7 @@ define(function(require) {
 
 			_.each(data.callflows, function(callflow) {
 				_.each(callflow.numbers, function(number) {
-					if (number.length < 7) {
+					if (number.length < self.appFlags.users.minNumberLength) {
 						formattedData.listExtensions[number] = callflow;
 						arrayExtensions.push(number);
 					}
@@ -4971,7 +4975,7 @@ define(function(require) {
 						}
 					});
 				} else {
-					if (numbers[0].length < 7) {
+					if (numbers[0].length < self.appFlags.users.minNumberLength) {
 						self.usersMigrateFromExtensions(userId, numbers, function(data) {
 							callback && callback(data);
 						});
