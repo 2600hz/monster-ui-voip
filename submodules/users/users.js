@@ -182,18 +182,19 @@ define(function(require) {
 		/**
 		 * Format user related data
 		 * @param  {Object} data
-		 * @param  {Object} data.user               User data
-		 * @param  {Object} data.userMainCallflows  User's main callflow
-		 * @param  {Object} data.userVMBox          User's main voicemail box
-		 * @param  {Object} data.existingVmboxes    Account's existing voicemail boxes
-		 * @param  {Object} data.mainDirectory      Account's main directory
+		 * @param  {Object} data.user                User data
+		 * @param  {Object} [data.userCallflows]     User callflows
+		 * @param  {Object} [data.userMainCallflow]  User's main callflow
+		 * @param  {Object} data.userVMBox           User's main voicemail box
+		 * @param  {Object} data.existingVmboxes     Account's existing voicemail boxes
+		 * @param  {Object} data.mainDirectory       Account's main directory
 		 */
 		usersFormatUserData: function(data) {
 			var self = this,
 				dataUser = data.user,
-				mainCallflows = _.get(data, 'userMainCallflows', []),
+				mainCallflows = data.userCallflows,
 				_mainDirectory = data.mainDirectory,
-				_mainCallflow = _.head(mainCallflows),
+				_mainCallflow = data.userMainCallflow,
 				_vmbox = data.userVMBox,
 				_vmboxes = data.existingVmboxes,
 				formattedUser = {
@@ -441,10 +442,16 @@ define(function(require) {
 			}
 
 			_.each(data.users, function(user) {
+				var userCallflows = _.get(mapCallflows, user.id),
+					userMainCallflow = _.head(userCallflows);
+
+				// TODO: Get vmbox based on callflow. If not found, get by owner_id.
+
 				mapUsers[user.id] = self.usersFormatUserData({
 					user: user,
 					userVMBox: self.usersGetUserMainVMBox(user, mapVMBoxes[user.id]),
-					userMainCallflows: _.get(mapCallflows, user.id)
+					userCallflows: userCallflows,
+					userMainCallflow: userMainCallflow
 				});
 			});
 
@@ -3428,7 +3435,7 @@ define(function(require) {
 
 				var dataTemplate = self.usersFormatUserData({
 						user: userData,
-						userMainCallflows: [ results.mainCallflow ],
+						userMainCallflow: results.mainCallflow,
 						userVMBox: results.vmboxes.userVM,
 						mainDirectory: results.mainDirectory,
 						existingVmboxes: results.vmboxes.listExisting
@@ -5604,6 +5611,7 @@ define(function(require) {
 
 		/**
 		 * Gets the main voicemail box for a user, which has been created through Smart PBX app
+		 * TODO: This won't be needed, use the vmbox reference that will already be set in user.extra.vmbox
 		 * @param  {Object}   args
 		 * @param  {Object}   args.user     User data
 		 * @param  {Function} args.success  Success callback
