@@ -324,18 +324,18 @@ define(function(require) {
 				dataUser.extra.mainCallflowId = _mainCallflow.id;
 
 				if ('flow' in _mainCallflow) {
-					var flow = _mainCallflow.flow,
-						module = 'user';
+					var cfModule = 'user';
 
 					if (dataUser.extra.features.indexOf('find_me_follow_me') >= 0) {
-						module = 'ring_group';
+						cfModule = 'ring_group';
 						dataUser.extra.groupTimeout = true;
 					}
 
-					while (flow.module !== module && '_' in flow.children) {
-						flow = flow.children._;
-					}
-					dataUser.extra.ringingTimeout = flow.data.timeout;
+					dataUser.extra.ringingTimeout = self.usersExtractDataFromCallflow({
+						callflow: _mainCallflow,
+						module: cfModule,
+						dataKey: 'data.timeout'
+					});
 				}
 
 				// Check if user has vmbox enabled
@@ -936,11 +936,12 @@ define(function(require) {
 										}
 
 										if (shouldUpdateTimeout && 'flow' in mainCallflow) {
-											var flow = mainCallflow.flow;
-											while (flow.module !== 'user' && '_' in flow.children) {
-												flow = flow.children._;
-											}
-											flow.data.timeout = parseInt(userToSave.extra.ringingTimeout);
+											var flowData = self.usersExtractDataFromCallflow({
+												callflow: mainCallflow,
+												module: 'user',
+												dataKey: 'data'
+											});
+											flowData.timeout = parseInt(userToSave.extra.ringingTimeout);
 										}
 
 										self.usersUpdateCallflow(mainCallflow, function(updatedCallflow) {
@@ -5794,6 +5795,28 @@ define(function(require) {
 			var self = this;
 
 			return userName + self.appFlags.users.smartPBXVMBoxString;
+		},
+
+		/**
+		 * Gets the user vmbox from its main user callflow
+		 * @param  {Object} args
+		 * @param  {Object} args.callflow  Main user callflow
+		 * @param  {Object} args.module    Callflow module
+		 * @param  {Object} args.dataKey   Data key
+		 */
+		usersExtractDataFromCallflow: function(args) {
+			var flow = _.get(args, 'callflow.flow'),
+				cfModule = args.module,
+				dataKey = args.dataKey;
+			if (_.isNil(flow)) {
+				return null;
+			}
+
+			while (flow.module !== cfModule && _.has(flow.children, '_')) {
+				flow = flow.children._;
+			}
+
+			return _.get(flow, dataKey);
 		}
 	};
 
