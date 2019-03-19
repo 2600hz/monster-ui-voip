@@ -43,7 +43,7 @@
 			{{/if}}
 		</div>
 		<div class="features grid-cell right-aligned{{#compare extra.countFeatures ">" 5}} smaller{{/compare}}" data-type="features">
-			{{#if extra.hasFeatures}}
+			{{#compare extra.countFeatures ">" 0}}
 				{{#each extra.mapFeatures}}
 					{{#if this.active}}
 						<i class="{{this.icon}} {{this.iconColor}}" data-toggle="tooltip" data-placement="top" data-original-title="{{ this.title }}"></i>
@@ -51,7 +51,7 @@
 				{{/each}}
 			{{else}}
 				{{ i18n.users.noUserFeatures }}
-			{{/if}}
+			{{/compare}}
 		</div>
 	</div>
 

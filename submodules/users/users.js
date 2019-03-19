@@ -182,17 +182,18 @@ define(function(require) {
 		/**
 		 * Format user related data
 		 * @param  {Object} data
-		 * @param  {Object} data.user              User data
-		 * @param  {Object} data.userMainCallflow  User's main callflow
-		 * @param  {Object} data.userVMBox         User's main voicemail box
-		 * @param  {Object} data.existingVmboxes   Account's existing voicemail boxes
-		 * @param  {Object} data.mainDirectory     Account's main directory
+		 * @param  {Object} data.user               User data
+		 * @param  {Object} data.userMainCallflows  User's main callflow
+		 * @param  {Object} data.userVMBox          User's main voicemail box
+		 * @param  {Object} data.existingVmboxes    Account's existing voicemail boxes
+		 * @param  {Object} data.mainDirectory      Account's main directory
 		 */
 		usersFormatUserData: function(data) {
 			var self = this,
 				dataUser = data.user,
+				mainCallflows = _.get(data, 'userMainCallflows', []),
 				_mainDirectory = data.mainDirectory,
-				_mainCallflow = data.userMainCallflow,
+				_mainCallflow = _.head(mainCallflows),
 				_vmbox = data.userVMBox,
 				_vmboxes = data.existingVmboxes,
 				formattedUser = {
@@ -202,7 +203,6 @@ define(function(require) {
 					devices: [],
 					extension: dataUser.hasOwnProperty('presence_id') ? dataUser.presence_id : '',
 					fullName: monster.util.getUserFullName(dataUser),
-					hasFeatures: false,
 					isAdmin: dataUser.priv_level === 'admin',
 					showLicensedUserRoles: _.size(self.appFlags.global.servicePlansRole) > 0,
 					licensedUserRole: self.i18n.active().users.licensedUserRoles.none,
@@ -299,7 +299,6 @@ define(function(require) {
 			dataUser.extra.features = _.clone(dataUser.features);
 
 			if (!_.isEmpty(_vmbox)) {
-				dataUser.extra.features.push('vmbox');
 				dataUser.extra.vmbox = _vmbox;
 
 				if (!_.isEmpty(_vmboxes)) {
@@ -309,18 +308,6 @@ define(function(require) {
 
 					dataUser.extra.existingVmboxes = _vmboxes;
 				}
-			}
-
-			dataUser.extra.countFeatures = 0;
-			_.each(dataUser.extra.features, function(v) {
-				if (v in dataUser.extra.mapFeatures) {
-					dataUser.extra.countFeatures++;
-					dataUser.extra.mapFeatures[v].active = true;
-				}
-			});
-
-			if (dataUser.extra.countFeatures > 0) {
-				dataUser.extra.hasFeatures = true;
 			}
 
 			if (_mainDirectory) {
@@ -350,7 +337,20 @@ define(function(require) {
 					}
 					dataUser.extra.ringingTimeout = flow.data.timeout;
 				}
+
+				// Check if user has vmbox enabled
+				if (_.includes(_mainCallflow.modules, 'vmbox')) {
+					dataUser.extra.features.push('vmbox');
+				}
 			}
+
+			dataUser.extra.countFeatures = 0;
+			_.each(dataUser.extra.features, function(v) {
+				if (v in dataUser.extra.mapFeatures) {
+					dataUser.extra.countFeatures++;
+					dataUser.extra.mapFeatures[v].active = true;
+				}
+			});
 
 			dataUser.extra.adminId = self.userId;
 
@@ -387,6 +387,35 @@ define(function(require) {
 				dataUser.extra.presenceIdOptions.unshift({ key: 'unset', value: self.i18n.active().users.editionForm.noPresenceID });
 			}
 
+			// if main callflows were provided, extract number data from them
+			_.each(mainCallflows, function(callflow) {
+				//User can only have one phoneNumber and one extension displayed with this code
+				_.each(callflow.numbers, function(number) {
+					if (number.length < self.appFlags.users.minNumberLength) {
+						dataUser.extra.listExtensions.push(number);
+					} else {
+						dataUser.extra.listCallerId.push(number);
+
+						dataUser.extra.listNumbers.push(number);
+
+						if (dataUser.extra.phoneNumber === '') {
+							dataUser.extra.phoneNumber = number;
+						} else {
+							dataUser.extra.additionalNumbers++;
+						}
+					}
+				});
+
+				// The additional extensions show how many more extensions than 1 a user has.
+				// So if the user has at least 1 extension, then we count how many he has minus the one we already display, otherwise we display 0.
+				dataUser.extra.additionalExtensions = dataUser.extra.listExtensions.length >= 1 ? user.extra.listExtensions.length - 1 : 0;
+
+				// If the main extension hasn't been defined because the presence_id isn't set, just pick the first extension
+				if (dataUser.extra.extension === '' && dataUser.extra.listExtensions.length > 0) {
+					dataUser.extra.extension = dataUser.extra.listExtensions[0];
+				}
+			});
+
 			return dataUser;
 		},
 
@@ -398,19 +427,24 @@ define(function(require) {
 					countUsers: data.users.length
 				},
 				mapUsers = {},
-				mapVMBoxes,
+				mapVMBoxes = _.groupBy(data.vmboxes, 'owner_id'),
+				mapCallflows = _.chain(data.callflows)
+					.filter(function(callflow) {
+						return callflow.type === 'mainUserCallflow';
+					})
+					.groupBy('owner_id')
+					.value(),
 				registeredDevices = _.map(data.deviceStatus, function(device) { return device.device_id; });
 
 			if (_.size(self.appFlags.global.servicePlansRole) > 0) {
 				dataTemplate.showLicensedUserRoles = true;
 			}
 
-			mapVMBoxes = _.groupBy(data.vmboxes, 'owner_id');
-
 			_.each(data.users, function(user) {
 				mapUsers[user.id] = self.usersFormatUserData({
 					user: user,
-					userVMBox: self.usersGetUserMainVMBox(user, mapVMBoxes[user.id])
+					userVMBox: self.usersGetUserMainVMBox(user, mapVMBoxes[user.id]),
+					userMainCallflows: _.get(mapCallflows, user.id)
 				});
 			});
 
@@ -419,46 +453,11 @@ define(function(require) {
 					return;
 				}
 
-				var userId = callflow.owner_id,
-					user;
-
 				_.each(callflow.numbers, function(number) {
 					if (number && number.length < self.appFlags.users.minNumberLength) {
 						dataTemplate.existingExtensions.push(number);
 					}
 				});
-
-				if (callflow.type !== 'mainUserCallflow' || !_.has(mapUsers, userId)) {
-					return;
-				}
-
-				user = mapUsers[userId];
-
-				//User can only have one phoneNumber and one extension displayed with this code
-				_.each(callflow.numbers, function(number) {
-					if (number.length < self.appFlags.users.minNumberLength) {
-						user.extra.listExtensions.push(number);
-					} else {
-						user.extra.listCallerId.push(number);
-
-						user.extra.listNumbers.push(number);
-
-						if (user.extra.phoneNumber === '') {
-							user.extra.phoneNumber = number;
-						} else {
-							user.extra.additionalNumbers++;
-						}
-					}
-				});
-
-				// The additional extensions show how many more extensions than 1 a user has.
-				// So if the user has at least 1 extension, then we count how many he has minus the one we already display, otherwise we display 0.
-				user.extra.additionalExtensions = user.extra.listExtensions.length >= 1 ? user.extra.listExtensions.length - 1 : 0;
-
-				// If the main extension hasn't been defined because the presence_id isn't set, just pick the first extension
-				if (user.extra.extension === '' && user.extra.listExtensions.length > 0) {
-					user.extra.extension = user.extra.listExtensions[0];
-				}
 			});
 
 			dataTemplate.existingExtensions.sort(self.usersSortExtensions);
@@ -3428,7 +3427,7 @@ define(function(require) {
 
 				var dataTemplate = self.usersFormatUserData({
 						user: userData,
-						userMainCallflow: results.mainCallflow,
+						userMainCallflows: [ results.mainCallflow ],
 						userVMBox: results.vmboxes.userVM,
 						mainDirectory: results.mainDirectory,
 						existingVmboxes: results.vmboxes.listExisting
