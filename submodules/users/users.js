@@ -408,7 +408,7 @@ define(function(require) {
 
 				// The additional extensions show how many more extensions than 1 a user has.
 				// So if the user has at least 1 extension, then we count how many he has minus the one we already display, otherwise we display 0.
-				dataUser.extra.additionalExtensions = dataUser.extra.listExtensions.length >= 1 ? user.extra.listExtensions.length - 1 : 0;
+				dataUser.extra.additionalExtensions = dataUser.extra.listExtensions.length >= 1 ? dataUser.extra.listExtensions.length - 1 : 0;
 
 				// If the main extension hasn't been defined because the presence_id isn't set, just pick the first extension
 				if (dataUser.extra.extension === '' && dataUser.extra.listExtensions.length > 0) {
