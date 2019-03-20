@@ -21,7 +21,7 @@ define(function(require) {
 
 		appFlags: {
 			users: {
-				minNumberLength: 7,
+				minNumberLength: 7,	// TODO: It is probably better to remove any change not related to the bug
 				smartPBXCallflowString: ' SmartPBX\'s Callflow',
 				smartPBXConferenceString: ' SmartPBX Conference',
 				smartPBXVMBoxString: '\'s VMBox'
@@ -184,9 +184,8 @@ define(function(require) {
 		 * @param  {Object} data
 		 * @param  {Object} data.user                User data
 		 * @param  {Object} [data.userMainCallflow]  User's main callflow
-		 * @param  {Object} data.userVMBox           User's main voicemail box
-		 * @param  {Object} data.existingVmboxes     Account's existing voicemail boxes
-		 * @param  {Object} data.mainDirectory       Account's main directory
+		 * @param  {Object} [data.userVMBox]         User's main voicemail box
+		 * @param  {Object} [data.mainDirectory]     Account's main directory
 		 */
 		usersFormatUserData: function(data) {
 			var self = this,
@@ -194,7 +193,6 @@ define(function(require) {
 				_mainDirectory = data.mainDirectory,
 				_mainCallflow = data.userMainCallflow,
 				_vmbox = data.userVMBox,
-				_vmboxes = data.existingVmboxes,
 				formattedUser = {
 					additionalDevices: 0,
 					additionalExtensions: 0,
@@ -297,18 +295,6 @@ define(function(require) {
 
 			dataUser.extra.features = _.clone(dataUser.features);
 
-			if (!_.isEmpty(_vmbox)) {
-				dataUser.extra.vmbox = _vmbox;
-
-				if (!_.isEmpty(_vmboxes)) {
-					var i = _vmboxes.indexOf(_vmbox.mailbox);
-
-					_vmboxes.splice(i, 1);
-
-					dataUser.extra.existingVmboxes = _vmboxes;
-				}
-			}
-
 			if (_mainDirectory) {
 				dataUser.extra.mainDirectoryId = _mainDirectory.id;
 
@@ -341,6 +327,10 @@ define(function(require) {
 				if (_.includes(_mainCallflow.modules, 'vmbox')) {
 					dataUser.extra.features.push('vmbox');
 				}
+			}
+
+			if (_vmbox) {
+				dataUser.extra.vmbox = _vmbox;
 			}
 
 			dataUser.extra.countFeatures = 0;
@@ -411,15 +401,10 @@ define(function(require) {
 
 			_.each(data.users, function(user) {
 				var userCallflows = _.get(mapCallflows, user.id),
-					userMainCallflow = _.head(userCallflows),
-					userVM = self.usersGetUserMainVMBox({
-						vmboxes: data.vmboxes,
-						userMainCallflow: userMainCallflow
-					});
+					userMainCallflow = _.head(userCallflows);
 
 				mapUsers[user.id] = self.usersFormatUserData({
 					user: user,
-					userVMBox: userVM,
 					userMainCallflow: userMainCallflow
 				});
 			});
@@ -865,8 +850,6 @@ define(function(require) {
 
 				monster.util.checkVersion(currentUser, function() {
 					if (monster.ui.valid(form)) {
-						currentUser.extra.vmbox.timezone = formData.timezone;
-
 						var oldPresenceId = currentUser.presence_id,
 							userToSave = $.extend(true, {}, currentUser, formData),
 							newName = monster.util.getUserFullName(userToSave),
@@ -995,22 +978,32 @@ define(function(require) {
 				});
 
 				pinTemplate.find('.save-new-pin').on('click', function() {
-					var formData = monster.ui.getFormData('form_new_pin'),
-						vmboxData = $.extend(true, currentUser.extra.vmbox, formData);
+					var formData = monster.ui.getFormData('form_new_pin');
 
-					if (monster.ui.valid(form)) {
-						self.usersUpdateVMBox(vmboxData, function(data) {
-							popup.dialog('close').remove();
+					// FIXME: Remove after tests
+					if (_.isEmpty(currentUser.extra.vmbox)) {
+						throw Error('You should not be here!!!');
+					}
 
-							monster.ui.toast({
-								type: 'success',
-								message: self.getTemplate({
-									name: '!' + toastrMessages.pinUpdated,
-									data: {
-										name: monster.util.getUserFullName(currentUser)
-									}
-								})
-							});
+					if (!monster.ui.valid(form)) {
+						self.usersPatchVMBox({
+							data: {
+								voicemailId: currentUser.extra.vmbox.id,
+								data: formData
+							},
+							success: function(data) {
+								popup.dialog('close').remove();
+
+								monster.ui.toast({
+									type: 'success',
+									message: self.getTemplate({
+										name: '!' + toastrMessages.pinUpdated,
+										data: {
+											name: monster.util.getUserFullName(currentUser)
+										}
+									})
+								});
+							}
 						});
 					}
 				});
@@ -1525,18 +1518,7 @@ define(function(require) {
 			template.on('click', '.feature[data-feature="vmbox"]', function() {
 				monster.waterfall([
 					function(waterfallCallback) {
-						if (currentUser.extra.vmbox) {
-							self.usersGetVMBox(currentUser.extra.vmbox.id, function(vmbox) {
-								if (vmbox) {
-									waterfallCallback(null, vmbox);
-								} else {
-									// User vmbox no longer exists
-									waterfallCallback(true);
-								}
-							});
-						} else {
-							waterfallCallback(null, null);
-						}
+						// TODO: Get user vmbox
 					}
 				], function(err, vmbox) {
 					if (err) {
@@ -2322,6 +2304,7 @@ define(function(require) {
 							return;
 						}
 
+						// TODO: Modify to a single function to create+enable/enable/disable vmbox
 						if (enabled) {
 							self.usersSetMainCallflowVMBox({
 								user: currentUser,
@@ -2340,7 +2323,7 @@ define(function(require) {
 					function(callback) {
 						if (!enabled || vmbox.delete_after_notify === deleteAfterNotify) {
 							// VMBox is not enabled, or delete_after_notify has not changed,
-							/// so there is nothing to do here
+							// so there is nothing to do here
 							callback(null);
 							return;
 						}
@@ -3395,10 +3378,32 @@ define(function(require) {
 			var self = this;
 
 			monster.parallel({
-				mainCallflow: function(callback) {
-					self.usersGetMainCallflow(userId, function(mainCallflow) {
-						callback(null, mainCallflow);
-					});
+				mainCallflowVMBox: function(callback) {
+					monster.waterfall([
+						function(waterfallCallback) {
+							self.usersGetMainCallflow(userId, function(mainCallflow) {
+								callback(null, mainCallflow);
+							});
+						},
+						function(mainCallflow, waterfallCallback) {
+							var vmboxId = self.usersExtractVMBoxIdFromCallflow({
+								userMainCallflow: mainCallflow
+							});
+
+							if (vmboxId) {
+								self.usersGetVMBox(vmboxId, function(vmbox) {
+									waterfallCallback(null, {
+										callflow: mainCallflow,
+										vmbox: vmbox
+									});
+								});
+							} else {
+								waterfallCallback(null, {
+									callflow: mainCallflow
+								});
+							}
+						}
+					], callback);
 				},
 				mainDirectory: function(callback) {
 					self.usersGetMainDirectory(function(mainDirectory) {
@@ -3409,21 +3414,9 @@ define(function(require) {
 					self.usersGetUser(userId, function(userData) {
 						callback(null, userData);
 					});
-				},
-				vmboxes: function(callback) {
-					self.usersListVMBoxes({
-						success: function(vmboxes) {
-							callback(null, vmboxes);
-						}
-					});
 				}
 			}, function(error, results) {
 				var userData = results.user;
-
-				var userVM = self.usersGetUserMainVMBox({
-					userMainCallflow: results.mainCallflow,
-					vmboxes: results.vmboxes
-				});
 
 				_.each(listUsers.users, function(user) {
 					if (user.id === results.user.id) {
@@ -3435,10 +3428,9 @@ define(function(require) {
 
 				var dataTemplate = self.usersFormatUserData({
 						user: userData,
-						userMainCallflow: results.mainCallflow,
-						userVMBox: userVM,
-						mainDirectory: results.mainDirectory,
-						existingVmboxes: results.vmboxes
+						userMainCallflow: results.mainCallflowVMBox.callflow,
+						userVMBox: results.mainCallflowVMBox.vmbox,
+						mainDirectory: results.mainDirectory
 					}),
 					template = $(self.getTemplate({
 						name: 'name',
@@ -5685,36 +5677,6 @@ define(function(require) {
 					args.hasOwnProperty('error') && args.error(parsedError);
 				}
 			});
-		},
-
-		/**
-		 * Get the main VMBox for a user, from a list of voicemail boxes, which are assumed to
-		 * belong to it already
-		 * @param  {Object}   args
-		 * @param  {Object[]} args.vmboxes           List of voicemail boxes to search
-		 * @param  {String}   args.userMainCallflow  User main callflow
-		 * @returns  {Object}                        User main vmbox, or undefined if not found
-		 */
-		usersGetUserMainVMBox: function(args) {
-			var self = this,
-				vmboxes = args.vmboxes,
-				userMainCallflow = args.userMainCallflow,
-				mainUserVMBox = null,
-				vmboxId;
-
-			if (!_.isEmpty(vmboxes)) {
-				vmboxId = self.usersExtractVMBoxIdFromCallflow({
-					userMainCallflow: userMainCallflow
-				});
-
-				if (vmboxId) {
-					mainUserVMBox = _.find(vmboxes, function(vmbox) {
-						return vmbox.id === vmboxId;
-					});
-				}
-			}
-
-			return mainUserVMBox;
 		},
 
 		/**
