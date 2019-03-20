@@ -183,7 +183,6 @@ define(function(require) {
 		 * Format user related data
 		 * @param  {Object} data
 		 * @param  {Object} data.user                User data
-		 * @param  {Object} [data.userCallflows]     User callflows
 		 * @param  {Object} [data.userMainCallflow]  User's main callflow
 		 * @param  {Object} data.userVMBox           User's main voicemail box
 		 * @param  {Object} data.existingVmboxes     Account's existing voicemail boxes
@@ -192,7 +191,6 @@ define(function(require) {
 		usersFormatUserData: function(data) {
 			var self = this,
 				dataUser = data.user,
-				mainCallflows = data.userCallflows,
 				_mainDirectory = data.mainDirectory,
 				_mainCallflow = data.userMainCallflow,
 				_vmbox = data.userVMBox,
@@ -388,35 +386,6 @@ define(function(require) {
 				dataUser.extra.presenceIdOptions.unshift({ key: 'unset', value: self.i18n.active().users.editionForm.noPresenceID });
 			}
 
-			// if main callflows were provided, extract number data from them
-			_.each(mainCallflows, function(callflow) {
-				//User can only have one phoneNumber and one extension displayed with this code
-				_.each(callflow.numbers, function(number) {
-					if (number.length < self.appFlags.users.minNumberLength) {
-						dataUser.extra.listExtensions.push(number);
-					} else {
-						dataUser.extra.listCallerId.push(number);
-
-						dataUser.extra.listNumbers.push(number);
-
-						if (dataUser.extra.phoneNumber === '') {
-							dataUser.extra.phoneNumber = number;
-						} else {
-							dataUser.extra.additionalNumbers++;
-						}
-					}
-				});
-
-				// The additional extensions show how many more extensions than 1 a user has.
-				// So if the user has at least 1 extension, then we count how many he has minus the one we already display, otherwise we display 0.
-				dataUser.extra.additionalExtensions = dataUser.extra.listExtensions.length >= 1 ? dataUser.extra.listExtensions.length - 1 : 0;
-
-				// If the main extension hasn't been defined because the presence_id isn't set, just pick the first extension
-				if (dataUser.extra.extension === '' && dataUser.extra.listExtensions.length > 0) {
-					dataUser.extra.extension = dataUser.extra.listExtensions[0];
-				}
-			});
-
 			return dataUser;
 		},
 
@@ -464,11 +433,43 @@ define(function(require) {
 					return;
 				}
 
+				var userId = callflow.owner_id;
+
 				_.each(callflow.numbers, function(number) {
 					if (number && number.length < self.appFlags.users.minNumberLength) {
 						dataTemplate.existingExtensions.push(number);
 					}
 				});
+
+				if (userId in mapUsers) {
+					var user = mapUsers[userId];
+
+					//User can only have one phoneNumber and one extension displayed with this code
+					_.each(callflow.numbers, function(number) {
+						if (number.length < self.appFlags.users.minNumberLength) {
+							user.extra.listExtensions.push(number);
+						} else {
+							user.extra.listCallerId.push(number);
+
+							user.extra.listNumbers.push(number);
+
+							if (user.extra.phoneNumber === '') {
+								user.extra.phoneNumber = number;
+							} else {
+								user.extra.additionalNumbers++;
+							}
+						}
+					});
+
+					// The additional extensions show how many more extensions than 1 a user has.
+					// So if the user has at least 1 extension, then we count how many he has minus the one we already display, otherwise we display 0.
+					user.extra.additionalExtensions = user.extra.listExtensions.length >= 1 ? user.extra.listExtensions.length - 1 : 0;
+
+					// If the main extension hasn't been defined because the presence_id isn't set, just pick the first extension
+					if (user.extra.extension === '' && user.extra.listExtensions.length > 0) {
+						user.extra.extension = user.extra.listExtensions[0];
+					}
+				}
 			});
 
 			dataTemplate.existingExtensions.sort(self.usersSortExtensions);
@@ -5652,26 +5653,6 @@ define(function(require) {
 						callback: callback
 					});
 				}
-			});
-		},
-
-		/**
-		 * Gets the list of vmboxes for a user, that has been created through Smart PBX app
-		 * @param  {Object}   args
-		 * @param  {String}   args.userId   User ID
-		 * @param  {Function} args.success  Success callback
-		 * @param  {Function} args.error    Error callback
-		 */
-		usersListVMBoxesUser: function(args) {
-			var self = this;
-
-			self.usersListVMBoxes({
-				data: {
-					filters: {
-						filter_owner_id: args.userId
-					}
-				},
-				success: args.success
 			});
 		},
 
