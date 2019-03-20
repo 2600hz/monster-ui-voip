@@ -397,7 +397,6 @@ define(function(require) {
 					countUsers: data.users.length
 				},
 				mapUsers = {},
-				mapVMBoxes = _.groupBy(data.vmboxes, 'owner_id'),
 				mapCallflows = _.chain(data.callflows)
 					.filter(function(callflow) {
 						return callflow.type === 'mainUserCallflow';
@@ -412,18 +411,15 @@ define(function(require) {
 
 			_.each(data.users, function(user) {
 				var userCallflows = _.get(mapCallflows, user.id),
-					userMainCallflow = _.head(userCallflows);
-
-				// TODO: Get vmbox based on callflow. If not found, get by owner_id.
+					userMainCallflow = _.head(userCallflows),
+					userVM = self.usersGetUserMainVMBox({
+						vmboxes: data.vmboxes,
+						userMainCallflow: userMainCallflow
+					});
 
 				mapUsers[user.id] = self.usersFormatUserData({
 					user: user,
-					userVMBox: self.usersGetUserMainVMBox({
-						user: user,
-						vmboxes: mapVMBoxes[user.id],
-						userMainCallflow: userMainCallflow
-					}),
-					userCallflows: userCallflows,
+					userVMBox: userVM,
 					userMainCallflow: userMainCallflow
 				});
 			});
@@ -3417,34 +3413,17 @@ define(function(require) {
 				vmboxes: function(callback) {
 					self.usersListVMBoxes({
 						success: function(vmboxes) {
-							var firstVmboxId,
-								results = {
-									listExisting: [],
-									userVM: {}
-								};
-
-							_.each(vmboxes, function(vmbox) {
-								results.listExisting.push(vmbox.mailbox);
-
-								if (vmbox.owner_id === userId && !firstVmboxId) {
-									firstVmboxId = vmbox.id;
-								}
-							});
-
-							if (firstVmboxId) {
-								self.usersGetVMBox(firstVmboxId, function(vmbox) {
-									results.userVM = vmbox;
-
-									callback(null, results);
-								});
-							} else {
-								callback(null, results);
-							}
+							callback(null, vmboxes);
 						}
 					});
 				}
 			}, function(error, results) {
 				var userData = results.user;
+
+				var userVM = self.usersGetUserMainVMBox({
+					userMainCallflow: results.mainCallflow,
+					vmboxes: results.vmboxes
+				});
 
 				_.each(listUsers.users, function(user) {
 					if (user.id === results.user.id) {
@@ -3457,9 +3436,9 @@ define(function(require) {
 				var dataTemplate = self.usersFormatUserData({
 						user: userData,
 						userMainCallflow: results.mainCallflow,
-						userVMBox: results.vmboxes.userVM,
+						userVMBox: userVM,
 						mainDirectory: results.mainDirectory,
-						existingVmboxes: results.vmboxes.listExisting
+						existingVmboxes: results.vmboxes
 					}),
 					template = $(self.getTemplate({
 						name: 'name',
@@ -5712,25 +5691,18 @@ define(function(require) {
 		 * Get the main VMBox for a user, from a list of voicemail boxes, which are assumed to
 		 * belong to it already
 		 * @param  {Object}   args
-		 * @param  {Object}   args.user                User data
-		 * @param  {Object[]} args.vmboxes             List of voicemail boxes that belong to the user
-		 * @param  {String}   [args.userMainCallflow]  ID of the vmbox, if available
-		 * @returns  {Object}                          User main vmbox, or undefined if not found
+		 * @param  {Object[]} args.vmboxes           List of voicemail boxes to search
+		 * @param  {String}   args.userMainCallflow  User main callflow
+		 * @returns  {Object}                        User main vmbox, or undefined if not found
 		 */
 		usersGetUserMainVMBox: function(args) {
 			var self = this,
-				user = args.user,
 				vmboxes = args.vmboxes,
 				userMainCallflow = args.userMainCallflow,
-				vmboxId,
-				mainUserVMBox,
-				presenceId;
+				mainUserVMBox = null,
+				vmboxId;
 
-			if (_.isEmpty(vmboxes)) {
-				return mainUserVMBox;
-			}
-
-			if (userMainCallflow) {
+			if (!_.isEmpty(vmboxes)) {
 				vmboxId = self.usersExtractVMBoxIdFromCallflow({
 					userMainCallflow: userMainCallflow
 				});
@@ -5740,17 +5712,6 @@ define(function(require) {
 						return vmbox.id === vmboxId;
 					});
 				}
-			}
-
-			if (!mainUserVMBox) {
-				presenceId = user.presence_id ? user.presence_id.toString() : null;
-				mainUserVMBox = _.find(vmboxes, function(vmbox) {
-					return vmbox.mailbox === presenceId;
-				});
-			}
-
-			if (!mainUserVMBox) {
-				mainUserVMBox = _.head(vmboxes);
 			}
 
 			return mainUserVMBox;
