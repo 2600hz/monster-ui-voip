@@ -2331,7 +2331,11 @@ define(function(require) {
 							return;
 						}
 
-						// TODO: Enable or disable vmbox in main callflow
+						self.usersUpdateVMBoxStatusInCallflow({
+							userId: userId,
+							enabled: enabled,
+							callback: callback
+						});
 					},
 					function(callback) {
 						if (currentUser.vm_to_email_enabled === vmToEmailEnabled) {
@@ -5772,6 +5776,46 @@ define(function(require) {
 					_.has(args, 'success') && args.success(vmbox);
 				}
 			});
+		},
+
+		/**
+		 * Update VMBox module status in callflow
+		 * @param  {Object}   args
+		 * @param  {String}   args.userId    User ID
+		 * @param  {Boolean}  args.enabled   Enabled status to set
+		 * @param  {Function} args.callback  Asynchronous callback
+		 */
+		usersUpdateVMBoxStatusInCallflow: function(args) {
+			var self = this,
+				userId = args.userId,
+				enabled = args.enabled,
+				callback = args.callback;
+
+			monster.waterfall([
+				function(waterfallCallback) {
+					self.usersGetMainCallflow(userId, function(callflow) {
+						waterfallCallback(null, callflow);
+					});
+				},
+				function(callflow, waterfallCallback) {
+					var flow = self.usersExtractDataFromCallflow({
+						callflow: callflow,
+						module: 'vmbox'
+					});
+
+					if (flow.module === 'vmbox') {
+						// Module already exists in callflow
+						flow.enabled = enabled;
+
+						self.usersUpdateCallflow(callflow, function(updatedCallflow) {
+							waterfallCallback(null, updatedCallflow);
+						});
+					} else {
+						// Module does not exist in callflow, but should
+						waterfallCallback(true);
+					}
+				}
+			], callback);
 		}
 	};
 
