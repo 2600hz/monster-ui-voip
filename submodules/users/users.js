@@ -21,7 +21,6 @@ define(function(require) {
 
 		appFlags: {
 			users: {
-				minNumberLength: 7,	// TODO: It is probably better to remove any change not related to the bug
 				smartPBXCallflowString: ' SmartPBX\'s Callflow',
 				smartPBXConferenceString: ' SmartPBX Conference',
 				smartPBXVMBoxString: '\'s VMBox'
@@ -411,44 +410,42 @@ define(function(require) {
 
 			_.each(data.callflows, function(callflow) {
 				if (callflow.type === 'faxing') {
-					return;
-				}
+					var userId = callflow.owner_id;
 
-				var userId = callflow.owner_id;
-
-				_.each(callflow.numbers, function(number) {
-					if (number && number.length < self.appFlags.users.minNumberLength) {
-						dataTemplate.existingExtensions.push(number);
-					}
-				});
-
-				if (userId in mapUsers) {
-					var user = mapUsers[userId];
-
-					//User can only have one phoneNumber and one extension displayed with this code
 					_.each(callflow.numbers, function(number) {
-						if (number.length < self.appFlags.users.minNumberLength) {
-							user.extra.listExtensions.push(number);
-						} else {
-							user.extra.listCallerId.push(number);
-
-							user.extra.listNumbers.push(number);
-
-							if (user.extra.phoneNumber === '') {
-								user.extra.phoneNumber = number;
-							} else {
-								user.extra.additionalNumbers++;
-							}
+						if (number && number.length < 7) {
+							dataTemplate.existingExtensions.push(number);
 						}
 					});
 
-					// The additional extensions show how many more extensions than 1 a user has.
-					// So if the user has at least 1 extension, then we count how many he has minus the one we already display, otherwise we display 0.
-					user.extra.additionalExtensions = user.extra.listExtensions.length >= 1 ? user.extra.listExtensions.length - 1 : 0;
+					if (userId in mapUsers) {
+						var user = mapUsers[userId];
 
-					// If the main extension hasn't been defined because the presence_id isn't set, just pick the first extension
-					if (user.extra.extension === '' && user.extra.listExtensions.length > 0) {
-						user.extra.extension = user.extra.listExtensions[0];
+						//User can only have one phoneNumber and one extension displayed with this code
+						_.each(callflow.numbers, function(number) {
+							if (number.length < 7) {
+								user.extra.listExtensions.push(number);
+							} else {
+								user.extra.listCallerId.push(number);
+
+								user.extra.listNumbers.push(number);
+
+								if (user.extra.phoneNumber === '') {
+									user.extra.phoneNumber = number;
+								} else {
+									user.extra.additionalNumbers++;
+								}
+							}
+						});
+
+						// The additional extensions show how many more extensions than 1 a user has.
+						// So if the user has at least 1 extension, then we count how many he has minus the one we already display, otherwise we display 0.
+						user.extra.additionalExtensions = user.extra.listExtensions.length >= 1 ? user.extra.listExtensions.length - 1 : 0;
+
+						// If the main extension hasn't been defined because the presence_id isn't set, just pick the first extension
+						if (user.extra.extension === '' && user.extra.listExtensions.length > 0) {
+							user.extra.extension = user.extra.listExtensions[0];
+						}
 					}
 				}
 			});
@@ -1996,7 +1993,7 @@ define(function(require) {
 
 			_.each(data.callflows, function(callflow) {
 				_.each(callflow.numbers, function(number) {
-					if (number.length < self.appFlags.users.minNumberLength) {
+					if (number.length < 7) {
 						formattedData.listExtensions[number] = callflow;
 						arrayExtensions.push(number);
 					}
@@ -4974,7 +4971,7 @@ define(function(require) {
 						}
 					});
 				} else {
-					if (numbers[0].length < self.appFlags.users.minNumberLength) {
+					if (numbers[0].length < 7) {
 						self.usersMigrateFromExtensions(userId, numbers, function(data) {
 							callback && callback(data);
 						});
