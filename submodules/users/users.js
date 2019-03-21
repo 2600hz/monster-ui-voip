@@ -5706,7 +5706,8 @@ define(function(require) {
 		 * @param  {Object} [args.dataKey]  Optional data key
 		 */
 		usersExtractDataFromCallflow: function(args) {
-			var flow = _.get(args, 'callflow.flow'),
+			var self = this,
+				flow = _.get(args, 'callflow.flow'),
 				cfModule = args.module;
 			if (_.isNil(flow)) {
 				return null;
@@ -5726,6 +5727,8 @@ define(function(require) {
 		 * @returns  {String}                      Voicemail box ID
 		 */
 		usersExtractVMBoxIdFromCallflow: function(args) {
+			var self = this;
+
 			return self.usersExtractDataFromCallflow({
 				callflow: args.userMainCallflow,
 				module: 'vmbox',
@@ -5741,6 +5744,8 @@ define(function(require) {
 		 * @param  {Function} [args.error]    Optional error callback
 		 */
 		usersGetMainVMBox: function(args) {
+			var self = this;
+
 			monster.waterfall([
 				function(waterfallCallback) {
 					self.usersGetMainCallflow(args.userId, function(callflow) {
