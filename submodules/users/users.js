@@ -746,8 +746,7 @@ define(function(require) {
 									callback: function() {
 										updateCallflow();
 									},
-									oldPresenceId: oldPresenceId,
-									userExtension: extensionsList[0]
+									oldPresenceId: oldPresenceId
 								});
 							});
 						});
@@ -4058,10 +4057,9 @@ define(function(require) {
 						type: 'mainUserCallflow'
 					};
 
-				self.usersSmartUpdateVMBox({
+				self.usersGetSuitableMainVMBoxSmartUser({
 					user: user,
-					needVMUpdate: false,
-					callback: function(_dataVM) {
+					success: function(_dataVM) {
 						if (_.isEmpty(_dataVM)) {
 							// Remove VMBox from callflow if there is none
 							callflow.flow.children = {};
@@ -5042,13 +5040,16 @@ define(function(require) {
 			});
 		},
 
-		/* If user has a vmbox, then only update it if it comes from the user form.
-		If the check comes from the extension page, where we create a callflow,
-		then only update the vmbox if there are no vmbox attached to this user */
+		/**
+		 * Update voicemail box, if needed
+		 * @param  {Object}   args
+		 * @param  {Object}   args.user           Kazoo user
+		 * @param  {String}   args.oldPresenceId  Previous user presence ID
+		 * @param  {Function} [args.callback]     Optional callback
+		 */
 		usersSmartUpdateVMBox: function(args) {
 			var self = this,
 				user = args.user,
-				needVMUpdate = args.needVMUpdate || true,
 				callback = args.callback,
 				oldPresenceId = args.oldPresenceId || undefined;
 
@@ -5069,11 +5070,6 @@ define(function(require) {
 						});
 					},
 					function(vmbox, wfCallback) {
-						if (!needVMUpdate) {
-							wfCallback(null, vmbox);
-							return;
-						}
-
 						vmbox.name = self.usersGetMainVMBoxName(monster.util.getUserFullName(user));
 						// We only want to update the vmbox number if it was already synced with the presenceId (and if the presenceId was not already set)
 						// This allows us to support old clients who have mailbox number != than their extension number
@@ -5598,6 +5594,49 @@ define(function(require) {
 		},
 
 		/**
+		 * Gets a suitable main voicemail box for a Smart PBX user
+		 * @param  {Object}   args
+		 * @param  {Object}   args.user     User data
+		 * @param  {Function} args.success  Success callback
+		 * @param  {Function} args.error    Error callback
+		 */
+		usersGetSuitableMainVMBoxSmartUser: function(args) {
+			var self = this,
+				user = args.user;
+
+			monster.waterfall([
+				function(callback) {
+					self.usersListVMBoxesUser({
+						userId: user.id,
+						success: function(vmboxes) {
+							callback(null, self.usersGetUserMainVMBox(user, vmboxes));
+						},
+						error: function(parsedError) {
+							callback(parsedError);
+						}
+					});
+				},
+				function(vmboxLite, callback) {
+					if (!vmboxLite) {
+						callback(null, null);
+						return;
+					}
+
+					self.usersGetVMBox(vmboxLite.id, function(vmbox) {
+						callback(null, vmbox);
+					});
+				}
+			], function(err, vmbox) {
+				if (err) {
+					args.hasOwnProperty('error') && args.error(err);
+					return;
+				}
+
+				args.hasOwnProperty('success') && args.success(vmbox);
+			});
+		},
+
+		/**
 		 * Gets the numbers data assigned to a user, separated in phone numbers and extensions
 		 * @param  {Object}   args
 		 * @param  {String}   args.userId             User ID
@@ -5621,6 +5660,26 @@ define(function(require) {
 						callback: callback
 					});
 				}
+			});
+		},
+
+		/**
+		 * Gets the list of vmboxes for a user
+		 * @param  {Object}   args
+		 * @param  {String}   args.userId   User ID
+		 * @param  {Function} args.success  Success callback
+		 * @param  {Function} args.error    Error callback
+		 */
+		usersListVMBoxesUser: function(args) {
+			var self = this;
+
+			self.usersListVMBoxes({
+				data: {
+					filters: {
+						filter_owner_id: args.userId
+					}
+				},
+				success: args.success
 			});
 		},
 
@@ -5674,6 +5733,29 @@ define(function(require) {
 					args.hasOwnProperty('error') && args.error(parsedError);
 				}
 			});
+		},
+
+		/**
+		 * Get the main VMBox for a user, from a list of voicemail boxes, which are assumed to
+		 * belong to it already
+		 * @param  {Object} user     User data
+		 * @param  {Array}  vmboxes  List of voicemail boxes that belong to the user
+		 */
+		usersGetUserMainVMBoxFromList: function(user, vmboxes) {
+			if (_.isEmpty(vmboxes)) {
+				return null;
+			}
+
+			var presenceId = user.presence_id ? user.presence_id.toString() : null,
+				mainUserVMBox = _.find(vmboxes, function(vmbox) {
+					return vmbox.mailbox === presenceId;
+				});
+
+			if (mainUserVMBox) {
+				return mainUserVMBox;
+			}
+
+			return _.head(vmboxes);
 		},
 
 		/**
