@@ -199,6 +199,7 @@ define(function(require) {
 					devices: [],
 					extension: dataUser.hasOwnProperty('presence_id') ? dataUser.presence_id : '',
 					fullName: monster.util.getUserFullName(dataUser),
+					hasFeatures: false,
 					isAdmin: dataUser.priv_level === 'admin',
 					showLicensedUserRoles: _.size(self.appFlags.global.servicePlansRole) > 0,
 					licensedUserRole: self.i18n.active().users.licensedUserRoles.none,
@@ -308,18 +309,18 @@ define(function(require) {
 				dataUser.extra.mainCallflowId = _mainCallflow.id;
 
 				if ('flow' in _mainCallflow) {
-					var cfModule = 'user';
+					var flow = _mainCallflow.flow,
+						module = 'user';
 
 					if (dataUser.extra.features.indexOf('find_me_follow_me') >= 0) {
-						cfModule = 'ring_group';
+						module = 'ring_group';
 						dataUser.extra.groupTimeout = true;
 					}
 
-					dataUser.extra.ringingTimeout = self.usersExtractDataFromCallflow({
-						callflow: _mainCallflow,
-						module: cfModule,
-						dataKey: 'data.timeout'
-					});
+					while (flow.module !== module && '_' in flow.children) {
+						flow = flow.children._;
+					}
+					dataUser.extra.ringingTimeout = flow.data.timeout;
 				}
 
 				// Check if user has vmbox enabled
@@ -339,6 +340,8 @@ define(function(require) {
 					dataUser.extra.mapFeatures[v].active = true;
 				}
 			});
+
+			dataUser.extra.hasFeatures = (dataUser.extra.countFeatures > 0);
 
 			dataUser.extra.adminId = self.userId;
 
@@ -409,7 +412,7 @@ define(function(require) {
 			});
 
 			_.each(data.callflows, function(callflow) {
-				if (callflow.type === 'faxing') {
+				if (callflow.type !== 'faxing') {
 					var userId = callflow.owner_id;
 
 					_.each(callflow.numbers, function(number) {
@@ -923,12 +926,11 @@ define(function(require) {
 										}
 
 										if (shouldUpdateTimeout && 'flow' in mainCallflow) {
-											var flowData = self.usersExtractDataFromCallflow({
-												callflow: mainCallflow,
-												module: 'user',
-												dataKey: 'data'
-											});
-											flowData.timeout = parseInt(userToSave.extra.ringingTimeout);
+											var flow = mainCallflow.flow;
+											while (flow.module !== 'user' && '_' in flow.children) {
+												flow = flow.children._;
+											}
+											flow.data.timeout = parseInt(userToSave.extra.ringingTimeout);
 										}
 
 										self.usersUpdateCallflow(mainCallflow, function(updatedCallflow) {
@@ -976,12 +978,7 @@ define(function(require) {
 				pinTemplate.find('.save-new-pin').on('click', function() {
 					var formData = monster.ui.getFormData('form_new_pin');
 
-					// FIXME: Remove after tests
-					if (_.isEmpty(currentUser.extra.vmbox)) {
-						throw Error('You should not be here!!!');
-					}
-
-					if (!monster.ui.valid(form)) {
+					if (monster.ui.valid(form)) {
 						self.usersPatchVMBox({
 							data: {
 								voicemailId: currentUser.extra.vmbox.id,
@@ -1512,14 +1509,11 @@ define(function(require) {
 			});
 
 			template.on('click', '.feature[data-feature="vmbox"]', function() {
-				self.usersGetMainVMBox({
+				self.usersGetMainVMBoxSmartUser({
 					userId: currentUser.id,
 					success: function(vmbox) {
-						currentUser.extra.deleteAfterNotify = _.get(data, 'vmbox.delete_after_notify', false);
-						self.usersRenderVMBox({
-							currentUser: currentUser,
-							vmbox: vmbox
-						});
+						currentUser.extra.deleteAfterNotify = (vmbox && vmbox.delete_after_notify);
+						self.usersRenderVMBox(currentUser, vmbox);
 					}
 				});
 			});
@@ -2291,37 +2285,36 @@ define(function(require) {
 
 				monster.waterfall([
 					function(callback) {
-						// Create VMBox if needed
 						if (!vmbox && enabled) {
-							// Create vmbox
 							self.usersAddMainVMBoxToUser({
 								user: currentUser,
 								deleteAfterNotify: deleteAfterNotify,
 								callback: callback
 							});
 							return;
-						} else if (vmbox && vmbox.delete_after_notify !== deleteAfterNotify) {
-							// Or update if needed
-							self.usersPatchVMBox({
-								data: {
-									voicemailId: vmbox.id,
-									data: {
-										delete_after_notify: deleteAfterNotify
-									}
-								},
-								success: function(updatedVmbox) {
-									callback(null);
-								},
-								error: function() {
-									callback(true);
-								}
-							});
-						} else {
+						}
+
+						if (!vmbox || vmbox.delete_after_notify === deleteAfterNotify) {
 							callback(null);
 							return;
 						}
+
+						self.usersPatchVMBox({
+							data: {
+								voicemailId: vmbox.id,
+								data: {
+									delete_after_notify: deleteAfterNotify
+								}
+							},
+							success: function() {
+								callback(null);
+							},
+							error: function() {
+								callback(true);
+							}
+						});
 					},
-					function(callback, updatedVmbox) {
+					function(callback) {
 						if ((!vmbox && enabled) || (vmboxActive === enabled)) {
 							// - Case 1: VMBox was created, so the main user callflow was already
 							//   updated
@@ -2343,7 +2336,6 @@ define(function(require) {
 							return;
 						}
 
-						// Update vm_to_email_enabled at user
 						self.usersPatchUser({
 							data: {
 								userId: userId,
@@ -5054,7 +5046,7 @@ define(function(require) {
 
 			monster.waterfall([
 				function(wfCallback) {
-					self.usersGetMainVMBox({
+					self.usersGetMainVMBoxSmartUser({
 						userId: user.id,
 						success: function(data) {
 							wfCallback(null, data.vmbox);
@@ -5747,7 +5739,7 @@ define(function(require) {
 		 * @param  {Function} [args.success]  Optional success callback
 		 * @param  {Function} [args.error]    Optional error callback
 		 */
-		usersGetMainVMBox: function(args) {
+		usersGetMainVMBoxSmartUser: function(args) {
 			var self = this;
 
 			monster.waterfall([
