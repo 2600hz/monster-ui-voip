@@ -1509,9 +1509,11 @@ define(function(require) {
 			});
 
 			template.on('click', '.feature[data-feature="vmbox"]', function() {
-				self.usersGetMainVMBoxSmartUser({
+				self.usersGetMainCallflowAndVMBox({
 					userId: currentUser.id,
-					success: function(vmbox) {
+					success: function(data) {
+						var vmbox = data.vmbox;
+
 						currentUser.extra.deleteAfterNotify = (vmbox && vmbox.delete_after_notify);
 						self.usersRenderVMBox(currentUser, vmbox);
 					}
@@ -3366,31 +3368,15 @@ define(function(require) {
 
 			monster.parallel({
 				mainCallflowVMBox: function(callback) {
-					monster.waterfall([
-						function(waterfallCallback) {
-							self.usersGetMainCallflow(userId, function(mainCallflow) {
-								callback(null, mainCallflow);
-							});
+					self.usersGetMainCallflowAndVMBox({
+						userId: userId,
+						success: function(data) {
+							callback(null, data);
 						},
-						function(mainCallflow, waterfallCallback) {
-							var vmboxId = self.usersExtractVMBoxIdFromCallflow({
-								userMainCallflow: mainCallflow
-							});
-
-							if (vmboxId) {
-								self.usersGetVMBox(vmboxId, function(vmbox) {
-									waterfallCallback(null, {
-										callflow: mainCallflow,
-										vmbox: vmbox
-									});
-								});
-							} else {
-								waterfallCallback(null, {
-									callflow: mainCallflow
-								});
-							}
+						error: function(err) {
+							callback(err);
 						}
-					], callback);
+					});
 				},
 				mainDirectory: function(callback) {
 					self.usersGetMainDirectory(function(mainDirectory) {
@@ -5046,7 +5032,7 @@ define(function(require) {
 
 			monster.waterfall([
 				function(wfCallback) {
-					self.usersGetMainVMBoxSmartUser({
+					self.usersGetMainCallflowAndVMBox({
 						userId: user.id,
 						success: function(data) {
 							wfCallback(null, data.vmbox);
@@ -5739,7 +5725,7 @@ define(function(require) {
 		 * @param  {Function} [args.success]  Optional success callback
 		 * @param  {Function} [args.error]    Optional error callback
 		 */
-		usersGetMainVMBoxSmartUser: function(args) {
+		usersGetMainCallflowAndVMBox: function(args) {
 			var self = this;
 
 			monster.waterfall([
@@ -5755,17 +5741,22 @@ define(function(require) {
 
 					if (vmboxId) {
 						self.usersGetVMBox(vmboxId, function(vmbox) {
-							waterfallCallback(null, vmbox);
+							waterfallCallback(null, {
+								callflow: callflow,
+								vmbox: vmbox
+							});
 						});
 					} else {
-						waterfallCallback(null, null);
+						waterfallCallback(null, {
+							callflow: callflow
+						});
 					}
 				}
-			], function(err, vmbox) {
+			], function(err, results) {
 				if (err) {
 					_.has(args, 'error') && args.error(err);
 				} else {
-					_.has(args, 'success') && args.success(vmbox);
+					_.has(args, 'success') && args.success(results);
 				}
 			});
 		},
