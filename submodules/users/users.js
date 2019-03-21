@@ -5071,8 +5071,8 @@ define(function(require) {
 						wfCallback(null, vmboxSaved);
 					});
 				}
-			], function(err, vmbox) {
-				callback && callback(vmbox);
+			], function(err, vmboxSaved) {
+				callback && callback(vmboxSaved);
 			});
 		},
 
@@ -5515,7 +5515,7 @@ define(function(require) {
 					self.usersListVMBoxesUser({
 						userId: user.id,
 						success: function(vmboxes) {
-							callback(null, self.usersGetUserMainVMBox(user, vmboxes));
+							callback(null, self.usersGetUserMainVMBoxFromList(user, vmboxes));
 						},
 						error: function(parsedError) {
 							callback(parsedError);
