@@ -1514,6 +1514,14 @@ define(function(require) {
 					success: function(data) {
 						var vmbox = data.vmbox;
 
+						// Updating vmbox status
+						currentUser.extra.mapFeatures.vmbox.active = self.usersExtractDataFromCallflow({
+							callflow: data.callflow,
+							module: 'voicemail',
+							dataKey: 'enabled',
+							defaultValue: true
+						});
+
 						currentUser.extra.deleteAfterNotify = (vmbox && vmbox.delete_after_notify);
 						self.usersRenderVMBox(currentUser, vmbox);
 					}
@@ -5671,14 +5679,19 @@ define(function(require) {
 		/**
 		 * Extracts a node from a callflow's default flow tree
 		 * @param  {Object} args
-		 * @param  {Object} args.callflow   Main user callflow
-		 * @param  {Object} args.module     Callflow module
-		 * @param  {Object} [args.dataKey]  Optional data key
+		 * @param  {Object} args.callflow        Main user callflow
+		 * @param  {Object} args.module          Callflow module
+		 * @param  {Object} [args.dataKey]       Optional data key
+		 * @param  {Any}    [args.defaultValue]  Default value to be returned, if the data is
+		 *                                       not found
+		 * @returns {Any}   Value extracted from the callflow, or default value if not found
 		 */
 		usersExtractDataFromCallflow: function(args) {
 			var self = this,
 				flow = _.get(args, 'callflow.flow'),
-				cfModule = args.module;
+				cfModule = args.module,
+				defaultValue = args.defaultValue;
+
 			if (_.isNil(flow)) {
 				return null;
 			}
@@ -5687,7 +5700,13 @@ define(function(require) {
 				flow = flow.children._;
 			}
 
-			return _.has(args, 'dataKey') ? _.get(flow, args.dataKey) : flow;
+			if (flow.module !== cfModule) {
+				return undefined;
+			} else if (_.has(args, 'dataKey')) {
+				return _.get(flow, args.dataKey, defaultValue);
+			} else {
+				return flow || defaultValue;
+			}
 		},
 
 		/**
@@ -5701,7 +5720,7 @@ define(function(require) {
 
 			return self.usersExtractDataFromCallflow({
 				callflow: args.userMainCallflow,
-				module: 'vmbox',
+				module: 'voicemail',
 				dataKey: 'data.id'
 			});
 		},
@@ -5771,18 +5790,18 @@ define(function(require) {
 				function(callflow, waterfallCallback) {
 					var flow = self.usersExtractDataFromCallflow({
 						callflow: callflow,
-						module: 'vmbox'
+						module: 'voicemail'
 					});
 
-					if (flow.module === 'vmbox') {
+					if (flow) {
 						// Module already exists in callflow
 						flow.enabled = enabled;
 
-						self.usersUpdateCallflow(callflow, function(updatedCallflow) {
-							waterfallCallback(null, updatedCallflow);
+						self.usersUpdateCallflow(callflow, function() {
+							waterfallCallback(null);
 						});
 					} else {
-						// Module does not exist in callflow, but should
+						// Module does not exist in callflow, but should, so err
 						waterfallCallback(true);
 					}
 				}
