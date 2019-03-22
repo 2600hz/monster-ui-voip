@@ -4766,18 +4766,6 @@ define(function(require) {
 							callback(null, data.data);
 						}
 					});
-				},
-				vmboxes: function(callback) {
-					self.usersListVMBoxes({
-						data: {
-							filters: {
-								'filter_ui_metadata.origin': 'voip'
-							}
-						},
-						success: function(vmboxes) {
-							callback(null, vmboxes);
-						}
-					});
 				}
 			}, function(err, results) {
 				callback && callback(results);
