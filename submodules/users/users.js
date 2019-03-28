@@ -1514,15 +1514,16 @@ define(function(require) {
 					success: function(data) {
 						var vmbox = data.vmbox;
 
-						// Updating vmbox status
+						// Update in-memory vmbox status
 						currentUser.extra.mapFeatures.vmbox.active = self.usersExtractDataFromCallflow({
 							callflow: data.callflow,
 							module: 'voicemail',
 							dataKey: 'data.skip_module',
-							defaultValue: true
+							defaultValue: false
 						});
 
 						currentUser.extra.deleteAfterNotify = (vmbox && vmbox.delete_after_notify);
+
 						self.usersRenderVMBox(currentUser, vmbox);
 					}
 				});
