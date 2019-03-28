@@ -1518,7 +1518,7 @@ define(function(require) {
 						currentUser.extra.mapFeatures.vmbox.active = self.usersExtractDataFromCallflow({
 							callflow: data.callflow,
 							module: 'voicemail',
-							dataKey: 'enabled',
+							dataKey: 'data.skip_module',
 							defaultValue: true
 						});
 
@@ -5769,10 +5769,10 @@ define(function(require) {
 		},
 
 		/**
-		 * Update VMBox module status in callflow
+		 * Update VMBox module status in callflow, to be enabled or skipped
 		 * @param  {Object}   args
 		 * @param  {String}   args.userId    User ID
-		 * @param  {Boolean}  args.enabled   Enabled status to set
+		 * @param  {Boolean}  args.enabled   Indicates if vmbox module should be enabled or skipped
 		 * @param  {Function} args.callback  Asynchronous callback
 		 */
 		usersUpdateVMBoxStatusInCallflow: function(args) {
@@ -5795,7 +5795,7 @@ define(function(require) {
 
 					if (flow) {
 						// Module already exists in callflow
-						flow.enabled = enabled;
+						flow.data.skip_module = !enabled;
 
 						self.usersUpdateCallflow(callflow, function() {
 							waterfallCallback(null);
