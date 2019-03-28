@@ -1515,7 +1515,7 @@ define(function(require) {
 						var vmbox = data.vmbox;
 
 						// Update in-memory vmbox status
-						currentUser.extra.mapFeatures.vmbox.active = self.usersExtractDataFromCallflow({
+						currentUser.extra.mapFeatures.vmbox.active = !self.usersExtractDataFromCallflow({
 							callflow: data.callflow,
 							module: 'voicemail',
 							dataKey: 'data.skip_module',
