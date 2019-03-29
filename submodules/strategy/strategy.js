@@ -1784,7 +1784,7 @@ define(function(require) {
 			});
 
 			container.on('click', '.action-links .edit-email', function(e) {
-				event.preventDefault();
+				e.preventDefault();
 
 				monster.waterfall([
 					function(callback) {
