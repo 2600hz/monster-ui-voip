@@ -1512,15 +1512,14 @@ define(function(require) {
 				self.usersGetMainCallflowAndVMBox({
 					userId: currentUser.id,
 					success: function(data) {
-						var vmbox = data.vmbox;
+						var vmbox = data.vmbox,
+							vmboxModule = self.usersExtractDataFromCallflow({
+								callflow: data.callflow,
+								module: 'voicemail'
+							});
 
 						// Update in-memory vmbox status
-						currentUser.extra.mapFeatures.vmbox.active = !self.usersExtractDataFromCallflow({
-							callflow: data.callflow,
-							module: 'voicemail',
-							dataKey: 'data.skip_module',
-							defaultValue: false
-						});
+						currentUser.extra.mapFeatures.vmbox.active = !(_.isUndefined(vmboxModule) || _.get(vmboxModule, 'data.skip_module', false));
 
 						currentUser.extra.deleteAfterNotify = (vmbox && vmbox.delete_after_notify);
 
@@ -5678,23 +5677,22 @@ define(function(require) {
 		},
 
 		/**
-		 * Extracts a node from a callflow's default flow tree
+		 * Extracts a module node or a module value (if path is provided) from a callflow's
+		 * default flow tree.
 		 * @param  {Object} args
-		 * @param  {Object} args.callflow        Main user callflow
-		 * @param  {Object} args.module          Callflow module
-		 * @param  {Object} [args.dataKey]       Optional data key
-		 * @param  {Any}    [args.defaultValue]  Default value to be returned, if the data is
-		 *                                       not found
-		 * @returns {Any}   Value extracted from the callflow, or default value if not found
+		 * @param  {Object} args.callflow    Callflow object
+		 * @param  {Object} args.module      Callflow module name
+		 * @param  {Object} [args.dataPath]  Optional path of data to extract within the module.
+		 * @returns {Any}   Value extracted from the callflow, or undefined if the module or path
+		 *                  is not found
 		 */
 		usersExtractDataFromCallflow: function(args) {
 			var self = this,
 				flow = _.get(args, 'callflow.flow'),
-				cfModule = args.module,
-				defaultValue = args.defaultValue;
+				cfModule = args.module;
 
 			if (_.isNil(flow)) {
-				return null;
+				return undefined;
 			}
 
 			while (flow.module !== cfModule && _.has(flow.children, '_')) {
@@ -5703,10 +5701,10 @@ define(function(require) {
 
 			if (flow.module !== cfModule) {
 				return undefined;
-			} else if (_.has(args, 'dataKey')) {
-				return _.get(flow, args.dataKey, defaultValue);
+			} else if (_.has(args, 'dataPath')) {
+				return _.get(flow, args.dataPath);
 			} else {
-				return flow || defaultValue;
+				return flow;
 			}
 		},
 
@@ -5722,7 +5720,7 @@ define(function(require) {
 			return self.usersExtractDataFromCallflow({
 				callflow: args.userMainCallflow,
 				module: 'voicemail',
-				dataKey: 'data.id'
+				dataPath: 'data.id'
 			});
 		},
 
