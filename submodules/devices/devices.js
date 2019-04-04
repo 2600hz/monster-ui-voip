@@ -212,16 +212,12 @@ define(function(require) {
 									});
 
 									var actions = [ 'none', 'presence', 'parking', 'personal_parking', 'speed_dial' ],
-										parkingSpots = [],
+										parkingSpots = _.range(1, 11),	// Array with integer numbers >= 1 and < 11
 										extra;
 
 									users.sort(function(a, b) {
 										return a.last_name.toLowerCase() > b.last_name.toLowerCase() ? 1 : -1;
 									});
-
-									for (var i = 0; i < 10; i++) {
-										parkingSpots[i] = i + 1;
-									}
 
 									_.each(actions, function(action, idx, list) {
 										list[idx] = {
@@ -244,7 +240,7 @@ define(function(require) {
 									};
 
 									_.each(keyTypes, function(key) {
-										var camelCaseKey = self.devicesSnakeToCamel(key);
+										var camelCaseKey = _.camelCase(key);
 
 										extra.provision.keys.push({
 											id: key,
@@ -255,7 +251,7 @@ define(function(require) {
 										});
 									});
 
-									dataDevice.extra = dataDevice.hasOwnProperty('extra') ? $.extend(true, {}, dataDevice.extra, extra) : extra;
+									dataDevice.extra = _.has(dataDevice, 'extra') ? _.merge({}, dataDevice.extra, extra) : extra;
 
 									self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
 								}
@@ -1042,10 +1038,6 @@ define(function(require) {
 			formattedData.devices = arrayToSort;
 
 			return formattedData;
-		},
-
-		devicesSnakeToCamel: function(string) {
-			return string.replace(/(_\w)/g, function(match) { return match[1].toUpperCase(); });
 		},
 
 		/* Utils */
