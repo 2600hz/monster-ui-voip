@@ -247,7 +247,6 @@
 }
 
 .voip-edit-device-popup .edit-device .title-bar .device-title > div {
-	display: inline-block;
 	float: left;
 	font-size: 18px;
 	font-weight: bold;
