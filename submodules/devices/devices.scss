@@ -1,3 +1,5 @@
+@import "../../../../css/partials/base";
+
 #devices_container .devices-header {
 	font-size: 18px;
 	line-height: 30px;
@@ -371,18 +373,75 @@
 	color: #aaa;
 }
 
-.voip-edit-device-popup .edit-device .feature-key-value {
-	display: none;
-	margin-left: 20px;
-}
+.voip-edit-device-popup .edit-device {
+	.tabs-section {
+		.feature-key-value {
+			display: none;
+			margin-left: 20px;
 
-.voip-edit-device-popup .edit-device .feature-key-value.active {
-	display: inline-block;
-}
+			&.active,
+			&:first-of-type {
+				display: inline-block;
+			}
 
-.voip-edit-device-popup .edit-device .feature-key-value label {
-	display: inline-block;
-	margin-right: 10px;
+			label {
+				display: inline-block;
+				margin-right: 10px;
+			}
+		}
+
+		&[data-section="comboKeys"]{
+			.control-group {
+				padding: 1rem;
+
+				&.warning {
+					background-color: #FCF8E3;
+				}
+
+				.controls {
+					margin-left: 0px;
+					display: flex;
+					/*flex-wrap: wrap;
+					justify-content: flex-start;*/
+
+					.feature-key-value {
+						display:none;
+						margin-left: 0.5rem;
+
+						&:first-of-type {
+							margin-left: 0;
+						}
+
+						&.active,
+						&:first-of-type {
+							display: block;
+							width: calc(33.33% - 0.33rem);
+						}
+					}
+				}
+
+				label {
+					display: block;
+					float: none;
+
+					&.control-label {
+						margin-top: 1rem;
+						margin-bottom: 1rem;
+						padding-top: 0;
+						width: auto;
+						text-align: left;
+						font-size: 1rem;
+						color: $woodsmoke;
+					}
+				}
+
+				select, .chosen-container {
+					display: block;
+					width: 100% !important;
+				}
+			}
+		}
+	}
 }
 
 .voip-edit-device-popup .keys .fa {

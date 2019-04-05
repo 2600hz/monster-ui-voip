@@ -303,6 +303,7 @@
 					"label": "Combo key"
 				},
 				"labels": {
+					"function": "Function",
 					"user": "User",
 					"parkingSpot": "Parking Spot",
 					"value": "Value"

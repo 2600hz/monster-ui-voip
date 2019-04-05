@@ -353,29 +353,35 @@
 					</div>
 				</div>
 				{{#each data}}
-				<div class="control-group{{#compare ../id '===' 'combo_keys'}}{{#compare @key '===' '0'}} error{{/compare}}{{/compare}}" data-id="{{@key}}">
+				<div class="control-group{{#compare ../id '===' 'combo_keys'}}{{#if @first}} warning{{/if}}{{/compare}}" data-id="{{@key}}">
 					{{#compare ../id '===' 'combo_keys'}}
-						{{#compare @key '===' '0'}}
-							<div class="alert alert-error">
+						{{#if @first}}
+							<div class="alert alert-warning">
+								{{telicon 'warning-triangle'}}
 								{{@root.i18n.devices.popupSettings.keys.alertMessage}}
 							</div>
-						{{/compare}}
+						{{/if}}
 					{{/compare}}
 					<label for="provision.keys.{{../id}}[{{@key}}].type" class="control-label">
 						<i class="fa fa-reorder monster-gray"></i>
 						{{ ../label }} <span class="feature-key-index">{{@key}}</span>
 					</label>
 					<div class="controls">
-						<select name="provision.keys.{{../id}}[{{@key}}].type" class="feature-key-type span2">
-						{{#select type}}
-							{{#each @root.extra.provision.keyActions}}
-								<option value="{{id}}">{{text}}</option>
-							{{/each}}
-							{{#compare ../id '===' 'combo_keys'}}
-								<option value="line">{{@root.i18n.devices.popupSettings.keys.types.line}}</option>
-							{{/compare}}
-						{{/select}}
-						</select>
+						<div class="feature-key-value">
+						{{#compare ../id '===' 'combo_keys'}}
+							<label for="provision.keys.{{../id}}[{{@key}}].type">{{ @root.i18n.devices.popupSettings.keys.labels.function }}</label>
+						{{/compare}}
+							<select name="provision.keys.{{../id}}[{{@key}}].type" class="feature-key-type span2">
+							{{#select type}}
+								{{#each @root.extra.provision.keyActions}}
+									<option value="{{id}}">{{text}}</option>
+								{{/each}}
+								{{#compare ../id '===' 'combo_keys'}}
+									<option value="line">{{@root.i18n.devices.popupSettings.keys.types.line}}</option>
+								{{/compare}}
+							{{/select}}
+							</select>
+						</div>
 						<div class="feature-key-value" data-type="presence">
 							<label for="provision.keys.{{../id}}[{{@key}}].value">{{ @root.i18n.devices.popupSettings.keys.labels.user }}</label>
 							<select name="provision.keys.{{../id}}[{{@key}}].value" class="chosen-feature-key-user">

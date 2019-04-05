@@ -606,10 +606,12 @@ define(function(require) {
 			});
 
 			templateDevice.find('.feature-key-type').on('change', function() {
-				var type = $(this).val();
+				var $this = $(this),
+					type = $this.val(),
+					$featureKeyValue = $this.closest('.feature-key-value');
 
-				$(this).siblings('.feature-key-value.active').removeClass('active');
-				$(this).siblings('.feature-key-value[data-type="' + type + '"]').addClass('active');
+				$featureKeyValue.siblings('.feature-key-value.active').removeClass('active');
+				$featureKeyValue.siblings('.feature-key-value[data-type="' + type + '"]').addClass('active');
 			});
 
 			templateDevice.find('.tabs-section[data-section="featureKeys"] .type-info a').on('click', function() {
