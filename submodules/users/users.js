@@ -324,7 +324,7 @@ define(function(require) {
 				}
 
 				// Check if user has vmbox enabled
-				if (_.includes(_mainCallflow.modules, 'voicemail')) {
+				if (!_.includes(_mainCallflow.skipped_modules, 'voicemail')) {
 					dataUser.extra.features.push('vmbox');
 				}
 			}
