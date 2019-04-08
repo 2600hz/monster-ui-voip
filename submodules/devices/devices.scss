@@ -303,12 +303,6 @@
 	margin: 0 40px 25px 40px;
 }
 
-.voip-edit-device-popup .edit-device .content .tabs-section .helper i {
-	position: absolute;
-	top: 0;
-	left: -25px;
-}
-
 .voip-edit-device-popup .edit-device .content .tabs-section .number-address {
 	display: none;
 }
@@ -375,34 +369,88 @@
 
 .voip-edit-device-popup .edit-device {
 	.tabs-section {
-		.feature-key-value {
-			display: none;
-			margin-left: 20px;
+		.section-header {
+			display: flex;
+			flex-direction: row;
+			align-items: stretch;
+			width: 100%;
+			margin-bottom: 1.5rem;
 
-			&.active,
-			&:first-of-type {
-				display: inline-block;
+			.title, .helper {
+				margin: 0;
 			}
 
-			label {
-				display: inline-block;
-				margin-right: 10px;
+			.helper {
+				flex: 1;
+				position: static;
+				padding-left: 1rem;
+				text-align: right;
+
+				.text {
+					padding-right: 0.5rem;
+				}
+
+				.collapse {
+					text-align: justify;
+				}
+			}
+		}
+
+		.control-group {
+			background-color: $white;
+
+			.drag-handle-icon {
+				margin-right: 12px;
+			}
+
+			.feature-key-value {
+				display: none;
+				margin-left: 20px;
+
+				&.active,
+				&:first-of-type {
+					display: inline-block;
+				}
+
+				label {
+					display: inline-block;
+					margin-right: 10px;
+				}
 			}
 		}
 
 		&[data-section="comboKeys"]{
 			.control-group {
+				margin-bottom: 0;
 				padding: 1rem;
+				box-shadow: inset 0px 1px 0px 0px #DBDBDE,
+					inset 0px -1px 0px 0px #DBDBDE;
 
-				&.warning {
+				&:first-of-type {
 					background-color: #FCF8E3;
+
+					.notice {
+						display: block;
+					}
+				}
+
+				&:hover {
+					box-shadow: inset 0px 1px 0px 0px #DBDBDE,
+						inset 0px -1px 0px 0px #DBDBDE,
+						0px 1px 4px 0px rgba(21, 21, 23, 0.24);
+
+					.drag-handle-icon {
+						display: inline;
+					}
+				}
+
+				.drag-handle-icon {
+					display: none;
 				}
 
 				.controls {
 					margin-left: 0px;
 					display: flex;
-					/*flex-wrap: wrap;
-					justify-content: flex-start;*/
 
 					.feature-key-value {
 						display:none;
@@ -420,12 +468,15 @@
 					}
 				}
 
+				.notice {
+					display: none;
+				}
+
 				label {
 					display: block;
 					float: none;
 
 					&.control-label {
-						margin-top: 1rem;
 						margin-bottom: 1rem;
 						padding-top: 0;
 						width: auto;
@@ -493,4 +544,42 @@
 /* Special checkbox case */
 .voip-edit-device-popup .edit-device .form-horizontal .control-label.checkbox-basic {
 	margin-left: 160px;
+}
+
+/* Notice message styles */
+.notice {
+	display: block;
+	margin-bottom: 1rem;
+	padding: 1rem;
+	background: $white;
+	border-radius: 2px 2px 2px 2px;
+
+	&.notice-warning {
+		box-shadow: inset 0px 4px 0px 0px #F8A506,
+			0px 1px 4px 0px rgba(21, 21, 23, 0.24);
+	}
+
+	.notice-icon {
+		color: #F8A506;
+		margin-right: 12px;
+	}
+
+	.notice-title, .notice-body {
+		display: block;
+		color: $woodsmoke;
+	}
+
+	.notice-title {
+		margin-top: 2px;
+		margin-bottom: 1rem;
+		line-height: 1rem;
+		font-size: 1rem;
+		font-weight: 600;
+	}
+
+	.notice-body {
+		font-size: 14px;
+		font-weight: normal;
+		line-height: 21px;
+	}
 }
