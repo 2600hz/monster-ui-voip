@@ -289,7 +289,9 @@
 			"__comment": "UI-1351: Möglichkeit zur Konfiguration von Funktionstasten für SIP-Geräte in SmartPBX hinzugefügt",
 			"__version": "v3.20_s4",
 			"keys": {
-				"alertMessage": "In der Standardeinstellung wird diese Taste als Leitungstaste verwendet. Wir empfehlen, dies nicht zu ändern.",
+				"alert": {
+					"message": "In der Standardeinstellung wird diese Taste als Leitungstaste verwendet. Wir empfehlen, dies nicht zu ändern."
+				},
 				"featureKeys": {
 					"title": "Funktionstasten",
 					"label": "Funktionstaste"
