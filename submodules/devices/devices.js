@@ -360,12 +360,24 @@ define(function(require) {
 
 				templateDevice.find('.keys').sortable({
 					items: '.control-group',
+					placeholder: 'control-group placeholder',
 					update: function() {
-						templateDevice
-								.find('.feature-key-index')
-									.each(function(idx, el) {
-										$(el).text(idx + 1);
-									});
+						var $this = $(this);
+
+						$this
+							.find('.feature-key-index')
+								.each(function(idx, el) {
+									$(el).text(idx + 1);
+								});
+
+						if ($this.data('section') === 'comboKeys') {
+							$this
+								.find('.control-group')
+								.first()
+								.addClass('warning')
+								.siblings()
+								.removeClass('warning');
+						}
 					}
 				});
 

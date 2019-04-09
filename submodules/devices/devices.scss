@@ -399,6 +399,11 @@
 		.control-group {
 			background-color: $white;
 
+			&.placeholder {
+				background-color: $white-lilac !important;
+				height: 91px;
+			}
+
 			.drag-handle-icon {
 				margin-right: 12px;
 			}
@@ -426,7 +431,7 @@
 				box-shadow: inset 0px 1px 0px 0px #DBDBDE,
 					inset 0px -1px 0px 0px #DBDBDE;
 
-				&:first-of-type {
+				&.warning {
 					background-color: #FCF8E3;
 
 					.monster-panel-text {

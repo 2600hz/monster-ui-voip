@@ -356,7 +356,7 @@
 				</div>
 				<div class="section-content">
 				{{#each data}}
-					<div class="control-group" data-id="{{@key}}">
+					<div class="control-group{{#compare ../id '===' 'combo_keys'}}{{#if @first}} warning{{/if}}{{/compare}}" data-id="{{@key}}">
 						<label for="provision.keys.{{../id}}[{{@key}}].type" class="control-label">
 							{{telicon 'drag-handle' class='drag-handle-icon'}}
 							<span>{{ ../label }}</span> <span class="feature-key-index">{{@key}}</span>
