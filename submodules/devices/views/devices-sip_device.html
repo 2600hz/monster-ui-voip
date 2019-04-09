@@ -362,10 +362,9 @@
 							<span>{{ ../label }}</span> <span class="feature-key-index">{{@key}}</span>
 						</label>
 						{{#compare ../id '===' 'combo_keys'}}
-							<div class="notice notice-warning">
-								<div class="notice-title">{{telicon 'warning--triangle' class='notice-icon'}}{{@root.i18n.devices.popupSettings.keys.alert.title}}</div>
-								<div class="notice-body">{{@root.i18n.devices.popupSettings.keys.alert.message}}</div>
-							</div>
+							{{#monsterPanelText @root.i18n.devices.popupSettings.keys.alert.title 'warning' 'fill-width'}}
+								{{@root.i18n.devices.popupSettings.keys.alert.message}}
+							{{/monsterPanelText}}
 						{{/compare}}
 						<div class="controls">
 							<div class="feature-key-value">

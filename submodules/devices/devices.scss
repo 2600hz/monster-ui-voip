@@ -429,7 +429,7 @@
 				&:first-of-type {
 					background-color: #FCF8E3;
 
-					.notice {
+					.monster-panel-text {
 						display: block;
 					}
 				}
@@ -468,7 +468,7 @@
 					}
 				}
 
-				.notice {
+				.monster-panel-text {
 					display: none;
 				}
 
@@ -544,42 +544,4 @@
 /* Special checkbox case */
 .voip-edit-device-popup .edit-device .form-horizontal .control-label.checkbox-basic {
 	margin-left: 160px;
-}
-
-/* Notice message styles */
-.notice {
-	display: block;
-	margin-bottom: 1rem;
-	padding: 1rem;
-	background: $white;
-	border-radius: 2px 2px 2px 2px;
-
-	&.notice-warning {
-		box-shadow: inset 0px 4px 0px 0px #F8A506,
-			0px 1px 4px 0px rgba(21, 21, 23, 0.24);
-	}
-
-	.notice-icon {
-		color: #F8A506;
-		margin-right: 12px;
-	}
-
-	.notice-title, .notice-body {
-		display: block;
-		color: $woodsmoke;
-	}
-
-	.notice-title {
-		margin-top: 2px;
-		margin-bottom: 1rem;
-		line-height: 1rem;
-		font-size: 1rem;
-		font-weight: 600;
-	}
-
-	.notice-body {
-		font-size: 14px;
-		font-weight: normal;
-		line-height: 21px;
-	}
 }
