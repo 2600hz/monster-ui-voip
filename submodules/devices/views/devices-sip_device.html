@@ -383,33 +383,39 @@
 								</select>
 							</div>
 							<div class="feature-key-value" data-type="presence">
-								<label for="provision.keys.{{../id}}[{{@key}}].value">{{ @root.i18n.devices.popupSettings.keys.labels.user }}</label>
-								<select name="provision.keys.{{../id}}[{{@key}}].value" class="chosen-feature-key-user">
+								<label for="provision.keys.{{../id}}[{{@key}}].value.value">{{ @root.i18n.devices.popupSettings.keys.labels.user }}</label>
+								<select name="provision.keys.{{../id}}[{{@key}}].value.value" class="chosen-feature-key-user">
 								{{#each @root.extra.provision.users}}
 									<option value="{{id}}">{{first_name}} {{last_name}}</option>
 								{{/each}}
 								</select>
 							</div>
 							<div class="feature-key-value" data-type="parking">
-								<label for="provision.keys.{{../id}}[{{@key}}].value">{{ @root.i18n.devices.popupSettings.keys.labels.parkingSpot }}</label>
-								<select class="span1" name="provision.keys.{{../id}}[{{@key}}].value">
+								<label for="provision.keys.{{../id}}[{{@key}}].value.value">{{ @root.i18n.devices.popupSettings.keys.labels.parkingSpot }}</label>
+								<select class="span1" name="provision.keys.{{../id}}[{{@key}}].value.value">
 								{{#each @root.extra.provision.parkingSpots}}
 									<option value="{{this}}">{{this}}</option>
 								{{/each}}
 								</select>
 							</div>
 							<div class="feature-key-value" data-type="personal_parking">
-								<label for="provision.keys.{{../id}}[{{@key}}].value">{{ @root.i18n.devices.popupSettings.keys.labels.user }}</label>
-								<select name="provision.keys.{{../id}}[{{@key}}].value" class="chosen-feature-key-user">
+								<label for="provision.keys.{{../id}}[{{@key}}].value.value">{{ @root.i18n.devices.popupSettings.keys.labels.user }}</label>
+								<select name="provision.keys.{{../id}}[{{@key}}].value.value" class="chosen-feature-key-user">
 								{{#each @root.extra.provision.users}}
 									<option value="{{id}}">{{first_name}} {{last_name}}</option>
 								{{/each}}
 								</select>
 							</div>
 							<div class="feature-key-value" data-type="speed_dial">
-								<label for="provision.keys.{{../id}}[{{@key}}].value">{{ @root.i18n.devices.popupSettings.keys.labels.value }}</label>
-								<input type="text" value="" name="provision.keys.{{../id}}[{{@key}}].value">
+								<label for="provision.keys.{{../id}}[{{@key}}].value.value">{{ @root.i18n.devices.popupSettings.keys.labels.value }}</label>
+								<input type="text" value="" name="provision.keys.{{../id}}[{{@key}}].value.value">
 							</div>
+						{{#compare ../id '===' 'combo_keys'}}
+							<div class="feature-key-value" data-type="presence personal_parking speed_dial parking">
+								<label for="provision.keys.{{../id}}[{{@key}}].value.label">{{ @root.i18n.devices.popupSettings.keys.labels.deviceLabel }}</label>
+								<input type="text" value="" name="provision.keys.{{../id}}[{{@key}}].value.label">
+							</div>
+						{{/compare}}
 						</div>
 					</div>
 				{{/each}}

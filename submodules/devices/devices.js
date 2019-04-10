@@ -240,15 +240,28 @@ define(function(require) {
 									};
 
 									_.each(keyTypes, function(key) {
-										var camelCaseKey = _.camelCase(key);
+										var camelCaseKey = _.camelCase(key),
+											keyData = {
+												id: key,
+												type: camelCaseKey,
+												title: self.i18n.active().devices.popupSettings.keys[camelCaseKey].title,
+												label: self.i18n.active().devices.popupSettings.keys[camelCaseKey].label,
+												data: _.map(dataDevice.provision[key], function(dataItem) {
+													var value = _.get(dataItem, 'value', {});
 
-										extra.provision.keys.push({
-											id: key,
-											type: camelCaseKey,
-											title: self.i18n.active().devices.popupSettings.keys[camelCaseKey].title,
-											label: self.i18n.active().devices.popupSettings.keys[camelCaseKey].label,
-											data: dataDevice.provision[key]
-										});
+													if (_.isString(value)) {
+														dataItem.value = {
+															value: {
+																value: value
+															}
+														};
+													}
+
+													return dataItem;
+												})
+											};
+
+										extra.provision.keys.push(keyData);
 									});
 
 									dataDevice.extra = _.has(dataDevice, 'extra') ? _.merge({}, dataDevice.extra, extra) : extra;
@@ -347,7 +360,7 @@ define(function(require) {
 					_.each(value.data, function(val, key) {
 						if (val) {
 							var groupSelector = '.control-group[data-id="' + key + '"] ',
-								valueSelector = '.feature-key-value[data-type="' + val.type + '"]';
+								valueSelector = '.feature-key-value[data-type~="' + val.type + '"]';
 
 							templateDevice
 								.find(section.concat(groupSelector, valueSelector))
@@ -375,7 +388,7 @@ define(function(require) {
 								.find('.control-group')
 								.first()
 								.addClass('warning')
-								.siblings()
+								.siblings('.control-group.warning')
 								.removeClass('warning');
 						}
 					}
@@ -623,7 +636,7 @@ define(function(require) {
 					$featureKeyValue = $this.closest('.feature-key-value');
 
 				$featureKeyValue.siblings('.feature-key-value.active').removeClass('active');
-				$featureKeyValue.siblings('.feature-key-value[data-type="' + type + '"]').addClass('active');
+				$featureKeyValue.siblings('.feature-key-value[data-type~="' + type + '"]').addClass('active');
 			});
 
 			templateDevice.find('.tabs-section[data-section="featureKeys"] .type-info a').on('click', function() {
@@ -678,7 +691,15 @@ define(function(require) {
 				hasCodecs = $.inArray(originalData.device_type, ['sip_device', 'landline', 'fax', 'ata', 'softphone', 'smartphone', 'mobile', 'sip_uri']) > -1,
 				hasCallForward = $.inArray(originalData.device_type, ['landline', 'cellphone', 'smartphone']) > -1,
 				hasRTP = $.inArray(originalData.device_type, ['sip_device', 'mobile', 'softphone']) > -1,
-				formData = monster.ui.getFormData('form_device');
+				formData = monster.ui.getFormData('form_device'),
+				isValuePropertyEmpty = function(data, property) {
+					return _
+						.chain(data)
+						.get(['value', property])
+						.trim()
+						.isEmpty()
+						.value();
+				};
 
 			if ('mac_address' in formData) {
 				formData.mac_address = monster.util.formatMacAddress(formData.mac_address);
@@ -730,7 +751,15 @@ define(function(require) {
 					var keys = {};
 
 					list[key].forEach(function(val, idx) {
-						keys[idx] = val.type === 'none' ? null : val;
+						if (val.type === 'none') {
+							keys[idx] = null;
+						} else if (key !== 'combo_keys' || isValuePropertyEmpty(val, 'label')) {
+							if (isValuePropertyEmpty(val, 'value')) {
+								val.value = val.value.value;
+							} else {
+								delete val.value;
+							}
+						}
 					});
 
 					if (_.isEmpty(keys)) {
