@@ -251,9 +251,7 @@ define(function(require) {
 
 													if (_.isString(value)) {
 														dataItem.value = {
-															value: {
-																value: value
-															}
+															value: value
 														};
 													}
 
@@ -364,9 +362,11 @@ define(function(require) {
 
 							templateDevice
 								.find(section.concat(groupSelector, valueSelector))
-									.addClass('active')
-								.find('[name="provision.keys.' + value.id + '[' + key + '].value"]')
-									.val(val.value);
+								.addClass('active');
+							templateDevice.find('[name="provision.keys.' + value.id + '[' + key + '].value.value"]')
+								.val(_.get(val, 'value.value'));
+							templateDevice.find('[name="provision.keys.' + value.id + '[' + key + '].value.label"]')
+								.val(_.get(val, 'value.label'));
 						}
 					});
 				});
@@ -635,7 +635,7 @@ define(function(require) {
 					type = $this.val(),
 					$featureKeyValue = $this.closest('.feature-key-value');
 
-				$featureKeyValue.siblings('.feature-key-value.active').removeClass('active');
+				$featureKeyValue.siblings('.feature-key-value.active[data-type]').removeClass('active');
 				$featureKeyValue.siblings('.feature-key-value[data-type~="' + type + '"]').addClass('active');
 			});
 
@@ -742,7 +742,7 @@ define(function(require) {
 				});
 			}
 
-			if (formData.hasOwnProperty('provision') && formData.provision.hasOwnProperty('keys')) {
+			if (_.has(formData, 'provision.keys')) {
 				/**
 				 * form2object sends keys back as arrays even if the first key is 1
 				 * they needs to be coerced into an object to match the datatype in originalData
@@ -753,12 +753,15 @@ define(function(require) {
 					list[key].forEach(function(val, idx) {
 						if (val.type === 'none') {
 							keys[idx] = null;
-						} else if (key !== 'combo_keys' || isValuePropertyEmpty(val, 'label')) {
-							if (isValuePropertyEmpty(val, 'value')) {
-								val.value = val.value.value;
-							} else {
-								delete val.value;
+						} else {
+							if (key !== 'combo_keys' || isValuePropertyEmpty(val, 'label')) {
+								if (isValuePropertyEmpty(val, 'value')) {
+									delete val.value;
+								} else {
+									val.value = val.value.value;
+								}
 							}
+							keys[idx] = val;
 						}
 					});
 
