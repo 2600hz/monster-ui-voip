@@ -301,8 +301,8 @@
 					"label": "Kombitaste"
 				},
 				"labels": {
-					"user": "Benutzer",
 					"parkingSpot": "Halteposition",
+					"user": "Benutzer",
 					"value": "Wert"
 				},
 				"info": {

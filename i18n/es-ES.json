@@ -232,8 +232,8 @@
 				"menuTitle": "Teclas de funciones",
 				"description": "Tecla de funcion",
 				"labels": {
-					"user": "Usuario",
 					"parkingSpot": "El punto de estacionamiento ",
+					"user": "Usuario",
 					"value": "Valor"
 				},
 				"info": {

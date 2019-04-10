@@ -306,9 +306,10 @@
 					"label": "Combo key"
 				},
 				"labels": {
+					"deviceLabel": "Label on Device",
 					"function": "Function",
-					"user": "User",
 					"parkingSpot": "Parking Spot",
+					"user": "User",
 					"value": "Value"
 				},
 				"info": {

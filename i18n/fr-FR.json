@@ -208,8 +208,8 @@
 				"menuTitle": "Feature Keys",
 				"description": "Feature key",
 				"labels": {
-					"user": "Utilisateur",
 					"parkingSpot": "Place",
+					"user": "Utilisateur",
 					"value": "Valeur"
 				},
 				"info": {
