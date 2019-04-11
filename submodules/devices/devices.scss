@@ -444,12 +444,18 @@
 						0px 1px 4px 0px rgba(21, 21, 23, 0.24);
 
 					.drag-handle-icon {
-						display: inline;
+						width: 1rem;
 					}
 				}
 
 				.drag-handle-icon {
-					display: none;
+					display: inline-block;
+					width: 0;
+					-webkit-transition: width 0.25s;
+					   -moz-transition: width 0.25s;
+						-ms-transition: width 0.25s;
+						 -o-transition: width 0.25s;
+  					transition: width 0.25s;
 				}
 
 				.controls {
