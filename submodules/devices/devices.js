@@ -363,9 +363,9 @@ define(function(require) {
 							templateDevice
 								.find(section.concat(groupSelector, valueSelector))
 								.addClass('active');
-							templateDevice.find('[name="provision.keys.' + value.id + '[' + key + '].value.value"]')
+							templateDevice.find(valueSelector + ' [name="provision.keys.' + value.id + '[' + key + '].value.value"]')
 								.val(_.get(val, 'value.value'));
-							templateDevice.find('[name="provision.keys.' + value.id + '[' + key + '].value.label"]')
+							templateDevice.find(valueSelector + ' [name="provision.keys.' + value.id + '[' + key + '].value.label"]')
 								.val(_.get(val, 'value.label'));
 						}
 					});
