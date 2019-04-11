@@ -25,6 +25,14 @@ define(function(require) {
 			'voip.devices.editDevice': 'devicesRenderEdit'
 		},
 
+		appFlags: {
+			devices: {
+				provisionKeysValueTypes: {
+					parking: 'integer'
+				}
+			}
+		},
+
 		/* Users */
 		/* args: parent and deviceId */
 		devicesRender: function(pArgs) {
@@ -748,12 +756,19 @@ define(function(require) {
 				 * they needs to be coerced into an object to match the datatype in originalData
 				 */
 				_.each(formData.provision.keys, function(value, key, list) {
-					var keys = {};
+					var keys = {},
+						valueDataType;
 
 					list[key].forEach(function(val, idx) {
 						if (val.type === 'none') {
 							keys[idx] = null;
 						} else {
+							valueDataType = _.get(self.appFlags.devices.provisionKeysValueTypes, val.type);
+
+							if (!_.isUndefined(valueDataType) && valueDataType === 'integer') {
+								val.value.value = parseInt(val.value.value);
+							}
+
 							if (key !== 'combo_keys' || isValuePropertyEmpty(val, 'label')) {
 								if (isValuePropertyEmpty(val, 'value')) {
 									delete val.value;
