@@ -464,8 +464,7 @@
 							margin-left: 0;
 						}
 
-						&.active,
-						&:first-of-type {
+						&.active {
 							display: block;
 							width: calc(33.33% - 0.33rem);
 						}
@@ -490,9 +489,27 @@
 					}
 				}
 
-				select, .chosen-container {
+				select {
+					display: block;
+					width: 100%;
+				}
+
+				input {
+					display: block;
+					width: auto;
+				}
+
+				.chosen-container {
 					display: block;
 					width: 100% !important;
+
+					.chosen-drop {
+						width: 100%;
+
+						.chosen-search input {
+							width: 100%;
+						}
+					}
 				}
 			}
 		}
