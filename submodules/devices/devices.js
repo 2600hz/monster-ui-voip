@@ -25,14 +25,6 @@ define(function(require) {
 			'voip.devices.editDevice': 'devicesRenderEdit'
 		},
 
-		appFlags: {
-			devices: {
-				provisionKeysValueTypes: {
-					parking: 'integer'
-				}
-			}
-		},
-
 		/* Users */
 		/* args: parent and deviceId */
 		devicesRender: function(pArgs) {
@@ -248,26 +240,25 @@ define(function(require) {
 									};
 
 									_.each(keyTypes, function(key) {
-										var camelCaseKey = _.camelCase(key),
-											keyData = {
-												id: key,
-												type: camelCaseKey,
-												title: self.i18n.active().devices.popupSettings.keys[camelCaseKey].title,
-												label: self.i18n.active().devices.popupSettings.keys[camelCaseKey].label,
-												data: _.map(dataDevice.provision[key], function(dataItem) {
-													var value = _.get(dataItem, 'value', {});
+										var camelCaseKey = _.camelCase(key);
 
-													if (_.isString(value)) {
-														dataItem.value = {
-															value: value
-														};
-													}
+										extra.provision.keys.push({
+											id: key,
+											type: camelCaseKey,
+											title: self.i18n.active().devices.popupSettings.keys[camelCaseKey].title,
+											label: self.i18n.active().devices.popupSettings.keys[camelCaseKey].label,
+											data: _.map(dataDevice.provision[key], function(dataItem) {
+												var value = _.get(dataItem, 'value', {});
 
-													return dataItem;
-												})
-											};
+												if (_.isString(value)) {
+													dataItem.value = {
+														value: value
+													};
+												}
 
-										extra.provision.keys.push(keyData);
+												return dataItem;
+											})
+										});
 									});
 
 									dataDevice.extra = _.has(dataDevice, 'extra') ? _.merge({}, dataDevice.extra, extra) : extra;
@@ -394,10 +385,10 @@ define(function(require) {
 						if ($this.data('section') === 'comboKeys') {
 							$this
 								.find('.control-group')
-								.first()
-								.addClass('warning')
-								.siblings('.control-group.warning')
-								.removeClass('warning');
+									.first()
+										.addClass('warning')
+									.siblings('.control-group.warning')
+										.removeClass('warning');
 						}
 					}
 				});
@@ -756,17 +747,14 @@ define(function(require) {
 				 * they needs to be coerced into an object to match the datatype in originalData
 				 */
 				_.each(formData.provision.keys, function(value, key, list) {
-					var keys = {},
-						valueDataType;
+					var keys = {};
 
-					list[key].forEach(function(val, idx) {
+					_.each(list[key], function(val, idx) {
 						if (val.type === 'none') {
 							keys[idx] = null;
 						} else {
-							valueDataType = _.get(self.appFlags.devices.provisionKeysValueTypes, val.type);
-
-							if (!_.isUndefined(valueDataType) && valueDataType === 'integer') {
-								val.value.value = parseInt(val.value.value);
+							if (val.type === 'parking') {
+								val.value.value = _.parseInt(val.value.value, 10);
 							}
 
 							if (key !== 'combo_keys' || isValuePropertyEmpty(val, 'label')) {
