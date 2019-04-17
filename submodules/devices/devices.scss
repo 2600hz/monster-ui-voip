@@ -445,13 +445,15 @@
 
 					.drag-handle-icon {
 						width: 1rem;
+						margin-right: 0.75rem;
 					}
 				}
 
 				.drag-handle-icon {
 					display: inline-block;
 					width: 0;
-  					transition: width 0.25s;
+					margin-right: 0;
+  					transition: all 0.25s ease-in-out;
 				}
 
 				.controls {
