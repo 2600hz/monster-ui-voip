@@ -224,18 +224,21 @@ define(function(require) {
 				var voicemailId = $(this).parents('.edit-vmbox').data('id');
 
 				monster.ui.confirm(self.i18n.active().vmboxes.confirmDeleteVmbox, function() {
-					self.vmboxesDeleteVmbox(voicemailId, function(vmbox) {
-						monster.ui.toast({
-							type: 'success',
-							message: self.getTemplate({
-								name: '!' + self.i18n.active().vmboxes.deletedVmbox,
-								data: {
-									vmboxName: vmbox.name
-								}
-							})
-						});
+					self.vmboxesDeleteVmbox({
+						voicemailId: voicemailId,
+						success: function(vmbox) {
+							monster.ui.toast({
+								type: 'success',
+								message: self.getTemplate({
+									name: '!' + self.i18n.active().vmboxes.deletedVmbox,
+									data: {
+										vmboxName: vmbox.name
+									}
+								})
+							});
 
-						callbacks.afterDelete && callbacks.afterDelete(vmbox);
+							callbacks.afterDelete && callbacks.afterDelete(vmbox);
+						}
 					});
 				});
 			});
@@ -384,22 +387,6 @@ define(function(require) {
 		},
 
 		/* Utils */
-		vmboxesDeleteVmbox: function(voicemailId, callback) {
-			var self = this;
-
-			self.callApi({
-				resource: 'voicemail.delete',
-				data: {
-					accountId: self.accountId,
-					voicemailId: voicemailId,
-					data: {}
-				},
-				success: function(data) {
-					callback(data.data);
-				}
-			});
-		},
-
 		vmboxesGetEditData: function(id, callback) {
 			var self = this;
 
@@ -529,6 +516,303 @@ define(function(require) {
 				self.vmboxesFormatListData(results);
 
 				callback && callback(results);
+			});
+		},
+
+		/**
+		 * Deletes a user voicemail box
+		 * @param  {Object}   args
+		 * @param  {Object}   args.voicemailId  ID of the voicemail box to delete
+		 * @param  {Function} [args.success]    Success callback
+		 * @param  {Function} [args.error]      Error callback
+		 */
+		vmboxesDeleteVmbox: function(args) {
+			var self = this,
+				voicemailId = args.voicemailId;
+
+			monster.waterfall([
+				function(callback) {
+					self.vmboxesRequestDeleteVmbox({
+						data: {
+							voicemailId: voicemailId
+						},
+						success: function(deletedVmbox) {
+							callback(null, deletedVmbox);
+						},
+						error: function() {
+							callback(true);
+						}
+					});
+				},
+				function(vmbox, callback) {
+					self.vmboxesGetUserMainCallflow({
+						userId: vmbox.owner_id,
+						success: function(userMainCallflow) {
+							callback(null, vmbox, userMainCallflow);
+						},
+						error: function() {
+							callback(true);
+						}
+					});
+				},
+				function(vmbox, userMainCallflow, callback) {
+					if (userMainCallflow) {
+						self.vmboxesRemoveModuleFromCallflow({
+							callflow: userMainCallflow,
+							module: 'voicemail',
+							dataId: voicemailId,
+							success: function() {
+								callback(null, vmbox);
+							},
+							error: function() {
+								callback(true);
+							}
+						});
+					} else {
+						callback(null);
+					}
+				}
+			], function(err, vmbox) {
+				if (err) {
+					_.has(args, 'error') && args.error(err);
+				} else {
+					_.has(args, 'success') && args.success(vmbox);
+				}
+			});
+		},
+
+		/**
+		 * Deletes a user voicemail box
+		 * @param  {Object}   args
+		 * @param  {Object}   args.callflow   Callflow to modify
+		 * @param  {String}   args.module     Module type to remove
+		 * @param  {String}   args.dataId     ID of the data whose module should be removed
+		 * @param  {Function} [args.success]  Success callback
+		 * @param  {Function} [args.error]    Error callback
+		 */
+		vmboxesRemoveModuleFromCallflow: function(args) {
+			var self = this,
+				callflow = args.callflow,
+				parentFlow = callflow,
+				flow = _.get(parentFlow, 'flow'),
+				cfModule = args.module,
+				dataId = args.dataId,
+				callflowModified = false;
+
+			monster.series([
+				function(callback) {
+					while (flow) {
+						console.log(parentFlow, flow);
+						if (flow.module === cfModule && _.get(flow, 'data.id') === dataId) {
+							var childFlow = _.get(flow, 'children._', {});
+							if (_.has(parentFlow, 'flow')) {
+								// The parent is the callflow itself
+								parentFlow.flow = childFlow;
+								flow = parentFlow.flow;
+							} else if (_.isEmpty(childFlow)) {
+								parentFlow.children = {};
+								flow = null;
+							} else {
+								parentFlow.children._ = childFlow;
+								flow = childFlow;
+							}
+							callflowModified = true;
+						}
+
+						parentFlow = flow;
+						flow = _.get(flow, 'children._');
+					}
+
+					callback(null);
+				},
+				function(callback) {
+					if (callflowModified) {
+						self.usersRequestUpdateCallflow({
+							callflow: callflow,
+							success: function() {
+								callback(null);
+							},
+							error: function() {
+								callback(true);
+							}
+						});
+					} else {
+						callback(null);
+					}
+				}
+			], function(err) {
+				if (err) {
+					_.has(args, 'error') && args.error();
+				} else {
+					_.has(args, 'success') && args.success();
+				}
+			});
+		},
+
+		/**
+		 * Gets the main callflow for a user, by its user ID
+		 * @param  {Object}   args
+		 * @param  {String}   args.userId   User ID
+		 * @param  {Function} args.success  Success callback
+		 * @param  {Function} [args.error]  Error callback
+		 */
+		vmboxesGetUserMainCallflow: function(args) {
+			var self = this,
+				userId = args.userId;
+
+			monster.waterfall([
+				function(callback) {
+					self.vmboxesRequestListCallflows({
+						data: {
+							filters: {
+								filter_owner_id: userId,
+								paginate: 'false'
+							}
+						},
+						success: function(listCallflows) {
+							callback(null, listCallflows);
+						},
+						error: function() {
+							callback(true);
+						}
+					});
+				},
+				function(listCallflows, callback) {
+					var indexMain = -1;
+
+					_.each(listCallflows, function(callflow, index) {
+						if (callflow.type === 'mainUserCallflow' || !('type' in callflow)) {
+							indexMain = index;
+							return false;
+						}
+					});
+
+					if (indexMain === -1) {
+						callback(null, null);
+					} else {
+						self.vmboxesRequestGetCallflow({
+							data: {
+								accountId: self.accountId,
+								callflowId: listCallflows[indexMain].id
+							},
+							success: function(data) {
+								callback(null, data);
+							},
+							error: function() {
+								callback(true);
+							}
+						});
+					}
+				}
+			], function(err, userMainCallflow) {
+				if (err) {
+					_.has(args, 'error') && args.error(err);
+				} else {
+					_.has(args, 'success') && args.success(userMainCallflow);
+				}
+			});
+		},
+
+		/**
+		 * Request a list of callflows to te API
+		 * @param  {Object}   args
+		 * @param  {Object}   [args.data]
+		 * @param  {Object}   [args.data.filters]  Querystring filters
+		 * @param  {Function} [args.success]       Success callback
+		 * @param  {Function} [args.error]         Error callback
+		 */
+		vmboxesRequestListCallflows: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'callflow.list',
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
+				success: function(data) {
+					_.has(args, 'success') && args.success(data.data);
+				},
+				error: function(parsedError) {
+					_.has(args, 'error') && args.error(parsedError);
+				}
+			});
+		},
+
+		/**
+		 * Request a callflow to the API by ID
+		 * @param  {Object}   args
+		 * @param  {Object}   args.data
+		 * @param  {String}   args.data.callflowId  Callflow ID
+		 * @param  {Function} [args.success]        Success callback
+		 * @param  {Function} [args.error]          Error callback
+		 */
+		vmboxesRequestGetCallflow: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'callflow.get',
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
+				success: function(data) {
+					_.has(args, 'success') && args.success(data.data);
+				},
+				error: function(parsedError) {
+					_.has(args, 'error') && args.error(parsedError);
+				}
+			});
+		},
+
+		/**
+		 * Request a callflow to the API by ID
+		 * @param  {Object}   args
+		 * @param  {Object}   args.callflow   Callflow to update
+		 * @param  {Function} [args.success]  Success callback
+		 * @param  {Function} [args.error]    Error callback
+		 */
+		usersRequestUpdateCallflow: function(args) {
+			var self = this,
+				callflow = args.callflow;
+
+			self.callApi({
+				resource: 'callflow.update',
+				data: {
+					accountId: self.accountId,
+					callflowId: callflow.id,
+					data: callflow
+				},
+				success: function(data) {
+					_.has(args, 'success') && args.success(data.data);
+				},
+				error: function(parsedError) {
+					_.has(args, 'error') && args.error(parsedError);
+				}
+			});
+		},
+
+		/**
+		 * Request the deletion of a voicemail box to the API, by its ID
+		 * @param  {Object}   args
+		 * @param  {Object}   args.data
+		 * @param  {String}   args.data.voicemailId  Voicemail box ID
+		 * @param  {Function} [args.success]         Success callback
+		 * @param  {Function} [args.error]           Error callback
+		 */
+		vmboxesRequestDeleteVmbox: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'voicemail.delete',
+				data: _.merge({
+					accountId: self.accountId,
+					data: {}
+				}, args.data),
+				success: function(data) {
+					_.has(args, 'success') && args.success(data.data);
+				},
+				error: function(parsedError) {
+					_.has(args, 'error') && args.error(parsedError);
+				}
 			});
 		}
 	};
