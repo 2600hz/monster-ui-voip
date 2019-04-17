@@ -602,7 +602,6 @@ define(function(require) {
 			monster.series([
 				function(callback) {
 					while (flow) {
-						console.log(parentFlow, flow);
 						if (flow.module === cfModule && _.get(flow, 'data.id') === dataId) {
 							var childFlow = _.get(flow, 'children._', {});
 							if (_.has(parentFlow, 'flow')) {
