@@ -2462,6 +2462,10 @@ define(function(require) {
 				} else if (user.call_forward.enabled === false) {
 					cfMode = user.call_forward.hasOwnProperty('failover') && user.call_forward.failover === true ? 'failover' : 'off';
 				}
+
+				if (_.has(user.call_forward, 'number')) {
+					user.call_forward.number = monster.util.unformatPhoneNumber(user.call_forward.number);
+				}
 			}
 
 			user.extra.callForwardMode = cfMode;
@@ -2518,8 +2522,11 @@ define(function(require) {
 			});
 
 			featureTemplate.find('.save').on('click', function() {
-				if (monster.ui.valid(featureForm)) {
-					var formData = monster.ui.getFormData('call_forward_form');
+				var formData = monster.ui.getFormData('call_forward_form'),
+					phoneNumber = monster.util.getFormatPhoneNumber(formData.number).e164Number,
+					isValidPhoneNumber = !_.isUndefined(phoneNumber);
+
+				if (monster.ui.valid(featureForm) && isValidPhoneNumber) {
 					formData.require_keypress = !formData.require_keypress;
 
 					var selectedType = featureTemplate.find('.feature-select-mode button.selected').data('value');
@@ -2534,7 +2541,7 @@ define(function(require) {
 						formData.failover = false;
 					}
 
-					formData.number = monster.util.unformatPhoneNumber(formData.number, 'keepPlus');
+					formData.number = phoneNumber;
 					delete formData.phoneType;
 
 					var userToSave = $.extend(true, {}, currentUser, { call_forward: formData });
@@ -2542,6 +2549,7 @@ define(function(require) {
 					if (timeoutWarningBox.is(':visible')) {
 						args.openedTab = 'name';
 					}
+
 
 					self.usersUpdateUser(userToSave, function(data) {
 						args.userId = data.data.id;
