@@ -354,7 +354,9 @@ define(function(require) {
 				addNumberToPresenceOptions = function(number) {
 					temp = {
 						key: number,
-						value: monster.util.formatPhoneNumber(number)
+						value: _.startsWith('+', number)
+							? monster.util.formatPhoneNumber(number)
+							: number
 					};
 
 					dataUser.extra.presenceIdOptions.push(temp);
