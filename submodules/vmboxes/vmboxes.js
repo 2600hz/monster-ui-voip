@@ -203,7 +203,7 @@ define(function(require) {
 
 			monster.ui.tabs(templateVMBox);
 
-			timezone.populateDropdown(templateVMBox.find('#timezone'), data.timezone || 'inherit', {inherit: self.i18n.active().defaultTimezone});
+			timezone.populateDropdown(templateVMBox.find('#timezone'), data.timezone || 'inherit', { inherit: self.i18n.active().defaultTimezone });
 			monster.ui.chosen(templateVMBox.find('#timezone'));
 
 			monster.ui.tooltips(templateVMBox);
@@ -556,21 +556,21 @@ define(function(require) {
 					});
 				},
 				function(vmbox, userMainCallflow, callback) {
-					if (userMainCallflow) {
-						self.vmboxesRemoveModuleFromCallflow({
-							callflow: userMainCallflow,
-							module: 'voicemail',
-							dataId: voicemailId,
-							success: function() {
-								callback(null, vmbox);
-							},
-							error: function() {
-								callback(true);
-							}
-						});
-					} else {
+					if (_.isUndefined(userMainCallflow)) {
 						callback(null);
+						return;
 					}
+					self.vmboxesRemoveModuleFromCallflow({
+						callflow: userMainCallflow,
+						module: 'voicemail',
+						dataId: voicemailId,
+						success: function() {
+							callback(null, vmbox);
+						},
+						error: function() {
+							callback(true);
+						}
+					});
 				}
 			], function(err, vmbox) {
 				if (err) {
@@ -625,19 +625,20 @@ define(function(require) {
 					callback(null);
 				},
 				function(callback) {
-					if (callflowModified) {
-						self.usersRequestUpdateCallflow({
-							callflow: callflow,
-							success: function() {
-								callback(null);
-							},
-							error: function() {
-								callback(true);
-							}
-						});
-					} else {
+					if (!callflowModified) {
 						callback(null);
+						return;
 					}
+
+					self.usersRequestUpdateCallflow({
+						callflow: callflow,
+						success: function() {
+							callback(null);
+						},
+						error: function() {
+							callback(true);
+						}
+					});
 				}
 			], function(err) {
 				if (err) {
@@ -665,43 +666,35 @@ define(function(require) {
 						data: {
 							filters: {
 								filter_owner_id: userId,
+								filter_type: 'mainUserCallflow',
 								paginate: 'false'
 							}
 						},
-						success: function(listCallflows) {
-							callback(null, listCallflows);
+						success: function(callflowsData) {
+							callback(null, callflowsData);
 						},
 						error: function() {
 							callback(true);
 						}
 					});
 				},
-				function(listCallflows, callback) {
-					var indexMain = -1;
+				function(callflowsData, callback) {
+					if (_.isEmpty(callflowsData)) {
+						callback(null);
+						return;
+					}
 
-					_.each(listCallflows, function(callflow, index) {
-						if (callflow.type === 'mainUserCallflow' || !('type' in callflow)) {
-							indexMain = index;
-							return false;
+					self.vmboxesRequestGetCallflow({
+						data: {
+							callflowId: _.head(callflowsData).id
+						},
+						success: function(data) {
+							callback(null, data);
+						},
+						error: function() {
+							callback(true);
 						}
 					});
-
-					if (indexMain === -1) {
-						callback(null, null);
-					} else {
-						self.vmboxesRequestGetCallflow({
-							data: {
-								accountId: self.accountId,
-								callflowId: listCallflows[indexMain].id
-							},
-							success: function(data) {
-								callback(null, data);
-							},
-							error: function() {
-								callback(true);
-							}
-						});
-					}
 				}
 			], function(err, userMainCallflow) {
 				if (err) {
