@@ -370,27 +370,84 @@ define(function(require) {
 					});
 				});
 
-				templateDevice.find('.keys').sortable({
-					items: '.control-group',
-					placeholder: 'control-group placeholder',
-					update: function() {
-						var $this = $(this);
+				templateDevice.find('.keys').each(function() {
+					var $this = $(this),
+						$overItem = null,
+						$siblings;
 
-						$this
-							.find('.feature-key-index')
-								.each(function(idx, el) {
-									$(el).text(idx + 1);
+					$this.sortable({
+						items: '.control-group',
+						placeholder: 'control-group placeholder',
+						update: function(e, ui) {
+							var $this = $(this);
+
+							console.log('Update', e, ui);
+
+							$this
+								.find('.feature-key-index')
+									.each(function(idx, el) {
+										$(el).text(idx + 1);
+									});
+
+							if ($this.data('section') === 'comboKeys') {
+								$this
+									.find('.control-group')
+										.first()
+											.addClass('warning')
+										.siblings('.control-group.warning')
+											.removeClass('warning');
+							}
+						},
+						start: function(e, ui) {
+							console.log('Start', e, ui);
+							//ui.helper.on('drag', onDrag);
+							//:not[data-id="' + ui.item.data('id') + '"]
+							$siblings = ui.item.siblings('.control-group');
+						},
+						over: function(e, ui) {
+							console.log('Over', e, ui);
+						},
+						/*change: function(e, ui) {
+							console.log('Change', e, ui);
+						},*/
+						stop: function(e, ui) {
+							console.log('Stop', e, ui);
+							//ui.helper.unbind('drag', onDrag);
+							if ($overItem) {
+								$overItem.removeClass('drag-over');
+								$overItem = null;
+							}
+						},
+						sort: /*_.debounce(*/ function(e, ui) {
+							//console.log('sort', e, ui);
+							//console.log('top:' + ui.position.top, 'left:' + ui.position.left);
+							var $newOverItem = $siblings
+								.filter(function(idx, elem) {
+									var itemPosition = ui.position,
+										$elem = $(elem),
+										elemPosition = $elem.position();
+									return itemPosition.left >= elemPosition.left
+										&& itemPosition.left <= elemPosition.left + $elem.width()
+										&& itemPosition.top >= elemPosition.top
+										&& itemPosition.top <= elemPosition.top + $elem.height();
 								});
 
-						if ($this.data('section') === 'comboKeys') {
-							$this
-								.find('.control-group')
-									.first()
-										.addClass('warning')
-									.siblings('.control-group.warning')
-										.removeClass('warning');
-						}
-					}
+							if (_.head($overItem) === _.head($newOverItem)) {
+								return;
+							}
+
+							if ($overItem) {
+								$overItem.removeClass('drag-over');
+							}
+
+							if ($newOverItem.length === 1) {
+								$newOverItem.addClass('drag-over');
+								$overItem = $newOverItem;
+							} else {
+								$overItem = null;
+							}
+						}	//, 50)
+					});
 				});
 
 				templateDevice

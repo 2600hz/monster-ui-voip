@@ -404,6 +404,10 @@
 				height: 91px;
 			}
 
+			&.drag-over, &.drag-over.placeholder {
+				background-color: $dodger-blue !important;
+			}
+
 			.drag-handle-icon {
 				margin-right: 12px;
 			}
