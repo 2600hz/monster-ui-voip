@@ -212,16 +212,12 @@ define(function(require) {
 									});
 
 									var actions = [ 'none', 'presence', 'parking', 'personal_parking', 'speed_dial' ],
-										parkingSpots = [],
+										parkingSpots = _.range(1, 11),	// Array with integer numbers >= 1 and < 11
 										extra;
 
 									users.sort(function(a, b) {
 										return a.last_name.toLowerCase() > b.last_name.toLowerCase() ? 1 : -1;
 									});
-
-									for (var i = 0; i < 10; i++) {
-										parkingSpots[i] = i + 1;
-									}
 
 									_.each(actions, function(action, idx, list) {
 										list[idx] = {
@@ -244,18 +240,28 @@ define(function(require) {
 									};
 
 									_.each(keyTypes, function(key) {
-										var camelCaseKey = self.devicesSnakeToCamel(key);
+										var camelCaseKey = _.camelCase(key);
 
 										extra.provision.keys.push({
 											id: key,
 											type: camelCaseKey,
 											title: self.i18n.active().devices.popupSettings.keys[camelCaseKey].title,
 											label: self.i18n.active().devices.popupSettings.keys[camelCaseKey].label,
-											data: dataDevice.provision[key]
+											data: _.map(dataDevice.provision[key], function(dataItem) {
+												var value = _.get(dataItem, 'value', {});
+
+												if (_.isString(value)) {
+													dataItem.value = {
+														value: value
+													};
+												}
+
+												return dataItem;
+											})
 										});
 									});
 
-									dataDevice.extra = dataDevice.hasOwnProperty('extra') ? $.extend(true, {}, dataDevice.extra, extra) : extra;
+									dataDevice.extra = _.has(dataDevice, 'extra') ? _.merge({}, dataDevice.extra, extra) : extra;
 
 									self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
 								}
@@ -351,25 +357,39 @@ define(function(require) {
 					_.each(value.data, function(val, key) {
 						if (val) {
 							var groupSelector = '.control-group[data-id="' + key + '"] ',
-								valueSelector = '.feature-key-value[data-type="' + val.type + '"]';
+								valueSelector = '.feature-key-value[data-type~="' + val.type + '"]';
 
 							templateDevice
 								.find(section.concat(groupSelector, valueSelector))
-									.addClass('active')
-								.find('[name="provision.keys.' + value.id + '[' + key + '].value"]')
-									.val(val.value);
+								.addClass('active');
+							templateDevice.find(valueSelector + ' [name="provision.keys.' + value.id + '[' + key + '].value.value"]')
+								.val(_.get(val, 'value.value'));
+							templateDevice.find(valueSelector + ' [name="provision.keys.' + value.id + '[' + key + '].value.label"]')
+								.val(_.get(val, 'value.label'));
 						}
 					});
 				});
 
 				templateDevice.find('.keys').sortable({
 					items: '.control-group',
+					placeholder: 'control-group placeholder',
 					update: function() {
-						templateDevice
-								.find('.feature-key-index')
-									.each(function(idx, el) {
-										$(el).text(idx + 1);
-									});
+						var $this = $(this);
+
+						$this
+							.find('.feature-key-index')
+								.each(function(idx, el) {
+									$(el).text(idx + 1);
+								});
+
+						if ($this.data('section') === 'comboKeys') {
+							$this
+								.find('.control-group')
+									.first()
+										.addClass('warning')
+									.siblings('.control-group.warning')
+										.removeClass('warning');
+						}
 					}
 				});
 
@@ -610,10 +630,12 @@ define(function(require) {
 			});
 
 			templateDevice.find('.feature-key-type').on('change', function() {
-				var type = $(this).val();
+				var $this = $(this),
+					type = $this.val(),
+					$featureKeyValue = $this.closest('.feature-key-value');
 
-				$(this).siblings('.feature-key-value.active').removeClass('active');
-				$(this).siblings('.feature-key-value[data-type="' + type + '"]').addClass('active');
+				$featureKeyValue.siblings('.feature-key-value.active[data-type]').removeClass('active');
+				$featureKeyValue.siblings('.feature-key-value[data-type~="' + type + '"]').addClass('active');
 			});
 
 			templateDevice.find('.tabs-section[data-section="featureKeys"] .type-info a').on('click', function() {
@@ -668,7 +690,15 @@ define(function(require) {
 				hasCodecs = $.inArray(originalData.device_type, ['sip_device', 'landline', 'fax', 'ata', 'softphone', 'smartphone', 'mobile', 'sip_uri']) > -1,
 				hasCallForward = $.inArray(originalData.device_type, ['landline', 'cellphone', 'smartphone']) > -1,
 				hasRTP = $.inArray(originalData.device_type, ['sip_device', 'mobile', 'softphone']) > -1,
-				formData = monster.ui.getFormData('form_device');
+				formData = monster.ui.getFormData('form_device'),
+				isValuePropertyEmpty = function(data, property) {
+					return _
+						.chain(data)
+						.get(['value', property])
+						.trim()
+						.isEmpty()
+						.value();
+				};
 
 			if ('mac_address' in formData) {
 				formData.mac_address = monster.util.formatMacAddress(formData.mac_address);
@@ -711,7 +741,7 @@ define(function(require) {
 				});
 			}
 
-			if (formData.hasOwnProperty('provision') && formData.provision.hasOwnProperty('keys')) {
+			if (_.has(formData, 'provision.keys')) {
 				/**
 				 * form2object sends keys back as arrays even if the first key is 1
 				 * they needs to be coerced into an object to match the datatype in originalData
@@ -719,8 +749,23 @@ define(function(require) {
 				_.each(formData.provision.keys, function(value, key, list) {
 					var keys = {};
 
-					list[key].forEach(function(val, idx) {
-						keys[idx] = val.type === 'none' ? null : val;
+					_.each(list[key], function(val, idx) {
+						if (val.type === 'none') {
+							keys[idx] = null;
+						} else {
+							if (val.type === 'parking') {
+								val.value.value = _.parseInt(val.value.value, 10);
+							}
+
+							if (key !== 'combo_keys' || isValuePropertyEmpty(val, 'label')) {
+								if (isValuePropertyEmpty(val, 'value')) {
+									delete val.value;
+								} else {
+									val.value = val.value.value;
+								}
+							}
+							keys[idx] = val;
+						}
 					});
 
 					if (_.isEmpty(keys)) {
@@ -1042,10 +1087,6 @@ define(function(require) {
 			formattedData.devices = arrayToSort;
 
 			return formattedData;
-		},
-
-		devicesSnakeToCamel: function(string) {
-			return string.replace(/(_\w)/g, function(match) { return match[1].toUpperCase(); });
 		},
 
 		/* Utils */

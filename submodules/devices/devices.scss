@@ -1,3 +1,5 @@
+@import "../../../../css/partials/base";
+
 #devices_container .devices-header {
 	font-size: 18px;
 	line-height: 30px;
@@ -247,7 +249,6 @@
 }
 
 .voip-edit-device-popup .edit-device .title-bar .device-title > div {
-	display: inline-block;
 	float: left;
 	font-size: 18px;
 	font-weight: bold;
@@ -300,12 +301,6 @@
 .voip-edit-device-popup .edit-device .content .tabs-section .helper {
 	position: relative;
 	margin: 0 40px 25px 40px;
-}
-
-.voip-edit-device-popup .edit-device .content .tabs-section .helper i {
-	position: absolute;
-	top: 0;
-	left: -25px;
 }
 
 .voip-edit-device-popup .edit-device .content .tabs-section .number-address {
@@ -372,18 +367,157 @@
 	color: #aaa;
 }
 
-.voip-edit-device-popup .edit-device .feature-key-value {
-	display: none;
-	margin-left: 20px;
-}
+.voip-edit-device-popup .edit-device {
+	.tabs-section {
+		.section-header {
+			display: flex;
+			flex-direction: row;
+			align-items: stretch;
+			width: 100%;
+			margin-bottom: 1.5rem;
 
-.voip-edit-device-popup .edit-device .feature-key-value.active {
-	display: inline-block;
-}
+			.title, .helper {
+				margin: 0;
+			}
 
-.voip-edit-device-popup .edit-device .feature-key-value label {
-	display: inline-block;
-	margin-right: 10px;
+			.helper {
+				flex: 1;
+				position: static;
+				padding-left: 1rem;
+				text-align: right;
+
+				.text {
+					padding-right: 0.5rem;
+				}
+
+				.collapse {
+					text-align: justify;
+				}
+			}
+		}
+
+		.control-group {
+			background-color: $white;
+
+			&.placeholder {
+				background-color: $white-lilac !important;
+				height: 91px;
+			}
+
+			.drag-handle-icon {
+				margin-right: 12px;
+			}
+
+			.feature-key-value {
+				display: none;
+				margin-left: 20px;
+
+				&.active {
+					display: inline-block;
+				}
+
+				label {
+					display: inline-block;
+					margin-right: 10px;
+				}
+			}
+		}
+
+		&[data-section="comboKeys"]{
+			.control-group {
+				margin-bottom: 0;
+				padding: 1rem;
+				box-shadow: inset 0px 1px 0px 0px #DBDBDE,
+					inset 0px -1px 0px 0px #DBDBDE;
+
+				&.warning {
+					background-color: #FCF8E3;
+
+					.monster-panel-text {
+						display: block;
+					}
+				}
+
+				&:hover {
+					box-shadow: inset 0px 1px 0px 0px #DBDBDE,
+						inset 0px -1px 0px 0px #DBDBDE,
+						0px 1px 4px 0px rgba(21, 21, 23, 0.24);
+
+					.drag-handle-icon {
+						width: 1rem;
+						margin-right: 0.75rem;
+					}
+				}
+
+				.drag-handle-icon {
+					display: inline-block;
+					width: 0;
+					margin-right: 0;
+  					transition: all 0.25s ease-in-out;
+				}
+
+				.controls {
+					margin-left: 0px;
+					display: flex;
+
+					.feature-key-value {
+						display:none;
+						margin-left: 0.5rem;
+
+						&:first-of-type {
+							margin-left: 0;
+						}
+
+						&.active {
+							display: block;
+							width: calc(33.33% - 0.33rem);
+						}
+					}
+				}
+
+				.monster-panel-text {
+					display: none;
+				}
+
+				label {
+					display: block;
+					float: none;
+
+					&.control-label {
+						margin-bottom: 1rem;
+						padding-top: 0;
+						width: auto;
+						text-align: left;
+						font-size: 1rem;
+						color: $woodsmoke;
+					}
+				}
+
+				select {
+					display: block;
+					width: 100%;
+				}
+
+				input {
+					display: block;
+					width: auto;
+				}
+
+				.chosen-container {
+					display: block;
+					width: 100% !important;
+
+					.chosen-drop {
+						width: 100%;
+
+						.chosen-search input {
+							width: 100%;
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 .voip-edit-device-popup .keys .fa {
