@@ -323,7 +323,8 @@
 						"parking": "Indicate when a call is placed on a parking slot available to the entire company. The indicator can be used to transfer a call to the parking slot or retrieve a parked call.",
 						"personal_parking": "Indicate when a call is placed on a parking slot dedicated to the selected user. The indicator can be used to transfer a call to the parking slot or retrieve a parked call.",
 						"speed_dial": "Does not indicate for any calls event but can be used to rapidly call the configured number."
-					}
+					},
+					"typeTitle": "{{variable}}: "
 				},
 				"types": {
 					"line": "Line",

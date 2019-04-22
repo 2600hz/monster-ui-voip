@@ -246,7 +246,8 @@
 						"parking": "Indicar cuando una llamada a sido puesta en ranura de estacionamiento disponible a la compañía entera. El indicador puede ser usada para transferir una llamada al la ranura de estacionamiento ò contestar una llamada estacionada.",
 						"personal_parking": "Indicar cuando una llamada este puesta en una ranura de estacionamiento dedicada al usuario seleccionado. El indicador puede ser usado para transferir una llamada a la ranura de estacionamiento or recivir una llamada ya estacionada.",
 						"speed_dial": "No es indicada para cualquier evento de llamada pero se puede usar para llamar el número configurado rapidamente."
-					}
+					},
+					"typeTitle": "{{variable}}: "
 				},
 				"types": {
 					"none": "Ningun",

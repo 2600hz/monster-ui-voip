@@ -337,18 +337,18 @@
 							{{#if info}}
 							<p>
 								<strong>
-									{{text}}
+									{{replaceVar @root.i18n.devices.popupSettings.keys.info.typeTitle text}}
 								</strong>
-								: {{info}}
+								{{info}}
 							</p>
 							{{/if}}
 						{{/each}}
 						{{#compare id '===' 'combo_keys'}}
 							<p>
 								<strong>
-									{{@root.i18n.devices.popupSettings.keys.types.line}}
+									{{replaceVar @root.i18n.devices.popupSettings.keys.info.typeTitle @root.i18n.devices.popupSettings.keys.types.line}}
 								</strong>
-								: {{@root.i18n.devices.popupSettings.keys.info.types.line}}
+								{{@root.i18n.devices.popupSettings.keys.info.types.line}}
 							</p>
 						{{/compare}}
 						</div>

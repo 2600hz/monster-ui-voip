@@ -222,7 +222,8 @@
 						"parking": "Indique lorsqu'un appel est placé sur une place de parking accessible par l'intégralité de l'entreprise. L'indicateur peut être utilisé pour transférer un appel vers la place de parking ou récupérer un appel en attente.",
 						"personal_parking": "Indique lorsqu'un appel est placé sur une place de parking dédié à l'utilisateur sélectionné. L'indicateur peut être utilisé pour transférer un appel vers la place de parking ou récupérer un appel en attente.",
 						"speed_dial": "N'indique pas l'état d'un appel mais peut être utilisé pour appeller rapidement le numéro configuré."
-					}
+					},
+					"typeTitle": "{{variable}}: "
 				},
 				"types": {
 					"none": "Aucun",

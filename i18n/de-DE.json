@@ -316,7 +316,8 @@
 						"parking": "Wird angezeigt, wenn ein Anruf eine Halteposition belegt, die für das gesamte Unternehmen zur Verfügung steht. Die Anzeige kann verwendet werden, um einen Anruf in die Halteposition zu verlegen oder um einen gehaltenen Anruf wieder abzurufen.",
 						"personal_parking": "Wird angezeigt, wenn ein Anruf eine Halteposition belegt, die für den ausgewählten Benutzer vorgesehen ist. Die Anzeige kann verwendet werden, um einen Anruf in die Halteposition zu verlegen oder um einen gehaltenen Anruf wieder abzurufen.",
 						"speed_dial": "Zeigt keine Anrufereignisse an, kann jedoch zum schnellen Anrufen der konfigurierten Nummer verwendet werden."
-					}
+					},
+					"typeTitle": "{{variable}}: "
 				},
 				"types": {
 					"line": "Zeile",
