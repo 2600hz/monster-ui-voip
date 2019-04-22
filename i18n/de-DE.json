@@ -289,7 +289,9 @@
 			"__comment": "UI-1351: Möglichkeit zur Konfiguration von Funktionstasten für SIP-Geräte in SmartPBX hinzugefügt",
 			"__version": "v3.20_s4",
 			"keys": {
-				"alertMessage": "In der Standardeinstellung wird diese Taste als Leitungstaste verwendet. Wir empfehlen, dies nicht zu ändern.",
+				"alert": {
+					"message": "In der Standardeinstellung wird diese Taste als Leitungstaste verwendet. Wir empfehlen, dies nicht zu ändern."
+				},
 				"featureKeys": {
 					"title": "Funktionstasten",
 					"label": "Funktionstaste"
@@ -299,8 +301,8 @@
 					"label": "Kombitaste"
 				},
 				"labels": {
-					"user": "Benutzer",
 					"parkingSpot": "Halteposition",
+					"user": "Benutzer",
 					"value": "Wert"
 				},
 				"info": {
@@ -314,7 +316,8 @@
 						"parking": "Wird angezeigt, wenn ein Anruf eine Halteposition belegt, die für das gesamte Unternehmen zur Verfügung steht. Die Anzeige kann verwendet werden, um einen Anruf in die Halteposition zu verlegen oder um einen gehaltenen Anruf wieder abzurufen.",
 						"personal_parking": "Wird angezeigt, wenn ein Anruf eine Halteposition belegt, die für den ausgewählten Benutzer vorgesehen ist. Die Anzeige kann verwendet werden, um einen Anruf in die Halteposition zu verlegen oder um einen gehaltenen Anruf wieder abzurufen.",
 						"speed_dial": "Zeigt keine Anrufereignisse an, kann jedoch zum schnellen Anrufen der konfigurierten Nummer verwendet werden."
-					}
+					},
+					"typeTitle": "{{variable}}: "
 				},
 				"types": {
 					"line": "Zeile",
