@@ -406,7 +406,7 @@
 				height: 30px;
 			}
 
-			&.drag-over, &.drag-over.placeholder {
+			&.selected, &.selected.placeholder {
 				background-color: $dodger-blue !important;
 			}
 
@@ -416,7 +416,7 @@
 			}
 
 			&.moved {
-				animation: highlight-out 2s ease-in-out;
+				animation: highlight-out 1s ease-in-out;
 			}
 
 			.drag-handle-icon {

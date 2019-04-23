@@ -372,8 +372,8 @@ define(function(require) {
 
 				templateDevice.find('.keys').each(function() {
 					var $this = $(this),
-						updated = false,
-						$overItem,
+						itemUpdated = false,
+						$itemUnder,
 						$itemBefore,
 						$itemAfter,
 						$siblings;
@@ -384,7 +384,7 @@ define(function(require) {
 						update: function(e, ui) {
 							ui.item.addClass('moved');
 
-							updated = true;
+							itemUpdated = true;
 						},
 						start: function(e, ui) {
 							$itemBefore = ui.item.prevAll('.control-group:not(.placeholder):first');
@@ -393,25 +393,25 @@ define(function(require) {
 						},
 						stop: function(e, ui) {
 							// Swap
-							if (!_.isEmpty($overItem) && !$overItem.hasClass('placeholder')) {
-								$overItem.addClass('moved');
+							if (!_.isEmpty($itemUnder) && !$itemUnder.hasClass('placeholder')) {
+								$itemUnder.addClass('moved');
 
-								if (updated) {
+								if (itemUpdated) {
 									// The dragged item was updated, so we only need to swap the other item
-									if (!_.isEmpty($itemBefore) && !$overItem.is($itemBefore)) {
-										$overItem.remove().insertAfter($itemBefore);
-									} else if (!_.isEmpty($itemAfter) && !$overItem.is($itemAfter)) {
-										$overItem.remove().insertBefore($itemAfter);
+									if (!_.isEmpty($itemBefore) && !$itemUnder.is($itemBefore)) {
+										$itemUnder.remove().insertAfter($itemBefore);
+									} else if (!_.isEmpty($itemAfter) && !$itemUnder.is($itemAfter)) {
+										$itemUnder.remove().insertBefore($itemAfter);
 									}
 								} else {
 									// Special case: the dragged item is over a sibling next to it,
 									// but it did not triggered an update event, because the
 									// placeholder was still at the same original position of the item
 									ui.item.addClass('moved');
-									if (!$overItem.is($itemBefore)) {
-										$overItem.insertBefore(ui.item);
-									} else if (!$overItem.is($itemAfter)) {
-										$overItem.insertAfter(ui.item);
+									if (!$itemUnder.is($itemBefore)) {
+										$itemUnder.insertBefore(ui.item);
+									} else if (!$itemUnder.is($itemAfter)) {
+										$itemUnder.insertAfter(ui.item);
 									}
 								}
 							}
@@ -433,11 +433,11 @@ define(function(require) {
 							}
 
 							// Cleanup
-							if (!_.isEmpty($overItem)) {
-								$overItem.removeClass('drag-over');
-								$overItem = null;
+							if (!_.isEmpty($itemUnder)) {
+								$itemUnder.removeClass('selected');
+								$itemUnder = null;
 							}
-							updated = false;
+							itemUpdated = false;
 						},
 						sort: _.debounce(function(e, ui) {
 							var $newOverItem = $siblings
@@ -451,16 +451,16 @@ define(function(require) {
 										&& itemPosition.top <= elemPosition.top + $elem.height();
 								});
 
-							if ($newOverItem.is($overItem)) {
+							if ($newOverItem.is($itemUnder)) {
 								return;
 							}
 
-							if (!_.isEmpty($overItem)) {
-								$overItem.removeClass('drag-over');
+							if (!_.isEmpty($itemUnder)) {
+								$itemUnder.removeClass('selected');
 							}
 
-							$newOverItem.addClass('drag-over');
-							$overItem = $newOverItem;
+							$newOverItem.addClass('selected');
+							$itemUnder = $newOverItem;
 						}, 50)
 					});
 				});
