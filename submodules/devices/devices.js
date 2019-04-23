@@ -372,17 +372,47 @@ define(function(require) {
 
 				templateDevice.find('.keys').each(function() {
 					var $this = $(this),
-						$overItem = null,
+						updated = false,
+						$overItem,
+						$itemBefore,
+						$itemAfter,
 						$siblings;
 
 					$this.sortable({
 						items: '.control-group',
 						placeholder: 'control-group placeholder',
 						update: function(e, ui) {
-							var $this = $(this);
+							ui.item.addClass('moved');
 
-							console.log('Update', e, ui);
+							updated = true;
+						},
+						start: function(e, ui) {
+							$itemBefore = ui.item.prev('.control-group:not(.placeholder)');
+							$itemAfter = ui.item.next('.control-group:not(.placeholder)');
+							$siblings = ui.item.siblings('.control-group');
+						},
+						stop: function(e, ui) {
+							// Swap
+							if (!_.isEmpty($overItem) && !$overItem.hasClass('placeholder')) {
+								$overItem.addClass('moved');
 
+								if (updated) {
+									if ($itemBefore.length === 1 && _.head($itemBefore) !== _.head($overItem)) {
+										$overItem.remove().insertAfter($itemBefore);
+									} else if ($itemAfter.length === 1 && _.head($itemAfter) !== _.head($overItem)) {
+										$overItem.remove().insertBefore($itemAfter);
+									}
+								} else {
+									ui.item.addClass('moved');
+									if (_.head($itemBefore) !== _.head($overItem)) {
+										$overItem.insertBefore(ui.item);
+									} else if (_.head($itemAfter) !== _.head($overItem)) {
+										$overItem.insertAfter(ui.item);
+									}
+								}
+							}
+
+							// Update items
 							$this
 								.find('.feature-key-index')
 									.each(function(idx, el) {
@@ -397,30 +427,17 @@ define(function(require) {
 										.siblings('.control-group.warning')
 											.removeClass('warning');
 							}
-						},
-						start: function(e, ui) {
-							console.log('Start', e, ui);
-							//ui.helper.on('drag', onDrag);
-							//:not[data-id="' + ui.item.data('id') + '"]
-							$siblings = ui.item.siblings('.control-group');
-						},
-						over: function(e, ui) {
-							console.log('Over', e, ui);
-						},
-						/*change: function(e, ui) {
-							console.log('Change', e, ui);
-						},*/
-						stop: function(e, ui) {
-							console.log('Stop', e, ui);
-							//ui.helper.unbind('drag', onDrag);
+
+							// Cleanup
 							if ($overItem) {
 								$overItem.removeClass('drag-over');
 								$overItem = null;
 							}
+							$itemBefore = null;
+							$itemAfter = null;
+							updated = false;
 						},
-						sort: /*_.debounce(*/ function(e, ui) {
-							//console.log('sort', e, ui);
-							//console.log('top:' + ui.position.top, 'left:' + ui.position.left);
+						sort: _.debounce(function(e, ui) {
 							var $newOverItem = $siblings
 								.filter(function(idx, elem) {
 									var itemPosition = ui.position,
@@ -446,7 +463,7 @@ define(function(require) {
 							} else {
 								$overItem = null;
 							}
-						}	//, 50)
+						}, 50)
 					});
 				});
 
