@@ -9,7 +9,8 @@ define(function(require) {
 		requests: {},
 
 		subscribe: {
-			'voip.vmboxes.render': 'vmboxesRender'
+			'voip.vmboxes.render': 'vmboxesRender',
+			'voip.vmboxes.removeCallflowModule': 'vmboxesRemoveModuleFromCallflow'
 		},
 
 		/* Users */

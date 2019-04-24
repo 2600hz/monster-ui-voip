@@ -4417,17 +4417,30 @@ define(function(require) {
 			});
 		},
 
-		usersGetVMBox: function(vmboxId, callback) {
+		/**
+		 * Creates a Voicemail Box
+		 * @param  {Object}   args
+		 * @param  {Object}   args.data                  Data to be sent by the SDK to the API
+		 * @param  {Object}   args.data.voicemailId      Voicemail box ID
+		 * @param  {Boolean}  [args.data.generateError]  Whether or not to display the generic
+		 *                                               Monster UI error dialog when the request
+		 *                                               fails.
+		 * @param  {Function} [args.success]             Success callback
+		 * @param  {Function} [args.error]               Error callback
+		 */
+		usersGetVMBox: function(args) {
 			var self = this;
 
 			self.callApi({
 				resource: 'voicemail.get',
-				data: {
-					accountId: self.accountId,
-					voicemailId: vmboxId
-				},
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
 				success: function(data) {
-					callback(data.data);
+					_.has(args, 'success') && args.success(data.data);
+				},
+				error: function(parsedError, error, globalHandler) {
+					_.has(args, 'error') && args.error(parsedError, error, globalHandler);
 				}
 			});
 		},
@@ -5520,8 +5533,13 @@ define(function(require) {
 						return;
 					}
 
-					self.usersGetVMBox(vmboxLite.id, function(vmbox) {
-						callback(null, vmbox);
+					self.usersGetVMBox({
+						data: {
+							voicemailId: vmboxLite.id
+						},
+						success: function(vmbox) {
+							callback(null, vmbox);
+						}
 					});
 				}
 			], function(err, vmbox) {
@@ -5755,18 +5773,54 @@ define(function(require) {
 						userMainCallflow: callflow
 					});
 
-					if (vmboxId) {
-						self.usersGetVMBox(vmboxId, function(vmbox) {
-							waterfallCallback(null, {
+					if (!vmboxId) {
+						waterfallCallback(null, null, {
+							callflow: callflow
+						});
+						return;
+					}
+
+					self.usersGetVMBox({
+						data: {
+							voicemailId: vmboxId,
+							generateError: false
+						},
+						success: function(vmbox) {
+							waterfallCallback(null, null, {
 								callflow: callflow,
 								vmbox: vmbox
 							});
-						});
-					} else {
-						waterfallCallback(null, {
-							callflow: callflow
-						});
+						},
+						error: function(parsedError, error, globalHandler) {
+							if (error.status === 404) {
+								waterfallCallback(null, vmboxId, {
+									callflow: callflow
+								});
+							} else {
+								globalHandler(parsedError, { generateError: true });
+								waterfallCallback(true);
+							}
+						}
+					});
+				},
+				function(vmboxIdNotFound, data, waterfallCallback) {
+					if (!vmboxIdNotFound) {
+						waterfallCallback(null, data);
+						return;
 					}
+
+					// VMBox no longer exists, so purge it from main callflow
+					monster.pub('voip.vmboxes.removeCallflowModule', {
+						callflow: data.callflow,
+						module: 'voicemail',
+						dataId: vmboxIdNotFound,
+						success: function() {
+							waterfallCallback(null, data);
+						},
+						error: function() {
+							waterfallCallback(true);
+						}
+					});
 				}
 			], function(err, results) {
 				if (err) {
