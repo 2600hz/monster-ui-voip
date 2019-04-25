@@ -649,9 +649,11 @@ define(function(require) {
 			});
 
 			var popup = monster.ui.dialog(templateDevice, {
-				position: ['center', 20],
+				position: ['center', 24],
 				title: popupTitle,
-				dialogClass: 'voip-edit-device-popup overflow-visible'
+				dialogClass: 'voip-edit-device-popup',
+				fitHeightToViewport: true,
+				scrollableContent: '.content'
 			});
 		},
 
