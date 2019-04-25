@@ -10,7 +10,7 @@ define(function(require) {
 
 		subscribe: {
 			'voip.vmboxes.render': 'vmboxesRender',
-			'voip.vmboxes.removeCallflowModule': 'vmboxesRemoveModuleFromCallflow'
+			'voip.vmboxes.removeCallflowModule': 'vmboxesRemoveCallflowModule'
 		},
 
 		/* Users */
@@ -561,7 +561,7 @@ define(function(require) {
 						callback(null);
 						return;
 					}
-					self.vmboxesRemoveModuleFromCallflow({
+					self.vmboxesRemoveCallflowModule({
 						callflow: userMainCallflow,
 						module: 'voicemail',
 						dataId: voicemailId,
@@ -591,7 +591,7 @@ define(function(require) {
 		 * @param  {Function} [args.success]  Success callback
 		 * @param  {Function} [args.error]    Error callback
 		 */
-		vmboxesRemoveModuleFromCallflow: function(args) {
+		vmboxesRemoveCallflowModule: function(args) {
 			var self = this,
 				callflow = args.callflow,
 				parentFlow = callflow,
