@@ -321,8 +321,18 @@ define(function(require) {
 			}
 		},
 
-		devicesRenderDevice: function(data, callbackSave, callbackDelete) {
+		/**
+		 * @param  {Object} args.data
+		 * @param  {Boolean} [args.allowAssign=true]
+		 * @param  {Function} [args.callbackSave]
+		 * @param  {Function} [args.callbackDelete]
+		 */
+		devicesRenderDevice: function(args) {
 			var self = this,
+				data = _.get(args, 'data'),
+				isAssignAllowed = !!_.get(args, 'allowAssign', true),
+				callbackSave = _.get(args, 'callbackSave'),
+				callbackDelete = _.get(args, 'callbackDelete'),
 				mode = data.id ? 'edit' : 'add',
 				type = data.device_type,
 				popupTitle = mode === 'edit'
@@ -348,7 +358,9 @@ define(function(require) {
 					submodule: 'devices'
 				}));
 
-			deviceForm.find('.tabs-section[data-section="basic"]').append(assignTemplate);
+			if (isAssignAllowed) {
+				deviceForm.find('.tabs-section[data-section="basic"]').append(assignTemplate);
+			}
 
 			if (data.extra.hasOwnProperty('provision') && data.extra.provision.hasOwnProperty('keys')) {
 				_.each(data.extra.provision.keys, function(value) {
