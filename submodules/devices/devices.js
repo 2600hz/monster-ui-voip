@@ -179,15 +179,30 @@ define(function(require) {
 			return _.isEmpty(types) ? null : types;
 		},
 
+		/**
+		 * @param  {Object} args
+		 * @param  {Object} args.data
+		 * @param  {Boolean} [args.allowAssign]
+		 * @param  {Function} [args.callbackSave]
+		 * @param  {Function} [args.callbackDelete]
+		 */
 		devicesRenderEdit: function(args) {
 			var self = this,
 				data = args.data,
+				allowAssign = _.get(args, 'allowAssign'),
 				callbackSave = args.callbackSave,
 				callbackDelete = args.callbackDelete || function(device) {
 					self.devicesRender();
 				};
 
 			self.devicesGetEditData(data, function(dataDevice) {
+				var renderDeviceArgs = {
+					data: dataDevice,
+					allowAssign: allowAssign,
+					callbackSave: callbackSave,
+					callbackDelete: callbackDelete
+				};
+
 				if (dataDevice.hasOwnProperty('provision')) {
 					self.devicesGetIterator(dataDevice.provision, function(template) {
 						var keyTypes = self.getKeyTypes(template);
@@ -263,23 +278,32 @@ define(function(require) {
 
 									dataDevice.extra = _.has(dataDevice, 'extra') ? _.merge({}, dataDevice.extra, extra) : extra;
 
-									self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
+									self.devicesRenderDevice(_.merge({}, renderDeviceArgs, {
+										data: dataDevice
+									}));
 								}
 							});
 						} else {
-							self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
+							self.devicesRenderDevice(renderDeviceArgs);
 						}
 					}, function() {
-						self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
+						self.devicesRenderDevice(renderDeviceArgs);
 					});
 				} else {
-					self.devicesRenderDevice(dataDevice, callbackSave, callbackDelete);
+					self.devicesRenderDevice(renderDeviceArgs);
 				}
 			});
 		},
 
+		/**
+		 * @param  {Object} args
+		 * @param  {Boolean} [args.allowAssign]
+		 * @param  {String} args.type
+		 * @param  {Function} args.callback
+		 */
 		devicesRenderAdd: function(args) {
 			var self = this,
+				allowAssign = _.get(args, 'allowAssign'),
 				type = args.type,
 				callback = args.callback,
 				data = {
@@ -304,6 +328,7 @@ define(function(require) {
 					},
 					callbackMissingBrand: function() {
 						self.devicesRenderEdit({
+							allowAssign: allowAssign,
 							data: data,
 							callbackSave: function(dataDevice) {
 								callback && callback(dataDevice);
@@ -313,6 +338,7 @@ define(function(require) {
 				});
 			} else {
 				self.devicesRenderEdit({
+					allowAssign: allowAssign,
 					data: data,
 					callbackSave: function(dataDevice) {
 						callback && callback(dataDevice);
