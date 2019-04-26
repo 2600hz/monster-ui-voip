@@ -1160,6 +1160,7 @@ define(function(require) {
 					type = $this.data('type');
 
 				monster.pub('voip.devices.renderAdd', {
+					allowAssign: false,
 					type: type,
 					callback: function(device) {
 						var rowDevice = $(self.getTemplate({
@@ -1242,6 +1243,7 @@ define(function(require) {
 					userId = $(this).parents('.grid-row').data('id');
 
 				monster.pub('voip.devices.editDevice', {
+					allowAssign: false,
 					data: { id: id },
 					callbackSave: function(device) {
 						row.find('.edit-device').html(device.name);
