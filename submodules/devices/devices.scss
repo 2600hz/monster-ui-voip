@@ -223,10 +223,6 @@
 }
 
 /* Adding / Edition Devices Popups */
-.overflow-visible .ui-dialog-content {
-	overflow: visible;
-}
-
 .voip-edit-device-popup .edit-device {
 	width: 700px;
 }
@@ -244,7 +240,6 @@
 
 .voip-edit-device-popup .edit-device .title-bar {
 	border-bottom: 1px solid #ccc;
-	margin-bottom: 20px;
 	padding: 15px 0;
 }
 
@@ -274,6 +269,10 @@
 .voip-edit-device-popup .edit-device .title-bar .nav-pills {
 	margin-top: 24px;
 	margin-right: 15px;
+}
+
+.voip-edit-device-popup .edit-device .content {
+	padding-top: 1.5rem;
 }
 
 .voip-edit-device-popup .edit-device .content .tabs-section.keys {
@@ -421,6 +420,10 @@
 					margin-right: 10px;
 				}
 			}
+		}
+
+		&[data-section="featureKeys"] input[type="text"] {
+			width: 190px;
 		}
 
 		&[data-section="comboKeys"]{
