@@ -440,16 +440,15 @@ define(function(require) {
 							itemUpdated = false;
 						},
 						sort: _.debounce(function(e, ui) {
-							var $newOverItem = $siblings
-								.filter(function(idx, elem) {
-									var itemPosition = ui.position,
-										$elem = $(elem),
-										elemPosition = $elem.position();
-									return itemPosition.left >= elemPosition.left
-										&& itemPosition.left <= elemPosition.left + $elem.width()
-										&& itemPosition.top >= elemPosition.top
-										&& itemPosition.top <= elemPosition.top + $elem.height();
-								});
+							var $newOverItem = $siblings.filter(function(idx, elem) {
+								var itemPosition = ui.position,
+									$elem = $(elem),
+									elemPosition = $elem.position();
+								return itemPosition.left >= elemPosition.left
+									&& itemPosition.left <= elemPosition.left + $elem.width()
+									&& itemPosition.top >= elemPosition.top
+									&& itemPosition.top <= elemPosition.top + $elem.height();
+							});
 
 							if ($newOverItem.is($itemUnder)) {
 								return;
