@@ -440,7 +440,7 @@ define(function(require) {
 							itemUpdated = false;
 						},
 						sort: _.debounce(function(e, ui) {
-							var $newOverItem = $siblings.filter(function(idx, elem) {
+							var $newItemUnder = $siblings.filter(function(idx, elem) {
 								var itemPosition = ui.position,
 									$elem = $(elem),
 									elemPosition = $elem.position();
@@ -450,7 +450,7 @@ define(function(require) {
 									&& itemPosition.top <= elemPosition.top + $elem.height();
 							});
 
-							if ($newOverItem.is($itemUnder)) {
+							if ($newItemUnder.is($itemUnder)) {
 								return;
 							}
 
@@ -458,8 +458,8 @@ define(function(require) {
 								$itemUnder.removeClass('selected');
 							}
 
-							$newOverItem.addClass('selected');
-							$itemUnder = $newOverItem;
+							$newItemUnder.addClass('selected');
+							$itemUnder = $newItemUnder;
 						}, 50)
 					});
 				});
