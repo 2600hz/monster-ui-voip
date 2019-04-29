@@ -397,11 +397,26 @@
 		}
 
 		.control-group {
+			margin-bottom: 0;
 			background-color: $white;
+			padding: 0.5rem 0;
 
 			&.placeholder {
 				background-color: $white-lilac !important;
-				height: 91px;
+				height: 30px;
+			}
+
+			&.selected, &.selected.placeholder {
+				background-color: $dodger-blue !important;
+			}
+
+			@keyframes highlight-out {
+				0%   { background-color: $dodger-blue }
+				100% { background-color: $white }
+			}
+
+			&.moved {
+				animation: highlight-out 1s ease-in-out;
 			}
 
 			.drag-handle-icon {
@@ -425,10 +440,13 @@
 
 		&[data-section="comboKeys"]{
 			.control-group {
-				margin-bottom: 0;
 				padding: 1rem;
 				box-shadow: inset 0px 1px 0px 0px #DBDBDE,
 					inset 0px -1px 0px 0px #DBDBDE;
+
+				&.placeholder {
+					height: 91px;
+				}
 
 				&.warning {
 					background-color: #FCF8E3;
