@@ -650,8 +650,7 @@ define(function(require) {
 
 			var popup = monster.ui.dialog(templateDevice, {
 				title: popupTitle,
-				dialogClass: 'voip-edit-device-popup',
-				scrollableContainer: '.content'
+				dialogClass: 'voip-edit-device-popup'
 			});
 		},
 
