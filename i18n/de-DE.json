@@ -947,7 +947,8 @@
 		},
 		"confirmMessages": {
 			"deleteHoliday": "Dieser Feiertag wird dauerhaft gelöscht. Vorgang fortsetzen?",
-			"disableHolidays": "Alle vorhandenen Feiertage werden dauerhaft gelöscht. Vorgang fortsetzen?"
+			"disableHolidays": "Alle vorhandenen Feiertage werden dauerhaft gelöscht. Vorgang fortsetzen?",
+			"resetCalls": "Alle Strategien zur Verarbeitung eingehender Anrufe werden auf die Standardwerte zurückgesetzt. Fortfahren?"
 		},
 		"alertMessages": {
 			"uniqueHoliday": "Jeder Feiertag benötigt einen eindeutigen Namen.",
