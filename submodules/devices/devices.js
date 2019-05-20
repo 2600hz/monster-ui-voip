@@ -861,7 +861,7 @@ define(function(require) {
 						if (val.type === 'none') {
 							keys[idx] = null;
 						} else {
-							if (val.type === 'parking') {
+							if (key === 'combo_keys' && val.type === 'parking') {
 								val.value.value = _.parseInt(val.value.value, 10);
 							}
 
