@@ -265,9 +265,9 @@ define(function(require) {
 											data: _.map(dataDevice.provision[key], function(dataItem) {
 												var value = _.get(dataItem, 'value', {});
 
-												if (_.isString(value)) {
+												if (!_.isPlainObject(value)) {
 													dataItem.value = {
-														value: value
+														value: _.toString(value)
 													};
 												}
 
