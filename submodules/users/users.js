@@ -16,7 +16,8 @@ define(function(require) {
 		},
 
 		subscribe: {
-			'voip.users.render': 'usersRender'
+			'voip.users.render': 'usersRender',
+			'voip.users.updateUserFeature': 'usersUpdateUserFeature'
 		},
 
 		appFlags: {
@@ -332,6 +333,10 @@ define(function(require) {
 			if (_vmbox) {
 				dataUser.extra.vmbox = _vmbox;
 			}
+
+			monster.pub('voip.users.features.init', {
+				user: dataUser
+			});
 
 			dataUser.extra.countFeatures = 0;
 			_.each(dataUser.extra.features, function(v) {
@@ -1656,6 +1661,12 @@ define(function(require) {
 				template.find('.grid-cell.active').removeClass('active');
 				template.find('.grid-row.active').removeClass('active');
 			});
+
+			monster.pub('voip.users.features.bind', {
+				template: template,
+				user: currentUser
+			});
+
 		},
 
 		usersBindAddUserEvents: function(args) {
@@ -4516,6 +4527,28 @@ define(function(require) {
 			var self = this;
 
 			self.usersUpdateUserAPI(user, callback, monster.apps.auth.originalAccount.id);
+		},
+
+		usersUpdateUserFeature: function(args) {
+			var self = this,
+				user = args.user,
+				feature = args.feature,
+				enabled = args.enabled,
+				options = {
+					userId: user.id,
+					openedTab: 'features'
+				},
+				callback = function(data) {
+					args.callback && args.callback();
+					self.usersRender(options);
+				};
+
+				user.smartpbx = user.smartpbx || {};
+				user.smartpbx[feature] = user.smartpbx[feature] || {};
+				user.smartpbx[feature].enabled = enabled;
+				
+				self.usersUpdateUser(user, callback);
+
 		},
 
 		usersUpdateUser: function(userData, callback) {
