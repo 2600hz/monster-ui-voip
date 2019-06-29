@@ -1410,6 +1410,14 @@
 					"label": "Über Menü konfigurierbar?",
 					"help": " Wenn deaktiviert, kann der Benutzer den Anrufbeantworter nicht über das Menü konfigurieren"
 				},
+				"fastForwardRewind": {
+					"label": "Vor- und Zurückspulen aktivieren?",
+					"help": "Wenn diese Option aktiviert ist, kann der Benutzer Voicemail-Nachrichten schnell vor- und zurückspulen"
+				},
+				"oldestMessageFirst": {
+					"label": "Mailbox nach ältester Nachricht sortieren?",
+					"help": "Wenn diese Option aktiviert ist, werden Voicemails in der Reihenfolge vom ältesten zum neuesten abgespielt"
+				},
 				"__comment": "UI-2634: Unterstützung für WAV, MP4 und MP3 für die Anrufbeantworter-Medienerweiterungen hinzugefügt",
 				"__version": "4.1",
 				"mediaExtension": {
