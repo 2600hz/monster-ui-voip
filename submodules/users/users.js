@@ -1241,8 +1241,8 @@ define(function(require) {
 				var row = $(this).parents('.item-row'),
 					id = row.data('id'),
 					userId = $(this).parents('.grid-row').data('id'),
-					userData = _.find(data.users, function(user) { return user.id === userId; }),
-					deviceData = _.find(userData.extra.devices, function(device) { return device.id === id; });
+					userData = _.find(data.users, { id: userId }),
+					deviceData = _.find(userData.extra.devices, { id: id });
 
 				monster.pub('voip.devices.editDevice', {
 					allowAssign: false,
