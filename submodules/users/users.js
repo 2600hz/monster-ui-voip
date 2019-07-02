@@ -1240,11 +1240,13 @@ define(function(require) {
 			template.on('click', '.detail-devices .edit-device-link', function() {
 				var row = $(this).parents('.item-row'),
 					id = row.data('id'),
-					userId = $(this).parents('.grid-row').data('id');
+					userId = $(this).parents('.grid-row').data('id'),
+					userData = _.find(data.users, { id: userId }),
+					deviceData = _.find(userData.extra.devices, { id: id });
 
 				monster.pub('voip.devices.editDevice', {
 					allowAssign: false,
-					data: { id: id },
+					data: { id: id, isRegistered: deviceData.registered },
 					callbackSave: function(device) {
 						row.find('.edit-device').html(device.name);
 					},
