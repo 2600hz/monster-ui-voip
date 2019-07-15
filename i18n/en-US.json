@@ -339,8 +339,8 @@
 		"buy": "Buy Device",
 		"classifiers": {
 			"unknown": {
-				"name": "Other than above",
-				"help": "Please select this option when you want this account to place calls to ANY NUMBER other than mentioned on the list. (When the format of the number is unknown to the system.)"
+			    "name": "Other than above",
+			    "help": "Please select this option when you want this account to place calls to ANY NUMBER other than mentioned on the list. (When the format of the number is unknown to the system.)"
 			}
 		},
 		"noMatchingDevices": "There were no devices found matching your search",
@@ -1420,14 +1420,6 @@
 				"configurable": {
 					"label": "Configurable via Menu?",
 					"help": " If unchecked, it will disallow the user to configure voicemail via the menu"
-				},
-				"fastForwardRewind": {
-					"label": "Enable fast-forward and rewind?",
-					"help": "If enabled, it will allow the user to fast forward and rewind their voicemail messages"
-				},
-				"oldestMessageFirst": {
-					"label": "Sort voicemail box by oldest message first?",
-					"help": "If enabled, voicemails will be played in order from oldest to newest"
 				},
 				"__comment": "UI-2634: add support for wav/mp4/mp3 for voicemail media extensions",
 				"__version": "4.1",
