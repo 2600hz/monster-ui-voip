@@ -662,18 +662,22 @@ define(function(require) {
 					data.topMessage = {
 						cssClass: 'btn-danger',
 						message: self.i18n.active().myOffice.missingCnamE911Message,
-						action: 'checkMissingE911'
+						category: 'myOffice',
+						subcategory: 'callerIdDialog'
 					};
 				} else if (!hasValidCallerId) {
 					data.topMessage = {
 						cssClass: 'btn-danger',
-						message: self.i18n.active().myOffice.missingCnamMessage
+						message: self.i18n.active().myOffice.missingCnamMessage,
+						category: 'myOffice',
+						subcategory: 'callerIdDialog'
 					};
 				} else if (!hasValidE911) {
 					data.topMessage = {
 						cssClass: 'btn-danger',
 						message: self.i18n.active().myOffice.missingE911Message,
-						action: 'checkMissingE911'
+						category: 'myOffice',
+						subcategory: 'callerIdDialog'
 					};
 				}
 			}
@@ -729,6 +733,13 @@ define(function(require) {
 							}
 						});
 						break;
+					case 'myOffice':
+						self.myOfficeOpenElement({
+							data: myOfficeData,
+							element: subcategory,
+							parent: parent
+						});
+						break;
 				}
 			});
 
@@ -754,6 +765,30 @@ define(function(require) {
 			});
 
 			monster.ui.tooltips(template);
+		},
+
+		/**
+		 * Opens an element within this submodule
+		 * @param  {Object} args
+		 * @param  {Object} args.data  Data to be provided to the element to be displayed
+		 * @param  {('callerIdDialog')} args.element  Name of the element to open
+		 * @param  {jQuery} args.parent  Parent container
+		 */
+		myOfficeOpenElement: function(args) {
+			var self = this,
+				data = args.data,
+				element = args.element,
+				$parent = args.parent;
+
+			// Currently only the Caller ID dialog is handled
+			if (element !== 'callerIdDialog') {
+				return;
+			}
+
+			self.myOfficeRenderCallerIdPopup({
+				parent: $parent,
+				myOfficeData: data
+			});
 		},
 
 		myOfficeRenderMusicOnHoldPopup: function(args) {

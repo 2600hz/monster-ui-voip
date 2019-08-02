@@ -23,7 +23,7 @@
 
 	<div class="dashboard-content">
 		{{#if topMessage}}
-		<div class="dashboard-top-message {{topMessage.cssClass}} link-box" data-category="strategy" data-subcategory="main-number"{{#if topMessage.action}} data-action="{{topMessage.action}}"{{/if}}>
+		<div class="dashboard-top-message {{topMessage.cssClass}} link-box" data-category="{{topMessage.category}}" data-subcategory="{{topMessage.subcategory}}"{{#if topMessage.action}} data-action="{{topMessage.action}}"{{/if}}>
 			<i class="fa fa-exclamation-triangle"></i>{{topMessage.message}}<!-- {{i18n.myOffice.missingE911Message}} -->
 		</div>
 		{{/if}}

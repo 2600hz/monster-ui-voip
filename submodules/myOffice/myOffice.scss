@@ -70,7 +70,7 @@
 		opacity: 0.8;
 	}
 	.dashboard-top-message{
-		&.link-box[data-action] {
+		&.link-box[data-category] {
 			cursor: pointer;
 			&:hover {
 				background-color: #ff3b29;
