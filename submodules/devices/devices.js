@@ -613,6 +613,8 @@ define(function(require) {
 
 			templateDevice.find('.actions .save').on('click', function() {
 				if (monster.ui.valid(deviceForm)) {
+					$(this).prop('disabled', 'disabled');
+
 					templateDevice.find('.feature-key-value:not(.active)').remove();
 
 					var dataToSave = self.devicesMergeData(data, templateDevice, audioCodecs, videoCodecs);
