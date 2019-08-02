@@ -615,12 +615,17 @@ define(function(require) {
 				if (monster.ui.valid(deviceForm)) {
 					templateDevice.find('.feature-key-value:not(.active)').remove();
 
-					var dataToSave = self.devicesMergeData(data, templateDevice, audioCodecs, videoCodecs);
+					var $this = $(this),
+						dataToSave = self.devicesMergeData(data, templateDevice, audioCodecs, videoCodecs);
+
+					$this.prop('disabled', 'disabled');
 
 					self.devicesSaveDevice(dataToSave, function(data) {
 						popup.dialog('close').remove();
 
 						callbackSave && callbackSave(data);
+					}, function() {
+						$this.prop('disabled', false);
 					});
 				} else {
 					templateDevice.find('.tabs-selector[data-section="basic"]').click();
@@ -1325,17 +1330,27 @@ define(function(require) {
 			});
 		},
 
-		devicesSaveDevice: function(deviceData, callback) {
+		/**
+		 * @param  {Object} deviceData
+		 * @param  {Function} callbackSuccess
+		 * @param  {Function} [callbackError]
+		 */
+		devicesSaveDevice: function(deviceData, callbackSuccess, callbackError) {
 			var self = this;
 
 			if (deviceData.id) {
-				self.devicesUpdateDevice(deviceData, callback);
+				self.devicesUpdateDevice(deviceData, callbackSuccess, callbackError);
 			} else {
-				self.devicesCreateDevice(deviceData, callback);
+				self.devicesCreateDevice(deviceData, callbackSuccess, callbackError);
 			}
 		},
 
-		devicesCreateDevice: function(deviceData, callback) {
+		/**
+		 * @param  {Object} deviceData
+		 * @param  {Function} callbackSuccess
+		 * @param  {Function} [callbackError]
+		 */
+		devicesCreateDevice: function(deviceData, callbackSuccess, callbackError) {
 			var self = this;
 
 			self.callApi({
@@ -1345,11 +1360,19 @@ define(function(require) {
 					data: deviceData
 				},
 				success: function(data) {
-					callback(data.data);
+					callbackSuccess(data.data);
+				},
+				error: function(data) {
+					callbackError && callbackError(data);
 				}
 			});
 		},
 
+		/**
+		 * @param  {Object} deviceData
+		 * @param  {Function} callbackSuccess
+		 * @param  {Function} [callbackError]
+		 */
 		devicesUpdateDevice: function(deviceData, callbackSuccess, callbackError) {
 			var self = this;
 
