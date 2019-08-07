@@ -706,8 +706,7 @@ define(function(require) {
 			template.find('.link-box').on('click', function(e) {
 				var $this = $(this),
 					category = $this.data('category'),
-					subcategory = $this.data('subcategory'),
-					actionType = $this.data('action');
+					subcategory = $this.data('subcategory');
 
 				$('.category').removeClass('active');
 				switch (category) {
@@ -727,10 +726,7 @@ define(function(require) {
 						$('.category#strategy').addClass('active');
 						monster.pub('voip.strategy.render', {
 							parent: parent,
-							openElement: subcategory,
-							action: {
-								type: actionType
-							}
+							openElement: subcategory
 						});
 						break;
 					case 'myOffice':
