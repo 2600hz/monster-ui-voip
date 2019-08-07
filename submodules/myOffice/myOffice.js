@@ -655,8 +655,16 @@ define(function(require) {
 			});
 
 			if (data.mainNumbers && data.mainNumbers.length > 0) {
-				var hasValidCallerId = monster.util.isNumberFeatureEnabled('cnam') === false || data.account.hasOwnProperty('caller_id') && data.account.caller_id.hasOwnProperty('emergency') && data.account.caller_id.emergency.hasOwnProperty('number') && data.numbers.hasOwnProperty(data.account.caller_id.emergency.number),
-					hasValidE911 = monster.util.isNumberFeatureEnabled('e911') === false || data.account.hasOwnProperty('caller_id') && data.account.caller_id.hasOwnProperty('emergency') && data.account.caller_id.emergency.hasOwnProperty('number') && data.numbers.hasOwnProperty(data.account.caller_id.emergency.number) && data.numbers[data.account.caller_id.emergency.number].features.indexOf('e911') >= 0;
+				var hasValidCallerId = monster.util.isNumberFeatureEnabled('cnam') === false
+						|| (_.has(data.account, 'caller_id.external.number')
+							&& _.has(data.numbers, data.account.caller_id.external.number)),
+					hasValidE911 = monster.util.isNumberFeatureEnabled('e911') === false
+						|| (_.has(data.account, 'caller_id.emergency.number')
+							&& _
+								.chain(data.numbers)
+								.get([ data.account.caller_id.emergency.number, 'features' ])
+								.includes('e911')
+								.value());
 
 				if (!hasValidCallerId && !hasValidE911) {
 					data.topMessage = {
