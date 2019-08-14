@@ -655,25 +655,37 @@ define(function(require) {
 			});
 
 			if (data.mainNumbers && data.mainNumbers.length > 0) {
-				var hasValidCallerId = monster.util.isNumberFeatureEnabled('cnam') === false || data.account.hasOwnProperty('caller_id') && data.account.caller_id.hasOwnProperty('emergency') && data.account.caller_id.emergency.hasOwnProperty('number') && data.numbers.hasOwnProperty(data.account.caller_id.emergency.number),
-					hasValidE911 = monster.util.isNumberFeatureEnabled('e911') === false || data.account.hasOwnProperty('caller_id') && data.account.caller_id.hasOwnProperty('emergency') && data.account.caller_id.emergency.hasOwnProperty('number') && data.numbers.hasOwnProperty(data.account.caller_id.emergency.number) && data.numbers[data.account.caller_id.emergency.number].features.indexOf('e911') >= 0;
+				var bypassCnam = !monster.util.isNumberFeatureEnabled('cnam'),
+					isExternalNumberSet = _.has(data.numbers, _.get(data.account, 'caller_id.external.number')),
+					hasValidCallerId = bypassCnam || isExternalNumberSet,
+					bypassE911 = !monster.util.isNumberFeatureEnabled('e911'),
+					isEmergencyNumberSet = _
+						.chain(data.numbers)
+						.get([ _.get(data.account, 'caller_id.emergency.number'), 'features' ])
+						.includes('e911')
+						.value(),
+					hasValidE911 = bypassE911 || isEmergencyNumberSet;
 
 				if (!hasValidCallerId && !hasValidE911) {
 					data.topMessage = {
 						cssClass: 'btn-danger',
 						message: self.i18n.active().myOffice.missingCnamE911Message,
-						action: 'checkMissingE911'
+						category: 'myOffice',
+						subcategory: 'callerIdDialog'
 					};
 				} else if (!hasValidCallerId) {
 					data.topMessage = {
 						cssClass: 'btn-danger',
-						message: self.i18n.active().myOffice.missingCnamMessage
+						message: self.i18n.active().myOffice.missingCnamMessage,
+						category: 'myOffice',
+						subcategory: 'callerIdDialog'
 					};
 				} else if (!hasValidE911) {
 					data.topMessage = {
 						cssClass: 'btn-danger',
 						message: self.i18n.active().myOffice.missingE911Message,
-						action: 'checkMissingE911'
+						category: 'myOffice',
+						subcategory: 'callerIdDialog'
 					};
 				}
 			}
@@ -702,8 +714,7 @@ define(function(require) {
 			template.find('.link-box').on('click', function(e) {
 				var $this = $(this),
 					category = $this.data('category'),
-					subcategory = $this.data('subcategory'),
-					actionType = $this.data('action');
+					subcategory = $this.data('subcategory');
 
 				$('.category').removeClass('active');
 				switch (category) {
@@ -723,10 +734,14 @@ define(function(require) {
 						$('.category#strategy').addClass('active');
 						monster.pub('voip.strategy.render', {
 							parent: parent,
-							openElement: subcategory,
-							action: {
-								type: actionType
-							}
+							openElement: subcategory
+						});
+						break;
+					case 'myOffice':
+						self.myOfficeOpenElement({
+							data: myOfficeData,
+							element: subcategory,
+							parent: parent
 						});
 						break;
 				}
@@ -754,6 +769,30 @@ define(function(require) {
 			});
 
 			monster.ui.tooltips(template);
+		},
+
+		/**
+		 * Opens an element within this submodule
+		 * @param  {Object} args
+		 * @param  {Object} args.data  Data to be provided to the element to be displayed
+		 * @param  {('callerIdDialog')} args.element  Name of the element to open
+		 * @param  {jQuery} args.parent  Parent container
+		 */
+		myOfficeOpenElement: function(args) {
+			var self = this,
+				data = args.data,
+				element = args.element,
+				$parent = args.parent;
+
+			// Currently only the Caller ID dialog is handled
+			if (element !== 'callerIdDialog') {
+				return;
+			}
+
+			self.myOfficeRenderCallerIdPopup({
+				parent: $parent,
+				myOfficeData: data
+			});
 		},
 
 		myOfficeRenderMusicOnHoldPopup: function(args) {
