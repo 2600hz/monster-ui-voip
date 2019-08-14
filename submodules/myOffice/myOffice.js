@@ -655,16 +655,16 @@ define(function(require) {
 			});
 
 			if (data.mainNumbers && data.mainNumbers.length > 0) {
-				var hasValidCallerId = monster.util.isNumberFeatureEnabled('cnam') === false
-						|| (_.has(data.account, 'caller_id.external.number')
-							&& _.has(data.numbers, data.account.caller_id.external.number)),
-					hasValidE911 = monster.util.isNumberFeatureEnabled('e911') === false
-						|| (_.has(data.account, 'caller_id.emergency.number')
-							&& _
-								.chain(data.numbers)
-								.get([ data.account.caller_id.emergency.number, 'features' ])
-								.includes('e911')
-								.value());
+				var bypassCnam = !monster.util.isNumberFeatureEnabled('cnam'),
+					isExternalNumberSet = _.has(data.numbers, _.get(data.account, 'caller_id.external.number')),
+					hasValidCallerId = bypassCnam || isExternalNumberSet,
+					bypassE911 = !monster.util.isNumberFeatureEnabled('e911'),
+					isEmergencyNumberSet = _
+						.chain(data.numbers)
+						.get([ _.get(data.account, 'caller_id.emergency.number'), 'features' ])
+						.includes('e911')
+						.value(),
+					hasValidE911 = bypassE911 || isEmergencyNumberSet;
 
 				if (!hasValidCallerId && !hasValidE911) {
 					data.topMessage = {
