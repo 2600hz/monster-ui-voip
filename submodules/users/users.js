@@ -2534,7 +2534,7 @@ define(function(require) {
 
 			featureTemplate.find('.save').on('click', function() {
 				var formData = monster.ui.getFormData('call_forward_form'),
-					phoneNumber = monster.util.getFormatPhoneNumber(formData.number).e164Number,
+					phoneNumber = monster.util.unformatPhoneNumber(formData.number),
 					isValidPhoneNumber = !_.isUndefined(phoneNumber);
 
 				if (monster.ui.valid(featureForm) && isValidPhoneNumber) {
