@@ -43,6 +43,12 @@ define(function(require) {
 
 		featureCodes: [
 			{
+				name: 'directed_ext_pickup',
+				number: '87',
+				pattern: '^\\*87([0-9]+)$',
+				moduleName: 'group_pickup_feature'
+			},
+			{
 				name: 'call_forward[action=deactivate]',
 				number: '73',
 				callflowNumber: '*73',
