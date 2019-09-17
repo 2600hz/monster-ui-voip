@@ -1684,8 +1684,8 @@ define(function(require) {
 										name: 'popupEditFaxbox',
 										data: {
 											email: faxbox.hasOwnProperty('notifications') && faxbox.notifications.hasOwnProperty('inbound') && faxbox.notifications.inbound.hasOwnProperty('email')
-													? faxbox.notifications.inbound.email.send_to
-													: ''
+												? faxbox.notifications.inbound.email.send_to
+												: ''
 										},
 										submodule: 'strategy'
 									})),
@@ -2706,7 +2706,7 @@ define(function(require) {
 							{ value: 'last', label: self.i18n.active().strategy.ordinals.last }
 						]
 					}
-				}, holiday, {holidayType: holidayType});
+				}, holiday, { holidayType: holidayType });
 
 			for (var i = 1; i <= 31; i++) {
 				templateData.resources.days.push({ value: i });
@@ -3653,7 +3653,7 @@ define(function(require) {
 										name: val,
 										type: 'main_weekdays',
 										time_window_start: 32400, // 9:00AM
-										time_window_stop: 61200,  // 5:00PM
+										time_window_stop: 61200, // 5:00PM
 										wdays: [val.substring(4).toLowerCase()]
 									}
 								},
@@ -3852,7 +3852,7 @@ define(function(require) {
 						ring_group: [],
 						userGroups: $.map(results.userGroups, function(val) {
 							var group = _.find(results.groups, function(group) { return val.group_id === group.id; });
-							val.name = group && group.name || val.name;
+							val.name = group && (group.name || val.name);
 							val.module = 'callflow';
 							return val;
 						}),
