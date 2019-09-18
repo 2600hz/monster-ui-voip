@@ -1204,6 +1204,10 @@
 		"noFeatureCodeMessage": "There are no feature codes enabled on your account yet. Feature codes are automatically created when you load the Main Number page.",
 		"mainNumberLink": "Go to Main Number",
 		"labels": {
+			"directed_ext_pickup": {
+				"label": "Directed Extension Pickup",
+				"tooltip": ""
+			},
 			"qubicle login": {
 				"label": "Agent Login",
 				"tooltip": ""
