@@ -1206,7 +1206,7 @@
 		"labels": {
 			"directed_ext_pickup": {
 				"label": "Directed Extension Pickup",
-				"tooltip": ""
+				"tooltip": "(Dial *87, then the extension number of the ringing device)"
 			},
 			"qubicle login": {
 				"label": "Agent Login",
