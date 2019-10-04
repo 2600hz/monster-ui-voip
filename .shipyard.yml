@@ -1,0 +1,18 @@
+---
+name: monster-ui-application-voip
+base_branch: origin/4.3
+metapackage:
+  - name: meta-monster-ui
+    branch: "4.3"
+    package: monster-ui-application-voip
+    type: required
+base_core: monster-ui
+template: monster-ui-application.spec.tmpl
+package:
+  centos7:
+    name: monster-ui-application-voip
+    app_name: voip
+    license: "MPL 2.0"
+    group: Productivity/Telephony
+    url: http://www.2600hz.org/
+    vendor: 2600Hz
