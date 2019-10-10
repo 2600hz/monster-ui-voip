@@ -34,7 +34,7 @@ jobs:
     steps:
       - checkout
       - run: 
-          name: Getting base branch
+          name: Setting up core repository
           command: |
             BAZE="$(cat "${HOME}/2600hz/the_app/.base_branch")"
             if [ -n "$BAZE" ]; then
@@ -44,7 +44,7 @@ jobs:
               exit 1
             fi
       - run: 
-          name: Setting up Directories
+          name: Generating build environment variables
           command: |
             APP=${CIRCLE_PROJECT_REPONAME#monster-ui-}
             echo -e "export MONSTER_APP=${APP}\n" >> $BASH_ENV
@@ -52,29 +52,32 @@ jobs:
             echo -e "export MONSTER_ROOT=${HOME}/2600hz/monster-ui" >> $BASH_ENV
             echo -e "export APP_PATH=src/apps/${APP}\n\n" >> $BASH_ENV
       - run:
-          name: Verify directories 
+          name: Displaying environment information 
           command: |
             echo ":: behold, running ci tests for application: $MONSTER_APP"
             echo "MONSTER_ROOT: $MONSTER_ROOT"
             echo "APP_PATH: $APP_PATH"
             echo "BASE_BRANCH: $BASE_BRANCH"
+      - run:
+          name: Cloning core repository
+          command: |
             if [ ! -d ${MONSTER_ROOT} ]; then
               git clone https://github.com/2600hz/monster-ui $MONSTER_ROOT
             fi
       - run: 
-          name: Running base setup script
+          name: Running core setup script
           command: ${MONSTER_ROOT}/scripts/circleci.bash
       - restore_cache:
           key: dependency-cache-centos-{{ checksum "/home/circleci/2600hz/monster-ui/package-lock.json" }}
           paths:
             -/home/circle/2600hz/monster-ui/node_modules
       - run:
-          name: Install dependencies from package.json
+          name: Making dependencies
           command: |
             cd $MONSTER_ROOT
             npm install
       - run:
-          name: Run a production build
+          name: Building release
           command: |
             cd $MONSTER_ROOT
             gulp build-app --app=${APP}            
@@ -92,14 +95,17 @@ jobs:
             echo "export PACKAGE_NAME=${PACKAGE_NAME}" >> $BASH_ENV
             echo "build version for ${PACKAGE_NAME} version: ${VERSION} release: ${RELEASE}"
       - run:
-          name: Preparing source
-          command: |           
+          name: Building CHANGELOG and VERSION files
+          command: |
             cd $BUILD_ROOT
             ./package_docs
+      - run:
+          name: Preparing source for packaging
+          command: |           
             cd $BUILD_SOURCES
             echo " - copy build into artifacts"
             cp -R ${MONSTER_ROOT}/dist/apps/${MONSTER_APP} ${BUILD_SOURCES}/
-            echo " - generate build version and changelog"
+            cp VERSION ${MONSTER_APP}/
             echo " - removing files that should not be packaged in the source tar"
             rm -rf ${BUILD_SOURCES}/.??*
             rm -rf ${BUILD_SOURCES}/doc*
@@ -111,7 +117,6 @@ jobs:
             cp -r ${BUILD_SOURCES}/* ${ARTIFACTS_NAME}/.
             tar -cf ${ARTIFACTS_NAME}.tar ${ARTIFACTS_NAME}
             cp ${ARTIFACTS_NAME}.tar ${BUILD_SOURCES}/.
-            
       - run:
           name: Building package
           command: |
