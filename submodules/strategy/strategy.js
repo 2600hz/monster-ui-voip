@@ -46,7 +46,7 @@ define(function(require) {
 				name: 'directed_ext_pickup',
 				number: '87',
 				pattern: '^\\*87([0-9]+)$',
-				moduleName: 'directed_ext_pickup',
+				moduleName: 'group_pickup_feature',
 				extraData: {
 					type: 'extension'
 				}
