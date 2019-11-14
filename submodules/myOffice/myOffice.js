@@ -35,7 +35,7 @@ define(function(require) {
 			'#BDE55F', // Light Green
 			'#F1E87C', // Pale Yellow
 			'#EF8F25', // Orange
-			'#6F7C7D'  // Grey
+			'#6F7C7D' // Grey
 		],
 
 		/* My Office */
@@ -80,7 +80,7 @@ define(function(require) {
 						// 	.orderBy('count', 'desc')
 						// 	.value(),
 						classifiedNumbers: myOfficeData.classifiedNumbers,
-						directoryUsers: myOfficeData.directory.users && myOfficeData.directory.users.length || 0,
+						directoryUsers: myOfficeData.directory.users && (myOfficeData.directory.users.length || 0),
 						directoryLink: myOfficeData.directoryLink,
 						showUserTypes: self.appFlags.global.showUserTypes
 					},
@@ -537,7 +537,7 @@ define(function(require) {
 					}
 					if (classifierRegexes[classifierKey].test(num)) {
 						if (classifierKey in classifiedNumbers) {
-							classifiedNumbers[classifierKey] ++;
+							classifiedNumbers[classifierKey] += 1;
 						} else {
 							classifiedNumbers[classifierKey] = 1;
 						}
