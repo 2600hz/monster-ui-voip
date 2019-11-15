@@ -516,7 +516,6 @@ define(function(require) {
 				// 		color: '#b588b9'
 				// 	}
 				// },
-				channelsArray = [],
 				classifierRegexes = {},
 				classifiedNumbers = {},
 				registeredDevices = _.map(data.devicesStatus, function(device) { return device.device_id; }),
@@ -612,12 +611,6 @@ define(function(require) {
 				}
 			});
 
-			_.each(data.channels, function(val) {
-				if (channelsArray.indexOf(val.bridge_id) < 0) {
-					channelsArray.push(val.bridge_id);
-				}
-			});
-
 			if (data.mainNumbers && data.mainNumbers.length > 0) {
 				var bypassCnam = !monster.util.isNumberFeatureEnabled('cnam'),
 					isExternalNumberSet = _.has(data.numbers, _.get(data.account, 'caller_id.external.number')),
@@ -654,7 +647,6 @@ define(function(require) {
 				}
 			}
 
-			data.totalChannels = channelsArray.length;
 			data.devicesData = devices;
 			data.assignedNumbersData = assignedNumbers;
 			// data.numberTypesData = numberTypes;
@@ -665,6 +657,12 @@ define(function(require) {
 			}
 
 			return _.merge({
+				totalChannels: _
+					.chain(data.channels)
+					.map('bridge_id')
+					.uniq()
+					.size()
+					.value(),
 				totalConferences: _
 					.chain(data.users)
 					.reject(function(user) {
