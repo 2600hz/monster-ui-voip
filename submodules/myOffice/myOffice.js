@@ -64,11 +64,7 @@ define(function(require) {
 							.toArray()
 							.orderBy('count', 'desc')
 							.value(),
-						usersList: _
-							.chain(myOfficeData.usersData)
-							.toArray()
-							.orderBy('count', 'desc')
-							.value(),
+						usersList: _.orderBy(myOfficeData.usersData, 'count', 'desc'),
 						assignedNumbersList: _
 							.chain(myOfficeData.assignedNumbersData)
 							.toArray()
@@ -99,7 +95,7 @@ define(function(require) {
 						}
 					],
 					devicesDataSet = _.chain(myOfficeData.devicesData).omit('totalCount').sortBy('count').value(),
-					usersDataSet = _.chain(myOfficeData.usersData).omit('totalCount').sortBy('count').value(),
+					usersDataSet = _.sortBy(myOfficeData.usersData, 'count'),
 					assignedNumbersDataSet = _.chain(myOfficeData.assignedNumbersData).omit('totalCount').sortBy('count').value(),
 					classifiedNumbersDataSet = _.chain(myOfficeData.classifiedNumbers).sortBy('count').value(),
 					createDoughnutCanvas = function createDoughnutCanvas($target) {
@@ -488,13 +484,21 @@ define(function(require) {
 					},
 					totalCount: 0
 				},
-				users = {
-					_unassigned: {
-						label: self.i18n.active().myOffice.userChartLegend.none,
-						count: 0,
-						color: self.chartColors[8]
-					}
-				},
+				showUserTypes = self.appFlags.global.showUserTypes,
+				userCountByServicePlanRole = _
+					.chain(data.users)
+					.groupBy(function(user) {
+						return showUserTypes
+							? _
+								.chain(user)
+								.get('service.plans', { _unassigned: {} })
+								.keys()
+								.head()
+								.value()
+							: '_unassigned';
+					})
+					.mapValues(_.size)
+					.value(),
 				// numberTypes = {
 				// 	local: {
 				// 		label: self.i18n.active().myOffice.numberChartLegend.local,
@@ -512,23 +516,11 @@ define(function(require) {
 				// 		color: '#b588b9'
 				// 	}
 				// },
-				totalConferences = 0,
 				channelsArray = [],
 				classifierRegexes = {},
 				classifiedNumbers = {},
 				registeredDevices = _.map(data.devicesStatus, function(device) { return device.device_id; }),
 				unregisteredDevices = 0;
-
-			if (self.appFlags.global.showUserTypes) {
-				var i = 7; // start from the end of chart colors so all the charts don't look the same
-				_.each(self.appFlags.global.servicePlansRole, function(role, id) {
-					users[id] = {
-						label: role.name,
-						count: 0,
-						color: self.chartColors[i >= 1 ? i-- : 8]
-					};
-				});
-			}
 
 			_.each(data.numbers, function(numData, num) {
 				_.find(data.classifiers, function(classifier, classifierKey) {
@@ -592,34 +584,6 @@ define(function(require) {
 
 				//TODO: Find out the number type and increment the right category
 				// numberTypes["local"].count++;
-			});
-
-			_.each(data.users, function(val) {
-				if (self.appFlags.global.showUserTypes
-					&& val.hasOwnProperty('service')
-					&& val.service.hasOwnProperty('plans')
-					&& !_.isEmpty(val.service.plans)) {
-					var planId;
-
-					for (var key in val.service.plans) {
-						if (val.service.plans.hasOwnProperty(key)) {
-							planId = key;
-							break;
-						}
-					}
-
-					if (users.hasOwnProperty(planId)) {
-						users[planId].count += 1;
-					} else {
-						users._unassigned.count += 1;
-					}
-				} else {
-					users._unassigned.count++;
-				}
-
-				if (val.features.indexOf('conferencing') >= 0) {
-					totalConferences++;
-				}
 			});
 
 			_.each(data.callflows, function(val) {
@@ -692,17 +656,38 @@ define(function(require) {
 
 			data.totalChannels = channelsArray.length;
 			data.devicesData = devices;
-			data.usersData = users;
 			data.assignedNumbersData = assignedNumbers;
 			// data.numberTypesData = numberTypes;
-			data.totalConferences = totalConferences;
 			data.unregisteredDevices = unregisteredDevices;
 
 			if (data.directory && data.directory.id) {
 				data.directoryLink = self.apiUrl + 'accounts/' + self.accountId + '/directories/' + data.directory.id + '?accept=pdf&paginate=false&auth_token=' + self.getAuthToken();
 			}
 
-			return data;
+			return _.merge({
+				totalConferences: _
+					.chain(data.users)
+					.reject(function(user) {
+						return !_.includes(user.features, 'conferencing');
+					})
+					.size()
+					.value(),
+				usersData: _
+					.chain({
+						_unassigned: {
+							name: self.i18n.active().myOffice.userChartLegend.none
+						}
+					})
+					.merge(showUserTypes ? self.appFlags.global.servicePlansRole : {})
+					.map(function(role, id, roles) {
+						return {
+							label: role.name,
+							count: _.get(userCountByServicePlanRole, id, 0),
+							color: self.chartColors[_.chain(roles).keys().indexOf(id).value() % self.chartColors.length]
+						};
+					})
+					.value()
+			}, data);
 		},
 
 		myOfficeBindEvents: function(args) {
