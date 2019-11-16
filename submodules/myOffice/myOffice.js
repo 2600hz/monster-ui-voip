@@ -62,12 +62,7 @@ define(function(require) {
 						devicesList: _.orderBy(myOfficeData.devicesData, 'count', 'desc'),
 						usersList: _.orderBy(myOfficeData.usersData, 'count', 'desc'),
 						assignedNumbersList: _.orderBy(myOfficeData.assignedNumbersData, 'count', 'desc'),
-						// numberTypesList: _
-						// 	.chain(myOfficeData.numberTypesData)
-						// 	.toArray()
-						// 	.orderBy('count', 'desc')
-						// 	.value(),
-						classifiedNumbers: myOfficeData.classifiedNumbers,
+						classifiedNumbers: _.orderBy(myOfficeData.classifiedNumbers, 'count', 'desc'),
 						directoryUsers: myOfficeData.directory.users && (myOfficeData.directory.users.length || 0),
 						directoryLink: myOfficeData.directoryLink,
 						showUserTypes: self.appFlags.global.showUserTypes
@@ -89,7 +84,7 @@ define(function(require) {
 					devicesDataSet = _.sortBy(myOfficeData.devicesData, 'count'),
 					usersDataSet = _.sortBy(myOfficeData.usersData, 'count'),
 					assignedNumbersDataSet = _.sortBy(myOfficeData.assignedNumbersData, 'count'),
-					classifiedNumbersDataSet = _.chain(myOfficeData.classifiedNumbers).sortBy('count').value(),
+					classifiedNumbersDataSet = _.sortBy(myOfficeData.classifiedNumbers, 'count'),
 					createDoughnutCanvas = function createDoughnutCanvas($target) {
 						var args = Array.prototype.slice.call(arguments),
 							datasets;
@@ -445,48 +440,7 @@ define(function(require) {
 					})
 					.mapValues(_.size)
 					.value(),
-				classifierRegexes = {},
-				classifiedNumbers = {},
 				registeredDevices = _.map(data.devicesStatus, 'device_id');
-
-			_.each(data.numbers, function(numData, num) {
-				_.find(data.classifiers, function(classifier, classifierKey) {
-					if (!(classifierKey in classifierRegexes)) {
-						classifierRegexes[classifierKey] = new RegExp(classifier.regex);
-					}
-					if (classifierRegexes[classifierKey].test(num)) {
-						if (classifierKey in classifiedNumbers) {
-							classifiedNumbers[classifierKey] += 1;
-						} else {
-							classifiedNumbers[classifierKey] = 1;
-						}
-						return true;
-					} else {
-						return false;
-					}
-				});
-			});
-
-			data.classifiedNumbers = _.map(classifiedNumbers, function(val, key) {
-				return {
-					key: key,
-					label: key in data.classifiers ? data.classifiers[key].friendly_name : key,
-					count: val
-				};
-			}).sort(function(a, b) { return b.count - a.count; });
-
-			var maxLength = self.chartColors.length;
-			if (data.classifiedNumbers.length > maxLength) {
-				data.classifiedNumbers[maxLength - 1].key = 'merged_others';
-				data.classifiedNumbers[maxLength - 1].label = 'Others';
-				while (data.classifiedNumbers.length > maxLength) {
-					data.classifiedNumbers[maxLength - 1].count += data.classifiedNumbers.pop().count;
-				}
-			}
-
-			_.each(data.classifiedNumbers, function(val, key) {
-				val.color = self.chartColors[key];
-			});
 
 			_.each(data.callflows, function(val) {
 				var numberArrayName = '';
@@ -572,6 +526,37 @@ define(function(require) {
 								})
 								.value()
 						};
+					})
+					.value(),
+				classifiedNumbers: _
+					.chain(data.numbers)
+					.keys()
+					.groupBy(function(number) {
+						return _.findKey(data.classifiers, function(value) {
+							return new RegExp(value.regex).test(number);
+						}) || 'unknown';
+					})
+					.map(function(numbers, classifier) {
+						return {
+							label: _.get(data.classifiers, [classifier, 'friendly_name'], monster.util.formatVariableToDisplay(classifier)),
+							count: _.size(numbers)
+						};
+					})
+					.orderBy('count', 'desc')
+					.tap(function(array) {
+						if (_.size(array) <= _.size(self.chartColors)) {
+							return;
+						}
+						var othersArray = array.splice(_.size(self.chartColors) - 1);
+						array.push({
+							label: self.i18n.active().myOffice.others,
+							count: _.sumBy(othersArray, 'count')
+						});
+					})
+					.map(function(metadata, index) {
+						return _.merge({
+							color: getColorByIndex(index)
+						}, metadata);
 					})
 					.value(),
 				devicesData: _
