@@ -488,8 +488,7 @@ define(function(require) {
 					.value(),
 				classifierRegexes = {},
 				classifiedNumbers = {},
-				registeredDevices = _.map(data.devicesStatus, function(device) { return device.device_id; }),
-				unregisteredDevices = 0;
+				registeredDevices = _.map(data.devicesStatus, 'device_id');
 
 			_.each(data.numbers, function(numData, num) {
 				_.find(data.classifiers, function(classifier, classifierKey) {
@@ -534,10 +533,6 @@ define(function(require) {
 				if (val.device_type in devices) {
 					devices[val.device_type].count++;
 					devices.totalCount++;
-
-					if (val.enabled === false || (['sip_device', 'smartphone', 'softphone', 'fax', 'ata'].indexOf(val.device_type) >= 0 && registeredDevices.indexOf(val.id) < 0)) {
-						unregisteredDevices++;
-					}
 				} else {
 					console.log('Unknown device type: ' + val.device_type);
 				}
@@ -606,7 +601,6 @@ define(function(require) {
 			}
 
 			data.devicesData = devices;
-			data.unregisteredDevices = unregisteredDevices;
 
 			if (data.directory && data.directory.id) {
 				data.directoryLink = self.apiUrl + 'accounts/' + self.accountId + '/directories/' + data.directory.id + '?accept=pdf&paginate=false&auth_token=' + self.getAuthToken();
@@ -642,6 +636,21 @@ define(function(require) {
 					.chain(data.users)
 					.reject(function(user) {
 						return !_.includes(user.features, 'conferencing');
+					})
+					.size()
+					.value(),
+				unregisteredDevices: _
+					.chain(data.devices)
+					.filter(function(device) {
+						var type = device.device_type,
+							isKnownDeviceType = _.has(devices, type),
+							isSipDevice = _.includes(['sip_device', 'smartphone', 'softphone', 'fax', 'ata'], type),
+							isDeviceRegistered = _.includes(registeredDevices, device.id),
+							isUnregisteredSipDevice = isSipDevice && !isDeviceRegistered,
+							isDeviceDisabled = !_.get(device, 'enabled', false),
+							isDeviceOffline = isDeviceDisabled || isUnregisteredSipDevice;
+
+						return isKnownDeviceType && isDeviceOffline;
 					})
 					.size()
 					.value(),
