@@ -59,11 +59,7 @@ define(function(require) {
 						faxingNumbers: myOfficeData.faxingNumbers || [],
 						faxNumbers: myOfficeData.faxNumbers || [],
 						topMessage: myOfficeData.topMessage,
-						devicesList: _
-							.chain(myOfficeData.devicesData)
-							.toArray()
-							.orderBy('count', 'desc')
-							.value(),
+						devicesList: _.orderBy(myOfficeData.devicesData, 'count', 'desc'),
 						usersList: _.orderBy(myOfficeData.usersData, 'count', 'desc'),
 						assignedNumbersList: _.orderBy(myOfficeData.assignedNumbersData, 'count', 'desc'),
 						// numberTypesList: _
@@ -90,7 +86,7 @@ define(function(require) {
 							color: '#ddd'
 						}
 					],
-					devicesDataSet = _.chain(myOfficeData.devicesData).omit('totalCount').sortBy('count').value(),
+					devicesDataSet = _.sortBy(myOfficeData.devicesData, 'count'),
 					usersDataSet = _.sortBy(myOfficeData.usersData, 'count'),
 					assignedNumbersDataSet = _.sortBy(myOfficeData.assignedNumbersData, 'count'),
 					classifiedNumbersDataSet = _.chain(myOfficeData.classifiedNumbers).sortBy('count').value(),
@@ -423,55 +419,18 @@ define(function(require) {
 					return self.chartColors[index % self.chartColors.length];
 				},
 				staticNumberStatuses = ['assigned', 'spare'],
-				devices = {
-					sip_device: {
-						label: self.i18n.active().devices.types.sip_device,
-						count: 0,
-						color: self.chartColors[5]
-					},
-					cellphone: {
-						label: self.i18n.active().devices.types.cellphone,
-						count: 0,
-						color: self.chartColors[3]
-					},
-					smartphone: {
-						label: self.i18n.active().devices.types.smartphone,
-						count: 0,
-						color: self.chartColors[2]
-					},
-					mobile: {
-						label: self.i18n.active().devices.types.mobile,
-						count: 0,
-						color: self.chartColors[1]
-					},
-					softphone: {
-						label: self.i18n.active().devices.types.softphone,
-						count: 0,
-						color: self.chartColors[0]
-					},
-					landline: {
-						label: self.i18n.active().devices.types.landline,
-						count: 0,
-						color: self.chartColors[6]
-					},
-					fax: {
-						label: self.i18n.active().devices.types.fax,
-						count: 0,
-						color: self.chartColors[7]
-					},
-					ata: {
-						label: self.i18n.active().devices.types.ata,
-						count: 0,
-						color: self.chartColors[8]
-					},
-					sip_uri: {
-						label: self.i18n.active().devices.types.sip_uri,
-						count: 0,
-						color: self.chartColors[4]
-					},
-					totalCount: 0
-				},
 				showUserTypes = self.appFlags.global.showUserTypes,
+				knownDeviceTypes = [
+					'softphone',
+					'mobile',
+					'smartphone',
+					'cellphone',
+					'sip_uri',
+					'sip_device',
+					'landline',
+					'fax',
+					'ata'
+				],
 				userCountByServicePlanRole = _
 					.chain(data.users)
 					.groupBy(function(user) {
@@ -527,15 +486,6 @@ define(function(require) {
 
 			_.each(data.classifiedNumbers, function(val, key) {
 				val.color = self.chartColors[key];
-			});
-
-			_.each(data.devices, function(val) {
-				if (val.device_type in devices) {
-					devices[val.device_type].count++;
-					devices.totalCount++;
-				} else {
-					console.log('Unknown device type: ' + val.device_type);
-				}
 			});
 
 			_.each(data.callflows, function(val) {
@@ -600,8 +550,6 @@ define(function(require) {
 				}
 			}
 
-			data.devicesData = devices;
-
 			if (data.directory && data.directory.id) {
 				data.directoryLink = self.apiUrl + 'accounts/' + self.accountId + '/directories/' + data.directory.id + '?accept=pdf&paginate=false&auth_token=' + self.getAuthToken();
 			}
@@ -626,6 +574,30 @@ define(function(require) {
 						};
 					})
 					.value(),
+				devicesData: _
+					.chain(data.devices)
+					.groupBy('device_type')
+					.merge(_.transform(knownDeviceTypes, function(object, type) {
+						_.set(object, type, []);
+					}, {}))
+					.pickBy(function(devices, type) {
+						if (!_.includes(knownDeviceTypes, type)) {
+							console.log('Unknown device type: ' + type);
+						}
+						return _.includes(knownDeviceTypes, type);
+					})
+					.map(function(devices, type) {
+						return {
+							label: monster.util.tryI18n(self.i18n.active().devices.types, type),
+							count: _.size(devices),
+							color: _
+								.chain(knownDeviceTypes)
+								.indexOf(type)
+								.thru(getColorByIndex)
+								.value()
+						};
+					})
+					.value(),
 				totalChannels: _
 					.chain(data.channels)
 					.map('bridge_id')
@@ -642,15 +614,15 @@ define(function(require) {
 				unregisteredDevices: _
 					.chain(data.devices)
 					.filter(function(device) {
-						var type = device.device_type,
-							isKnownDeviceType = _.has(devices, type),
-							isSipDevice = _.includes(['sip_device', 'smartphone', 'softphone', 'fax', 'ata'], type),
-							isDeviceRegistered = _.includes(registeredDevices, device.id),
-							isUnregisteredSipDevice = isSipDevice && !isDeviceRegistered,
+						var type = _.get(device, 'device_type'),
+							isDeviceTypeKnown = _.includes(knownDeviceTypes, type),
 							isDeviceDisabled = !_.get(device, 'enabled', false),
+							isDeviceRegistered = _.includes(registeredDevices, device.id),
+							isSipDevice = _.includes(['sip_device', 'smartphone', 'softphone', 'fax', 'ata'], type),
+							isUnregisteredSipDevice = isSipDevice && !isDeviceRegistered,
 							isDeviceOffline = isDeviceDisabled || isUnregisteredSipDevice;
 
-						return isKnownDeviceType && isDeviceOffline;
+						return isDeviceTypeKnown && isDeviceOffline;
 					})
 					.size()
 					.value(),
