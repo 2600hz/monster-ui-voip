@@ -419,6 +419,9 @@ define(function(require) {
 
 		myOfficeFormatData: function(data) {
 			var self = this,
+				getColorByIndex = function getColorByIndex(index) {
+					return self.chartColors[index % self.chartColors.length];
+				},
 				staticNumberStatuses = ['assigned', 'spare'],
 				devices = {
 					sip_device: {
@@ -619,7 +622,13 @@ define(function(require) {
 						return {
 							label: monster.util.tryI18n(self.i18n.active().myOffice.numberChartLegend, type),
 							count: _.size(numbers),
-							color: self.chartColors[_.indexOf(staticNumberStatuses, type) % self.chartColors.length]
+							color: _
+								.chain(staticNumberStatuses)
+								.indexOf(type)
+								.thru(function(index) {
+									return getColorByIndex((index * 5) + 3);
+								})
+								.value()
 						};
 					})
 					.value(),
@@ -647,7 +656,12 @@ define(function(require) {
 						return {
 							label: role.name,
 							count: _.get(userCountByServicePlanRole, id, 0),
-							color: self.chartColors[_.chain(roles).keys().indexOf(id).value() % self.chartColors.length]
+							color: _
+								.chain(roles)
+								.keys()
+								.indexOf(id)
+								.thru(getColorByIndex)
+								.value()
 						};
 					})
 					.value()
