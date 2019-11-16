@@ -65,11 +65,7 @@ define(function(require) {
 							.orderBy('count', 'desc')
 							.value(),
 						usersList: _.orderBy(myOfficeData.usersData, 'count', 'desc'),
-						assignedNumbersList: _
-							.chain(myOfficeData.assignedNumbersData)
-							.toArray()
-							.orderBy('count', 'desc')
-							.value(),
+						assignedNumbersList: _.orderBy(myOfficeData.assignedNumbersData, 'count', 'desc'),
 						// numberTypesList: _
 						// 	.chain(myOfficeData.numberTypesData)
 						// 	.toArray()
@@ -96,7 +92,7 @@ define(function(require) {
 					],
 					devicesDataSet = _.chain(myOfficeData.devicesData).omit('totalCount').sortBy('count').value(),
 					usersDataSet = _.sortBy(myOfficeData.usersData, 'count'),
-					assignedNumbersDataSet = _.chain(myOfficeData.assignedNumbersData).omit('totalCount').sortBy('count').value(),
+					assignedNumbersDataSet = _.sortBy(myOfficeData.assignedNumbersData, 'count'),
 					classifiedNumbersDataSet = _.chain(myOfficeData.classifiedNumbers).sortBy('count').value(),
 					createDoughnutCanvas = function createDoughnutCanvas($target) {
 						var args = Array.prototype.slice.call(arguments),
@@ -423,6 +419,7 @@ define(function(require) {
 
 		myOfficeFormatData: function(data) {
 			var self = this,
+				staticNumberStatuses = ['assigned', 'spare'],
 				devices = {
 					sip_device: {
 						label: self.i18n.active().devices.types.sip_device,
@@ -471,19 +468,6 @@ define(function(require) {
 					},
 					totalCount: 0
 				},
-				assignedNumbers = {
-					spare: {
-						label: self.i18n.active().myOffice.numberChartLegend.spare,
-						count: 0,
-						color: self.chartColors[8]
-					},
-					assigned: {
-						label: self.i18n.active().myOffice.numberChartLegend.assigned,
-						count: 0,
-						color: self.chartColors[3]
-					},
-					totalCount: 0
-				},
 				showUserTypes = self.appFlags.global.showUserTypes,
 				userCountByServicePlanRole = _
 					.chain(data.users)
@@ -499,23 +483,6 @@ define(function(require) {
 					})
 					.mapValues(_.size)
 					.value(),
-				// numberTypes = {
-				// 	local: {
-				// 		label: self.i18n.active().myOffice.numberChartLegend.local,
-				// 		count: 0,
-				// 		color: '#6cc5e9'
-				// 	},
-				// 	tollfree: {
-				// 		label: self.i18n.active().myOffice.numberChartLegend.tollfree,
-				// 		count: 0,
-				// 		color: '#bde55f'
-				// 	},
-				// 	international: {
-				// 		label: self.i18n.active().myOffice.numberChartLegend.international,
-				// 		count: 0,
-				// 		color: '#b588b9'
-				// 	}
-				// },
 				classifierRegexes = {},
 				classifiedNumbers = {},
 				registeredDevices = _.map(data.devicesStatus, function(device) { return device.device_id; }),
@@ -571,18 +538,6 @@ define(function(require) {
 				} else {
 					console.log('Unknown device type: ' + val.device_type);
 				}
-			});
-
-			_.each(data.numbers, function(val) {
-				if ('used_by' in val && val.used_by.length > 0) {
-					assignedNumbers.assigned.count++;
-				} else {
-					assignedNumbers.spare.count++;
-				}
-				assignedNumbers.totalCount++;
-
-				//TODO: Find out the number type and increment the right category
-				// numberTypes["local"].count++;
 			});
 
 			_.each(data.callflows, function(val) {
@@ -648,8 +603,6 @@ define(function(require) {
 			}
 
 			data.devicesData = devices;
-			data.assignedNumbersData = assignedNumbers;
-			// data.numberTypesData = numberTypes;
 			data.unregisteredDevices = unregisteredDevices;
 
 			if (data.directory && data.directory.id) {
@@ -657,6 +610,19 @@ define(function(require) {
 			}
 
 			return _.merge({
+				assignedNumbersData: _
+					.chain(data.numbers)
+					.groupBy(function(number) {
+						return staticNumberStatuses[_.chain(number).get('used_by', '').isEmpty().toNumber().value()];
+					})
+					.map(function(numbers, type) {
+						return {
+							label: monster.util.tryI18n(self.i18n.active().myOffice.numberChartLegend, type),
+							count: _.size(numbers),
+							color: self.chartColors[_.indexOf(staticNumberStatuses, type) % self.chartColors.length]
+						};
+					})
+					.value(),
 				totalChannels: _
 					.chain(data.channels)
 					.map('bridge_id')
