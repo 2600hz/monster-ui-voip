@@ -415,6 +415,12 @@ define(function(require) {
 				},
 				staticNumberStatuses = ['assigned', 'spare'],
 				showUserTypes = self.appFlags.global.showUserTypes,
+				staticNonNumbers = ['0', 'undefined', 'undefinedconf', 'undefinedfaxing', 'undefinedMainNumber'],
+				specialNumberMatchers = {
+					mainNumbers: { type: 'main', name: 'MainCallflow' },
+					confNumbers: { type: 'conference', name: 'MainConference' },
+					faxingNumbers: { type: 'faxing', name: 'MainFaxing' }
+				},
 				knownDeviceTypes = [
 					'softphone',
 					'mobile',
@@ -440,33 +446,37 @@ define(function(require) {
 					})
 					.mapValues(_.size)
 					.value(),
+				specialNumbers = _
+					.chain(data.callflows)
+					.groupBy(function(callflow) {
+						return _.findKey(specialNumberMatchers, {
+							type: callflow.type,
+							name: callflow.name
+						});
+					})
+					.omit('undefined')
+					.mapValues(function(callflows) {
+						return _.flatMap(callflows, function(callflow) {
+							return _
+								.chain(callflow.numbers)
+								.reject(function(number) {
+									return _.includes(staticNonNumbers, number);
+								})
+								.map(function(number) {
+									return _
+										.chain(data.numbers)
+										.get(number, {})
+										.pick('features')
+										.merge({
+											number: number
+										})
+										.value();
+								})
+								.value();
+						});
+					})
+					.value(),
 				registeredDevices = _.map(data.devicesStatus, 'device_id');
-
-			_.each(data.callflows, function(val) {
-				var numberArrayName = '';
-				if (val.type === 'main' && val.name === 'MainCallflow') {
-					numberArrayName = 'mainNumbers';
-				} else if (val.type === 'conference' && val.name === 'MainConference') {
-					numberArrayName = 'confNumbers';
-				} else if (val.type === 'faxing' && val.name === 'MainFaxing') {
-					numberArrayName = 'faxingNumbers';
-				}
-
-				if (numberArrayName.length > 0) {
-					if (!(numberArrayName in data)) { data[numberArrayName] = []; }
-					_.each(val.numbers, function(num) {
-						if (['0', 'undefined', 'undefinedconf', 'undefinedfaxing', 'undefinedMainNumber'].indexOf(num) < 0) {
-							var number = {
-								number: num
-							};
-							if (num in data.numbers) {
-								number.features = data.numbers[num].features;
-							}
-							data[numberArrayName].push(number);
-						}
-					});
-				}
-			});
 
 			if (data.mainNumbers && data.mainNumbers.length > 0) {
 				var bypassCnam = !monster.util.isNumberFeatureEnabled('cnam'),
@@ -631,7 +641,7 @@ define(function(require) {
 						};
 					})
 					.value()
-			}, data);
+			}, specialNumbers, data);
 		},
 
 		myOfficeBindEvents: function(args) {
