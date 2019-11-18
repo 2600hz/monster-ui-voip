@@ -476,43 +476,38 @@ define(function(require) {
 						});
 					})
 					.value(),
+				topMessage = (function(mainNumbers, account, numbers) {
+					var shouldBypassCnam = !monster.util.isNumberFeatureEnabled('cnam'),
+						callerIdExternalNumber = _.get(account, 'caller_id.external.number'),
+						isExternalNumberSet = _.has(numbers, callerIdExternalNumber),
+						hasValidCallerId = shouldBypassCnam || isExternalNumberSet,
+						shouldBypassE911 = !monster.util.isNumberFeatureEnabled('e911'),
+						callerIdEmergencyNumber = _.get(account, 'caller_id.emergency.number'),
+						isEmergencyNumberSet = _
+							.chain(numbers)
+							.get([callerIdEmergencyNumber, 'features'])
+							.includes('e911')
+							.value(),
+						hasValidE911 = shouldBypassE911 || isEmergencyNumberSet,
+						messageKey;
+
+					if (!hasValidCallerId && !hasValidE911) {
+						messageKey = 'missingCnamE911Message';
+					} else if (!hasValidCallerId) {
+						messageKey = 'missingCnamMessage';
+					} else if (!hasValidE911) {
+						messageKey = 'missingE911Message';
+					}
+					return !_.isEmpty(mainNumbers) && messageKey
+						? {
+							cssClass: 'btn-danger',
+							message: _.get(self.i18n.active().myOffice, messageKey),
+							category: 'myOffice',
+							subcategory: 'callerIdDialog'
+						}
+						: undefined;
+				}(specialNumbers.mainNumbers, data.account, data.numbers)),
 				registeredDevices = _.map(data.devicesStatus, 'device_id');
-
-			if (data.mainNumbers && data.mainNumbers.length > 0) {
-				var bypassCnam = !monster.util.isNumberFeatureEnabled('cnam'),
-					isExternalNumberSet = _.has(data.numbers, _.get(data.account, 'caller_id.external.number')),
-					hasValidCallerId = bypassCnam || isExternalNumberSet,
-					bypassE911 = !monster.util.isNumberFeatureEnabled('e911'),
-					isEmergencyNumberSet = _
-						.chain(data.numbers)
-						.get([ _.get(data.account, 'caller_id.emergency.number'), 'features' ])
-						.includes('e911')
-						.value(),
-					hasValidE911 = bypassE911 || isEmergencyNumberSet;
-
-				if (!hasValidCallerId && !hasValidE911) {
-					data.topMessage = {
-						cssClass: 'btn-danger',
-						message: self.i18n.active().myOffice.missingCnamE911Message,
-						category: 'myOffice',
-						subcategory: 'callerIdDialog'
-					};
-				} else if (!hasValidCallerId) {
-					data.topMessage = {
-						cssClass: 'btn-danger',
-						message: self.i18n.active().myOffice.missingCnamMessage,
-						category: 'myOffice',
-						subcategory: 'callerIdDialog'
-					};
-				} else if (!hasValidE911) {
-					data.topMessage = {
-						cssClass: 'btn-danger',
-						message: self.i18n.active().myOffice.missingE911Message,
-						category: 'myOffice',
-						subcategory: 'callerIdDialog'
-					};
-				}
-			}
 
 			if (data.directory && data.directory.id) {
 				data.directoryLink = self.apiUrl + 'accounts/' + self.accountId + '/directories/' + data.directory.id + '?accept=pdf&paginate=false&auth_token=' + self.getAuthToken();
@@ -593,6 +588,7 @@ define(function(require) {
 						};
 					})
 					.value(),
+				topMessage: topMessage,
 				totalChannels: _
 					.chain(data.channels)
 					.map('bridge_id')
