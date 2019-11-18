@@ -509,10 +509,6 @@ define(function(require) {
 				}(specialNumbers.mainNumbers, data.account, data.numbers)),
 				registeredDevices = _.map(data.devicesStatus, 'device_id');
 
-			if (data.directory && data.directory.id) {
-				data.directoryLink = self.apiUrl + 'accounts/' + self.accountId + '/directories/' + data.directory.id + '?accept=pdf&paginate=false&auth_token=' + self.getAuthToken();
-			}
-
 			return _.merge({
 				assignedNumbersData: _
 					.chain(data.numbers)
@@ -588,6 +584,7 @@ define(function(require) {
 						};
 					})
 					.value(),
+				directoryLink: _.has(data, 'directory.id') && self.apiUrl + 'accounts/' + self.accountId + '/directories/' + data.directory.id + '?accept=pdf&paginate=false&auth_token=' + self.getAuthToken(),
 				topMessage: topMessage,
 				totalChannels: _
 					.chain(data.channels)
