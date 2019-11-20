@@ -35,7 +35,7 @@ define(function(require) {
 			'#BDE55F', // Light Green
 			'#F1E87C', // Pale Yellow
 			'#EF8F25', // Orange
-			'#6F7C7D'  // Grey
+			'#6F7C7D' // Grey
 		],
 
 		/* My Office */
@@ -59,28 +59,11 @@ define(function(require) {
 						faxingNumbers: myOfficeData.faxingNumbers || [],
 						faxNumbers: myOfficeData.faxNumbers || [],
 						topMessage: myOfficeData.topMessage,
-						devicesList: _
-							.chain(myOfficeData.devicesData)
-							.toArray()
-							.orderBy('count', 'desc')
-							.value(),
-						usersList: _
-							.chain(myOfficeData.usersData)
-							.toArray()
-							.orderBy('count', 'desc')
-							.value(),
-						assignedNumbersList: _
-							.chain(myOfficeData.assignedNumbersData)
-							.toArray()
-							.orderBy('count', 'desc')
-							.value(),
-						// numberTypesList: _
-						// 	.chain(myOfficeData.numberTypesData)
-						// 	.toArray()
-						// 	.orderBy('count', 'desc')
-						// 	.value(),
-						classifiedNumbers: myOfficeData.classifiedNumbers,
-						directoryUsers: myOfficeData.directory.users && myOfficeData.directory.users.length || 0,
+						devicesList: _.orderBy(myOfficeData.devicesData, 'count', 'desc'),
+						usersList: _.orderBy(myOfficeData.usersData, 'count', 'desc'),
+						assignedNumbersList: _.orderBy(myOfficeData.assignedNumbersData, 'count', 'desc'),
+						classifiedNumbers: _.orderBy(myOfficeData.classifiedNumbers, 'count', 'desc'),
+						directoryUsers: myOfficeData.directory.users && (myOfficeData.directory.users.length || 0),
 						directoryLink: myOfficeData.directoryLink,
 						showUserTypes: self.appFlags.global.showUserTypes
 					},
@@ -98,10 +81,10 @@ define(function(require) {
 							color: '#ddd'
 						}
 					],
-					devicesDataSet = _.chain(myOfficeData.devicesData).omit('totalCount').sortBy('count').value(),
-					usersDataSet = _.chain(myOfficeData.usersData).omit('totalCount').sortBy('count').value(),
-					assignedNumbersDataSet = _.chain(myOfficeData.assignedNumbersData).omit('totalCount').sortBy('count').value(),
-					classifiedNumbersDataSet = _.chain(myOfficeData.classifiedNumbers).sortBy('count').value(),
+					devicesDataSet = _.sortBy(myOfficeData.devicesData, 'count'),
+					usersDataSet = _.sortBy(myOfficeData.usersData, 'count'),
+					assignedNumbersDataSet = _.sortBy(myOfficeData.assignedNumbersData, 'count'),
+					classifiedNumbersDataSet = _.sortBy(myOfficeData.classifiedNumbers, 'count'),
 					createDoughnutCanvas = function createDoughnutCanvas($target) {
 						var args = Array.prototype.slice.call(arguments),
 							datasets;
@@ -427,282 +410,231 @@ define(function(require) {
 
 		myOfficeFormatData: function(data) {
 			var self = this,
-				devices = {
-					sip_device: {
-						label: self.i18n.active().devices.types.sip_device,
-						count: 0,
-						color: self.chartColors[5]
-					},
-					cellphone: {
-						label: self.i18n.active().devices.types.cellphone,
-						count: 0,
-						color: self.chartColors[3]
-					},
-					smartphone: {
-						label: self.i18n.active().devices.types.smartphone,
-						count: 0,
-						color: self.chartColors[2]
-					},
-					mobile: {
-						label: self.i18n.active().devices.types.mobile,
-						count: 0,
-						color: self.chartColors[1]
-					},
-					softphone: {
-						label: self.i18n.active().devices.types.softphone,
-						count: 0,
-						color: self.chartColors[0]
-					},
-					landline: {
-						label: self.i18n.active().devices.types.landline,
-						count: 0,
-						color: self.chartColors[6]
-					},
-					fax: {
-						label: self.i18n.active().devices.types.fax,
-						count: 0,
-						color: self.chartColors[7]
-					},
-					ata: {
-						label: self.i18n.active().devices.types.ata,
-						count: 0,
-						color: self.chartColors[8]
-					},
-					sip_uri: {
-						label: self.i18n.active().devices.types.sip_uri,
-						count: 0,
-						color: self.chartColors[4]
-					},
-					totalCount: 0
+				getColorByIndex = function getColorByIndex(index) {
+					return self.chartColors[index % self.chartColors.length];
 				},
-				assignedNumbers = {
-					spare: {
-						label: self.i18n.active().myOffice.numberChartLegend.spare,
-						count: 0,
-						color: self.chartColors[8]
-					},
-					assigned: {
-						label: self.i18n.active().myOffice.numberChartLegend.assigned,
-						count: 0,
-						color: self.chartColors[3]
-					},
-					totalCount: 0
+				staticNumberStatuses = ['assigned', 'spare'],
+				showUserTypes = self.appFlags.global.showUserTypes,
+				staticNonNumbers = ['0', 'undefined', 'undefinedconf', 'undefinedfaxing', 'undefinedMainNumber'],
+				specialNumberMatchers = {
+					mainNumbers: { type: 'main', name: 'MainCallflow' },
+					confNumbers: { type: 'conference', name: 'MainConference' },
+					faxingNumbers: { type: 'faxing', name: 'MainFaxing' }
 				},
-				users = {
-					_unassigned: {
-						label: self.i18n.active().myOffice.userChartLegend.none,
-						count: 0,
-						color: self.chartColors[8]
-					}
-				},
-				// numberTypes = {
-				// 	local: {
-				// 		label: self.i18n.active().myOffice.numberChartLegend.local,
-				// 		count: 0,
-				// 		color: '#6cc5e9'
-				// 	},
-				// 	tollfree: {
-				// 		label: self.i18n.active().myOffice.numberChartLegend.tollfree,
-				// 		count: 0,
-				// 		color: '#bde55f'
-				// 	},
-				// 	international: {
-				// 		label: self.i18n.active().myOffice.numberChartLegend.international,
-				// 		count: 0,
-				// 		color: '#b588b9'
-				// 	}
-				// },
-				totalConferences = 0,
-				channelsArray = [],
-				classifierRegexes = {},
-				classifiedNumbers = {},
-				registeredDevices = _.map(data.devicesStatus, function(device) { return device.device_id; }),
-				unregisteredDevices = 0;
+				knownDeviceTypes = [
+					'softphone',
+					'mobile',
+					'smartphone',
+					'cellphone',
+					'sip_uri',
+					'sip_device',
+					'landline',
+					'fax',
+					'ata'
+				],
+				userCountByServicePlanRole = _
+					.chain(data.users)
+					.groupBy(function(user) {
+						return showUserTypes
+							? _
+								.chain(user)
+								.get('service.plans', { _unassigned: {} })
+								.keys()
+								.head()
+								.value()
+							: '_unassigned';
+					})
+					.mapValues(_.size)
+					.value(),
+				specialNumbers = _
+					.chain(data.callflows)
+					.groupBy(function(callflow) {
+						return _.findKey(specialNumberMatchers, {
+							type: callflow.type,
+							name: callflow.name
+						});
+					})
+					.omit('undefined')
+					.mapValues(function(callflows) {
+						return _.flatMap(callflows, function(callflow) {
+							return _
+								.chain(callflow.numbers)
+								.reject(function(number) {
+									return _.includes(staticNonNumbers, number);
+								})
+								.map(function(number) {
+									return _
+										.chain(data.numbers)
+										.get(number, {})
+										.pick('features')
+										.merge({
+											number: number
+										})
+										.value();
+								})
+								.value();
+						});
+					})
+					.value(),
+				topMessage = (function(mainNumbers, account, numbers) {
+					var shouldBypassCnam = !monster.util.isNumberFeatureEnabled('cnam'),
+						callerIdExternalNumber = _.get(account, 'caller_id.external.number'),
+						isExternalNumberSet = _.has(numbers, callerIdExternalNumber),
+						hasValidCallerId = shouldBypassCnam || isExternalNumberSet,
+						shouldBypassE911 = !monster.util.isNumberFeatureEnabled('e911'),
+						callerIdEmergencyNumber = _.get(account, 'caller_id.emergency.number'),
+						isEmergencyNumberSet = _
+							.chain(numbers)
+							.get([callerIdEmergencyNumber, 'features'])
+							.includes('e911')
+							.value(),
+						hasValidE911 = shouldBypassE911 || isEmergencyNumberSet,
+						messageKey;
 
-			if (self.appFlags.global.showUserTypes) {
-				var i = 7; // start from the end of chart colors so all the charts don't look the same
-				_.each(self.appFlags.global.servicePlansRole, function(role, id) {
-					users[id] = {
-						label: role.name,
-						count: 0,
-						color: self.chartColors[i >= 1 ? i-- : 8]
-					};
-				});
-			}
-
-			_.each(data.numbers, function(numData, num) {
-				_.find(data.classifiers, function(classifier, classifierKey) {
-					if (!(classifierKey in classifierRegexes)) {
-						classifierRegexes[classifierKey] = new RegExp(classifier.regex);
+					if (!hasValidCallerId && !hasValidE911) {
+						messageKey = 'missingCnamE911Message';
+					} else if (!hasValidCallerId) {
+						messageKey = 'missingCnamMessage';
+					} else if (!hasValidE911) {
+						messageKey = 'missingE911Message';
 					}
-					if (classifierRegexes[classifierKey].test(num)) {
-						if (classifierKey in classifiedNumbers) {
-							classifiedNumbers[classifierKey] ++;
-						} else {
-							classifiedNumbers[classifierKey] = 1;
+					return !_.isEmpty(mainNumbers) && messageKey
+						? {
+							cssClass: 'btn-danger',
+							message: _.get(self.i18n.active().myOffice, messageKey),
+							category: 'myOffice',
+							subcategory: 'callerIdDialog'
 						}
-						return true;
-					} else {
-						return false;
-					}
-				});
-			});
+						: undefined;
+				}(specialNumbers.mainNumbers, data.account, data.numbers)),
+				registeredDevices = _.map(data.devicesStatus, 'device_id');
 
-			data.classifiedNumbers = _.map(classifiedNumbers, function(val, key) {
-				return {
-					key: key,
-					label: key in data.classifiers ? data.classifiers[key].friendly_name : key,
-					count: val
-				};
-			}).sort(function(a, b) { return b.count - a.count; });
-
-			var maxLength = self.chartColors.length;
-			if (data.classifiedNumbers.length > maxLength) {
-				data.classifiedNumbers[maxLength - 1].key = 'merged_others';
-				data.classifiedNumbers[maxLength - 1].label = 'Others';
-				while (data.classifiedNumbers.length > maxLength) {
-					data.classifiedNumbers[maxLength - 1].count += data.classifiedNumbers.pop().count;
-				}
-			}
-
-			_.each(data.classifiedNumbers, function(val, key) {
-				val.color = self.chartColors[key];
-			});
-
-			_.each(data.devices, function(val) {
-				if (val.device_type in devices) {
-					devices[val.device_type].count++;
-					devices.totalCount++;
-
-					if (val.enabled === false || (['sip_device', 'smartphone', 'softphone', 'fax', 'ata'].indexOf(val.device_type) >= 0 && registeredDevices.indexOf(val.id) < 0)) {
-						unregisteredDevices++;
-					}
-				} else {
-					console.log('Unknown device type: ' + val.device_type);
-				}
-			});
-
-			_.each(data.numbers, function(val) {
-				if ('used_by' in val && val.used_by.length > 0) {
-					assignedNumbers.assigned.count++;
-				} else {
-					assignedNumbers.spare.count++;
-				}
-				assignedNumbers.totalCount++;
-
-				//TODO: Find out the number type and increment the right category
-				// numberTypes["local"].count++;
-			});
-
-			_.each(data.users, function(val) {
-				if (self.appFlags.global.showUserTypes
-					&& val.hasOwnProperty('service')
-					&& val.service.hasOwnProperty('plans')
-					&& !_.isEmpty(val.service.plans)) {
-					var planId;
-
-					for (var key in val.service.plans) {
-						if (val.service.plans.hasOwnProperty(key)) {
-							planId = key;
-							break;
+			return _.merge({
+				assignedNumbersData: _
+					.chain(data.numbers)
+					.groupBy(function(number) {
+						return staticNumberStatuses[_.chain(number).get('used_by', '').isEmpty().toNumber().value()];
+					})
+					.map(function(numbers, type) {
+						return {
+							label: monster.util.tryI18n(self.i18n.active().myOffice.numberChartLegend, type),
+							count: _.size(numbers),
+							color: _
+								.chain(staticNumberStatuses)
+								.indexOf(type)
+								.thru(function(index) {
+									return getColorByIndex((index * 5) + 3);
+								})
+								.value()
+						};
+					})
+					.value(),
+				classifiedNumbers: _
+					.chain(data.numbers)
+					.keys()
+					.groupBy(function(number) {
+						return _.findKey(data.classifiers, function(value) {
+							return new RegExp(value.regex).test(number);
+						}) || 'unknown';
+					})
+					.map(function(numbers, classifier) {
+						return {
+							label: _.get(data.classifiers, [classifier, 'friendly_name'], monster.util.formatVariableToDisplay(classifier)),
+							count: _.size(numbers)
+						};
+					})
+					.orderBy('count', 'desc')
+					.tap(function(array) {
+						if (_.size(array) <= _.size(self.chartColors)) {
+							return;
 						}
-					}
-
-					if (users.hasOwnProperty(planId)) {
-						users[planId].count += 1;
-					} else {
-						users._unassigned.count += 1;
-					}
-				} else {
-					users._unassigned.count++;
-				}
-
-				if (val.features.indexOf('conferencing') >= 0) {
-					totalConferences++;
-				}
-			});
-
-			_.each(data.callflows, function(val) {
-				var numberArrayName = '';
-				if (val.type === 'main' && val.name === 'MainCallflow') {
-					numberArrayName = 'mainNumbers';
-				} else if (val.type === 'conference' && val.name === 'MainConference') {
-					numberArrayName = 'confNumbers';
-				} else if (val.type === 'faxing' && val.name === 'MainFaxing') {
-					numberArrayName = 'faxingNumbers';
-				}
-
-				if (numberArrayName.length > 0) {
-					if (!(numberArrayName in data)) { data[numberArrayName] = []; }
-					_.each(val.numbers, function(num) {
-						if (['0', 'undefined', 'undefinedconf', 'undefinedfaxing', 'undefinedMainNumber'].indexOf(num) < 0) {
-							var number = {
-								number: num
-							};
-							if (num in data.numbers) {
-								number.features = data.numbers[num].features;
-							}
-							data[numberArrayName].push(number);
+						var othersArray = array.splice(_.size(self.chartColors) - 1);
+						array.push({
+							label: self.i18n.active().myOffice.others,
+							count: _.sumBy(othersArray, 'count')
+						});
+					})
+					.map(function(metadata, index) {
+						return _.merge({
+							color: getColorByIndex(index)
+						}, metadata);
+					})
+					.value(),
+				devicesData: _
+					.chain(data.devices)
+					.groupBy('device_type')
+					.merge(_.transform(knownDeviceTypes, function(object, type) {
+						_.set(object, type, []);
+					}, {}))
+					.pickBy(function(devices, type) {
+						if (!_.includes(knownDeviceTypes, type)) {
+							console.log('Unknown device type: ' + type);
 						}
-					});
-				}
-			});
+						return _.includes(knownDeviceTypes, type);
+					})
+					.map(function(devices, type) {
+						return {
+							label: monster.util.tryI18n(self.i18n.active().devices.types, type),
+							count: _.size(devices),
+							color: _
+								.chain(knownDeviceTypes)
+								.indexOf(type)
+								.thru(getColorByIndex)
+								.value()
+						};
+					})
+					.value(),
+				directoryLink: _.has(data, 'directory.id') && self.apiUrl + 'accounts/' + self.accountId + '/directories/' + data.directory.id + '?accept=pdf&paginate=false&auth_token=' + self.getAuthToken(),
+				topMessage: topMessage,
+				totalChannels: _
+					.chain(data.channels)
+					.map('bridge_id')
+					.uniq()
+					.size()
+					.value(),
+				totalConferences: _
+					.chain(data.users)
+					.reject(function(user) {
+						return !_.includes(user.features, 'conferencing');
+					})
+					.size()
+					.value(),
+				unregisteredDevices: _
+					.chain(data.devices)
+					.filter(function(device) {
+						var type = _.get(device, 'device_type'),
+							isDeviceTypeKnown = _.includes(knownDeviceTypes, type),
+							isDeviceDisabled = !_.get(device, 'enabled', false),
+							isDeviceRegistered = _.includes(registeredDevices, device.id),
+							isSipDevice = _.includes(['sip_device', 'smartphone', 'softphone', 'fax', 'ata'], type),
+							isUnregisteredSipDevice = isSipDevice && !isDeviceRegistered,
+							isDeviceOffline = isDeviceDisabled || isUnregisteredSipDevice;
 
-			_.each(data.channels, function(val) {
-				if (channelsArray.indexOf(val.bridge_id) < 0) {
-					channelsArray.push(val.bridge_id);
-				}
-			});
-
-			if (data.mainNumbers && data.mainNumbers.length > 0) {
-				var bypassCnam = !monster.util.isNumberFeatureEnabled('cnam'),
-					isExternalNumberSet = _.has(data.numbers, _.get(data.account, 'caller_id.external.number')),
-					hasValidCallerId = bypassCnam || isExternalNumberSet,
-					bypassE911 = !monster.util.isNumberFeatureEnabled('e911'),
-					isEmergencyNumberSet = _
-						.chain(data.numbers)
-						.get([ _.get(data.account, 'caller_id.emergency.number'), 'features' ])
-						.includes('e911')
-						.value(),
-					hasValidE911 = bypassE911 || isEmergencyNumberSet;
-
-				if (!hasValidCallerId && !hasValidE911) {
-					data.topMessage = {
-						cssClass: 'btn-danger',
-						message: self.i18n.active().myOffice.missingCnamE911Message,
-						category: 'myOffice',
-						subcategory: 'callerIdDialog'
-					};
-				} else if (!hasValidCallerId) {
-					data.topMessage = {
-						cssClass: 'btn-danger',
-						message: self.i18n.active().myOffice.missingCnamMessage,
-						category: 'myOffice',
-						subcategory: 'callerIdDialog'
-					};
-				} else if (!hasValidE911) {
-					data.topMessage = {
-						cssClass: 'btn-danger',
-						message: self.i18n.active().myOffice.missingE911Message,
-						category: 'myOffice',
-						subcategory: 'callerIdDialog'
-					};
-				}
-			}
-
-			data.totalChannels = channelsArray.length;
-			data.devicesData = devices;
-			data.usersData = users;
-			data.assignedNumbersData = assignedNumbers;
-			// data.numberTypesData = numberTypes;
-			data.totalConferences = totalConferences;
-			data.unregisteredDevices = unregisteredDevices;
-
-			if (data.directory && data.directory.id) {
-				data.directoryLink = self.apiUrl + 'accounts/' + self.accountId + '/directories/' + data.directory.id + '?accept=pdf&paginate=false&auth_token=' + self.getAuthToken();
-			}
-
-			return data;
+						return isDeviceTypeKnown && isDeviceOffline;
+					})
+					.size()
+					.value(),
+				usersData: _
+					.chain({
+						_unassigned: {
+							name: self.i18n.active().myOffice.userChartLegend.none
+						}
+					})
+					.merge(showUserTypes ? self.appFlags.global.servicePlansRole : {})
+					.map(function(role, id, roles) {
+						return {
+							label: role.name,
+							count: _.get(userCountByServicePlanRole, id, 0),
+							color: _
+								.chain(roles)
+								.keys()
+								.indexOf(id)
+								.thru(getColorByIndex)
+								.value()
+						};
+					})
+					.value()
+			}, specialNumbers, data);
 		},
 
 		myOfficeBindEvents: function(args) {
