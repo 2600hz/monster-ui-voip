@@ -1120,15 +1120,18 @@ define(function(require) {
 			return formattedData;
 		},
 
+		/**
+		 * @param  {Object} data
+		 * @param  {Object} data.users
+		 * @param  {Object} data.status
+		 * @param  {Object} data.devices
+		 * @return {Object}
+		 */
 		devicesFormatListData: function(data) {
 			var self = this,
-				formattedData = {
-					countDevices: 0,
-					devices: {}
-				},
-				mapUsers = {},
+				usersById = _.keyBy(data.users, 'id'),
 				unassignedString = self.i18n.active().devices.unassignedDevice,
-				mapIconClass = {
+				iconClassesByDeviceType = {
 					cellphone: 'fa fa-phone',
 					smartphone: 'icon-telicon-mobile-phone',
 					landline: 'icon-telicon-home',
@@ -1139,67 +1142,75 @@ define(function(require) {
 					fax: 'icon-telicon-fax',
 					ata: 'icon-telicon-ata'
 				},
-				registeredDevices = _.map(data.status, function(device) { return device.device_id; });
+				registeredDevicesById = _.map(data.status, 'device_id');
 
-			_.each(data.users, function(user) {
-				mapUsers[user.id] = user;
-			});
+			return {
+				countDevices: _.size(data.devices),
+				devices: _
+					.chain(data.devices)
+					.map(function(device) {
+						var staticStatusClasses = ['unregistered', 'registered'],
+							deviceType = device.device_type,
+							isRegistered = _.includes(['sip_device', 'smartphone', 'softphone', 'fax', 'ata'], deviceType)
+								? _.includes(registeredDevicesById, device.id)
+								: true,
+							isEnabled = _.get(device, 'enabled', false),
+							userName = _
+								.chain(usersById)
+								.get(device.owner_id, {
+									first_name: unassignedString,
+									last_name: ''
+								})
+								.thru(monster.util.getUserFullName)
+								.value();
 
-			_.each(data.devices, function(device) {
-				var isAssigned = device.owner_id ? true : false,
-					isRegistered = ['sip_device', 'smartphone', 'softphone', 'fax', 'ata'].indexOf(device.device_type) >= 0 ? registeredDevices.indexOf(device.id) >= 0 : true;
+						return _.merge({
+							// Display a device in black if it's disabled, otherwise, until we know whether it's registered or not, we set the color to red
+							classStatus: isEnabled ? staticStatusClasses[_.toNumber(isRegistered)] : 'disabled',
+							enabled: isEnabled,
+							friendlyIconClass: iconClassesByDeviceType[deviceType],
+							friendlyType: _.get(self.i18n.active().devices.types, deviceType),
+							isAssigned: _
+								.chain(device)
+								.has('owner_id')
+								.toString()
+								.value(),
+							// Even though a device is registered, we don't count it as registered if it's disabled
+							isRegistered: isEnabled && isRegistered,
+							macAddress: device.mac_address,
+							registered: isRegistered,
+							sipUserName: device.userName,
+							sortableUserName: userName.split(' ').reverse().join(' '),
+							type: deviceType,
+							userName: userName
+						}, _.pick(device, [
+							'id',
+							'name'
+						]));
+					})
+					.sort(function(a, b) {
+						// If owner is the same, order by device name
+						if (a.userName === b.userName) {
+							var aName = a.name.toLowerCase(),
+								bName = b.name.toLowerCase();
 
-				formattedData.countDevices++;
+							return (aName > bName) ? 1 : (aName < bName) ? -1 : 0;
+						} else {
+							// Otherwise, push the unassigned devices to the bottom of the list, and show the assigned devices ordered by user name
+							if (a.userName === unassignedString) {
+								return 1;
+							} else if (b.userName === unassignedString) {
+								return -1;
+							} else {
+								var aSortName = a.sortableUserName.toLowerCase(),
+									bSortName = b.sortableUserName.toLowerCase();
 
-				formattedData.devices[device.id] = {
-					id: device.id,
-					isAssigned: isAssigned + '',
-					friendlyIconClass: mapIconClass[device.device_type],
-					macAddress: device.mac_address,
-					name: device.name,
-					userName: device.owner_id && device.owner_id in mapUsers ? mapUsers[device.owner_id].first_name + ' ' + mapUsers[device.owner_id].last_name : unassignedString,
-					sortableUserName: device.owner_id && device.owner_id in mapUsers ? mapUsers[device.owner_id].last_name + ' ' + mapUsers[device.owner_id].first_name : unassignedString,
-					enabled: device.enabled,
-					type: device.device_type,
-					friendlyType: self.i18n.active().devices.types[device.device_type],
-					registered: isRegistered,
-					isRegistered: device.enabled && isRegistered, // even though a device is registered, we don't count it as registered if it's disabled
-					classStatus: device.enabled ? (isRegistered ? 'registered' : 'unregistered') : 'disabled' /* Display a device in black if it's disabled, otherwise, until we know whether it's registered or not, we set the color to red */,
-					sipUserName: device.username
-				};
-			});
-
-			var arrayToSort = [];
-
-			_.each(formattedData.devices, function(device) {
-				arrayToSort.push(device);
-			});
-
-			arrayToSort.sort(function(a, b) {
-				/* If owner is the same, order by device name */
-				if (a.userName === b.userName) {
-					var aName = a.name.toLowerCase(),
-						bName = b.name.toLowerCase();
-
-					return (aName > bName) ? 1 : (aName < bName) ? -1 : 0;
-				} else {
-					/* Otherwise, push the unassigned devices to the bottom of the list, and show the assigned devices ordered by user name */
-					if (a.userName === unassignedString) {
-						return 1;
-					} else if (b.userName === unassignedString) {
-						return -1;
-					} else {
-						var aSortName = a.sortableUserName.toLowerCase(),
-							bSortName = b.sortableUserName.toLowerCase();
-
-						return (aSortName > bSortName) ? 1 : (aSortName < bSortName) ? -1 : 0;
-					}
-				}
-			});
-
-			formattedData.devices = arrayToSort;
-
-			return formattedData;
+								return (aSortName > bSortName) ? 1 : (aSortName < bSortName) ? -1 : 0;
+							}
+						}
+					})
+					.value()
+			};
 		},
 
 		/* Utils */
