@@ -954,39 +954,33 @@ define(function(require) {
 			return mergedData;
 		},
 
+		/**
+		 * @param  {Object} data
+		 * @param  {Object} data.device
+		 * @param  {String} data.device.device_type
+		 * @param  {Object} data.e911Numbers
+		 * @param  {Object} data.accountLimits
+		 * @param  {Object} data.listClassifiers
+		 * @param  {Object} data.users
+		 * @param  {Object} [data.template]
+		 * @param  {Boolean} [dataList.isRegistered]
+		 * @return {Object}
+		 */
 		devicesFormatData: function(data, dataList) {
 			var self = this,
-				defaults = {
-					extra: {
-						outboundPrivacy: _.map(self.appFlags.common.outboundPrivacy, function(strategy) {
-							return {
-								key: strategy,
-								value: self.i18n.active().commonMisc.outboundPrivacy.values[strategy]
-							};
-						}),
-						hasE911Numbers: !_.isEmpty(data.e911Numbers),
-						e911Numbers: data.e911Numbers,
-						restrictions: data.listClassifiers,
-						rtpMethod: data.device.media && data.device.media.encryption && data.device.media.encryption.enforce_security ? data.device.media.encryption.methods[0] : '',
-						selectedCodecs: {
-							audio: [],
-							video: []
-						},
-						availableCodecs: {
-							audio: [],
-							video: []
-						},
-						users: data.users
-					},
+				isClassifierDisabledByAccount = function isClassifierDisabledByAccount(classifier) {
+					return _.get(data.accountLimits, ['call_restriction', classifier, 'action']) === 'deny';
+				},
+				deviceDefaults = {
 					call_restriction: {},
 					device_type: 'sip_device',
 					enabled: true,
 					media: {
+						audio: {
+							codecs: ['PCMA', 'PCMU']
+						},
 						encryption: {
 							enforce_security: false
-						},
-						audio: {
-							codecs: ['PCMU', 'PCMA']
 						},
 						video: {
 							codecs: []
@@ -994,130 +988,87 @@ define(function(require) {
 					},
 					suppress_unregister_notifications: true
 				},
-				typedDefaults = {
-					sip_device: {
-						sip: {
-							password: monster.util.randomString(12),
-							realm: monster.apps.auth.currentAccount.realm,
-							username: 'user_' + monster.util.randomString(10)
-						}
+				callForwardSettings = {
+					call_forward: {
+						require_keypress: true,
+						keep_caller_id: true
 					},
-					landline: {
-						call_forward: {
-							require_keypress: true,
-							keep_caller_id: true
-						},
-						contact_list: {
-							exclude: true
-						}
-					},
-					cellphone: {
-						call_forward: {
-							require_keypress: true,
-							keep_caller_id: true
-						},
-						contact_list: {
-							exclude: true
-						}
-					},
-					ata: {
-						sip: {
-							password: monster.util.randomString(12),
-							realm: monster.apps.auth.currentAccount.realm,
-							username: 'user_' + monster.util.randomString(10)
-						}
-					},
-					fax: {
+					contact_list: {
+						exclude: true
+					}
+				},
+				sipSettings = {
+					sip: {
+						password: monster.util.randomString(12),
+						realm: monster.apps.auth.currentAccount.realm,
+						username: 'user_' + monster.util.randomString(10)
+					}
+				},
+				deviceDefaultsForType = _.get({
+					ata: _.merge({}, sipSettings),
+					cellphone: _.merge({}, callForwardSettings),
+					fax: _.merge({
 						media: {
 							fax_option: 'false'
 						},
-						outbound_flags: ['fax'],
+						outbound_flags: [
+							'fax'
+						]
+					}, sipSettings),
+					landline: _.merge({}, callForwardSettings),
+					mobile: _.merge({}, sipSettings),
+					sip_device: _.merge({}, sipSettings),
+					sip_uri: _.merge({
 						sip: {
-							password: monster.util.randomString(12),
-							realm: monster.apps.auth.currentAccount.realm,
-							username: 'user_' + monster.util.randomString(10)
-						}
-					},
-					softphone: {
-						sip: {
-							password: monster.util.randomString(12),
-							realm: monster.apps.auth.currentAccount.realm,
-							username: 'user_' + monster.util.randomString(10)
-						}
-					},
-					mobile: {
-						sip: {
-							password: monster.util.randomString(12),
-							realm: monster.apps.auth.currentAccount.realm,
-							username: 'user_' + monster.util.randomString(10)
-						}
-					},
-					smartphone: {
-						call_forward: {
-							require_keypress: true,
-							keep_caller_id: true
-						},
-						contact_list: {
-							exclude: true
-						},
-						sip: {
-							password: monster.util.randomString(12),
-							realm: monster.apps.auth.currentAccount.realm,
-							username: 'user_' + monster.util.randomString(10)
-						}
-					},
-					sip_uri: {
-						sip: {
-							password: monster.util.randomString(12),
-							username: 'user_' + monster.util.randomString(10),
 							expire_seconds: 360,
 							invite_format: 'route',
 							method: 'password'
 						}
-					}
-				};
+					}, _.omit(sipSettings, 'realm')),
+					smartphone: _.merge({}, sipSettings, callForwardSettings),
+					softphone: _.merge({}, sipSettings)
+				}, data.device.device_type, {}),
+				mergedDevice = _.merge({}, deviceDefaults, deviceDefaultsForType, data.device);
 
-			_.each(data.listClassifiers, function(restriction, name) {
-				if (name in self.i18n.active().devices.classifiers) {
-					defaults.extra.restrictions[name].friendly_name = self.i18n.active().devices.classifiers[name].name;
+			return _.merge({
+				extra: {
+					allowVMCellphone: !_.get(mergedDevice, 'call_forward.require_keypress', true),
+					availableCodecs: {
+						audio: [],
+						video: []
+					},
+					e911Numbers: data.e911Numbers,
+					hasDisabledRestrictions: _.some(data.listClassifiers, function(metadata, classifier) {
+						return isClassifierDisabledByAccount(classifier);
+					}),
+					hasE911Numbers: !_.isEmpty(data.e911Numbers),
+					isRegistered: _.get(dataList, 'isRegistered', false),
+					outboundPrivacy: _.map(self.appFlags.common.outboundPrivacy, function(strategy) {
+						return {
+							key: strategy,
+							value: monster.util.tryI18n(self.i18n.active().commonMisc.outboundPrivacy.values, strategy)
+						};
+					}),
+					restrictions: _.mapValues(data.listClassifiers, function(metadata, classifier) {
+						var i18n = _.get(self.i18n.active().devices.classifiers, classifier);
 
-					if ('help' in self.i18n.active().devices.classifiers[name]) {
-						defaults.extra.restrictions[name].help = self.i18n.active().devices.classifiers[name].help;
-					}
+						return {
+							action: _.get(data.device, ['call_restriction', classifier, 'action'], 'inherit'),
+							disabled: isClassifierDisabledByAccount(classifier),
+							friendly_name: _.get(i18n, 'name', metadata.friendly_name),
+							help: _.get(i18n, 'help')
+						};
+					}),
+					rtpMethod: _.get(mergedDevice, 'media.encryption.enforce_security', false)
+						? _.head(mergedDevice.media.encryption.methods)
+						: '',
+					selectedCodecs: {
+						audio: [],
+						video: []
+					},
+					users: data.users
 				}
-
-				if ('call_restriction' in data.accountLimits && name in data.accountLimits.call_restriction && data.accountLimits.call_restriction[name].action === 'deny') {
-					defaults.extra.restrictions[name].disabled = true;
-					defaults.extra.hasDisabledRestrictions = true;
-				}
-
-				if ('call_restriction' in data.device && name in data.device.call_restriction) {
-					defaults.extra.restrictions[name].action = data.device.call_restriction[name].action;
-				} else {
-					defaults.extra.restrictions[name].action = 'inherit';
-				}
-			});
-
-			var formattedData = $.extend(true, {}, typedDefaults[data.device.device_type], defaults, data.device);
-
-			/* Audio Codecs*/
-			/* extend doesn't replace the array so we need to do it manually */
-			if (data.device.media && data.device.media.audio && data.device.media.audio.codecs) {
-				formattedData.media.audio.codecs = data.device.media.audio.codecs;
-			}
-
-			/* Video codecs */
-			if (data.device.media && data.device.media.video && data.device.media.video.codecs) {
-				formattedData.media.video.codecs = data.device.media.video.codecs;
-			}
-
-			formattedData.extra.isRegistered = dataList.isRegistered;
-
-			if (formattedData.hasOwnProperty('call_forward') && formattedData.call_forward.hasOwnProperty('require_keypress')) {
-				formattedData.extra.allowVMCellphone = !formattedData.call_forward.require_keypress;
-			}
-
-			return formattedData;
+			}, mergedDevice);
 		},
 
 		/**
