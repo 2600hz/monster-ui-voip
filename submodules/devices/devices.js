@@ -165,18 +165,17 @@ define(function(require) {
 			});
 		},
 
+		/**
+		 * @param  {Object} data
+		 * @return {Array}
+		 */
 		getKeyTypes: function(data) {
-			var types = [];
-
-			if (data.hasOwnProperty('feature_keys') && data.feature_keys.iterate > 0) {
-				types.push('feature_keys');
-			}
-
-			if (data.hasOwnProperty('combo_keys') && data.combo_keys.iterate > 0) {
-				types.push('combo_keys');
-			}
-
-			return _.isEmpty(types) ? null : types;
+			return _.filter([
+				'combo_keys',
+				'feature_keys'
+			], function(type) {
+				return _.get(data, [type, 'iterate'], 0) > 0;
+			});
 		},
 
 		/**
@@ -196,102 +195,80 @@ define(function(require) {
 				};
 
 			self.devicesGetEditData(data, function(dataDevice) {
-				var renderDeviceArgs = {
+				var template = dataDevice.extra.template,
+					keyTypes = self.getKeyTypes(template);
+
+				if (keyTypes) {
+					_.each(keyTypes, function(type) {
+						if (!dataDevice.provision.hasOwnProperty(type)) {
+							dataDevice.provision[type] = {};
+						}
+
+						var i = 0,
+							len = template[type].iterate;
+						for (; i < len; i++) {
+							if (!dataDevice.provision[type].hasOwnProperty(i)) {
+								dataDevice.provision[type][i] = {
+									type: 'none'
+								};
+							}
+						}
+					});
+
+					var actions = [ 'none', 'presence', 'parking', 'personal_parking', 'speed_dial' ],
+						parkingSpots = _.range(1, 11),	// Array with integer numbers >= 1 and < 11
+						extra;
+
+					_.each(actions, function(action, idx, list) {
+						list[idx] = {
+							id: action,
+							text: self.i18n.active().devices.popupSettings.keys.types[action]
+						};
+
+						if (action !== 'none') {
+							list[idx].info = self.i18n.active().devices.popupSettings.keys.info.types[action];
+						}
+					});
+
+					extra = {
+						provision: {
+							parkingSpots: parkingSpots,
+							keyActions: actions,
+							keys: []
+						}
+					};
+
+					_.each(keyTypes, function(key) {
+						var camelCaseKey = _.camelCase(key);
+
+						extra.provision.keys.push({
+							id: key,
+							type: camelCaseKey,
+							title: self.i18n.active().devices.popupSettings.keys[camelCaseKey].title,
+							label: self.i18n.active().devices.popupSettings.keys[camelCaseKey].label,
+							data: _.map(dataDevice.provision[key], function(dataItem) {
+								var value = _.get(dataItem, 'value', {});
+
+								if (!_.isPlainObject(value)) {
+									dataItem.value = {
+										value: _.toString(value)
+									};
+								}
+
+								return dataItem;
+							})
+						});
+					});
+
+					dataDevice.extra = _.has(dataDevice, 'extra') ? _.merge({}, dataDevice.extra, extra) : extra;
+				}
+
+				self.devicesRenderDevice({
 					data: dataDevice,
 					allowAssign: allowAssign,
 					callbackSave: callbackSave,
 					callbackDelete: callbackDelete
-				};
-
-				if (dataDevice.hasOwnProperty('provision')) {
-					self.devicesGetIterator(dataDevice.provision, function(template) {
-						var keyTypes = self.getKeyTypes(template);
-
-						if (keyTypes) {
-							self.devicesListUsers({
-								success: function(users) {
-									_.each(keyTypes, function(type) {
-										if (!dataDevice.provision.hasOwnProperty(type)) {
-											dataDevice.provision[type] = {};
-										}
-
-										var i = 0,
-											len = template[type].iterate;
-										for (; i < len; i++) {
-											if (!dataDevice.provision[type].hasOwnProperty(i)) {
-												dataDevice.provision[type][i] = {
-													type: 'none'
-												};
-											}
-										}
-									});
-
-									var actions = [ 'none', 'presence', 'parking', 'personal_parking', 'speed_dial' ],
-										parkingSpots = _.range(1, 11),	// Array with integer numbers >= 1 and < 11
-										extra;
-
-									users.sort(function(a, b) {
-										return a.last_name.toLowerCase() > b.last_name.toLowerCase() ? 1 : -1;
-									});
-
-									_.each(actions, function(action, idx, list) {
-										list[idx] = {
-											id: action,
-											text: self.i18n.active().devices.popupSettings.keys.types[action]
-										};
-
-										if (action !== 'none') {
-											list[idx].info = self.i18n.active().devices.popupSettings.keys.info.types[action];
-										}
-									});
-
-									extra = {
-										provision: {
-											users: users,
-											parkingSpots: parkingSpots,
-											keyActions: actions,
-											keys: []
-										}
-									};
-
-									_.each(keyTypes, function(key) {
-										var camelCaseKey = _.camelCase(key);
-
-										extra.provision.keys.push({
-											id: key,
-											type: camelCaseKey,
-											title: self.i18n.active().devices.popupSettings.keys[camelCaseKey].title,
-											label: self.i18n.active().devices.popupSettings.keys[camelCaseKey].label,
-											data: _.map(dataDevice.provision[key], function(dataItem) {
-												var value = _.get(dataItem, 'value', {});
-
-												if (!_.isPlainObject(value)) {
-													dataItem.value = {
-														value: _.toString(value)
-													};
-												}
-
-												return dataItem;
-											})
-										});
-									});
-
-									dataDevice.extra = _.has(dataDevice, 'extra') ? _.merge({}, dataDevice.extra, extra) : extra;
-
-									self.devicesRenderDevice(_.merge({}, renderDeviceArgs, {
-										data: dataDevice
-									}));
-								}
-							});
-						} else {
-							self.devicesRenderDevice(renderDeviceArgs);
-						}
-					}, function() {
-						self.devicesRenderDevice(renderDeviceArgs);
-					});
-				} else {
-					self.devicesRenderDevice(renderDeviceArgs);
-				}
+				});
 			});
 		},
 
@@ -1066,7 +1043,14 @@ define(function(require) {
 						audio: [],
 						video: []
 					},
-					users: data.users
+					template: data.template,
+					users: _.sortBy(data.users, function(user) {
+						return _
+							.chain(user)
+							.thru(monster.util.getUserFullName)
+							.toLower()
+							.value();
+					})
 				}
 			}, mergedDevice);
 		},
@@ -1229,45 +1213,63 @@ define(function(require) {
 		devicesGetEditData: function(dataDevice, callback) {
 			var self = this;
 
-			monster.parallel({
-				listClassifiers: function(callback) {
-					self.devicesListClassifiers(function(dataClassifiers) {
-						callback(null, dataClassifiers);
-					});
-				},
-				device: function(callback) {
-					if (dataDevice.id) {
-						self.devicesGetDevice(dataDevice.id, function(dataDevice) {
-							callback(null, dataDevice);
-						});
-					} else {
-						callback(null, dataDevice);
-					}
-				},
-				e911Numbers: function(callback) {
-					self.devicesGetE911Numbers(function(e911Numbers) {
-						callback(null, e911Numbers);
-					});
-				},
-				accountLimits: function(callback) {
-					self.callApi({
-						resource: 'limits.get',
-						data: {
-							accountId: self.accountId
+			monster.waterfall([
+				function(waterfallCb) {
+					monster.parallel({
+						listClassifiers: function(callback) {
+							self.devicesListClassifiers(function(dataClassifiers) {
+								callback(null, dataClassifiers);
+							});
 						},
-						success: function(data, status) {
-							callback(null, data.data);
+						device: function(callback) {
+							if (dataDevice.id) {
+								self.devicesGetDevice(dataDevice.id, function(dataDevice) {
+									callback(null, dataDevice);
+								});
+							} else {
+								callback(null, dataDevice);
+							}
+						},
+						e911Numbers: function(callback) {
+							self.devicesGetE911Numbers(function(e911Numbers) {
+								callback(null, e911Numbers);
+							});
+						},
+						accountLimits: function(callback) {
+							self.callApi({
+								resource: 'limits.get',
+								data: {
+									accountId: self.accountId
+								},
+								success: function(data, status) {
+									callback(null, data.data);
+								}
+							});
+						},
+						users: function(callback) {
+							self.devicesListUsers({
+								success: function(users, status) {
+									callback(null, users);
+								}
+							});
 						}
+					}, function(error, results) {
+						waterfallCb(null, results);
 					});
 				},
-				users: function(callback) {
-					self.devicesListUsers({
-						success: function(users, status) {
-							callback(null, users);
-						}
+				function(results, waterfallCb) {
+					if (!_.has(results.device, 'provision')) {
+						return waterfallCb(null, results);
+					}
+					self.devicesGetIterator(results.device.provision, function(template) {
+						waterfallCb(null, _.merge({
+							template: template
+						}, results));
+					}, function() {
+						waterfallCb(null, results);
 					});
 				}
-			}, function(error, results) {
+			], function(err, results) {
 				var formattedData = self.devicesFormatData(results, dataDevice);
 
 				callback && callback(formattedData);
