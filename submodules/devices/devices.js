@@ -25,6 +25,53 @@ define(function(require) {
 			'voip.devices.editDevice': 'devicesRenderEdit'
 		},
 
+		appFlags: {
+			devices: {
+				iconClassesByDeviceTypes: {
+					application: 'icon-telicon-apps',
+					ata: 'icon-telicon-ata',
+					cellphone: 'fa fa-phone',
+					fax: 'icon-telicon-fax',
+					landline: 'icon-telicon-home',
+					mobile: 'icon-telicon-sprint-phone',
+					sip_device: 'icon-telicon-voip-phone',
+					sip_uri: 'icon-telicon-voip-phone',
+					smartphone: 'icon-telicon-mobile-phone',
+					softphone: 'icon-telicon-soft-phone'
+				},
+				/**
+				 * Lists device types allowed to be added by devicesRenderAdd.
+				 * The order is important and controls the list rendered in DOM.
+				 * @type {Array}
+				 */
+				addableDeviceTypes: [
+					'sip_device',
+					'cellphone',
+					'smartphone',
+					'softphone',
+					'landline',
+					'fax',
+					'ata',
+					'sip_uri'
+				],
+				/**
+				 * Lists device types allowed to be edited by devicesRenderEdit.
+				 * @type {Array}
+				 */
+				editableDeviceTypes: [
+					'ata',
+					'cellphone',
+					'fax',
+					'landline',
+					'mobile',
+					'sip_device',
+					'sip_uri',
+					'smartphone',
+					'softphone'
+				]
+			}
+		},
+
 		/* Users */
 		/* args: parent and deviceId */
 		devicesRender: function(pArgs) {
@@ -1075,19 +1122,12 @@ define(function(require) {
 		 */
 		devicesFormatListData: function(data) {
 			var self = this,
+				getIconClassForDeviceType = function getIconClassForDeviceType(type) {
+					var knownType = _.has(self.appFlags.devices.iconClassesByDeviceTypes, type) ? type : 'sip_device';
+					return _.get(self.appFlags.devices.iconClassesByDeviceTypes, knownType);
+				},
 				usersById = _.keyBy(data.users, 'id'),
 				unassignedString = self.i18n.active().devices.unassignedDevice,
-				iconClassesByDeviceType = {
-					cellphone: 'fa fa-phone',
-					smartphone: 'icon-telicon-mobile-phone',
-					landline: 'icon-telicon-home',
-					mobile: 'icon-telicon-sprint-phone',
-					softphone: 'icon-telicon-soft-phone',
-					sip_device: 'icon-telicon-voip-phone',
-					sip_uri: 'icon-telicon-voip-phone',
-					fax: 'icon-telicon-fax',
-					ata: 'icon-telicon-ata'
-				},
 				registeredDevicesById = _.map(data.status, 'device_id');
 
 			return {
@@ -1114,7 +1154,7 @@ define(function(require) {
 							// Display a device in black if it's disabled, otherwise, until we know whether it's registered or not, we set the color to red
 							classStatus: isEnabled ? staticStatusClasses[_.toNumber(isRegistered)] : 'disabled',
 							enabled: isEnabled,
-							friendlyIconClass: iconClassesByDeviceType[deviceType],
+							friendlyIconClass: getIconClassForDeviceType(deviceType),
 							friendlyType: _.get(self.i18n.active().devices.types, deviceType),
 							isAssigned: _
 								.chain(device)
@@ -1155,7 +1195,13 @@ define(function(require) {
 							}
 						}
 					})
-					.value()
+					.value(),
+				deviceTypesToAdd: _.map(self.appFlags.devices.addableDeviceTypes, function(type) {
+					return {
+						type: type,
+						icon: _.get(self.appFlags.devices.iconClassesByDeviceTypes, type)
+					};
+				})
 			};
 		},
 
