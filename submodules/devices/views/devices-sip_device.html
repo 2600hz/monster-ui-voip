@@ -386,7 +386,9 @@
 								<label for="provision.keys.{{../id}}[{{@key}}].value.value">{{ @root.i18n.devices.popupSettings.keys.labels.user }}</label>
 								<select name="provision.keys.{{../id}}[{{@key}}].value.value" class="chosen-feature-key-user">
 								{{#each @root.extra.users}}
-									<option value="{{id}}">{{getUserFullName this}}</option>
+									<option value="{{id}}">
+										{{getUserFullName this}}
+									</option>
 								{{/each}}
 								</select>
 							</div>
@@ -402,7 +404,9 @@
 								<label for="provision.keys.{{../id}}[{{@key}}].value.value">{{ @root.i18n.devices.popupSettings.keys.labels.user }}</label>
 								<select name="provision.keys.{{../id}}[{{@key}}].value.value" class="chosen-feature-key-user">
 								{{#each @root.extra.users}}
-									<option value="{{id}}">{{getUserFullName this}}</option>
+									<option value="{{id}}">
+										{{getUserFullName this}}
+									</option>
 								{{/each}}
 								</select>
 							</div>
