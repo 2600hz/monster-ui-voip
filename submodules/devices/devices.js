@@ -195,74 +195,6 @@ define(function(require) {
 				};
 
 			self.devicesGetEditData(data, function(dataDevice) {
-				var template = dataDevice.extra.template,
-					keyTypes = self.getKeyTypes(template);
-
-				if (keyTypes) {
-					_.each(keyTypes, function(type) {
-						if (!dataDevice.provision.hasOwnProperty(type)) {
-							dataDevice.provision[type] = {};
-						}
-
-						var i = 0,
-							len = template[type].iterate;
-						for (; i < len; i++) {
-							if (!dataDevice.provision[type].hasOwnProperty(i)) {
-								dataDevice.provision[type][i] = {
-									type: 'none'
-								};
-							}
-						}
-					});
-
-					var actions = [ 'none', 'presence', 'parking', 'personal_parking', 'speed_dial' ],
-						parkingSpots = _.range(1, 11),	// Array with integer numbers >= 1 and < 11
-						extra;
-
-					_.each(actions, function(action, idx, list) {
-						list[idx] = {
-							id: action,
-							text: self.i18n.active().devices.popupSettings.keys.types[action]
-						};
-
-						if (action !== 'none') {
-							list[idx].info = self.i18n.active().devices.popupSettings.keys.info.types[action];
-						}
-					});
-
-					extra = {
-						provision: {
-							parkingSpots: parkingSpots,
-							keyActions: actions,
-							keys: []
-						}
-					};
-
-					_.each(keyTypes, function(key) {
-						var camelCaseKey = _.camelCase(key);
-
-						extra.provision.keys.push({
-							id: key,
-							type: camelCaseKey,
-							title: self.i18n.active().devices.popupSettings.keys[camelCaseKey].title,
-							label: self.i18n.active().devices.popupSettings.keys[camelCaseKey].label,
-							data: _.map(dataDevice.provision[key], function(dataItem) {
-								var value = _.get(dataItem, 'value', {});
-
-								if (!_.isPlainObject(value)) {
-									dataItem.value = {
-										value: _.toString(value)
-									};
-								}
-
-								return dataItem;
-							})
-						});
-					});
-
-					dataDevice.extra = _.has(dataDevice, 'extra') ? _.merge({}, dataDevice.extra, extra) : extra;
-				}
-
 				self.devicesRenderDevice({
 					data: dataDevice,
 					allowAssign: allowAssign,
@@ -1005,7 +937,37 @@ define(function(require) {
 					smartphone: _.merge({}, sipSettings, callForwardSettings),
 					softphone: _.merge({}, sipSettings)
 				}, data.device.device_type, {}),
-				mergedDevice = _.merge({}, deviceDefaults, deviceDefaultsForType, data.device);
+				deviceOverrides = {
+					provision: _
+						.chain(data.template)
+						.thru(self.getKeyTypes)
+						.map(function(type) {
+							return {
+								type: type,
+								data: _
+									.chain(data.template)
+									.get([type, 'iterate'], 0)
+									.range()
+									.keyBy()
+									.mapValues(function(index) {
+										return _.get(data.device, ['provision', type, index], {
+											type: 'none'
+										});
+									})
+									.value()
+							};
+						})
+						.keyBy('type')
+						.mapValues('data')
+						.value()
+				},
+				mergedDevice = _.merge(
+					{},
+					deviceDefaults,
+					deviceDefaultsForType,
+					data.device,
+					deviceOverrides
+				);
 
 			return _.merge({
 				extra: {
@@ -1026,6 +988,56 @@ define(function(require) {
 							value: monster.util.tryI18n(self.i18n.active().commonMisc.outboundPrivacy.values, strategy)
 						};
 					}),
+					provision: {
+						keyActions: _.map([
+							'none',
+							'presence',
+							'parking',
+							'personal_parking',
+							'speed_dial'
+						], function(action) {
+							var i18n = self.i18n.active().devices.popupSettings.keys;
+
+							return {
+								id: action,
+								info: _.get(i18n, ['info', 'types', action]),
+								text: _.get(i18n, ['types', action])
+							};
+						}),
+						keys: _
+							.chain(data.template)
+							.thru(self.getKeyTypes)
+							.map(function(type) {
+								var camelCasedType = _.camelCase(type),
+									i18n = _.get(self.i18n.active().devices.popupSettings.keys, camelCasedType);
+
+								return _.merge({
+									id: type,
+									type: camelCasedType,
+									data: _
+										.chain(mergedDevice)
+										.get(['provision', type], {})
+										.mapValues(function(metadata) {
+											var value = _.get(metadata, 'value', {});
+
+											return _.merge({}, metadata, _.isPlainObject(value)
+												? {}
+												: {
+													value: {
+														value: _.toString(value)
+													}
+												}
+											);
+										})
+										.value()
+								}, _.pick(i18n, [
+									'title',
+									'label'
+								]));
+							})
+							.value(),
+						parkingSpots: _.range(1, 11)
+					},
 					restrictions: _.mapValues(data.listClassifiers, function(metadata, classifier) {
 						var i18n = _.get(self.i18n.active().devices.classifiers, classifier);
 
@@ -1043,7 +1055,6 @@ define(function(require) {
 						audio: [],
 						video: []
 					},
-					template: data.template,
 					users: _.sortBy(data.users, function(user) {
 						return _
 							.chain(user)
@@ -1222,13 +1233,12 @@ define(function(require) {
 							});
 						},
 						device: function(callback) {
-							if (dataDevice.id) {
-								self.devicesGetDevice(dataDevice.id, function(dataDevice) {
-									callback(null, dataDevice);
-								});
-							} else {
-								callback(null, dataDevice);
+							if (!_.has(dataDevice, 'id')) {
+								return callback(null, dataDevice);
 							}
+							self.devicesGetDevice(dataDevice.id, function(dataDevice) {
+								callback(null, dataDevice);
+							});
 						},
 						e911Numbers: function(callback) {
 							self.devicesGetE911Numbers(function(e911Numbers) {
