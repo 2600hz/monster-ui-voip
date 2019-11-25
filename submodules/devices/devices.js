@@ -187,17 +187,24 @@ define(function(require) {
 
 			template.find('.settings').on('click', function() {
 				var $this = $(this),
+					action = $this.data('action'),
 					dataDevice = {
 						id: $this.parents('.grid-row').data('id'),
 						isRegistered: $this.parents('.grid-row').data('registered') === true
 					};
 
-				self.devicesRenderEdit({
-					data: dataDevice,
-					callbackSave: function(dataDevice) {
-						self.devicesRender({ deviceId: dataDevice.id });
-					}
-				});
+				if (action === 'edit') {
+					self.devicesRenderEdit({
+						data: dataDevice,
+						callbackSave: function(dataDevice) {
+							self.devicesRender({ deviceId: dataDevice.id });
+						}
+					});
+				} else if (action === 'delete') {
+					self.devicesHelperDeleteDevice(dataDevice.id, function() {
+						self.devicesRender();
+					});
+				}
 			});
 
 			template.find('.create-device').on('click', function() {
@@ -592,22 +599,10 @@ define(function(require) {
 				templateDevice.find('#delete_device').on('click', function() {
 					var deviceId = $(this).parents('.edit-device').data('id');
 
-					monster.ui.confirm(self.i18n.active().devices.confirmDeleteDevice, function() {
-						self.devicesDeleteDevice(deviceId, function(device) {
-							popup.dialog('close').remove();
+					self.devicesHelperDeleteDevice(deviceId, function(device) {
+						popup.dialog('close').remove();
 
-							monster.ui.toast({
-								type: 'success',
-								message: self.getTemplate({
-									name: '!' + self.i18n.active().devices.deletedDevice,
-									data: {
-										deviceName: device.name
-									}
-								})
-							});
-
-							callbackDelete && callbackDelete(device);
-						});
+						callbackDelete && callbackDelete(device);
 					});
 				});
 			}
@@ -1155,12 +1150,13 @@ define(function(require) {
 							classStatus: isEnabled ? staticStatusClasses[_.toNumber(isRegistered)] : 'disabled',
 							enabled: isEnabled,
 							friendlyIconClass: getIconClassForDeviceType(deviceType),
-							friendlyType: _.get(self.i18n.active().devices.types, deviceType),
+							friendlyType: monster.util.tryI18n(self.i18n.active().devices.types, deviceType),
 							isAssigned: _
 								.chain(device)
 								.has('owner_id')
 								.toString()
 								.value(),
+							isEditable: _.includes(self.appFlags.devices.editableDeviceTypes, deviceType),
 							// Even though a device is registered, we don't count it as registered if it's disabled
 							isRegistered: isEnabled && isRegistered,
 							macAddress: device.mac_address,
@@ -1203,6 +1199,41 @@ define(function(require) {
 					};
 				})
 			};
+		},
+
+		devicesHelperDeleteDevice: function(deviceId, onSuccess) {
+			var self = this;
+
+			monster.waterfall([
+				function(waterfallCb) {
+					monster.ui.confirm(self.i18n.active().devices.confirmDeleteDevice, function() {
+						waterfallCb(null);
+					}, function() {
+						waterfallCb(true);
+					});
+				},
+				function(waterfallCb) {
+					self.devicesDeleteDevice(deviceId, function(device) {
+						waterfallCb(null, device);
+					});
+				}
+			], function(err, device) {
+				if (err) {
+					return;
+				}
+
+				monster.ui.toast({
+					type: 'success',
+					message: self.getTemplate({
+						name: '!' + self.i18n.active().devices.deletedDevice,
+						data: {
+							deviceName: device.name
+						}
+					})
+				});
+
+				onSuccess && onSuccess(device);
+			});
 		},
 
 		/* Utils */
