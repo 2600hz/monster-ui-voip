@@ -430,7 +430,8 @@ define(function(require) {
 					'sip_device',
 					'landline',
 					'fax',
-					'ata'
+					'ata',
+					'application'
 				],
 				userCountByServicePlanRole = _
 					.chain(data.users)
