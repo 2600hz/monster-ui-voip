@@ -448,6 +448,7 @@
 			"type": "Type"
 		},
 		"types": {
+			"application": "Application",
 			"cellphone": "Cell Phone",
 			"sip_device": "SIP Phone",
 			"smartphone": "Smartphone",
