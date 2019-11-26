@@ -43,6 +43,15 @@ define(function(require) {
 
 		featureCodes: [
 			{
+				name: 'directed_ext_pickup',
+				number: '87',
+				pattern: '^\\*87([0-9]+)$',
+				moduleName: 'group_pickup_feature',
+				extraData: {
+					type: 'extension'
+				}
+			},
+			{
 				name: 'call_forward[action=deactivate]',
 				number: '73',
 				callflowNumber: '*73',
@@ -163,10 +172,6 @@ define(function(require) {
 		 * @param  {Object}   args
 		 * @param  {jQuery}   args.parent                      Parent template
 		 * @param  {String}   [args.openElement]               Name of the element to display on render
-		 * @param  {Object}   [args.action]                    Action to execute on render
-		 * @param  {String}   [args.action.type]               Type of action to execute
-		 * @param  {Object}   [args.action.callbacks]          Action callbacks
-		 * @param  {Function} [args.action.callbacks.success]  Action success callback
 		 * @param  {Function} [args.callback]                  Callback to execute after render
 		 */
 		strategyRender: function(args) {
@@ -174,7 +179,6 @@ define(function(require) {
 				args = args || {},
 				parent = args.parent || $('.right-content'),
 				openElement = args.openElement,
-				action = args.action,
 				callback = args.callback;
 
 			monster.parallel({
@@ -247,7 +251,6 @@ define(function(require) {
 						self.strategyRefreshTemplate({
 							container: element,
 							strategyData: results,
-							action: action,
 							callback: function() {
 								element.addClass('open');
 								element.find('.element-content').show();
@@ -626,10 +629,6 @@ define(function(require) {
 		 * @param  {Object}   args
 		 * @param  {jQuery}   args.container                   Container template
 		 * @param  {Object}   args.strategyData                Strategy data
-		 * @param  {Object}   [args.action]                    Action to execute
-		 * @param  {String}   [args.action.type]               Type of action to execute
-		 * @param  {Object}   [args.action.callbacks]          Action callbacks
-		 * @param  {Function} [args.action.callbacks.success]  Action success callback
 		 * @param  {Function} [args.callback]                  Optional callback to execute after refresh
 		 */
 		strategyRefreshTemplate: function(args) {
@@ -983,10 +982,6 @@ define(function(require) {
 		 * @param  {jQuery}   args.container                   Container template
 		 * @param  {Object}   args.strategyData                Strategy data
 		 * @param  {Object}   args.templateName                Template name
-		 * @param  {Object}   [args.action]                    Action to execute
-		 * @param  {String}   [args.action.type]               Type of action to execute
-		 * @param  {Object}   [args.action.callbacks]          Action callbacks
-		 * @param  {Function} [args.action.callbacks.success]  Action success callback
 		 * @param  {Function} [args.callback]                  Optional callback to execute after refresh
 		 */
 		strategyRefreshTemplateNumbers: function(args) {
@@ -994,8 +989,6 @@ define(function(require) {
 				$container = args.container,
 				strategyData = args.strategyData,
 				templateName = args.templateName,
-				action = args.action,
-				actionType = _.get(action, 'type'),
 				callback = args.callback;
 
 			self.strategyListAccountNumbers(function(accountNumbers) {
@@ -1037,98 +1030,6 @@ define(function(require) {
 							number: numberId,
 							callbacks: callbacks
 						});
-					},
-					actions = {
-						checkMissingE911: function(numbers) {
-							if (!monster.util.isNumberFeatureEnabled('e911')) {
-								// E911 feature is not enabled for the account, so there is
-								// nothing to do here
-								return;
-							}
-
-							// Cases:
-							// * If there is one or more main numbers with E911 set:
-							//   - If there is one number, set that number as the emergency
-							//     caller ID for the account.
-							//   - If there are 2 or more, display dialog to choose number,
-							//     then set it as the account emergency caller ID.
-							// * If there are one or more numbers with E911 available (but not
-							//   set), then:
-							//   - If there is one number, select that number for E911.
-							//   - If there are 2 or more, display dialog to choose number.
-							//   Then display pop-up to set and save the info, and set the
-							//   selected number as the account emergency caller ID.
-							// * If there are no numbers with E911 feature available, display
-							//   toast to notify the user about it.
-							monster.waterfall([
-								function(callback) {
-									var isE911Active = _.some(numbers, function(numberData) {
-										return _.includes(numberData.number.features, 'e911');
-									});
-
-									if (isE911Active) {
-										callback('OK', { });
-									} else {
-										callback(null);
-									}
-								},
-								function(callback) {
-									var e911AvailableNumbers = _.filter(numbers, function(numberData) {
-										var availableFeatures = monster.util.getNumberFeatures(numberData.number);
-										return _.includes(availableFeatures, 'e911');
-									});
-
-									if (_.isEmpty(e911AvailableNumbers)) {
-										callback('no_e911_numbers');
-									} else {
-										callback(null, e911AvailableNumbers);
-									}
-								},
-								function(e911AvailableNumbers, callback) {
-									if (e911AvailableNumbers.length === 1) {
-										callback(null, _.head(e911AvailableNumbers).number.id);
-										return;
-									}
-
-									self.strategyShowNumberChoices({
-										callerIdType: 'emergency',
-										newNumbers: _.map(e911AvailableNumbers, 'number.id'),
-										save: function(number) {
-											callback(null, number);
-										}
-									});
-								},
-								function(numberId, callback) {
-									monster.pub('common.e911.renderPopup', {
-										phoneNumber: numberId,
-										callbacks: {
-											success: function(data) {
-												callback(null, {
-													numberId: numberId,
-													features: data.data.features
-												});
-											},
-											error: function() {
-												callback(true);
-											}
-										}
-									});
-								}
-							], function(err, results) {
-								if (err && err !== 'OK') {
-									if (err === 'no_e911_numbers') {
-										monster.ui.toast({
-											type: 'warning',
-											message: self.i18n.active().strategy.toastrMessages.noE911NumberAvailable
-										});
-									} else {
-										_.has(action, 'callbacks.error') && action.callbacks.error(err);
-									}
-								} else {
-									afterFeatureUpdate(results.numberId, results.features, action.callbacks);
-								}
-							});
-						}
 					};
 
 				_.each(templateData.numbers, function(data) {
@@ -1152,11 +1053,6 @@ define(function(require) {
 					.find('.element-content')
 					.empty()
 					.append(template);
-
-				// Execute any additional action that has been requested
-				if (_.has(actions, actionType)) {
-					actions[actionType](templateData.numbers);
-				}
 
 				callback && callback();
 			});
@@ -1351,7 +1247,7 @@ define(function(require) {
 											message: self.i18n.active().strategy.toastrMessages.removeNumberSuccess
 										});
 										strategyData.callflows.MainCallflow = updatedCallflow;
-										refreshNumbersTemplate(updateCallflow);
+										refreshNumbersTemplate();
 
 										self.strategyGetAccount({
 											success: function(accountData) {
@@ -1797,8 +1693,8 @@ define(function(require) {
 										name: 'popupEditFaxbox',
 										data: {
 											email: faxbox.hasOwnProperty('notifications') && faxbox.notifications.hasOwnProperty('inbound') && faxbox.notifications.inbound.hasOwnProperty('email')
-													? faxbox.notifications.inbound.email.send_to
-													: ''
+												? faxbox.notifications.inbound.email.send_to
+												: ''
 										},
 										submodule: 'strategy'
 									})),
@@ -2819,7 +2715,7 @@ define(function(require) {
 							{ value: 'last', label: self.i18n.active().strategy.ordinals.last }
 						]
 					}
-				}, holiday, {holidayType: holidayType});
+				}, holiday, { holidayType: holidayType });
 
 			for (var i = 1; i <= 31; i++) {
 				templateData.resources.days.push({ value: i });
@@ -3766,7 +3662,7 @@ define(function(require) {
 										name: val,
 										type: 'main_weekdays',
 										time_window_start: 32400, // 9:00AM
-										time_window_stop: 61200,  // 5:00PM
+										time_window_stop: 61200, // 5:00PM
 										wdays: [val.substring(4).toLowerCase()]
 									}
 								},
@@ -3965,7 +3861,7 @@ define(function(require) {
 						ring_group: [],
 						userGroups: $.map(results.userGroups, function(val) {
 							var group = _.find(results.groups, function(group) { return val.group_id === group.id; });
-							val.name = group && group.name || val.name;
+							val.name = group && (group.name || val.name);
 							val.module = 'callflow';
 							return val;
 						}),

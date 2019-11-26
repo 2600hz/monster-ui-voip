@@ -1774,9 +1774,14 @@ define(function(require) {
 
 					monster.request({
 						resource: 'common.chooseModel.getProvisionerData',
-						data: {},
+						data: {
+							generateError: false
+						},
 						success: function(provisionerData) {
 							callback(null, provisionerData.data);
+						},
+						error: function() {
+							callback(null, {});
 						}
 					});
 				}
@@ -1983,7 +1988,7 @@ define(function(require) {
 		usersFormatAddUser: function(data) {
 			var self = this,
 				formattedData = {
-					hasProvisioner: self.appFlags.common.hasProvisioner,
+					hasProvisioner: self.appFlags.common.hasProvisioner && !_.isEmpty(data.provisioners),
 					sendToSameEmail: true,
 					nextExtension: '',
 					listExtensions: {},
@@ -2529,7 +2534,7 @@ define(function(require) {
 
 			featureTemplate.find('.save').on('click', function() {
 				var formData = monster.ui.getFormData('call_forward_form'),
-					phoneNumber = monster.util.getFormatPhoneNumber(formData.number).e164Number,
+					phoneNumber = monster.util.unformatPhoneNumber(formData.number),
 					isValidPhoneNumber = !_.isUndefined(phoneNumber);
 
 				if (monster.ui.valid(featureForm) && isValidPhoneNumber) {
