@@ -23,7 +23,11 @@
 			</div>
 		</div>
 		<div class="edit grid-cell centered">
-			<i class="fa fa-wrench settings"></i>
+		{{#if isEditable}}
+			<i class="fa fa-wrench settings" data-action="edit"></i>
+		{{else}}
+			<i class="fa fa-trash settings" data-action="delete"></i>
+		{{/if}}
 		</div>
 	</div>
 </div>

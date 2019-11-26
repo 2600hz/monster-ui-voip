@@ -25,6 +25,53 @@ define(function(require) {
 			'voip.devices.editDevice': 'devicesRenderEdit'
 		},
 
+		appFlags: {
+			devices: {
+				iconClassesByDeviceTypes: {
+					application: 'icon-telicon-apps',
+					ata: 'icon-telicon-ata',
+					cellphone: 'fa fa-phone',
+					fax: 'icon-telicon-fax',
+					landline: 'icon-telicon-home',
+					mobile: 'icon-telicon-sprint-phone',
+					sip_device: 'icon-telicon-voip-phone',
+					sip_uri: 'icon-telicon-voip-phone',
+					smartphone: 'icon-telicon-mobile-phone',
+					softphone: 'icon-telicon-soft-phone'
+				},
+				/**
+				 * Lists device types allowed to be added by devicesRenderAdd.
+				 * The order is important and controls the list rendered in DOM.
+				 * @type {Array}
+				 */
+				addableDeviceTypes: [
+					'sip_device',
+					'cellphone',
+					'smartphone',
+					'softphone',
+					'landline',
+					'fax',
+					'ata',
+					'sip_uri'
+				],
+				/**
+				 * Lists device types allowed to be edited by devicesRenderEdit.
+				 * @type {Array}
+				 */
+				editableDeviceTypes: [
+					'ata',
+					'cellphone',
+					'fax',
+					'landline',
+					'mobile',
+					'sip_device',
+					'sip_uri',
+					'smartphone',
+					'softphone'
+				]
+			}
+		},
+
 		/* Users */
 		/* args: parent and deviceId */
 		devicesRender: function(pArgs) {
@@ -140,17 +187,24 @@ define(function(require) {
 
 			template.find('.settings').on('click', function() {
 				var $this = $(this),
+					action = $this.data('action'),
 					dataDevice = {
 						id: $this.parents('.grid-row').data('id'),
 						isRegistered: $this.parents('.grid-row').data('registered') === true
 					};
 
-				self.devicesRenderEdit({
-					data: dataDevice,
-					callbackSave: function(dataDevice) {
-						self.devicesRender({ deviceId: dataDevice.id });
-					}
-				});
+				if (action === 'edit') {
+					self.devicesRenderEdit({
+						data: dataDevice,
+						callbackSave: function(dataDevice) {
+							self.devicesRender({ deviceId: dataDevice.id });
+						}
+					});
+				} else if (action === 'delete') {
+					self.devicesHelperDeleteDevice(dataDevice.id, function() {
+						self.devicesRender();
+					});
+				}
 			});
 
 			template.find('.create-device').on('click', function() {
@@ -165,18 +219,17 @@ define(function(require) {
 			});
 		},
 
+		/**
+		 * @param  {Object} data
+		 * @return {Array}
+		 */
 		getKeyTypes: function(data) {
-			var types = [];
-
-			if (data.hasOwnProperty('feature_keys') && data.feature_keys.iterate > 0) {
-				types.push('feature_keys');
-			}
-
-			if (data.hasOwnProperty('combo_keys') && data.combo_keys.iterate > 0) {
-				types.push('combo_keys');
-			}
-
-			return _.isEmpty(types) ? null : types;
+			return _.filter([
+				'combo_keys',
+				'feature_keys'
+			], function(type) {
+				return _.get(data, [type, 'iterate'], 0) > 0;
+			});
 		},
 
 		/**
@@ -196,102 +249,12 @@ define(function(require) {
 				};
 
 			self.devicesGetEditData(data, function(dataDevice) {
-				var renderDeviceArgs = {
+				self.devicesRenderDevice({
 					data: dataDevice,
 					allowAssign: allowAssign,
 					callbackSave: callbackSave,
 					callbackDelete: callbackDelete
-				};
-
-				if (dataDevice.hasOwnProperty('provision')) {
-					self.devicesGetIterator(dataDevice.provision, function(template) {
-						var keyTypes = self.getKeyTypes(template);
-
-						if (keyTypes) {
-							self.devicesListUsers({
-								success: function(users) {
-									_.each(keyTypes, function(type) {
-										if (!dataDevice.provision.hasOwnProperty(type)) {
-											dataDevice.provision[type] = {};
-										}
-
-										var i = 0,
-											len = template[type].iterate;
-										for (; i < len; i++) {
-											if (!dataDevice.provision[type].hasOwnProperty(i)) {
-												dataDevice.provision[type][i] = {
-													type: 'none'
-												};
-											}
-										}
-									});
-
-									var actions = [ 'none', 'presence', 'parking', 'personal_parking', 'speed_dial' ],
-										parkingSpots = _.range(1, 11),	// Array with integer numbers >= 1 and < 11
-										extra;
-
-									users.sort(function(a, b) {
-										return a.last_name.toLowerCase() > b.last_name.toLowerCase() ? 1 : -1;
-									});
-
-									_.each(actions, function(action, idx, list) {
-										list[idx] = {
-											id: action,
-											text: self.i18n.active().devices.popupSettings.keys.types[action]
-										};
-
-										if (action !== 'none') {
-											list[idx].info = self.i18n.active().devices.popupSettings.keys.info.types[action];
-										}
-									});
-
-									extra = {
-										provision: {
-											users: users,
-											parkingSpots: parkingSpots,
-											keyActions: actions,
-											keys: []
-										}
-									};
-
-									_.each(keyTypes, function(key) {
-										var camelCaseKey = _.camelCase(key);
-
-										extra.provision.keys.push({
-											id: key,
-											type: camelCaseKey,
-											title: self.i18n.active().devices.popupSettings.keys[camelCaseKey].title,
-											label: self.i18n.active().devices.popupSettings.keys[camelCaseKey].label,
-											data: _.map(dataDevice.provision[key], function(dataItem) {
-												var value = _.get(dataItem, 'value', {});
-
-												if (!_.isPlainObject(value)) {
-													dataItem.value = {
-														value: _.toString(value)
-													};
-												}
-
-												return dataItem;
-											})
-										});
-									});
-
-									dataDevice.extra = _.has(dataDevice, 'extra') ? _.merge({}, dataDevice.extra, extra) : extra;
-
-									self.devicesRenderDevice(_.merge({}, renderDeviceArgs, {
-										data: dataDevice
-									}));
-								}
-							});
-						} else {
-							self.devicesRenderDevice(renderDeviceArgs);
-						}
-					}, function() {
-						self.devicesRenderDevice(renderDeviceArgs);
-					});
-				} else {
-					self.devicesRenderDevice(renderDeviceArgs);
-				}
+				});
 			});
 		},
 
@@ -636,22 +599,10 @@ define(function(require) {
 				templateDevice.find('#delete_device').on('click', function() {
 					var deviceId = $(this).parents('.edit-device').data('id');
 
-					monster.ui.confirm(self.i18n.active().devices.confirmDeleteDevice, function() {
-						self.devicesDeleteDevice(deviceId, function(device) {
-							popup.dialog('close').remove();
+					self.devicesHelperDeleteDevice(deviceId, function(device) {
+						popup.dialog('close').remove();
 
-							monster.ui.toast({
-								type: 'success',
-								message: self.getTemplate({
-									name: '!' + self.i18n.active().devices.deletedDevice,
-									data: {
-										deviceName: device.name
-									}
-								})
-							});
-
-							callbackDelete && callbackDelete(device);
-						});
+						callbackDelete && callbackDelete(device);
 					});
 				});
 			}
@@ -954,39 +905,33 @@ define(function(require) {
 			return mergedData;
 		},
 
+		/**
+		 * @param  {Object} data
+		 * @param  {Object} data.device
+		 * @param  {String} data.device.device_type
+		 * @param  {Object} data.e911Numbers
+		 * @param  {Object} data.accountLimits
+		 * @param  {Object} data.listClassifiers
+		 * @param  {Object} data.users
+		 * @param  {Object} [data.template]
+		 * @param  {Boolean} [dataList.isRegistered]
+		 * @return {Object}
+		 */
 		devicesFormatData: function(data, dataList) {
 			var self = this,
-				defaults = {
-					extra: {
-						outboundPrivacy: _.map(self.appFlags.common.outboundPrivacy, function(strategy) {
-							return {
-								key: strategy,
-								value: self.i18n.active().commonMisc.outboundPrivacy.values[strategy]
-							};
-						}),
-						hasE911Numbers: !_.isEmpty(data.e911Numbers),
-						e911Numbers: data.e911Numbers,
-						restrictions: data.listClassifiers,
-						rtpMethod: data.device.media && data.device.media.encryption && data.device.media.encryption.enforce_security ? data.device.media.encryption.methods[0] : '',
-						selectedCodecs: {
-							audio: [],
-							video: []
-						},
-						availableCodecs: {
-							audio: [],
-							video: []
-						},
-						users: data.users
-					},
+				isClassifierDisabledByAccount = function isClassifierDisabledByAccount(classifier) {
+					return _.get(data.accountLimits, ['call_restriction', classifier, 'action']) === 'deny';
+				},
+				deviceDefaults = {
 					call_restriction: {},
 					device_type: 'sip_device',
 					enabled: true,
 					media: {
+						audio: {
+							codecs: ['PCMA', 'PCMU']
+						},
 						encryption: {
 							enforce_security: false
-						},
-						audio: {
-							codecs: ['PCMU', 'PCMA']
 						},
 						video: {
 							codecs: []
@@ -994,212 +939,301 @@ define(function(require) {
 					},
 					suppress_unregister_notifications: true
 				},
-				typedDefaults = {
-					sip_device: {
-						sip: {
-							password: monster.util.randomString(12),
-							realm: monster.apps.auth.currentAccount.realm,
-							username: 'user_' + monster.util.randomString(10)
-						}
+				callForwardSettings = {
+					call_forward: {
+						require_keypress: true,
+						keep_caller_id: true
 					},
-					landline: {
-						call_forward: {
-							require_keypress: true,
-							keep_caller_id: true
-						},
-						contact_list: {
-							exclude: true
-						}
-					},
-					cellphone: {
-						call_forward: {
-							require_keypress: true,
-							keep_caller_id: true
-						},
-						contact_list: {
-							exclude: true
-						}
-					},
-					ata: {
-						sip: {
-							password: monster.util.randomString(12),
-							realm: monster.apps.auth.currentAccount.realm,
-							username: 'user_' + monster.util.randomString(10)
-						}
-					},
-					fax: {
+					contact_list: {
+						exclude: true
+					}
+				},
+				sipSettings = {
+					sip: {
+						password: monster.util.randomString(12),
+						realm: monster.apps.auth.currentAccount.realm,
+						username: 'user_' + monster.util.randomString(10)
+					}
+				},
+				deviceDefaultsForType = _.get({
+					ata: _.merge({}, sipSettings),
+					cellphone: _.merge({}, callForwardSettings),
+					fax: _.merge({
 						media: {
 							fax_option: 'false'
 						},
-						outbound_flags: ['fax'],
+						outbound_flags: [
+							'fax'
+						]
+					}, sipSettings),
+					landline: _.merge({}, callForwardSettings),
+					mobile: _.merge({}, sipSettings),
+					sip_device: _.merge({}, sipSettings),
+					sip_uri: _.merge({
 						sip: {
-							password: monster.util.randomString(12),
-							realm: monster.apps.auth.currentAccount.realm,
-							username: 'user_' + monster.util.randomString(10)
-						}
-					},
-					softphone: {
-						sip: {
-							password: monster.util.randomString(12),
-							realm: monster.apps.auth.currentAccount.realm,
-							username: 'user_' + monster.util.randomString(10)
-						}
-					},
-					mobile: {
-						sip: {
-							password: monster.util.randomString(12),
-							realm: monster.apps.auth.currentAccount.realm,
-							username: 'user_' + monster.util.randomString(10)
-						}
-					},
-					smartphone: {
-						call_forward: {
-							require_keypress: true,
-							keep_caller_id: true
-						},
-						contact_list: {
-							exclude: true
-						},
-						sip: {
-							password: monster.util.randomString(12),
-							realm: monster.apps.auth.currentAccount.realm,
-							username: 'user_' + monster.util.randomString(10)
-						}
-					},
-					sip_uri: {
-						sip: {
-							password: monster.util.randomString(12),
-							username: 'user_' + monster.util.randomString(10),
 							expire_seconds: 360,
 							invite_format: 'route',
 							method: 'password'
 						}
-					}
-				};
+					}, _.omit(sipSettings, 'realm')),
+					smartphone: _.merge({}, sipSettings, callForwardSettings),
+					softphone: _.merge({}, sipSettings)
+				}, data.device.device_type, {}),
+				deviceOverrides = {
+					provision: _
+						.chain(data.template)
+						.thru(self.getKeyTypes)
+						.map(function(type) {
+							return {
+								type: type,
+								data: _
+									.chain(data.template)
+									.get([type, 'iterate'], 0)
+									.range()
+									.keyBy()
+									.mapValues(function(index) {
+										return _.get(data.device, ['provision', type, index], {
+											type: 'none'
+										});
+									})
+									.value()
+							};
+						})
+						.keyBy('type')
+						.mapValues('data')
+						.value()
+				},
+				mergedDevice = _.merge(
+					{},
+					deviceDefaults,
+					deviceDefaultsForType,
+					data.device,
+					deviceOverrides
+				);
 
-			_.each(data.listClassifiers, function(restriction, name) {
-				if (name in self.i18n.active().devices.classifiers) {
-					defaults.extra.restrictions[name].friendly_name = self.i18n.active().devices.classifiers[name].name;
+			return _.merge({
+				extra: {
+					allowVMCellphone: !_.get(mergedDevice, 'call_forward.require_keypress', true),
+					availableCodecs: {
+						audio: [],
+						video: []
+					},
+					e911Numbers: data.e911Numbers,
+					hasDisabledRestrictions: _.some(data.listClassifiers, function(metadata, classifier) {
+						return isClassifierDisabledByAccount(classifier);
+					}),
+					hasE911Numbers: !_.isEmpty(data.e911Numbers),
+					isRegistered: _.get(dataList, 'isRegistered', false),
+					outboundPrivacy: _.map(self.appFlags.common.outboundPrivacy, function(strategy) {
+						return {
+							key: strategy,
+							value: monster.util.tryI18n(self.i18n.active().commonMisc.outboundPrivacy.values, strategy)
+						};
+					}),
+					provision: {
+						keyActions: _.map([
+							'none',
+							'presence',
+							'parking',
+							'personal_parking',
+							'speed_dial'
+						], function(action) {
+							var i18n = self.i18n.active().devices.popupSettings.keys;
 
-					if ('help' in self.i18n.active().devices.classifiers[name]) {
-						defaults.extra.restrictions[name].help = self.i18n.active().devices.classifiers[name].help;
-					}
+							return {
+								id: action,
+								info: _.get(i18n, ['info', 'types', action]),
+								text: _.get(i18n, ['types', action])
+							};
+						}),
+						keys: _
+							.chain(data.template)
+							.thru(self.getKeyTypes)
+							.map(function(type) {
+								var camelCasedType = _.camelCase(type),
+									i18n = _.get(self.i18n.active().devices.popupSettings.keys, camelCasedType);
+
+								return _.merge({
+									id: type,
+									type: camelCasedType,
+									data: _
+										.chain(mergedDevice)
+										.get(['provision', type], {})
+										.mapValues(function(metadata) {
+											var value = _.get(metadata, 'value', {});
+
+											return _.merge({}, metadata, _.isPlainObject(value)
+												? {}
+												: {
+													value: {
+														value: _.toString(value)
+													}
+												}
+											);
+										})
+										.value()
+								}, _.pick(i18n, [
+									'title',
+									'label'
+								]));
+							})
+							.value(),
+						parkingSpots: _.range(1, 11)
+					},
+					restrictions: _.mapValues(data.listClassifiers, function(metadata, classifier) {
+						var i18n = _.get(self.i18n.active().devices.classifiers, classifier);
+
+						return {
+							action: _.get(data.device, ['call_restriction', classifier, 'action'], 'inherit'),
+							disabled: isClassifierDisabledByAccount(classifier),
+							friendly_name: _.get(i18n, 'name', metadata.friendly_name),
+							help: _.get(i18n, 'help')
+						};
+					}),
+					rtpMethod: _.get(mergedDevice, 'media.encryption.enforce_security', false)
+						? _.head(mergedDevice.media.encryption.methods)
+						: '',
+					selectedCodecs: {
+						audio: [],
+						video: []
+					},
+					users: _.sortBy(data.users, function(user) {
+						return _
+							.chain(user)
+							.thru(monster.util.getUserFullName)
+							.toLower()
+							.value();
+					})
 				}
-
-				if ('call_restriction' in data.accountLimits && name in data.accountLimits.call_restriction && data.accountLimits.call_restriction[name].action === 'deny') {
-					defaults.extra.restrictions[name].disabled = true;
-					defaults.extra.hasDisabledRestrictions = true;
-				}
-
-				if ('call_restriction' in data.device && name in data.device.call_restriction) {
-					defaults.extra.restrictions[name].action = data.device.call_restriction[name].action;
-				} else {
-					defaults.extra.restrictions[name].action = 'inherit';
-				}
-			});
-
-			var formattedData = $.extend(true, {}, typedDefaults[data.device.device_type], defaults, data.device);
-
-			/* Audio Codecs*/
-			/* extend doesn't replace the array so we need to do it manually */
-			if (data.device.media && data.device.media.audio && data.device.media.audio.codecs) {
-				formattedData.media.audio.codecs = data.device.media.audio.codecs;
-			}
-
-			/* Video codecs */
-			if (data.device.media && data.device.media.video && data.device.media.video.codecs) {
-				formattedData.media.video.codecs = data.device.media.video.codecs;
-			}
-
-			formattedData.extra.isRegistered = dataList.isRegistered;
-
-			if (formattedData.hasOwnProperty('call_forward') && formattedData.call_forward.hasOwnProperty('require_keypress')) {
-				formattedData.extra.allowVMCellphone = !formattedData.call_forward.require_keypress;
-			}
-
-			return formattedData;
+			}, mergedDevice);
 		},
 
+		/**
+		 * @param  {Object} data
+		 * @param  {Object} data.users
+		 * @param  {Object} data.status
+		 * @param  {Object} data.devices
+		 * @return {Object}
+		 */
 		devicesFormatListData: function(data) {
 			var self = this,
-				formattedData = {
-					countDevices: 0,
-					devices: {}
+				getIconClassForDeviceType = function getIconClassForDeviceType(type) {
+					var knownType = _.has(self.appFlags.devices.iconClassesByDeviceTypes, type) ? type : 'sip_device';
+					return _.get(self.appFlags.devices.iconClassesByDeviceTypes, knownType);
 				},
-				mapUsers = {},
+				usersById = _.keyBy(data.users, 'id'),
 				unassignedString = self.i18n.active().devices.unassignedDevice,
-				mapIconClass = {
-					cellphone: 'fa fa-phone',
-					smartphone: 'icon-telicon-mobile-phone',
-					landline: 'icon-telicon-home',
-					mobile: 'icon-telicon-sprint-phone',
-					softphone: 'icon-telicon-soft-phone',
-					sip_device: 'icon-telicon-voip-phone',
-					sip_uri: 'icon-telicon-voip-phone',
-					fax: 'icon-telicon-fax',
-					ata: 'icon-telicon-ata'
+				registeredDevicesById = _.map(data.status, 'device_id');
+
+			return {
+				countDevices: _.size(data.devices),
+				devices: _
+					.chain(data.devices)
+					.map(function(device) {
+						var staticStatusClasses = ['unregistered', 'registered'],
+							deviceType = device.device_type,
+							isRegistered = _.includes(['sip_device', 'smartphone', 'softphone', 'fax', 'ata'], deviceType)
+								? _.includes(registeredDevicesById, device.id)
+								: true,
+							isEnabled = _.get(device, 'enabled', false),
+							userName = _
+								.chain(usersById)
+								.get(device.owner_id, {
+									first_name: unassignedString,
+									last_name: ''
+								})
+								.thru(monster.util.getUserFullName)
+								.value();
+
+						return _.merge({
+							// Display a device in black if it's disabled, otherwise, until we know whether it's registered or not, we set the color to red
+							classStatus: isEnabled ? staticStatusClasses[_.toNumber(isRegistered)] : 'disabled',
+							enabled: isEnabled,
+							friendlyIconClass: getIconClassForDeviceType(deviceType),
+							friendlyType: monster.util.tryI18n(self.i18n.active().devices.types, deviceType),
+							isAssigned: _
+								.chain(device)
+								.has('owner_id')
+								.toString()
+								.value(),
+							isEditable: _.includes(self.appFlags.devices.editableDeviceTypes, deviceType),
+							// Even though a device is registered, we don't count it as registered if it's disabled
+							isRegistered: isEnabled && isRegistered,
+							macAddress: device.mac_address,
+							registered: isRegistered,
+							sipUserName: device.userName,
+							sortableUserName: userName.split(' ').reverse().join(' '),
+							type: deviceType,
+							userName: userName
+						}, _.pick(device, [
+							'id',
+							'name'
+						]));
+					})
+					.sort(function(a, b) {
+						// If owner is the same, order by device name
+						if (a.userName === b.userName) {
+							var aName = a.name.toLowerCase(),
+								bName = b.name.toLowerCase();
+
+							return (aName > bName) ? 1 : (aName < bName) ? -1 : 0;
+						} else {
+							// Otherwise, push the unassigned devices to the bottom of the list, and show the assigned devices ordered by user name
+							if (a.userName === unassignedString) {
+								return 1;
+							} else if (b.userName === unassignedString) {
+								return -1;
+							} else {
+								var aSortName = a.sortableUserName.toLowerCase(),
+									bSortName = b.sortableUserName.toLowerCase();
+
+								return (aSortName > bSortName) ? 1 : (aSortName < bSortName) ? -1 : 0;
+							}
+						}
+					})
+					.value(),
+				deviceTypesToAdd: _.map(self.appFlags.devices.addableDeviceTypes, function(type) {
+					return {
+						type: type,
+						icon: _.get(self.appFlags.devices.iconClassesByDeviceTypes, type)
+					};
+				})
+			};
+		},
+
+		devicesHelperDeleteDevice: function(deviceId, onSuccess) {
+			var self = this;
+
+			monster.waterfall([
+				function(waterfallCb) {
+					monster.ui.confirm(self.i18n.active().devices.confirmDeleteDevice, function() {
+						waterfallCb(null);
+					}, function() {
+						waterfallCb(true);
+					});
 				},
-				registeredDevices = _.map(data.status, function(device) { return device.device_id; });
-
-			_.each(data.users, function(user) {
-				mapUsers[user.id] = user;
-			});
-
-			_.each(data.devices, function(device) {
-				var isAssigned = device.owner_id ? true : false,
-					isRegistered = ['sip_device', 'smartphone', 'softphone', 'fax', 'ata'].indexOf(device.device_type) >= 0 ? registeredDevices.indexOf(device.id) >= 0 : true;
-
-				formattedData.countDevices++;
-
-				formattedData.devices[device.id] = {
-					id: device.id,
-					isAssigned: isAssigned + '',
-					friendlyIconClass: mapIconClass[device.device_type],
-					macAddress: device.mac_address,
-					name: device.name,
-					userName: device.owner_id && device.owner_id in mapUsers ? mapUsers[device.owner_id].first_name + ' ' + mapUsers[device.owner_id].last_name : unassignedString,
-					sortableUserName: device.owner_id && device.owner_id in mapUsers ? mapUsers[device.owner_id].last_name + ' ' + mapUsers[device.owner_id].first_name : unassignedString,
-					enabled: device.enabled,
-					type: device.device_type,
-					friendlyType: self.i18n.active().devices.types[device.device_type],
-					registered: isRegistered,
-					isRegistered: device.enabled && isRegistered, // even though a device is registered, we don't count it as registered if it's disabled
-					classStatus: device.enabled ? (isRegistered ? 'registered' : 'unregistered') : 'disabled' /* Display a device in black if it's disabled, otherwise, until we know whether it's registered or not, we set the color to red */,
-					sipUserName: device.username
-				};
-			});
-
-			var arrayToSort = [];
-
-			_.each(formattedData.devices, function(device) {
-				arrayToSort.push(device);
-			});
-
-			arrayToSort.sort(function(a, b) {
-				/* If owner is the same, order by device name */
-				if (a.userName === b.userName) {
-					var aName = a.name.toLowerCase(),
-						bName = b.name.toLowerCase();
-
-					return (aName > bName) ? 1 : (aName < bName) ? -1 : 0;
-				} else {
-					/* Otherwise, push the unassigned devices to the bottom of the list, and show the assigned devices ordered by user name */
-					if (a.userName === unassignedString) {
-						return 1;
-					} else if (b.userName === unassignedString) {
-						return -1;
-					} else {
-						var aSortName = a.sortableUserName.toLowerCase(),
-							bSortName = b.sortableUserName.toLowerCase();
-
-						return (aSortName > bSortName) ? 1 : (aSortName < bSortName) ? -1 : 0;
-					}
+				function(waterfallCb) {
+					self.devicesDeleteDevice(deviceId, function(device) {
+						waterfallCb(null, device);
+					});
 				}
+			], function(err, device) {
+				if (err) {
+					return;
+				}
+
+				monster.ui.toast({
+					type: 'success',
+					message: self.getTemplate({
+						name: '!' + self.i18n.active().devices.deletedDevice,
+						data: {
+							deviceName: device.name
+						}
+					})
+				});
+
+				onSuccess && onSuccess(device);
 			});
-
-			formattedData.devices = arrayToSort;
-
-			return formattedData;
 		},
 
 		/* Utils */
@@ -1267,45 +1301,62 @@ define(function(require) {
 		devicesGetEditData: function(dataDevice, callback) {
 			var self = this;
 
-			monster.parallel({
-				listClassifiers: function(callback) {
-					self.devicesListClassifiers(function(dataClassifiers) {
-						callback(null, dataClassifiers);
-					});
-				},
-				device: function(callback) {
-					if (dataDevice.id) {
-						self.devicesGetDevice(dataDevice.id, function(dataDevice) {
-							callback(null, dataDevice);
-						});
-					} else {
-						callback(null, dataDevice);
-					}
-				},
-				e911Numbers: function(callback) {
-					self.devicesGetE911Numbers(function(e911Numbers) {
-						callback(null, e911Numbers);
-					});
-				},
-				accountLimits: function(callback) {
-					self.callApi({
-						resource: 'limits.get',
-						data: {
-							accountId: self.accountId
+			monster.waterfall([
+				function(waterfallCb) {
+					monster.parallel({
+						listClassifiers: function(callback) {
+							self.devicesListClassifiers(function(dataClassifiers) {
+								callback(null, dataClassifiers);
+							});
 						},
-						success: function(data, status) {
-							callback(null, data.data);
+						device: function(callback) {
+							if (!_.has(dataDevice, 'id')) {
+								return callback(null, dataDevice);
+							}
+							self.devicesGetDevice(dataDevice.id, function(dataDevice) {
+								callback(null, dataDevice);
+							});
+						},
+						e911Numbers: function(callback) {
+							self.devicesGetE911Numbers(function(e911Numbers) {
+								callback(null, e911Numbers);
+							});
+						},
+						accountLimits: function(callback) {
+							self.callApi({
+								resource: 'limits.get',
+								data: {
+									accountId: self.accountId
+								},
+								success: function(data, status) {
+									callback(null, data.data);
+								}
+							});
+						},
+						users: function(callback) {
+							self.devicesListUsers({
+								success: function(users, status) {
+									callback(null, users);
+								}
+							});
 						}
+					}, function(error, results) {
+						waterfallCb(null, results);
 					});
 				},
-				users: function(callback) {
-					self.devicesListUsers({
-						success: function(users, status) {
-							callback(null, users);
-						}
+				function(results, waterfallCb) {
+					if (!_.has(results.device, 'provision')) {
+						return waterfallCb(null, results);
+					}
+					self.devicesGetIterator(results.device.provision, function(template) {
+						waterfallCb(null, _.merge({
+							template: template
+						}, results));
+					}, function() {
+						waterfallCb(null, results);
 					});
 				}
-			}, function(error, results) {
+			], function(err, results) {
 				var formattedData = self.devicesFormatData(results, dataDevice);
 
 				callback && callback(formattedData);
