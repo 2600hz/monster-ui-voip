@@ -410,8 +410,9 @@ define(function(require) {
 
 		myOfficeFormatData: function(data) {
 			var self = this,
-				getColorByIndex = function getColorByIndex(index) {
-					return self.chartColors[index % self.chartColors.length];
+				getColorByIndex = function getColorByIndex(index, customColors) {
+					var colors = customColors || self.chartColors;
+					return colors[index % colors.length];
 				},
 				reduceArrayToChartColorsSize = function reduceArrayToChartColorsSize(array) {
 					if (_.size(array) <= _.size(self.chartColors)) {
@@ -424,6 +425,9 @@ define(function(require) {
 						count: _.sumBy(overflowArray, 'count')
 					});
 				},
+				colorsOrderedForDeviceTypes = _.map([5, 0, 3, 1, 2, 4, 6, 7, 8], function(index) {
+					return self.chartColors[index];
+				}),
 				staticNumberStatuses = ['assigned', 'spare'],
 				showUserTypes = self.appFlags.global.showUserTypes,
 				staticNonNumbers = ['0', 'undefined', 'undefinedconf', 'undefinedfaxing', 'undefinedMainNumber'],
@@ -577,7 +581,6 @@ define(function(require) {
 					})
 					.map(function(devices, type) {
 						return {
-							type: type,
 							label: monster.util.tryI18n(self.i18n.active().devices.types, type),
 							count: _.size(devices)
 						};
@@ -586,12 +589,8 @@ define(function(require) {
 					.thru(reduceArrayToChartColorsSize)
 					.map(function(metadata, index) {
 						return _.merge({
-							color: _
-								.chain(knownDeviceTypes)
-								.indexOf(metadata.type)
-								.thru(getColorByIndex)
-								.value()
-						}, _.omit(metadata, 'type'));
+							color: getColorByIndex(index, colorsOrderedForDeviceTypes)
+						}, metadata);
 					})
 					.value(),
 				directoryLink: _.has(data, 'directory.id') && self.apiUrl + 'accounts/' + self.accountId + '/directories/' + data.directory.id + '?accept=pdf&paginate=false&auth_token=' + self.getAuthToken(),
