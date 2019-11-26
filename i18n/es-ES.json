@@ -1058,14 +1058,6 @@
 				"configurable": {
 					"label": "Configurar a través del menú?",
 					"help": "Si no activado, no permitirá al usuario configurar el correo de voz a través del menú "
-				},
-				"fastForwardRewind": {
-					"label": "¿Habilitar el avance rápido y rebobinar?",
-					"help": "Si está habilitado, permitirá al usuario avanzar y rebobinar sus mensajes de correo de voz"
-				},
-				"oldestMessageFirst": {
-					"label": "¿Ordenar primero el buzón de correo de voz por el mensaje más antiguo?",
-					"help": "Si está habilitado, los correos de voz se reproducirán en orden del más antiguo al más nuevo"
 				}
 			},
 			"recipients": {
