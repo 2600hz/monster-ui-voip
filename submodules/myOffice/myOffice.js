@@ -410,9 +410,24 @@ define(function(require) {
 
 		myOfficeFormatData: function(data) {
 			var self = this,
-				getColorByIndex = function getColorByIndex(index) {
-					return self.chartColors[index % self.chartColors.length];
+				getColorByIndex = function getColorByIndex(index, customColors) {
+					var colors = customColors || self.chartColors;
+					return colors[index % colors.length];
 				},
+				reduceArrayToChartColorsSize = function reduceArrayToChartColorsSize(array) {
+					if (_.size(array) <= _.size(self.chartColors)) {
+						return array;
+					}
+					var newArray = array.slice(0, _.size(self.chartColors) - 1),
+						overflowArray = array.slice(_.size(self.chartColors) - 1);
+					return _.concat(newArray, {
+						label: self.i18n.active().myOffice.others,
+						count: _.sumBy(overflowArray, 'count')
+					});
+				},
+				colorsOrderedForDeviceTypes = _.map([5, 0, 3, 1, 2, 4, 6, 7, 8], function(index) {
+					return self.chartColors[index];
+				}),
 				staticNumberStatuses = ['assigned', 'spare'],
 				showUserTypes = self.appFlags.global.showUserTypes,
 				staticNonNumbers = ['0', 'undefined', 'undefinedconf', 'undefinedfaxing', 'undefinedMainNumber'],
@@ -430,7 +445,8 @@ define(function(require) {
 					'sip_device',
 					'landline',
 					'fax',
-					'ata'
+					'ata',
+					'application'
 				],
 				userCountByServicePlanRole = _
 					.chain(data.users)
@@ -544,16 +560,7 @@ define(function(require) {
 						};
 					})
 					.orderBy('count', 'desc')
-					.tap(function(array) {
-						if (_.size(array) <= _.size(self.chartColors)) {
-							return;
-						}
-						var othersArray = array.splice(_.size(self.chartColors) - 1);
-						array.push({
-							label: self.i18n.active().myOffice.others,
-							count: _.sumBy(othersArray, 'count')
-						});
-					})
+					.thru(reduceArrayToChartColorsSize)
 					.map(function(metadata, index) {
 						return _.merge({
 							color: getColorByIndex(index)
@@ -575,13 +582,15 @@ define(function(require) {
 					.map(function(devices, type) {
 						return {
 							label: monster.util.tryI18n(self.i18n.active().devices.types, type),
-							count: _.size(devices),
-							color: _
-								.chain(knownDeviceTypes)
-								.indexOf(type)
-								.thru(getColorByIndex)
-								.value()
+							count: _.size(devices)
 						};
+					})
+					.orderBy('count', 'desc')
+					.thru(reduceArrayToChartColorsSize)
+					.map(function(metadata, index) {
+						return _.merge({
+							color: getColorByIndex(index, colorsOrderedForDeviceTypes)
+						}, metadata);
 					})
 					.value(),
 				directoryLink: _.has(data, 'directory.id') && self.apiUrl + 'accounts/' + self.accountId + '/directories/' + data.directory.id + '?accept=pdf&paginate=false&auth_token=' + self.getAuthToken(),
