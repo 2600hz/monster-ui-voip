@@ -1146,6 +1146,7 @@
 			"emergencyHelp2": "Note: You can set this feature on users' numbers too if they do not share the same location as above.",
 			"mandatoryE911Alert": "You must specify e911 information for your company caller ID number."
 		},
+		"others": "Others",
 		"missingMainNumberForCallerId": "You need to add a main number to your office before configuring the Caller-ID!",
 		"missingMainNumberMessage": "Please add a Main Number to your account.",
 		"totalUsers": "Total Users",
