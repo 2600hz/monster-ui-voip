@@ -424,6 +424,7 @@ define(function(require) {
 								+ '%0D%0ACall ID: ' + cdr.call_id
 								+ '%0D%0AOther Leg Call ID: ' + (cdr.other_leg_call_id || '')
 								+ '%0D%0AHandling Server: ' + (cdr.media_server || '')
+								+ '%0D%0ATimestamp: ' + (cdr.timestamp || '')
 					};
 
 					if (cdr.hasOwnProperty('channel_created_time')) {
