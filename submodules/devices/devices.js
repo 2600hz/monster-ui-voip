@@ -969,13 +969,16 @@ define(function(require) {
 					landline: _.merge({}, callForwardSettings),
 					mobile: _.merge({}, sipSettings),
 					sip_device: _.merge({}, sipSettings),
-					sip_uri: _.merge({
-						sip: {
+					sip_uri: {
+						sip: _.merge({
 							expire_seconds: 360,
 							invite_format: 'route',
 							method: 'password'
-						}
-					}, _.omit(sipSettings, 'realm')),
+						}, _.pick(sipSettings.sip, [
+							'password',
+							'username'
+						]))
+					},
 					smartphone: _.merge({}, sipSettings, callForwardSettings),
 					softphone: _.merge({}, sipSettings)
 				}, data.device.device_type, {}),
