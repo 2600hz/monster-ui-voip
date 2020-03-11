@@ -152,7 +152,7 @@
 					<label class="control-input checkbox">
 						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.announceOnly.help }}">
 							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.announceOnly.label}}
-								<input type="checkbox" name="announce_only_mode" id="announce_only_mode" {{#if announce_only_mode }}checked{{/if}} />
+								<input type="checkbox" name="announcement_only" id="announcement_only" {{#if announcement_only }}checked{{/if}} />
 							{{/monsterCheckbox}}
 						</div>
 					</label>
@@ -172,7 +172,7 @@
 					<label class="control-input checkbox">
 						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.emailAsAttachment.help }}">
 							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.emailAsAttachment.label}}
-								<input type="checkbox" name="attachment_messages_to_email" id="attachment_messages_to_email" {{#if attachment_messages_to_email }}checked{{/if}} />
+								<input type="checkbox" name="include_message_on_notify" id="include_message_on_notify" {{#if include_message_on_notify }}checked{{/if}} />
 							{{/monsterCheckbox}}
 						</div>
 					</label>
