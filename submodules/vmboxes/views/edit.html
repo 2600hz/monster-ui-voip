@@ -150,6 +150,16 @@
 
 				<div class="control-group">
 					<label class="control-input checkbox">
+						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.announceOnly.help }}">
+							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.announceOnly.label}}
+								<input type="checkbox" name="announce_only_mode" id="announce_only_mode" {{#if announce_only_mode }}checked{{/if}} />
+							{{/monsterCheckbox}}
+						</div>
+					</label>
+				</div>
+
+				<div class="control-group">
+					<label class="control-input checkbox">
 						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.deleteAfterNotify.help }}">
 							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.deleteAfterNotify.label}}
 								<input type="checkbox" name="delete_after_notify" id="delete_after_notify" {{#if delete_after_notify }}checked{{/if}} />
@@ -157,6 +167,28 @@
 						</div>
 					</label>
 				</div>
+
+				<div class="control-group">
+					<label class="control-input checkbox">
+						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.emailAsAttachment.help }}">
+							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.emailAsAttachment.label}}
+								<input type="checkbox" name="attachment_messages_to_email" id="attachment_messages_to_email" {{#if attachment_messages_to_email }}checked{{/if}} />
+							{{/monsterCheckbox}}
+						</div>
+					</label>
+				</div>
+
+				{{#if hasTranscribe}}
+				<div class="control-group">
+					<label class="control-input checkbox">
+						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.transcription.help }}">
+							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.transcription.label}}
+								<input type="checkbox" name="transcribe" id="transcription" {{#if transcribe }}checked{{/if}} />
+							{{/monsterCheckbox}}
+						</div>
+					</label>
+				</div>
+				{{/if}}
 
 				<div class="control-group">
 					<label class="control-input checkbox">

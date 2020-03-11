@@ -1427,6 +1427,18 @@
 					"label": "Configurable via Menu?",
 					"help": " If unchecked, it will disallow the user to configure voicemail via the menu"
 				},
+				"transcription": {
+					"label": "Transcribe Messages",
+					"help": "Control recent enhancements to the voicemail system"
+				},
+				"announceOnly": {
+					"label": "Announce only-mode",
+					"help": "Set a voicemail box to announce-only mode"
+				},
+				"emailAsAttachment": {
+					"label": "Attach messages to e-mail",
+					"help": "E-mail not having the message as an attachment"
+				},
 				"__comment": "UI-2634: add support for wav/mp4/mp3 for voicemail media extensions",
 				"__version": "4.1",
 				"mediaExtension": {
