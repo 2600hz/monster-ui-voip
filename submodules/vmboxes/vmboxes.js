@@ -135,8 +135,8 @@ define(function(require) {
 					data: _.merge(data, {
 						hasTranscribe: _.get(transcription, 'isEnabled', false),
 						transcribe: _.get(data, 'transcribe', transcription.defaultValue),
-						announce_only_mode: _.get(data, 'announce_only_mode', false),
-						attachment_messages_to_email: _.get(data, 'attachment_messages_to_email', false)
+						announcement_only: _.get(data, 'announcement_only', false),
+						include_message_on_notify: _.get(data, 'include_message_on_notify', false)
 					}),
 					submodule: 'vmboxes'
 				})),
