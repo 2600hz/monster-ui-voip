@@ -2270,9 +2270,16 @@ define(function(require) {
 		usersRenderVMBox: function(currentUser, vmbox) {
 			var self = this,
 				vmboxActive = currentUser.extra.mapFeatures.vmbox.active,
+				transcription = monster.util.getCapability('voicemail.transcription'),
 				featureTemplate = $(self.getTemplate({
 					name: 'feature-vmbox',
-					data: currentUser,
+					data: _.merge(currentUser, {
+						vmbox: _.merge(vmbox, {
+							transcribe: _.get(vmbox, 'transcribe', transcription.defaultValue),
+							announcement_only: _.get(vmbox, 'announcement_only', false),
+							include_message_on_notify: _.get(vmbox, 'include_message_on_notify', false)
+						})
+					}),
 					submodule: 'users'
 				})),
 				switchFeature = featureTemplate.find('.switch-state'),
