@@ -1009,7 +1009,6 @@
 			&.main{
 				display: flex;
 				flex-direction: row;
-				justify-content: center;
 				align-items: center;
 				padding-bottom: 15px;
 
@@ -1017,6 +1016,8 @@
 					font-size: 1em;
 					padding-right: 1em;
 					margin-bottom: 0px;
+					width: 200px;
+					text-align: right;
 				}
 			}
 
