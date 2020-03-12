@@ -27,7 +27,7 @@
 					{{i18n.users.vmbox.announceOnly}}
 				</label>
 				{{#monsterSwitch}}
-					<input type="checkbox" name="vm_to_email_enabled" id="vm_to_email_enabled" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if vm_to_email_enabled}} checked="checked"{{/if}}></input>
+					<input type="checkbox" name="announcement_only" id="announcement_only" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if vmbox.announcement_only}} checked="checked"{{/if}}></input>
 				{{/monsterSwitch}}
 			</div>
 
@@ -36,7 +36,7 @@
 					{{i18n.users.vmbox.transcribe}}
 				</label>
 				{{#monsterSwitch}}
-					<input type="checkbox" name="vm_to_email_enabled" id="vm_to_email_enabled" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if vm_to_email_enabled}} checked="checked"{{/if}}></input>
+					<input type="checkbox" name="transcribe" id="transcribe" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if vmbox.transcribe}} checked="checked"{{/if}}></input>
 				{{/monsterSwitch}}
 			</div>
 

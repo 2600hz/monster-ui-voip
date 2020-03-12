@@ -2271,20 +2271,24 @@ define(function(require) {
 			var self = this,
 				vmboxActive = currentUser.extra.mapFeatures.vmbox.active,
 				transcription = monster.util.getCapability('voicemail.transcription'),
+				transcribe = _.get(vmbox, 'transcribe', transcription.defaultValue),
+				announcement_only = _.get(vmbox, 'announcement_only', false),
+				vm_to_email_enabled = currentUser.vm_to_email_enabled,
 				featureTemplate = $(self.getTemplate({
 					name: 'feature-vmbox',
 					data: _.merge(currentUser, {
 						vmbox: _.merge(vmbox, {
-							transcribe: _.get(vmbox, 'transcribe', transcription.defaultValue),
-							announcement_only: _.get(vmbox, 'announcement_only', false),
-							include_message_on_notify: _.get(vmbox, 'include_message_on_notify', false)
+							transcribe: transcribe,
+							announcement_only: announcement_only
 						})
 					}),
 					submodule: 'users'
 				})),
 				switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#vmbox_form'),
-				switchVmToEmail = featureForm.find('#vm_to_email_enabled');
+				switchVmToEmail = featureForm.find('#vm_to_email_enabled'),
+				switchVmTranscribe = featureForm.find('#transcribe'),
+				switchVmAnnounceOnly = featureForm.find('#announcement_only');
 
 			monster.ui.validate(featureForm);
 
@@ -2298,6 +2302,18 @@ define(function(require) {
 
 			switchVmToEmail.on('change', function() {
 				$(this).prop('checked') ? featureForm.find('.extra-content').slideDown() : featureForm.find('.extra-content').slideUp();
+			});
+
+			switchVmAnnounceOnly.on('change', function() {
+				var isEnabled = $(this).prop('checked');
+
+				switchVmTranscribe
+					.prop('checked', isEnabled ? false : transcribe)
+					.prop('disabled', isEnabled);
+
+				switchVmToEmail
+					.prop('checked', isEnabled ? false : vm_to_email_enabled)
+					.prop('disabled', isEnabled);
 			});
 
 			featureTemplate.find('.save').on('click', function() {
