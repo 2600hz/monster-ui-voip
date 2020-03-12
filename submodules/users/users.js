@@ -2271,14 +2271,15 @@ define(function(require) {
 			var self = this,
 				vmboxActive = currentUser.extra.mapFeatures.vmbox.active,
 				transcription = monster.util.getCapability('voicemail.transcription'),
-				transcribe = _.get(vmbox, 'transcribe', transcription.defaultValue),
 				announcement_only = _.get(vmbox, 'announcement_only', false),
 				vm_to_email_enabled = currentUser.vm_to_email_enabled,
+				transcribe = _.get(vmbox, 'transcribe', transcription.defaultValue),
 				featureTemplate = $(self.getTemplate({
 					name: 'feature-vmbox',
 					data: _.merge(currentUser, {
+						vm_to_email_enabled: announcement_only ? false : vm_to_email_enabled,
 						vmbox: _.merge(vmbox, {
-							transcribe: transcribe,
+							transcribe: announcement_only ? false : transcribe,
 							announcement_only: announcement_only
 						})
 					}),
