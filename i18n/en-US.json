@@ -711,7 +711,10 @@
 			"text": "A voicemail box will be available for this user.",
 			"label": "Voicemail to e-mail:",
 			"title": "Voicemail Box",
-			"vmToEmailHelp": "An e-mail will be sent to {{variable}} for every new voicemail. If you want to change where email notifications go to, please edit the user's email address in the User Administration section."
+			"vmToEmailHelp": "An e-mail will be sent to {{variable}} for every new voicemail. If you want to change where email notifications go to, please edit the user's email address in the User Administration section.",
+			"announceOnly": "Announce Only",
+			"transcribe": "Transcribe",
+			"attach_voicemail": "Attach voicemail message to email."
 		},
 		"find_me_follow_me": {
 			"title": "Find me, Follow me",
@@ -1426,6 +1429,18 @@
 				"configurable": {
 					"label": "Configurable via Menu?",
 					"help": " If unchecked, it will disallow the user to configure voicemail via the menu"
+				},
+				"transcription": {
+					"label": "Transcribe Messages",
+					"help": "Control recent enhancements to the voicemail system"
+				},
+				"announceOnly": {
+					"label": "Announce only-mode",
+					"help": "Set a voicemail box to announce-only mode"
+				},
+				"emailAsAttachment": {
+					"label": "Attach messages to e-mail",
+					"help": "E-mail not having the message as an attachment"
 				},
 				"__comment": "UI-2634: add support for wav/mp4/mp3 for voicemail media extensions",
 				"__version": "4.1",

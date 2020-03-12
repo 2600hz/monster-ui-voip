@@ -129,9 +129,15 @@ define(function(require) {
 						}
 					})
 					: self.i18n.active().vmboxes.addTitle,
+				transcription = monster.util.getCapability('voicemail.transcription'),
 				templateVMBox = $(self.getTemplate({
 					name: 'edit',
-					data: data,
+					data: _.merge(data, {
+						hasTranscribe: _.get(transcription, 'isEnabled', false),
+						transcribe: _.get(data, 'transcribe', transcription.defaultValue),
+						announcement_only: _.get(data, 'announcement_only', false),
+						include_message_on_notify: _.get(data, 'include_message_on_notify', false)
+					}),
 					submodule: 'vmboxes'
 				})),
 				popup,

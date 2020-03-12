@@ -24,6 +24,24 @@
 
 			<div class="control-group main">
 				<label class="title">
+					{{i18n.users.vmbox.announceOnly}}
+				</label>
+				{{#monsterSwitch}}
+					<input type="checkbox" name="announcement_only" id="announcement_only" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if vmbox.announcement_only}} checked="checked"{{/if}}></input>
+				{{/monsterSwitch}}
+			</div>
+
+			<div class="control-group main">
+				<label class="title">
+					{{i18n.users.vmbox.transcribe}}
+				</label>
+				{{#monsterSwitch}}
+					<input type="checkbox" name="transcribe" id="transcribe" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if vmbox.transcribe}} checked="checked"{{/if}}></input>
+				{{/monsterSwitch}}
+			</div>
+
+			<div class="control-group main">
+				<label class="title">
 					{{i18n.users.vmbox.label}}
 				</label>
 				{{#monsterSwitch}}
@@ -32,9 +50,17 @@
 			</div>
 
 			<div class="extra-content{{#unless vm_to_email_enabled}} disabled{{/unless}}">
-				<div class="control-group extra">
+				<div class="control-group">
 					<label class="fix-left">
 						{{#monsterCheckbox i18n.users.vmbox.deleteAfterNotify}}
+							<input type="checkbox" name="delete_after_notify"{{#if extra.deleteAfterNotify}} checked{{/if}}></input>
+						{{/monsterCheckbox}}
+					</label>
+				</div>
+
+				<div class="control-group extra">
+					<label class="fix-left">
+						{{#monsterCheckbox i18n.users.vmbox.attach_voicemail}}
 							<input type="checkbox" name="delete_after_notify"{{#if extra.deleteAfterNotify}} checked{{/if}}></input>
 						{{/monsterCheckbox}}
 					</label>
