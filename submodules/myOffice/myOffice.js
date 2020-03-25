@@ -947,23 +947,28 @@ define(function(require) {
 				emergencyCityInput = popupTemplate.find('.caller-id-emergency-city'),
 				emergencyStateInput = popupTemplate.find('.caller-id-emergency-state'),
 				loadNumberDetails = function(number, popupTemplate) {
-					var allowedFeatures = [],
-						callback = function(features) {
-							popupTemplate.find('.number-feature').hide();
-							_.each(features, function(featureName) {
-								popupTemplate.find('.number-feature[data-feature="' + featureName + '"]').slideDown();
+					monster.waterfall([
+						function(waterfallCallback) {
+							if (!number) {
+								return waterfallCallback(null, null);
+							}
+
+							self.myOfficeGetNumber(number, function(numberData) {
+								waterfallCallback(null, numberData);
 							});
-						};
+						},
+						function(numberData, waterfallCallback) {
+							if (_.isNil(numberData)) {
+								return waterfallCallback(null, []);
+							}
 
-					if (number) {
-						self.myOfficeGetNumber(number, function(numberData) {
 							var availableFeatures = monster.util.getNumberFeatures(numberData),
-								hasE911 = availableFeatures.indexOf('e911') >= 0,
-								hasCNAM = availableFeatures.indexOf('cnam') >= 0;
+								allowedFeatures = _.intersection(availableFeatures, [ 'e911', 'cnam' ]),
+								hasE911 = _.includes(allowedFeatures, 'e911'),
+								hasCNAM = _.includes(allowedFeatures, 'cnam'),
+								isE911Enabled = monster.util.isNumberFeatureEnabled('e911');
 
-							if (hasE911 && monster.util.isNumberFeatureEnabled('e911')) {
-								allowedFeatures.push('e911');
-
+							if (hasE911 && isE911Enabled) {
 								if ('e911' in numberData) {
 									emergencyZipcodeInput.val(numberData.e911.postal_code);
 									emergencyAddress1Input.val(numberData.e911.street_address);
@@ -980,20 +985,21 @@ define(function(require) {
 							}
 
 							if (hasCNAM) {
-								allowedFeatures.push('cnam');
-
-								if ('cnam' in numberData) {
+								if (_.has(numberData, 'cnam')) {
 									callerIdNameInput.val(numberData.cnam.display_name);
 								} else {
 									callerIdNameInput.val('');
 								}
 							}
 
-							callback && callback(allowedFeatures);
+							waterfallCallback(null, allowedFeatures);
+						}
+					], function(err, features) {
+						popupTemplate.find('.number-feature').hide();
+						_.each(features, function(featureName) {
+							popupTemplate.find('.number-feature[data-feature="' + featureName + '"]').slideDown();
 						});
-					} else {
-						callback && callback(allowedFeatures);
-					}
+					});
 				};
 
 			popupTemplate.find('.cancel-link').on('click', function() {
