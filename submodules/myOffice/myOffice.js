@@ -957,29 +957,25 @@ define(function(require) {
 
 					if (number) {
 						self.myOfficeGetNumber(number, function(numberData) {
-							var availableFeatures = numberData.hasOwnProperty('_read_only') && numberData._read_only.hasOwnProperty('features_available') ? numberData._read_only.features_available : [],
-								activatedFeatures = numberData.hasOwnProperty('_read_only') && numberData._read_only.hasOwnProperty('features') ? numberData._read_only.features : [],
-								allFeatures = availableFeatures.concat(activatedFeatures),
-								hasE911 = allFeatures.indexOf('e911') >= 0,
-								hasCNAM = allFeatures.indexOf('cnam') >= 0;
+							var availableFeatures = monster.util.getNumberFeatures(numberData),
+								hasE911 = availableFeatures.indexOf('e911') >= 0,
+								hasCNAM = availableFeatures.indexOf('cnam') >= 0;
 
-							if (hasE911) {
-								if (monster.util.isNumberFeatureEnabled('e911')) {
-									allowedFeatures.push('e911');
+							if (hasE911 && monster.util.isNumberFeatureEnabled('e911')) {
+								allowedFeatures.push('e911');
 
-									if ('e911' in numberData) {
-										emergencyZipcodeInput.val(numberData.e911.postal_code);
-										emergencyAddress1Input.val(numberData.e911.street_address);
-										emergencyAddress2Input.val(numberData.e911.extended_address);
-										emergencyCityInput.val(numberData.e911.locality);
-										emergencyStateInput.val(numberData.e911.region);
-									} else {
-										emergencyZipcodeInput.val('');
-										emergencyAddress1Input.val('');
-										emergencyAddress2Input.val('');
-										emergencyCityInput.val('');
-										emergencyStateInput.val('');
-									}
+								if ('e911' in numberData) {
+									emergencyZipcodeInput.val(numberData.e911.postal_code);
+									emergencyAddress1Input.val(numberData.e911.street_address);
+									emergencyAddress2Input.val(numberData.e911.extended_address);
+									emergencyCityInput.val(numberData.e911.locality);
+									emergencyStateInput.val(numberData.e911.region);
+								} else {
+									emergencyZipcodeInput.val('');
+									emergencyAddress1Input.val('');
+									emergencyAddress2Input.val('');
+									emergencyCityInput.val('');
+									emergencyStateInput.val('');
 								}
 							}
 
