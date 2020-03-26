@@ -948,7 +948,7 @@ define(function(require) {
 				emergencyStateInput = popupTemplate.find('.caller-id-emergency-state'),
 				loadNumberDetails = function(number, popupTemplate) {
 					monster.waterfall([
-						function(waterfallCallback) {
+						function getNumberData(waterfallCallback) {
 							if (!number) {
 								return waterfallCallback(null, null);
 							}
@@ -957,14 +957,22 @@ define(function(require) {
 								waterfallCallback(null, numberData);
 							});
 						},
-						function(numberData, waterfallCallback) {
+						function getAllowedFeatures(numberData, waterfallCallback) {
 							if (_.isNil(numberData)) {
-								return waterfallCallback(null, []);
+								return waterfallCallback(null, numberData, []);
 							}
 
 							var availableFeatures = monster.util.getNumberFeatures(numberData),
-								allowedFeatures = _.intersection(availableFeatures, [ 'e911', 'cnam' ]),
-								hasE911 = _.includes(allowedFeatures, 'e911'),
+								allowedFeatures = _.intersection(availableFeatures, editableFeatures);
+
+							waterfallCallback(null, numberData, allowedFeatures);
+						},
+						function fillFormFields(numberData, allowedFeatures, waterfallCallback) {
+							if (_.isEmpty(allowedFeatures)) {
+								return waterfallCallback(null, allowedFeatures);
+							}
+
+							var hasE911 = _.includes(allowedFeatures, 'e911'),
 								hasCNAM = _.includes(allowedFeatures, 'cnam'),
 								isE911Enabled = monster.util.isNumberFeatureEnabled('e911');
 
