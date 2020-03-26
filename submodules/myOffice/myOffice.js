@@ -946,6 +946,7 @@ define(function(require) {
 				emergencyAddress2Input = popupTemplate.find('.caller-id-emergency-address2'),
 				emergencyCityInput = popupTemplate.find('.caller-id-emergency-city'),
 				emergencyStateInput = popupTemplate.find('.caller-id-emergency-state'),
+				editableFeatures = [ 'e911', 'cnam' ],
 				loadNumberDetails = function(number, popupTemplate) {
 					monster.waterfall([
 						function getNumberData(waterfallCallback) {
@@ -1002,10 +1003,13 @@ define(function(require) {
 
 							waterfallCallback(null, allowedFeatures);
 						}
-					], function(err, features) {
-						popupTemplate.find('.number-feature').hide();
-						_.each(features, function(featureName) {
-							popupTemplate.find('.number-feature[data-feature="' + featureName + '"]').slideDown();
+					], function hideOrShowFeatureSections(err, allowedFeatures) {
+						_.each(editableFeatures, function(featureName) {
+							var $featureSection = popupTemplate.find('.number-feature[data-feature="' + featureName + '"]'),
+								isFeatureAllowed = _.includes(allowedFeatures, featureName),
+								action = isFeatureAllowed ? 'slideDown' : 'slideUp';
+
+							$featureSection[action]();
 						});
 					});
 				};
