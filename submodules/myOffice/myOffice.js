@@ -969,7 +969,7 @@ define(function(require) {
 								isE911Enabled = monster.util.isNumberFeatureEnabled('e911');
 
 							if (hasE911 && isE911Enabled) {
-								if ('e911' in numberData) {
+								if (_.has(numberData, 'e911')) {
 									emergencyZipcodeInput.val(numberData.e911.postal_code);
 									emergencyAddress1Input.val(numberData.e911.street_address);
 									emergencyAddress2Input.val(numberData.e911.extended_address);
