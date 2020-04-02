@@ -2326,7 +2326,10 @@ define(function(require) {
 					formData = monster.ui.getFormData('vmbox_form'),
 					userId = currentUser.id,
 					vmToEmailEnabled = enabled && formData.vm_to_email_enabled,
-					deleteAfterNotify = vmToEmailEnabled && formData.delete_after_notify;
+					deleteAfterNotify = vmToEmailEnabled && formData.delete_after_notify,
+					transcribe = formData.transcribe,
+					include_message_on_notify = formData.include_message_on_notify,
+					vm_to_email_enabled = formData.include_message_on_notify;
 
 				monster.waterfall([
 					function(callback) {
@@ -2339,7 +2342,15 @@ define(function(require) {
 							return;
 						}
 
-						if (!vmbox || vmbox.delete_after_notify === deleteAfterNotify) {
+						if (
+							!vmbox
+							|| (
+								vmbox.delete_after_notify === deleteAfterNotify
+								&& vmbox.transcribe === transcribe
+								&& vmbox.include_message_on_notify === include_message_on_notify
+								&& vmbox.vm_to_email_enabled === vm_to_email_enabled
+							)
+						) {
 							callback(null);
 							return;
 						}
@@ -2348,7 +2359,10 @@ define(function(require) {
 							data: {
 								voicemailId: vmbox.id,
 								data: {
-									delete_after_notify: deleteAfterNotify
+									delete_after_notify: deleteAfterNotify,
+									transcribe: transcribe,
+									include_message_on_notify: include_message_on_notify,
+									vm_to_email_enabled: vm_to_email_enabled
 								}
 							},
 							success: function() {
