@@ -2280,7 +2280,8 @@ define(function(require) {
 						vm_to_email_enabled: announcement_only ? false : vm_to_email_enabled,
 						vmbox: _.merge(vmbox, {
 							transcribe: announcement_only ? false : transcribe,
-							announcement_only: announcement_only
+							announcement_only: announcement_only,
+							hasTranscribe: _.get(transcription, 'isEnabled', false),
 						})
 					}),
 					submodule: 'users'
