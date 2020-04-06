@@ -22,6 +22,7 @@
 				{{i18n.users.vmbox.text}}
 			</div>
 
+			{{#if hasTranscribe}}
 			<div class="control-group main">
 				<label class="title">
 					{{i18n.users.vmbox.transcribe}}
@@ -30,6 +31,7 @@
 					<input type="checkbox" name="transcribe" id="transcribe" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if vmbox.transcribe}} checked="checked"{{/if}}></input>
 				{{/monsterSwitch}}
 			</div>
+			{{/if}}
 
 			<div class="control-group main">
 				<label class="title">
