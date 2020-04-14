@@ -2282,6 +2282,7 @@ define(function(require) {
 							transcribe: announcement_only ? false : transcribe,
 							announcement_only: announcement_only,
 							hasTranscribe: _.get(transcription, 'isEnabled', false),
+							include_message_on_notify: _.get(vmbox, 'include_message_on_notify', true)
 						})
 					}),
 					submodule: 'users'
