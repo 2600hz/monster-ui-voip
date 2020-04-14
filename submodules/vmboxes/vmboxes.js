@@ -136,7 +136,7 @@ define(function(require) {
 						hasTranscribe: _.get(transcription, 'isEnabled', false),
 						transcribe: _.get(data, 'transcribe', transcription.defaultValue),
 						announcement_only: _.get(data, 'announcement_only', false),
-						include_message_on_notify: _.get(data, 'include_message_on_notify', false)
+						include_message_on_notify: _.get(data, 'include_message_on_notify', true)
 					}),
 					submodule: 'vmboxes'
 				})),
