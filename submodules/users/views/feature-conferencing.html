@@ -30,6 +30,14 @@
 				{{ i18n.users.conferencing.pinLabel }}
 				<input required id="pin" type="text" name="conference_numbers[]" class="input-small" value="{{conference.conference_numbers.[0]}}"></input>
 			</div>
+
+			<div class="main-line">
+				<label class="fix-left">
+					{{#monsterCheckbox i18n.users.conferencing.enableVideoConferencing}}
+						<input type="checkbox" name="enable_video_conferencing"{{#if conference.enable_video_conferencing}} checked{{/if}}></input>
+					{{/monsterCheckbox}}
+				</label>
+			</div>
 		</form>
 
 		{{#monsterText}}

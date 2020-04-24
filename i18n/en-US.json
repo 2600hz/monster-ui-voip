@@ -658,7 +658,8 @@
 			"pinLabel": "Personal Conference Room number",
 			"number": "Conferencing Phone Number(s)",
 			"help": "You can create a conference call by providing a conferencing phone number and your personal room number to the participants",
-			"noConfNumbers": "You need to add a Main Conference Number (in the Main number section on the left of the SmartPBX) in order to enable the Personnals Conference Bridges"
+			"noConfNumbers": "You need to add a Main Conference Number (in the Main number section on the left of the SmartPBX) in order to enable the Personnals Conference Bridges",
+			"enableVideoConferencing": "Enable Video Conferencing"
 		},
 		"do_not_disturb": {
 			"headline": "User DND Settings",
