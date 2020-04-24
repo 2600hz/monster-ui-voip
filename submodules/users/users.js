@@ -2102,6 +2102,20 @@ define(function(require) {
 				if (monster.ui.valid(featureForm)) {
 					data.conference = monster.ui.getFormData('conferencing_form');
 
+					if (data.conference.enable_video_conferencing) {
+						data.conference = _.merge(data.conference, {
+							profile_name: 'verto',
+							caller_controls: 'verto-participant',
+							moderator_controls: 'verto-moderator'
+						});
+					} else {
+						delete data.conference.profile_name;
+						delete data.conference.caller_controls;
+						delete data.conference.moderator_controls;
+					}
+
+					delete data.conference.enable_video_conferencing;
+
 					if (switchFeature.prop('checked')) {
 						self.usersUpdateConferencing(data, function(data) {
 							args.userId = data.user.id;
@@ -2125,6 +2139,8 @@ define(function(require) {
 		},
 
 		usersFormatConferencingData: function(data) {
+			data.conference.enable_video_conferencing = _.has(data, 'conference.profile_name');
+
 			return data;
 		},
 
