@@ -36,7 +36,8 @@ define(function(require) {
 			'sip_device': 'icon-telicon-voip-phone',
 			'sip_uri': 'icon-telicon-voip-phone',
 			'fax': 'icon-telicon-fax',
-			'ata': 'icon-telicon-ata'
+			'ata': 'icon-telicon-ata',
+			'application': 'icon-telicon-apps'
 		},
 
 		/* Users */
@@ -461,7 +462,7 @@ define(function(require) {
 				var userId = device.owner_id;
 
 				if (userId in mapUsers) {
-					var isRegistered = device.enabled && (['sip_device', 'smartphone', 'softphone', 'fax', 'ata'].indexOf(device.device_type) >= 0 ? registeredDevices.indexOf(device.id) >= 0 : true);
+					var isRegistered = device.enabled && (['sip_device', 'smartphone', 'softphone', 'fax', 'ata', 'application'].indexOf(device.device_type) >= 0 ? registeredDevices.indexOf(device.id) >= 0 : true);
 					var isEnabled = device.enabled;
 
 					if (mapUsers[userId].extra.devices.length >= 2) {
