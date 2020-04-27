@@ -17,8 +17,8 @@
 
 	<div class="content{{#unless user.extra.mapFeatures.conferencing.active}} disabled{{/unless}}">
 		<form id="conferencing_form">
-			<div class="main-line">
-				{{ i18n.users.conferencing.number }}
+			<div class="control-group main">
+				<label class="title">{{ i18n.users.conferencing.number }}</label>
 				<div class="list-numbers" data-count="{{listConferences.length}}">
 					{{#each listConferences}}
 						<div class="conference-number">{{formatPhoneNumber this}}</div>
@@ -26,17 +26,16 @@
 				</div>
 			</div>
 
-			<div class="main-line">
-				{{ i18n.users.conferencing.pinLabel }}
+			<div class="control-group main">
+				<label class="title">{{ i18n.users.conferencing.pinLabel }}</label>
 				<input required id="pin" type="text" name="conference_numbers[]" class="input-small" value="{{conference.conference_numbers.[0]}}"></input>
 			</div>
 
-			<div class="main-line">
-				<label class="fix-left">
-					{{#monsterCheckbox i18n.users.conferencing.enableVideoConferencing}}
-						<input type="checkbox" name="enable_video_conferencing"{{#if conference.enable_video_conferencing}} checked{{/if}}></input>
-					{{/monsterCheckbox}}
-				</label>
+			<div class="control-group main">
+				<label class="title">{{i18n.users.conferencing.enableVideoConferencing}}</label>
+				{{#monsterSwitch}}
+					<input type="checkbox" name="enable_video_conferencing" id="enable_video_conferencing" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if conference.enable_video_conferencing}} checked="checked"{{/if}}></input>
+				{{/monsterSwitch}}
 			</div>
 		</form>
 
