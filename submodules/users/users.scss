@@ -854,12 +854,32 @@
 		form {
 			margin-bottom: 0;
 
+			.control-group {
+				&.main{
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					padding-bottom: 15px;
+
+					label.title {
+						font-size: 1em;
+						padding-right: 1em;
+						margin-bottom: 0px;
+						width: 230px;
+						text-align: right;
+					}
+				}
+
+				&.extra {
+					margin-bottom: 40px;
+				}
+			}
+
 			.list-numbers {
 				display: inline-block;
 				font-weight: 600;
 				height: 65px;
 				line-height: 15px;
-				margin-left: 25px;
 				overflow: auto;
 				vertical-align: middle;
 				width: 180px;
