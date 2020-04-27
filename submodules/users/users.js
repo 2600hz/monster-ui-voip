@@ -2104,9 +2104,9 @@ define(function(require) {
 
 					if (data.conference.enable_video_conferencing) {
 						data.conference = _.merge(data.conference, {
-							profile_name: 'verto',
-							caller_controls: 'verto-participant',
-							moderator_controls: 'verto-moderator'
+							profile_name: 'video',
+							caller_controls: 'video-participant',
+							moderator_controls: 'video-moderator'
 						});
 					} else {
 						delete data.conference.profile_name;
