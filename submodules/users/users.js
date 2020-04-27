@@ -2071,7 +2071,6 @@ define(function(require) {
 
 		usersRenderConferencing: function(data) {
 			var self = this,
-				data = self.usersFormatConferencingData(data),
 				featureTemplate = $(self.getTemplate({
 					name: 'feature-conferencing',
 					data: data,
@@ -2136,10 +2135,6 @@ define(function(require) {
 				title: data.user.extra.mapFeatures.conferencing.title,
 				position: ['center', 20]
 			});
-		},
-
-		usersFormatConferencingData: function(data) {
-			return data;
 		},
 
 		usersRenderFaxboxes: function(data) {
