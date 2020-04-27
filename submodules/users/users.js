@@ -2071,7 +2071,6 @@ define(function(require) {
 
 		usersRenderConferencing: function(data) {
 			var self = this,
-				data = self.usersFormatConferencingData(data),
 				featureTemplate = $(self.getTemplate({
 					name: 'feature-conferencing',
 					data: data,
@@ -2102,19 +2101,19 @@ define(function(require) {
 				if (monster.ui.valid(featureForm)) {
 					data.conference = monster.ui.getFormData('conferencing_form');
 
-					if (data.conference.enable_video_conferencing) {
+					if (data.conference.video) {
 						data.conference = _.merge(data.conference, {
+							video: true,
 							profile_name: 'video',
 							caller_controls: 'video-participant',
 							moderator_controls: 'video-moderator'
 						});
 					} else {
+						delete data.conference.video;
 						delete data.conference.profile_name;
 						delete data.conference.caller_controls;
 						delete data.conference.moderator_controls;
 					}
-
-					delete data.conference.enable_video_conferencing;
 
 					if (switchFeature.prop('checked')) {
 						self.usersUpdateConferencing(data, function(data) {
@@ -2136,12 +2135,6 @@ define(function(require) {
 				title: data.user.extra.mapFeatures.conferencing.title,
 				position: ['center', 20]
 			});
-		},
-
-		usersFormatConferencingData: function(data) {
-			data.conference.enable_video_conferencing = _.has(data, 'conference.profile_name');
-
-			return data;
 		},
 
 		usersRenderFaxboxes: function(data) {
