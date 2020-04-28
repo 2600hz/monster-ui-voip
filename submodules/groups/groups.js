@@ -52,7 +52,7 @@ define(function(require) {
 						template.find('.groups-rows').append(templateGroup);
 					});
 
-					self.groupsBindEvents(template, parent);
+					self.groupsBindEvents(template, parent, dataTemplate.groups);
 
 					parent
 						.empty()
@@ -181,7 +181,7 @@ define(function(require) {
 			return result;
 		},
 
-		groupsBindEvents: function(template, parent) {
+		groupsBindEvents: function(template, parent, groups) {
 			var self = this;
 
 			setTimeout(function() { template.find('.search-query').focus(); });
@@ -234,7 +234,7 @@ define(function(require) {
 						'border-top-color': 'transparent'
 					});
 
-					self.groupsGetTemplate(type, groupId, function(template, data) {
+					self.groupsGetTemplate(type, groupId, groups, function(template, data) {
 						monster.ui.tooltips(template);
 
 						row.find('.edit-groups').append(template).slideDown();
@@ -421,7 +421,7 @@ define(function(require) {
 			return formattedData;
 		},
 
-		groupsGetTemplate: function(type, groupId, callbackAfterData) {
+		groupsGetTemplate: function(type, groupId, groups, callbackAfterData) {
 			var self = this;
 
 			if (type === 'name') {
@@ -431,13 +431,13 @@ define(function(require) {
 			} else if (type === 'extensions') {
 				self.groupsGetExtensionsTemplate(groupId, callbackAfterData);
 			} else if (type === 'features') {
-				self.groupsGetFeaturesTemplate(groupId, callbackAfterData);
+				self.groupsGetFeaturesTemplate(groupId, groups, callbackAfterData);
 			} else if (type === 'members') {
 				self.groupsGetMembersTemplate(groupId, callbackAfterData);
 			}
 		},
 
-		groupsGetFeaturesTemplate: function(groupId, callback) {
+		groupsGetFeaturesTemplate: function(groupId, groups, callback) {
 			var self = this;
 
 			self.groupsGetFeaturesData(groupId, function(data) {
@@ -447,7 +447,9 @@ define(function(require) {
 					submodule: 'groups'
 				}));
 
-				self.groupsBindFeatures(template, data);
+				self.groupsBindFeatures(template, _.merge({
+					groups: groups
+				}, data));
 
 				callback && callback(template, data);
 			});
@@ -835,10 +837,13 @@ define(function(require) {
 				selectedEntity = flow.children._.data.id;
 			} //Find the existing Next Action if there is one
 
-			var templateData = $.extend(true, {selectedEntity: selectedEntity}, data),
-				featureTemplate = $(self.getTemplate({
+			var featureTemplate = $(self.getTemplate({
 					name: 'feature-next_action',
-					data: templateData,
+					data: _.assign({
+						selectedEntity: selectedEntity
+					}, data, {
+						groups: _.reject(data.groups, { id: data.group.id })
+					}),
 					submodule: 'groups'
 				})),
 				switchFeature = featureTemplate.find('.switch-state'),
