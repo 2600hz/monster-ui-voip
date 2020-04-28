@@ -81,14 +81,11 @@ define(function(require) {
 
 		groupsFormatListData: function(data) {
 			var self = this,
-				mapGroups = {},
-				arrayGroups = [];
-
-			_.each(data.groups, function(group) {
-				mapGroups[group.id] = group;
-
-				mapGroups[group.id].extra = self.groupsGetGroupFeatures(group);
-			});
+				mapGroups = _.transform(data.groups, function(object, group) {
+					_.set(object, group.id, _.merge({
+						extra: self.groupsGetGroupFeatures(group)
+					}, group));
+				}, {});
 
 			_.each(data.callflows, function(callflow) {
 				if (callflow.group_id in mapGroups) {
@@ -126,18 +123,18 @@ define(function(require) {
 				}
 			});
 
-			_.each(mapGroups, function(group) {
-				// Only list groups created with SmartPBX (e.g. with an associated baseGroup callflow)
-				group.extra.hasOwnProperty('baseCallflowId') && arrayGroups.push(group);
-			});
-
-			arrayGroups.sort(function(a, b) {
-				return a.name > b.name ? 1 : -1;
-			});
-
-			data.groups = arrayGroups;
-
-			return data;
+			return {
+				groups: _
+					.chain(mapGroups)
+					// Only list groups created with SmartPBX (e.g. with an associated baseGroup callflow)
+					.reject(function(group) {
+						return !_.has(group, 'extra.baseCallflowId');
+					})
+					.sortBy(function(group) {
+						return _.toLower(group.name);
+					})
+					.value()
+			};
 		},
 
 		groupsGetGroupFeatures: function(group) {
