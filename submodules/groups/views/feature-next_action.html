@@ -40,6 +40,11 @@
 					<option value="{{id}}" data-module="device" {{#compare ../selectedEntity '===' id}}selected{{/compare}}>{{name}}</option>
 					{{/each}}
 				</optgroup>
+				<optgroup label="{{ i18n.groups.nextAction.groups }}">
+					{{#each groups}}
+					<option value="{{extra.callflowId}}" data-module="callflow" {{#compare ../selectedEntity '===' extra.callflowId}}selected{{/compare}}>{{name}}</option>
+					{{/each}}
+				</optgroup>
 			</select>
 		</div>
 	</div>

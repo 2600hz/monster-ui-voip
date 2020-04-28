@@ -112,6 +112,7 @@
 			"mainMenu": "Main Menu (Open hours)",
 			"voicemails": "Voicemail Boxes",
 			"users": "Users",
+			"groups": "Groups",
 			"__comment": "UI-2664: Adding devices as next action",
 			"__version": "4.1",
 			"devices": "Devices"
