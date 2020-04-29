@@ -2,7 +2,7 @@
 	<div class="feature-popup-title">
 		<div class="popup-title">
 			<div class="feature-fa-wrapper">
-				<i class="{{group.extra.mapFeatures.next_action.icon}}"></i>
+				<i class="{{iconClass}}"></i>
 			</div>
 			<div class="feature-title">
 				{{ i18n.groups.nextAction.headline }}
@@ -10,42 +10,33 @@
 		</div>
 		<div class="switch popup-action">
 		{{#monsterSwitch}}
-			<input class="switch-state" type="checkbox" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if group.extra.mapFeatures.next_action.active}} checked="checked"{{/if}}></input>
+			<input class="switch-state" type="checkbox" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if isEnabled}} checked="checked"{{/if}}></input>
 		{{/monsterSwitch}}
 		</div>
 	</div>
 
-	<div class="content{{#unless group.extra.mapFeatures.next_action.active}} disabled{{/unless}}">
+	<div class="content{{#unless isEnabled}} disabled{{/unless}}">
 
 		<div class="next-action">
 			<span>{{ i18n.groups.nextAction.label }}</span>
 			<select class="next-action-select">
 			{{#select selectedEntity}}
-				<optgroup label="{{ i18n.groups.nextAction.menu }}">
-					{{#if mainMenu}}
-					<option value="{{mainMenu.id}}" data-module="callflow">{{ i18n.groups.nextAction.mainMenu }}</option>
-					{{/if}}
-				</optgroup>
-				<optgroup label="{{ i18n.groups.nextAction.voicemails }}">
-					{{#each voicemails}}
-					<option value="{{id}}" data-module="voicemail">{{name}}</option>
+				{{#if mainMenu}}
+					<optgroup label="{{ i18n.groups.nextAction.menu }}">
+						<option value="{{mainMenu.id}}" data-module="callflow">
+							{{ i18n.groups.nextAction.mainMenu }}
+						</option>
+					</optgroup>
+				{{/if}}
+				{{#each categories}}
+					<optgroup label="{{label}}">
+					{{#each entities}}
+						<option value="{{value}}" data-module="{{../module}}">
+							{{label}}
+						</option>
 					{{/each}}
-				</optgroup>
-				<optgroup label="{{ i18n.groups.nextAction.users }}">
-					{{#each userCallflows}}
-					<option value="{{id}}" data-module="callflow">{{userName}}</option>
-					{{/each}}
-				</optgroup>
-				<optgroup label="{{ i18n.groups.nextAction.devices }}">
-					{{#each devices}}
-					<option value="{{id}}" data-module="device">{{name}}</option>
-					{{/each}}
-				</optgroup>
-				<optgroup label="{{ i18n.groups.nextAction.groups }}">
-					{{#each groups}}
-					<option value="{{extra.callflowId}}" data-module="callflow">{{name}}</option>
-					{{/each}}
-				</optgroup>
+					</optgroup>
+				{{/each}}
 			{{/select}}
 			</select>
 		</div>
