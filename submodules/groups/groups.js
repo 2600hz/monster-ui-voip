@@ -902,18 +902,89 @@ define(function(require) {
 
 		groupsFormatNextActionData: function(data) {
 			var self = this,
-				flow = data.callflow.flow;
+				featureData = data.group.extra.mapFeatures.next_action,
+				//Get the first callflow (i.e. base ring group)
+				flow = (function huntDownFirstCallflow(flow) {
+					return flow.module === 'callflow'
+						? flow
+						: huntDownFirstCallflow(flow.children._);
+				}(data.callflow.flow));
 
-			while (flow.module !== 'callflow') {
-				flow = flow.children._;
-			} //Go to the first callflow (i.e. base ring group)
-
-			return _.assign({
+			return _.merge({
 				//Find the existing Next Action if there is one
-				selectedEntity: _.get(flow.children, '_.data.id', null)
-			}, data, {
-				groups: _.reject(data.groups, { id: data.group.id })
-			});
+				selectedEntity: _.get(flow.children, '_.data.id', null),
+				iconClass: featureData.icon,
+				isEnabled: featureData.active,
+				categories: _
+					.chain([{
+						dataPath: 'devices',
+						label: self.i18n.active().groups.nextAction.devices,
+						module: 'device',
+						entityValuePath: 'id',
+						entityLabelPath: 'userName'
+					}, {
+						dataPath: 'groups',
+						label: self.i18n.active().groups.nextAction.groups,
+						module: 'callflow',
+						entityValuePath: 'extra.callflowId',
+						entityLabelPath: 'name',
+						reject: {
+							by: 'id',
+							values: [data.group.id]
+						}
+					}, {
+						dataPath: 'voicemails',
+						label: self.i18n.active().groups.nextAction.voicemails,
+						module: 'voicemails',
+						entityValuePath: 'id',
+						entityLabelPath: 'name'
+					}, {
+						dataPath: 'userCallflows',
+						label: self.i18n.active().groups.nextAction.users,
+						module: 'callflow',
+						entityValuePath: 'id',
+						entityLabelPath: 'userName'
+					}])
+					.reject(function(category) {
+						return _
+							.chain(data)
+							.get(category.dataPath, [])
+							.isEmpty()
+							.value();
+					})
+					.map(function(category) {
+						return _.merge({
+							entities: _
+								.chain(data)
+								.get(category.dataPath, [])
+								.reject(function(entity) {
+									return _.has(category, 'reject') && _.includes(
+										category.reject.values,
+										_.get(entity, category.reject.by)
+									);
+								})
+								.map(function(entity) {
+									return {
+										value: _.get(entity, category.entityValuePath),
+										label: _.get(entity, category.entityLabelPath)
+									};
+								})
+								.sortBy(function(entity) {
+									return _.toLower(entity.label);
+								})
+								.value()
+						}, _.pick(category, [
+							'label',
+							'module'
+						]));
+					})
+					.sortBy(function(category) {
+						return _.toLower(category.label);
+					})
+					.value()
+			}, _.pick(data, [
+				'mainMenu'
+			]));
 		},
 
 		groupsRenderForward: function(data) {
