@@ -827,23 +827,9 @@ define(function(require) {
 
 		groupsRenderNextAction: function(data) {
 			var self = this,
-				flow = data.callflow.flow,
-				selectedEntity = null;
-
-			while (flow.module !== 'callflow') {
-				flow = flow.children._;
-			} //Go to the first callflow (i.e. base ring group)
-			if ('_' in flow.children) {
-				selectedEntity = flow.children._.data.id;
-			} //Find the existing Next Action if there is one
-
-			var featureTemplate = $(self.getTemplate({
+				featureTemplate = $(self.getTemplate({
 					name: 'feature-next_action',
-					data: _.assign({
-						selectedEntity: selectedEntity
-					}, data, {
-						groups: _.reject(data.groups, { id: data.group.id })
-					}),
+					data: self.groupsFormatNextActionData(data),
 					submodule: 'groups'
 				})),
 				switchFeature = featureTemplate.find('.switch-state'),
@@ -911,6 +897,22 @@ define(function(require) {
 				dialogClass: 'next-action-group-dialog',
 				title: data.group.extra.mapFeatures.next_action.title,
 				position: ['center', 20]
+			});
+		},
+
+		groupsFormatNextActionData: function(data) {
+			var self = this,
+				flow = data.callflow.flow;
+
+			while (flow.module !== 'callflow') {
+				flow = flow.children._;
+			} //Go to the first callflow (i.e. base ring group)
+
+			return _.assign({
+				//Find the existing Next Action if there is one
+				selectedEntity: _.get(flow.children, '_.data.id', null)
+			}, data, {
+				groups: _.reject(data.groups, { id: data.group.id })
 			});
 		},
 
