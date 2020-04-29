@@ -20,31 +20,33 @@
 		<div class="next-action">
 			<span>{{ i18n.groups.nextAction.label }}</span>
 			<select class="next-action-select">
+			{{#select selectedEntity}}
 				<optgroup label="{{ i18n.groups.nextAction.menu }}">
 					{{#if mainMenu}}
-					<option value="{{mainMenu.id}}" data-module="callflow" {{#compare selectedEntity '===' mainMenu.id}}selected{{/compare}}>{{ i18n.groups.nextAction.mainMenu }}</option>
+					<option value="{{mainMenu.id}}" data-module="callflow">{{ i18n.groups.nextAction.mainMenu }}</option>
 					{{/if}}
 				</optgroup>
 				<optgroup label="{{ i18n.groups.nextAction.voicemails }}">
 					{{#each voicemails}}
-					<option value="{{id}}" data-module="voicemail" {{#compare ../selectedEntity '===' id}}selected{{/compare}}>{{name}}</option>
+					<option value="{{id}}" data-module="voicemail">{{name}}</option>
 					{{/each}}
 				</optgroup>
 				<optgroup label="{{ i18n.groups.nextAction.users }}">
 					{{#each userCallflows}}
-					<option value="{{id}}" data-module="callflow" {{#compare ../selectedEntity '===' id}}selected{{/compare}}>{{userName}}</option>
+					<option value="{{id}}" data-module="callflow">{{userName}}</option>
 					{{/each}}
 				</optgroup>
 				<optgroup label="{{ i18n.groups.nextAction.devices }}">
 					{{#each devices}}
-					<option value="{{id}}" data-module="device" {{#compare ../selectedEntity '===' id}}selected{{/compare}}>{{name}}</option>
+					<option value="{{id}}" data-module="device">{{name}}</option>
 					{{/each}}
 				</optgroup>
 				<optgroup label="{{ i18n.groups.nextAction.groups }}">
 					{{#each groups}}
-					<option value="{{extra.callflowId}}" data-module="callflow" {{#compare ../selectedEntity '===' extra.callflowId}}selected{{/compare}}>{{name}}</option>
+					<option value="{{extra.callflowId}}" data-module="callflow">{{name}}</option>
 					{{/each}}
 				</optgroup>
+			{{/select}}
 			</select>
 		</div>
 	</div>
