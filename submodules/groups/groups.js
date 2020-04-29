@@ -52,7 +52,7 @@ define(function(require) {
 						template.find('.groups-rows').append(templateGroup);
 					});
 
-					self.groupsBindEvents(template, parent);
+					self.groupsBindEvents(template, parent, dataTemplate.groups);
 
 					parent
 						.empty()
@@ -81,14 +81,11 @@ define(function(require) {
 
 		groupsFormatListData: function(data) {
 			var self = this,
-				mapGroups = {},
-				arrayGroups = [];
-
-			_.each(data.groups, function(group) {
-				mapGroups[group.id] = group;
-
-				mapGroups[group.id].extra = self.groupsGetGroupFeatures(group);
-			});
+				mapGroups = _.transform(data.groups, function(object, group) {
+					_.set(object, group.id, _.merge({
+						extra: self.groupsGetGroupFeatures(group)
+					}, group));
+				}, {});
 
 			_.each(data.callflows, function(callflow) {
 				if (callflow.group_id in mapGroups) {
@@ -126,18 +123,18 @@ define(function(require) {
 				}
 			});
 
-			_.each(mapGroups, function(group) {
-				// Only list groups created with SmartPBX (e.g. with an associated baseGroup callflow)
-				group.extra.hasOwnProperty('baseCallflowId') && arrayGroups.push(group);
-			});
-
-			arrayGroups.sort(function(a, b) {
-				return a.name > b.name ? 1 : -1;
-			});
-
-			data.groups = arrayGroups;
-
-			return data;
+			return {
+				groups: _
+					.chain(mapGroups)
+					// Only list groups created with SmartPBX (e.g. with an associated baseGroup callflow)
+					.reject(function(group) {
+						return !_.has(group, 'extra.baseCallflowId');
+					})
+					.sortBy(function(group) {
+						return _.toLower(group.name);
+					})
+					.value()
+			};
 		},
 
 		groupsGetGroupFeatures: function(group) {
@@ -184,7 +181,7 @@ define(function(require) {
 			return result;
 		},
 
-		groupsBindEvents: function(template, parent) {
+		groupsBindEvents: function(template, parent, groups) {
 			var self = this;
 
 			setTimeout(function() { template.find('.search-query').focus(); });
@@ -237,7 +234,7 @@ define(function(require) {
 						'border-top-color': 'transparent'
 					});
 
-					self.groupsGetTemplate(type, groupId, function(template, data) {
+					self.groupsGetTemplate(type, groupId, groups, function(template, data) {
 						monster.ui.tooltips(template);
 
 						row.find('.edit-groups').append(template).slideDown();
@@ -424,7 +421,7 @@ define(function(require) {
 			return formattedData;
 		},
 
-		groupsGetTemplate: function(type, groupId, callbackAfterData) {
+		groupsGetTemplate: function(type, groupId, groups, callbackAfterData) {
 			var self = this;
 
 			if (type === 'name') {
@@ -434,13 +431,13 @@ define(function(require) {
 			} else if (type === 'extensions') {
 				self.groupsGetExtensionsTemplate(groupId, callbackAfterData);
 			} else if (type === 'features') {
-				self.groupsGetFeaturesTemplate(groupId, callbackAfterData);
+				self.groupsGetFeaturesTemplate(groupId, groups, callbackAfterData);
 			} else if (type === 'members') {
 				self.groupsGetMembersTemplate(groupId, callbackAfterData);
 			}
 		},
 
-		groupsGetFeaturesTemplate: function(groupId, callback) {
+		groupsGetFeaturesTemplate: function(groupId, groups, callback) {
 			var self = this;
 
 			self.groupsGetFeaturesData(groupId, function(data) {
@@ -450,7 +447,9 @@ define(function(require) {
 					submodule: 'groups'
 				}));
 
-				self.groupsBindFeatures(template, data);
+				self.groupsBindFeatures(template, _.merge({
+					groups: groups
+				}, data));
 
 				callback && callback(template, data);
 			});
@@ -828,20 +827,9 @@ define(function(require) {
 
 		groupsRenderNextAction: function(data) {
 			var self = this,
-				flow = data.callflow.flow,
-				selectedEntity = null;
-
-			while (flow.module !== 'callflow') {
-				flow = flow.children._;
-			} //Go to the first callflow (i.e. base ring group)
-			if ('_' in flow.children) {
-				selectedEntity = flow.children._.data.id;
-			} //Find the existing Next Action if there is one
-
-			var templateData = $.extend(true, {selectedEntity: selectedEntity}, data),
 				featureTemplate = $(self.getTemplate({
 					name: 'feature-next_action',
-					data: templateData,
+					data: self.groupsFormatNextActionData(data),
 					submodule: 'groups'
 				})),
 				switchFeature = featureTemplate.find('.switch-state'),
@@ -910,6 +898,93 @@ define(function(require) {
 				title: data.group.extra.mapFeatures.next_action.title,
 				position: ['center', 20]
 			});
+		},
+
+		groupsFormatNextActionData: function(data) {
+			var self = this,
+				featureData = data.group.extra.mapFeatures.next_action,
+				//Get the first callflow (i.e. base ring group)
+				flow = (function huntDownFirstCallflow(flow) {
+					return flow.module === 'callflow'
+						? flow
+						: huntDownFirstCallflow(flow.children._);
+				}(data.callflow.flow));
+
+			return _.merge({
+				//Find the existing Next Action if there is one
+				selectedEntity: _.get(flow.children, '_.data.id', null),
+				iconClass: featureData.icon,
+				isEnabled: featureData.active,
+				categories: _
+					.chain([{
+						dataPath: 'devices',
+						label: self.i18n.active().groups.nextAction.devices,
+						module: 'device',
+						entityValuePath: 'id',
+						entityLabelPath: 'userName'
+					}, {
+						dataPath: 'groups',
+						label: self.i18n.active().groups.nextAction.groups,
+						module: 'callflow',
+						entityValuePath: 'extra.callflowId',
+						entityLabelPath: 'name',
+						reject: {
+							by: 'id',
+							values: [data.group.id]
+						}
+					}, {
+						dataPath: 'voicemails',
+						label: self.i18n.active().groups.nextAction.voicemails,
+						module: 'voicemails',
+						entityValuePath: 'id',
+						entityLabelPath: 'name'
+					}, {
+						dataPath: 'userCallflows',
+						label: self.i18n.active().groups.nextAction.users,
+						module: 'callflow',
+						entityValuePath: 'id',
+						entityLabelPath: 'userName'
+					}])
+					.reject(function(category) {
+						return _
+							.chain(data)
+							.get(category.dataPath, [])
+							.isEmpty()
+							.value();
+					})
+					.map(function(category) {
+						return _.merge({
+							entities: _
+								.chain(data)
+								.get(category.dataPath, [])
+								.reject(function(entity) {
+									return _.has(category, 'reject') && _.includes(
+										category.reject.values,
+										_.get(entity, category.reject.by)
+									);
+								})
+								.map(function(entity) {
+									return {
+										value: _.get(entity, category.entityValuePath),
+										label: _.get(entity, category.entityLabelPath)
+									};
+								})
+								.sortBy(function(entity) {
+									return _.toLower(entity.label);
+								})
+								.value()
+						}, _.pick(category, [
+							'label',
+							'module'
+						]));
+					})
+					.sortBy(function(category) {
+						return _.toLower(category.label);
+					})
+					.value()
+			}, _.pick(data, [
+				'mainMenu'
+			]));
 		},
 
 		groupsRenderForward: function(data) {
