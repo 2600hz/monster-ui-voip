@@ -227,6 +227,13 @@
 .edit-vmbox .control-input.checkbox > div {
 	display: inline-block;
 }
+.edit-vmbox .control-input.checkbox.disabled {
+	color: #909099;
+}
+.edit-vmbox .control-input.checkbox.disabled input ~ i {
+	border: solid 1px #bcbcc2;
+	background: #909099;
+}
 
 .edit-vmbox .helper {
 	margin: 0 30px;

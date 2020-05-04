@@ -139,7 +139,7 @@
 				</div>
 
 				<div class="control-group">
-					<label class="control-input checkbox">
+					<label class="control-input checkbox{{#if announcement_only}} disabled{{/if}}">
 						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.skipInstructions.help }}">
 							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.skipInstructions.label}}
 								<input type="checkbox" name="skip_instructions" id="skip_instructions" {{#if skip_instructions }}checked{{/if}} />
