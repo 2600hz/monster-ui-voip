@@ -227,6 +227,30 @@ define(function(require) {
 				}
 			});
 
+			templateVMBox.find('#announcement_only').on('click', function() {
+				var $this = $(this),
+					isChecked = $this.prop('checked'),
+					$skipInstructions = templateVMBox.find('#skip_instructions'),
+					$parentDiv = $skipInstructions.parents('label.control-input'),
+					isDisabled = false;
+
+				if (isChecked) {
+					$skipInstructions
+						.prop('checked', true);
+
+					isDisabled = true;
+
+					$parentDiv
+						.addClass('disabled');
+				} else {
+					$parentDiv
+						.removeClass('disabled');
+				}
+
+				$skipInstructions
+					.prop('disabled', isDisabled);
+			});
+
 			templateVMBox.find('#delete_vmbox').on('click', function() {
 				var voicemailId = $(this).parents('.edit-vmbox').data('id');
 
