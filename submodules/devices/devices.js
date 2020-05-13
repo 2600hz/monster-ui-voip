@@ -201,8 +201,10 @@ define(function(require) {
 						}
 					});
 				} else if (action === 'delete') {
-					self.devicesHelperDeleteDevice(dataDevice.id, function() {
-						self.devicesRender();
+					monster.ui.confirm(self.i18n.active().devices.confirmDeleteDevice, function() {
+						self.devicesHelperDeleteDevice(dataDevice.id, function() {
+							self.devicesRender();
+						});
 					});
 				}
 			});
