@@ -1,0 +1,44 @@
+#my_office_caller_id_popup {
+	display: flex;
+	flex-direction: column;
+	max-height: inherit;
+
+	.content-wrapper {
+		flex: 1;
+		overflow-y: auto;
+
+		.number-feature {
+			display: none;
+
+			.caller-id-name {
+				margin-top: 5px;
+			}
+		}
+
+		#emergency_form {
+			margin: 15px 0 0;
+
+			form {
+				margin: 0px;
+			}
+			label {
+				display: flex;
+				align-items: center;
+				margin: 0;
+
+				.emergency-form-label {
+					display: inline-block;
+					width: 120px;
+				}
+			}
+			textarea {
+				margin-left: 10px;
+			}
+			label.monster-invalid {
+				position: relative;
+				margin-left: 5px;
+				font-size: 30px;
+			}
+		}
+	}
+}
