@@ -30,6 +30,10 @@
 					display: inline-block;
 					width: 120px;
 				}
+
+				.horizontal-error-container {
+					position: relative;
+				}
 			}
 			textarea {
 				margin-left: 10px;
@@ -38,6 +42,12 @@
 				position: relative;
 				margin-left: 5px;
 				font-size: 30px;
+
+				&#notification_contact_emails-error {
+					position: absolute;
+					margin: -10px 0 0 10px;
+					font-size: 12px;
+				}
 			}
 		}
 	}

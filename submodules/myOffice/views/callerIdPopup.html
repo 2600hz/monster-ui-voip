@@ -52,6 +52,12 @@
 					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyState }}</span>
 					<input required name="region" type="text" class="caller-id-emergency-state">
 				</label>
+				<label>
+					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyEmail }}</span>
+					<div class="horizontal-error-container">
+						<textarea name="notification_contact_emails" class="caller-id-emergency-email"></textarea>
+					</div>
+				</label>
 			</form>
 
 			{{#monsterText}}
