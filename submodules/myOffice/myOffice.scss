@@ -1,5 +1,7 @@
 @import '../../../../css/partials/base';
 
+@import './partials/callerIdPopup';
+
 /********** Header **********/
 #myoffice_container .dashboard-header {
 	height: 62px;
@@ -442,33 +444,6 @@
 }
 #my_office_music_on_hold_popup .upload-div .file-upload > button {
 	width: 120px;
-}
-
-/********** Caller ID Popup **********/
-#my_office_caller_id_popup .emergency-form {
-	margin-top: 15px;
-}
-#my_office_caller_id_popup .emergency-form form {
-	margin: 0px;
-}
-#my_office_caller_id_popup .emergency-form label {
-	margin: 0;
-}
-#my_office_caller_id_popup .emergency-form label.monster-invalid {
-	margin: 12px 0 0 5px;
-	display: inline-block !important;
-	font-size: 30px;
-}
-#my_office_caller_id_popup .emergency-form-label {
-	display: inline-block;
-	width: 120px;
-}
-#my_office_caller_id_popup .caller-id-name {
-	margin-top: 5px;
-}
-
-#my_office_caller_id_popup .number-feature {
-	display: none;
 }
 
 #myoffice_container .warning-pulse-box {

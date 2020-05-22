@@ -898,14 +898,21 @@ define(function(require) {
 					submodule: 'myOffice'
 				})),
 				popup = monster.ui.dialog(popupTemplate, {
+					autoScroll: false,
 					title: self.i18n.active().myOffice.callerId.title,
 					position: ['center', 20]
 				});
 
 			if (monster.util.isNumberFeatureEnabled('e911')) {
-				var e911Form = popupTemplate.find('.emergency-form > form');
+				var e911Form = popupTemplate.find('#emergency_form');
 
 				monster.ui.validate(e911Form, {
+					rules: {
+						notification_contact_emails: {
+							normalizer: _.trim,
+							regex: /^(?:([\w+-.%]+@[\w-.]+\.[A-Za-z]{2,4})(?: ?))*$/
+						}
+					},
 					messages: {
 						'postal_code': {
 							required: '*'
@@ -918,6 +925,9 @@ define(function(require) {
 						},
 						'region': {
 							required: '*'
+						},
+						notification_contact_emails: {
+							regex: self.i18n.active().myOffice.callerId.emergencyEmailError
 						}
 					}
 				});
@@ -946,6 +956,7 @@ define(function(require) {
 				emergencyAddress2Input = popupTemplate.find('.caller-id-emergency-address2'),
 				emergencyCityInput = popupTemplate.find('.caller-id-emergency-city'),
 				emergencyStateInput = popupTemplate.find('.caller-id-emergency-state'),
+				emergencyEmailInput = popupTemplate.find('.caller-id-emergency-email'),
 				editableFeatures = [ 'e911', 'cnam' ],
 				loadNumberDetails = function(number, popupTemplate) {
 					monster.waterfall([
@@ -984,12 +995,19 @@ define(function(require) {
 									emergencyAddress2Input.val(numberData.e911.extended_address);
 									emergencyCityInput.val(numberData.e911.locality);
 									emergencyStateInput.val(numberData.e911.region);
+									emergencyEmailInput.val(_
+										.chain(numberData.e911)
+										.get('notification_contact_emails', [])
+										.join(' ')
+										.value()
+									);
 								} else {
 									emergencyZipcodeInput.val('');
 									emergencyAddress1Input.val('');
 									emergencyAddress2Input.val('');
 									emergencyCityInput.val('');
 									emergencyStateInput.val('');
+									emergencyEmailInput.val('');
 								}
 							}
 
@@ -1081,8 +1099,18 @@ define(function(require) {
 							}
 
 							if (setE911) {
-								$.extend(true, numberData, {
-									e911: e911Data
+								_.assign(numberData, {
+									e911: _.assign({}, e911Data, {
+										notification_contact_emails: _
+											.chain(e911Data)
+											.get('notification_contact_emails', '')
+											.trim()
+											.toLower()
+											.split(' ')
+											.reject(_.isEmpty)
+											.uniq()
+											.value()
+									})
 								});
 							} else {
 								delete numberData.e911;
@@ -1096,7 +1124,7 @@ define(function(require) {
 					e911Form;
 
 				if (monster.util.isNumberFeatureEnabled('e911')) {
-					e911Form = popupTemplate.find('.emergency-form > form');
+					e911Form = popupTemplate.find('#emergency_form');
 				}
 
 				if (callerIdNumber) {
