@@ -1,74 +1,72 @@
 <div id="my_office_caller_id_popup" class="monster-feature-popup-container">
-	<!-- <div class="feature-popup-title">
-		<div class="feature-fa-wrapper">
-			<i class="fa fa-user"></i>
-		</div>
-		{{ i18n.myOffice.callerId.headline }}
-	</div> -->
-
-	<div class="content">
-		<div>
-			{{ i18n.myOffice.callerId.numberLabel }}
-			<select class="caller-id-select">
-				<option{{#compare selectedMainNumber "===" "none"}} selected{{/compare}} value="">None</option>
-				{{#each mainNumbers}}
-					<option{{#compare ../selectedMainNumber "===" this.number}} selected{{/compare}} value="{{this.number}}">{{formatPhoneNumber this.number}}</option>
-				{{/each}}
-			</select>
-		</div>
-
-		{{#monsterText}}
-			{{ i18n.myOffice.callerId.numberHelp }}
-		{{/monsterText}}
-	</div>
-
-	<div class="content number-feature" data-feature="cnam">
-		<div>
-			{{ i18n.myOffice.callerId.nameLabel }}
-			<input type="text" class="caller-id-name">
-		</div>
-
-		{{#monsterText}}
-			{{ i18n.myOffice.callerId.nameHelp }}
-		{{/monsterText}}
-	</div>
-
-	{{#if isE911Enabled}}
-	<div class="content number-feature" data-feature="e911">
-		<div>
-			<div>{{ i18n.myOffice.callerId.emergencyLabel }}</div>
-			<div class="emergency-form">
-				<form>
-					<label>
-						<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyZipcode }}</span>
-						<input required name="postal_code" type="text" class="caller-id-emergency-zipcode">
-					</label>
-					<label>
-						<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyAddress1 }}</span>
-						<input required name="street_address" type="text" class="caller-id-emergency-address1">
-					</label>
-					<label>
-						<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyAddress2 }}</span>
-						<input name="extended_address" type="text" class="caller-id-emergency-address2">
-					</label>
-					<label>
-						<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyCity }}</span>
-						<input required name="locality" type="text" class="caller-id-emergency-city">
-					</label>
-					<label>
-						<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyState }}</span>
-						<input required name="region" type="text" class="caller-id-emergency-state">
-					</label>
-				</form>
+	<div class="content-wrapper">
+		<div class="content">
+			<div>
+				{{ i18n.myOffice.callerId.numberLabel }}
+				<select class="caller-id-select">
+					<option{{#compare selectedMainNumber "===" "none"}} selected{{/compare}} value="">None</option>
+					{{#each mainNumbers}}
+						<option{{#compare ../selectedMainNumber "===" this.number}} selected{{/compare}} value="{{this.number}}">{{formatPhoneNumber this.number}}</option>
+					{{/each}}
+				</select>
 			</div>
+
+			{{#monsterText}}
+				{{ i18n.myOffice.callerId.numberHelp }}
+			{{/monsterText}}
 		</div>
 
-		{{#monsterText}}
-			<p>{{ i18n.myOffice.callerId.emergencyHelp1 }}</p>
-			<p>{{ i18n.myOffice.callerId.emergencyHelp2 }}</p>
-		{{/monsterText}}
+		<div class="content number-feature" data-feature="cnam">
+			<div>
+				{{ i18n.myOffice.callerId.nameLabel }}
+				<input type="text" class="caller-id-name">
+			</div>
+
+			{{#monsterText}}
+				{{ i18n.myOffice.callerId.nameHelp }}
+			{{/monsterText}}
+		</div>
+
+		{{#if isE911Enabled}}
+		<div class="content number-feature" data-feature="e911">
+			<div>{{ i18n.myOffice.callerId.emergencyLabel }}</div>
+
+			<form id="emergency_form">
+				<label>
+					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyZipcode }}</span>
+					<input required name="postal_code" type="text" class="caller-id-emergency-zipcode">
+				</label>
+				<label>
+					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyAddress1 }}</span>
+					<input required name="street_address" type="text" class="caller-id-emergency-address1">
+				</label>
+				<label>
+					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyAddress2 }}</span>
+					<input name="extended_address" type="text" class="caller-id-emergency-address2">
+				</label>
+				<label>
+					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyCity }}</span>
+					<input required name="locality" type="text" class="caller-id-emergency-city">
+				</label>
+				<label>
+					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyState }}</span>
+					<input required name="region" type="text" class="caller-id-emergency-state">
+				</label>
+				<label>
+					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyEmail }}</span>
+					<div class="horizontal-error-container">
+						<textarea name="notification_contact_emails" class="caller-id-emergency-email"></textarea>
+					</div>
+				</label>
+			</form>
+
+			{{#monsterText}}
+				<p>{{ i18n.myOffice.callerId.emergencyHelp1 }}</p>
+				<p>{{ i18n.myOffice.callerId.emergencyHelp2 }}</p>
+			{{/monsterText}}
+		</div>
+		{{/if}}
 	</div>
-	{{/if}}
 
 	<div class="actions clearfix">
 		<div class="pull-right">
