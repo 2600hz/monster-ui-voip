@@ -436,6 +436,11 @@
 
 		<div class="pull-right">
 			<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
+			{{#if id}}
+				{{#if provision}}
+					<button type="button" class="monster-button monster-button-primary save{{#unless extra.isRegistered}} disabled{{/unless}}" data-extra="restart">{{ i18n.devices.popupSettings.saveAndApply }}</button>
+				{{/if}}
+			{{/if}}
 			<button type="button" class="monster-button monster-button-success save">
 			{{#if id}}
 				{{ i18n.saveChanges }}
