@@ -333,24 +333,16 @@
 							{{telicon 'question--circle'}}
 						</a>
 						<div id="info_content_{{type}}" class="collapse">
-						{{#each @root.extra.provision.keyActions}}
+						{{#each actions}}
 							{{#if info}}
 							<p>
 								<strong>
-									{{replaceVar @root.i18n.devices.popupSettings.keys.info.typeTitle text}}
+									{{replaceVar @root.i18n.devices.popupSettings.keys.info.typeTitle label}}
 								</strong>
 								{{info}}
 							</p>
 							{{/if}}
 						{{/each}}
-						{{#compare id '===' 'combo_keys'}}
-							<p>
-								<strong>
-									{{replaceVar @root.i18n.devices.popupSettings.keys.info.typeTitle @root.i18n.devices.popupSettings.keys.types.line}}
-								</strong>
-								{{@root.i18n.devices.popupSettings.keys.info.types.line}}
-							</p>
-						{{/compare}}
 						</div>
 					</div>
 				</div>
@@ -373,12 +365,11 @@
 							{{/compare}}
 								<select name="provision.keys.{{../id}}[{{@key}}].type" class="feature-key-type span2">
 								{{#select type}}
-									{{#each @root.extra.provision.keyActions}}
-										<option value="{{id}}">{{text}}</option>
+									{{#each ../actions}}
+										<option value="{{id}}">
+											{{label}}
+										</option>
 									{{/each}}
-									{{#compare ../id '===' 'combo_keys'}}
-										<option value="line">{{@root.i18n.devices.popupSettings.keys.types.line}}</option>
-									{{/compare}}
 								{{/select}}
 								</select>
 							</div>
