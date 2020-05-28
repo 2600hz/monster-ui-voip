@@ -1036,21 +1036,6 @@ define(function(require) {
 						};
 					}),
 					provision: {
-						keyActions: _.map([
-							'none',
-							'presence',
-							'parking',
-							'personal_parking',
-							'speed_dial'
-						], function(action) {
-							var i18n = self.i18n.active().devices.popupSettings.keys;
-
-							return {
-								id: action,
-								info: _.get(i18n, ['info', 'types', action]),
-								text: _.get(i18n, ['types', action])
-							};
-						}),
 						keys: _
 							.chain(data.template)
 							.thru(self.getKeyTypes)
@@ -1061,6 +1046,33 @@ define(function(require) {
 								return _.merge({
 									id: type,
 									type: camelCasedType,
+									actions: _
+										.chain([
+											'none',
+											'presence',
+											'parking',
+											'personal_parking',
+											'speed_dial'
+										])
+										.concat(
+											type === 'combo_keys' ? ['line'] : []
+										)
+										.map(function(action) {
+											var i18n = self.i18n.active().devices.popupSettings.keys;
+
+											return {
+												id: action,
+												info: _.get(i18n, ['info', 'types', action]),
+												label: _.get(i18n, ['types', action])
+											};
+										})
+										// Sort alphabetically while keeping `none` as first item
+										.sort(function(a, b) {
+											return a.id === 'none' ? -1
+												: b.id === 'none' ? 1
+												: a.label.localeCompare(b.label, monster.config.whitelabel.language);
+										})
+										.value(),
 									data: _
 										.chain(mergedDevice)
 										.get(['provision', type], {})
