@@ -299,11 +299,14 @@
 					"title": "Key 1 Default"
 				},
 				"featureKeys": {
-					"title": "Feature Keys",
+					"menuTitle": "Feature Keys",
+					"sectionTitle": "Feature Keys",
 					"label": "Feature key"
 				},
 				"comboKeys": {
-					"title": "Combo Keys",
+					"menuTitle": "Combo Keys",
+					"sectionTitle": "Combo Keys {{range}}",
+					"range": "{{min}} - {{max}}",
 					"label": "Combo key"
 				},
 				"labels": {

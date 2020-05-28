@@ -1040,7 +1040,9 @@ define(function(require) {
 							.thru(self.getKeyTypes)
 							.map(function(type) {
 								var camelCasedType = _.camelCase(type),
-									i18n = _.get(self.i18n.active().devices.popupSettings.keys, camelCasedType);
+									i18n = _.get(self.i18n.active().devices.popupSettings.keys, camelCasedType),
+									entries = _.get(mergedDevice, ['provision', type], []),
+									entriesCount = _.size(entries);
 
 								return _.merge({
 									id: type,
@@ -1072,26 +1074,36 @@ define(function(require) {
 												: a.label.localeCompare(b.label, monster.config.whitelabel.language);
 										})
 										.value(),
-									data: _
-										.chain(mergedDevice)
-										.get(['provision', type], [])
-										.map(function(metadata) {
-											var value = _.get(metadata, 'value', {});
+									data: _.map(entries, function(metadata) {
+										var value = _.get(metadata, 'value', {});
 
-											return _.merge({}, metadata, _.isPlainObject(value)
-												? {}
-												: {
-													value: {
-														value: _.toString(value)
-													}
+										return _.merge({}, metadata, _.isPlainObject(value)
+											? {}
+											: {
+												value: {
+													value: _.toString(value)
 												}
-											);
-										})
-										.value()
+											}
+										);
+									})
 								}, _.pick(i18n, [
-									'title',
+									'menuTitle',
+									'sectionTitle',
 									'label'
-								]));
+								]), _.has(i18n, 'range') ? {
+									sectionTitle: self.getTemplate({
+										name: '!' + i18n.sectionTitle,
+										data: {
+											range: entriesCount > 1 ? self.getTemplate({
+												name: '!' + i18n.range,
+												data: {
+													min: 1,
+													max: entriesCount
+												}
+											}) : ''
+										}
+									})
+								} : {});
 							})
 							.value(),
 						parkingSpots: _.range(1, 11)
