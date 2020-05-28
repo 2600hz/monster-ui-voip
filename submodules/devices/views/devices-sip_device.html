@@ -442,16 +442,16 @@
 					<button type="button" class="monster-button-success save">
 						{{i18n.saveChanges}}
 					</button>
-					<button class="monster-button-success dropdown-toggle" data-toggle="dropdown">
-						<span class="caret"></span>
-					</button>
-					<ul class="dropdown-menu pull-right">
-						{{#if provision}}
-						<li>
-							<a class="save {{#unless extra.isRegistered}} disabled{{/unless}}" data-extra="restart">{{i18n.devices.popupSettings.saveAndApply}}</a>
-						</li>
-						{{/if}}
-					</ul>
+					{{#if provision}}
+						<button class="monster-button-success dropdown-toggle" data-toggle="dropdown">
+							<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu pull-right">
+							<li>
+								<a class="save {{#unless extra.isRegistered}} disabled{{/unless}}" data-extra="restart">{{i18n.devices.popupSettings.saveAndApply}}</a>
+							</li>
+						</ul>
+					{{/if}}
 				</div>
 			{{else}}
 				<button type="button" class="monster-button monster-button-success save">
