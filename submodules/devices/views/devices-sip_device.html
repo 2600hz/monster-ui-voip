@@ -437,27 +437,25 @@
 		<div class="pull-right">
 			<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
 
-			{{#if id}}
-				<div class="btn-group dropup">
-					<button type="button" class="monster-button-success save">
+			<div class="btn-group dropup">
+				<button type="button" class="monster-button-success save">
+					{{#if id}}
 						{{i18n.saveChanges}}
-					</button>
-					{{#if provision}}
-						<button class="monster-button-success dropdown-toggle" data-toggle="dropdown">
-							<span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu pull-right">
-							<li>
-								<a class="save {{#unless extra.isRegistered}} disabled{{/unless}}" data-extra="restart">{{i18n.devices.popupSettings.saveAndApply}}</a>
-							</li>
-						</ul>
+					{{else}}
+						{{ i18n.devices.createDevice }}
 					{{/if}}
-				</div>
-			{{else}}
-				<button type="button" class="monster-button monster-button-success save">
-					{{ i18n.devices.createDevice }}
 				</button>
-			{{/if}}
+				{{#if extra.isRegistered}}
+					<button class="monster-button-success dropdown-toggle" data-toggle="dropdown">
+						<span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu pull-right">
+						<li>
+							<a class="save" data-extra="restart">{{i18n.devices.popupSettings.saveAndApply}}</a>
+						</li>
+					</ul>
+				{{/if}}
+			</div>
 		</div>
 	</div>
 </div>
