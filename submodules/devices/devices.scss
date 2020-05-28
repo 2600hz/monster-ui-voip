@@ -234,8 +234,19 @@
 	padding: 15px;
 }
 
-.voip-edit-device-popup .edit-device .actions button {
-	margin-left: 10px;
+.voip-edit-device-popup .edit-device .actions{
+	button {
+		&.save {
+			font-size: 15px;
+			margin-left: 10px;
+		}
+	}
+
+	a {
+		&.save.disabled {
+			color: $french-gray;
+		}
+	}
 }
 
 .voip-edit-device-popup .edit-device .title-bar {
