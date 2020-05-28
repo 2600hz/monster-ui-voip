@@ -995,8 +995,7 @@ define(function(require) {
 									.chain(data.template)
 									.get([type, 'iterate'], 0)
 									.range()
-									.keyBy()
-									.mapValues(function(index) {
+									.map(function(index) {
 										return _.get(data.device, ['provision', type, index], {
 											type: 'none'
 										});
@@ -1075,8 +1074,8 @@ define(function(require) {
 										.value(),
 									data: _
 										.chain(mergedDevice)
-										.get(['provision', type], {})
-										.mapValues(function(metadata) {
+										.get(['provision', type], [])
+										.map(function(metadata) {
 											var value = _.get(metadata, 'value', {});
 
 											return _.merge({}, metadata, _.isPlainObject(value)
