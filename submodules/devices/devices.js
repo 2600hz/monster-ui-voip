@@ -1008,8 +1008,7 @@ define(function(require) {
 									.chain(data.template)
 									.get([type, 'iterate'], 0)
 									.range()
-									.keyBy()
-									.mapValues(function(index) {
+									.map(function(index) {
 										return _.get(data.device, ['provision', type, index], {
 											type: 'none'
 										});
@@ -1049,51 +1048,75 @@ define(function(require) {
 						};
 					}),
 					provision: {
-						keyActions: _.map([
-							'none',
-							'presence',
-							'parking',
-							'personal_parking',
-							'speed_dial'
-						], function(action) {
-							var i18n = self.i18n.active().devices.popupSettings.keys;
-
-							return {
-								id: action,
-								info: _.get(i18n, ['info', 'types', action]),
-								text: _.get(i18n, ['types', action])
-							};
-						}),
 						keys: _
 							.chain(data.template)
 							.thru(self.getKeyTypes)
 							.map(function(type) {
 								var camelCasedType = _.camelCase(type),
-									i18n = _.get(self.i18n.active().devices.popupSettings.keys, camelCasedType);
+									i18n = _.get(self.i18n.active().devices.popupSettings.keys, camelCasedType),
+									entries = _.get(mergedDevice, ['provision', type], []),
+									entriesCount = _.size(entries);
 
 								return _.merge({
 									id: type,
 									type: camelCasedType,
-									data: _
-										.chain(mergedDevice)
-										.get(['provision', type], {})
-										.mapValues(function(metadata) {
-											var value = _.get(metadata, 'value', {});
+									actions: _
+										.chain([
+											'none',
+											'presence',
+											'parking',
+											'personal_parking',
+											'speed_dial'
+										])
+										.concat(
+											type === 'combo_keys' ? ['line'] : []
+										)
+										.map(function(action) {
+											var i18n = self.i18n.active().devices.popupSettings.keys;
 
-											return _.merge({}, metadata, _.isPlainObject(value)
-												? {}
-												: {
-													value: {
-														value: _.toString(value)
-													}
-												}
-											);
+											return {
+												id: action,
+												info: _.get(i18n, ['info', 'types', action]),
+												label: _.get(i18n, ['types', action])
+											};
 										})
-										.value()
+										// Sort alphabetically while keeping `none` as first item
+										.sort(function(a, b) {
+											return a.id === 'none' ? -1
+												: b.id === 'none' ? 1
+												: a.label.localeCompare(b.label, monster.config.whitelabel.language);
+										})
+										.value(),
+									data: _.map(entries, function(metadata) {
+										var value = _.get(metadata, 'value', {});
+
+										return _.merge({}, metadata, _.isPlainObject(value)
+											? {}
+											: {
+												value: {
+													value: _.toString(value)
+												}
+											}
+										);
+									})
 								}, _.pick(i18n, [
-									'title',
+									'menuTitle',
+									'sectionTitle',
 									'label'
-								]));
+								]), _.has(i18n, 'range') ? {
+									sectionTitle: self.getTemplate({
+										name: '!' + i18n.sectionTitle,
+										data: {
+											range: entriesCount > 1 ? self.getTemplate({
+												name: '!' + i18n.range,
+												data: {
+													min: 1,
+													max: entriesCount
+												}
+											}) : ''
+										}
+									})
+								} : {});
 							})
 							.value(),
 						parkingSpots: _.range(1, 11)

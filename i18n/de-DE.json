@@ -290,19 +290,25 @@
 			"__version": "v3.20_s4",
 			"keys": {
 				"alert": {
-					"message": "In der Standardeinstellung wird diese Taste als Leitungstaste verwendet. Wir empfehlen, dies nicht zu ändern."
+					"message": "In der Standardeinstellung wird diese Taste als Leitungstaste verwendet. Wir empfehlen, dies nicht zu ändern.",
+					"title": "Taste 1 im Standart"
 				},
 				"featureKeys": {
-					"title": "Funktionstasten",
+					"menuTitle": "Funktionstasten",
+					"sectionTitle": "Funktionstasten",
 					"label": "Funktionstaste"
 				},
 				"comboKeys": {
-					"title": "Kombitasten",
-					"label": "Kombitaste"
+					"menuTitle": "Funktionstaste",
+					"sectionTitle": "Funktionstaste {{range}}",
+					"range": "{{min}} - {{max}}",
+					"label": "Funktionstaste"
 				},
 				"labels": {
+					"deviceLabel": "Beschriftung",
+					"function": "Aktion",
 					"parkingSpot": "Halteposition",
-					"user": "Benutzer",
+					"user": "Aktionsdaten",
 					"value": "Wert"
 				},
 				"info": {
@@ -320,7 +326,7 @@
 					"typeTitle": "{{variable}}: "
 				},
 				"types": {
-					"line": "Zeile",
+					"line": "Leitung",
 					"none": "Keine",
 					"presence": "Anwesenheit",
 					"parking": "Parken",
