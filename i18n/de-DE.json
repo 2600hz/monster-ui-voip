@@ -294,11 +294,14 @@
 					"title": "Taste 1 im Standart"
 				},
 				"featureKeys": {
-					"title": "Funktionstasten",
+					"menuTitle": "Funktionstasten",
+					"sectionTitle": "Funktionstasten",
 					"label": "Funktionstaste"
 				},
 				"comboKeys": {
-					"title": "Funktionstaste",
+					"menuTitle": "Funktionstaste",
+					"sectionTitle": "Funktionstaste {{range}}",
+					"range": "{{min}} - {{max}}",
 					"label": "Funktionstaste"
 				},
 				"labels": {
