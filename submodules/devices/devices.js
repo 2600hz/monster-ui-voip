@@ -581,13 +581,26 @@ define(function(require) {
 					templateDevice.find('.feature-key-value:not(.active)').remove();
 
 					var $this = $(this),
+						hasToRestart = !!$this.data('extra'),
 						dataToSave = self.devicesMergeData(data, templateDevice, audioCodecs, videoCodecs);
+
+					if ($this.hasClass('disabled')) {
+						return;
+					}
 
 					$this.prop('disabled', 'disabled');
 
 					self.devicesSaveDevice(dataToSave, function(data) {
-						popup.dialog('close').remove();
+						if (hasToRestart) {
+							self.devicesRestart(data.id, function() {
+								monster.ui.toast({
+									type: 'success',
+									message: self.i18n.active().devices.popupSettings.miscellaneous.restart.success
+								});
+							});
+						}
 
+						popup.dialog('close').remove();
 						callbackSave && callbackSave(data);
 					}, function() {
 						$this.prop('disabled', false);
