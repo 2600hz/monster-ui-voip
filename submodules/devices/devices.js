@@ -935,18 +935,16 @@ define(function(require) {
 		 */
 		devicesFormatData: function(data, dataList) {
 			var self = this,
-				deviceBrand = _.get(data, 'device.provision.endpoint_brand', null),
-				getDeviceAvailableFUnctions = function(brand) {
-					var availableFunctions = ['none', 'presence', 'parking', 'personal_parking', 'speed_dial'],
-						brandKey = 'brands.' + brand,
-						brandFlag = _.get(self.appFlags.devices.provisionerConfigFlags, brandKey, null),
-						deviceFunctions = _.get(brandFlag, 'functions', availableFunctions);
+				isActionTypeAvailableByBrand = function(action) {
+					var deviceBrand = _.get(data, 'device.provision.endpoint_brand', null),
+						brandFlag = _.get(self.appFlags.devices.provisionerConfigFlags, 'brands.' + deviceBrand, null),
+						deviceActions = _.get(brandFlag, 'functions', null);
 
-					if (!brandFlag) {
-						return availableFunctions;
+					if (!deviceActions || action === 'none') {
+						return true;
 					}
 
-					return _.intersection(availableFunctions, _.union(['none'], deviceFunctions));
+					return _.includes(deviceActions, action);
 				},
 				isClassifierDisabledByAccount = function isClassifierDisabledByAccount(classifier) {
 					return _.get(data.accountLimits, ['call_restriction', classifier, 'action']) === 'deny';
@@ -1062,14 +1060,6 @@ define(function(require) {
 						};
 					}),
 					provision: {
-						keyActions: _.map(getDeviceAvailableFUnctions(deviceBrand), function(action) {
-							var i18n = self.i18n.active().devices.popupSettings.keys;
-							return {
-								id: action,
-								info: _.get(i18n, ['info', 'types', action]),
-								text: _.get(i18n, ['types', action])
-							};
-						}),
 						keys: _
 							.chain(data.template)
 							.thru(self.getKeyTypes)
@@ -1093,6 +1083,7 @@ define(function(require) {
 										.concat(
 											type === 'combo_keys' ? ['line'] : []
 										)
+										.filter(isActionTypeAvailableByBrand)
 										.map(function(action) {
 											var i18n = self.i18n.active().devices.popupSettings.keys;
 
