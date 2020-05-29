@@ -69,7 +69,7 @@ define(function(require) {
 					'smartphone',
 					'softphone'
 				],
-				provisionerConfigFlags: monster.config.provisioner
+				provisionerConfigFlags: monster.config.whitelabel.provisioner
 			}
 		},
 
@@ -935,17 +935,11 @@ define(function(require) {
 		 */
 		devicesFormatData: function(data, dataList) {
 			var self = this,
-				isActionTypeAvailableByBrand = function(action) {
-					var deviceBrand = _.get(data, 'device.provision.endpoint_brand', null),
-						brandFlag = _.get(self.appFlags.devices.provisionerConfigFlags, 'brands.' + deviceBrand, null),
-						deviceActions = _.get(brandFlag, 'functions', null);
-
-					if (!deviceActions || action === 'none') {
-						return true;
-					}
-
-					return _.includes(deviceActions, action);
-				},
+				keyActionsMod = _.get(
+					self.appFlags.devices.provisionerConfigFlags,
+					['brands', _.get(data.device, 'provision.endpoint_brand'), 'keyFunctions'],
+					[]
+				),
 				isClassifierDisabledByAccount = function isClassifierDisabledByAccount(classifier) {
 					return _.get(data.accountLimits, ['call_restriction', classifier, 'action']) === 'deny';
 				},
@@ -1074,7 +1068,6 @@ define(function(require) {
 									type: camelCasedType,
 									actions: _
 										.chain([
-											'none',
 											'presence',
 											'parking',
 											'personal_parking',
@@ -1083,7 +1076,10 @@ define(function(require) {
 										.concat(
 											type === 'combo_keys' ? ['line'] : []
 										)
-										.filter(isActionTypeAvailableByBrand)
+										.filter(function(action) {
+											return _.isEmpty(keyActionsMod) || _.includes(keyActionsMod, action);
+										})
+										.concat(['none'])
 										.map(function(action) {
 											var i18n = self.i18n.active().devices.popupSettings.keys;
 
