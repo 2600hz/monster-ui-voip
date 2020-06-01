@@ -68,7 +68,8 @@ define(function(require) {
 					'sip_uri',
 					'smartphone',
 					'softphone'
-				]
+				],
+				provisionerConfigFlags: monster.config.whitelabel.provisioner
 			}
 		},
 
@@ -934,6 +935,11 @@ define(function(require) {
 		 */
 		devicesFormatData: function(data, dataList) {
 			var self = this,
+				keyActionsMod = _.get(
+					self.appFlags.devices.provisionerConfigFlags,
+					['brands', _.get(data.device, 'provision.endpoint_brand'), 'keyFunctions'],
+					[]
+				),
 				isClassifierDisabledByAccount = function isClassifierDisabledByAccount(classifier) {
 					return _.get(data.accountLimits, ['call_restriction', classifier, 'action']) === 'deny';
 				},
@@ -1062,7 +1068,6 @@ define(function(require) {
 									type: camelCasedType,
 									actions: _
 										.chain([
-											'none',
 											'presence',
 											'parking',
 											'personal_parking',
@@ -1071,6 +1076,10 @@ define(function(require) {
 										.concat(
 											type === 'combo_keys' ? ['line'] : []
 										)
+										.filter(function(action) {
+											return _.isEmpty(keyActionsMod) || _.includes(keyActionsMod, action);
+										})
+										.concat(['none'])
 										.map(function(action) {
 											var i18n = self.i18n.active().devices.popupSettings.keys;
 
