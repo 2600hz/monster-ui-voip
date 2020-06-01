@@ -217,7 +217,14 @@ define(function(require) {
 
 			templateVMBox.find('.actions .save').on('click', function() {
 				if (monster.ui.valid(vmboxForm)) {
-					var dataToSave = self.vmboxesMergeData(data, templateVMBox, greetingControl, temporaryGreetingControl);
+					var dataToSave = self.vmboxesMergeData(data, templateVMBox, greetingControl, temporaryGreetingControl),
+						$skipInstructionsInput = templateVMBox.find('#skip_instructions_input').val();
+
+					if (dataToSave.announcement_only) {
+						dataToSave.skip_instructions = $skipInstructionsInput === 'true' ? true : false;
+					} else {
+						delete dataToSave.announcement_only;
+					}
 
 					self.vmboxesSaveVmbox(dataToSave, function(data) {
 						callbacks.afterSave && callbacks.afterSave(data);
@@ -225,6 +232,33 @@ define(function(require) {
 				} else {
 					templateVMBox.find('.tabs-selector[data-section="basic"]').click();
 				}
+			});
+
+			templateVMBox.find('#announcement_only').on('click', function() {
+				var $this = $(this),
+					isChecked = $this.prop('checked'),
+					$skipInstructions = templateVMBox.find('#skip_instructions'),
+					$parentDiv = $skipInstructions.parents('label.control-input'),
+					$skipInstructionsInput = templateVMBox.find('#skip_instructions_input').val(),
+					isSkipInstructions = $skipInstructionsInput === 'true' ? true : false,
+					isDisabled = false;
+
+				if (isChecked) {
+					isDisabled = true;
+					isSkipInstructions = true;
+
+					$parentDiv
+						.addClass('disabled');
+				} else {
+					$parentDiv
+						.removeClass('disabled');
+				}
+
+				$skipInstructions
+					.prop('checked', isSkipInstructions);
+
+				$skipInstructions
+					.prop('disabled', isDisabled);
 			});
 
 			templateVMBox.find('#delete_vmbox').on('click', function() {
