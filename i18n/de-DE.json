@@ -717,7 +717,8 @@
 			"text": "Für diesen Benutzer steht ein Anrufbeantworter zur Verfügung.",
 			"label": "Voicemail-zu-Email",
 			"title": "Anrufbeantworter",
-			"vmToEmailHelp": "Für jede neue Sprachnachricht wird eine E-Mail an {{variable}} gesendet. Wenn Sie den Empfänger dieser E-Mail-Benachrichtigungen ändern möchten, bearbeiten Sie bitte die E-Mail-Adresse des Benutzers im Abschnitt Benutzerverwaltung."
+			"vmToEmailHelp": "Für jede neue Sprachnachricht wird eine E-Mail an {{variable}} gesendet. Wenn Sie den Empfänger dieser E-Mail-Benachrichtigungen ändern möchten, bearbeiten Sie bitte die E-Mail-Adresse des Benutzers im Abschnitt Benutzerverwaltung.",
+			"attach_voicemail": "Nachricht der E-Mail beifügen."
 		},
 		"find_me_follow_me": {
 			"title": "Find Me/Follow Me",
