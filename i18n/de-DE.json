@@ -1199,6 +1199,10 @@
 		"noFeatureCodeMessage": "Für Ihren Account sind noch keine Funktionscodes aktiviert. Funktionscodes werden automatisch erstellt, wenn Sie die Seite „Hauptrufnummer“ laden.",
 		"mainNumberLink": "Gehe zu „Hauptrufnummer“",
 		"labels": {
+			"directed_ext_pickup": {
+				"label": "gezielte Anrufübernahme",
+				"tooltip": "Übernahme des an der Nebenstelle eingehenden Anrufs. Wählen Sie *87 und die gewünschte Nebenstellennummer des klingelnden Endgerätes"
+			},
 			"qubicle login": {
 				"label": "Agentenanmeldung",
 				"tooltip": ""
@@ -1415,6 +1419,14 @@
 				"configurable": {
 					"label": "Über Menü konfigurierbar?",
 					"help": " Wenn deaktiviert, kann der Benutzer den Anrufbeantworter nicht über das Menü konfigurieren"
+				},
+				"announceOnly": {
+					"label": "Ansage ohne Aufnahme",
+					"help": "Der Anrufer wird nicht die Möglichkeit haben eine Nachricht zu hinterlassen."
+				},
+				"emailAsAttachment": {
+					"label": "Nachricht der E-Mail beifügen",
+					"help": "Die E-Mail enthält nicht die Voicemail-Nachricht als Anhang."
 				},
 				"__comment": "UI-2634: Unterstützung für WAV, MP4 und MP3 für die Anrufbeantworter-Medienerweiterungen hinzugefügt",
 				"__version": "4.1",
