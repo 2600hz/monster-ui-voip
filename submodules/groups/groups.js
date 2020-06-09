@@ -935,7 +935,7 @@ define(function(require) {
 					}, {
 						dataPath: 'voicemails',
 						label: self.i18n.active().groups.nextAction.voicemails,
-						module: 'voicemails',
+						module: 'voicemail',
 						entityValuePath: 'id',
 						entityLabelPath: 'name'
 					}, {
