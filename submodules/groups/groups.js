@@ -21,7 +21,7 @@ define(function(require) {
 				_groupId = args.groupId,
 				callback = args.callback;
 
-			self.groupsRemoveOverlay();
+			self.overlayRemove();
 
 			self.groupsGetData(function(data) {
 				var hasOldData = _.find(data.callflows, function(callflow) {
@@ -206,7 +206,7 @@ define(function(require) {
 					template.find('.grid-cell').removeClass('active');
 					template.find('.grid-row').removeClass('active');
 
-					self.groupsRemoveOverlay();
+					self.overlayRemove();
 					cell.css({
 						'position': 'inline-block',
 						'z-index': '0'
@@ -239,7 +239,7 @@ define(function(require) {
 
 						row.find('.edit-groups').append(template).slideDown();
 
-						$('body').append($('<div id="groups_container_overlay"></div>'));
+						self.overlayInsert();
 					});
 				}
 			});
@@ -272,7 +272,7 @@ define(function(require) {
 						'z-index': '0'
 					});
 					template.find('.grid-row.active').removeClass('active');
-					self.groupsRemoveOverlay();
+					self.overlayRemove();
 
 					template.find('.grid-cell.active').removeClass('active');
 				});
@@ -324,26 +324,7 @@ define(function(require) {
 				});
 			});
 
-			$('body').on('click', '#groups_container_overlay', function() {
-				template.find('.edit-groups').slideUp('400', function() {
-					$(this).empty();
-				});
-
-				self.groupsRemoveOverlay();
-
-				template.find('.grid-cell.active').css({
-					'position': 'inline-block',
-					'z-index': '0'
-				});
-
-				template.find('.grid-row.active').parent().siblings('.edit-groups').css({
-					'position': 'block',
-					'z-index': '0'
-				});
-
-				template.find('.grid-cell.active').removeClass('active');
-				template.find('.grid-row.active').removeClass('active');
-			});
+			self.overlayBindOnClick(template, 'groups');
 		},
 
 		groupsCreationMergeData: function(data, template) {
@@ -2394,10 +2375,6 @@ define(function(require) {
 			}, function(err, results) {
 				callback && callback(results);
 			});
-		},
-
-		groupsRemoveOverlay: function() {
-			$('body').find('#groups_container_overlay').remove();
 		},
 
 		groupsUpdateOriginalUser: function(userToUpdate, callback) {

@@ -51,7 +51,7 @@ define(function(require) {
 				_sortBy = args.sortBy,
 				callback = args.callback;
 
-			self.usersRemoveOverlay();
+			self.overlayRemove();
 
 			self.usersGetData(function(data) {
 				var dataTemplate = self.usersFormatListData(data, _sortBy),
@@ -592,7 +592,7 @@ define(function(require) {
 					template.find('.grid-cell').removeClass('active');
 					template.find('.grid-row').removeClass('active');
 
-					self.usersRemoveOverlay();
+					self.overlayRemove();
 					cell.css({
 						'position': 'initial',
 						'z-index': '0'
@@ -661,7 +661,7 @@ define(function(require) {
 							$('body').animate({ scrollTop: row.offset().top - (window.innerHeight - row.height() - 10) });
 						});
 
-						$('body').append($('<div id="users_container_overlay"></div>'));
+						self.overlayInsert();
 					});
 				}
 			});
@@ -699,7 +699,7 @@ define(function(require) {
 					});
 					template.find('.grid-row.active').removeClass('active');
 
-					self.usersRemoveOverlay();
+					self.overlayRemove();
 
 					template.find('.grid-cell.active').removeClass('active');
 				});
@@ -1639,26 +1639,7 @@ define(function(require) {
 				}
 			});
 
-			$('body').on('click', '#users_container_overlay', function() {
-				template.find('.edit-user').slideUp('400', function() {
-					$(this).empty();
-				});
-
-				self.usersRemoveOverlay();
-
-				template.find('.grid-cell.active').css({
-					'position': 'inline-block',
-					'z-index': '0'
-				});
-
-				template.find('.grid-row.active').parent().siblings('.edit-user').css({
-					'position': 'block',
-					'z-index': '0'
-				});
-
-				template.find('.grid-cell.active').removeClass('active');
-				template.find('.grid-row.active').removeClass('active');
-			});
+			self.overlayBindOnClick(template, 'user');
 		},
 
 		usersBindAddUserEvents: function(args) {
@@ -5429,10 +5410,6 @@ define(function(require) {
 			}
 
 			return result;
-		},
-
-		usersRemoveOverlay: function() {
-			$('body').find('#users_container_overlay').remove();
 		},
 
 		usersResetPassword: function(data, callback) {
