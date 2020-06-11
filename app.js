@@ -152,6 +152,48 @@ define(function(require) {
 				container.empty();
 				monster.pub('voip.' + id + '.render', args);
 			});
+		},
+
+		overlayInsert: function() {
+			$('#monster_content')
+				.append($('<div>', {
+					id: 'voip_container_overlay'
+				}));
+		},
+
+		overlayRemove: function() {
+			$('#monster_content')
+				.find('#voip_container_overlay')
+					.remove();
+		},
+
+		/**
+		 * @param  {jQuery} $template
+		 * @param  {String} entityId
+		 */
+		overlayBindOnClick: function($template, entityId) {
+			var self = this,
+				editContainerClass = '.edit-' + entityId;
+
+			$('#monster_content').on('click', '#voip_container_overlay', function() {
+				$template.find(editContainerClass).slideUp('400', function() {
+					$(this).empty();
+				});
+
+				self.overlayRemove();
+
+				$template.find('.grid-cell.active').css({
+					'z-index': '0'
+				});
+
+				$template.find('.grid-row.active').parent().siblings(editContainerClass).css({
+					'z-index': '0'
+				});
+
+				$template
+					.find('.grid-cell.active, .grid-row.active')
+						.removeClass('active');
+			});
 		}
 	};
 
