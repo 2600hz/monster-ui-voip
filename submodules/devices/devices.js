@@ -940,6 +940,11 @@ define(function(require) {
 					['brands', _.get(data.device, 'provision.endpoint_brand'), 'keyFunctions'],
 					[]
 				),
+				defaultLineKeys = _.get(
+					self.appFlags.devices.provisionerConfigFlags,
+					['brands', _.get(data.device, 'provision.endpoint_brand'), 'lineKeys'],
+					[1]
+				),
 				isClassifierDisabledByAccount = function isClassifierDisabledByAccount(classifier) {
 					return _.get(data.accountLimits, ['call_restriction', classifier, 'action']) === 'deny';
 				},
@@ -1066,6 +1071,7 @@ define(function(require) {
 								return _.merge({
 									id: type,
 									type: camelCasedType,
+									lineKeys: defaultLineKeys,
 									actions: _
 										.chain([
 											'presence',
@@ -1096,10 +1102,10 @@ define(function(require) {
 												: a.label.localeCompare(b.label, monster.config.whitelabel.language);
 										})
 										.value(),
-									data: _.map(entries, function(metadata) {
+									data: _.map(entries, function(metadata, idx) {
 										var value = _.get(metadata, 'value', {});
 
-										return _.merge({}, metadata, _.isPlainObject(value)
+										return _.merge({ keyNumber: idx + 1 }, metadata, _.isPlainObject(value)
 											? {}
 											: {
 												value: {
