@@ -348,13 +348,13 @@
 				</div>
 				<div class="section-content">
 				{{#each data}}
-					<div class="control-group{{#compare ../id '===' 'combo_keys'}}{{#if @first}} warning{{/if}}{{/compare}}" data-id="{{@index}}">
+					<div class="control-group{{#compare ../id '===' 'combo_keys'}}{{#ifInArray keyNumber ../lineKeys}} warning{{/ifInArray}}{{/compare}}" data-id="{{@index}}">
 						<label for="provision.keys.{{../id}}[{{@index}}].type" class="control-label">
 							{{telicon 'drag-handle' class='drag-handle-icon'}}
-							<span>{{ ../label }}</span> <span class="feature-key-index">{{@index}}</span>
+							<span>{{ ../label }} {{keyNumber}}</span>
 						</label>
 						{{#compare ../id '===' 'combo_keys'}}
-							{{#monsterPanelText @root.i18n.devices.popupSettings.keys.alert.title 'warning' 'fill-width'}}
+							{{#monsterPanelText (replaceVar @root.i18n.devices.popupSettings.keys.alert.title keyNumber) 'warning' 'fill-width'}}
 								{{@root.i18n.devices.popupSettings.keys.alert.message}}
 							{{/monsterPanelText}}
 						{{/compare}}
