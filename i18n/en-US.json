@@ -297,7 +297,7 @@
 			"keys": {
 				"alert": {
 					"message": "By default, this key will be used as a Line Key. It is strongly recommended that you not change it.",
-					"title": "Key 1 Default"
+					"title": "Key {{variable}} Default"
 				},
 				"featureKeys": {
 					"menuTitle": "Feature Keys",
