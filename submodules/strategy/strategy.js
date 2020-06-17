@@ -3467,88 +3467,82 @@ define(function(require) {
 					'voicemail[action=check]',
 					'voicemail[single_mailbox_login]'
 				],
-				expectedFeaturedCodes = _.keyBy(self.featureCodes, 'name');
+				expectedFeaturedCodes = _.keyBy(self.featureCodes, 'name'),
+				isFeatureCodeMalformed = function isFeatureCodeMalformed(featureCode) {
+					var name = featureCode.featurecode.name;
+					return !_.includes(
+						_.get(featureCode, 'patterns', []),
+						_.get(expectedFeaturedCodes, [name, 'pattern'])
+					) && _.includes(featureCodesToUpdate, name);
+				},
+				createFeatureCodeFactory = function createFeatureCodeFactory(featureCode) {
+					return function(callback) {
+						self.strategyCreateCallflow({
+							data: {
+								data: _.merge({
+									flow: _.merge({
+										children: {},
+										data: _.get(featureCode, 'extraData', {}),
+										module: featureCode.moduleName
+									}, _.has(featureCode, 'actionName') && {
+										data: {
+											action: featureCode.actionName
+										}
+									}),
+									featurecode: _.pick(featureCode, [
+										'name',
+										'number'
+									])
+								}, _.has(featureCode, 'pattern') ? {
+									patterns: [featureCode.pattern]
+								} : {
+									numbers: [featureCode.callflowNumber]
+								})
+							},
+							success: _.partial(callback, null),
+							error: _.partial(callback, true)
+						});
+					};
+				},
+				patchFeatureCodeFactory = function patchFeatureCodeFactory(featureCode) {
+					return function(callback) {
+						self.strategyPatchCallflow({
+							data: {
+								callfowId: featureCode.id,
+								data: {
+									patterns: [_.get(expectedFeaturedCodes, [featureCode.featurecode.name, 'pattern'])],
+									numbers: []
+								}
+							},
+							callback: _.partial(callback, null)
+						});
+					};
+				};
 
 			monster.waterfall([
 				function(callback) {
-					self.strategyGetFeatureCodes(function(featureCodes) {
-						callback(null, featureCodes);
-					});
+					self.strategyGetFeatureCodes(_.partial(callback, null));
 				},
 				function(featureCodes, callback) {
 					var featureCodeNames = _.map(featureCodes, 'featurecode.name');
 
 					monster.parallel(_
 						.chain(self.featureCodes)
-						.reject(function(featureCode) {
-							return _.includes(featureCodeNames, featureCode.name);
-						})
-						.map(function(featureCode) {
-							var newCallflow = {
-								flow: {
-									children: {},
-									data: _.get(featureCode, 'extraData', {}),
-									module: featureCode.moduleName
-								},
-								featurecode: {
-									name: featureCode.name,
-									number: featureCode.number
-								}
-							};
-
-							if (_.has(featureCode, 'actionName')) {
-								_.set(newCallflow, 'flow.data.action', featureCode.actionName);
-							}
-							if (_.has(featureCode, 'pattern')) {
-								_.set(newCallflow, 'patterns', [featureCode.pattern]);
-							} else {
-								_.set(newCallflow, 'numbers', [featureCode.callflowNumber]);
-							}
-
-							return function(parallelCallback) {
-								self.strategyCreateCallflow({
-									data: {
-										data: newCallflow
-									},
-									success: function() {
-										parallelCallback(null);
-									}
-								});
-							};
-						})
+						.reject(_.flow([
+							_.partial(_.get, _, 'name'),
+							_.partial(_.includes, featureCodeNames)
+						]))
+						.map(createFeatureCodeFactory)
 						.value()
-					, function() {
-						callback(null, featureCodes);
-					});
+					, _.partial(callback, null, featureCodes));
 				},
 				function(featureCodes, callback) {
-					monster.parallel(
-						_.chain(featureCodes)
-						.filter(function(featureCode) {
-							return !_.includes(
-								_.get(featureCode, 'patterns', []),
-								_.get(expectedFeaturedCodes, [featureCode.featurecode.name, 'pattern'])
-							) && _.includes(featureCodesToUpdate, featureCode.featurecode.name);
-						})
-						.map(function(featureCode) {
-							return function(parallelCallback) {
-								self.strategyPatchCallflow({
-									data: {
-										callflowId: featureCode.id,
-										data: {
-											patterns: [_.get(expectedFeaturedCodes, [featureCode.featurecode.name, 'pattern'])],
-											numbers: []
-										}
-									},
-									callback: function() {
-										parallelCallback(null);
-									}
-								});
-							};
-						})
-						.value(),
-						callback
-					);
+					monster.parallel(_
+						.chain(featureCodes)
+						.filter(isFeatureCodeMalformed)
+						.map(patchFeatureCodeFactory)
+						.value()
+					, callback);
 				}
 			]);
 		},
