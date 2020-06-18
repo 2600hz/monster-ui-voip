@@ -3734,180 +3734,177 @@ define(function(require) {
 
 		strategyGetCallEntities: function(callback) {
 			var self = this;
-			monster.parallel(
-				{
-					callQueues: function(_callback) {
-						self.strategyListCallflows({
-							filters: {
-								'filter_flow.module': 'qubicle'
-							},
-							success: function(callQueuesData) {
-								_callback(null, callQueuesData);
-							}
-						});
-					},
-					users: function(_callback) {
-						self.callApi({
-							resource: 'user.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									paginate: 'false'
-								}
-							},
-							success: function(data, status) {
-								_callback(null, data.data);
-							}
-						});
-					},
-					media: function(callback) {
-						self.strategyListMedia(function(media) {
-							callback(null, media);
-						});
-					},
-					userCallflows: function(_callback) {
-						self.callApi({
-							resource: 'callflow.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									has_key: 'owner_id',
-									filter_type: 'mainUserCallflow',
-									paginate: 'false'
-								}
-							},
-							success: function(data, status) {
-								var mapCallflowsByOwnerId = _.keyBy(data.data, 'owner_id');
-								_callback(null, mapCallflowsByOwnerId);
-							}
-						});
-					},
-					groups: function(_callback) {
-						self.callApi({
-							resource: 'group.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									paginate: 'false'
-								}
-							},
-							success: function(data, status) {
-								_callback(null, data.data);
-							}
-						});
-					},
-					ringGroups: function(_callback) {
-						self.callApi({
-							resource: 'callflow.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									'has_key': 'group_id',
-									'filter_type': 'baseGroup'
-								}
-							},
-							success: function(data, status) {
-								_callback(null, data.data);
-							}
-						});
-					},
-					userGroups: function(_callback) {
-						self.callApi({
-							resource: 'callflow.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									'has_key': 'group_id',
-									'filter_type': 'userGroup'
-								}
-							},
-							success: function(data, status) {
-								_callback(null, data.data);
-							}
-						});
-					},
-					devices: function(_callback) {
-						self.callApi({
-							resource: 'device.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									paginate: 'false'
-								}
-							},
-							success: function(data, status) {
-								_callback(null, data.data);
-							}
-						});
-					},
-					advancedCallflows: function(_callback) {
-						self.strategyListCallflows({
-							filters: {
-								'filter_ui_is_main_number_cf': true
-							},
-							success: function(advancedCallflowsData) {
-								_callback(null, advancedCallflowsData);
-							}
-						});
-					}
+			monster.parallel({
+				callQueues: function(_callback) {
+					self.strategyListCallflows({
+						filters: {
+							'filter_flow.module': 'qubicle'
+						},
+						success: function(callQueuesData) {
+							_callback(null, callQueuesData);
+						}
+					});
 				},
-				function(err, results) {
-					var callEntities = {
-						qubicle: results.callQueues,
-						device: results.devices,
-						user: $.extend(true, [], results.users),
-						play: results.media,
-						userCallflows: [],
-						ring_group: [],
-						userGroups: $.map(results.userGroups, function(val) {
-							var group = _.find(results.groups, function(group) { return val.group_id === group.id; });
-							val.name = group && (group.name || val.name);
-							val.module = 'callflow';
-							return val;
-						}),
-						advancedCallflows: results.advancedCallflows
-					};
-
-					_.forEach(callEntities.qubicle, function(queue) {
-						queue.module = 'callflow';
-					});
-
-					_.each(callEntities.play, function(media) {
-						media.module = 'play';
-					});
-
-					_.each(callEntities.device, function(device) {
-						device.module = 'device';
-					});
-
-					_.each(results.users, function(user) {
-						if (results.userCallflows.hasOwnProperty(user.id)) {
-							user.id = results.userCallflows[user.id].id;
-							user.module = 'callflow';
-						} else {
-							user.module = 'user';
+				users: function(_callback) {
+					self.callApi({
+						resource: 'user.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								paginate: 'false'
+							}
+						},
+						success: function(data, status) {
+							_callback(null, data.data);
 						}
-						callEntities.userCallflows.push(user);
 					});
-
-					_.each(results.groups, function(group) {
-						var ringGroup = _.find(results.ringGroups, function(ringGroup) { return ringGroup.group_id === group.id; });
-						if (ringGroup) {
-							group.id = ringGroup.id;
-							group.module = 'callflow';
-						} else {
-							group.module = 'ring_group';
+				},
+				media: function(callback) {
+					self.strategyListMedia(function(media) {
+						callback(null, media);
+					});
+				},
+				userCallflows: function(_callback) {
+					self.callApi({
+						resource: 'callflow.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								has_key: 'owner_id',
+								filter_type: 'mainUserCallflow',
+								paginate: 'false'
+							}
+						},
+						success: function(data, status) {
+							var mapCallflowsByOwnerId = _.keyBy(data.data, 'owner_id');
+							_callback(null, mapCallflowsByOwnerId);
 						}
-						callEntities.ring_group.push(group);
 					});
-
-					_.each(results.advancedCallflows, function(callflow) {
-						callflow.module = 'callflow';
+				},
+				groups: function(_callback) {
+					self.callApi({
+						resource: 'group.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								paginate: 'false'
+							}
+						},
+						success: function(data, status) {
+							_callback(null, data.data);
+						}
 					});
-
-					callback(callEntities);
+				},
+				ringGroups: function(_callback) {
+					self.callApi({
+						resource: 'callflow.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								'has_key': 'group_id',
+								'filter_type': 'baseGroup'
+							}
+						},
+						success: function(data, status) {
+							_callback(null, data.data);
+						}
+					});
+				},
+				userGroups: function(_callback) {
+					self.callApi({
+						resource: 'callflow.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								'has_key': 'group_id',
+								'filter_type': 'userGroup'
+							}
+						},
+						success: function(data, status) {
+							_callback(null, data.data);
+						}
+					});
+				},
+				devices: function(_callback) {
+					self.callApi({
+						resource: 'device.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								paginate: 'false'
+							}
+						},
+						success: function(data, status) {
+							_callback(null, data.data);
+						}
+					});
+				},
+				advancedCallflows: function(_callback) {
+					self.strategyListCallflows({
+						filters: {
+							'filter_ui_is_main_number_cf': true
+						},
+						success: function(advancedCallflowsData) {
+							_callback(null, advancedCallflowsData);
+						}
+					});
 				}
-			);
+			}, function(err, results) {
+				var callEntities = {
+					qubicle: results.callQueues,
+					device: results.devices,
+					user: $.extend(true, [], results.users),
+					play: results.media,
+					userCallflows: [],
+					ring_group: [],
+					userGroups: $.map(results.userGroups, function(val) {
+						var group = _.find(results.groups, function(group) { return val.group_id === group.id; });
+						val.name = group && (group.name || val.name);
+						val.module = 'callflow';
+						return val;
+					}),
+					advancedCallflows: results.advancedCallflows
+				};
+
+				_.forEach(callEntities.qubicle, function(queue) {
+					queue.module = 'callflow';
+				});
+
+				_.each(callEntities.play, function(media) {
+					media.module = 'play';
+				});
+
+				_.each(callEntities.device, function(device) {
+					device.module = 'device';
+				});
+
+				_.each(results.users, function(user) {
+					if (results.userCallflows.hasOwnProperty(user.id)) {
+						user.id = results.userCallflows[user.id].id;
+						user.module = 'callflow';
+					} else {
+						user.module = 'user';
+					}
+					callEntities.userCallflows.push(user);
+				});
+
+				_.each(results.groups, function(group) {
+					var ringGroup = _.find(results.ringGroups, function(ringGroup) { return ringGroup.group_id === group.id; });
+					if (ringGroup) {
+						group.id = ringGroup.id;
+						group.module = 'callflow';
+					} else {
+						group.module = 'ring_group';
+					}
+					callEntities.ring_group.push(group);
+				});
+
+				_.each(results.advancedCallflows, function(callflow) {
+					callflow.module = 'callflow';
+				});
+
+				callback(callEntities);
+			});
 		},
 
 		strategyGetVoicesmailBoxes: function(callback) {
