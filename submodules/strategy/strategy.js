@@ -3850,60 +3850,51 @@ define(function(require) {
 					});
 				}
 			}, function(err, results) {
-				var callEntities = {
-					qubicle: results.callQueues,
-					device: results.devices,
-					user: $.extend(true, [], results.users),
-					play: results.media,
-					userCallflows: [],
-					ring_group: [],
-					userGroups: $.map(results.userGroups, function(val) {
-						var group = _.find(results.groups, function(group) { return val.group_id === group.id; });
-						val.name = group && (group.name || val.name);
-						val.module = 'callflow';
-						return val;
+				callback({
+					advancedCallflows: _.map(results.advancedCallflows, function(callflow) {
+						return _.merge({
+							module: 'callflow'
+						}, callflow);
 					}),
-					advancedCallflows: results.advancedCallflows
-				};
+					device: _.map(results.devices, function(device) {
+						return _.merge({
+							module: 'device'
+						}, device);
+					}),
+					qubicle: _.map(results.callQueues, function(callQueue) {
+						return _.merge({
+							module: 'callflow'
+						}, callQueue);
+					}),
+					play: _.map(results.media, function(media) {
+						return _.merge({
+							module: 'play'
+						}, media);
+					}),
+					ring_group: _.map(results.groups, function(group) {
+						var ringGroup = _.find(results.ringGroups, { group_id: group.id });
 
-				_.forEach(callEntities.qubicle, function(queue) {
-					queue.module = 'callflow';
+						return _.merge({}, group, {
+							id: _.get(ringGroup, 'id', group.id),
+							module: _.isUndefined(ringGroup) ? 'ring_group' : 'callflow'
+						});
+					}),
+					user: results.users,
+					userCallflows: _.map(results.users, function(user) {
+						return _.merge({}, user, {
+							id: _.get(results.userCallflows, [user.id, 'id'], user.id),
+							module: _.has(results.userCallflows, user.id) ? 'callflow' : 'user'
+						});
+					}),
+					userGroups: _.map(results.userGroups, function(userGroup) {
+						var group = _.find(results.groups, { id: userGroup.group_id });
+
+						return _.merge({}, userGroup, {
+							name: _.get(group, 'name', userGroup.name),
+							module: 'callflow'
+						});
+					})
 				});
-
-				_.each(callEntities.play, function(media) {
-					media.module = 'play';
-				});
-
-				_.each(callEntities.device, function(device) {
-					device.module = 'device';
-				});
-
-				_.each(results.users, function(user) {
-					if (results.userCallflows.hasOwnProperty(user.id)) {
-						user.id = results.userCallflows[user.id].id;
-						user.module = 'callflow';
-					} else {
-						user.module = 'user';
-					}
-					callEntities.userCallflows.push(user);
-				});
-
-				_.each(results.groups, function(group) {
-					var ringGroup = _.find(results.ringGroups, function(ringGroup) { return ringGroup.group_id === group.id; });
-					if (ringGroup) {
-						group.id = ringGroup.id;
-						group.module = 'callflow';
-					} else {
-						group.module = 'ring_group';
-					}
-					callEntities.ring_group.push(group);
-				});
-
-				_.each(results.advancedCallflows, function(callflow) {
-					callflow.module = 'callflow';
-				});
-
-				callback(callEntities);
 			});
 		},
 
