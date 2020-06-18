@@ -438,9 +438,13 @@ define(function(require) {
 				// if it's a "main leg" we sort by descending timestamp.
 				// if it's a "detail leg", then it has a channelCreatedTime attribute set, and we sort on this as it's more precise. We sort it ascendingly so the details of the calls go from top to bottom in the UI
 				.sort(function(a, b) {
-					return (a.hasOwnProperty('channelCreatedTime') && b.hasOwnProperty('channelCreatedTime'))
-						? (a.channelCreatedTime > b.channelCreatedTime ? 1 : -1)
-						: (a.timestamp > b.timestamp ? -1 : 1);
+					var isMainLeg = !_.every([a, b], _.partial(_.has, _, 'channelCreatedTime')),
+						aTime = isMainLeg ? a.timestamp : b.channelCreatedTime,
+						bTime = isMainLeg ? b.timestamp : a.channelCreatedTime;
+
+					return aTime > bTime ? -1
+						: bTime < aTime ? 1
+						: 0;
 				})
 				.value();
 		},
