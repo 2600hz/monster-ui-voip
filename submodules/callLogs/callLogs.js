@@ -1,6 +1,7 @@
 define(function(require) {
 	var $ = require('jquery'),
 		_ = require('lodash'),
+		jstz = require('jstz'),
 		monster = require('monster');
 
 	var app = {
@@ -302,7 +303,7 @@ define(function(require) {
 
 			if (type === 'thisWeek') {
 				// First we need to know how many days separate today and monday.
-					// Since Sunday is 0 and Monday is 1, we do this little substraction to get the result.
+				// Since Sunday is 0 and Monday is 1, we do this little substraction to get the result.
 				var day = from.getDay(),
 					countDaysFromMonday = (day || 7) - 1;
 
