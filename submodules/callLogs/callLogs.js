@@ -384,19 +384,7 @@ define(function(require) {
 						durationSec = (cdr.duration_seconds % 60 < 10 ? '0' : '') + (cdr.duration_seconds % 60),
 						hangupI18n = self.i18n.active().hangupCauses,
 						isOutboundCall = 'authorizing_id' in cdr && cdr.authorizing_id.length > 0,
-						device = _.get(self.appFlags.callLogs.devices, _.get(cdr, 'custom_channel_vars.authorizing_id')),
-						// Only display help if it's in the i18n.
-						hangupHelp = (function() {
-							if (hangupI18n.hasOwnProperty(cdr.hangup_cause)) {
-								if (isOutboundCall && hangupI18n[cdr.hangup_cause].hasOwnProperty('outbound')) {
-									return hangupI18n[cdr.hangup_cause].outbound;
-								} else if (!isOutboundCall && hangupI18n[cdr.hangup_cause].hasOwnProperty('inbound')) {
-									return hangupI18n[cdr.hangup_cause].inbound;
-								}
-								return '';
-							}
-							return '';
-						}());
+						device = _.get(self.appFlags.callLogs.devices, _.get(cdr, 'custom_channel_vars.authorizing_id'));
 
 					return _.merge({
 						id: cdr.id,
@@ -409,11 +397,13 @@ define(function(require) {
 						toName: cdr.callee_id_name,
 						toNumber: cdr.callee_id_number || ('request' in cdr) ? cdr.request.replace(/@.*/, '') : cdr.to.replace(/@.*/, ''),
 						duration: durationMin + ':' + durationSec,
-						hangupCause: _.chain(self.i18n.active().hangupCauses[cdr.hangup_cause])
-							.get('label', cdr.hangup_cause)
+						hangupCause: _
+							.chain(hangupI18n)
+							.get([cdr.hangup_cause, 'label'], cdr.hangup_cause)
 							.lowerCase()
 							.value(),
-						hangupHelp: hangupHelp,
+						// Only display help if it's in the i18n.
+						hangupHelp: _.get(hangupI18n, [cdr.hangup_cause, isOutboundCall ? 'outbound' : 'inbound'], ''),
 						isOutboundCall: isOutboundCall,
 						mailtoLink: 'mailto:' + monster.config.whitelabel.callReportEmail
 								+ '?subject=Call Report: ' + cdr.call_id
