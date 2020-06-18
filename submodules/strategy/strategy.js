@@ -3981,26 +3981,17 @@ define(function(require) {
 		strategyRebuildMainCallflowRuleArray: function(strategyData) {
 			var self = this,
 				mainCallflow = strategyData.callflows.MainCallflow,
-				rules = strategyData.temporalRules,
-				ruleArray = [];
+				rules = strategyData.temporalRules;
 
-			_.each(rules.holidays, function(val, key) {
-				if (val.id in mainCallflow.flow.children) {
-					ruleArray.push(val.id);
-				}
-			});
-
-			if (rules.lunchbreak.id in mainCallflow.flow.children) {
-				ruleArray.push(rules.lunchbreak.id);
-			}
-
-			_.each(rules.weekdays, function(val, key) {
-				if (val.id in mainCallflow.flow.children) {
-					ruleArray.push(val.id);
-				}
-			});
-
-			mainCallflow.flow.data.rules = ruleArray;
+			mainCallflow.flow.data.rules = _
+				.chain([
+					_.map(rules.holidays, 'id'),
+					_.has(rules.lunchbreak, 'id') ? [rules.lunchbreak.id] : [],
+					_.map(rules.weekdays, 'id')
+				])
+				.flatten()
+				.filter(_.partial(_.has, mainCallflow.flow.children))
+				.value();
 		},
 
 		strategyListCallflows: function(args) {
