@@ -111,11 +111,9 @@ define(function(require) {
 		vmboxesMigrateData: function(data) {
 			var self = this;
 
-			if (data.hasOwnProperty('notify_email_address')) {
-				data.notify_email_addresses = data.notify_email_address;
-			}
-
-			return data;
+			return _.merge({}, data, _.has(data, 'notify_email_address') && {
+				notify_email_addresses: data.notify_email_address
+			});
 		},
 
 		vmboxesRenderVmbox: function(data, callback) {
