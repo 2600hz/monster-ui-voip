@@ -4032,12 +4032,14 @@ define(function(require) {
 
 			self.callApi(_.merge({
 				resource: 'callflow.create',
-				data: {
-					accountId: self.accountId,
-					data: args.data.data
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
+				success: function(data) {
+					_.has(args, 'success') && args.success(data.data);
 				},
-				success: function(callflowData) {
-					args.hasOwnProperty('success') && args.success(callflowData.data);
+				error: function(parsedError) {
+					_.has(args, 'error') && args.error(parsedError);
 				}
 			}, _.has(args, 'bypassProgressIndicator') && {
 				bypassProgressIndicator: true
