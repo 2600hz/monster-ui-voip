@@ -2486,28 +2486,25 @@ define(function(require) {
 
 		usersFormatCallForwardData: function(user) {
 			var self = this,
-				cfMode = 'off';
-
-			user.extra = user.extra || {};
+				isCallForwardConfigured = _.has(user, 'call_forward.enabled'),
+				isCallForwardEnabled = _.get(user, 'call_forward.enabled', false),
+				isFailoverEnabled = _.get(user, 'call_forward.failover', false);
 
 			//cfmode is on if call_forward.enabled = true
 			//cfmode is failover if call_forward.enabled = false & call_forward.failover = true
 			//cfmode is off if call_forward.enabled = false & call_forward.failover = false
-			if (user.hasOwnProperty('call_forward') && user.call_forward.hasOwnProperty('enabled')) {
-				if (user.call_forward.enabled === true) {
-					cfMode = 'on';
-				} else if (user.call_forward.enabled === false) {
-					cfMode = user.call_forward.hasOwnProperty('failover') && user.call_forward.failover === true ? 'failover' : 'off';
+			return _.merge({}, user, _.merge({
+				extra: {
+					callForwardMode: !isCallForwardConfigured ? 'off'
+					: isCallForwardEnabled ? 'on'
+					: isFailoverEnabled ? 'failover'
+					: 'off'
 				}
-
-				if (_.has(user.call_forward, 'number')) {
-					user.call_forward.number = monster.util.unformatPhoneNumber(user.call_forward.number);
-				}
-			}
-
-			user.extra.callForwardMode = cfMode;
-
-			return user;
+			}, isCallForwardConfigured && {
+				call_forward: _.merge({}, _.has(user, 'call_forward.number') && {
+					number: monster.util.unformatPhoneNumber(user.call_forward.number)
+				})
+			}));
 		},
 
 		usersRenderCallForward: function(currentUser) {
