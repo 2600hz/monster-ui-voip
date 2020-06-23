@@ -2427,7 +2427,7 @@ define(function(require) {
 		usersRenderCallerId: function(currentUser, numberChoices) {
 			var self = this,
 				allowAnyOwnedNumberAsCallerID = monster.config.whitelabel && monster.config.whitelabel.allowAnyOwnedNumberAsCallerID ? true : false,
-				templateUser = $.extend(true, {allowAnyOwnedNumberAsCallerID: allowAnyOwnedNumberAsCallerID}, currentUser),
+				templateUser = $.extend(true, { allowAnyOwnedNumberAsCallerID: allowAnyOwnedNumberAsCallerID }, currentUser),
 				featureTemplate,
 				switchFeature;
 
@@ -2591,7 +2591,6 @@ define(function(require) {
 					if (timeoutWarningBox.is(':visible')) {
 						args.openedTab = 'name';
 					}
-
 
 					self.usersUpdateUser(userToSave, function(data) {
 						args.userId = data.data.id;
@@ -3485,7 +3484,7 @@ define(function(require) {
 					}
 				});
 
-				timezone.populateDropdown(template.find('#user_timezone'), dataTemplate.timezone || 'inherit', {inherit: self.i18n.active().defaultTimezone});
+				timezone.populateDropdown(template.find('#user_timezone'), dataTemplate.timezone || 'inherit', { inherit: self.i18n.active().defaultTimezone });
 
 				monster.ui.tooltips(template, {
 					options: {
