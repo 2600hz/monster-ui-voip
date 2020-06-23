@@ -1,6 +1,7 @@
 define(function(require) {
 	var $ = require('jquery'),
 		_ = require('lodash'),
+		jstz = require('jstz'),
 		monster = require('monster');
 
 	var app = {
@@ -302,7 +303,7 @@ define(function(require) {
 
 			if (type === 'thisWeek') {
 				// First we need to know how many days separate today and monday.
-					// Since Sunday is 0 and Monday is 1, we do this little substraction to get the result.
+				// Since Sunday is 0 and Monday is 1, we do this little substraction to get the result.
 				var day = from.getDay(),
 					countDaysFromMonday = (day || 7) - 1;
 
@@ -360,7 +361,6 @@ define(function(require) {
 
 		callLogsFormatCdrs: function(cdrs) {
 			var self = this,
-				result = [],
 				deviceIcons = {
 					'cellphone': 'fa fa-phone',
 					'smartphone': 'icon-telicon-mobile-phone',
@@ -372,27 +372,21 @@ define(function(require) {
 					'fax': 'icon-telicon-fax',
 					'ata': 'icon-telicon-ata',
 					'unknown': 'fa fa-circle'
-				},
-				formatCdr = function(cdr) {
+				};
+
+			return _
+				.chain(cdrs)
+				.map(function(cdr) {
 					var date = cdr.hasOwnProperty('channel_created_time') ? monster.util.unixToDate(cdr.channel_created_time, true) : monster.util.gregorianToDate(cdr.timestamp),
 						shortDate = monster.util.toFriendlyDate(date, 'shortDate'),
 						time = monster.util.toFriendlyDate(date, 'time'),
 						durationMin = parseInt(cdr.duration_seconds / 60).toString(),
 						durationSec = (cdr.duration_seconds % 60 < 10 ? '0' : '') + (cdr.duration_seconds % 60),
 						hangupI18n = self.i18n.active().hangupCauses,
-						hangupHelp = '',
-						isOutboundCall = 'authorizing_id' in cdr && cdr.authorizing_id.length > 0;
+						isOutboundCall = 'authorizing_id' in cdr && cdr.authorizing_id.length > 0,
+						device = _.get(self.appFlags.callLogs.devices, _.get(cdr, 'custom_channel_vars.authorizing_id'));
 
-					// Only display help if it's in the i18n.
-					if (hangupI18n.hasOwnProperty(cdr.hangup_cause)) {
-						if (isOutboundCall && hangupI18n[cdr.hangup_cause].hasOwnProperty('outbound')) {
-							hangupHelp += hangupI18n[cdr.hangup_cause].outbound;
-						} else if (!isOutboundCall && hangupI18n[cdr.hangup_cause].hasOwnProperty('inbound')) {
-							hangupHelp += hangupI18n[cdr.hangup_cause].inbound;
-						}
-					}
-
-					var call = {
+					return _.merge({
 						id: cdr.id,
 						callId: cdr.call_id,
 						timestamp: cdr.timestamp,
@@ -403,11 +397,13 @@ define(function(require) {
 						toName: cdr.callee_id_name,
 						toNumber: cdr.callee_id_number || ('request' in cdr) ? cdr.request.replace(/@.*/, '') : cdr.to.replace(/@.*/, ''),
 						duration: durationMin + ':' + durationSec,
-						hangupCause: _.chain(self.i18n.active().hangupCauses[cdr.hangup_cause])
-							.get('label', cdr.hangup_cause)
+						hangupCause: _
+							.chain(hangupI18n)
+							.get([cdr.hangup_cause, 'label'], cdr.hangup_cause)
 							.lowerCase()
 							.value(),
-						hangupHelp: hangupHelp,
+						// Only display help if it's in the i18n.
+						hangupHelp: _.get(hangupI18n, [cdr.hangup_cause, isOutboundCall ? 'outbound' : 'inbound'], ''),
 						isOutboundCall: isOutboundCall,
 						mailtoLink: 'mailto:' + monster.config.whitelabel.callReportEmail
 								+ '?subject=Call Report: ' + cdr.call_id
@@ -425,41 +421,32 @@ define(function(require) {
 								+ '%0D%0AOther Leg Call ID: ' + (cdr.other_leg_call_id || '')
 								+ '%0D%0AHandling Server: ' + (cdr.media_server || '')
 								+ '%0D%0ATimestamp: ' + (cdr.timestamp || '')
-					};
+					}, _.has(cdr, 'channel_created_time') && {
+						channelCreatedTime: cdr.channel_created_time
+					}, !_.isUndefined(device) && {
+						formatted: _.merge({
+							deviceIcon: deviceIcons[device.device_type],
+							deviceTooltip: self.i18n.active().devices.types[device.device_type]
+						}, cdr.call_direction === 'inbound' ? {
+							fromDeviceName: device.name
+						} : {
+							toDeviceName: device.name
+						})
+					});
+				})
+				// In this automagic function... if field doesn't have channelCreateTime, it's because it's a "Main Leg" (legs listed on the first listing, not details)
+				// if it's a "main leg" we sort by descending timestamp.
+				// if it's a "detail leg", then it has a channelCreatedTime attribute set, and we sort on this as it's more precise. We sort it ascendingly so the details of the calls go from top to bottom in the UI
+				.sort(function(a, b) {
+					var isMainLeg = !_.every([a, b], _.partial(_.has, _, 'channelCreatedTime')),
+						aTime = isMainLeg ? a.timestamp : b.channelCreatedTime,
+						bTime = isMainLeg ? b.timestamp : a.channelCreatedTime;
 
-					if (cdr.hasOwnProperty('channel_created_time')) {
-						call.channelCreatedTime = cdr.channel_created_time;
-					}
-
-					if (cdr.hasOwnProperty('custom_channel_vars') && cdr.custom_channel_vars.hasOwnProperty('authorizing_id') && self.appFlags.callLogs.devices.hasOwnProperty(cdr.custom_channel_vars.authorizing_id)) {
-						var device = self.appFlags.callLogs.devices[cdr.custom_channel_vars.authorizing_id];
-
-						call.formatted = call.formatted || {};
-						call.formatted.deviceIcon = deviceIcons[device.device_type];
-						call.formatted.deviceTooltip = self.i18n.active().devices.types[device.device_type];
-
-						if (cdr.call_direction === 'inbound') {
-							call.formatted.fromDeviceName = device.name;
-						} else {
-							call.formatted.toDeviceName = device.name;
-						}
-					}
-
-					return call;
-				};
-
-			_.each(cdrs, function(v) {
-				result.push(formatCdr(v));
-			});
-
-			// In this automagic function... if field doesn't have channelCreateTime, it's because it's a "Main Leg" (legs listed on the first listing, not details)
-			// if it's a "main leg" we sort by descending timestamp.
-			// if it's a "detail leg", then it has a channelCreatedTime attribute set, and we sort on this as it's more precise. We sort it ascendingly so the details of the calls go from top to bottom in the UI
-			result.sort(function(a, b) {
-				return (a.hasOwnProperty('channelCreatedTime') && b.hasOwnProperty('channelCreatedTime')) ? (a.channelCreatedTime > b.channelCreatedTime ? 1 : -1) : (a.timestamp > b.timestamp ? -1 : 1);
-			});
-
-			return result;
+					return aTime > bTime ? -1
+						: bTime < aTime ? 1
+						: 0;
+				})
+				.value();
 		},
 
 		callLogsShowDetailsPopup: function(callLogId) {
