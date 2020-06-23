@@ -2022,32 +2022,27 @@ define(function(require) {
 		},
 
 		usersFormatFaxingData: function(data) {
-			var tempList = [],
-				listNumbers = {};
-
-			_.each(data.numbers, function(val, key) {
-				tempList.push(key);
-			});
-
-			tempList.sort(function(a, b) {
-				return a < b ? -1 : 1;
-			});
-
-			if (data.callflows) {
-				if (data.callflows.numbers.length > 0) {
-					listNumbers[data.callflows.numbers[0]] = data.callflows.numbers[0];
+			return _.merge({}, data, {
+				extra: {
+					listNumbers: _
+						.chain([
+							_
+								.chain(data.numbers)
+								.keys()
+								.sortBy()
+								.value(),
+							_
+								.chain(data.callflows)
+								.get('numbers', [])
+								.slice(0, 1)
+								.value()
+						])
+						.flatten()
+						.uniq()
+						.keyBy()
+						.value()
 				}
-			}
-
-			_.each(tempList, function(val, key) {
-				listNumbers[val] = val;
 			});
-
-			data.extra = $.extend(true, {}, data.extra, {
-				listNumbers: listNumbers
-			});
-
-			return data;
 		},
 
 		usersRenderConferencing: function(data) {
