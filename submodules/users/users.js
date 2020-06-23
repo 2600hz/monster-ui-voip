@@ -3688,27 +3688,22 @@ define(function(require) {
 				selectedRole: _.head(userPlanIds)
 			});
 		},
-		usersFormatDevicesData: function(userId, data) {
+
+		usersFormatDevicesData: function(userId, devices) {
 			var self = this,
-				formattedData = {
-					countSpare: 0,
-					assignedDevices: {},
-					unassignedDevices: {}
-				};
+				assigned = _.filter(devices, { owner_id: userId }),
+				unassigned = _.flatten([
+					_.filter(devices, { owner_id: '' }),
+					_.reject(devices, _.partial(_.has, _, 'owner_id'))
+				]);
 
-			_.each(data, function(device) {
-				if (device.owner_id === userId) {
-					formattedData.assignedDevices[device.id] = device;
-				} else if (device.owner_id === '' || !('owner_id' in device)) {
-					formattedData.countSpare++;
-					formattedData.unassignedDevices[device.id] = device;
-				}
-			});
-
-			formattedData.emptyAssigned = _.isEmpty(formattedData.assignedDevices);
-			formattedData.emptySpare = _.isEmpty(formattedData.unassignedDevices);
-
-			return formattedData;
+			return {
+				countSpare: _.size(unassigned),
+				emptyAssigned: _.isEmpty(assigned),
+				emptySpare: _.isEmpty(unassigned),
+				assigned: _.keyBy(assigned, 'id'),
+				unassignedvices: _.keyBy(unassigned, 'id')
+			};
 		},
 
 		/**
