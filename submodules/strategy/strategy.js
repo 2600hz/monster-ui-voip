@@ -41,13 +41,13 @@ define(function(require) {
 			'MainHolidays'
 		],
 
-		featureCodes: [
+		featureCodeConfigs: [
 			{
 				name: 'directed_ext_pickup',
 				number: '87',
 				pattern: '^\\*87([0-9]+)$',
 				moduleName: 'group_pickup_feature',
-				extraData: {
+				metadata: {
 					type: 'extension'
 				}
 			},
@@ -113,7 +113,7 @@ define(function(require) {
 				pattern: '^\\*98([0-9]*)$',
 				moduleName: 'voicemail',
 				actionName: 'check',
-				extraData: {
+				metadata: {
 					single_mailbox_login: true
 				}
 			},
@@ -3463,92 +3463,95 @@ define(function(require) {
 
 		strategyHandleFeatureCodes: function() {
 			var self = this,
-				featureCodesToUpdate = [
-					'voicemail[action=check]',
-					'voicemail[single_mailbox_login]'
-				],
-				expectedFeaturedCodes = _.keyBy(self.featureCodes, 'name');
+				featureCodeConfigs = _.keyBy(self.featureCodeConfigs, 'name'),
+				configToEntries = {
+					pattern: 'patterns',
+					callflowNumber: 'numbers'
+				},
+				isMalformed = function isMalformed(featureCode) {
+					var config = _.get(featureCodeConfigs, featureCode.featurecode.name),
+						configProp = _
+							.chain(configToEntries)
+							.keys()
+							.find(_.partial(_.has, config))
+							.value(),
+						expectedEntry = _.get(config, configProp),
+						entriesProp = _.get(configToEntries, configProp),
+						entries = _.get(featureCode, entriesProp);
+
+					return _.isUndefined(config)
+						|| !_.isEqual(entries, [expectedEntry]);
+				},
+				createFeatureCodeFactory = function createFeatureCodeFactory(featureCode) {
+					return function(callback) {
+						self.strategyCreateCallflow({
+							bypassProgressIndicator: true,
+							data: {
+								data: _.merge({
+									flow: _.merge({
+										children: {},
+										data: _.get(featureCode, 'metadata', {}),
+										module: featureCode.moduleName
+									}, _.has(featureCode, 'actionName') && {
+										data: {
+											action: featureCode.actionName
+										}
+									}),
+									featurecode: _.pick(featureCode, [
+										'name',
+										'number'
+									])
+								}, _.has(featureCode, 'pattern') ? {
+									patterns: [featureCode.pattern]
+								} : {
+									numbers: [featureCode.callflowNumber]
+								})
+							},
+							success: _.partial(callback, null),
+							error: _.partial(callback, null)
+						});
+					};
+				};
 
 			monster.waterfall([
-				function(callback) {
-					self.strategyGetFeatureCodes(function(featureCodes) {
-						callback(null, featureCodes);
-					});
+				function fetchExistingFeatureCodes(callback) {
+					self.strategyGetFeatureCodes(_.partial(callback, null));
 				},
-				function(featureCodes, callback) {
-					var featureCodeNames = _.map(featureCodes, 'featurecode.name');
-
+				function maybeDeleteMalformedFeatureCodes(existing, callback) {
 					monster.parallel(_
-						.chain(self.featureCodes)
-						.reject(function(featureCode) {
-							return _.includes(featureCodeNames, featureCode.name);
-						})
-						.map(function(featureCode) {
-							var newCallflow = {
-								flow: {
-									children: {},
-									data: _.get(featureCode, 'extraData', {}),
-									module: featureCode.moduleName
-								},
-								featurecode: {
-									name: featureCode.name,
-									number: featureCode.number
-								}
-							};
-
-							if (_.has(featureCode, 'actionName')) {
-								_.set(newCallflow, 'flow.data.action', featureCode.actionName);
-							}
-							if (_.has(featureCode, 'pattern')) {
-								_.set(newCallflow, 'patterns', [featureCode.pattern]);
-							} else {
-								_.set(newCallflow, 'numbers', [featureCode.callflowNumber]);
-							}
-
-							return function(parallelCallback) {
-								self.strategyCreateCallflow({
+						.chain(existing)
+						.filter(isMalformed)
+						.keyBy('id')
+						.mapValues(function(featureCode) {
+							return function(callback) {
+								self.strategyDeleteCallflow({
+									bypassProgressIndicator: true,
 									data: {
-										data: newCallflow
+										callflowId: featureCode.id
 									},
-									success: function() {
-										parallelCallback(null);
-									}
+									success: _.partial(callback, null),
+									error: _.partial(callback, null)
 								});
 							};
 						})
 						.value()
-					, function() {
-						callback(null, featureCodes);
+					, function(err, results) {
+						callback(null, _.reject(existing, _.flow([
+							_.partial(_.get, _, 'id'),
+							_.partial(_.includes, _.keys(results))
+						])));
 					});
 				},
-				function(featureCodes, callback) {
-					monster.parallel(
-						_.chain(featureCodes)
-						.filter(function(featureCode) {
-							return !_.includes(
-								_.get(featureCode, 'patterns', []),
-								_.get(expectedFeaturedCodes, [featureCode.featurecode.name, 'pattern'])
-							) && _.includes(featureCodesToUpdate, featureCode.featurecode.name);
-						})
-						.map(function(featureCode) {
-							return function(parallelCallback) {
-								self.strategyPatchCallflow({
-									data: {
-										callflowId: featureCode.id,
-										data: {
-											patterns: [_.get(expectedFeaturedCodes, [featureCode.featurecode.name, 'pattern'])],
-											numbers: []
-										}
-									},
-									callback: function() {
-										parallelCallback(null);
-									}
-								});
-							};
-						})
-						.value(),
-						callback
-					);
+				function maybeCreateMissingFeatureCodes(existing, callback) {
+					monster.parallel(_
+						.chain(self.featureCodeConfigs)
+						.reject(_.flow([
+							_.partial(_.get, _, 'name'),
+							_.partial(_.includes, _.map(existing, 'featurecode.name'))
+						]))
+						.map(createFeatureCodeFactory)
+						.value()
+					, callback);
 				}
 			]);
 		},
@@ -3557,6 +3560,7 @@ define(function(require) {
 			var self = this;
 
 			self.strategyListCallflows({
+				bypassProgressIndicator: true,
 				filters: {
 					paginate: 'false',
 					has_key: 'featurecode'
@@ -3734,180 +3738,168 @@ define(function(require) {
 
 		strategyGetCallEntities: function(callback) {
 			var self = this;
-			monster.parallel(
-				{
-					callQueues: function(_callback) {
-						self.strategyListCallflows({
-							filters: {
-								'filter_flow.module': 'qubicle'
-							},
-							success: function(callQueuesData) {
-								_callback(null, callQueuesData);
-							}
-						});
-					},
-					users: function(_callback) {
-						self.callApi({
-							resource: 'user.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									paginate: 'false'
-								}
-							},
-							success: function(data, status) {
-								_callback(null, data.data);
-							}
-						});
-					},
-					media: function(callback) {
-						self.strategyListMedia(function(media) {
-							callback(null, media);
-						});
-					},
-					userCallflows: function(_callback) {
-						self.callApi({
-							resource: 'callflow.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									has_key: 'owner_id',
-									filter_type: 'mainUserCallflow',
-									paginate: 'false'
-								}
-							},
-							success: function(data, status) {
-								var mapCallflowsByOwnerId = _.keyBy(data.data, 'owner_id');
-								_callback(null, mapCallflowsByOwnerId);
-							}
-						});
-					},
-					groups: function(_callback) {
-						self.callApi({
-							resource: 'group.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									paginate: 'false'
-								}
-							},
-							success: function(data, status) {
-								_callback(null, data.data);
-							}
-						});
-					},
-					ringGroups: function(_callback) {
-						self.callApi({
-							resource: 'callflow.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									'has_key': 'group_id',
-									'filter_type': 'baseGroup'
-								}
-							},
-							success: function(data, status) {
-								_callback(null, data.data);
-							}
-						});
-					},
-					userGroups: function(_callback) {
-						self.callApi({
-							resource: 'callflow.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									'has_key': 'group_id',
-									'filter_type': 'userGroup'
-								}
-							},
-							success: function(data, status) {
-								_callback(null, data.data);
-							}
-						});
-					},
-					devices: function(_callback) {
-						self.callApi({
-							resource: 'device.list',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									paginate: 'false'
-								}
-							},
-							success: function(data, status) {
-								_callback(null, data.data);
-							}
-						});
-					},
-					advancedCallflows: function(_callback) {
-						self.strategyListCallflows({
-							filters: {
-								'filter_ui_is_main_number_cf': true
-							},
-							success: function(advancedCallflowsData) {
-								_callback(null, advancedCallflowsData);
-							}
-						});
-					}
+			monster.parallel({
+				callQueues: function(_callback) {
+					self.strategyListCallflows({
+						filters: {
+							'filter_flow.module': 'qubicle'
+						},
+						success: function(callQueuesData) {
+							_callback(null, callQueuesData);
+						}
+					});
 				},
-				function(err, results) {
-					var callEntities = {
-						qubicle: results.callQueues,
-						device: results.devices,
-						user: $.extend(true, [], results.users),
-						play: results.media,
-						userCallflows: [],
-						ring_group: [],
-						userGroups: $.map(results.userGroups, function(val) {
-							var group = _.find(results.groups, function(group) { return val.group_id === group.id; });
-							val.name = group && (group.name || val.name);
-							val.module = 'callflow';
-							return val;
-						}),
-						advancedCallflows: results.advancedCallflows
-					};
-
-					_.forEach(callEntities.qubicle, function(queue) {
-						queue.module = 'callflow';
-					});
-
-					_.each(callEntities.play, function(media) {
-						media.module = 'play';
-					});
-
-					_.each(callEntities.device, function(device) {
-						device.module = 'device';
-					});
-
-					_.each(results.users, function(user) {
-						if (results.userCallflows.hasOwnProperty(user.id)) {
-							user.id = results.userCallflows[user.id].id;
-							user.module = 'callflow';
-						} else {
-							user.module = 'user';
+				users: function(_callback) {
+					self.callApi({
+						resource: 'user.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								paginate: 'false'
+							}
+						},
+						success: function(data, status) {
+							_callback(null, data.data);
 						}
-						callEntities.userCallflows.push(user);
 					});
-
-					_.each(results.groups, function(group) {
-						var ringGroup = _.find(results.ringGroups, function(ringGroup) { return ringGroup.group_id === group.id; });
-						if (ringGroup) {
-							group.id = ringGroup.id;
-							group.module = 'callflow';
-						} else {
-							group.module = 'ring_group';
+				},
+				media: function(callback) {
+					self.strategyListMedia(function(media) {
+						callback(null, media);
+					});
+				},
+				userCallflows: function(_callback) {
+					self.callApi({
+						resource: 'callflow.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								has_key: 'owner_id',
+								filter_type: 'mainUserCallflow',
+								paginate: 'false'
+							}
+						},
+						success: function(data, status) {
+							var mapCallflowsByOwnerId = _.keyBy(data.data, 'owner_id');
+							_callback(null, mapCallflowsByOwnerId);
 						}
-						callEntities.ring_group.push(group);
 					});
-
-					_.each(results.advancedCallflows, function(callflow) {
-						callflow.module = 'callflow';
+				},
+				groups: function(_callback) {
+					self.callApi({
+						resource: 'group.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								paginate: 'false'
+							}
+						},
+						success: function(data, status) {
+							_callback(null, data.data);
+						}
 					});
-
-					callback(callEntities);
+				},
+				ringGroups: function(_callback) {
+					self.callApi({
+						resource: 'callflow.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								'has_key': 'group_id',
+								'filter_type': 'baseGroup'
+							}
+						},
+						success: function(data, status) {
+							_callback(null, data.data);
+						}
+					});
+				},
+				userGroups: function(_callback) {
+					self.callApi({
+						resource: 'callflow.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								'has_key': 'group_id',
+								'filter_type': 'userGroup'
+							}
+						},
+						success: function(data, status) {
+							_callback(null, data.data);
+						}
+					});
+				},
+				devices: function(_callback) {
+					self.callApi({
+						resource: 'device.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								paginate: 'false'
+							}
+						},
+						success: function(data, status) {
+							_callback(null, data.data);
+						}
+					});
+				},
+				advancedCallflows: function(_callback) {
+					self.strategyListCallflows({
+						filters: {
+							'filter_ui_is_main_number_cf': true
+						},
+						success: function(advancedCallflowsData) {
+							_callback(null, advancedCallflowsData);
+						}
+					});
 				}
-			);
+			}, function(err, results) {
+				callback({
+					advancedCallflows: _.map(results.advancedCallflows, function(callflow) {
+						return _.merge({
+							module: 'callflow'
+						}, callflow);
+					}),
+					device: _.map(results.devices, function(device) {
+						return _.merge({
+							module: 'device'
+						}, device);
+					}),
+					qubicle: _.map(results.callQueues, function(callQueue) {
+						return _.merge({
+							module: 'callflow'
+						}, callQueue);
+					}),
+					play: _.map(results.media, function(media) {
+						return _.merge({
+							module: 'play'
+						}, media);
+					}),
+					ring_group: _.map(results.groups, function(group) {
+						var ringGroup = _.find(results.ringGroups, { group_id: group.id });
+
+						return _.merge({}, group, {
+							id: _.get(ringGroup, 'id', group.id),
+							module: _.isUndefined(ringGroup) ? 'ring_group' : 'callflow'
+						});
+					}),
+					user: results.users,
+					userCallflows: _.map(results.users, function(user) {
+						return _.merge({}, user, {
+							id: _.get(results.userCallflows, [user.id, 'id'], user.id),
+							module: _.has(results.userCallflows, user.id) ? 'callflow' : 'user'
+						});
+					}),
+					userGroups: _.map(results.userGroups, function(userGroup) {
+						var group = _.find(results.groups, { id: userGroup.group_id });
+
+						return _.merge({}, userGroup, {
+							name: _.get(group, 'name', userGroup.name),
+							module: 'callflow'
+						});
+					})
+				});
+			});
 		},
 
 		strategyGetVoicesmailBoxes: function(callback) {
@@ -3981,32 +3973,23 @@ define(function(require) {
 		strategyRebuildMainCallflowRuleArray: function(strategyData) {
 			var self = this,
 				mainCallflow = strategyData.callflows.MainCallflow,
-				rules = strategyData.temporalRules,
-				ruleArray = [];
+				rules = strategyData.temporalRules;
 
-			_.each(rules.holidays, function(val, key) {
-				if (val.id in mainCallflow.flow.children) {
-					ruleArray.push(val.id);
-				}
-			});
-
-			if (rules.lunchbreak.id in mainCallflow.flow.children) {
-				ruleArray.push(rules.lunchbreak.id);
-			}
-
-			_.each(rules.weekdays, function(val, key) {
-				if (val.id in mainCallflow.flow.children) {
-					ruleArray.push(val.id);
-				}
-			});
-
-			mainCallflow.flow.data.rules = ruleArray;
+			mainCallflow.flow.data.rules = _
+				.chain([
+					_.map(rules.holidays, 'id'),
+					_.has(rules.lunchbreak, 'id') ? [rules.lunchbreak.id] : [],
+					_.map(rules.weekdays, 'id')
+				])
+				.flatten()
+				.filter(_.partial(_.has, mainCallflow.flow.children))
+				.value();
 		},
 
 		strategyListCallflows: function(args) {
 			var self = this;
 
-			self.callApi({
+			self.callApi(_.merge({
 				resource: 'callflow.list',
 				data: {
 					accountId: self.accountId,
@@ -4018,22 +4001,28 @@ define(function(require) {
 				error: function(parsedError) {
 					args.hasOwnProperty('error') && args.error(parsedError);
 				}
-			});
+			}, _.has(args, 'bypassProgressIndicator') && {
+				bypassProgressIndicator: true
+			}));
 		},
 
 		strategyCreateCallflow: function(args) {
 			var self = this;
 
-			self.callApi({
+			self.callApi(_.merge({
 				resource: 'callflow.create',
-				data: {
-					accountId: self.accountId,
-					data: args.data.data
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
+				success: function(data) {
+					_.has(args, 'success') && args.success(data.data);
 				},
-				success: function(callflowData) {
-					args.hasOwnProperty('success') && args.success(callflowData.data);
+				error: function(parsedError) {
+					_.has(args, 'error') && args.error(parsedError);
 				}
-			});
+			}, _.has(args, 'bypassProgressIndicator') && {
+				bypassProgressIndicator: true
+			}));
 		},
 
 		strategyUpdateCallflow: function(callflow, callback) {
@@ -4066,6 +4055,25 @@ define(function(require) {
 					args.callback(data.data);
 				}
 			});
+		},
+
+		strategyDeleteCallflow: function(args) {
+			var self = this;
+
+			self.callApi(_.merge({
+				resource: 'callflow.delete',
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
+				success: function(data) {
+					_.has(args, 'success') && args.success(data.data);
+				},
+				error: function(parsedError) {
+					_.has(args, 'error') && args.error(parsedError);
+				}
+			}, _.has(args, 'bypassProgressIndicator') && {
+				bypassProgressIndicator: true
+			}));
 		},
 
 		strategyListDirectories: function(callbackSuccess, callbackError) {
