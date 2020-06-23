@@ -111,11 +111,9 @@ define(function(require) {
 		vmboxesMigrateData: function(data) {
 			var self = this;
 
-			if (data.hasOwnProperty('notify_email_address')) {
-				data.notify_email_addresses = data.notify_email_address;
-			}
-
-			return data;
+			return _.merge({}, data, _.has(data, 'notify_email_address') && {
+				notify_email_addresses: data.notify_email_address
+			});
 		},
 
 		vmboxesRenderVmbox: function(data, callback) {
@@ -386,45 +384,43 @@ define(function(require) {
 		},
 
 		vmboxesFormatData: function(data) {
-			var self = this,
-				defaults = {
-					require_pin: true,
-					check_if_owner: true
-				},
-				formattedData = $.extend(true, {}, defaults, data.vmbox);
+			var self = this;
 
-			formattedData.extra = {
-				mediaList: data.mediaList
-			};
-
-			return formattedData;
+			return _.merge({
+				require_pin: true,
+				check_if_owner: true
+			}, data.vmbox, {
+				extra: _.pick(data, [
+					'mediaList'
+				])
+			});
 		},
 
 		vmboxesFormatListData: function(results) {
-			var self = this,
-				formattedData = {
-					countVMBoxes: results.vmboxes.length,
-					vmboxes: results.vmboxes
-				},
-				mapUsers = {};
+			var mapUsers = _.keyBy(results.users, 'id');
 
-			_.each(results.users, function(user) {
-				mapUsers[user.id] = user;
-			});
-
-			formattedData.vmboxes.sort(function(a, b) {
-				return parseInt(a.mailbox) > parseInt(b.mailbox) ? 1 : -1;
-			});
-
-			_.each(formattedData.vmboxes, function(vmbox) {
-				if (vmbox.hasOwnProperty('owner_id') && mapUsers.hasOwnProperty(vmbox.owner_id)) {
-					vmbox.friendlyOwnerName = mapUsers[vmbox.owner_id].first_name + ' ' + mapUsers[vmbox.owner_id].last_name;
-				} else {
-					vmbox.friendlyOwnerName = '-';
-				}
-			});
-
-			return formattedData;
+			return {
+				countVMBoxes: _.size(results.vmboxes),
+				vmboxes: _
+					.chain(results.vmboxes)
+					.map(function(vmbox) {
+						return _.merge({
+							friendlyOwnerName: _
+								.chain(mapUsers)
+								.get(_.get(vmbox, 'owner_id'), {
+									first_name: '-',
+									last_name: ''
+								})
+								.thru(monster.util.getUserFullName)
+								.value()
+						}, vmbox);
+					})
+					.sortBy(_.flow([
+						_.partial(_.get, _, 'mailbox'),
+						_.parseInt
+					]))
+					.value()
+			};
 		},
 
 		/* Utils */
