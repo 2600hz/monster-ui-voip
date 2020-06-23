@@ -3673,23 +3673,20 @@ define(function(require) {
 				callback && callback(template, user);
 			});
 		},
+
 		usersFormatLicensedRolesData: function(user) {
 			var self = this,
-				formattedData = {
-					selectedRole: undefined,
-					availableRoles: self.appFlags.global.servicePlansRole
-				};
+				userPlanIds = _
+					.chain(user)
+					.get('service.plans', {})
+					.keys()
+					.value();
 
-			if (user.hasOwnProperty('service') && user.service.hasOwnProperty('plans') && _.size(user.service.plans) > 0) {
-				for (var key in user.service.plans) {
-					if (user.service.plans.hasOwnProperty(key)) {
-						formattedData.selectedRole = key;
-						break;
-					}
-				}
-			}
-
-			return formattedData;
+			return _.merge({
+				availableRoles: self.appFlags.global.servicePlansRole
+			}, !_.isEmpty(userPlanIds) && {
+				selectedRole: _.head(userPlanIds)
+			});
 		},
 		usersFormatDevicesData: function(userId, data) {
 			var self = this,
