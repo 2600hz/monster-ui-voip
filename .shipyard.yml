@@ -1,9 +1,9 @@
 ---
 name: monster-ui-application-voip
-base_branch: origin/master
+base_branch: 'origin/5.0'
 metapackage:
   - name: meta-monster-ui
-    branch: master
+    branch: '5.0'
     package: monster-ui-application-voip
     type: required
 base_core: monster-ui
