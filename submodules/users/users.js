@@ -3717,8 +3717,8 @@ define(function(require) {
 				countSpare: _.size(unassigned),
 				emptyAssigned: _.isEmpty(assigned),
 				emptySpare: _.isEmpty(unassigned),
-				assigned: _.keyBy(assigned, 'id'),
-				unassignedvices: _.keyBy(unassigned, 'id')
+				assignedDevices: _.keyBy(assigned, 'id'),
+				unassignedDevices: _.keyBy(unassigned, 'id')
 			};
 		},
 
