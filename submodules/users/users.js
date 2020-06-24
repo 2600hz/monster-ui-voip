@@ -2042,11 +2042,7 @@ define(function(require) {
 				extra: {
 					listNumbers: _
 						.chain([
-							_
-								.chain(data.numbers)
-								.keys()
-								.sortBy()
-								.value(),
+							_.keys(data.numbers),
 							_
 								.chain(data.callflows)
 								.get('numbers', [])
