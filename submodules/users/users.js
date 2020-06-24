@@ -1967,58 +1967,74 @@ define(function(require) {
 			}
 		},
 
+		/**
+		 * @param  {Object} data
+		 * @param  {Array} data.callflows
+		 * @param  {Array} data.provisioners
+		 * @param  {Array} data.vmboxes
+		 * @return {Object}
+		 */
 		usersFormatAddUser: function(data) {
 			var self = this,
-				formattedData = {
-					hasProvisioner: self.appFlags.common.hasProvisioner && !_.isEmpty(data.provisioners),
-					sendToSameEmail: true,
-					nextExtension: '',
-					listExtensions: {},
-					createVmbox: true,
-					listVMBoxes: {}
-				},
-				arrayExtensions = [],
-				arrayVMBoxes = [],
-				allNumbers = [];
+				servicePlansRole = self.appFlags.global.servicePlansRole,
+				listExtensions = _.flatMap(data.callflows, function(callflow) {
+					return _
+						.chain(callflow.numbers)
+						.filter(function(number) {
+							return _.size(number) < 7;
+						})
+						.map(function(number) {
+							return {
+								callflow: callflow,
+								extension: number
+							};
+						})
+						.value();
+				}),
+				mapVMBoxes = _.keyBy(data.vmboxes, 'mailbox'),
+				// We concat both arrays because we want to create users with the same number for the extension # and the vmbox,
+				// If for some reason a vmbox number exist without an extension, we still don't want to let them set their extension number to that number.
+				allNumbers = _
+					.chain([
+						_.map(listExtensions, 'extension'),
+						_.keys(mapVMBoxes, 'mailbox')
+					])
+					.flatten()
+					.uniq()
+					.value();
 
-			if (_.size(self.appFlags.global.servicePlansRole) > 0) {
-				formattedData.licensedUserRoles = self.appFlags.global.servicePlansRole;
-			}
-
-			_.each(data.callflows, function(callflow) {
-				_.each(callflow.numbers, function(number) {
-					if (number.length < 7) {
-						formattedData.listExtensions[number] = callflow;
-						arrayExtensions.push(number);
-					}
-				});
+			return _.merge({
+				createVmbox: true,
+				hasProvisioner: self.appFlags.common.hasProvisioner && !_.isEmpty(data.provisioners),
+				listExtensions: _
+					.chain(listExtensions)
+					.keyBy('extension')
+					.mapValues('callflow')
+					.value(),
+				listProvisioners: _
+					.chain(data.provisioners)
+					.map(function(brand) {
+						return _.merge({
+							models: _.flatMap(brand.families, function(family) {
+								return _.map(family.models, function(model) {
+									return _.merge({
+										family: family.name
+									}, model);
+								});
+							})
+						}, _.pick(brand, [
+							'id',
+							'name'
+						]));
+					})
+					.sortBy('name')
+					.value(),
+				listVMBoxes: mapVMBoxes,
+				nextExtension: parseInt(monster.util.getNextExtension(allNumbers)) + '',
+				sendToSameEmail: true
+			}, !_.isEmpty(servicePlansRole) && {
+				licensedUserRoles: servicePlansRole
 			});
-
-			_.each(data.vmboxes, function(vmbox) {
-				formattedData.listVMBoxes[vmbox.mailbox] = vmbox;
-				arrayVMBoxes.push(vmbox.mailbox);
-			});
-
-			// We concat both arrays because we want to create users with the same number for the extension # and the vmbox,
-			// If for some reason a vmbox number exist without an extension, we still don't want to let them set their extension number to that number.
-			allNumbers = arrayExtensions.concat(arrayVMBoxes);
-			formattedData.nextExtension = parseInt(monster.util.getNextExtension(allNumbers)) + '';
-			formattedData.listProvisioners = _.map(data.provisioners, function(brand) {
-				var models = _.flatMap(brand.families, function(family) {
-					return _.map(family.models, function(model) {
-						model.family = family.name;
-						return model;
-					});
-				});
-
-				return {
-					id: brand.id,
-					name: brand.name,
-					models: models
-				};
-			});
-
-			return formattedData;
 		},
 
 		usersFormatFaxingData: function(data) {
