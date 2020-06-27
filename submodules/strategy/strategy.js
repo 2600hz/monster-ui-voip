@@ -1384,7 +1384,7 @@ define(function(require) {
 				e.preventDefault();
 				var confCallflow = strategyData.callflows.MainConference;
 				if (confCallflow) {
-					self.getMainConferenceGreetingMedia(function(greetingMedia) {
+					self.strategyGetMainConferenceGreetingMedia(function(greetingMedia) {
 						var greetingTemplate = $(self.getTemplate({
 								name: 'customConferenceGreeting',
 								data: {
@@ -1534,7 +1534,7 @@ define(function(require) {
 			});
 		},
 
-		getMainConferenceGreetingMedia: function(callback) {
+		strategyGetMainConferenceGreetingMedia: function(callback) {
 			var self = this;
 			self.callApi({
 				resource: 'media.list',
