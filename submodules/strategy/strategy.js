@@ -1384,7 +1384,7 @@ define(function(require) {
 				e.preventDefault();
 				var confCallflow = strategyData.callflows.MainConference;
 				if (confCallflow) {
-					self.getMainConferenceGreetingMedia(function(greetingMedia) {
+					self.strategyGetMainConferenceGreetingMedia(confCallflow, function(greetingMedia) {
 						var greetingTemplate = $(self.getTemplate({
 								name: 'customConferenceGreeting',
 								data: {
@@ -1534,38 +1534,31 @@ define(function(require) {
 			});
 		},
 
-		getMainConferenceGreetingMedia: function(callback) {
-			var self = this;
-			self.callApi({
-				resource: 'media.list',
-				data: {
-					accountId: self.accountId,
-					filters: {
-						'filter_type': 'mainConfGreeting'
+		strategyGetMainConferenceGreetingMedia: function(mainConferenceCallflow, callback) {
+			var self = this,
+				mediaId = _.get(mainConferenceCallflow, 'flow.data.welcome_prompt.media_id');
+
+			monster.waterfall([
+				function(cb) {
+					if (_.isUndefined(mediaId)) {
+						return cb(null, null);
 					}
-				},
-				success: function(data, status) {
-					if (data.data && data.data.length > 0) {
-						self.callApi({
-							resource: 'media.get',
-							data: {
-								accountId: self.accountId,
-								mediaId: data.data[0].id
-							},
-							success: function(data, status) {
-								callback && callback(data.data);
-							},
-							error: function(data, status) {
-								callback && callback(null);
-							}
-						});
-					} else {
-						callback && callback(null);
-					}
-				},
-				error: function(data, status) {
-					callback && callback(null);
+					self.callApi({
+						resource: 'media.get',
+						data: {
+							accountId: self.accountId,
+							mediaId: mediaId
+						},
+						success: function(data) {
+							cb(null, data.data);
+						},
+						error: function() {
+							cb(true);
+						}
+					});
 				}
+			], function(err, media) {
+				callback(err ? null : media);
 			});
 		},
 
