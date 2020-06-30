@@ -3243,6 +3243,15 @@ define(function(require) {
 
 		strategyGetMainCallflows: function(mainCallback) {
 			var self = this,
+				getMainCallflowLabel = function getMainCallflowLabel(callflow) {
+					var name = _.get(callflow, 'name'),
+						type = callflow.type;
+
+					return _.isUndefined(name) ? _.head(callflow.numbers)
+						: type === 'conference' ? 'MainConference'
+						: type === 'faxing' ? 'MainFaxing'
+						: name;
+				},
 				smartTypes = ['conference', 'faxing', 'main'];
 
 			monster.waterfall([
@@ -3263,79 +3272,71 @@ define(function(require) {
 						}
 					});
 				},
-				function maybeCreateOfficeHourMenuEntities(data, waterfallCallback) {
-					var parallelRequests = {},
+				function maybeCreateOfficeHourMenuEntities(existingMainCallflows, waterfallCallback) {
+					var parallelRequests = _.merge({
+							MainConference: function(callback) {
+								self.strategyCreateCallflow({
+									data: {
+										data: {
+											contact_list: {
+												exclude: false
+											},
+											numbers: ['undefinedconf'],
+											name: 'MainConference',
+											type: 'conference',
+											flow: {
+												children: {},
+												data: {},
+												module: 'conference'
+											}
+										}
+									},
+									success: _.partial(callback, null)
+								});
+							},
+							MainFaxing: function(callback) {
+								self.strategyCreateCallflow({
+									data: {
+										data: {
+											contact_list: {
+												exclude: false
+											},
+											numbers: ['undefinedfaxing'],
+											name: 'MainFaxing',
+											type: 'faxing',
+											flow: {
+												children: {},
+												data: {},
+												module: 'faxbox'
+											}
+										}
+									},
+									success: _.partial(callback, null)
+								});
+							}
+						}, _
+							.chain(existingMainCallflows)
+							.map(function(callflow) {
+								return _.merge({
+									label: getMainCallflowLabel(callflow)
+								}, _.pick(callflow, [
+									'id'
+								]));
+							})
+							.keyBy('label')
+							.mapValues(function(value) {
+								return function(callback) {
+									self.strategyGetCallflow({
+										data: {
+											id: value.id
+										},
+										success: _.partial(callback, null)
+									});
+								};
+							})
+							.value()
+						),
 						menuRequests = {};
-
-					_.each(data, function(val, key) {
-						var name = val.name || val.numbers[0];
-						if (val.type === 'conference') {
-							name = 'MainConference';
-						} else if (val.type === 'faxing') {
-							name = 'MainFaxing';
-						}
-
-						parallelRequests[name] = function(callback) {
-							self.strategyGetCallflow({
-								data: {
-									id: val.id
-								},
-								success: function(data) {
-									callback(null, data);
-								}
-							});
-						};
-					});
-
-					if (!parallelRequests.MainConference) {
-						parallelRequests.MainConference = function(callback) {
-							self.strategyCreateCallflow({
-								data: {
-									data: {
-										contact_list: {
-											exclude: false
-										},
-										numbers: ['undefinedconf'],
-										name: 'MainConference',
-										type: 'conference',
-										flow: {
-											children: {},
-											data: {},
-											module: 'conference'
-										}
-									}
-								},
-								success: function(data) {
-									callback(null, data);
-								}
-							});
-						};
-					}
-
-					if (!parallelRequests.MainFaxing) {
-						parallelRequests.MainFaxing = function(callback) {
-							self.strategyCreateCallflow({
-								data: {
-									data: {
-										contact_list: {
-											exclude: false
-										},
-										numbers: ['undefinedfaxing'],
-										name: 'MainFaxing',
-										type: 'faxing',
-										flow: {
-											children: {},
-											data: {},
-											module: 'faxbox'
-										}
-									}
-								},
-								success: function(data) {
-									callback(null, data);
-								}
-							});
-						};
-					}
 
 					_.each(self.subCallflowsLabel, function(val) {
 						var menuName = val + 'Menu';
