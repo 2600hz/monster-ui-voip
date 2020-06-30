@@ -3242,7 +3242,9 @@ define(function(require) {
 		},
 
 		strategyGetMainCallflows: function(mainCallback) {
-			var self = this;
+			var self = this,
+				smartTypes = ['conference', 'faxing', 'main'];
+
 			monster.waterfall([
 				function fetchMainCallflows(waterfallCallback) {
 					self.strategyListCallflows({
@@ -3250,8 +3252,11 @@ define(function(require) {
 							'has_value': 'type',
 							'key_missing': ['owner_id', 'group_id']
 						},
-						success: function(data) {
-							waterfallCallback(null, data);
+						success: function(callflows) {
+							waterfallCallback(null, _.filter(callflows, _.flow(
+								_.partial(_.get, _, 'type'),
+								_.partial(_.includes, smartTypes)
+							)));
 						},
 						error: function() {
 							waterfallCallback(true);
@@ -3263,10 +3268,6 @@ define(function(require) {
 						menuRequests = {};
 
 					_.each(data, function(val, key) {
-						if (!_.includes(['main', 'conference', 'faxing'], val.type)) {
-							return;
-						}
-
 						var name = val.name || val.numbers[0];
 						if (val.type === 'conference') {
 							name = 'MainConference';
