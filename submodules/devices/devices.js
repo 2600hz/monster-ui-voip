@@ -1031,11 +1031,14 @@ define(function(require) {
 						.mapValues('data')
 						.value()
 				},
-				deviceData = _.merge(
+				deviceData = _.mergeWith(
 					{},
 					deviceDefaults,
 					deviceDefaultsForType,
-					data.device
+					data.device,
+					function(dest, src) {
+						return _.every([dest, src], _.isArray) ? src : undefined;
+					}
 				),
 				mergedDevice = _.merge(
 					{},
