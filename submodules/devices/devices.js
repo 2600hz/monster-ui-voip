@@ -1031,11 +1031,15 @@ define(function(require) {
 						.mapValues('data')
 						.value()
 				},
-				mergedDevice = _.merge(
+				deviceData = _.merge(
 					{},
 					deviceDefaults,
 					deviceDefaultsForType,
-					data.device,
+					data.device
+				),
+				mergedDevice = _.merge(
+					{},
+					deviceData,
 					deviceOverrides
 				);
 
