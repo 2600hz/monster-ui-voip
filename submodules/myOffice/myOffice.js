@@ -479,14 +479,13 @@ define(function(require) {
 									return _.includes(staticNonNumbers, number);
 								})
 								.map(function(number) {
-									return _
-										.chain(data.numbers)
+									return _.merge({
+										number: number
+									}, _.chain(data.numbers)
 										.get(number, {})
 										.pick('features')
-										.merge({
-											number: number
-										})
-										.value();
+										.value()
+									);
 								})
 								.value();
 						});
