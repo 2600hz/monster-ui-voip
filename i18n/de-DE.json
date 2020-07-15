@@ -164,7 +164,7 @@
 			"basicTitle": "Allgemeine Einstellungen",
 			"basicSectionTitle": "Allgemeine Einstellungen",
 			"dragAndDrop": "Um einen Codec auszuwählen, ziehen Sie diesen aus dem Feld „Verfügbare Codecs“ in das Feld „Ausgewählte Codecs“.",
-			"saveAndApply": "Speichern und anwenden",
+			"saveAndApply": "Speichern und Ausführen",
 			"options": {
 				"menuTitle": "Optionen"
 			},
