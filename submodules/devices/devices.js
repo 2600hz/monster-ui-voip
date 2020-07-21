@@ -1040,7 +1040,7 @@ define(function(require) {
 						return _.every([dest, src], _.isArray) ? src : undefined;
 					}
 				),
-				mergedDevice = _.assign(
+				mergedDevice = _.merge(
 					{},
 					deviceData,
 					deviceOverrides
