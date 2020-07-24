@@ -1400,82 +1400,43 @@ define(function(require) {
 								position: ['center', 20]
 							});
 
+						monster.pub('common.mediaSelect.render', {
+							container: greetingTemplate.find('.media-wrapper'),
+							selectedOption: _.get(greetingMedia, 'id', null),
+							skin: 'tabs',
+							enableTTS: true,
+							tts: {
+								name: 'MainConferenceGreeting',
+								type: 'conferencingCallInNumber'
+							},
+							callback: function(mediaControl) {
+								self.bindMediaUpload(greetingTemplate, mediaControl, confCallflow, function(updatedCallflow) {
+									if (greetingTemplate.find('.switch-state').prop('checked')) {
+										strategyData.callflows.MainConference = updatedCallflow;
+										greetingPopup.dialog('close').remove();
+										$('#strategy_container .custom-greeting-icon').show();
+									} else {
+										if ('welcome_prompt' in confCallflow.flow.data) {
+											delete confCallflow.flow.data.welcome_prompt;
+											self.strategyUpdateCallflow(confCallflow, function(updatedCallflow) {
+												strategyData.callflows.MainConference = updatedCallflow;
+												greetingPopup.dialog('close').remove();
+												$('#strategy_container .custom-greeting-icon').hide();
+											});
+										} else {
+											greetingPopup.dialog('close').remove();
+										}
+									}
+								});
+							}
+						});
+
 						greetingTemplate.find('.switch-state').on('change', function() {
 							$(this).prop('checked') ? greetingTemplate.find('.content').slideDown() : greetingTemplate.find('.content').slideUp();
 						});
 
 						greetingTemplate.find('.cancel').on('click', function() {
 							greetingPopup.dialog('close').remove();
-						});
-
-						greetingTemplate.find('.save').on('click', function() {
-							if (greetingTemplate.find('.switch-state').prop('checked')) {
-								var updateMedia = function(callback) {
-									if (greetingMedia) {
-										greetingMedia.description = '<Text to Speech>';
-										greetingMedia.media_source = 'tts';
-										greetingMedia.tts = {
-											text: greetingTemplate.find('.custom-greeting-text').val(),
-											voice: 'female/en-US'
-										};
-
-										self.callApi({
-											resource: 'media.update',
-											data: {
-												accountId: self.accountId,
-												mediaId: greetingMedia.id,
-												data: greetingMedia
-											},
-											success: function(data, status) {
-												callback && callback(data.data);
-											}
-										});
-									} else {
-										self.callApi({
-											resource: 'media.create',
-											data: {
-												accountId: self.accountId,
-												data: {
-													description: '<Text to Speech>',
-													media_source: 'tts',
-													name: 'MainConferenceGreeting',
-													streamable: true,
-													type: 'mainConfGreeting',
-													tts: {
-														text: greetingTemplate.find('.custom-greeting-text').val(),
-														voice: 'female/en-US'
-													}
-												}
-											},
-											success: function(data, status) {
-												callback && callback(data.data);
-											}
-										});
-									}
-								};
-
-								updateMedia(function(updatedGreeting) {
-									confCallflow.flow.data.welcome_prompt = {
-										media_id: updatedGreeting.id
-									};
-									self.strategyUpdateCallflow(confCallflow, function(updatedCallflow) {
-										strategyData.callflows.MainConference = updatedCallflow;
-										greetingPopup.dialog('close').remove();
-										$('#strategy_container .custom-greeting-icon').show();
-									});
-								});
-							} else {
-								if ('welcome_prompt' in confCallflow.flow.data) {
-									delete confCallflow.flow.data.welcome_prompt;
-									self.strategyUpdateCallflow(confCallflow, function(updatedCallflow) {
-										strategyData.callflows.MainConference = updatedCallflow;
-										greetingPopup.dialog('close').remove();
-										$('#strategy_container .custom-greeting-icon').hide();
-									});
-								} else {
-									greetingPopup.dialog('close').remove();
-								}
-							}
 						});
 					});
 				} else {
@@ -1534,6 +1495,26 @@ define(function(require) {
 			});
 		},
 
+		bindMediaUpload: function(template, mediaControl, confCallflow, callback) {
+			var self = this;
+
+			template.find('.save').on('click', function() {
+				if (template.find('.switch-state').prop('checked')) {
+					mediaControl.getValue(function(id) {
+						confCallflow.flow.data.welcome_prompt = {
+							media_id: id
+						};
+
+						self.strategyUpdateCallflow(confCallflow, function(updatedCallflow) {
+							callback(updatedCallflow);
+						});
+					});
+				} else {
+					callback();
+				}
+			});
+		},
+
 		strategyGetMainConferenceGreetingMedia: function(mainConferenceCallflow, callback) {
 			var self = this,
 				mediaId = _.get(mainConferenceCallflow, 'flow.data.welcome_prompt.media_id');
@@ -1553,7 +1534,7 @@ define(function(require) {
 							cb(null, data.data);
 						},
 						error: function() {
-							cb(true);
+							cb(null, {});
 						}
 					});
 				}
