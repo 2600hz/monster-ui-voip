@@ -366,9 +366,17 @@
 								<select name="provision.keys.{{../id}}[{{@index}}].type" class="feature-key-type span2">
 								{{#select type}}
 									{{#each ../actions}}
-										<option value="{{id}}">
-											{{label}}
-										</option>
+										{{#ifInArray ../keyNumber ../../lineKeys}}
+											{{#unless isActionRestringed}}
+												<option value="{{id}}">
+													{{label}}
+												</option>
+											{{/unless}}
+										{{else}}
+											<option value="{{id}}">
+												{{label}}
+											</option>
+										{{/ifInArray}}
 									{{/each}}
 								{{/select}}
 								</select>
