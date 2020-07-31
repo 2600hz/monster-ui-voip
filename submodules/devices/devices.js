@@ -942,8 +942,7 @@ define(function(require) {
 				),
 				defaultLineKeys = _.get(
 					self.appFlags.devices.provisionerConfigFlags,
-					['brands', _.get(data.device, 'provision.endpoint_brand'), 'lineKeys'],
-					[1]
+					['brands', _.get(data.device, 'provision.endpoint_brand'), 'lineKeys']
 				),
 				isClassifierDisabledByAccount = function isClassifierDisabledByAccount(classifier) {
 					return _.get(data.accountLimits, ['call_restriction', classifier, 'action']) === 'deny';
@@ -1078,7 +1077,7 @@ define(function(require) {
 								return _.merge({
 									id: type,
 									type: camelCasedType,
-									lineKeys: defaultLineKeys,
+									lineKeys: defaultLineKeys || [1],
 									actions: _
 										.chain([
 											'presence',
@@ -1094,13 +1093,20 @@ define(function(require) {
 										})
 										.concat(['none'])
 										.map(function(action) {
-											var i18n = self.i18n.active().devices.popupSettings.keys;
+											var i18n = self.i18n.active().devices.popupSettings.keys,
+												hasDefaultLineKeys = !!defaultLineKeys,
+												allowedDefaultLineKeyActions = ['none', 'line'];
 
-											return {
+											return _.merge({
 												id: action,
 												info: _.get(i18n, ['info', 'types', action]),
 												label: _.get(i18n, ['types', action])
-											};
+											},
+											type === 'combo_keys' && hasDefaultLineKeys && !_.includes(allowedDefaultLineKeyActions, action) ? {
+												isActionRestringed: true
+											}
+											: {}
+											);
 										})
 										// Sort alphabetically while keeping `none` as first item
 										.sort(function(a, b) {
