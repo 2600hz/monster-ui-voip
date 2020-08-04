@@ -1220,7 +1220,7 @@ define(function(require) {
 				resource: 'numbers.get',
 				data: {
 					accountId: self.accountId,
-					phoneNumber: encodeURIComponent(number)
+					phoneNumber: number
 				},
 				success: function(data, status) {
 					success && success(data.data);
@@ -1238,7 +1238,7 @@ define(function(require) {
 				resource: 'numbers.update',
 				data: {
 					accountId: self.accountId,
-					phoneNumber: encodeURIComponent(numberData.id),
+					phoneNumber: numberData.id,
 					data: numberData
 				},
 				success: function(data, status) {
