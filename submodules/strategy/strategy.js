@@ -3935,7 +3935,7 @@ define(function(require) {
 				resource: 'numbers.get',
 				data: {
 					accountId: self.accountId,
-					phoneNumber: encodeURIComponent(phoneNumber),
+					phoneNumber: phoneNumber,
 					generateError: false
 				},
 				success: function(data, status) {
@@ -3954,7 +3954,7 @@ define(function(require) {
 				resource: 'numbers.update',
 				data: {
 					accountId: self.accountId,
-					phoneNumber: encodeURIComponent(phoneNumber),
+					phoneNumber: phoneNumber,
 					data: data
 				},
 				success: function(data, status) {
