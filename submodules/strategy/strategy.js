@@ -10,6 +10,7 @@ define(function(require) {
 		},
 
 		subscribe: {
+			'voip.strategy.addOfficeHours': 'strategyAddOfficeHoursPopup',
 			'voip.strategy.render': 'strategyRender',
 			'auth.currentAccountUpdated': '_strategyOnCurrentAccountUpdated'
 		},
@@ -4604,6 +4605,156 @@ define(function(require) {
 
 			return _.filter(mainCallflow.numbers, function(val) {
 				return val !== '0' && val !== 'undefinedMainNumber';
+			});
+		},
+
+		strategyAddOfficeHoursPopup: function(args) {
+			var self = this,
+				existing = args.existing,
+				callback = args.callback,
+				$template = $(self.getTemplate({
+					name: 'addOfficeHours',
+					data: {
+						days: [
+							'Monday',
+							'Tuesday',
+							'Wednesday',
+							'Thursday',
+							'Friday',
+							'Saturday',
+							'Sunday'
+						]
+					},
+					submodule: 'strategy'
+				})),
+				$startTimepicker = $template.find('.start-time'),
+				$endTimepicker = $template.find('.end-time'),
+				popup;
+
+			$template.find('input[name="days[]"]').on('change', function(event) {
+				event.preventDefault();
+
+				var atLeastOneChecked = _.some($template.find('input[name="days[]"]'), function(input) {
+					return $(input).prop('checked');
+				});
+
+				$template.find('.no-days-error')[atLeastOneChecked ? 'slideUp' : 'slideDown'](200);
+			});
+
+			monster.ui.timepicker($startTimepicker, {
+				useSelect: true,
+				maxTime: 86400 - (3600 / 2)
+			});
+			monster.ui.timepicker($endTimepicker, {
+				useSelect: true,
+				minTime: 3600 / 2,
+				maxTime: 86400
+			});
+			$endTimepicker.timepicker('setTime', 3600 * 24);
+
+			$startTimepicker.on('changeTime', function() {
+				$template.find('.overlapping-hours-error').slideUp(200);
+
+				var startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
+					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight');
+
+				$endTimepicker.timepicker('option', 'minTime', startSeconds + (3600 / 2));
+				if (!_.isNull(endSeconds)) {
+					$endTimepicker.timepicker('setTime', endSeconds);
+				}
+			});
+
+			$endTimepicker.on('changeTime', function() {
+				$template.find('.overlapping-hours-error').slideUp(200);
+
+				var startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
+					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight');
+
+				$startTimepicker.timepicker('option', 'maxTime', endSeconds - (3600 / 2));
+				if (!_.isNull(endSeconds)) {
+					$startTimepicker.timepicker('setTime', startSeconds);
+				}
+			});
+
+			$template.find('.cancel').on('click', function(event) {
+				event.preventDefault();
+				popup.dialog('close');
+			});
+
+			$template.on('submit', function(event) {
+				event.preventDefault();
+				var formData = monster.ui.getFormData($template.get(0)),
+					endTime = $endTimepicker.timepicker('getSecondsFromMidnight'),
+					formattedData = _.merge({
+						start: $startTimepicker.timepicker('getSecondsFromMidnight'),
+						end: endTime === 0 ? 3600 * 24 : endTime,
+						isOpen: formData.isOpen === 'true'
+					}, _.pick(formData, [
+						'days'
+					])),
+					overlapsExisting = _
+						.chain(formattedData.days)
+						.map(function(v, index) {
+							return {
+								selected: v,
+								overlaps: _
+									.chain((existing || [])[index])
+									.map(function(interval) {
+										var start = interval.start,
+											end = interval.end,
+											startsWithinExistingInterval = formattedData.start >= start && formattedData.start < end,
+											endsWithinExistingInterval = formattedData.end > start && formattedData.end <= end,
+											overlapsExistingInterval = formattedData.start <= start && formattedData.end >= end;
+
+										return startsWithinExistingInterval
+											|| endsWithinExistingInterval
+											|| overlapsExistingInterval;
+									})
+									.some()
+									.value()
+							};
+						})
+						.filter('selected')
+						.map('overlaps')
+						.some()
+						.value();
+
+				if (!monster.ui.valid($template)) {
+					return;
+				}
+
+				if (!_.some(formattedData.days)) {
+					$template.find('.no-days-error').slideDown(200);
+					return;
+				}
+
+				if (overlapsExisting) {
+					$template.find('.overlapping-hours-error').slideDown(200);
+					return;
+				}
+
+				callback(null, _
+					.chain(existing)
+					.map(function(intervals, index) {
+						var isDaySelected = formattedData.days[index];
+
+						return _
+							.chain(intervals)
+							.concat(isDaySelected ? [_.pick(formattedData, [
+								'start',
+								'end',
+								'isOpen'
+							])] : [])
+							.sortBy('start')
+							.value();
+					})
+					.value()
+				);
+			});
+
+			popup = monster.ui.dialog($template, {
+				autoScroll: false,
+				title: self.i18n.active().strategy.addOfficeHours.title
 			});
 		}
 	};
