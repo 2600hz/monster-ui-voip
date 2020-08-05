@@ -4317,7 +4317,7 @@ define(function(require) {
 				resource: 'callflow.searchByNumber',
 				data: {
 					accountId: self.accountId,
-					value: encodeURIComponent(phoneNumber),
+					value: phoneNumber,
 					filter_owner_id: userId,
 					filter_type: 'mobile'
 				},
