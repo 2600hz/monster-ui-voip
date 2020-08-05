@@ -4837,146 +4837,143 @@ define(function(require) {
 				callback && callback(results);
 			});
 		},
-
 		usersUpdateDevices: function(data, userId, callbackAfterUpdate) {
 			var self = this,
-				updateDevices = function(userCallflow) {
-					var listFnParallel = [],
-						updateDeviceRequest = function(newDataDevice, callback) {
-							self.usersUpdateDevice(newDataDevice, function(updatedDataDevice) {
-								callback(null, updatedDataDevice);
-							});
-						};
-
-					_.each(data.newDevices, function(deviceId) {
-						listFnParallel.push(function(callback) {
-							self.usersGetDevice(deviceId, function(data) {
-								data.owner_id = userId;
-
-								if (data.device_type === 'mobile') {
-									self.usersSearchMobileCallflowsByNumber(userId, data.mobile.mdn, function(listCallflowData) {
-										self.callApi({
-											resource: 'callflow.get',
-											data: {
-												accountId: self.accountId,
-												callflowId: listCallflowData.id
-											},
-											success: function(rawCallflowData, status) {
-												var callflowData = rawCallflowData.data;
-
-												if (userCallflow) {
-													$.extend(true, callflowData, {
-														owner_id: userId,
-														flow: {
-															module: 'callflow',
-															data: {
-																id: userCallflow.id
-															}
-														}
-													});
-												} else {
-													$.extend(true, callflowData, {
-														owner_id: userId,
-														flow: {
-															module: 'device',
-															data: {
-																id: deviceId
-															}
-														}
-													});
-												}
-
-												self.usersUpdateCallflow(callflowData, function() {
-													updateDeviceRequest(data, callback);
-												});
-											}
-										});
-									});
-								} else {
-									updateDeviceRequest(data, callback);
-								}
-							});
-						});
+				updateDeviceRequest = function(newDataDevice, callback) {
+					self.usersUpdateDevice(newDataDevice, function(updatedDataDevice) {
+						callback(null, updatedDataDevice);
 					});
+				},
+				assignDeviceToUser = function assignDeviceToUser(deviceId, userId, userCallflow, callback) {
+					self.usersGetDevice(deviceId, function(data) {
+						data.owner_id = userId;
 
-					_.each(data.oldDevices, function(deviceId) {
-						listFnParallel.push(function(callback) {
-							self.usersGetDevice(deviceId, function(data) {
-								delete data.owner_id;
+						if (data.device_type === 'mobile') {
+							self.usersSearchMobileCallflowsByNumber(userId, data.mobile.mdn, function(listCallflowData) {
+								self.callApi({
+									resource: 'callflow.get',
+									data: {
+										accountId: self.accountId,
+										callflowId: listCallflowData.id
+									},
+									success: function(rawCallflowData, status) {
+										var callflowData = rawCallflowData.data;
 
-								if (data.device_type === 'mobile') {
-									self.usersSearchMobileCallflowsByNumber(userId, data.mobile.mdn, function(listCallflowData) {
-										self.callApi({
-											resource: 'callflow.get',
-											data: {
-												accountId: self.accountId,
-												callflowId: listCallflowData.id
-											},
-											success: function(rawCallflowData, status) {
-												var callflowData = rawCallflowData.data;
-
-												delete callflowData.owner_id;
-												$.extend(true, callflowData, {
-													flow: {
-														module: 'device',
-														data: {
-															id: deviceId
-														}
+										if (userCallflow) {
+											$.extend(true, callflowData, {
+												owner_id: userId,
+												flow: {
+													module: 'callflow',
+													data: {
+														id: userCallflow.id
 													}
-												});
+												}
+											});
+										} else {
+											$.extend(true, callflowData, {
+												owner_id: userId,
+												flow: {
+													module: 'device',
+													data: {
+														id: deviceId
+													}
+												}
+											});
+										}
 
-												self.usersUpdateCallflow(callflowData, function() {
-													updateDeviceRequest(data, callback);
-												});
+										self.usersUpdateCallflow(callflowData, function() {
+											updateDeviceRequest(data, callback);
+										});
+									}
+								});
+							});
+						} else {
+							updateDeviceRequest(data, callback);
+						}
+					});
+				},
+				unassignDeviceFromUser = function unassignDeviceFromUser(deviceId, userId, callback) {
+					self.usersGetDevice(deviceId, function(data) {
+						delete data.owner_id;
+
+						if (data.device_type === 'mobile') {
+							self.usersSearchMobileCallflowsByNumber(userId, data.mobile.mdn, function(listCallflowData) {
+								self.callApi({
+									resource: 'callflow.get',
+									data: {
+										accountId: self.accountId,
+										callflowId: listCallflowData.id
+									},
+									success: function(rawCallflowData, status) {
+										var callflowData = rawCallflowData.data;
+
+										delete callflowData.owner_id;
+										$.extend(true, callflowData, {
+											flow: {
+												module: 'device',
+												data: {
+													id: deviceId
+												}
 											}
 										});
-									});
-								} else {
-									updateDeviceRequest(data, callback);
-								}
-							});
-						});
-					});
 
-					if (data.oldDevices.length > 0 && userCallflow && userCallflow.flow.module === 'ring_group') {
-						var endpointsCount = userCallflow.flow.data.endpoints.length;
-
-						userCallflow.flow.data.endpoints = _.filter(userCallflow.flow.data.endpoints, function(endpoint) {
-							return (data.oldDevices.indexOf(endpoint.id) < 0);
-						});
-
-						if (userCallflow.flow.data.endpoints.length < endpointsCount) {
-							if (userCallflow.flow.data.endpoints.length === 0) {
-								userCallflow.flow.module = 'user';
-								userCallflow.flow.data = {
-									can_call_self: false,
-									id: userId,
-									timeout: '20'
-								};
-								listFnParallel.push(function(callback) {
-									self.usersGetUser(userId, function(user) {
-										user.smartpbx.find_me_follow_me.enabled = false;
-										self.usersUpdateUser(user, function(data) {
-											callback(null, data);
+										self.usersUpdateCallflow(callflowData, function() {
+											updateDeviceRequest(data, callback);
 										});
-									});
-								});
-							}
-							listFnParallel.push(function(callback) {
-								self.usersUpdateCallflow(userCallflow, function(data) {
-									callback(null, data);
+									}
 								});
 							});
+						} else {
+							updateDeviceRequest(data, callback);
 						}
-					}
-
-					monster.parallel(listFnParallel, function(err, results) {
-						callbackAfterUpdate && callbackAfterUpdate(results);
 					});
 				};
 
-			self.usersGetMainCallflow(userId, function(callflow) {
-				updateDevices(callflow);
+			self.usersGetMainCallflow(userId, function(userCallflow) {
+				var listFnParallel = _.flatten([
+					_.map(data.newDevices, function(deviceId) {
+						return _.partial(assignDeviceToUser, deviceId, userId, userCallflow);
+					}),
+					_.map(data.oldDevices, function(deviceId) {
+						return _.partial(unassignDeviceFromUser, deviceId, userId);
+					})
+				]);
+
+				if (data.oldDevices.length > 0 && userCallflow && userCallflow.flow.module === 'ring_group') {
+					var endpointsCount = userCallflow.flow.data.endpoints.length;
+
+					userCallflow.flow.data.endpoints = _.filter(userCallflow.flow.data.endpoints, function(endpoint) {
+						return (data.oldDevices.indexOf(endpoint.id) < 0);
+					});
+
+					if (userCallflow.flow.data.endpoints.length < endpointsCount) {
+						if (userCallflow.flow.data.endpoints.length === 0) {
+							userCallflow.flow.module = 'user';
+							userCallflow.flow.data = {
+								can_call_self: false,
+								id: userId,
+								timeout: '20'
+							};
+							listFnParallel.push(function(callback) {
+								self.usersGetUser(userId, function(user) {
+									user.smartpbx.find_me_follow_me.enabled = false;
+									self.usersUpdateUser(user, function(data) {
+										callback(null, data);
+									});
+								});
+							});
+						}
+						listFnParallel.push(function(callback) {
+							self.usersUpdateCallflow(userCallflow, function(data) {
+								callback(null, data);
+							});
+						});
+					}
+				}
+
+				monster.parallel(listFnParallel, function(err, results) {
+					callbackAfterUpdate && callbackAfterUpdate(results);
+				});
 			});
 		},
 
