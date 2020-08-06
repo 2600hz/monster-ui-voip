@@ -4812,10 +4812,10 @@ define(function(require) {
 			self.usersGetMainCallflow(userId, function(userCallflow) {
 				var listFnParallel = _.flatten([
 					_.map(data.newDevices, function(deviceId) {
-						return _.bind(self.assignDeviceToUser, self, deviceId, userId, _.get(userCallflow, 'id'));
+						return _.bind(self.updateDeviceAssignmentFromUser, self, deviceId, userId, _.get(userCallflow, 'id'));
 					}),
 					_.map(data.oldDevices, function(deviceId) {
-						return _.bind(self.unassignDeviceFromUser, self, deviceId, userId);
+						return _.bind(self.updateDeviceAssignmentFromUser, self, deviceId, null, undefined);
 					})
 				]);
 
