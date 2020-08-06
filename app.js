@@ -231,18 +231,39 @@ define(function(require) {
 			});
 		},
 
+		getMobileCallflowIdByNumber: function(number, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'callflow.searchByNumber',
+				data: {
+					accountId: self.accountId,
+					value: number
+				},
+				success: _.flow(
+					_.partial(_.get, _, 'data'),
+					_.head,
+					_.partial(_.get, _, 'id'),
+					_.partial(callback, null)
+				),
+				error: _.partial(callback, true)
+			});
+		},
+
 		assignDeviceToUser: function assignDeviceToUser(deviceId, userId, userMainCallflowId, mainCallback) {
 			var self = this,
 				maybeUpdateMobileCallflow = function maybeUpdateMobileCallflow(userId, userMainCallflowId, device, callback) {
 					if (device.device_type !== 'mobile') {
 						return callback(null);
 					}
-					self.usersSearchMobileCallflowsByNumber(userId, device.mobile.mdn, function(listCallflowData) {
+					monster.waterfall([
+						_.bind(self.getMobileCallflowIdByNumber, self, device.mobile.mdn)
+					], function(err, callflowId) {
 						self.callApi({
 							resource: 'callflow.get',
 							data: {
 								accountId: self.accountId,
-								callflowId: listCallflowData.id
+								callflowId: callflowId
 							},
 							success: function(rawCallflowData, status) {
 								var callflowData = rawCallflowData.data;
@@ -297,12 +318,14 @@ define(function(require) {
 					if (device.device_type !== 'mobile') {
 						return callback(null);
 					}
-					self.usersSearchMobileCallflowsByNumber(userId, device.mobile.mdn, function(listCallflowData) {
+					monster.waterfall([
+						_.bind(self.getMobileCallflowIdByNumber, self, device.mobile.mdn)
+					], function(err, callflowId) {
 						self.callApi({
 							resource: 'callflow.get',
 							data: {
 								accountId: self.accountId,
-								callflowId: listCallflowData.id
+								callflowId: callflowId
 							},
 							success: function(rawCallflowData, status) {
 								var callflowData = rawCallflowData.data;
