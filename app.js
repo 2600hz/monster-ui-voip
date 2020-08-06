@@ -268,7 +268,7 @@ define(function(require) {
 			});
 		},
 
-		assignDeviceToUser: function assignDeviceToUser(deviceId, userId, userMainCallflowId, mainCallback) {
+		updateDeviceAssignmentFromUser: function(deviceId, userId, userMainCallflowId, mainCallback) {
 			var self = this,
 				maybeUpdateMobileCallflow = function maybeUpdateMobileCallflow(userId, userMainCallflowId, device, callback) {
 					if (device.device_type !== 'mobile') {
@@ -297,7 +297,7 @@ define(function(require) {
 						_.bind(self.patchCallflow, self, updatedCallflow)
 					], callback);
 				},
-				assignDeviceToUser = function assignDeviceToUser(userId, userMainCallflowId, device, callback) {
+				updateDeviceAssignment = function updateDeviceAssignment(userId, userMainCallflowId, device, callback) {
 					var updatedDevice = {
 						owner_id: userId
 					};
@@ -310,45 +310,7 @@ define(function(require) {
 
 			monster.waterfall([
 				_.bind(self.getDevice, self, deviceId),
-				_.partial(assignDeviceToUser, userId, userMainCallflowId)
-			], mainCallback);
-		},
-
-		unassignDeviceFromUser: function unassignDeviceFromUser(deviceId, userId, mainCallback) {
-			var self = this,
-				maybeUpdateMobileCallflow = function maybeUpdateMobileCallflow(userId, device, callback) {
-					if (device.device_type !== 'mobile') {
-						return callback(null);
-					}
-					var updatedCallflow = {
-						owner_id: null,
-						flow: {
-							module: 'device',
-							data: {
-								id: device.id
-							}
-						}
-					};
-
-					monster.waterfall([
-						_.bind(self.getMobileCallflowIdByNumber, self, device.mobile.mdn),
-						_.bind(self.patchCallflow, self, updatedCallflow)
-					], callback);
-				},
-				unassignDeviceFromUser = function unassignDeviceFromUser(userId, device, callback) {
-					var updatedDevice = {
-						owner_id: null
-					};
-
-					monster.waterfall([
-						_.partial(maybeUpdateMobileCallflow, userId, device),
-						_.bind(self.patchDevice, self, updatedDevice, device.id)
-					], callback);
-				};
-
-			monster.waterfall([
-				_.bind(self.getDevice, self, deviceId),
-				_.partial(unassignDeviceFromUser)
+				_.partial(updateDeviceAssignment, userId, userMainCallflowId)
 			], mainCallback);
 		}
 	};
