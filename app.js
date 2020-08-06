@@ -204,10 +204,29 @@ define(function(require) {
 			});
 		},
 
+		getDevice: function(deviceId, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'device.get',
+				data: {
+					accountId: self.accountId,
+					deviceId: deviceId
+				},
+				success: _.flow(
+					_.partial(_.get, _, 'data'),
+					_.partial(callback, null)
+				),
+				error: _.partial(callback, true)
+			});
+		},
+
 		assignDeviceToUser: function assignDeviceToUser(deviceId, userId, userCallflowId, callback) {
 			var self = this;
 
-			self.usersGetDevice(deviceId, function(data) {
+			monster.waterfall([
+				_.bind(self.getDevice, self, deviceId)
+			], function(err, data) {
 				data.owner_id = userId;
 
 				if (data.device_type === 'mobile') {
@@ -258,7 +277,9 @@ define(function(require) {
 		unassignDeviceFromUser: function unassignDeviceFromUser(deviceId, userId, callback) {
 			var self = this;
 
-			self.usersGetDevice(deviceId, function(data) {
+			monster.waterfall([
+				_.bind(self.getDevice, self, deviceId)
+			], function(err, data) {
 				delete data.owner_id;
 
 				if (data.device_type === 'mobile') {
