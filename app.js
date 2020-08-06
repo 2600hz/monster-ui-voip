@@ -221,98 +221,102 @@ define(function(require) {
 			});
 		},
 
-		assignDeviceToUser: function assignDeviceToUser(deviceId, userId, userCallflowId, callback) {
-			var self = this;
+		assignDeviceToUser: function assignDeviceToUser(deviceId, userId, userMainCallflowId, mainCallback) {
+			var self = this,
+				assignDeviceToUser = function assignDeviceToUser(userId, userMainCallflowId, device, callback) {
+					device.owner_id = userId;
+
+					if (device.device_type === 'mobile') {
+						self.usersSearchMobileCallflowsByNumber(userId, device.mobile.mdn, function(listCallflowData) {
+							self.callApi({
+								resource: 'callflow.get',
+								data: {
+									accountId: self.accountId,
+									callflowId: listCallflowData.id
+								},
+								success: function(rawCallflowData, status) {
+									var callflowData = rawCallflowData.data;
+
+									if (userMainCallflowId) {
+										$.extend(true, callflowData, {
+											owner_id: userId,
+											flow: {
+												module: 'callflow',
+												data: {
+													id: userMainCallflowId
+												}
+											}
+										});
+									} else {
+										$.extend(true, callflowData, {
+											owner_id: userId,
+											flow: {
+												module: 'device',
+												data: {
+													id: device.id
+												}
+											}
+										});
+									}
+
+									self.usersUpdateCallflow(callflowData, function() {
+										self.updateDeviceRequest(device, callback);
+									});
+								}
+							});
+						});
+					} else {
+						self.updateDeviceRequest(device, callback);
+					}
+				};
 
 			monster.waterfall([
-				_.bind(self.getDevice, self, deviceId)
-			], function(err, data) {
-				data.owner_id = userId;
+				_.bind(self.getDevice, self, deviceId),
+				_.partial(assignDeviceToUser, userId, userMainCallflowId)
+			], mainCallback);
+		},
 
-				if (data.device_type === 'mobile') {
-					self.usersSearchMobileCallflowsByNumber(userId, data.mobile.mdn, function(listCallflowData) {
-						self.callApi({
-							resource: 'callflow.get',
-							data: {
-								accountId: self.accountId,
-								callflowId: listCallflowData.id
-							},
-							success: function(rawCallflowData, status) {
-								var callflowData = rawCallflowData.data;
+		unassignDeviceFromUser: function unassignDeviceFromUser(deviceId, userId, mainCallback) {
+			var self = this,
+				unassignDeviceFromUser = function unassignDeviceFromUser(userId, device, callback) {
+					delete device.owner_id;
 
-								if (userCallflowId) {
+					if (device.device_type === 'mobile') {
+						self.usersSearchMobileCallflowsByNumber(userId, device.mobile.mdn, function(listCallflowData) {
+							self.callApi({
+								resource: 'callflow.get',
+								data: {
+									accountId: self.accountId,
+									callflowId: listCallflowData.id
+								},
+								success: function(rawCallflowData, status) {
+									var callflowData = rawCallflowData.data;
+
+									delete callflowData.owner_id;
 									$.extend(true, callflowData, {
-										owner_id: userId,
-										flow: {
-											module: 'callflow',
-											data: {
-												id: userCallflowId
-											}
-										}
-									});
-								} else {
-									$.extend(true, callflowData, {
-										owner_id: userId,
 										flow: {
 											module: 'device',
 											data: {
-												id: deviceId
+												id: device.id
 											}
 										}
 									});
+
+									self.usersUpdateCallflow(callflowData, function() {
+										self.updateDeviceRequest(device, callback);
+									});
 								}
-
-								self.usersUpdateCallflow(callflowData, function() {
-									self.updateDeviceRequest(data, callback);
-								});
-							}
+							});
 						});
-					});
-				} else {
-					self.updateDeviceRequest(data, callback);
-				}
-			});
-		},
-
-		unassignDeviceFromUser: function unassignDeviceFromUser(deviceId, userId, callback) {
-			var self = this;
+					} else {
+						self.updateDeviceRequest(device, callback);
+					}
+				};
 
 			monster.waterfall([
-				_.bind(self.getDevice, self, deviceId)
-			], function(err, data) {
-				delete data.owner_id;
-
-				if (data.device_type === 'mobile') {
-					self.usersSearchMobileCallflowsByNumber(userId, data.mobile.mdn, function(listCallflowData) {
-						self.callApi({
-							resource: 'callflow.get',
-							data: {
-								accountId: self.accountId,
-								callflowId: listCallflowData.id
-							},
-							success: function(rawCallflowData, status) {
-								var callflowData = rawCallflowData.data;
-
-								delete callflowData.owner_id;
-								$.extend(true, callflowData, {
-									flow: {
-										module: 'device',
-										data: {
-											id: deviceId
-										}
-									}
-								});
-
-								self.usersUpdateCallflow(callflowData, function() {
-									self.updateDeviceRequest(data, callback);
-								});
-							}
-						});
-					});
-				} else {
-					self.updateDeviceRequest(data, callback);
-				}
-			});
+				_.bind(self.getDevice, self, deviceId),
+				_.partial(unassignDeviceFromUser)
+			], mainCallback);
 		}
 	};
 
