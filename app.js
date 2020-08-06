@@ -194,6 +194,104 @@ define(function(require) {
 					.find('.grid-cell.active, .grid-row.active')
 						.removeClass('active');
 			});
+		},
+
+		updateDeviceRequest: function(newDataDevice, callback) {
+			var self = this;
+
+			self.usersUpdateDevice(newDataDevice, function(updatedDataDevice) {
+				callback(null, updatedDataDevice);
+			});
+		},
+
+		assignDeviceToUser: function assignDeviceToUser(deviceId, userId, userCallflowId, callback) {
+			var self = this;
+
+			self.usersGetDevice(deviceId, function(data) {
+				data.owner_id = userId;
+
+				if (data.device_type === 'mobile') {
+					self.usersSearchMobileCallflowsByNumber(userId, data.mobile.mdn, function(listCallflowData) {
+						self.callApi({
+							resource: 'callflow.get',
+							data: {
+								accountId: self.accountId,
+								callflowId: listCallflowData.id
+							},
+							success: function(rawCallflowData, status) {
+								var callflowData = rawCallflowData.data;
+
+								if (userCallflowId) {
+									$.extend(true, callflowData, {
+										owner_id: userId,
+										flow: {
+											module: 'callflow',
+											data: {
+												id: userCallflowId
+											}
+										}
+									});
+								} else {
+									$.extend(true, callflowData, {
+										owner_id: userId,
+										flow: {
+											module: 'device',
+											data: {
+												id: deviceId
+											}
+										}
+									});
+								}
+
+								self.usersUpdateCallflow(callflowData, function() {
+									self.updateDeviceRequest(data, callback);
+								});
+							}
+						});
+					});
+				} else {
+					self.updateDeviceRequest(data, callback);
+				}
+			});
+		},
+
+		unassignDeviceFromUser: function unassignDeviceFromUser(deviceId, userId, callback) {
+			var self = this;
+
+			self.usersGetDevice(deviceId, function(data) {
+				delete data.owner_id;
+
+				if (data.device_type === 'mobile') {
+					self.usersSearchMobileCallflowsByNumber(userId, data.mobile.mdn, function(listCallflowData) {
+						self.callApi({
+							resource: 'callflow.get',
+							data: {
+								accountId: self.accountId,
+								callflowId: listCallflowData.id
+							},
+							success: function(rawCallflowData, status) {
+								var callflowData = rawCallflowData.data;
+
+								delete callflowData.owner_id;
+								$.extend(true, callflowData, {
+									flow: {
+										module: 'device',
+										data: {
+											id: deviceId
+										}
+									}
+								});
+
+								self.usersUpdateCallflow(callflowData, function() {
+									self.updateDeviceRequest(data, callback);
+								});
+							}
+						});
+					});
+				} else {
+					self.updateDeviceRequest(data, callback);
+				}
+			});
 		}
 	};
 
