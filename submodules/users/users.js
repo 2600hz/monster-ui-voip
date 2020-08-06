@@ -4838,104 +4838,15 @@ define(function(require) {
 			});
 		},
 		usersUpdateDevices: function(data, userId, callbackAfterUpdate) {
-			var self = this,
-				updateDeviceRequest = function(newDataDevice, callback) {
-					self.usersUpdateDevice(newDataDevice, function(updatedDataDevice) {
-						callback(null, updatedDataDevice);
-					});
-				},
-				assignDeviceToUser = function assignDeviceToUser(deviceId, userId, userCallflow, callback) {
-					self.usersGetDevice(deviceId, function(data) {
-						data.owner_id = userId;
-
-						if (data.device_type === 'mobile') {
-							self.usersSearchMobileCallflowsByNumber(userId, data.mobile.mdn, function(listCallflowData) {
-								self.callApi({
-									resource: 'callflow.get',
-									data: {
-										accountId: self.accountId,
-										callflowId: listCallflowData.id
-									},
-									success: function(rawCallflowData, status) {
-										var callflowData = rawCallflowData.data;
-
-										if (userCallflow) {
-											$.extend(true, callflowData, {
-												owner_id: userId,
-												flow: {
-													module: 'callflow',
-													data: {
-														id: userCallflow.id
-													}
-												}
-											});
-										} else {
-											$.extend(true, callflowData, {
-												owner_id: userId,
-												flow: {
-													module: 'device',
-													data: {
-														id: deviceId
-													}
-												}
-											});
-										}
-
-										self.usersUpdateCallflow(callflowData, function() {
-											updateDeviceRequest(data, callback);
-										});
-									}
-								});
-							});
-						} else {
-							updateDeviceRequest(data, callback);
-						}
-					});
-				},
-				unassignDeviceFromUser = function unassignDeviceFromUser(deviceId, userId, callback) {
-					self.usersGetDevice(deviceId, function(data) {
-						delete data.owner_id;
-
-						if (data.device_type === 'mobile') {
-							self.usersSearchMobileCallflowsByNumber(userId, data.mobile.mdn, function(listCallflowData) {
-								self.callApi({
-									resource: 'callflow.get',
-									data: {
-										accountId: self.accountId,
-										callflowId: listCallflowData.id
-									},
-									success: function(rawCallflowData, status) {
-										var callflowData = rawCallflowData.data;
-
-										delete callflowData.owner_id;
-										$.extend(true, callflowData, {
-											flow: {
-												module: 'device',
-												data: {
-													id: deviceId
-												}
-											}
-										});
-
-										self.usersUpdateCallflow(callflowData, function() {
-											updateDeviceRequest(data, callback);
-										});
-									}
-								});
-							});
-						} else {
-							updateDeviceRequest(data, callback);
-						}
-					});
-				};
+			var self = this;
 
 			self.usersGetMainCallflow(userId, function(userCallflow) {
 				var listFnParallel = _.flatten([
 					_.map(data.newDevices, function(deviceId) {
-						return _.partial(assignDeviceToUser, deviceId, userId, userCallflow);
+						return _.bind(self.assignDeviceToUser, self, deviceId, userId, _.get(userCallflow, 'id'));
 					}),
 					_.map(data.oldDevices, function(deviceId) {
-						return _.partial(unassignDeviceFromUser, deviceId, userId);
+						return _.bind(self.unassignDeviceFromUser, self, deviceId, userId);
 					})
 				]);
 
