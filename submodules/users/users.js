@@ -4728,22 +4728,6 @@ define(function(require) {
 			});
 		},
 
-		usersUpdateDevice: function(data, callback) {
-			var self = this;
-
-			self.callApi({
-				resource: 'device.update',
-				data: {
-					accountId: self.accountId,
-					data: data,
-					deviceId: data.id
-				},
-				success: function(data) {
-					callback(data.data);
-				}
-			});
-		},
-
 		usersListDeviceUser: function(userId, callback) {
 			var self = this;
 

@@ -196,14 +196,6 @@ define(function(require) {
 			});
 		},
 
-		updateDeviceRequest: function(newDataDevice, callback) {
-			var self = this;
-
-			self.usersUpdateDevice(newDataDevice, function(updatedDataDevice) {
-				callback(null, updatedDataDevice);
-			});
-		},
-
 		getDevice: function(deviceId, callback) {
 			var self = this;
 
@@ -212,6 +204,24 @@ define(function(require) {
 				data: {
 					accountId: self.accountId,
 					deviceId: deviceId
+				},
+				success: _.flow(
+					_.partial(_.get, _, 'data'),
+					_.partial(callback, null)
+				),
+				error: _.partial(callback, true)
+			});
+		},
+
+		patchDevice: function(data, deviceId, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'device.patch',
+				data: {
+					accountId: self.accountId,
+					deviceId: deviceId,
+					data: data
 				},
 				success: _.flow(
 					_.partial(_.get, _, 'data'),
@@ -265,13 +275,14 @@ define(function(require) {
 					});
 				},
 				assignDeviceToUser = function assignDeviceToUser(userId, userMainCallflowId, device, callback) {
+					var updatedDevice = {
+						owner_id: userId
+					};
+
 					monster.waterfall([
-						_.partial(maybeUpdateMobileCallflow, userId, userMainCallflowId, device)
-					], function(err) {
-						self.updateDeviceRequest(_.merge({}, device, {
-							owner_id: userId
-						}), callback);
-					});
+						_.partial(maybeUpdateMobileCallflow, userId, userMainCallflowId, device),
+						_.bind(self.patchDevice, self, updatedDevice, device.id)
+					], callback);
 				};
 
 			monster.waterfall([
@@ -312,11 +323,14 @@ define(function(require) {
 					});
 				},
 				unassignDeviceFromUser = function unassignDeviceFromUser(userId, device, callback) {
+					var updatedDevice = {
+						owner_id: null
+					};
+
 					monster.waterfall([
-						_.partial(maybeUpdateMobileCallflow, userId, device)
-					], function(err) {
-						self.updateDeviceRequest(_.omit(device, 'owner_id'), callback);
-					});
+						_.partial(maybeUpdateMobileCallflow, userId, device),
+						_.bind(self.patchDevice, self, updatedDevice, device.id)
+					], callback);
 				};
 
 			monster.waterfall([
