@@ -292,7 +292,7 @@ define(function(require) {
 						owner_id: userId
 					};
 
-					monster.waterfall([
+					monster.parallel([
 						_.bind(self.maybeUpdateMobileCallflow, self, userId, userMainCallflowId, device),
 						_.partial(patchDevice, updatedDevice, device.id)
 					], callback);
