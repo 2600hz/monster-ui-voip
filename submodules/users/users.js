@@ -4815,7 +4815,7 @@ define(function(require) {
 						return _.bind(self.usersUpdateDeviceAssignmentFromUser, self, deviceId, userId, _.get(userCallflow, 'id'));
 					}),
 					_.map(data.oldDevices, function(deviceId) {
-						return _.bind(self.usersUpdateDeviceAssignmentFromUser, self, deviceId, null, undefined);
+						return _.bind(self.usersUpdateDeviceAssignmentFromUser, self, deviceId, null, null);
 					})
 				]);
 
@@ -4888,13 +4888,19 @@ define(function(require) {
 						error: _.partial(callback, true)
 					});
 				},
+				maybeUpdateMobileCallflow = function maybeUpdateMobileCallflow(userId, userMainCallflowId, device, callback) {
+					if (device.device_type !== 'mobile') {
+						return callback(null);
+					}
+					self.updateMobileCallflow(userId, userMainCallflowId, device, callback);
+				},
 				updateDeviceAssignment = function updateDeviceAssignment(userId, userMainCallflowId, device, callback) {
 					var updatedDevice = {
 						owner_id: userId
 					};
 
 					monster.parallel([
-						_.bind(self.maybeUpdateMobileCallflow, self, userId, userMainCallflowId, device),
+						_.partial(maybeUpdateMobileCallflow, userId, userMainCallflowId, device),
 						_.partial(patchDevice, updatedDevice, device.id)
 					], callback);
 				};
