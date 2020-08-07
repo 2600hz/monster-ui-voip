@@ -4812,10 +4812,10 @@ define(function(require) {
 			self.usersGetMainCallflow(userId, function(userCallflow) {
 				var listFnParallel = _.flatten([
 					_.map(data.newDevices, function(deviceId) {
-						return _.bind(self.updateDeviceAssignmentFromUser, self, deviceId, userId, _.get(userCallflow, 'id'));
+						return _.bind(self.usersUpdateDeviceAssignmentFromUser, self, deviceId, userId, _.get(userCallflow, 'id'));
 					}),
 					_.map(data.oldDevices, function(deviceId) {
-						return _.bind(self.updateDeviceAssignmentFromUser, self, deviceId, null, undefined);
+						return _.bind(self.usersUpdateDeviceAssignmentFromUser, self, deviceId, null, undefined);
 					})
 				]);
 
@@ -4855,6 +4855,54 @@ define(function(require) {
 					callbackAfterUpdate && callbackAfterUpdate(results);
 				});
 			});
+		},
+
+		usersUpdateDeviceAssignmentFromUser: function(deviceId, userId, userMainCallflowId, mainCallback) {
+			var self = this,
+				getDevice = function getDevice(deviceId, callback) {
+					self.callApi({
+						resource: 'device.get',
+						data: {
+							accountId: self.accountId,
+							deviceId: deviceId
+						},
+						success: _.flow(
+							_.partial(_.get, _, 'data'),
+							_.partial(callback, null)
+						),
+						error: _.partial(callback, true)
+					});
+				},
+				patchDevice = function patchDevice(data, deviceId, callback) {
+					self.callApi({
+						resource: 'device.patch',
+						data: {
+							accountId: self.accountId,
+							deviceId: deviceId,
+							data: data
+						},
+						success: _.flow(
+							_.partial(_.get, _, 'data'),
+							_.partial(callback, null)
+						),
+						error: _.partial(callback, true)
+					});
+				},
+				updateDeviceAssignment = function updateDeviceAssignment(userId, userMainCallflowId, device, callback) {
+					var updatedDevice = {
+						owner_id: userId
+					};
+
+					monster.parallel([
+						_.bind(self.maybeUpdateMobileCallflow, self, userId, userMainCallflowId, device),
+						_.partial(patchDevice, updatedDevice, device.id)
+					], callback);
+				};
+
+			monster.waterfall([
+				_.partial(getDevice, deviceId),
+				_.partial(updateDeviceAssignment, userId, userMainCallflowId)
+			], mainCallback);
 		},
 
 		usersUpdateCallflowNumbers: function(userId, callflowId, numbers, callback) {
