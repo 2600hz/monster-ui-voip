@@ -1456,13 +1456,10 @@ define(function(require) {
 		 * @param  {Function} [callbackError]
 		 */
 		devicesSaveDevice: function(deviceData, callbackSuccess, callbackError) {
-			var self = this;
+			var self = this,
+				method = deviceData.id ? 'devicesUpdateDevice' : 'devicesCreateDevice';
 
-			if (deviceData.id) {
-				self.devicesUpdateDevice(deviceData, callbackSuccess, callbackError);
-			} else {
-				self.devicesCreateDevice(deviceData, callbackSuccess, callbackError);
-			}
+			self[method](deviceData, callbackSuccess, callbackError);
 		},
 
 		/**
