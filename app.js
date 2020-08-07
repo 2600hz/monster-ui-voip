@@ -254,54 +254,6 @@ define(function(require) {
 				_.partial(getMobileCallflowIdByNumber, device.mobile.mdn),
 				_.partial(patchCallflow, updatedCallflow)
 			], mainCallback);
-		},
-
-		updateDeviceAssignmentFromUser: function(deviceId, userId, userMainCallflowId, mainCallback) {
-			var self = this,
-				getDevice = function getDevice(deviceId, callback) {
-					self.callApi({
-						resource: 'device.get',
-						data: {
-							accountId: self.accountId,
-							deviceId: deviceId
-						},
-						success: _.flow(
-							_.partial(_.get, _, 'data'),
-							_.partial(callback, null)
-						),
-						error: _.partial(callback, true)
-					});
-				},
-				patchDevice = function patchDevice(data, deviceId, callback) {
-					self.callApi({
-						resource: 'device.patch',
-						data: {
-							accountId: self.accountId,
-							deviceId: deviceId,
-							data: data
-						},
-						success: _.flow(
-							_.partial(_.get, _, 'data'),
-							_.partial(callback, null)
-						),
-						error: _.partial(callback, true)
-					});
-				},
-				updateDeviceAssignment = function updateDeviceAssignment(userId, userMainCallflowId, device, callback) {
-					var updatedDevice = {
-						owner_id: userId
-					};
-
-					monster.parallel([
-						_.bind(self.maybeUpdateMobileCallflow, self, userId, userMainCallflowId, device),
-						_.partial(patchDevice, updatedDevice, device.id)
-					], callback);
-				};
-
-			monster.waterfall([
-				_.partial(getDevice, deviceId),
-				_.partial(updateDeviceAssignment, userId, userMainCallflowId)
-			], mainCallback);
 		}
 	};
 
