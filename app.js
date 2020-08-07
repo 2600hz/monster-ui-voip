@@ -196,41 +196,64 @@ define(function(require) {
 			});
 		},
 
-		getMobileCallflowIdByNumber: function(number, callback) {
-			var self = this;
-
-			self.callApi({
-				resource: 'callflow.searchByNumber',
-				data: {
-					accountId: self.accountId,
-					value: number
+		maybeUpdateMobileCallflow: function(userId, userMainCallflowId, device, mainCallback) {
+			if (device.device_type !== 'mobile') {
+				return mainCallback(null);
+			}
+			var self = this,
+				getMobileCallflowIdByNumber = function getMobileCallflowIdByNumber(number, callback) {
+					self.callApi({
+						resource: 'callflow.searchByNumber',
+						data: {
+							accountId: self.accountId,
+							value: number
+						},
+						success: _.flow(
+							_.partial(_.get, _, 'data'),
+							_.head,
+							_.partial(_.get, _, 'id'),
+							_.partial(callback, null)
+						),
+						error: _.partial(callback, true)
+					});
 				},
-				success: _.flow(
-					_.partial(_.get, _, 'data'),
-					_.head,
-					_.partial(_.get, _, 'id'),
-					_.partial(callback, null)
-				),
-				error: _.partial(callback, true)
-			});
-		},
-
-		patchCallflow: function(data, callflowId, callback) {
-			var self = this;
-
-			self.callApi({
-				resource: 'callflow.patch',
-				data: {
-					accountId: self.accountId,
-					callflowId: callflowId,
-					data: data
+				patchCallflow = function patchCallflow(data, callflowId, callback) {
+					self.callApi({
+						resource: 'callflow.patch',
+						data: {
+							accountId: self.accountId,
+							callflowId: callflowId,
+							data: data
+						},
+						success: _.flow(
+							_.partial(_.get, _, 'data'),
+							_.partial(callback, null)
+						),
+						error: _.partial(callback, true)
+					});
 				},
-				success: _.flow(
-					_.partial(_.get, _, 'data'),
-					_.partial(callback, null)
-				),
-				error: _.partial(callback, true)
-			});
+				updatedCallflow = _.merge({
+					owner_id: userId
+				}, _.isUndefined(userMainCallflowId) ? {
+					flow: {
+						module: 'device',
+						data: {
+							id: device.id
+						}
+					}
+				} : {
+					flow: {
+						module: 'callflow',
+						data: {
+							id: userMainCallflowId
+						}
+					}
+				});
+
+			monster.waterfall([
+				_.partial(getMobileCallflowIdByNumber, device.mobile.mdn),
+				_.partial(patchCallflow, updatedCallflow)
+			], mainCallback);
 		},
 
 		updateDeviceAssignmentFromUser: function(deviceId, userId, userMainCallflowId, mainCallback) {
@@ -264,40 +287,13 @@ define(function(require) {
 						error: _.partial(callback, true)
 					});
 				},
-				maybeUpdateMobileCallflow = function maybeUpdateMobileCallflow(userId, userMainCallflowId, device, callback) {
-					if (device.device_type !== 'mobile') {
-						return callback(null);
-					}
-					var updatedCallflow = _.merge({
-						owner_id: userId
-					}, _.isUndefined(userMainCallflowId) ? {
-						flow: {
-							module: 'device',
-							data: {
-								id: device.id
-							}
-						}
-					} : {
-						flow: {
-							module: 'callflow',
-							data: {
-								id: userMainCallflowId
-							}
-						}
-					});
-
-					monster.waterfall([
-						_.bind(self.getMobileCallflowIdByNumber, self, device.mobile.mdn),
-						_.bind(self.patchCallflow, self, updatedCallflow)
-					], callback);
-				},
 				updateDeviceAssignment = function updateDeviceAssignment(userId, userMainCallflowId, device, callback) {
 					var updatedDevice = {
 						owner_id: userId
 					};
 
 					monster.waterfall([
-						_.partial(maybeUpdateMobileCallflow, userId, userMainCallflowId, device),
+						_.bind(self.maybeUpdateMobileCallflow, self, userId, userMainCallflowId, device),
 						_.partial(patchDevice, updatedDevice, device.id)
 					], callback);
 				};
