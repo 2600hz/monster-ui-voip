@@ -4888,11 +4888,11 @@ define(function(require) {
 						error: _.partial(callback, true)
 					});
 				},
-				maybeUpdateMobileCallflow = function maybeUpdateMobileCallflow(userId, userMainCallflowId, device, callback) {
+				maybeUpdateMobileCallflowAssignment = function maybeUpdateMobileCallflowAssignment(userId, userMainCallflowId, device, callback) {
 					if (device.device_type !== 'mobile') {
 						return callback(null);
 					}
-					self.updateMobileCallflow(userId, userMainCallflowId, device, callback);
+					self.updateMobileCallflowAssignment(userId, userMainCallflowId, device, callback);
 				},
 				updateDeviceAssignment = function updateDeviceAssignment(userId, userMainCallflowId, device, callback) {
 					var updatedDevice = {
@@ -4900,7 +4900,7 @@ define(function(require) {
 					};
 
 					monster.parallel([
-						_.partial(maybeUpdateMobileCallflow, userId, userMainCallflowId, device),
+						_.partial(maybeUpdateMobileCallflowAssignment, userId, userMainCallflowId, device),
 						_.partial(patchDevice, updatedDevice, device.id)
 					], callback);
 				};
