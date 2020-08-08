@@ -205,16 +205,16 @@ define(function(require) {
 		 * @param  {String} device.mobile.mdn
 		 * @param  {Function} mainCallback
 		 *
-		 * updateMobileCallflow(userId, userMainCallflowId|undefined, ...)
+		 * updateMobileCallflowAssignment(userId, userMainCallflowId|undefined, ...)
 		 * this signature will assign the device
 		 *
-		 * updateMobileCallflow(null, null, ...)
+		 * updateMobileCallflowAssignment(null, null, ...)
 		 * this signature will unassign the device
 		 *
 		 * While assigning, you can either provide the user's main callflow's ID or set it to
 		 * `undefined`, in which case the method will take care of resolving it based on `userId`.
 		 */
-		updateMobileCallflow: function(userId, userMainCallflowId, device, mainCallback) {
+		updateMobileCallflowAssignment: function(userId, userMainCallflowId, device, mainCallback) {
 			var self = this,
 				getMainUserCallflowId = function getMainUserCallflowId(userId, callback) {
 					self.callApi({
@@ -278,7 +278,7 @@ define(function(require) {
 						error: _.partial(callback, true)
 					});
 				},
-				updateMobileCallflow = function updateMobileCallflow(userId, deviceId, callflowIds, callback) {
+				updateMobileCallflowAssignment = function updateMobileCallflowAssignment(userId, deviceId, callflowIds, callback) {
 					var userMainCallflowId = callflowIds.userMainCallflowId,
 						mobileCallflowId = callflowIds.mobileCallflowId,
 						updatedCallflow = _.merge({
@@ -304,7 +304,7 @@ define(function(require) {
 
 			monster.waterfall([
 				_.partial(getCallflowIds, userId, userMainCallflowId, device.mobile.mdn),
-				_.partial(updateMobileCallflow, userId, device.id)
+				_.partial(updateMobileCallflowAssignment, userId, device.id)
 			], mainCallback);
 		}
 	};
