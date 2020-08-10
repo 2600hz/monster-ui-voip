@@ -82,8 +82,7 @@
 		},
 		"toastrMessages": {
 			"numbersUpdated": "You successfully updated the phone numbers of {{name}}",
-			"extensionsUpdated": "You successfully updated the extensions numbers of {{name}}",
-			"invalidMedia": "Select a valid media id"
+			"extensionsUpdated": "You successfully updated the extensions numbers of {{name}}"
 		},
 		"callRecording": {
 			"title": "Call Recording",
@@ -976,7 +975,8 @@
 			"buyNumbersSuccess": "The numbers have been purchased.",
 			"buyNumbersError": "An error occured while purchasing numbers.",
 			"removeNumberSuccess": "Number successfully removed from the main callflow.",
-			"noE911NumberAvailable": "There are no main numbers with e911 feature available. Please assign a main number with the e911 feature."
+			"noE911NumberAvailable": "There are no main numbers with e911 feature available. Please assign a main number with the e911 feature.",
+			"invalidMedia": "Select a valid media"
 		},
 		"popupRemoveFeatures": {
 			"title": "Features",
