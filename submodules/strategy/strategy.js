@@ -1384,60 +1384,55 @@ define(function(require) {
 				e.preventDefault();
 				var confCallflow = strategyData.callflows.MainConference;
 				if (confCallflow) {
-					self.strategyGetMainConferenceGreetingMedia(confCallflow, function(greetingMedia) {
-						var greetingTemplate = $(self.getTemplate({
-								name: 'customConferenceGreeting',
-								data: {
-									enabled: ('welcome_prompt' in confCallflow.flow.data),
-									greeting: greetingMedia && greetingMedia.tts
-										? greetingMedia.tts.text
-										: ''
-								},
-								submodule: 'strategy'
-							})),
-							greetingPopup = monster.ui.dialog(greetingTemplate, {
-								title: self.i18n.active().strategy.customConferenceGreeting.title,
-								position: ['center', 20]
-							});
-
-						monster.pub('common.mediaSelect.render', {
-							container: greetingTemplate.find('.media-wrapper'),
-							selectedOption: _.get(greetingMedia, 'id', null),
-							skin: 'tabs',
-							enableTTS: true,
-							tts: {
-								name: 'MainConferenceGreeting',
-								type: 'conferencingCallInNumber'
+					var greetingTemplate = $(self.getTemplate({
+							name: 'customConferenceGreeting',
+							data: {
+								enabled: ('welcome_prompt' in confCallflow.flow.data)
 							},
-							callback: function(mediaControl) {
-								self.bindMediaUpload(greetingTemplate, mediaControl, confCallflow, function(updatedCallflow) {
-									if (greetingTemplate.find('.switch-state').prop('checked')) {
-										strategyData.callflows.MainConference = updatedCallflow;
-										greetingPopup.dialog('close').remove();
-										$('#strategy_container .custom-greeting-icon').show();
-									} else {
-										if ('welcome_prompt' in confCallflow.flow.data) {
-											delete confCallflow.flow.data.welcome_prompt;
-											self.strategyUpdateCallflow(confCallflow, function(updatedCallflow) {
-												strategyData.callflows.MainConference = updatedCallflow;
-												greetingPopup.dialog('close').remove();
-												$('#strategy_container .custom-greeting-icon').hide();
-											});
-										} else {
+							submodule: 'strategy'
+						})),
+						greetingPopup = monster.ui.dialog(greetingTemplate, {
+							title: self.i18n.active().strategy.customConferenceGreeting.title,
+							position: ['center', 20]
+						});
+
+					monster.pub('common.mediaSelect.render', {
+						container: greetingTemplate.find('.media-wrapper'),
+						selectedOption: _.get(confCallflow, 'flow.data.welcome_prompt.media_id', null),
+						skin: 'tabs',
+						enableTTS: true,
+						tts: {
+							name: 'MainConferenceGreeting',
+							type: 'conferencingCallInNumber'
+						},
+						callback: function(mediaControl) {
+							self.bindMediaUpload(greetingTemplate, mediaControl, confCallflow, function(updatedCallflow) {
+								if (greetingTemplate.find('.switch-state').prop('checked')) {
+									strategyData.callflows.MainConference = updatedCallflow;
+									greetingPopup.dialog('close').remove();
+									$('#strategy_container .custom-greeting-icon').show();
+								} else {
+									if ('welcome_prompt' in confCallflow.flow.data) {
+										delete confCallflow.flow.data.welcome_prompt;
+										self.strategyUpdateCallflow(confCallflow, function(updatedCallflow) {
+											strategyData.callflows.MainConference = updatedCallflow;
 											greetingPopup.dialog('close').remove();
-										}
+											$('#strategy_container .custom-greeting-icon').hide();
+										});
+									} else {
+										greetingPopup.dialog('close').remove();
 									}
-								});
-							}
-						});
+								}
+							});
+						}
+					});
 
-						greetingTemplate.find('.switch-state').on('change', function() {
-							$(this).prop('checked') ? greetingTemplate.find('.content').slideDown() : greetingTemplate.find('.content').slideUp();
-						});
+					greetingTemplate.find('.switch-state').on('change', function() {
+						$(this).prop('checked') ? greetingTemplate.find('.content').slideDown() : greetingTemplate.find('.content').slideUp();
+					});
 
-						greetingTemplate.find('.cancel').on('click', function() {
-							greetingPopup.dialog('close').remove();
-						});
+					greetingTemplate.find('.cancel').on('click', function() {
+						greetingPopup.dialog('close').remove();
 					});
 				} else {
 					monster.ui.alert('error', self.i18n.active().strategy.customConferenceGreeting.mainConfMissing);
@@ -1498,48 +1493,28 @@ define(function(require) {
 		bindMediaUpload: function(template, mediaControl, confCallflow, callback) {
 			var self = this;
 
+			// Welcome to our conference service. Your call may be recorded.
 			template.find('.save').on('click', function() {
 				if (template.find('.switch-state').prop('checked')) {
 					mediaControl.getValue(function(id) {
-						confCallflow.flow.data.welcome_prompt = {
-							media_id: id
-						};
+						if (id === 'none') {
+							monster.ui.toast({
+								type: 'error',
+								message: self.i18n.active().strategy.toastrMessages.invalidMedia
+							});
+						} else {
+							confCallflow.flow.data.welcome_prompt = {
+								media_id: id
+							};
 
-						self.strategyUpdateCallflow(confCallflow, function(updatedCallflow) {
-							callback(updatedCallflow);
-						});
+							self.strategyUpdateCallflow(confCallflow, function(updatedCallflow) {
+								callback(updatedCallflow);
+							});
+						}
 					});
 				} else {
 					callback();
 				}
-			});
-		},
-
-		strategyGetMainConferenceGreetingMedia: function(mainConferenceCallflow, callback) {
-			var self = this,
-				mediaId = _.get(mainConferenceCallflow, 'flow.data.welcome_prompt.media_id');
-
-			monster.waterfall([
-				function(cb) {
-					if (_.isUndefined(mediaId)) {
-						return cb(null, null);
-					}
-					self.callApi({
-						resource: 'media.get',
-						data: {
-							accountId: self.accountId,
-							mediaId: mediaId
-						},
-						success: function(data) {
-							cb(null, data.data);
-						},
-						error: function() {
-							cb(null, {});
-						}
-					});
-				}
-			], function(err, media) {
-				callback(err ? null : media);
 			});
 		},
 
