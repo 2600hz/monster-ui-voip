@@ -1403,7 +1403,8 @@ define(function(require) {
 						enableTTS: true,
 						tts: {
 							name: 'MainConferenceGreeting',
-							type: 'conferencingCallInNumber'
+							type: 'conferencingCallInNumber',
+							entity: self.i18n.active().strategy.customConferenceGreeting.entity
 						},
 						callback: function(mediaControl) {
 							self.bindMediaUpload(greetingTemplate, mediaControl, confCallflow, function(updatedCallflow) {
@@ -1493,7 +1494,6 @@ define(function(require) {
 		bindMediaUpload: function(template, mediaControl, confCallflow, callback) {
 			var self = this;
 
-			// Welcome to our conference service. Your call may be recorded.
 			template.find('.save').on('click', function() {
 				if (template.find('.switch-state').prop('checked')) {
 					mediaControl.getValue(function(id) {
