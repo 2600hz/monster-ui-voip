@@ -1026,7 +1026,8 @@
 			"link": "Custom Greeting",
 			"info": "Customize your conference greeting message using our Text-to-Speech feature. Simply type your greeting message in the input field below.",
 			"mainConfMissing": "Your Main Conference could not be found.",
-			"tooltip": "Your Main Conference has a custom greeting message."
+			"tooltip": "Your Main Conference has a custom greeting message.",
+			"entity": "conference"
 		},
 
 		"__comment": "UI-2499: Handle case where greeting has been deleted",
