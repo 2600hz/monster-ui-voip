@@ -659,7 +659,7 @@ define(function(require) {
 						resource: 'numbers.matchClassifier',
 						data: {
 							accountId: self.accountId,
-							phoneNumber: encodeURIComponent(number)
+							phoneNumber: number
 						},
 						success: function(data, status) {
 							var matchedLine = templateDevice.find('.restriction-line[data-restriction="' + data.data.name + '"]'),
@@ -1570,7 +1570,7 @@ define(function(require) {
 				resource: 'numbers.get',
 				data: {
 					accountId: self.accountId,
-					phoneNumber: encodeURIComponent(number)
+					phoneNumber: number
 				},
 				success: function(_data, status) {
 					var street_address = _data.data.e911.street_address,
