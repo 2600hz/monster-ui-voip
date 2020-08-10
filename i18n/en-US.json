@@ -82,7 +82,8 @@
 		},
 		"toastrMessages": {
 			"numbersUpdated": "You successfully updated the phone numbers of {{name}}",
-			"extensionsUpdated": "You successfully updated the extensions numbers of {{name}}"
+			"extensionsUpdated": "You successfully updated the extensions numbers of {{name}}",
+			"invalidMedia": "Select a valid media id"
 		},
 		"callRecording": {
 			"title": "Call Recording",
