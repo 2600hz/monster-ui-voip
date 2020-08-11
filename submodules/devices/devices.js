@@ -264,12 +264,14 @@ define(function(require) {
 		/**
 		 * @param  {Object} args
 		 * @param  {Boolean} [args.allowAssign]
+		 * @param  {Boolean} [args.ownerId]
 		 * @param  {String} args.type
 		 * @param  {Function} args.callback
 		 */
 		devicesRenderAdd: function(args) {
 			var self = this,
 				allowAssign = _.get(args, 'allowAssign'),
+				ownerId = _.get(args, 'ownerId'),
 				type = args.type,
 				callback = args.callback,
 				data = {
@@ -283,7 +285,7 @@ define(function(require) {
 							resource: 'device.create',
 							data: {
 								accountId: self.accountId,
-								data: dataModel
+								data: _.merge({}, dataModel, ownerId && { owner_id: ownerId })
 							},
 							success: function(data, status) {
 								callback(data.data);
