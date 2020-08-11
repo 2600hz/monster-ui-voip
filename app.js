@@ -196,6 +196,23 @@ define(function(require) {
 			});
 		},
 
+		patchCallflow: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'callflow.patch',
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
+				success: function(data) {
+					_.has(args, 'success') && args.success(data.data);
+				},
+				error: function(parsedError) {
+					_.has(args, 'error') && args.error(parsedError);
+				}
+			});
+		},
+
 		/**
 		 * Runs tasks necessary for mobile device callfow update on un\assignement.
 		 * @param  {String|null} userId
@@ -263,21 +280,6 @@ define(function(require) {
 						mobileCallflowId: _.partial(getMobileCallflowIdByNumber, number)
 					}, callback);
 				},
-				patchCallflow = function patchCallflow(data, callflowId, callback) {
-					self.callApi({
-						resource: 'callflow.patch',
-						data: {
-							accountId: self.accountId,
-							callflowId: callflowId,
-							data: data
-						},
-						success: _.flow(
-							_.partial(_.get, _, 'data'),
-							_.partial(callback, null)
-						),
-						error: _.partial(callback, true)
-					});
-				},
 				updateMobileCallflowAssignment = function updateMobileCallflowAssignment(userId, deviceId, callflowIds, callback) {
 					var userMainCallflowId = callflowIds.userMainCallflowId,
 						mobileCallflowId = callflowIds.mobileCallflowId,
@@ -299,7 +301,14 @@ define(function(require) {
 							}
 						});
 
-					patchCallflow(updatedCallflow, mobileCallflowId, callback);
+					self.patchCallflow({
+						data: {
+							callflowId: mobileCallflowId,
+							data: updatedCallflow
+						},
+						success: _.partial(callback, null),
+						error: _.partial(callback, true)
+					});
 				};
 
 			monster.waterfall([

@@ -4806,55 +4806,93 @@ define(function(require) {
 				callback && callback(results);
 			});
 		},
-		usersUpdateDevices: function(data, userId, callbackAfterUpdate) {
-			var self = this;
 
-			self.usersGetMainCallflow(userId, function(userCallflow) {
-				var listFnParallel = _.flatten([
-					_.map(data.newDevices, function(deviceId) {
-						return _.bind(self.usersUpdateDeviceAssignmentFromUser, self, deviceId, userId, _.get(userCallflow, 'id'));
-					}),
-					_.map(data.oldDevices, function(deviceId) {
-						return _.bind(self.usersUpdateDeviceAssignmentFromUser, self, deviceId, null, null);
-					})
-				]);
-
-				if (data.oldDevices.length > 0 && userCallflow && userCallflow.flow.module === 'ring_group') {
-					var endpointsCount = userCallflow.flow.data.endpoints.length;
-
-					userCallflow.flow.data.endpoints = _.filter(userCallflow.flow.data.endpoints, function(endpoint) {
-						return (data.oldDevices.indexOf(endpoint.id) < 0);
+		/**
+		 * @param  {Object} data
+		 * @param  {String[]} data.newDevices List of device IDs to assign
+		 * @param  {String[]} data.oldDevices List of device IDs to unassign
+		 * @param  {String} userId
+		 * @param  {Function} callback
+		 */
+		usersUpdateDevices: function(data, userId, callback) {
+			var self = this,
+				getUserMainCallflow = function getUserMainCallflow(userId, next) {
+					self.usersGetMainCallflow(userId, _.partial(next, null));
+				},
+				assignDeviceFactory = function assignDeviceFactory(userId, userMainCallflowId, deviceId) {
+					return _.bind(self.usersUpdateDeviceAssignmentFromUser, self, deviceId, userId, userMainCallflowId);
+				},
+				unassignDeviceFactory = function unassignDeviceFactory(deviceId) {
+					return _.bind(self.usersUpdateDeviceAssignmentFromUser, self, deviceId, null, null);
+				},
+				updateCallflowEndpoints = function updateCallflowEndpoints(updatedEndpoints, callflowId, next) {
+					self.patchCallflow({
+						data: {
+							callflowId: callflowId,
+							data: {
+								flow: _.isEmpty(updatedEndpoints) ? {
+									module: 'user',
+									data: {
+										can_call_self: false,
+										endpoints: null,
+										id: userId,
+										timeout: 20
+									}
+								} : {
+									data: {
+										endpoints: updatedEndpoints
+									}
+								}
+							}
+						},
+						success: _.partial(next, null),
+						error: _.partial(next, true)
 					});
+				},
+				disableFindMeFollowMeForUserId = function disableFindMeFollowMeForUserId(userId, next) {
+					self.usersPatchUser({
+						data: {
+							userId: userId,
+							data: {
+								smartpbx: {
+									find_me_follow_me: false
+								}
+							}
+						},
+						success: _.partial(next, null),
+						error: _.partial(next, true)
+					});
+				},
+				maybeUpdateUserAndCallflow = function maybeUpdateUserAndCallflow(userId, userCallflow, deviceIdsRemoved, next) {
+					var hasRingGroupModule = _.get(userCallflow, 'flow.module') === 'ring_group',
+						currentEndpoints = _.get(userCallflow, 'flow.data.endpoints', []),
+						updatedEndpoints = _.reject(currentEndpoints, _.flow(
+							_.partial(_.get, _, 'id'),
+							_.partial(_.includes, deviceIdsRemoved)
+						)),
+						whereEndpointsRemoved = _.size(updatedEndpoints) < _.size(currentEndpoints);
 
-					if (userCallflow.flow.data.endpoints.length < endpointsCount) {
-						if (userCallflow.flow.data.endpoints.length === 0) {
-							userCallflow.flow.module = 'user';
-							userCallflow.flow.data = {
-								can_call_self: false,
-								id: userId,
-								timeout: '20'
-							};
-							listFnParallel.push(function(callback) {
-								self.usersGetUser(userId, function(user) {
-									user.smartpbx.find_me_follow_me.enabled = false;
-									self.usersUpdateUser(user, function(data) {
-										callback(null, data);
-									});
-								});
-							});
-						}
-						listFnParallel.push(function(callback) {
-							self.usersUpdateCallflow(userCallflow, function(data) {
-								callback(null, data);
-							});
-						});
-					}
-				}
+					monster.parallel(_.flatten([
+						hasRingGroupModule && whereEndpointsRemoved ? [
+							_.partial(updateCallflowEndpoints, updatedEndpoints, userCallflow.id)
+						] : [],
+						hasRingGroupModule && whereEndpointsRemoved && _.isEmpty(updatedEndpoints) ? [
+							_.partial(disableFindMeFollowMeForUserId, userId)
+						] : []
+					]), next);
+				},
+				updateEntities = function updateEntities(userId, devices, userMainCallflow, next) {
+					monster.parallel(_.flatten([
+						_.map(data.newDevices, _.partial(assignDeviceFactory, userId, _.get(userMainCallflow, 'id'))),
+						_.map(data.oldDevices, unassignDeviceFactory),
+						_.partial(maybeUpdateUserAndCallflow, userId, userMainCallflow, data.oldDevices)
+					]), next);
+				};
 
-				monster.parallel(listFnParallel, function(err, results) {
-					callbackAfterUpdate && callbackAfterUpdate(results);
-				});
-			});
+			monster.waterfall([
+				_.partial(getUserMainCallflow, userId),
+				_.partial(updateEntities, userId, data)
+			], callback);
 		},
 
 		usersUpdateDeviceAssignmentFromUser: function(deviceId, userId, userMainCallflowId, mainCallback) {
