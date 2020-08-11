@@ -1162,6 +1162,7 @@ define(function(require) {
 
 				monster.pub('voip.devices.renderAdd', {
 					allowAssign: false,
+					ownerId: currentUser,
 					type: type,
 					callback: function(device) {
 						var rowDevice = $(self.getTemplate({
