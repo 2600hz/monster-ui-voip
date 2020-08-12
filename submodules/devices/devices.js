@@ -274,9 +274,11 @@ define(function(require) {
 				ownerId = _.get(args, 'ownerId'),
 				type = args.type,
 				callback = args.callback,
-				data = {
+				data = _.merge({
 					device_type: type
-				};
+				}, ownerId && {
+					owner_id: ownerId
+				});
 
 			if (type === 'sip_device' && monster.config.api.provisioner) {
 				monster.pub('common.chooseModel.render', {
