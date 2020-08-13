@@ -935,6 +935,7 @@ define(function(require) {
 		 */
 		devicesFormatData: function(data, dataList) {
 			var self = this,
+				isNewDevice = !_.has(data.device, 'id'),
 				keyActionsMod = _.get(
 					self.appFlags.devices.provisionerConfigFlags,
 					['brands', _.get(data.device, 'provision.endpoint_brand'), 'keyFunctions'],
@@ -1031,9 +1032,16 @@ define(function(require) {
 						.value()
 				},
 				deviceData = _.mergeWith(
-					{},
-					deviceDefaults,
-					deviceDefaultsForType,
+					{
+						// Empty props required for UI render
+						media: {
+							audio: {},
+							encryption: {},
+							video: {}
+						}
+					},
+					isNewDevice && deviceDefaults,
+					isNewDevice && deviceDefaultsForType,
 					data.device,
 					function(dest, src) {
 						return _.every([dest, src], _.isArray) ? src : undefined;
