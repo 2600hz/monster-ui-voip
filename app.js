@@ -194,6 +194,127 @@ define(function(require) {
 					.find('.grid-cell.active, .grid-row.active')
 						.removeClass('active');
 			});
+		},
+
+		patchCallflow: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'callflow.patch',
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
+				success: function(data) {
+					_.has(args, 'success') && args.success(data.data);
+				},
+				error: function(parsedError) {
+					_.has(args, 'error') && args.error(parsedError);
+				}
+			});
+		},
+
+		/**
+		 * Runs tasks necessary for mobile device callfow update on un\assignement.
+		 * @param  {String|null} userId
+		 * @param  {String|null|undefined} userMainCallflowId
+		 * @param  {Object} device
+		 * @param  {String} device.id
+		 * @param  {String} device.mobile.mdn
+		 * @param  {Function} mainCallback
+		 *
+		 * updateMobileCallflowAssignment(userId, userMainCallflowId|undefined, ...)
+		 * this signature will assign the device
+		 *
+		 * updateMobileCallflowAssignment(null, null, ...)
+		 * this signature will unassign the device
+		 *
+		 * While assigning, you can either provide the user's main callflow's ID or set it to
+		 * `undefined`, in which case the method will take care of resolving it based on `userId`.
+		 */
+		updateMobileCallflowAssignment: function(userId, userMainCallflowId, device, mainCallback) {
+			var self = this,
+				getMainUserCallflowId = function getMainUserCallflowId(userId, callback) {
+					self.callApi({
+						resource: 'callflow.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								filter_owner_id: userId,
+								filter_type: 'mainUserCallflow'
+							}
+						},
+						success: _.flow(
+							_.partial(_.get, _, 'data'),
+							_.head,
+							_.partial(_.get, _, 'id'),
+							_.partial(callback, null)
+						),
+						error: _.partial(callback, true)
+					});
+				},
+				maybeGetMainUserCallflowId = function maybeGetMainUserCallflowId(userId, userMainCallflowId, callback) {
+					if (_.isNull(userMainCallflowId) || !_.isUndefined(userMainCallflowId)) {
+						return callback(null, userMainCallflowId);
+					}
+					getMainUserCallflowId(userId, callback);
+				},
+				getMobileCallflowIdByNumber = function getMobileCallflowIdByNumber(number, callback) {
+					self.callApi({
+						resource: 'callflow.searchByNumber',
+						data: {
+							accountId: self.accountId,
+							value: number
+						},
+						success: _.flow(
+							_.partial(_.get, _, 'data'),
+							_.head,
+							_.partial(_.get, _, 'id'),
+							_.partial(callback, null)
+						),
+						error: _.partial(callback, true)
+					});
+				},
+				getCallflowIds = function getCallflowIds(userId, userMainCallflowId, number, callback) {
+					monster.parallel({
+						userMainCallflowId: _.partial(maybeGetMainUserCallflowId, userId, userMainCallflowId),
+						mobileCallflowId: _.partial(getMobileCallflowIdByNumber, number)
+					}, callback);
+				},
+				updateMobileCallflowAssignment = function updateMobileCallflowAssignment(userId, deviceId, callflowIds, callback) {
+					var userMainCallflowId = callflowIds.userMainCallflowId,
+						mobileCallflowId = callflowIds.mobileCallflowId,
+						updatedCallflow = _.merge({
+							owner_id: userId
+						}, _.isNull(userMainCallflowId) ? {
+							flow: {
+								module: 'device',
+								data: {
+									id: deviceId
+								}
+							}
+						} : {
+							flow: {
+								module: 'callflow',
+								data: {
+									id: userMainCallflowId
+								}
+							}
+						});
+
+					self.patchCallflow({
+						data: {
+							callflowId: mobileCallflowId,
+							data: updatedCallflow
+						},
+						success: _.partial(callback, null),
+						error: _.partial(callback, true)
+					});
+				};
+
+			monster.waterfall([
+				_.partial(getCallflowIds, userId, userMainCallflowId, device.mobile.mdn),
+				_.partial(updateMobileCallflowAssignment, userId, device.id)
+			], mainCallback);
 		}
 	};
 
