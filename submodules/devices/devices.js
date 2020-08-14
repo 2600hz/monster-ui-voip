@@ -935,6 +935,7 @@ define(function(require) {
 		 */
 		devicesFormatData: function(data, dataList) {
 			var self = this,
+				isNewDevice = !_.has(data.device, 'id'),
 				keyActionsMod = _.get(
 					self.appFlags.devices.provisionerConfigFlags,
 					['brands', _.get(data.device, 'provision.endpoint_brand'), 'keyFunctions'],
@@ -947,7 +948,14 @@ define(function(require) {
 				isClassifierDisabledByAccount = function isClassifierDisabledByAccount(classifier) {
 					return _.get(data.accountLimits, ['call_restriction', classifier, 'action']) === 'deny';
 				},
-				deviceDefaults = {
+				templateDefaults = {
+					media: {
+						audio: {},
+						encryption: {},
+						video: {}
+					}
+				},
+				deviceBaseDefaults = {
 					call_restriction: {},
 					device_type: 'sip_device',
 					enabled: true,
@@ -1007,6 +1015,7 @@ define(function(require) {
 					smartphone: _.merge({}, sipSettings, callForwardSettings),
 					softphone: _.merge({}, sipSettings)
 				}, data.device.device_type, {}),
+				deviceDefaults = _.merge({}, deviceBaseDefaults, deviceDefaultsForType),
 				deviceOverrides = {
 					provision: _
 						.chain(data.template)
@@ -1032,8 +1041,8 @@ define(function(require) {
 				},
 				deviceData = _.mergeWith(
 					{},
-					deviceDefaults,
-					deviceDefaultsForType,
+					templateDefaults,
+					isNewDevice && deviceDefaults,
 					data.device,
 					function(dest, src) {
 						return _.every([dest, src], _.isArray) ? src : undefined;
