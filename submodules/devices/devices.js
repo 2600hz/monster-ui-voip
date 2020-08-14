@@ -948,7 +948,14 @@ define(function(require) {
 				isClassifierDisabledByAccount = function isClassifierDisabledByAccount(classifier) {
 					return _.get(data.accountLimits, ['call_restriction', classifier, 'action']) === 'deny';
 				},
-				deviceDefaults = {
+				templateDefaults = {
+					media: {
+						audio: {},
+						encryption: {},
+						video: {}
+					}
+				},
+				deviceBaseDefaults = {
 					call_restriction: {},
 					device_type: 'sip_device',
 					enabled: true,
@@ -1008,6 +1015,7 @@ define(function(require) {
 					smartphone: _.merge({}, sipSettings, callForwardSettings),
 					softphone: _.merge({}, sipSettings)
 				}, data.device.device_type, {}),
+				deviceDefaults = _.merge({}, deviceBaseDefaults, deviceDefaultsForType),
 				deviceOverrides = {
 					provision: _
 						.chain(data.template)
@@ -1032,16 +1040,9 @@ define(function(require) {
 						.value()
 				},
 				deviceData = _.mergeWith(
-					{
-						// Empty props required for UI render
-						media: {
-							audio: {},
-							encryption: {},
-							video: {}
-						}
-					},
+					{},
+					templateDefaults,
 					isNewDevice && deviceDefaults,
-					isNewDevice && deviceDefaultsForType,
 					data.device,
 					function(dest, src) {
 						return _.every([dest, src], _.isArray) ? src : undefined;
