@@ -1450,6 +1450,9 @@ define(function(require) {
 					});
 
 					self.strategyConfGreetingBindEvents(greetingPopup, mediaControl, confCallflow.id, function afterSaveHandler(err, updatedCallflow, isEnabled) {
+						if (err) {
+							return monster.ui.alert('error', self.i18n.active().strategy.customConferenceGreeting.mainConfMissing);
+						}
 						strategyData.callflows.MainConference = updatedCallflow;
 						greetingPopup.dialog('close');
 						$('#strategy_container .custom-greeting-icon')[isEnabled ? 'fadeIn' : 'fadeOut']();
