@@ -1406,6 +1406,7 @@ define(function(require) {
 							type: 'conferencingCallInNumber',
 							entity: self.i18n.active().strategy.customConferenceGreeting.entity
 						},
+						required: true,
 						callback: function(mediaControl) {
 							self.bindMediaUpload(greetingTemplate, mediaControl, confCallflow, function(updatedCallflow) {
 								if (greetingTemplate.find('.switch-state').prop('checked')) {
@@ -1497,20 +1498,13 @@ define(function(require) {
 			template.find('.save').on('click', function() {
 				if (template.find('.switch-state').prop('checked')) {
 					mediaControl.getValue(function(id) {
-						if (id === 'none') {
-							monster.ui.toast({
-								type: 'error',
-								message: self.i18n.active().strategy.toastrMessages.invalidMedia
-							});
-						} else {
-							confCallflow.flow.data.welcome_prompt = {
-								media_id: id
-							};
+						confCallflow.flow.data.welcome_prompt = {
+							media_id: id
+						};
 
-							self.strategyUpdateCallflow(confCallflow, function(updatedCallflow) {
-								callback(updatedCallflow);
-							});
-						}
+						self.strategyUpdateCallflow(confCallflow, function(updatedCallflow) {
+							callback(updatedCallflow);
+						});
 					});
 				} else {
 					callback();
