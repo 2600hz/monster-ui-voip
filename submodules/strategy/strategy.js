@@ -1445,8 +1445,7 @@ define(function(require) {
 				})),
 				onMediaSelectRender = function onMediaSelectRender(mediaControl) {
 					var greetingPopup = monster.ui.dialog($greetingTemplate, {
-						title: self.i18n.active().strategy.customConferenceGreeting.title,
-						position: ['center', 20]
+						title: self.i18n.active().strategy.customConferenceGreeting.title
 					});
 
 					self.strategyConfGreetingBindEvents(greetingPopup, mediaControl, confCallflow.id, function afterSaveHandler(err, updatedCallflow, isEnabled) {
