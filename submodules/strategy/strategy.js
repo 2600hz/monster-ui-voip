@@ -1488,10 +1488,14 @@ define(function(require) {
 		},
 
 		strategyConfGreetingBindEvents: function($popup, mediaControl, confCallflow, callback) {
-			var self = this;
+			var self = this,
+				$switch = $popup.find('.switch-state'),
+				isEnabled = function() {
+					return $switch.prop('checked');
+				};
 
 			$popup.find('.save').on('click', function() {
-				if ($popup.find('.switch-state').prop('checked')) {
+				if (isEnabled()) {
 					mediaControl.getValue(function(id) {
 						confCallflow.flow.data.welcome_prompt = {
 							media_id: id
@@ -1506,8 +1510,8 @@ define(function(require) {
 				}
 			});
 
-			$popup.find('.switch-state').on('change', function() {
-				$(this).prop('checked') ? $popup.find('.content').slideDown() : $popup.find('.content').slideUp();
+			$switch.on('change', function() {
+				isEnabled() ? $popup.find('.content').slideDown() : $popup.find('.content').slideUp();
 			});
 
 			$popup.find('.cancel').on('click', function() {
