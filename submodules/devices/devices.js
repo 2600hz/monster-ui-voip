@@ -591,7 +591,7 @@ define(function(require) {
 
 					$this.prop('disabled', 'disabled');
 
-					self.devicesSaveDevice(dataToSave, function(data) {
+					self.devicesSaveDevice(data.owner_id, dataToSave, function(data) {
 						if (hasToRestart) {
 							self.devicesRestart(data.id, function() {
 								monster.ui.toast({
@@ -659,7 +659,7 @@ define(function(require) {
 						resource: 'numbers.matchClassifier',
 						data: {
 							accountId: self.accountId,
-							phoneNumber: encodeURIComponent(number)
+							phoneNumber: number
 						},
 						success: function(data, status) {
 							var matchedLine = templateDevice.find('.restriction-line[data-restriction="' + data.data.name + '"]'),
@@ -935,6 +935,7 @@ define(function(require) {
 		 */
 		devicesFormatData: function(data, dataList) {
 			var self = this,
+				isNewDevice = !_.has(data.device, 'id'),
 				keyActionsMod = _.get(
 					self.appFlags.devices.provisionerConfigFlags,
 					['brands', _.get(data.device, 'provision.endpoint_brand'), 'keyFunctions'],
@@ -942,13 +943,19 @@ define(function(require) {
 				),
 				defaultLineKeys = _.get(
 					self.appFlags.devices.provisionerConfigFlags,
-					['brands', _.get(data.device, 'provision.endpoint_brand'), 'lineKeys'],
-					[1]
+					['brands', _.get(data.device, 'provision.endpoint_brand'), 'lineKeys']
 				),
 				isClassifierDisabledByAccount = function isClassifierDisabledByAccount(classifier) {
 					return _.get(data.accountLimits, ['call_restriction', classifier, 'action']) === 'deny';
 				},
-				deviceDefaults = {
+				templateDefaults = {
+					media: {
+						audio: {},
+						encryption: {},
+						video: {}
+					}
+				},
+				deviceBaseDefaults = {
 					call_restriction: {},
 					device_type: 'sip_device',
 					enabled: true,
@@ -1008,6 +1015,7 @@ define(function(require) {
 					smartphone: _.merge({}, sipSettings, callForwardSettings),
 					softphone: _.merge({}, sipSettings)
 				}, data.device.device_type, {}),
+				deviceDefaults = _.merge({}, deviceBaseDefaults, deviceDefaultsForType),
 				deviceOverrides = {
 					provision: _
 						.chain(data.template)
@@ -1033,8 +1041,8 @@ define(function(require) {
 				},
 				deviceData = _.mergeWith(
 					{},
-					deviceDefaults,
-					deviceDefaultsForType,
+					templateDefaults,
+					isNewDevice && deviceDefaults,
 					data.device,
 					function(dest, src) {
 						return _.every([dest, src], _.isArray) ? src : undefined;
@@ -1078,7 +1086,7 @@ define(function(require) {
 								return _.merge({
 									id: type,
 									type: camelCasedType,
-									lineKeys: defaultLineKeys,
+									lineKeys: defaultLineKeys || [1],
 									actions: _
 										.chain([
 											'presence',
@@ -1094,13 +1102,20 @@ define(function(require) {
 										})
 										.concat(['none'])
 										.map(function(action) {
-											var i18n = self.i18n.active().devices.popupSettings.keys;
+											var i18n = self.i18n.active().devices.popupSettings.keys,
+												hasDefaultLineKeys = !!defaultLineKeys,
+												allowedDefaultLineKeyActions = ['none', 'line'];
 
-											return {
+											return _.merge({
 												id: action,
 												info: _.get(i18n, ['info', 'types', action]),
 												label: _.get(i18n, ['types', action])
-											};
+											},
+											type === 'combo_keys' && hasDefaultLineKeys && !_.includes(allowedDefaultLineKeyActions, action) ? {
+												isActionRestringed: true
+											}
+											: {}
+											);
 										})
 										// Sort alphabetically while keeping `none` as first item
 										.sort(function(a, b) {
@@ -1445,18 +1460,45 @@ define(function(require) {
 		},
 
 		/**
+		 * @param  {String|undefined} originalUserId
 		 * @param  {Object} deviceData
 		 * @param  {Function} callbackSuccess
 		 * @param  {Function} [callbackError]
 		 */
-		devicesSaveDevice: function(deviceData, callbackSuccess, callbackError) {
-			var self = this;
+		devicesSaveDevice: function(originalUserId, deviceData, callbackSuccess, callbackError) {
+			var self = this,
+				isMobileDevice = deviceData.device_type === 'mobile',
+				hasDifferentUserId = originalUserId !== deviceData.owner_id,
+				shouldUpdateMobileCallflow = isMobileDevice && hasDifferentUserId,
+				maybeUpdateMobileCallflowAssignment = function maybeUpdateMobileCallflowAssignment(shouldUpdateMobileCallflow, device, callback) {
+					if (!shouldUpdateMobileCallflow) {
+						return callback(null);
+					}
+					var userId = _.get(device, 'owner_id', null),
+						userMainCallflowId = userId ? undefined : null;
 
-			if (deviceData.id) {
-				self.devicesUpdateDevice(deviceData, callbackSuccess, callbackError);
-			} else {
-				self.devicesCreateDevice(deviceData, callbackSuccess, callbackError);
-			}
+					self.updateMobileCallflowAssignment(userId, userMainCallflowId, device, callback);
+				},
+				saveDevice = function saveDevice(device, callback) {
+					var method = _.has(device, 'id') ? 'devicesUpdateDevice' : 'devicesCreateDevice';
+
+					self[method](device, _.partial(callback, null), callback);
+				};
+
+			/**
+			 * We perform both operations in parallel because, although app#updateMobileCallflowAssignment
+			 * requires an existing device to run, since it is not possible to create mobile devices
+			 * from smartpbx, that ID will always be present.
+			 */
+			monster.parallel({
+				_: _.partial(maybeUpdateMobileCallflowAssignment, shouldUpdateMobileCallflow, deviceData),
+				device: _.partial(saveDevice, deviceData)
+			}, function(err, results) {
+				if (err) {
+					return callbackError && callbackError(err);
+				}
+				callbackSuccess && callbackSuccess(results.device);
+			});
 		},
 
 		/**
@@ -1564,7 +1606,7 @@ define(function(require) {
 				resource: 'numbers.get',
 				data: {
 					accountId: self.accountId,
-					phoneNumber: encodeURIComponent(number)
+					phoneNumber: number
 				},
 				success: function(_data, status) {
 					var street_address = _data.data.e911.street_address,
