@@ -1435,39 +1435,39 @@ define(function(require) {
 
 		strategyConfGreetingRender: function(strategyData) {
 			var self = this,
-				confCallflow = strategyData.callflows.MainConference;
+				confCallflow = strategyData.callflows.MainConference,
+				$greetingTemplate = $(self.getTemplate({
+					name: 'customConferenceGreeting',
+					data: {
+						enabled: _.has(confCallflow, 'flow.data.welcome_prompt')
+					},
+					submodule: 'strategy'
+				}));
 
-			if (confCallflow) {
-				var greetingTemplate = $(self.getTemplate({
-						name: 'customConferenceGreeting',
-						data: {
-							enabled: ('welcome_prompt' in confCallflow.flow.data)
-						},
-						submodule: 'strategy'
-					})),
-					greetingPopup = monster.ui.dialog(greetingTemplate, {
+			if (_.isUndefined(confCallflow)) {
+				return monster.ui.alert('error', self.i18n.active().strategy.customConferenceGreeting.mainConfMissing);
+			}
+
+			monster.pub('common.mediaSelect.render', {
+				container: $greetingTemplate.find('.media-wrapper'),
+				selectedOption: _.get(confCallflow, 'flow.data.welcome_prompt.media_id', null),
+				skin: 'tabs',
+				enableTTS: true,
+				tts: {
+					name: 'MainConferenceGreeting',
+					type: 'conferencingCallInNumber',
+					entity: self.i18n.active().strategy.customConferenceGreeting.entity
+				},
+				required: true,
+				callback: function(mediaControl) {
+					var greetingPopup = monster.ui.dialog($greetingTemplate, {
 						title: self.i18n.active().strategy.customConferenceGreeting.title,
 						position: ['center', 20]
 					});
 
-				monster.pub('common.mediaSelect.render', {
-					container: greetingTemplate.find('.media-wrapper'),
-					selectedOption: _.get(confCallflow, 'flow.data.welcome_prompt.media_id', null),
-					skin: 'tabs',
-					enableTTS: true,
-					tts: {
-						name: 'MainConferenceGreeting',
-						type: 'conferencingCallInNumber',
-						entity: self.i18n.active().strategy.customConferenceGreeting.entity
-					},
-					required: true,
-					callback: function(mediaControl) {
-						self.strategyConfGreetingBindEvents(greetingPopup, mediaControl, strategyData.callflows);
-					}
-				});
-			} else {
-				monster.ui.alert('error', self.i18n.active().strategy.customConferenceGreeting.mainConfMissing);
-			}
+					self.strategyConfGreetingBindEvents(greetingPopup, mediaControl, strategyData.callflows);
+				}
+			});
 		},
 
 		strategyConfGreetingBindEvents: function($popup, mediaControl, callflows) {
