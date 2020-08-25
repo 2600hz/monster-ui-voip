@@ -1462,24 +1462,7 @@ define(function(require) {
 					},
 					required: true,
 					callback: function(mediaControl) {
-						self.strategyConfGreetingBindEvents(greetingPopup, mediaControl, confCallflow, function(updatedCallflow) {
-							if (greetingTemplate.find('.switch-state').prop('checked')) {
-								strategyData.callflows.MainConference = updatedCallflow;
-								greetingPopup.dialog('close').remove();
-								$('#strategy_container .custom-greeting-icon').show();
-							} else {
-								if ('welcome_prompt' in confCallflow.flow.data) {
-									delete confCallflow.flow.data.welcome_prompt;
-									self.strategyUpdateCallflow(confCallflow, function(updatedCallflow) {
-										strategyData.callflows.MainConference = updatedCallflow;
-										greetingPopup.dialog('close').remove();
-										$('#strategy_container .custom-greeting-icon').hide();
-									});
-								} else {
-									greetingPopup.dialog('close').remove();
-								}
-							}
-						});
+						self.strategyConfGreetingBindEvents(greetingPopup, mediaControl, strategyData.callflows);
 					}
 				});
 			} else {
@@ -1487,7 +1470,7 @@ define(function(require) {
 			}
 		},
 
-		strategyConfGreetingBindEvents: function($popup, mediaControl, confCallflow, callback) {
+		strategyConfGreetingBindEvents: function($popup, mediaControl, callflows) {
 			var self = this,
 				$switch = $popup.find('.switch-state'),
 				isEnabled = function() {
@@ -1495,19 +1478,41 @@ define(function(require) {
 				};
 
 			$popup.find('.save').on('click', function() {
-				if (isEnabled()) {
-					mediaControl.getValue(function(id) {
-						confCallflow.flow.data.welcome_prompt = {
-							media_id: id
-						};
+				monster.waterfall([
+					function maybeGetMediaId(next) {
+						if (!isEnabled()) {
+							return next(null, null);
+						}
+						mediaControl.getValue(_.partial(next, null));
+					},
+					function updateConfCallflow(mediaId, next) {
+						var welcomePrompt = _.isNull(mediaId) ? null : { media_id: mediaId };
 
-						self.strategyUpdateCallflow(confCallflow, function(updatedCallflow) {
-							callback(updatedCallflow);
+						self.callApi({
+							resource: 'callflow.patch',
+							data: {
+								accountId: self.accountId,
+								callflowId: callflows.MainConference.id,
+								data: {
+									flow: {
+										data: {
+											welcome_prompt: welcomePrompt
+										}
+									}
+								}
+							},
+							success: _.flow(
+								_.partial(_.get, _, 'data'),
+								_.partial(next, null)
+							),
+							error: _.partial(next, true)
 						});
-					});
-				} else {
-					callback();
-				}
+					}
+				], function(err, updatedCallflow) {
+					callflows.MainConference = updatedCallflow;
+					$popup.dialog('close');
+					$('#strategy_container .custom-greeting-icon')[isEnabled() ? 'fadeIn' : 'fadeOut']();
+				});
 			});
 
 			$switch.on('change', function() {
@@ -1515,7 +1520,7 @@ define(function(require) {
 			});
 
 			$popup.find('.cancel').on('click', function() {
-				$popup.dialog('close').remove();
+				$popup.dialog('close');
 			});
 		},
 
