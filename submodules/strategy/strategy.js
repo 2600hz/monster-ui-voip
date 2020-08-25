@@ -1380,58 +1380,7 @@ define(function(require) {
 				monster.pub('common.numbers.dialogSpare', args);
 			});
 
-			container.on('click', '.action-links .greeting-link', function(e) {
-				e.preventDefault();
-				var confCallflow = strategyData.callflows.MainConference;
-				if (confCallflow) {
-					var greetingTemplate = $(self.getTemplate({
-							name: 'customConferenceGreeting',
-							data: {
-								enabled: ('welcome_prompt' in confCallflow.flow.data)
-							},
-							submodule: 'strategy'
-						})),
-						greetingPopup = monster.ui.dialog(greetingTemplate, {
-							title: self.i18n.active().strategy.customConferenceGreeting.title,
-							position: ['center', 20]
-						});
-
-					monster.pub('common.mediaSelect.render', {
-						container: greetingTemplate.find('.media-wrapper'),
-						selectedOption: _.get(confCallflow, 'flow.data.welcome_prompt.media_id', null),
-						skin: 'tabs',
-						enableTTS: true,
-						tts: {
-							name: 'MainConferenceGreeting',
-							type: 'conferencingCallInNumber',
-							entity: self.i18n.active().strategy.customConferenceGreeting.entity
-						},
-						required: true,
-						callback: function(mediaControl) {
-							self.strategyConfGreetingBindEvents(greetingPopup, mediaControl, confCallflow, function(updatedCallflow) {
-								if (greetingTemplate.find('.switch-state').prop('checked')) {
-									strategyData.callflows.MainConference = updatedCallflow;
-									greetingPopup.dialog('close').remove();
-									$('#strategy_container .custom-greeting-icon').show();
-								} else {
-									if ('welcome_prompt' in confCallflow.flow.data) {
-										delete confCallflow.flow.data.welcome_prompt;
-										self.strategyUpdateCallflow(confCallflow, function(updatedCallflow) {
-											strategyData.callflows.MainConference = updatedCallflow;
-											greetingPopup.dialog('close').remove();
-											$('#strategy_container .custom-greeting-icon').hide();
-										});
-									} else {
-										greetingPopup.dialog('close').remove();
-									}
-								}
-							});
-						}
-					});
-				} else {
-					monster.ui.alert('error', self.i18n.active().strategy.customConferenceGreeting.mainConfMissing);
-				}
-			});
+			container.on('click', '.action-links .greeting-link', _.bind(self.strategyConfGreetingRender, self, strategyData));
 
 			container.on('click', '.action-links .buy-link', function(e) {
 				e.preventDefault();
@@ -1482,6 +1431,60 @@ define(function(require) {
 					});
 				}
 			});
+		},
+
+		strategyConfGreetingRender: function(strategyData) {
+			var self = this,
+				confCallflow = strategyData.callflows.MainConference;
+
+			if (confCallflow) {
+				var greetingTemplate = $(self.getTemplate({
+						name: 'customConferenceGreeting',
+						data: {
+							enabled: ('welcome_prompt' in confCallflow.flow.data)
+						},
+						submodule: 'strategy'
+					})),
+					greetingPopup = monster.ui.dialog(greetingTemplate, {
+						title: self.i18n.active().strategy.customConferenceGreeting.title,
+						position: ['center', 20]
+					});
+
+				monster.pub('common.mediaSelect.render', {
+					container: greetingTemplate.find('.media-wrapper'),
+					selectedOption: _.get(confCallflow, 'flow.data.welcome_prompt.media_id', null),
+					skin: 'tabs',
+					enableTTS: true,
+					tts: {
+						name: 'MainConferenceGreeting',
+						type: 'conferencingCallInNumber',
+						entity: self.i18n.active().strategy.customConferenceGreeting.entity
+					},
+					required: true,
+					callback: function(mediaControl) {
+						self.strategyConfGreetingBindEvents(greetingPopup, mediaControl, confCallflow, function(updatedCallflow) {
+							if (greetingTemplate.find('.switch-state').prop('checked')) {
+								strategyData.callflows.MainConference = updatedCallflow;
+								greetingPopup.dialog('close').remove();
+								$('#strategy_container .custom-greeting-icon').show();
+							} else {
+								if ('welcome_prompt' in confCallflow.flow.data) {
+									delete confCallflow.flow.data.welcome_prompt;
+									self.strategyUpdateCallflow(confCallflow, function(updatedCallflow) {
+										strategyData.callflows.MainConference = updatedCallflow;
+										greetingPopup.dialog('close').remove();
+										$('#strategy_container .custom-greeting-icon').hide();
+									});
+								} else {
+									greetingPopup.dialog('close').remove();
+								}
+							}
+						});
+					}
+				});
+			} else {
+				monster.ui.alert('error', self.i18n.active().strategy.customConferenceGreeting.mainConfMissing);
+			}
 		},
 
 		strategyConfGreetingBindEvents: function($popup, mediaControl, confCallflow, callback) {
