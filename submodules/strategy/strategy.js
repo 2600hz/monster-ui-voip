@@ -1408,7 +1408,7 @@ define(function(require) {
 						},
 						required: true,
 						callback: function(mediaControl) {
-							self.bindMediaUpload(greetingTemplate, mediaControl, confCallflow, function(updatedCallflow) {
+							self.strategyConfGreetingBindEvents(greetingPopup, mediaControl, confCallflow, function(updatedCallflow) {
 								if (greetingTemplate.find('.switch-state').prop('checked')) {
 									strategyData.callflows.MainConference = updatedCallflow;
 									greetingPopup.dialog('close').remove();
@@ -1427,14 +1427,6 @@ define(function(require) {
 								}
 							});
 						}
-					});
-
-					greetingTemplate.find('.switch-state').on('change', function() {
-						$(this).prop('checked') ? greetingTemplate.find('.content').slideDown() : greetingTemplate.find('.content').slideUp();
-					});
-
-					greetingTemplate.find('.cancel').on('click', function() {
-						greetingPopup.dialog('close').remove();
 					});
 				} else {
 					monster.ui.alert('error', self.i18n.active().strategy.customConferenceGreeting.mainConfMissing);
@@ -1492,11 +1484,11 @@ define(function(require) {
 			});
 		},
 
-		bindMediaUpload: function(template, mediaControl, confCallflow, callback) {
+		strategyConfGreetingBindEvents: function($popup, mediaControl, confCallflow, callback) {
 			var self = this;
 
-			template.find('.save').on('click', function() {
-				if (template.find('.switch-state').prop('checked')) {
+			$popup.find('.save').on('click', function() {
+				if ($popup.find('.switch-state').prop('checked')) {
 					mediaControl.getValue(function(id) {
 						confCallflow.flow.data.welcome_prompt = {
 							media_id: id
@@ -1509,6 +1501,14 @@ define(function(require) {
 				} else {
 					callback();
 				}
+			});
+
+			$popup.find('.switch-state').on('change', function() {
+				$(this).prop('checked') ? $popup.find('.content').slideDown() : $popup.find('.content').slideUp();
+			});
+
+			$popup.find('.cancel').on('click', function() {
+				$popup.dialog('close').remove();
 			});
 		},
 
