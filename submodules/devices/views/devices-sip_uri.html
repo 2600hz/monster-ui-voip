@@ -25,6 +25,18 @@
 				</a>
 				<ul class="dropdown-menu pull-right">
 					<li>
+						<a class="tabs-selector change-section" data-section="audio" href="javascript:void(0)">
+							<i class="fa fa-music"></i>
+							{{ i18n.devices.popupSettings.audio.menuTitle }}
+						</a>
+					</li>
+					<li>
+						<a class="tabs-selector change-section" data-section="video" href="javascript:void(0)">
+							<i class="fa fa-video-camera"></i>
+							{{ i18n.devices.popupSettings.video.menuTitle }}
+						</a>
+					</li>
+					<li>
 						<a class="tabs-selector change-section" data-section="options" href="javascript:void(0)">
 							<i class="fa fa-ambulance"></i>
 							{{ i18n.devices.popupSettings.options.menuTitle }}
@@ -49,6 +61,33 @@
 					<div class="controls">
 						<input type="text" name="sip.route" placeholder="{{ i18n.devices.sip_uri.uriPlaceholder }}" value="{{sip.route}}">
 					</div>
+				</div>
+			</div>
+
+			<div class="tabs-section clearfix" data-section="audio">
+				<div class="title">
+					{{ i18n.devices.popupSettings.audio.sectionTitle }}
+				</div>
+
+				<div class="helper">
+					<i class="fa fa-info-circle"></i>
+					{{ i18n.devices.popupSettings.dragAndDrop }}
+				</div>
+
+				<div class="items-selector codec-selector clearfix" id="audio_codec_selector">
+				</div>
+			</div>
+
+			<div class="tabs-section clearfix" data-section="video">
+				<div class="title">
+					{{ i18n.devices.popupSettings.video.sectionTitle }}
+				</div>
+				<div class="helper">
+					<i class="fa fa-info-circle"></i>
+					{{ i18n.devices.popupSettings.dragAndDrop }}
+				</div>
+
+				<div class="items-selector codec-selector" id="video_codec_selector">
 				</div>
 			</div>
 

@@ -531,11 +531,11 @@ define(function(require) {
 				ignore: '' // Do not ignore hidden fields
 			});
 
-			if ($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone', 'fax', 'ata']) > -1) {
+			if ($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone', 'sip_uri', 'fax', 'ata']) > -1) {
 				var audioCodecs = monster.ui.codecSelector('audio', templateDevice.find('#audio_codec_selector'), data.media.audio.codecs);
 			}
 
-			if ($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone']) > -1) {
+			if ($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone', 'sip_uri']) > -1) {
 				var videoCodecs = monster.ui.codecSelector('video', templateDevice.find('#video_codec_selector'), data.media.video.codecs);
 			}
 
