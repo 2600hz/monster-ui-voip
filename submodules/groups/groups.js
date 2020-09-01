@@ -1307,8 +1307,8 @@ define(function(require) {
 
 								monster.ui.tooltips(rowTemplate);
 
-								template.find('.list-unassigned-items .empty-row').hide();
-								template.find('.list-unassigned-items').append(rowTemplate);
+								template.find('.list-assigned-items .empty-row').hide();
+								template.find('.list-assigned-items').append(rowTemplate);
 							});
 						}
 					}
