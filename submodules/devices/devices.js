@@ -1015,7 +1015,10 @@ define(function(require) {
 					smartphone: _.merge({}, sipSettings, callForwardSettings),
 					softphone: _.merge({}, sipSettings)
 				}, data.device.device_type, {}),
-				deviceDefaults = _.merge({}, deviceBaseDefaults, deviceDefaultsForType),
+				deviceDefaults = _.merge({},
+					isNewDevice && deviceBaseDefaults,
+					deviceDefaultsForType
+				),
 				deviceOverrides = {
 					provision: _
 						.chain(data.template)
@@ -1042,7 +1045,7 @@ define(function(require) {
 				deviceData = _.mergeWith(
 					{},
 					templateDefaults,
-					isNewDevice && deviceDefaults,
+					deviceDefaults,
 					data.device,
 					function(dest, src) {
 						return _.every([dest, src], _.isArray) ? src : undefined;
