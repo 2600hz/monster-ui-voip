@@ -1,3 +1,18 @@
+#strategy_container {
+	.element-container {
+		&.strategy-hours .element-header-outer .svg-icon {
+			width: 1.5rem;
+			height: 1.5rem;
+			margin: 0 20px;
+			color: #22a5ff;
+		}
+
+		.element-content {
+			@import "../strategyHours/_strategyHours.scss";
+		}
+	}
+}
+
 #strategy_container .clearfix:after {
 	clear: right;
 }
@@ -50,6 +65,11 @@
 	box-sizing: border-box;
 	/* For Safari */
 	float: left;
+}
+
+#strategy_container .element-header-inner .title {
+	display: flex;
+	align-items: center;
 }
 
 #strategy_container .element-header-inner .title > i {
@@ -169,96 +189,6 @@
 #strategy_container .element-container .number-actions .action-links .buy-dropdown:hover {
 	background-color: transparent;
 	text-decoration: underline;
-}
-
-/********** Strategy Hours ***********/
-
-#strategy_container .element-container.strategy-hours form {
-	margin: 0px;
-}
-
-#strategy_container .element-container.strategy-hours .custom-hours-toggler {
-	padding: 20px;
-}
-
-#strategy_container .element-container.strategy-hours .custom-hours-toggler .title {
-	line-height: 30px;
-}
-#strategy_container .element-container.strategy-hours .custom-hours-toggler .title span {
-	font-size: 18px;
-}
-
-#strategy_container .element-container.strategy-hours .custom-hours-toggler > label:first-of-type {
-	margin-bottom: 20px;
-}
-
-#strategy_container .element-container.strategy-hours .custom-hours-toggler .title > input {
-	margin: 0 16px 4px 0;
-}
-
-#strategy_container .element-container.strategy-hours .custom-hours-toggler .description {
-	margin-left: 30px;
-}
-
-#strategy_container .element-container.strategy-hours .custom-hours-div {
-	border-top: dashed 1px #ccc;
-	padding: 20px;
-	display: none;
-}
-
-#strategy_container .element-container.strategy-hours .custom-hours-header {
-	font-size: 18px;
-	padding: 15px;
-}
-
-#strategy_container .element-container.strategy-hours .custom-hours-header .timezone {
-	margin-left: 5px;
-}
-
-#strategy_container .element-container.strategy-hours .custom-days {
-	border: solid 1px #ccc;
-	border-radius: 10px;
-	background-color: #FCFCFC;
-}
-
-#strategy_container .element-container.strategy-hours .custom-day {
-	min-height: 32px;
-	line-height: 30px;
-	padding: 15px;
-}
-
-#strategy_container .element-container.strategy-hours .custom-day:not(:first-of-type) {
-	border-top: solid 1px #ccc;
-}
-
-#strategy_container .element-container.strategy-hours .custom-hours-div label {
-	display: inline-block;
-	margin: 0;
-	vertical-align: middle;
-}
-
-#strategy_container .element-container.strategy-hours .custom-hours-div .custom-day .custom-day-label {
-	width: 120px;
-}
-
-#strategy_container .element-container.strategy-hours .custom-hours-div .custom-day label.monster-invalid {
-	position: static;
-}
-
-#strategy_container .element-container.strategy-hours .custom-hours-div input[type="text"] {
-	width: 80px;
-	margin: 0 10px;
-}
-
-#strategy_container .element-container.strategy-hours .custom-day .status {
-	color: #999;
-}
-
-#strategy_container .element-container.strategy-hours .custom-hours-lunchbreak {
-	height: 30px;
-	line-height: 30px;
-	padding: 15px;
-	margin-top: 20px;
 }
 
 /********** Strategy Holidays ***********/

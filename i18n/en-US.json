@@ -834,12 +834,28 @@
 			"port": "Port Numbers"
 		},
 		"hours": {
+			"emptyState": {
+				"title": "Your Office Hours Are Empty"
+			},
+			"days": {
+				"monday": "Monday",
+				"tuesday": "Tuesday",
+				"wednesday": "Wednesday",
+				"thursday": "Thursday",
+				"friday": "Friday",
+				"saturday": "Saturday",
+				"sunday": "Sunday"
+			},
+			"allDays": "All Days",
+			"to": "to",
+			"open": "Open",
+			"lunch": "Lunch Hours",
 			"alwaysOpenTitle": "24 hours Open Office",
 			"alwaysOpenDescription": "Choose this option if you want incoming calls to be handled the same way all the time.",
 			"customHoursTitle": "Custom Office Hours",
 			"customHoursDescription": "Choose this option if you want incoming calls to be handled differently when your office is closed.",
 			"listTitle": "Custom Hours",
-			"timezone": "Company Timezone:",
+			"timezone": "Timezone:",
 			"to": "to",
 			"lunchbreakTitle": "Are you closed for lunch hours?",
 			"__comment": "UI-1250: Adding help boxes",
