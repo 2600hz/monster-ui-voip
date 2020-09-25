@@ -123,6 +123,17 @@ define(function(require) {
 				toggleDiv[toggleMethod](200);
 			});
 
+			template.on('click', '.add-hours', function(event) {
+				event.preventDefault();
+
+				monster.pub('voip.strategy.addOfficeHours', {
+					existing: self.strategyHoursGetIntervalsFromTemplate(parent),
+					callback: function(err, existing) {
+						self.strategyHoursListingRender(parent, existing);
+					}
+				});
+			});
+
 			template.find('form').on('submit', function(event) {
 				event.preventDefault();
 			});
@@ -318,6 +329,25 @@ define(function(require) {
 							}
 						});
 					}
+				});
+			});
+		},
+
+		strategyHoursGetIntervalsFromTemplate: function(parent) {
+			var self = this,
+				days = self.weekdays;
+
+			return _.map(days, function(day) {
+				var $el = parent.find('.office-hours[data-day="' + day + '"]');
+
+				return _.map($el.find('.interval'), function(interval) {
+					var $interval = $(interval);
+
+					return {
+						start: $interval.find('input[name$=".start"]').timepicker('getSecondsFromMidnight'),
+						end: $interval.find('input[name$=".end"]').timepicker('getSecondsFromMidnight'),
+						isOpen: $interval.find('select.status').val() === 'true'
+					};
 				});
 			});
 		}
