@@ -92,13 +92,22 @@ form {
 						background-color: $primary-color;
 					}
 				}
+
+				&.disabled {
+					background-color: $border-color;
+				}
+
+				&:hover:not(.active):not(.disabled) {
+					cursor: pointer;
+					background-color: $mischka;
+				}
 			}
 
 			.nav-item-filler {
 				max-width: 100%;
 				height: 52px;
 				flex: 1 1 auto;
-				border-bottom: 1px solid #bcbcc2;
+				border-bottom: 1px solid $border-color;
 			}
 		}
 
@@ -113,6 +122,7 @@ form {
 				flex-direction: column;
 				align-items: center;
 				padding: 2.5rem 0;
+				border-bottom: 1px solid $border-color;
 
 				.title {
 					display: flex;
