@@ -226,6 +226,21 @@ define(function(require) {
 		strategyHoursListingBindEvents: function(parent, template) {
 			var self = this;
 
+			template.on('click', '.office-hours-nav .nav-item:not(.active):not(.disabled)', function(event) {
+				var $this = $(this),
+					day = $this.data('day');
+
+				template.find('.office-hours-nav .nav-item.active').removeClass('active');
+				$this.addClass('active');
+
+				if (day) {
+					template.find('.office-hours').hide();
+					template.find('.office-hours[data-day="' + day + '"]').fadeIn(200);
+				} else {
+					template.find('.office-hours').fadeIn(200);
+				}
+			});
+
 			template.on('change', '.office-hours-content .empty-state select[name="template"]', function(event) {
 				event.preventDefault();
 

@@ -3,6 +3,11 @@
 		<li class="nav-item active">
 			{{i18n.strategy.hours.allDays}}
 		</li>
+	{{#each days}}
+		<li class="nav-item{{#unless intervals}} disabled{{/unless}}" data-day="{{id}}">
+			{{abbreviation}}
+		</li>
+	{{/each}}
 		<li class="nav-item-filler"></li>
 	</ul>
 	<div class="office-hours-content">
