@@ -856,7 +856,10 @@
 		},
 		"hours": {
 			"emptyState": {
-				"title": "Your Office Hours Are Empty"
+				"title": "Your Office Hours Are Empty",
+				"text": "Get started quickly by populating your office hours using one of our templates.",
+				"defaultOption": "Select a template",
+				"nineToFiveWithNoonToOneLunchbreak": "Open weekdays from 9:00 to 5:00. Closed for lunch from 12:00 to 1:00."
 			},
 			"days": {
 				"monday": "Monday",
