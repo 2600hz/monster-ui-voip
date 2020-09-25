@@ -1,0 +1,802 @@
+@import '../../../../css/partials/base';
+
+#form_add_office_hours {
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+	max-height: inherit;
+	width: 448px;
+
+	select {
+		width: 100%;
+		height: 2rem;
+		margin: 0;
+		border-radius: 2px;
+		box-sizing: border-box;
+	}
+
+	.form-content {
+		overflow-y: auto;
+		padding: 1.5rem 1rem;
+
+		.no-days-error,
+		.overlapping-hours-error {
+			display: none;
+		}
+
+		& > * {
+			margin: 0;
+
+			&:not(:first-child) {
+				margin-top: 1rem;
+			}
+
+			&:first-child > label {
+				margin-bottom: 1rem;
+			}
+		}
+
+		ul.controls {
+			margin: 0;
+			list-style: none;
+
+			li {
+				margin: 5px 0;
+
+				&:first-child {
+					margin-top: 0;
+				}
+				&:last-child {
+					margin-bottom: 0;
+				}
+			}
+
+			.monster-checkbox {
+				input[type="checkbox"]:checked ~ span {
+					font-weight: bold;
+				}
+			}
+		}
+	}
+
+	.form-actions {
+		display: flex;
+		justify-content: flex-end;
+		margin: 0;
+		padding: 1rem;
+		background-color: $athens-gray;
+		border-top-color: #dbdbde;
+
+		& > *:not(:last-child) {
+			margin-right: .75rem;
+		}
+	}
+}
+
+#strategy_container .clearfix:after {
+	clear: right;
+}
+
+#strategy_container .element-container:not(:first-of-type) {
+	margin-bottom: 5px;
+	margin-top: 5px;
+}
+
+#strategy_container .element-header-outer {
+	background: #dedede;
+	border-radius: 2px;
+}
+
+#strategy_container .element-header-inner {
+	height: 60px;
+	background: #f3f3f3;
+	margin: 5px;
+	cursor: pointer;
+	position: relative;
+}
+
+#strategy_container .element-container.open .element-header-outer {
+	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0px;
+}
+
+#strategy_container .element-container.open .element-header-inner {
+	margin-bottom: 0px;
+}
+
+#strategy_container .element-container .element-content {
+	display: none;
+}
+
+#strategy_container .element-content {
+	border: solid 1px #dedede;
+}
+
+#strategy_container .element-header-inner > div {
+	width: 50%;
+	line-height: 60px;
+	height: 60px;
+	display: inline-block;
+	white-space: nowrap;   overflow: hidden;
+	text-overflow: ellipsis;
+	position: relative;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	/* For Safari */
+	float: left;
+}
+
+#strategy_container .element-header-inner .title > i {
+	margin: 0px 20px;
+}
+
+#strategy_container .element-header-inner .title > span {
+	font-size: 18px;
+}
+
+#strategy_container .element-header-inner .summary {
+	padding-right: 60px;
+	padding-left: 20px;
+}
+
+#strategy_container .element-header-inner .summary > span i {
+	margin-left: 15px;
+}
+
+#strategy_container .element-header-inner .summary > i {
+	position: absolute;
+	line-height: 60px;
+	margin-right: 20px;
+	margin-left: 20px;
+	right: 0px;
+}
+
+#strategy_container .element-container.open .element-header-inner .summary > i {
+	-webkit-transform: rotate(90deg);
+	-moz-transform: rotate(90deg);
+	-ms-transform: rotate(90deg);
+	-o-transform: rotate(90deg);
+	color: #22a5ff;
+}
+
+#strategy_container .element-container .basic-actions {
+	padding: 20px;
+	border-top: solid 1px #ccc;
+	background-color: #f3f3f3;
+	text-align: right;
+}
+
+#strategy_container .element-container .basic-actions .cancel-link {
+	margin-right: 10px;
+	vertical-align: middle;
+}
+
+#strategy_container .element-container:not(.strategy-confnum) .title .fa-phone {
+	color: #22a5ff;
+}
+
+/************** Main Numbers **************/
+
+#strategy_container .element-container.main-number .title .fa-phone {
+	position: relative;
+	top: 3px;
+	font-size: 28px;
+}
+
+#strategy_container .element-container .number-element {
+	position: relative;
+	border-bottom: solid 1px #dedede;
+	height: 70px;
+}
+
+#strategy_container .element-container .number-element > div {
+	display: inline-block;
+	padding: 10px;
+	line-height: 50px;
+	height: 50px;
+}
+
+#strategy_container .element-container .number-element .features-block .dropdown-toggle {
+	background-color: #ffffff;
+	margin-top: 5px;
+}
+#strategy_container .element-container .number-element .features-block .edit-features {
+	position: absolute;
+	right: 10px;
+
+}
+#strategy_container .element-container .number-element .features-block .features {
+	margin-right: 45px;
+}
+
+#strategy_container .element-container .number-element .features-block .features > i.active {
+	display: inline-block;
+}
+
+#strategy_container .element-container .number-element .number > button {
+	margin: 0px 15px;
+}
+
+#strategy_container .element-container .number-element .no-number-error {
+	font-style: italic;
+	color: #ee1212;
+	font-weight: 600;
+}
+
+#strategy_container .element-container .number-actions {
+	padding: 25px 20px;
+	background-color: #f3f3f3;
+}
+
+#strategy_container .element-container .number-actions .action-links a {
+	margin-right: 10px;
+}
+
+#strategy_container .element-container .number-actions .action-links a i {
+	margin-right: 5px;
+}
+
+#strategy_container .element-container .number-actions .action-links ul.dropdown-menu {
+	min-width: 0;
+}
+
+#strategy_container .element-container .number-actions .action-links .buy-dropdown:hover {
+	background-color: transparent;
+	text-decoration: underline;
+}
+
+/********** Strategy Hours ***********/
+
+#strategy_container .element-container.strategy-hours form {
+	margin: 0px;
+}
+
+#strategy_container .element-container.strategy-hours .custom-hours-toggler {
+	padding: 20px;
+}
+
+#strategy_container .element-container.strategy-hours .custom-hours-toggler .title {
+	line-height: 30px;
+}
+#strategy_container .element-container.strategy-hours .custom-hours-toggler .title span {
+	font-size: 18px;
+}
+
+#strategy_container .element-container.strategy-hours .custom-hours-toggler > label:first-of-type {
+	margin-bottom: 20px;
+}
+
+#strategy_container .element-container.strategy-hours .custom-hours-toggler .title > input {
+	margin: 0 16px 4px 0;
+}
+
+#strategy_container .element-container.strategy-hours .custom-hours-toggler .description {
+	margin-left: 30px;
+}
+
+#strategy_container .element-container.strategy-hours .custom-hours-div {
+	border-top: dashed 1px #ccc;
+	padding: 20px;
+	display: none;
+}
+
+#strategy_container .element-container.strategy-hours .custom-hours-header {
+	font-size: 18px;
+	padding: 15px;
+}
+
+#strategy_container .element-container.strategy-hours .custom-hours-header .timezone {
+	margin-left: 5px;
+}
+
+#strategy_container .element-container.strategy-hours .custom-days {
+	border: solid 1px #ccc;
+	border-radius: 10px;
+	background-color: #FCFCFC;
+}
+
+#strategy_container .element-container.strategy-hours .custom-day {
+	min-height: 32px;
+	line-height: 30px;
+	padding: 15px;
+}
+
+#strategy_container .element-container.strategy-hours .custom-day:not(:first-of-type) {
+	border-top: solid 1px #ccc;
+}
+
+#strategy_container .element-container.strategy-hours .custom-hours-div label {
+	display: inline-block;
+	margin: 0;
+	vertical-align: middle;
+}
+
+#strategy_container .element-container.strategy-hours .custom-hours-div .custom-day .custom-day-label {
+	width: 120px;
+}
+
+#strategy_container .element-container.strategy-hours .custom-hours-div .custom-day label.monster-invalid {
+	position: static;
+}
+
+#strategy_container .element-container.strategy-hours .custom-hours-div input[type="text"] {
+	width: 80px;
+	margin: 0 10px;
+}
+
+#strategy_container .element-container.strategy-hours .custom-day .status {
+	color: #999;
+}
+
+#strategy_container .element-container.strategy-hours .custom-hours-lunchbreak {
+	height: 30px;
+	line-height: 30px;
+	padding: 15px;
+	margin-top: 20px;
+}
+
+/********** Strategy Holidays ***********/
+
+#strategy_container .element-container.strategy-holidays .holidays-toggler {
+	padding: 20px;
+}
+
+#strategy_container .element-container.strategy-holidays .holidays-div {
+	border-top: dashed 1px #ccc;
+	padding: 20px;
+	display: none;
+}
+
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-add {
+	padding: 0px 20px;
+	margin: 0;
+}
+
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-add .dropdown {
+	display: inline-block;
+}
+
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-add .dropdown-menu {
+	min-width: 0;
+}
+
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-add .dropdown-toggle {
+	color: #22a5ff;
+	background-color: transparent;
+}
+
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-element {
+	padding: 5px 0px;
+}
+
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-element:not(:last-of-type) {
+	border-bottom: solid 1px #dedede;
+}
+
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-element input,
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-element select {
+	margin: 5px 20px 5px 0px;
+}
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-element span {
+	margin: 10px 20px 0px 0px;
+}
+
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-element .month {
+	width: 70px;
+	text-transform: uppercase;
+}
+
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-element .wday {
+	width: 70px;
+}
+
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-element .day {
+	width: 60px;
+}
+
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-element .ordinal {
+	width: 120px;
+}
+
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-element .name {
+	width: 380px;
+	min-width: 0px;
+}
+
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-element .date {
+	width: 120px;
+}
+
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-element .delete-holiday {
+	float: right;
+	line-height: 40px;
+	cursor: pointer;
+}
+
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-element .holiday-inputs {
+	display: flex;
+}
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-element .holiday-inputs select,
+#strategy_container .element-container.strategy-holidays .holidays-div .holidays-element .holiday-inputs span {
+	flex-shrink: 0;
+}
+
+/********** Strategy Calls ***********/
+
+#strategy_container .element-container.strategy-calls .calls-tabs {
+	height: 34px;
+	margin: 0;
+	padding: 20px;
+}
+
+#strategy_container .element-container.strategy-calls .calls-tabs .open-hours-tab:hover a,
+#strategy_container .element-container.strategy-calls .calls-tabs .open-hours-tab:hover i {
+	color: #74b814;
+}
+
+#strategy_container .element-container.strategy-calls .calls-tabs .open-hours-tab.active a {
+	background-color: #74b814;
+}
+
+#strategy_container .element-container.strategy-calls .calls-tabs .lunch-hours-tab:hover a,
+#strategy_container .element-container.strategy-calls .calls-tabs .lunch-hours-tab:hover i {
+	color: #f89406;
+}
+
+#strategy_container .element-container.strategy-calls .calls-tabs .lunch-hours-tab.active a {
+	background-color: #f89406;
+}
+
+#strategy_container .element-container.strategy-calls .calls-tabs .after-hours-tab:hover a,
+#strategy_container .element-container.strategy-calls .calls-tabs .after-hours-tab:hover i {
+	color: #363636;
+}
+
+#strategy_container .element-container.strategy-calls .calls-tabs .after-hours-tab.active a {
+	background-color: #363636;
+}
+
+#strategy_container .element-container.strategy-calls .calls-tabs .holidays-tab:hover a,
+#strategy_container .element-container.strategy-calls .calls-tabs .holidays-tab:hover i {
+	color: #49afcd;
+}
+
+#strategy_container .element-container.strategy-calls .calls-tabs .holidays-tab.active a {
+	background-color: #49afcd;
+}
+
+#strategy_container .element-container.strategy-calls .calls-tabs .open-hours-tab.active a:hover,
+#strategy_container .element-container.strategy-calls .calls-tabs .open-hours-tab.active a:focus,
+#strategy_container .element-container.strategy-calls .calls-tabs .open-hours-tab.active a:hover i,
+#strategy_container .element-container.strategy-calls .calls-tabs .open-hours-tab.active a:focus i,
+#strategy_container .element-container.strategy-calls .calls-tabs .lunch-hours-tab.active a:hover,
+#strategy_container .element-container.strategy-calls .calls-tabs .lunch-hours-tab.active a:focus,
+#strategy_container .element-container.strategy-calls .calls-tabs .lunch-hours-tab.active a:hover i,
+#strategy_container .element-container.strategy-calls .calls-tabs .lunch-hours-tab.active a:focus i,
+#strategy_container .element-container.strategy-calls .calls-tabs .after-hours-tab.active a:hover,
+#strategy_container .element-container.strategy-calls .calls-tabs .after-hours-tab.active a:focus,
+#strategy_container .element-container.strategy-calls .calls-tabs .after-hours-tab.active a:hover i,
+#strategy_container .element-container.strategy-calls .calls-tabs .after-hours-tab.active a:focus i,
+#strategy_container .element-container.strategy-calls .calls-tabs .holidays-tab.active a:hover,
+#strategy_container .element-container.strategy-calls .calls-tabs .holidays-tab.active a:focus,
+#strategy_container .element-container.strategy-calls .calls-tabs .holidays-tab.active a:hover i,
+#strategy_container .element-container.strategy-calls .calls-tabs .holidays-tab.active a:focus i {
+	color: #fff;
+}
+
+#strategy_container .element-container.strategy-calls .callflow-tabs {
+	overflow: visible;
+	padding: 20px;
+	border: none;
+	background: transparent;
+}
+
+#strategy_container .element-container.strategy-calls .callflow-tabs .call-option {
+	display: inline-block;
+	vertical-align: top;
+	padding: 10px;
+	border: solid 2px #ccc;
+	border-radius: 10px;
+	text-align: center;
+	background-color: #f9f9f9;
+}
+
+#strategy_container .element-container.strategy-calls .callflow-tabs .call-option i {
+	color: #aaa;
+}
+
+#strategy_container .element-container.strategy-calls .callflow-tabs .call-option .radio-div .iradio_flat {
+	margin: 0;
+}
+
+#strategy_container .element-container.strategy-calls .callflow-tabs .call-option select {
+	width: 160px;
+}
+
+#strategy_container .element-container.strategy-calls .call-options-container .call-option {
+	margin: 14px 14px 0 0;
+}
+
+#strategy_container .element-container.strategy-calls .call-options-container .call-option:last-child {
+	margin-right: 0;
+}
+
+#strategy_container .element-container.strategy-calls .callflow-tabs .call-option > div:not(:first-of-type) {
+	margin-top: 10px;
+}
+
+#strategy_container .element-container.strategy-calls .callflow-tabs .call-option .chosen-container {
+	text-align: left;
+}
+
+#strategy_container .element-container.strategy-calls .callflow-tabs .call-option .menu-div .link-icon i {
+	margin-right: 5px;
+}
+
+#strategy_container .element-container.strategy-calls .callflow-tabs .call-option .menu-div .link a {
+	color: #333;
+	text-decoration: underline;
+}
+
+#strategy_container .element-container.strategy-calls .callflow-tabs .call-option.active {
+	background-color: #f0f0f0;
+}
+
+#strategy_container .element-container.strategy-calls .callflow-tabs #strategy_calls_open_hours_tab .call-option.active {
+	border-color: #74B814;
+}
+#strategy_container .element-container.strategy-calls .callflow-tabs #strategy_calls_lunch_hours_tab .call-option.active {
+	border-color: #f89406;
+}
+#strategy_container .element-container.strategy-calls .callflow-tabs #strategy_calls_after_hours_tab .call-option.active {
+	border-color: #363636;
+}
+#strategy_container .element-container.strategy-calls .callflow-tabs #strategy_calls_holidays_tab .call-option.active {
+	border-color: #49afcd;
+}
+
+#strategy_container .element-container.strategy-calls .callflow-tabs .call-option.active .menu-div .menu-icon i {
+	color: rgba(238, 18, 18, 0.8);
+}
+
+#strategy_container .element-container.strategy-calls .callflow-tabs .call-option.active .menu-div.has-menu .menu-icon i {
+	color: #22a5ff;
+}
+
+/********** Strategy Conference ***********/
+
+#strategy_container .element-container.strategy-confnum .title i {
+	position: relative;
+	top: 2px;
+	font-size: 28px;
+	color: #44cc44;
+}
+#strategy_container .element-container.strategy-confnum .greeting-link {
+	margin-right: 30px !important;
+	position: relative;
+}
+#strategy_container .element-container.strategy-confnum .greeting-link:after {
+	content: "";
+	position: absolute;
+	width: 0px;
+	height: 50px;
+	border-right: solid 1px #c0c0c9;
+	top: -15px;
+	right: -15px;
+}
+
+#strategy_custom_conference_greeting textarea {
+	width: 100%;
+	box-sizing: border-box;
+}
+#strategy_custom_conference_greeting .actions button:not(:first-child) {
+	margin-left: 10px;
+}
+#strategy_container .element-container.strategy-confnum .custom-greeting-icon {
+	position: absolute;
+	right: 45px;
+	top: 23px;
+}
+
+/************ Strategy Faxbox *************/
+
+#strategy_container .element-container.strategy-faxingnum .title i {
+	position: relative;
+	top: 2px;
+	font-size: 28px;
+	color: #44cc44;
+}
+
+/********** Strategy Helper ***********/
+
+#strategy_container .element-container.helper {
+	/*display: none;*/
+}
+
+#strategy_container .element-container.helper .fa-info-circle {
+	float: left;
+	margin-right: 10px;
+}
+
+#strategy_container .element-container.helper p {
+	text-align: justify;
+}
+
+/******************* Menu Popup *******************/
+
+.overflow-visible .ui-dialog-content {
+	overflow: visible;
+}
+
+#strategy_menu_popup {
+	width: 760px;
+	padding: 20px;
+}
+#strategy_menu_popup > div:not(:last-of-type) {
+	margin-bottom: 25px;
+}
+#strategy_menu_popup .menu-block > div {
+	float: left;
+}
+#strategy_menu_popup .menu-block .left {
+	width: 400px;
+}
+#strategy_menu_popup .menu-block .right {
+	margin-left: 20px;
+	width: 340px;
+}
+#strategy_menu_popup .menu-block .title {
+	color: #22a5ff;
+	font-size: 22px;
+	font-weight: 600;
+	padding: 15px 0;
+}
+#strategy_menu_popup .menu-block .menu-line {
+	padding: 5px 0px;
+}
+#strategy_menu_popup .menu-block .menu-line > div,
+#strategy_menu_popup .menu-block .menu-line > input,
+#strategy_menu_popup .menu-block .menu-line > select {
+	margin: 0 12px 0 0;
+	display: inline-block;
+	vertical-align: middle;
+}
+#strategy_menu_popup .menu-block .menu-line .target-input .add-on {
+	width: 20px;
+}
+#strategy_menu_popup .menu-block .menu-line .target-select {
+	width: 150px;
+}
+#strategy_menu_popup .menu-block .menu-line i.remove-btn {
+	cursor: pointer;
+	opacity: 0.8;
+	vertical-align: middle;
+}
+#strategy_menu_popup .menu-block .menu-line i.remove-btn:hover {
+	color: #ff1212 !important;
+}
+#strategy_menu_popup .menu-block .menu-line i.remove-btn:active {
+	color: #ff1212 !important;
+	text-shadow: 1px 1px 1px #999;
+}
+
+#strategy_menu_popup .menu-block .add-menu-line {
+	margin-top: 10px;
+}
+
+#strategy_menu_popup .action-block .cancel-link {
+	line-height: 30px;
+	margin-right: 10px;
+	color: #22a5ff;
+}
+
+#strategy_menu_popup_accordion .greeting-option {
+	border-color: #c0c0c9;
+}
+
+#strategy_menu_popup_accordion .greeting-option.active {
+	border-color: #22a5ff;
+}
+
+#strategy_menu_popup_accordion .greeting-option:not(:last-of-type) {
+	margin-bottom: 15px;
+}
+
+#strategy_menu_popup_accordion .greeting-option.active .greeting-option-header i {
+	color: #22a5ff !important;
+}
+
+#strategy_menu_popup_accordion .greeting-option-header {
+	padding: 10px;
+	font-weight: bold;
+	border-radius: 2px;
+	cursor: pointer;
+	background-color: #e0e0e9;
+}
+
+#strategy_menu_popup_accordion .greeting-option-header:not(.collapsed) {
+	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0px;
+}
+
+#strategy_menu_popup_accordion .greeting-option-header i {
+	vertical-align: middle;
+}
+
+#strategy_menu_popup_accordion .greeting-option-content {
+	padding: 10px;
+	font-size: 14px;
+}
+
+#strategy_menu_popup_accordion .greeting-option-content textarea {
+	width: 100%;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	margin: 0px;
+	min-height: 90px;
+}
+
+#strategy_menu_popup_accordion .greeting-option-actions {
+	margin-top: 10px;
+}
+
+#strategy_menu_popup_accordion .greeting-option-actions button:not(:first-of-type) {
+	margin-right: 10px;
+}
+
+#strategy_menu_popup_accordion .greeting-option .upload-container {
+	display: flex;
+}
+#strategy_menu_popup_accordion .greeting-option .upload-container input[type="text"] {
+	margin: 0;
+	width: auto;
+	box-shadow: none;
+	border-radius: 2px 0px 0px 2px;
+	margin-right: -1px;
+	flex-grow: 1;
+}
+#strategy_menu_popup_accordion .greeting-option .upload-container button {
+	border-top-left-radius: 0px;
+	border-bottom-left-radius: 0px;
+	width: 170px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+/**** CSS For Changing the E911 *****/
+.e911-change-wrapper {
+	padding: 15px;
+	width: 400px;
+}
+
+.e911-change-wrapper .cancel-link {
+	margin-right: 5px;
+}
+
+.e911-change-wrapper .list-choices {
+	margin-bottom: 20px;
+	margin-top: 20px;
+}
+
+.e911-change-wrapper .list-choices .choice {
+	background: #EEE;
+	padding: 20px;
+	border: 1px solid #CCC;
+	margin-bottom: 5px;
+}
+
+.e911-change-wrapper .list-choices .choice:hover {
+	background: #FFF;
+	cursor: pointer;
+}
+
+.e911-change-wrapper .list-choices .choice.active {
+	background: #FFF;
+	border: 1px solid #22a5ff;
+}
+
+.e911-change-wrapper .actions {
+	margin-top: 10px;
+}
