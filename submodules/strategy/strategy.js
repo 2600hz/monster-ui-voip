@@ -4459,6 +4459,8 @@ define(function(require) {
 					return;
 				}
 
+				popup.dialog('close');
+
 				callback(null, _
 					.chain(existing)
 					.map(function(intervals, index) {
