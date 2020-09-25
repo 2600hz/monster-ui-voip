@@ -1,0 +1,63 @@
+<form id="form_add_office_hours" class="form">
+	<div class="form-content">
+		<div class="control-group">
+			<label class="control-label">
+				{{i18n.strategy.addOfficeHours.labels.selectDays}}
+			</label>
+			<ul class="controls">
+			{{#each i18n.strategy.addOfficeHours.days as | label |}}
+				<li>
+				{{#monsterCheckbox label}}
+					<input type="checkbox" name="days[]">
+				{{/monsterCheckbox}}
+				</li>
+			{{/each}}
+			</ul>
+		</div>
+		{{#monsterPanelText "No days have been selected." "danger" "fill-width no-days-error"}}
+		{{/monsterPanelText}}
+		<div class="control-group">
+			<label for="office_status" class="control-label">
+				{{i18n.strategy.addOfficeHours.labels.officeStatus}}
+			</label>
+			<div class="controls">
+				<select name="isOpen" id="office_status">
+					<option value="false">
+						{{i18n.strategy.addOfficeHours.labels.lunchHours}}
+					</option>
+					<option value="true">
+						{{i18n.strategy.addOfficeHours.labels.openHours}}
+					</option>
+				</select>
+			</div>
+		</div>
+		<div class="row-fluid">
+			<div class="control-group span6">
+				<label for="start_time" class="control-label">
+					{{i18n.strategy.addOfficeHours.labels.startTime}}
+				</label>
+				<div class="controls">
+					<input type="text" class="start-time" id="start_time" name="start">
+				</div>
+			</div>
+			<div class="control-group span6">
+				<label for="end_time" class="control-label">
+					{{i18n.strategy.addOfficeHours.labels.endTime}}
+				</label>
+				<div class="controls">
+					<input type="text" class="end-time" id="end_time" name="end">
+				</div>
+			</div>
+		</div>
+		{{#monsterPanelText "Selected hours overlap existing hours." "danger" "fill-width overlapping-hours-error"}}
+		{{/monsterPanelText}}
+	</div>
+	<div class="form-actions">
+		<button type="button" class="monster-button-ghost monster-button-fit cancel">
+			{{i18n.cancel}}
+		</button>
+		<button type="submit" class="monster-button-success monster-button-fit">
+			{{i18n.strategy.addOfficeHours.labels.addHours}}
+		</button>
+	</div>
+</form>

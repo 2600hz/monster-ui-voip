@@ -809,6 +809,27 @@
 	},
 
 	"strategy": {
+		"addOfficeHours": {
+			"title": "Add Office Hours",
+			"labels": {
+				"addHours": "Add Hours",
+				"selectDays": "Select one or more days of the week",
+				"officeStatus": "Office Status",
+				"startTime": "Start Time",
+				"endTime": "End Time",
+				"lunchHours": "Lunch Hours (closed)",
+				"openHours": "Open Hours"
+			},
+			"days": [
+				"Monday",
+				"Tuesday",
+				"Wednesday",
+				"Thursday",
+				"Friday",
+				"Saturday",
+				"Sunday"
+			]
+		},
 		"noNumberHelp": "Note: Please add a Main Office Number to your account first. Once you add a main number, you will be able to set up Office Hours, Holidays and Incoming Call Handling (Call-Flow) for your office.",
 		"sectionTitles": {
 			"numbers": "Main Company Numbers",
