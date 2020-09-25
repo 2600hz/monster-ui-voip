@@ -11,6 +11,7 @@ define(function(require) {
 		'myOffice',
 		'numbers',
 		'strategy',
+		'strategyHours',
 		'users',
 		'vmboxes'
 	];
@@ -78,8 +79,13 @@ define(function(require) {
 
 			self.loadGlobalData(function() {
 				/* On first Load, load my office */
-				template.find('.category#myOffice').addClass('active');
-				monster.pub('voip.myOffice.render', { parent: template.find('.right-content') });
+				template.find('.category#strategy').addClass('active');
+				monster.pub('voip.strategy.render', {
+					parent: template.find('.right-content'),
+					callback: function() {
+						template.find('.element-container[data-template="hours"] .element-header-inner').click();
+					}
+				});
 			});
 
 			self.bindEvents(template);
