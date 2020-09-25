@@ -13,6 +13,21 @@
 					{{i18n.strategy.hours.emptyState.title}}
 				</span>
 			</div>
+			<div class="content">
+				<div class="info-text">
+					{{i18n.strategy.hours.emptyState.text}}
+				</div>
+				<select name="template">
+					<option value="">
+						{{i18n.strategy.hours.emptyState.defaultOption}}
+					</option>
+				{{#each templates}}
+					<option value="{{this}}">
+						{{tryI18n @root.i18n.strategy.hours.emptyState this}}
+					</option>
+				{{/each}}
+				</select>
+			</div>
 		</div>
 	{{#each days}}
 		{{#if intervals}}
