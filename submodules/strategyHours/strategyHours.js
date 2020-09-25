@@ -9,6 +9,21 @@ define(function(require) {
 			'voip.strategyHours.render': 'strategyHoursRender'
 		},
 
+		templatePresets: {
+			nineToFiveWithNoonToOneLunchbreak: _
+				.chain(5)
+				.range()
+				.map(function() {
+					return [
+						{ start: 3600 * 9, end: 3600 * 12, isOpen: true },
+						{ start: 3600 * 12, end: 3600 * 13, isOpen: false },
+						{ start: 3600 * 13, end: 3600 * 17, isOpen: true }
+					];
+				})
+				.concat([[], []])
+				.value()
+		},
+
 		strategyHoursRender: function(args) {
 			var self = this,
 				$container = args.container,
@@ -44,6 +59,7 @@ define(function(require) {
 				days = self.weekdays,
 				templateData = {
 					isEmpty: _.every(intervals, _.isEmpty),
+					templates: _.keys(self.templatePresets),
 					days: _.map(days, function(day, index) {
 						var label = monster.util.tryI18n(self.i18n.active().strategy.hours.days, day);
 
@@ -209,6 +225,18 @@ define(function(require) {
 
 		strategyHoursListingBindEvents: function(parent, template) {
 			var self = this;
+
+			template.on('change', '.office-hours-content .empty-state select[name="template"]', function(event) {
+				event.preventDefault();
+
+				var option = $(this).val();
+
+				if (!option) {
+					return;
+				}
+
+				self.strategyHoursListingRender(parent, self.templatePresets[option]);
+			});
 
 			template.on('change', 'input.ui-timepicker-input', function(event) {
 				event.preventDefault();
