@@ -33,7 +33,15 @@ define(function(require) {
 		},
 
 		requests: {},
-		subscribe: {},
+
+		subscribe: {
+			'monster.onTemplateLoad': 'onTemplateLoad'
+		},
+
+		onTemplateLoad: function(args) {
+			monster.pub('core.onTemplateLoad', args);
+		},
+
 		appFlags: {
 			common: {
 				hasProvisioner: false,
