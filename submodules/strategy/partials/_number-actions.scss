@@ -1,0 +1,23 @@
+.number-actions {
+	padding: 25px 20px;
+	background-color: #f3f3f3;
+
+	.action-links {
+		a {
+			margin-right: 10px;
+
+			i {
+				margin-right: 5px;
+			}
+		}
+
+		ul.dropdown-menu {
+			min-width: 0;
+		}
+
+		.buy-dropdown:hover {
+			background-color: transparent;
+			text-decoration: underline;
+		}
+	}
+}
