@@ -7,11 +7,13 @@
 		<div class="element-header-outer clearfix">
 			<div class="element-header-inner">
 				<div class="title">
-					<i class="fa fa-phone"></i>
-					<span>{{ i18n.strategy.sectionTitles.numbers }}</span>
+					{{telicon "number"}}
+					<div class="text">
+						{{ i18n.strategy.sectionTitles.numbers }}
+					</div>
 				</div>
 				<div class="summary">
-					<span>
+					<div class="content">
 						{{formatPhoneNumber mainNumbers.[0]}}
 						{{#if mainNumbers.[1]}}
 							{{#if mainNumbers.[2]}}
@@ -20,8 +22,10 @@
 								, {{formatPhoneNumber mainNumbers.[1]}}
 							{{/if}}
 						{{/if}}
-					</span>
-					<i class="fa fa-play"></i>
+					</div>
+					<div class="icons">
+						<i class="fa fa-play"></i>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -32,11 +36,15 @@
 			<div class="element-header-inner">
 				<div class="title">
 					{{telicon "clock"}}
-					<span>{{ i18n.strategy.sectionTitles.hours }}</span>
+					<div class="text">
+						{{ i18n.strategy.sectionTitles.hours }}
+					</div>
 				</div>
 				<div class="summary">
-					<span></span>
-					<i class="fa fa-play"></i>
+					<div class="content"></div>
+					<div class="icons">
+						<i class="fa fa-play"></i>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -46,12 +54,16 @@
 		<div class="element-header-outer clearfix">
 			<div class="element-header-inner">
 				<div class="title">
-					<i class="fa fa-phone"></i>
-					<span>{{ i18n.strategy.sectionTitles.holidays }}</span>
+					{{telicon "calendar"}}
+					<div class="text">
+						{{ i18n.strategy.sectionTitles.holidays }}
+					</div>
 				</div>
 				<div class="summary">
-					<span></span>
-					<i class="fa fa-play"></i>
+					<div class="content"></div>
+					<div class="icons">
+						<i class="fa fa-play"></i>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -61,12 +73,16 @@
 		<div class="element-header-outer clearfix">
 			<div class="element-header-inner">
 				<div class="title">
-					<i class="fa fa-phone"></i>
-					<span>{{ i18n.strategy.sectionTitles.calls }}</span>
+					{{telicon "phone-inbound"}}
+					<div class="text">
+						{{ i18n.strategy.sectionTitles.calls }}
+					</div>
 				</div>
 				<div class="summary">
-					<span></span>
-					<i class="fa fa-play"></i>
+					<div class="content"></div>
+					<div class="icons">
+						<i class="fa fa-play"></i>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -76,11 +92,13 @@
 		<div class="element-header-outer clearfix">
 			<div class="element-header-inner">
 				<div class="title">
-					<i class="fa fa-comments"></i>
-					<span>{{ i18n.strategy.sectionTitles.confnum }}</span>
+					{{telicon "comments"}}
+					<div class="text">
+						{{ i18n.strategy.sectionTitles.confnum }}
+					</div>
 				</div>
 				<div class="summary">
-					<span>
+					<div class="content">
 						{{formatPhoneNumber confNumbers.[0]}}
 						{{#if confNumbers.[1]}}
 							{{#if confNumbers.[2]}}
@@ -89,10 +107,12 @@
 								, {{formatPhoneNumber confNumbers.[1]}}
 							{{/if}}
 						{{/if}}
-					</span>
-					<i class="fa fa-play"></i>
+					</div>
+					<div class="icons">
+						<i class="fa fa-volume-up monster-primary-color custom-greeting-icon" title="{{i18n.strategy.customConferenceGreeting.tooltip}}" data-toggle="tooltip" {{#unless customConfGreeting}}style="display:none"{{/unless}}></i>
+						<i class="fa fa-play"></i>
+					</div>
 				</div>
-				<i class="fa fa-volume-up monster-primary-color custom-greeting-icon" data-original-title="{{i18n.strategy.customConferenceGreeting.tooltip}}" data-placement="top" data-toggle="tooltip" {{#unless customConfGreeting}}style="display:none"{{/unless}}></i>
 			</div>
 		</div>
 		<div class="element-content"></div>
@@ -101,11 +121,13 @@
 		<div class="element-header-outer clearfix">
 			<div class="element-header-inner">
 				<div class="title">
-					<i class="fa fa-fax"></i>
-					<span>{{ i18n.strategy.sectionTitles.faxingnum }}</span>
+					{{telicon "device-fax"}}
+					<div class="text">
+						{{ i18n.strategy.sectionTitles.faxingnum }}
+					</div>
 				</div>
 				<div class="summary">
-					<span>
+					<div class="content">
 						{{formatPhoneNumber faxingNumbers.[0]}}
 						{{#if faxingNumbers.[1]}}
 							{{#if faxingNumbers.[2]}}
@@ -114,8 +136,10 @@
 								, {{formatPhoneNumber faxingNumbers.[1]}}
 							{{/if}}
 						{{/if}}
-					</span>
-					<i class="fa fa-play"></i>
+					</div>
+					<div class="icons">
+						<i class="fa fa-play"></i>
+					</div>
 				</div>
 			</div>
 		</div>
