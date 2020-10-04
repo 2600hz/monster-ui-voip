@@ -419,7 +419,6 @@ define(function(require) {
 				strategyNumbersContainer = template.find('.element-container.main-number .element-content'),
 				strategyConfNumContainer = template.find('.element-container.strategy-confnum .element-content'),
 				strategyFaxingNumContainer = template.find('.element-container.strategy-faxingnum .element-content'),
-				strategyHoursContainer = template.find('.element-container.strategy-hours .element-content'),
 				strategyHolidaysContainer = template.find('.element-container.strategy-holidays .element-content'),
 				strategyCallsContainer = template.find('.element-container.strategy-calls .element-content');
 
@@ -780,18 +779,17 @@ define(function(require) {
 
 					break;
 				case 'calls':
-					var templateData = {
-							lunchbreak: (strategyData.temporalRules.lunchbreak.id in strategyData.callflows.MainCallflow.flow.children),
-							holidays: !$.isEmptyObject(strategyData.temporalRules.holidays),
-							afterhours: false
+					var isRuleIdActive = _.partial(_.includes, _.keys(strategyData.callflows.MainCallflow.flow.children)),
+						hasAtLeatOneActiveRule = _.flow(
+							_.partial(_.map, _, 'id'),
+							_.partial(_.some, _, isRuleIdActive)
+						),
+						templateData = {
+							holidays: hasAtLeatOneActiveRule(strategyData.temporalRules.holidays),
+							lunchbreak: hasAtLeatOneActiveRule(strategyData.temporalRules.lunchbreak),
+							afterhours: hasAtLeatOneActiveRule(strategyData.temporalRules.weekdays)
 						},
 						template;
-
-					_.each(self.weekdayLabels, function(val) {
-						if (strategyData.temporalRules.weekdays[val].id in strategyData.callflows.MainCallflow.flow.children) {
-							templateData.afterhours = true;
-						}
-					});
 
 					template = $(self.getTemplate({
 						name: 'strategy-' + templateName,
@@ -3364,8 +3362,8 @@ define(function(require) {
 			self.strategyGetAllRules(function(data) {
 				var parallelRequests = {};
 
-				_.each(data.rules, function(val, key) {
-					parallelRequests[val.name] = function(callback) {
+				_.each(data.rules, function(val) {
+					parallelRequests[val.type === 'main_lunchbreak' ? val.id : val.name] = function(callback) {
 						self.strategyGetRule(val.id, function(data) {
 							callback(null, data);
 						});
@@ -3398,29 +3396,6 @@ define(function(require) {
 					}
 				});
 
-				if (!('MainLunchHours' in parallelRequests)) {
-					parallelRequests.MainLunchHours = function(callback) {
-						self.callApi({
-							resource: 'temporalRule.create',
-							data: {
-								accountId: self.accountId,
-								data: {
-									cycle: 'weekly',
-									interval: 1,
-									name: 'MainLunchHours',
-									type: 'main_lunchbreak',
-									time_window_start: 43200,
-									time_window_stop: 46800,
-									wdays: self.weekdays
-								}
-							},
-							success: function(data, status) {
-								callback(null, data.data);
-							}
-						});
-					};
-				}
-
 				monster.parallel(parallelRequests, function(err, results) {
 					var temporalRules = {
 						weekdays: {},
@@ -3435,7 +3410,7 @@ define(function(require) {
 
 								break;
 							case 'main_lunchbreak':
-								temporalRules.lunchbreak = val;
+								temporalRules.lunchbreak[key] = val;
 
 								break;
 							case 'main_holidays':
@@ -3698,7 +3673,7 @@ define(function(require) {
 			mainCallflow.flow.data.rules = _
 				.chain([
 					_.map(rules.holidays, 'id'),
-					_.has(rules.lunchbreak, 'id') ? [rules.lunchbreak.id] : [],
+					_.keys(rules.lunchbreak),
 					_.map(rules.weekdays, 'id')
 				])
 				.flatten()
