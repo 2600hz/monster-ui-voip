@@ -721,7 +721,7 @@ define(function(require) {
 					break;
 				case 'holidays':
 					var templateData = {
-							enabled: !$.isEmptyObject(strategyData.temporalRules.holidays)
+							enabled: !_.isEmpty(strategyData.temporalRules.holidays)
 						},
 						template = $(self.getTemplate({
 							name: 'strategy-' + templateName,
@@ -737,7 +737,7 @@ define(function(require) {
 
 					holidayList.empty();
 
-					_.each(strategyData.temporalRules.holidays, function(val, key) {
+					_.each(_.get(strategyData.temporalRules, 'holidays', {}), function(val, key) {
 						if (val.id in strategyData.callflows.MainCallflow.flow.children) {
 							var holidayType,
 								holidayData = {
@@ -1711,7 +1711,7 @@ define(function(require) {
 						self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
 							strategyData.callflows.MainCallflow = updatedCallflow;
 							var afterDelete = function(data) {
-								delete strategyData.temporalRules.holidays[data.name];
+								_.unset(strategyData.temporalRules, ['holidays', data.name]);
 								holidaysElement.remove();
 							};
 
@@ -1790,7 +1790,7 @@ define(function(require) {
 									},
 									module: 'callflow'
 								};
-								strategyData.temporalRules.holidays[val.name] = val;
+								_.set(strategyData.temporalRules, ['holidays', val.name], val);
 							});
 
 							self.strategyRebuildMainCallflowRuleArray(strategyData);
@@ -1807,7 +1807,7 @@ define(function(require) {
 					}
 				} else {
 					monster.ui.confirm(self.i18n.active().strategy.confirmMessages.disableHolidays, function() {
-						_.each(strategyData.temporalRules.holidays, function(val, key) {
+						_.each(_.get(strategyData.temporalRules, 'holidays', {}), function(val, key) {
 							holidayRulesRequests[key] = function(callback) {
 								if (val.hasOwnProperty('temporal_rules')) {
 									self.strategyDeleteRuleSetAndRules(val.id, function() {
@@ -1824,7 +1824,7 @@ define(function(require) {
 						});
 
 						monster.parallel(holidayRulesRequests, function(err, results) {
-							strategyData.temporalRules.holidays = {};
+							_.set(strategyData.temporalRules, 'holidays', {});
 							self.strategyRebuildMainCallflowRuleArray(strategyData);
 							self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
 								strategyData.callflows.MainCallflow = updatedCallflow;
@@ -3357,76 +3357,41 @@ define(function(require) {
 		},
 
 		strategyGetTemporalRules: function(callback) {
-			var self = this;
+			var self = this,
+				types = [
+					'main_holidays',
+					'main_lunchbreak',
+					'main_weekdays'
+				],
+				getTypeProp = _.partial(_.get, _, 'type'),
+				isTypeValid = _.flow(
+					getTypeProp,
+					_.partial(_.includes, types)
+				),
+				getStripedType = _.flow(
+					getTypeProp,
+					_.partial(_.replace, _, 'main_', '')
+				);
 
 			self.strategyGetAllRules(function(data) {
-				var parallelRequests = {};
-
-				_.each(data.rules, function(val) {
-					parallelRequests[val.type === 'main_lunchbreak' ? val.id : val.name] = function(callback) {
-						self.strategyGetRule(val.id, function(data) {
-							callback(null, data);
-						});
+				monster.parallel(_.map(data.rules, function(rule) {
+					return function(next) {
+						self.strategyGetRule(rule.id, _.partial(next, null));
 					};
-				});
-
-				// Always check that the necessary time rules exist, or re-create them
-				_.each(self.weekdayLabels, function(val) {
-					if (!(val in parallelRequests)) {
-						parallelRequests[val] = function(callback) {
-							self.callApi({
-								resource: 'temporalRule.create',
-								data: {
-									accountId: self.accountId,
-									data: {
-										cycle: 'weekly',
-										interval: 1,
-										name: val,
-										type: 'main_weekdays',
-										time_window_start: 32400, // 9:00AM
-										time_window_stop: 61200, // 5:00PM
-										wdays: [val.substring(4).toLowerCase()]
-									}
-								},
-								success: function(data, status) {
-									callback(null, data.data);
-								}
-							});
-						};
-					}
-				});
-
-				monster.parallel(parallelRequests, function(err, results) {
-					var temporalRules = {
-						weekdays: {},
-						lunchbreak: {},
-						holidays: {}
-					};
-
-					_.each(results, function(val, key) {
-						switch (val.type) {
-							case 'main_weekdays':
-								temporalRules.weekdays[key] = val;
-
-								break;
-							case 'main_lunchbreak':
-								temporalRules.lunchbreak[key] = val;
-
-								break;
-							case 'main_holidays':
-								temporalRules.holidays[key] = val;
-
-								break;
-						}
-					});
-
-					_.each(data.sets, function(set) {
-						if (!_.isEmpty(set)) {
-							temporalRules.holidays[set.name] = set;
-						}
-					});
-
-					callback(temporalRules);
+				}), function(err, rules) {
+					callback(_
+						.chain(rules)
+						.filter(isTypeValid)
+						.groupBy(getStripedType)
+						.mapValues(_.partial(_.keyBy, _, 'id'))
+						.merge(_
+							.chain(data.sets)
+							.reject(_.isEmpty)
+							.keyBy('name')
+							.value()
+						)
+						.value()
+					);
 				});
 			});
 		},

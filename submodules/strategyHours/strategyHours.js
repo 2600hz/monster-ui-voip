@@ -300,7 +300,7 @@ define(function(require) {
 			);
 		},
 
-		strategyHoursGetIntervalsFromStrategyData: function(strategyData) {
+		strategyHoursGetIntervalsFromStrategyData2: function(strategyData) {
 			var self = this,
 				weekdays = self.weekdays,
 				activeRulesIds = _
@@ -335,8 +335,8 @@ define(function(require) {
 						})
 						.value();
 				},
-				openIntervalsPerDay = extractIntervalsFromRules(strategyData.temporalRules.weekdays, true),
-				lunchIntervalsPerDay = extractIntervalsFromRules(strategyData.temporalRules.lunchbreak, false);
+				openIntervalsPerDay = extractIntervalsFromRules(_.get(strategyData.temporalRules, 'weekdays', {}), true),
+				lunchIntervalsPerDay = extractIntervalsFromRules(_.get(strategyData.temporalRules, 'lunchbreak', {}), false);
 
 			return _.map(weekdays, function(day) {
 				return self.strategyHoursBuildIntervalsSetForDay({
@@ -347,6 +347,39 @@ define(function(require) {
 						.value(),
 					lunch: _.get(lunchIntervalsPerDay, day, [])
 				});
+			});
+		},
+
+		strategyHoursGetIntervalsFromStrategyData: function(strategyData) {
+			var self = this,
+				weekdays = self.weekdays,
+				extractIntervalsFromRules = function(rules, day, isOpen) {
+					return _
+						.chain(rules)
+						.filter(_.flow(
+							_.partial(_.get, _, 'wdays'),
+							_.partial(_.includes, _, day)
+						))
+						.map(function(rule) {
+							return {
+								day: day,
+								start: rule.time_window_start,
+								end: rule.time_window_stop,
+								isOpen: isOpen
+							};
+						})
+						.value();
+				};
+
+			return _.map(weekdays, function(day) {
+				return _
+					.chain([
+						extractIntervalsFromRules(_.get(strategyData.temporalRules, 'weekdays', {}), day, true),
+						extractIntervalsFromRules(_.get(strategyData.temporalRules, 'lunchbreak', {}), day, false)
+					])
+					.flatten()
+					.sortBy('start')
+					.value();
 			});
 		},
 
@@ -456,7 +489,7 @@ define(function(require) {
 			)(days), callback);
 		},
 
-		strategyHoursUpdateLunchHoursRules: function(days, existingLunchRules, callback) {
+		strategyHoursUpdateLunchHoursRules: function(days, existingLunchRules, onCreateMetadata, callback) {
 			var self = this,
 				weekdays = self.weekdays,
 				combineIntervals = function combineIntervals(days) {
@@ -584,15 +617,13 @@ define(function(require) {
 									resource: 'temporalRule.create',
 									data: {
 										accountId: self.accountId,
-										data: {
+										data: _.merge({
 											cycle: 'weekly',
 											interval: 1,
-											name: 'MainLunchHours',
-											type: 'main_lunchbreak',
 											time_window_start: rule.start,
 											time_window_stop: rule.end,
 											wdays: rule.days
-										}
+										}, onCreateMetadata)
 									},
 									success: _.flow(
 										_.partial(_.get, _, 'data'),
@@ -651,9 +682,7 @@ define(function(require) {
 						mainLunchHoursCallflowId = strategyData.callflows.MainLunchHours.id;
 
 					_.forEach(openRules.toAdd, function(rule) {
-						var ruleKey = _.findKey(strategyData.temporalRules.weekdays, { id: rule.id });
-
-						strategyData.temporalRules.weekdays[ruleKey] = rule;
+						_.set(strategyData.temporalRules, ['weekdays', rule.id], rule);
 						strategyData.callflows.MainCallflow.flow.children[rule.id] = {
 							children: {},
 							data: {
@@ -663,11 +692,12 @@ define(function(require) {
 						};
 					});
 					_.forEach(openRules.toRemove, function(rule) {
+						_.unset(strategyData.temporalRules, ['weekdays', rule.id]);
 						delete strategyData.callflows.MainCallflow.flow.children[rule.id];
 					});
 
 					_.forEach(lunchRules.toAdd, function(rule) {
-						strategyData.temporalRules.lunchbreak[rule.id] = rule;
+						_.set(strategyData.temporalRules, ['lunchbreak', rule.id], rule);
 						strategyData.callflows.MainCallflow.flow.children[rule.id] = {
 							children: {},
 							data: {
@@ -677,7 +707,7 @@ define(function(require) {
 						};
 					});
 					_.forEach(lunchRules.toRemove, function(rule) {
-						delete strategyData.temporalRules.lunchbreak[rule.id];
+						_.unset(strategyData.temporalRules, ['lunchbreak', rule.id]);
 						delete strategyData.callflows.MainCallflow.flow.children[rule.id];
 					});
 
@@ -686,8 +716,8 @@ define(function(require) {
 						data: {
 							id: _
 								.chain([
-									_.map(strategyData.temporalRules.weekdays, 'id'),
-									_.map(strategyData.temporalRules.lunchbreak, 'id')
+									_.chain(strategyData.temporalRules).get('weekdays', {}).map('id').value(),
+									_.chain(strategyData.temporalRules).get('lunchbreak', {}).map('id').value()
 								])
 								.flatten()
 								.every(_.partial(_.negate(_.includes), _.keys(strategyData.callflows.MainCallflow.flow.children)))
@@ -704,8 +734,14 @@ define(function(require) {
 				};
 
 			monster.parallel({
-				weekdays: _.bind(self.strategyHoursUpdateOpenHoursRules, self, openHoursIntervals, strategyData.temporalRules.weekdays),
-				lunchbreak: _.bind(self.strategyHoursUpdateLunchHoursRules, self, lunchHoursIntervals, strategyData.temporalRules.lunchbreak)
+				weekdays: _.bind(self.strategyHoursUpdateLunchHoursRules, self, openHoursIntervals, _.get(strategyData.temporalRules, 'weekdays', {}), {
+					type: 'main_weekdays',
+					name: 'mainOpenHours'
+				}),
+				lunchbreak: _.bind(self.strategyHoursUpdateLunchHoursRules, self, lunchHoursIntervals, _.get(strategyData.temporalRules, 'lunchbreak', {}), {
+					type: 'main_lunchbreak',
+					name: 'mainLunchHours'
+				})
 			}, _.partial(updateStrategyData, _, _, strategyData));
 		}
 	};
