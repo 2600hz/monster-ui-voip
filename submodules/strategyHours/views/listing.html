@@ -51,12 +51,12 @@
 							<input class="span2 {{../id}}[{{@key}}].end" name="{{../id}}[{{@key}}].end"></input>
 						</div>
 						<div class="status">
-							<select name="{{../id}}[{{@key}}].isOpen" class="status">
-							{{#select isOpen}}
-								<option value="true">
+							<select name="{{../id}}[{{@key}}].type" class="status">
+							{{#select type}}
+								<option value="open">
 									{{@root.i18n.strategy.hours.open}}
 								</option>
-								<option value="false">
+								<option value="lunch">
 									{{@root.i18n.strategy.hours.lunch}}
 								</option>
 							{{/select}}

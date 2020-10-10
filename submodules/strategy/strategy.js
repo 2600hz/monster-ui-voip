@@ -419,7 +419,6 @@ define(function(require) {
 				strategyNumbersContainer = template.find('.element-container.main-number .element-content'),
 				strategyConfNumContainer = template.find('.element-container.strategy-confnum .element-content'),
 				strategyFaxingNumContainer = template.find('.element-container.strategy-faxingnum .element-content'),
-				strategyHoursContainer = template.find('.element-container.strategy-hours .element-content'),
 				strategyHolidaysContainer = template.find('.element-container.strategy-holidays .element-content'),
 				strategyCallsContainer = template.find('.element-container.strategy-calls .element-content');
 
@@ -722,7 +721,7 @@ define(function(require) {
 					break;
 				case 'holidays':
 					var templateData = {
-							enabled: !$.isEmptyObject(strategyData.temporalRules.holidays)
+							enabled: !_.isEmpty(strategyData.temporalRules.holidays)
 						},
 						template = $(self.getTemplate({
 							name: 'strategy-' + templateName,
@@ -738,7 +737,7 @@ define(function(require) {
 
 					holidayList.empty();
 
-					_.each(strategyData.temporalRules.holidays, function(val, key) {
+					_.each(_.get(strategyData.temporalRules, 'holidays', {}), function(val, key) {
 						if (val.id in strategyData.callflows.MainCallflow.flow.children) {
 							var holidayType,
 								holidayData = {
@@ -780,18 +779,17 @@ define(function(require) {
 
 					break;
 				case 'calls':
-					var templateData = {
-							lunchbreak: (strategyData.temporalRules.lunchbreak.id in strategyData.callflows.MainCallflow.flow.children),
-							holidays: !$.isEmptyObject(strategyData.temporalRules.holidays),
-							afterhours: false
+					var isRuleIdActive = _.partial(_.includes, _.keys(strategyData.callflows.MainCallflow.flow.children)),
+						hasAtLeatOneActiveRule = _.flow(
+							_.partial(_.map, _, 'id'),
+							_.partial(_.some, _, isRuleIdActive)
+						),
+						templateData = {
+							holidays: hasAtLeatOneActiveRule(strategyData.temporalRules.holidays),
+							lunchbreak: hasAtLeatOneActiveRule(strategyData.temporalRules.lunchbreak),
+							afterhours: hasAtLeatOneActiveRule(strategyData.temporalRules.weekdays)
 						},
 						template;
-
-					_.each(self.weekdayLabels, function(val) {
-						if (strategyData.temporalRules.weekdays[val].id in strategyData.callflows.MainCallflow.flow.children) {
-							templateData.afterhours = true;
-						}
-					});
 
 					template = $(self.getTemplate({
 						name: 'strategy-' + templateName,
@@ -1713,7 +1711,7 @@ define(function(require) {
 						self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
 							strategyData.callflows.MainCallflow = updatedCallflow;
 							var afterDelete = function(data) {
-								delete strategyData.temporalRules.holidays[data.name];
+								_.unset(strategyData.temporalRules, ['holidays', data.name]);
 								holidaysElement.remove();
 							};
 
@@ -1792,7 +1790,7 @@ define(function(require) {
 									},
 									module: 'callflow'
 								};
-								strategyData.temporalRules.holidays[val.name] = val;
+								_.set(strategyData.temporalRules, ['holidays', val.name], val);
 							});
 
 							self.strategyRebuildMainCallflowRuleArray(strategyData);
@@ -1809,7 +1807,7 @@ define(function(require) {
 					}
 				} else {
 					monster.ui.confirm(self.i18n.active().strategy.confirmMessages.disableHolidays, function() {
-						_.each(strategyData.temporalRules.holidays, function(val, key) {
+						_.each(_.get(strategyData.temporalRules, 'holidays', {}), function(val, key) {
 							holidayRulesRequests[key] = function(callback) {
 								if (val.hasOwnProperty('temporal_rules')) {
 									self.strategyDeleteRuleSetAndRules(val.id, function() {
@@ -1826,7 +1824,7 @@ define(function(require) {
 						});
 
 						monster.parallel(holidayRulesRequests, function(err, results) {
-							strategyData.temporalRules.holidays = {};
+							_.set(strategyData.temporalRules, 'holidays', {});
 							self.strategyRebuildMainCallflowRuleArray(strategyData);
 							self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
 								strategyData.callflows.MainCallflow = updatedCallflow;
@@ -3359,100 +3357,49 @@ define(function(require) {
 		},
 
 		strategyGetTemporalRules: function(callback) {
-			var self = this;
+			var self = this,
+				types = [
+					'main_holidays',
+					'main_lunchbreak',
+					'main_weekdays'
+				],
+				getTypeProp = _.partial(_.get, _, 'type'),
+				isTypeValid = _.flow(
+					getTypeProp,
+					_.partial(_.includes, types)
+				),
+				getStripedType = _.flow(
+					getTypeProp,
+					_.partial(_.replace, _, 'main_', '')
+				),
+				getRule = function(ruleId, next) {
+					self.strategyGetRule(ruleId, _.partial(next, null));
+				};
 
-			self.strategyGetAllRules(function(data) {
-				var parallelRequests = {};
-
-				_.each(data.rules, function(val, key) {
-					parallelRequests[val.name] = function(callback) {
-						self.strategyGetRule(val.id, function(data) {
-							callback(null, data);
-						});
-					};
-				});
-
-				// Always check that the necessary time rules exist, or re-create them
-				_.each(self.weekdayLabels, function(val) {
-					if (!(val in parallelRequests)) {
-						parallelRequests[val] = function(callback) {
-							self.callApi({
-								resource: 'temporalRule.create',
-								data: {
-									accountId: self.accountId,
-									data: {
-										cycle: 'weekly',
-										interval: 1,
-										name: val,
-										type: 'main_weekdays',
-										time_window_start: 32400, // 9:00AM
-										time_window_stop: 61200, // 5:00PM
-										wdays: [val.substring(4).toLowerCase()]
-									}
-								},
-								success: function(data, status) {
-									callback(null, data.data);
-								}
-							});
-						};
-					}
-				});
-
-				if (!('MainLunchHours' in parallelRequests)) {
-					parallelRequests.MainLunchHours = function(callback) {
-						self.callApi({
-							resource: 'temporalRule.create',
-							data: {
-								accountId: self.accountId,
-								data: {
-									cycle: 'weekly',
-									interval: 1,
-									name: 'MainLunchHours',
-									type: 'main_lunchbreak',
-									time_window_start: 43200,
-									time_window_stop: 46800,
-									wdays: self.weekdays
-								}
-							},
-							success: function(data, status) {
-								callback(null, data.data);
-							}
-						});
-					};
+			monster.waterfall([
+				function(next) {
+					self.strategyGetAllRules(_.partial(next, null));
+				},
+				function(data, next) {
+					monster.parallel(_.map(data.rules, function(rule) {
+						return _.partial(getRule, rule.id);
+					}), _.partialRight(next, data.sets));
 				}
-
-				monster.parallel(parallelRequests, function(err, results) {
-					var temporalRules = {
-						weekdays: {},
-						lunchbreak: {},
-						holidays: {}
-					};
-
-					_.each(results, function(val, key) {
-						switch (val.type) {
-							case 'main_weekdays':
-								temporalRules.weekdays[key] = val;
-
-								break;
-							case 'main_lunchbreak':
-								temporalRules.lunchbreak = val;
-
-								break;
-							case 'main_holidays':
-								temporalRules.holidays[key] = val;
-
-								break;
-						}
-					});
-
-					_.each(data.sets, function(set) {
-						if (!_.isEmpty(set)) {
-							temporalRules.holidays[set.name] = set;
-						}
-					});
-
-					callback(temporalRules);
-				});
+			], function(err, rules, sets) {
+				callback(_
+					.chain(rules)
+					.filter(isTypeValid)
+					.groupBy(getStripedType)
+					.mapValues(_.partial(_.keyBy, _, 'id'))
+					.merge({
+						holidays: _
+							.chain(sets)
+							.reject(_.isEmpty)
+							.keyBy('name')
+							.value()
+					})
+					.value()
+				);
 			});
 		},
 
@@ -3698,7 +3645,7 @@ define(function(require) {
 			mainCallflow.flow.data.rules = _
 				.chain([
 					_.map(rules.holidays, 'id'),
-					_.has(rules.lunchbreak, 'id') ? [rules.lunchbreak.id] : [],
+					_.keys(rules.lunchbreak),
 					_.map(rules.weekdays, 'id')
 				])
 				.flatten()
@@ -4336,25 +4283,24 @@ define(function(require) {
 
 		strategyAddOfficeHoursPopup: function(args) {
 			var self = this,
+				meta = _.pick(self.appFlags.strategyHours.intervals, ['max', 'unit', 'step']),
 				existing = args.existing,
 				callback = args.callback,
 				$template = $(self.getTemplate({
 					name: 'addOfficeHours',
 					data: {
-						days: [
-							'Monday',
-							'Tuesday',
-							'Wednesday',
-							'Thursday',
-							'Friday',
-							'Saturday',
-							'Sunday'
-						]
+						days: _.map(
+							self.weekdays,
+							_.partial(monster.util.tryI18n, self.i18n.active().strategy.hours.days)
+						)
 					},
 					submodule: 'strategy'
 				})),
 				$startTimepicker = $template.find('.start-time'),
 				$endTimepicker = $template.find('.end-time'),
+				timepickerOptions = {
+					step: meta.step / 60
+				},
 				popup;
 
 			$template.find('input[name="days[]"]').on('change', function(event) {
@@ -4367,16 +4313,16 @@ define(function(require) {
 				$template.find('.no-days-error')[atLeastOneChecked ? 'slideUp' : 'slideDown'](200);
 			});
 
-			monster.ui.timepicker($startTimepicker, {
+			monster.ui.timepicker($startTimepicker, _.merge({
 				useSelect: true,
-				maxTime: 86400 - (3600 / 2)
-			});
-			monster.ui.timepicker($endTimepicker, {
+				maxTime: meta.max - meta.step
+			}, timepickerOptions));
+			monster.ui.timepicker($endTimepicker, _.merge({
 				useSelect: true,
-				minTime: 3600 / 2,
-				maxTime: 86400
-			});
-			$endTimepicker.timepicker('setTime', 3600 * 24);
+				minTime: meta.step,
+				maxTime: meta.max
+			}, timepickerOptions));
+			$endTimepicker.timepicker('setTime', meta.max);
 
 			$startTimepicker.on('changeTime', function() {
 				$template.find('.overlapping-hours-error').slideUp(200);
@@ -4384,7 +4330,7 @@ define(function(require) {
 				var startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
 					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight');
 
-				$endTimepicker.timepicker('option', 'minTime', startSeconds + (3600 / 2));
+				$endTimepicker.timepicker('option', 'minTime', startSeconds + meta.step);
 				if (!_.isNull(endSeconds)) {
 					$endTimepicker.timepicker('setTime', endSeconds);
 				}
@@ -4396,7 +4342,7 @@ define(function(require) {
 				var startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
 					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight');
 
-				$startTimepicker.timepicker('option', 'maxTime', endSeconds - (3600 / 2));
+				$startTimepicker.timepicker('option', 'maxTime', endSeconds - meta.step);
 				if (!_.isNull(endSeconds)) {
 					$startTimepicker.timepicker('setTime', startSeconds);
 				}
@@ -4413,8 +4359,8 @@ define(function(require) {
 					endTime = $endTimepicker.timepicker('getSecondsFromMidnight'),
 					formattedData = _.merge({
 						start: $startTimepicker.timepicker('getSecondsFromMidnight'),
-						end: endTime === 0 ? 3600 * 24 : endTime,
-						isOpen: formData.isOpen === 'true'
+						end: endTime === 0 ? meta.max : endTime,
+						type: formData.type
 					}, _.pick(formData, [
 						'days'
 					])),
@@ -4471,7 +4417,7 @@ define(function(require) {
 							.concat(isDaySelected ? [_.pick(formattedData, [
 								'start',
 								'end',
-								'isOpen'
+								'type'
 							])] : [])
 							.sortBy('start')
 							.value();
