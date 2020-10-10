@@ -820,15 +820,10 @@
 				"lunchHours": "Lunch Hours (closed)",
 				"openHours": "Open Hours"
 			},
-			"days": [
-				"Monday",
-				"Tuesday",
-				"Wednesday",
-				"Thursday",
-				"Friday",
-				"Saturday",
-				"Sunday"
-			]
+			"errors": {
+				"noDaysSelected": "No days have been selected.",
+				"overlappingHours": "Selected hours overlap existing hours."
+			}
 		},
 		"noNumberHelp": "Note: Please add a Main Office Number to your account first. Once you add a main number, you will be able to set up Office Hours, Holidays and Incoming Call Handling (Call-Flow) for your office.",
 		"sectionTitles": {

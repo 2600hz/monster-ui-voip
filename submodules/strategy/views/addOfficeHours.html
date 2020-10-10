@@ -5,7 +5,7 @@
 				{{i18n.strategy.addOfficeHours.labels.selectDays}}
 			</label>
 			<ul class="controls">
-			{{#each i18n.strategy.addOfficeHours.days as | label |}}
+			{{#each days as |label|}}
 				<li>
 				{{#monsterCheckbox label}}
 					<input type="checkbox" name="days[]">
@@ -14,18 +14,18 @@
 			{{/each}}
 			</ul>
 		</div>
-		{{#monsterPanelText "No days have been selected." "danger" "fill-width no-days-error"}}
+		{{#monsterPanelText i18n.strategy.addOfficeHours.errors.noDaysSelected "danger" "fill-width no-days-error"}}
 		{{/monsterPanelText}}
 		<div class="control-group">
 			<label for="office_status" class="control-label">
 				{{i18n.strategy.addOfficeHours.labels.officeStatus}}
 			</label>
 			<div class="controls">
-				<select name="isOpen" id="office_status">
-					<option value="false">
+				<select name="type" id="office_status">
+					<option value="lunch">
 						{{i18n.strategy.addOfficeHours.labels.lunchHours}}
 					</option>
-					<option value="true">
+					<option value="open">
 						{{i18n.strategy.addOfficeHours.labels.openHours}}
 					</option>
 				</select>
@@ -49,7 +49,7 @@
 				</div>
 			</div>
 		</div>
-		{{#monsterPanelText "Selected hours overlap existing hours." "danger" "fill-width overlapping-hours-error"}}
+		{{#monsterPanelText i18n.strategy.addOfficeHours.errors.overlappingHours "danger" "fill-width overlapping-hours-error"}}
 		{{/monsterPanelText}}
 	</div>
 	<div class="form-actions">
