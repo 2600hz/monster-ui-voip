@@ -4,58 +4,82 @@ define(function(require) {
 		$ = require('jquery'),
 		timezone = require('monster-timezone');
 
+	var isNotUndefined = _.negate(_.isUndefined),
+		/**
+		 * Returns whether a pair of objects match against a property.
+		 * @param  {String} prop Property to match against.
+		 * @param  {Object} a The object to compare.
+		 * @param  {Object} b The other object to compare.
+		 * @return {Boolean}
+		 */
+		compareBy = function compareBy(prop, a, b) {
+			var values = _.map([a, b], prop);
+			return _.every([
+				_.every(values, isNotUndefined),
+				_.spread(_.isEqual)(values)
+			]);
+		};
+
 	return {
 		subscribe: {
 			'voip.strategyHours.render': 'strategyHoursRender'
 		},
-
-		templatePresets: {
-			nineToFiveWithNoonToOneLunchbreak: _
-				.chain(5)
-				.range()
-				.map(function() {
-					return [
-						{ start: 3600 * 9, end: 3600 * 12, isOpen: true },
-						{ start: 3600 * 12, end: 3600 * 13, isOpen: false },
-						{ start: 3600 * 13, end: 3600 * 17, isOpen: true }
-					];
-				})
-				.concat([[], []])
-				.value()
+		appFlags: {
+			strategyHours: {
+				minIntervalStep: 1800,
+				templatePresets: {
+					nineToFiveWithNoonToOneLunchbreak: _
+						.chain(5)
+						.range()
+						.map(function() {
+							return [
+								{ start: 3600 * 9, end: 3600 * 12, isOpen: true },
+								{ start: 3600 * 12, end: 3600 * 13, isOpen: false },
+								{ start: 3600 * 13, end: 3600 * 17, isOpen: true }
+							];
+						})
+						.concat([[], []])
+						.value()
+				}
+			}
 		},
 
 		strategyHoursRender: function(args) {
 			var self = this,
 				$container = args.container,
 				strategyData = args.strategyData,
-				callback = args.callback,
-				intervals = self.strategyHoursGetIntervalsFromStrategyData(strategyData),
-				template = $(self.getTemplate({
-					name: 'layout',
-					data: {
-						alwaysOpen: _.every(intervals, _.isEmpty),
-						companyTimezone: timezone.formatTimezone(strategyData.callflows.MainCallflow.flow.data.timezone || monster.apps.auth.currentAccount.timezone)
-					},
-					submodule: 'strategyHours'
-				}));
+				callback = args.callback;
 
-			$container
-				.find('.element-content')
-					.empty()
-					.append(template);
+			self.strategyHoursMigrateTemporalRules(strategyData, function() {
+				var intervals = self.strategyHoursExtractDaysIntervalsFromStrategyData(strategyData),
+					template = $(self.getTemplate({
+						name: 'layout',
+						data: {
+							alwaysOpen: _.every(intervals, _.isEmpty),
+							companyTimezone: timezone.formatTimezone(strategyData.callflows.MainCallflow.flow.data.timezone || monster.apps.auth.currentAccount.timezone)
+						},
+						submodule: 'strategyHours'
+					}));
 
-			self.strategyHoursListingRender($container, intervals);
-			self.strategyHoursBindEvents($container, template, strategyData);
+				$container
+					.find('.element-content')
+						.empty()
+						.append(template);
 
-			callback && callback();
+				self.strategyHoursListingRender($container, intervals);
+				self.strategyHoursBindEvents($container, template, strategyData);
+
+				callback && callback();
+			});
 		},
 
 		strategyHoursListingRender: function($container, intervals) {
 			var self = this,
 				days = self.weekdays,
+				minIntervalStep = self.appFlags.strategyHours.minIntervalStep,
 				templateData = {
 					isEmpty: _.every(intervals, _.isEmpty),
-					templates: _.keys(self.templatePresets),
+					templates: _.keys(self.appFlags.strategyHours.templatePresets),
 					days: _.map(days, function(day, index) {
 						var label = monster.util.tryI18n(self.i18n.active().strategy.hours.days, day);
 
@@ -85,11 +109,11 @@ define(function(require) {
 							monster.ui.timepicker($startPicker, {
 								useSelect: true,
 								minTime: previousBound,
-								maxTime: interval.end - (3600 / 2)
+								maxTime: interval.end - minIntervalStep
 							});
 							monster.ui.timepicker($endPicker, {
 								useSelect: true,
-								minTime: interval.start + (3600 / 2),
+								minTime: interval.start + minIntervalStep,
 								maxTime: nextBound
 							});
 							$startPicker.timepicker('setTime', interval.start);
@@ -123,7 +147,7 @@ define(function(require) {
 				event.preventDefault();
 
 				monster.pub('voip.strategy.addOfficeHours', {
-					existing: self.strategyHoursGetIntervalsFromTemplate(parent),
+					existing: self.strategyHoursGetDaysIntervalsFromTemplate(parent),
 					callback: function(err, existing) {
 						self.strategyHoursListingRender(parent, existing);
 					}
@@ -139,12 +163,12 @@ define(function(require) {
 					is24hStrategy = formData.enabled === 'true',
 					weekdays = self.weekdays,
 					intervals = is24hStrategy
-						? self.strategyHoursGetIntervalsFromTemplate(parent)
+						? self.strategyHoursGetDaysIntervalsFromTemplate(parent)
 						: _.map(weekdays, function() { return []; });
 
 				$button.prop('disabled', 'disabled');
 
-				self.strategyHoursSaveStrategyData(intervals, strategyData, function() {
+				self.strategyHoursUpdateStrategyData(intervals, strategyData, function() {
 					$section.find('.element-content').slideUp();
 					$section.removeClass('open');
 				});
@@ -178,7 +202,7 @@ define(function(require) {
 					return;
 				}
 
-				self.strategyHoursListingRender(parent, self.templatePresets[option]);
+				self.strategyHoursListingRender(parent, self.appFlags.strategyHours.templatePresets[option]);
 			});
 
 			template.on('change', 'input.ui-timepicker-input', function(event) {
@@ -251,139 +275,150 @@ define(function(require) {
 		},
 
 		/**
-		 * @param  {Object} args.open
-		 * @param  {Object[]} args.lunch
-		 * @return {Array}
+		 * Enforces nonoverlapping temporal rules by CRUDing them as necessary.
+		 * @param  {Object}   strategyData
+		 * @param  {Function} callback
 		 */
-		strategyHoursBuildIntervalsSetForDay: function(args) {
-			var open = _.get(args, 'open', {}),
-				lunch = _.get(args, 'lunch', []),
-				hasIntervals = !_.every([open, lunch], _.isEmpty),
-				openStart = open.start,
-				openEnd = open.end,
-				firstLunch = _.first(lunch) || {},
-				lastLunch = _.last(lunch) || {},
-				shouldFirstIntervalBeFilledIn = hasIntervals && (_.isEmpty(lunch) || openStart < firstLunch.start),
-				firstOpenInterval = shouldFirstIntervalBeFilledIn ? [{
-					start: openStart,
-					end: _.isEmpty(lunch) || openEnd < firstLunch.end
-						? openEnd
-						: firstLunch.start,
-					isOpen: true
-				}] : [],
-				lastOpenInterval = openEnd > lastLunch.end ? [{
-					start: lastLunch.end,
-					end: openEnd,
-					isOpen: true
-				}] : [];
+		strategyHoursMigrateTemporalRules: function(strategyData, callback) {
+			var self = this,
+				getIntervalsByDays = _.flow(
+					_.bind(self.strategyHoursExtractDaysIntervalsFromStrategyData, self),
+					_.bind(self.strategyHoursNormalizeDaysIntervals, self)
+				);
 
-			return _.concat(
-				firstOpenInterval,
-				_.flatMap(lunch, function(interval, index) {
-					var previous = lunch[index - 1],
-						shouldFillIn = !_.isUndefined(previous) && openEnd > previous.end;
-
-					return _.flatMap([
-						shouldFillIn ? [{
-							start: previous.end,
-							end: openEnd < interval.start
-								? openEnd
-								: interval.start,
-							isOpen: true
-						}] : [],
-						_.merge({}, interval, {
-							isOpen: false
-						})
-					]);
-				}),
-				lastOpenInterval
+			self.strategyHoursUpdateStrategyData(
+				getIntervalsByDays(strategyData),
+				strategyData,
+				callback
 			);
 		},
 
-		strategyHoursGetIntervalsFromStrategyData2: function(strategyData) {
+		/**
+		 * Returns an array of arrays containing nonoverlapping intervals.
+		 * @param  {Array[]} intervalsByDays
+		 * @return {Array[]}
+		 */
+		strategyHoursNormalizeDaysIntervals: function(intervalsByDays) {
+			var self = this,
+				step = self.appFlags.strategyHours.minIntervalStep,
+				breakUp = function(step, interval) {
+					return _
+						.chain(interval.start)
+						.range(interval.end, step)
+						.map(function(start) {
+							return _.merge({}, interval, {
+								start: start,
+								end: start + step
+							});
+						})
+						.value();
+				},
+				identify = _.flow(
+					_.partial(_.pick, _, ['start', 'end']),
+					_.values,
+					_.sortBy,
+					_.join
+				),
+				resolve = function(intervals) {
+					var open = _.find(intervals, { isOpen: true }),
+						lunch = _.find(intervals, { isOpen: false });
+
+					return lunch || open;
+				},
+				combine = function(intervals) {
+					var pointer = 0;
+
+					while (pointer < intervals.length - 1) {
+						var curr = intervals[pointer],
+							nextPossibleIndex = _.findIndex(intervals.slice(pointer + 1), { isOpen: !curr.isOpen }),
+							nextIndex = nextPossibleIndex > -1 ? nextPossibleIndex + (pointer + 1) : nextPossibleIndex,
+							lastOfTypeIndex = nextIndex > -1 ? nextIndex - 1 : intervals.length - 1,
+							lastOfType = intervals[lastOfTypeIndex];
+
+						if (
+							lastOfTypeIndex === -1
+							|| pointer === lastOfTypeIndex
+						) {
+							pointer += 1;
+							continue;
+						}
+
+						curr.end = lastOfType.end;
+						intervals.splice(pointer + 1, lastOfTypeIndex - pointer);
+						pointer += 1;
+					}
+
+					return intervals;
+				},
+				normalize = _.flow(
+					_.partial(_.flatMap, _, _.partial(breakUp, step)),
+					_.partial(_.uniqWith, _, _.isEqual),
+					_.partial(_.groupBy, _, identify),
+					_.partial(_.map, _, resolve),
+					_.partial(_.sortBy, _, 'start'),
+					_.partial(_.thru, _, combine)
+				);
+
+			return _.map(intervalsByDays, normalize);
+		},
+
+		/**
+		 * Returns an array of arrays containing intervals for each day of the week.
+		 * @param  {Object} strategyData.temporalRules
+		 * @return {Array[]}
+		 *
+		 * Intervals are extracted from temporal rules and are not necessarily nonoverlapping or
+		 * linear (start/end where the previous/next one begins/ends).
+		 */
+		strategyHoursExtractDaysIntervalsFromStrategyData: function(strategyData) {
 			var self = this,
 				weekdays = self.weekdays,
-				activeRulesIds = _
-					.chain(strategyData.callflows.MainCallflow)
-					.get('flow.children', {})
-					.omit('_')
-					.keys()
-					.value(),
-				isRuleActive = _.flow(
-					_.partial(_.get, _, 'id'),
-					_.partial(_.includes, activeRulesIds)
-				),
-				getIntervalsFromRule = function(rule, isOpen) {
+				types = [
+					{ id: 'main_weekdays', isOpen: true },
+					{ id: 'main_lunchbreak', isOpen: false }
+				],
+				extractIntervalsForRule = function(rule) {
+					var isOpen = _
+						.chain(types)
+						.find({ id: rule.type })
+						.get('isOpen')
+						.value();
+
 					return _.map(rule.wdays, function(day) {
 						return {
-							day: day,
 							start: rule.time_window_start,
 							end: rule.time_window_stop,
-							isOpen: isOpen
+							isOpen: isOpen,
+							day: day
 						};
 					});
 				},
-				extractIntervalsFromRules = function(rules, isOpen) {
-					return _
-						.chain(rules)
-						.map()
-						.filter(isRuleActive)
-						.flatMap(_.partial(getIntervalsFromRule, _, isOpen))
-						.groupBy('day')
-						.mapValues(function(intervals) {
-							return _.map(intervals, _.partial(_.omit, _, 'day'));
-						})
-						.value();
-				},
-				openIntervalsPerDay = extractIntervalsFromRules(_.get(strategyData.temporalRules, 'weekdays', {}), true),
-				lunchIntervalsPerDay = extractIntervalsFromRules(_.get(strategyData.temporalRules, 'lunchbreak', {}), false);
-
-			return _.map(weekdays, function(day) {
-				return self.strategyHoursBuildIntervalsSetForDay({
-					open: _
-						.chain(openIntervalsPerDay)
-						.get(day, [])
-						.first()
-						.value(),
-					lunch: _.get(lunchIntervalsPerDay, day, [])
-				});
-			});
-		},
-
-		strategyHoursGetIntervalsFromStrategyData: function(strategyData) {
-			var self = this,
-				weekdays = self.weekdays,
-				extractIntervalsFromRules = function(rules, day, isOpen) {
-					return _
-						.chain(rules)
-						.filter(_.flow(
-							_.partial(_.get, _, 'wdays'),
-							_.partial(_.includes, _, day)
-						))
-						.map(function(rule) {
-							return {
-								day: day,
-								start: rule.time_window_start,
-								end: rule.time_window_stop,
-								isOpen: isOpen
-							};
-						})
-						.value();
-				};
+				intervalsPerDays = _
+					.chain(strategyData.temporalRules)
+					.pick(['weekdays', 'lunchbreak'])
+					.flatMap(_.values)
+					.flatMap(extractIntervalsForRule)
+					.groupBy('day')
+					.value();
 
 			return _.map(weekdays, function(day) {
 				return _
-					.chain([
-						extractIntervalsFromRules(_.get(strategyData.temporalRules, 'weekdays', {}), day, true),
-						extractIntervalsFromRules(_.get(strategyData.temporalRules, 'lunchbreak', {}), day, false)
-					])
-					.flatten()
+					.chain(intervalsPerDays)
+					.get(day, [])
+					.map(_.partial(_.omit, _, 'day'))
 					.sortBy('start')
 					.value();
 			});
 		},
 
-		strategyHoursGetIntervalsFromTemplate: function(parent) {
+		/**
+		 * Returns an array of arrays containing intervals for each day of the week.
+		 * @param  {jQuery} parent
+		 * @return {Array[]}
+		 *
+		 * Intervals are extracted from the DOM and are nonoverlapping and linear.
+		 */
+		strategyHoursGetDaysIntervalsFromTemplate: function(parent) {
 			var self = this,
 				days = self.weekdays;
 
@@ -402,129 +437,52 @@ define(function(require) {
 			});
 		},
 
-		strategyHoursUpdateOpenHoursRules: function(days, existingOpenRules, callback) {
-			var self = this,
-				groupRulesByAction = function groupRulesByAction(intervalsWithDays, existingOpenRules) {
-					var weekdays = self.weekdays,
-						rules = {
-							toUnset: [],
-							toUpdate: [],
-							toUse: []
-						};
-
-					_.forEach(days, function(intervals, index) {
-						var firstOpen = _.find(intervals, { isOpen: true }),
-							lastOpen = _.findLast(intervals, { isOpen: true }),
-							weekdayId = 'Main' + _.capitalize(weekdays[index]),
-							rule = _.get(existingOpenRules, weekdayId),
-							isUnset = _.isUndefined(firstOpen),
-							shouldUpdate = _.some([
-								_.get(firstOpen, 'start') !== rule.time_window_start,
-								_.get(lastOpen, 'end') !== rule.time_window_stop
-							]);
-
-						if (isUnset) {
-							rules.toUnset.push(rule);
-						} else if (shouldUpdate) {
-							rules.toUpdate.push({
-								id: rule.id,
-								start: _.get(firstOpen, 'start'),
-								end: _.get(lastOpen, 'end')
-							});
-						} else {
-							rules.toUse.push(rule);
-						}
-					});
-
-					return rules;
-				},
-				buildRequestsFromActions = function buildRequestsFromActions(rulesPerAction) {
-					var toReuse = _.map(rulesPerAction.toUse, function(rule) {
-							return function(next) {
-								next(null, rule);
-							};
-						}),
-						toUpdate = _.map(rulesPerAction.toUpdate, function(interval) {
-							return function(next) {
-								self.callApi({
-									resource: 'temporalRule.patch',
-									data: {
-										accountId: self.accountId,
-										ruleId: interval.id,
-										data: {
-											time_window_start: interval.start,
-											time_window_stop: interval.end
-										}
-									},
-									success: _.flow(
-										_.partial(_.get, _, 'data'),
-										_.partial(next, null)
-									),
-									error: _.partial(next, null)
-								});
-							};
-						}),
-						toRemove = _.map(rulesPerAction.toUnset, function(rule) {
-							return function(next) {
-								next(null, rule);
-							};
-						});
-
-					return {
-						toAdd: function(next) {
-							monster.parallel(_.flatten([
-								toReuse,
-								toUpdate
-							]), next);
-						},
-						toRemove: function(next) {
-							monster.parallel(toRemove, next);
-						}
-					};
-				};
-
-			monster.parallel(_.flow(
-				_.partial(groupRulesByAction, _, existingOpenRules),
-				buildRequestsFromActions
-			)(days), callback);
-		},
-
-		strategyHoursUpdateLunchHoursRules: function(days, existingLunchRules, onCreateMetadata, callback) {
+		/**
+		 * Builds and runs tasks to create/update/delete temporal rules based on intervals.
+		 * @param  {Array[]}   intervalsByDays
+		 * @param  {Object[]}   existingRules
+		 * @param  {String}   onCreateMetadata.type
+		 * @param  {String}   onCreateMetadata.name
+		 * @param  {Function} callback
+		 */
+		strategyHoursReconcileTemporalRules: function(intervalsByDays, existingRules, onCreateMetadata, callback) {
 			var self = this,
 				weekdays = self.weekdays,
-				combineIntervals = function combineIntervals(days) {
+				injectProp = function(prop, value, object) {
+					return _.merge({}, object, _.set({}, prop, value));
+				},
+				getIdentifierFromTimes = _.flow(
+					_.partial(_.pick, _, ['start', 'end']),
+					_.values,
+					_.partial(_.sortBy),
+					_.partial(_.join, _, ',')
+				),
+				buildInterval = function(intervals, identifier) {
+					var times = _.chain(identifier).split(',').map(Number).value();
+					return {
+						start: _.head(times),
+						end: _.last(times),
+						days: _.map(intervals, 'day')
+					};
+				},
+				reduceIntervalsByDays = function reduceIntervalsByDays(intervalsByDays) {
 					return _
-						.chain(days)
+						.chain(intervalsByDays)
 						.flatMap(function(intervals, index) {
-							return _.map(intervals, function(interval) {
-								return _.merge({
-									day: weekdays[index]
-								}, interval);
-							});
+							var weekday = weekdays[index];
+							return _.map(intervals, _.partial(injectProp, 'day', weekday));
 						})
-						.groupBy(function(interval) {
-							return _.join([interval.start, interval.end], ',');
-						})
-						.map(function(intervals, key) {
-							var times = _
-								.chain(key)
-								.split(',')
-								.map(Number)
-								.value();
-							return {
-								start: _.head(times),
-								end: _.last(times),
-								days: _.map(intervals, 'day')
-							};
-						})
+						.groupBy(getIdentifierFromTimes)
+						.map(buildInterval)
 						.value();
 				},
-				getUnusedRules = function(existingRules, usedIds) {
-					return _.reject(existingRules, _.flow(
+				getUnusedRules = function(rules, usedIds) {
+					return _.reject(rules, _.flow(
 						_.partial(_.get, _, 'id'),
 						_.partial(_.includes, usedIds)
 					));
 				},
+				mapIds = _.partial(_.map, _, 'id'),
 				findRuleMatchingTimes = function(rules, start, end) {
 					return _.find(rules, {
 						time_window_start: start,
@@ -532,40 +490,36 @@ define(function(require) {
 					});
 				},
 				findRuleMatchingDays = function(rules, days) {
-					return _.find(rules, function(rule) {
-						return _.isEqual(_.sortBy(rule.wdays), _.sortBy(days));
-					});
+					return _.find(rules, _.flow(
+						_.partial(_.get, _, 'wdays'),
+						_.sortBy,
+						_.partial(_.isEqual, _, _.sortBy(days))
+					));
 				},
-				compareRules = function(a, b) {
-					var ids = _.map([a, b], 'id');
-					return !_.some(ids, _.isUndefined) && _.spread(_.isEqual)(ids);
-				},
-				getUsedRulesIds = function() {
-					return _
-						.chain(arguments)
-						.toArray()
-						.flatten()
-						.map('id')
-						.value();
-				},
-				isNotUndefined = _.negate(_.isUndefined),
-				groupRulesByAction = function groupRulesByAction(intervalsByDays, existingRules) {
+				compareById = _.partial(compareBy, 'id'),
+				groupRulesPerTask = function groupRulesPerTask(intervalsByTimes, rules) {
 					var toReuse = [],
 						toUpdate = [],
 						toCreate = [];
 
-					_.forEach(intervalsByDays, function(interval) {
-						var unsuedRules = getUnusedRules(existingRules, getUsedRulesIds(toReuse, toUpdate)),
+					_.forEach(intervalsByTimes, function(interval) {
+						var unsuedRules = getUnusedRules(rules, mapIds(_.concat(toReuse, toUpdate))),
 							matchingTimes = findRuleMatchingTimes(unsuedRules, interval.start, interval.end),
-							matchingDays = findRuleMatchingDays(unsuedRules, interval.days),
+							/**
+							 * We force the potential times match to be checked first as we could
+							 * have another rule matching the same days but not the times.
+							 */
+							matchingDays = findRuleMatchingDays(unsuedRules.sort(function(rule) {
+								return compareById(rule, matchingTimes) ? -1 : 1;
+							}), interval.days),
 							matchingRules = [matchingTimes, matchingDays];
 
-						if (compareRules(matchingTimes, matchingDays)) {
+						if (compareById(matchingTimes, matchingDays)) {
 							toReuse.push(matchingTimes);
 						} else if (_.some(matchingRules, isNotUndefined)) {
 							toUpdate.push(_.merge({
 								id: _.find(matchingRules, _.flow(
-									_.partial(_.get, _, 'id'),
+									_.partial(_.ary(_.get, 2), _, 'id'),
 									isNotUndefined
 								)).id
 							}, interval));
@@ -578,19 +532,16 @@ define(function(require) {
 						toReuse: toReuse,
 						toUpdate: toUpdate,
 						toCreate: toCreate,
-						toDelete: _.reject(existingRules, _.flow(
-							_.partial(_.get, _, 'id'),
-							_.partial(_.includes, getUsedRulesIds(toReuse, toUpdate))
-						))
+						toDelete: getUnusedRules(rules, mapIds(_.concat(toReuse, toUpdate)))
 					};
 				},
-				buildRequestsFromActions = function buildRequestsFromActions(rulesPerAction) {
-					var toReuse = _.map(rulesPerAction.toReuse, function(rule) {
+				getTasksToRun = function getTasksToRun(rulesPerTask) {
+					var toReuse = _.map(rulesPerTask.toReuse, function(rule) {
 							return function(next) {
 								next(null, rule);
 							};
 						}),
-						toUpdate = _.map(rulesPerAction.toUpdate, function(rule) {
+						toUpdate = _.map(rulesPerTask.toUpdate, function(rule) {
 							return function(next) {
 								self.callApi({
 									resource: 'temporalRule.patch',
@@ -611,7 +562,7 @@ define(function(require) {
 								});
 							};
 						}),
-						toCreate = _.map(rulesPerAction.toCreate, function(rule) {
+						toCreate = _.map(rulesPerTask.toCreate, function(rule) {
 							return function(next) {
 								self.callApi({
 									resource: 'temporalRule.create',
@@ -633,7 +584,7 @@ define(function(require) {
 								});
 							};
 						}),
-						toDelete = _.map(rulesPerAction.toDelete, function(rule) {
+						toDelete = _.map(rulesPerTask.toDelete, function(rule) {
 							return function(next) {
 								self.callApi({
 									resource: 'temporalRule.delete',
@@ -665,19 +616,39 @@ define(function(require) {
 				};
 
 			monster.parallel(_.flow(
-				combineIntervals,
-				_.partial(groupRulesByAction, _, existingLunchRules),
-				buildRequestsFromActions
-			)(days), callback);
+				reduceIntervalsByDays,
+				_.partial(groupRulesPerTask, _, existingRules),
+				getTasksToRun
+			)(intervalsByDays), callback);
 		},
 
-		strategyHoursSaveStrategyData: function(intervals, strategyData, callback) {
+		/**
+		 * Update/create temporal rules to match days' intervals and update main callflow if needed.
+		 * @param  {Array[]}   intervals
+		 * @param  {Object}   strategyData
+		 * @param  {Function} callback
+		 */
+		strategyHoursUpdateStrategyData: function(intervalsByDays, strategyData, callback) {
 			var self = this,
-				openHoursIntervals = _.map(intervals, _.partial(_.filter, _, { isOpen: true })),
-				lunchHoursIntervals = _.map(intervals, _.partial(_.filter, _, { isOpen: false })),
-				updateStrategyData = function updateStrategyData(err, rules, strategyData) {
-					var openRules = _.get(rules, 'weekdays', {}),
-						lunchRules = _.get(rules, 'lunchbreak', {}),
+				openHoursIntervals = _.map(intervalsByDays, _.partial(_.filter, _, { isOpen: true })),
+				openHoursRules = _.get(strategyData.temporalRules, 'weekdays', {}),
+				reconcileOpenHoursRules = _.bind(self.strategyHoursReconcileTemporalRules, self, openHoursIntervals, openHoursRules, {
+					type: 'main_weekdays',
+					name: 'mainOpenHours'
+				}),
+				lunchHoursIntervals = _.map(intervalsByDays, _.partial(_.filter, _, { isOpen: false })),
+				lunchHoursRules = _.get(strategyData.temporalRules, 'lunchbreak', {}),
+				reconcileLunchHoursRules = _.bind(self.strategyHoursReconcileTemporalRules, self, lunchHoursIntervals, lunchHoursRules, {
+					type: 'main_lunchbreak',
+					name: 'mainLunchHours'
+				}),
+				reconcileTemporalRules = _.partial(monster.parallel, {
+					weekdays: reconcileOpenHoursRules,
+					lunchbreak: reconcileLunchHoursRules
+				}),
+				rebuildTemporalRulesInPlace = function(actionsByType, strategyData) {
+					var openRules = _.get(actionsByType, 'weekdays', {}),
+						lunchRules = _.get(actionsByType, 'lunchbreak', {}),
 						mainOpenHoursCallflowId = strategyData.callflows.MainOpenHours.id,
 						mainLunchHoursCallflowId = strategyData.callflows.MainLunchHours.id;
 
@@ -693,7 +664,7 @@ define(function(require) {
 					});
 					_.forEach(openRules.toRemove, function(rule) {
 						_.unset(strategyData.temporalRules, ['weekdays', rule.id]);
-						delete strategyData.callflows.MainCallflow.flow.children[rule.id];
+						_.unset(strategyData.callflows.MainCallflow.flow.children, rule.id);
 					});
 
 					_.forEach(lunchRules.toAdd, function(rule) {
@@ -708,41 +679,74 @@ define(function(require) {
 					});
 					_.forEach(lunchRules.toRemove, function(rule) {
 						_.unset(strategyData.temporalRules, ['lunchbreak', rule.id]);
-						delete strategyData.callflows.MainCallflow.flow.children[rule.id];
+						_.unset(strategyData.callflows.MainCallflow.flow.children, rule.id);
 					});
+				},
+				updateMainCallflowCatchAllInPlace = function(strategyData) {
+					var rulesIds = _
+							.chain(strategyData.temporalRules)
+							.pick(['weekdays', 'lunchbreak'])
+							.flatMap(_.values)
+							.map('id')
+							.value(),
+						activeRulesIds = _
+							.chain(strategyData.callflows.MainCallflow.flow.children)
+							.omit('_')
+							.keys()
+							.value(),
+						hasActiveRules = _.every(rulesIds, _.partial(_.includes, activeRulesIds)),
+						catchAllCallflowId = _.get(
+							strategyData.callflows,
+							[hasActiveRules ? 'MainOpenHours' : 'MainAfterHours', 'id']
+						);
 
 					strategyData.callflows.MainCallflow.flow.children._ = {
 						children: {},
 						data: {
-							id: _
-								.chain([
-									_.chain(strategyData.temporalRules).get('weekdays', {}).map('id').value(),
-									_.chain(strategyData.temporalRules).get('lunchbreak', {}).map('id').value()
-								])
-								.flatten()
-								.every(_.partial(_.negate(_.includes), _.keys(strategyData.callflows.MainCallflow.flow.children)))
-								.value() ? strategyData.callflows.MainOpenHours.id : strategyData.callflows.MainAfterHours.id
+							id: catchAllCallflowId
 						},
 						module: 'callflow'
 					};
+				},
+				rebuildMainCallflowRulesInPlace = _.bind(self.strategyRebuildMainCallflowRuleArray, self),
+				shouldUpdateMainCallflow = function(current, strategyData) {
+					var currentRules = _.sortBy(current.rules),
+						updatedRules = _.sortBy(strategyData.callflows.MainCallflow.flow.data.rules),
+						currentCatchAll = current.catchAllCallflowId,
+						updatedCatchAll = strategyData.callflows.MainCallflow.flow.children._.data.id;
 
-					self.strategyRebuildMainCallflowRuleArray(strategyData);
-					self.strategyUpdateCallflow(strategyData.callflows.MainCallflow, function(updatedCallflow) {
-						strategyData.callflows.MainCallflow = updatedCallflow;
-						callback();
-					});
+					return !_.every([
+						_.isEqual(currentRules, updatedRules),
+						currentCatchAll === updatedCatchAll
+					]);
+				},
+				updateStrategyDataInPlace = function updateStrategyDataInPlace(actionsPerType, strategyData) {
+					var current = {
+						rules: _.get(strategyData.callflows.MainCallflow, 'flow.data.rules', []),
+						catchAllCallflowId: _.get(strategyData.callflows.MainCallflow, 'flow.children._.data.id')
+					};
+
+					rebuildTemporalRulesInPlace(actionsPerType, strategyData);
+					updateMainCallflowCatchAllInPlace(strategyData);
+					rebuildMainCallflowRulesInPlace(strategyData);
+
+					monster.waterfall([
+						function(next) {
+							if (!shouldUpdateMainCallflow(current, strategyData)) {
+								return next(null);
+							}
+							self.strategyUpdateCallflow(strategyData.callflows.MainCallflow, function(updatedCallflow) {
+								strategyData.callflows.MainCallflow = updatedCallflow;
+								next(null);
+							});
+						}
+					], callback);
 				};
 
-			monster.parallel({
-				weekdays: _.bind(self.strategyHoursUpdateLunchHoursRules, self, openHoursIntervals, _.get(strategyData.temporalRules, 'weekdays', {}), {
-					type: 'main_weekdays',
-					name: 'mainOpenHours'
-				}),
-				lunchbreak: _.bind(self.strategyHoursUpdateLunchHoursRules, self, lunchHoursIntervals, _.get(strategyData.temporalRules, 'lunchbreak', {}), {
-					type: 'main_lunchbreak',
-					name: 'mainLunchHours'
-				})
-			}, _.partial(updateStrategyData, _, _, strategyData));
+			monster.waterfall([
+				reconcileTemporalRules,
+				_.partial(updateStrategyDataInPlace, _, strategyData)
+			], callback);
 		}
 	};
 });
