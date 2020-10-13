@@ -304,11 +304,6 @@
 	background: #FFF;
 }
 
-#groups_container .list-unassigned-items{
-	overflow: auto;
-	max-height: 211px;
-}
-
 #groups_container .unassigned-list-header {
 	padding: 10px;
 	height: 32px;
@@ -382,10 +377,6 @@
 
 #groups_container .detail-numbers .list-wrapper .features-block .features {
 	margin-right: 46px;
-}
-
-#groups_container .list-wrapper .list-unassigned-items .features-block {
-	display: none;
 }
 
 #groups_container .list-wrapper .features-block .dropdown {
