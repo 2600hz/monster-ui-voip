@@ -809,6 +809,22 @@
 	},
 
 	"strategy": {
+		"addOfficeHours": {
+			"title": "Add Office Hours",
+			"labels": {
+				"addHours": "Add Hours",
+				"selectDays": "Select one or more days of the week",
+				"officeStatus": "Office Status",
+				"startTime": "Start Time",
+				"endTime": "End Time",
+				"lunchHours": "Lunch Hours (closed)",
+				"openHours": "Open Hours"
+			},
+			"errors": {
+				"noDaysSelected": "No days have been selected.",
+				"overlappingHours": "Selected hours overlap existing hours."
+			}
+		},
 		"noNumberHelp": "Note: Please add a Main Office Number to your account first. Once you add a main number, you will be able to set up Office Hours, Holidays and Incoming Call Handling (Call-Flow) for your office.",
 		"sectionTitles": {
 			"numbers": "Main Company Numbers",
@@ -834,12 +850,35 @@
 			"port": "Port Numbers"
 		},
 		"hours": {
+			"emptyState": {
+				"title": "Your Office Hours Are Empty",
+				"text": "Get started quickly by populating your office hours using one of our templates.",
+				"defaultOption": "Select a template",
+				"nineToFiveWithNoonToOneLunchbreak": "Open weekdays from 9:00 to 5:00. Closed for lunch from 12:00 to 1:00."
+			},
+			"days": {
+				"monday": "Monday",
+				"tuesday": "Tuesday",
+				"wednesday": "Wednesday",
+				"thursday": "Thursday",
+				"friday": "Friday",
+				"saturday": "Saturday",
+				"sunday": "Sunday"
+			},
+			"allDays": "All Days",
+			"to": "to",
+			"open": "Open",
+			"lunch": "Lunch Hours",
+			"addHours": "Add Hours",
+			"info": "Info",
+			"infoOne": "If a timeframe is not listed in the table below, it is assumed the office is closed and will follow the closed call path.",
+			"infoTwo": "Don’t forget to set the call routing for when your office is closed. To set call routing for when your office is closed, go in the “Incoming Call Handling” section of this page and select the “After Hours” tab. For setting call routing for lunch hours, select the “Lunch Hours” tab.",
 			"alwaysOpenTitle": "24 hours Open Office",
 			"alwaysOpenDescription": "Choose this option if you want incoming calls to be handled the same way all the time.",
 			"customHoursTitle": "Custom Office Hours",
 			"customHoursDescription": "Choose this option if you want incoming calls to be handled differently when your office is closed.",
 			"listTitle": "Custom Hours",
-			"timezone": "Company Timezone:",
+			"timezone": "Timezone:",
 			"to": "to",
 			"lunchbreakTitle": "Are you closed for lunch hours?",
 			"__comment": "UI-1250: Adding help boxes",

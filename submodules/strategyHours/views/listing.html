@@ -1,0 +1,76 @@
+<div>
+	<ul class="office-hours-nav">
+		<li class="nav-item active">
+			{{i18n.strategy.hours.allDays}}
+		</li>
+	{{#each days}}
+		<li class="nav-item{{#unless intervals}} disabled{{/unless}}" data-day="{{id}}">
+			{{abbreviation}}
+		</li>
+	{{/each}}
+		<li class="nav-item-filler"></li>
+	</ul>
+	<div class="office-hours-content">
+		<div class="empty-state"{{#unless isEmpty}} style="display: none"{{/unless}}>
+			<div class="title">
+				{{telicon "clock"}}
+				<span class="text">
+					{{i18n.strategy.hours.emptyState.title}}
+				</span>
+			</div>
+			<div class="content">
+				<div class="info-text">
+					{{i18n.strategy.hours.emptyState.text}}
+				</div>
+				<select name="template">
+					<option value="">
+						{{i18n.strategy.hours.emptyState.defaultOption}}
+					</option>
+				{{#each templates}}
+					<option value="{{this}}">
+						{{tryI18n @root.i18n.strategy.hours.emptyState this}}
+					</option>
+				{{/each}}
+				</select>
+			</div>
+		</div>
+	{{#each days}}
+		{{#if intervals}}
+			<div class="office-hours" data-day="{{id}}">
+				<div class="day">
+					{{label}}
+				</div>
+				<ul class="intervals">
+				{{#each intervals}}
+					<li class="interval">
+						<div class="hours">
+							<input class="span2 {{../id}}[{{@key}}].start" name="{{../id}}[{{@key}}].start"></input>
+							<span class="separator">
+								{{@root.i18n.strategy.hours.to}}
+							</span>
+							<input class="span2 {{../id}}[{{@key}}].end" name="{{../id}}[{{@key}}].end"></input>
+						</div>
+						<div class="status">
+							<select name="{{../id}}[{{@key}}].type" class="status">
+							{{#select type}}
+								<option value="open">
+									{{@root.i18n.strategy.hours.open}}
+								</option>
+								<option value="lunch">
+									{{@root.i18n.strategy.hours.lunch}}
+								</option>
+							{{/select}}
+							</select>
+						</div>
+						<button type="button" class="monster-button-ghost-icon delete-interval">
+							{{telicon "trash"}}
+						</button>
+					</li>
+				{{/each}}
+				</ul>
+			</div>
+		{{/if}}
+	{{/each}}
+	</div>
+
+</div>

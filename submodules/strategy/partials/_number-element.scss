@@ -1,0 +1,40 @@
+.number-element {
+	position: relative;
+	border-bottom: solid 1px #dedede;
+	height: 70px;
+
+	& > div {
+		display: inline-block;
+		padding: 10px;
+		line-height: 50px;
+		height: 50px;
+	}
+
+	.features-block {
+		.dropdown-toggle {
+			background-color: #ffffff;
+			margin-top: 5px;
+		}
+		.edit-features {
+			position: absolute;
+			right: 10px;
+		}
+		.features {
+			margin-right: 45px;
+
+			& > i.active {
+				display: inline-block;
+			}
+		}
+	}
+
+	.number > button {
+		margin: 0px 15px;
+	}
+
+	.no-number-error {
+		font-style: italic;
+		color: #ee1212;
+		font-weight: 600;
+	}
+}
