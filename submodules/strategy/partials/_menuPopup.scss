@@ -1,0 +1,146 @@
+#strategy_menu_popup {
+	width: 760px;
+	padding: 20px;
+
+	& > div:not(:last-of-type) {
+		margin-bottom: 25px;
+	}
+	.menu-block {
+		& > div {
+			float: left;
+		}
+
+		.left {
+			width: 400px;
+		}
+
+		.right {
+			margin-left: 20px;
+			width: 340px;
+		}
+
+		.title {
+			color: $primary-color;
+			font-size: 22px;
+			font-weight: 600;
+			padding: 15px 0;
+		}
+
+		.menu-line {
+			padding: 5px 0px;
+
+			& > div,
+			& > input,
+			& > select {
+				margin: 0 12px 0 0;
+				display: inline-block;
+				vertical-align: middle;
+			}
+
+			.target-input .add-on {
+				width: 20px;
+			}
+			.target-select {
+				width: 150px;
+			}
+			i.remove-btn {
+				cursor: pointer;
+				opacity: 0.8;
+				vertical-align: middle;
+			}
+			i.remove-btn:hover {
+				color: #ff1212 !important;
+			}
+			i.remove-btn:active {
+				color: #ff1212 !important;
+				text-shadow: 1px 1px 1px #999;
+			}
+		}
+
+		.add-menu-line {
+			margin-top: 10px;
+		}
+	}
+
+	.action-block .cancel-link {
+		line-height: 30px;
+		margin-right: 10px;
+		color: $primary-color;
+	}
+
+	#strategy_menu_popup_accordion .greeting-option {
+		border-color: #c0c0c9;
+
+		&.active {
+			border-color: $primary-color;
+		}
+
+		&:not(:last-of-type) {
+			margin-bottom: 15px;
+		}
+
+		&.active .greeting-option-header i {
+			color: $primary-color !important;
+		}
+
+		.greeting-option-header {
+			padding: 10px;
+			font-weight: bold;
+			border-radius: 2px;
+			cursor: pointer;
+			background-color: #e0e0e9;
+
+			&:not(.collapsed) {
+				border-bottom-left-radius: 0px;
+				border-bottom-right-radius: 0px;
+			}
+
+			i {
+				vertical-align: middle;
+			}
+		}
+
+		.greeting-option-content {
+			padding: 10px;
+			font-size: 14px;
+
+			textarea {
+				width: 100%;
+				box-sizing: border-box;
+				-moz-box-sizing: border-box;
+				-webkit-box-sizing: border-box;
+				margin: 0px;
+				min-height: 90px;
+			}
+		}
+
+		.greeting-option-actions {
+			margin-top: 10px;
+
+			button:not(:first-of-type) {
+				margin-right: 10px;
+			}
+		}
+
+		.upload-container {
+			display: flex;
+
+			input[type="text"] {
+				margin: 0;
+				width: auto;
+				box-shadow: none;
+				border-radius: 2px 0px 0px 2px;
+				margin-right: -1px;
+				flex-grow: 1;
+			}
+
+			button {
+				border-top-left-radius: 0px;
+				border-bottom-left-radius: 0px;
+				width: 170px;
+				padding-top: 4px;
+				padding-bottom: 4px;
+			}
+		}
+	}
+}

@@ -1,0 +1,178 @@
+#strategy_container {
+	@mixin text-ellipsis {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.clearfix:after {
+		clear: right;
+	}
+
+	.element-container {
+		.element-header-outer {
+			background: #dedede;
+			border-radius: 2px;
+
+			.element-header-inner {
+				display: flex;
+				height: 60px;
+				background: #f3f3f3;
+				margin: 5px;
+				cursor: pointer;
+
+				& > div {
+					width: 50%;
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					box-sizing: border-box;
+				}
+
+				.title {
+					display: flex;
+					align-items: center;
+
+					& > .svg-icon {
+						width: 1.5rem;
+						height: 1.5rem;
+						margin: 0 20px;
+						color: #22a5ff;
+					}
+
+					.text {
+						@include text-ellipsis;
+						font-size: 18px;
+					}
+				}
+
+				.summary {
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+					padding-left: 20px;
+
+					.content {
+						@include text-ellipsis;
+						display: flex;
+						align-items: center;
+
+						i {
+							margin-left: 15px;
+						}
+					}
+
+					.icons {
+						& > * {
+							margin-right: 20px;
+
+							&:first-child {
+								margin-left: 20px;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		.element-content {
+			display: none;
+			border: solid 1px #dedede;
+
+			.basic-actions {
+				padding: 20px;
+				border-top: solid 1px #ccc;
+				background-color: #f3f3f3;
+				text-align: right;
+
+				.cancel-link {
+					margin-right: 10px;
+					vertical-align: middle;
+				}
+			}
+		}
+
+		&:not(:first-of-type) {
+			margin-bottom: 5px;
+			margin-top: 5px;
+		}
+
+		&.main-number,
+		&.strategy-confnum,
+		&.strategy-faxingnum {
+			@import "./partials/number-element.scss";
+			@import "./partials/number-actions.scss";
+		}
+
+		&.strategy-confnum,
+		&.strategy-faxingnum {
+			.element-header-outer {
+				.element-header-inner {
+					.title {
+						& > .svg-icon {
+							color: $emerald;
+						}
+					}
+				}
+			}
+		}
+
+		&.strategy-hours {
+			.element-content {
+				@import "../strategyHours/strategyHours.scss";
+			}
+		}
+
+		&.strategy-holidays {
+			.element-content {
+				@import "./partials/strategy-holidays.scss";
+			}
+		}
+
+		&.strategy-calls {
+			.element-content {
+				@import "./partials/strategy-calls.scss";
+			}
+		}
+
+		&.strategy-confnum {
+			.element-content {
+				@import "./partials/strategy-confnum.scss";
+			}
+		}
+
+		&.helper {
+			.fa-info-circle {
+				float: left;
+				margin-right: 10px;
+			}
+
+			p {
+				text-align: justify;
+			}
+		}
+	}
+
+	.element-container.open {
+		.element-header-outer {
+			border-bottom-left-radius: 0px;
+			border-bottom-right-radius: 0px;
+
+			.element-header-inner {
+				margin-bottom: 0px;
+
+				.summary {
+					.icons {
+						& > *:last-child {
+							-webkit-transform: rotate(90deg);
+							-moz-transform: rotate(90deg);
+							-ms-transform: rotate(90deg);
+							-o-transform: rotate(90deg);
+							color: #22a5ff;
+						}
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,52 @@
+<div>
+	<form id="strategy_custom_hours_form">
+		<div class="custom-hours-toggler">
+			<label>
+				<div class="title">
+					{{#monsterRadio i18n.strategy.hours.alwaysOpenTitle}}<input type="radio" name="enabled" value="false" {{#if alwaysOpen}}checked{{/if}}>{{/monsterRadio}}
+				</div>
+				<div class="description">
+					{{i18n.strategy.hours.alwaysOpenDescription}}
+				</div>
+			</label>
+			<label>
+				<div class="title">
+					{{#monsterRadio i18n.strategy.hours.customHoursTitle}}<input type="radio" name="enabled" value="true" {{#unless alwaysOpen}}checked{{/unless}}>{{/monsterRadio}}
+				</div>
+				<div class="description">
+					{{i18n.strategy.hours.customHoursDescription}}
+				</div>
+			</label>
+		</div>
+
+		<div class="custom-hours-div" {{#unless alwaysOpen}}style="display: block;"{{/unless}}>
+			<div class="custom-hours-header">
+				<div class="pull-right timezone-container">
+					{{i18n.strategy.hours.timezone}}
+					<span id="strategy_custom_hours_timezone" class="timezone">{{companyTimezone}}</span>
+				</div>
+				<div class="title">{{i18n.strategy.hours.listTitle}}</div>
+			</div>
+			{{#monsterPanelText i18n.strategy.hours.info "info" "fill-width"}}
+				<p>{{i18n.strategy.hours.infoOne}}</p>
+				<p>{{i18n.strategy.hours.infoTwo}}</p>
+			{{/monsterPanelText}}
+			<div class="custom-hours-wrapper">
+				<div class="actions">
+					<button type="button" class="monster-button-primary monster-button-svg add-hours">
+						{{telicon "plus"}}
+						<span>
+							{{i18n.strategy.hours.addHours}}
+						</span>
+					</button>
+				</div>
+				<div class="office-hours-wrapper"></div>
+			</div>
+		</div>
+
+		<div class="custom-hours-actions basic-actions">
+			<a href="#" class="monster-link cancel-link">{{i18n.cancel}}</a>
+			<button type="submit" class="monster-button monster-button-success">{{i18n.saveChanges}}</button>
+		</div>
+	</form>
+</div>

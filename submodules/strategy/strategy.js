@@ -10,6 +10,7 @@ define(function(require) {
 		},
 
 		subscribe: {
+			'voip.strategy.addOfficeHours': 'strategyAddOfficeHoursPopup',
 			'voip.strategy.render': 'strategyRender',
 			'auth.currentAccountUpdated': '_strategyOnCurrentAccountUpdated'
 		},
@@ -418,7 +419,6 @@ define(function(require) {
 				strategyNumbersContainer = template.find('.element-container.main-number .element-content'),
 				strategyConfNumContainer = template.find('.element-container.strategy-confnum .element-content'),
 				strategyFaxingNumContainer = template.find('.element-container.strategy-faxingnum .element-content'),
-				strategyHoursContainer = template.find('.element-container.strategy-hours .element-content'),
 				strategyHolidaysContainer = template.find('.element-container.strategy-holidays .element-content'),
 				strategyCallsContainer = template.find('.element-container.strategy-calls .element-content');
 
@@ -460,7 +460,6 @@ define(function(require) {
 			self.strategyNumbersBindEvents(strategyNumbersContainer, strategyData);
 			self.strategyConfNumBindEvents(strategyConfNumContainer, strategyData);
 			self.strategyFaxingNumBindEvents(strategyFaxingNumContainer, strategyData);
-			self.strategyHoursBindEvents(strategyHoursContainer, strategyData);
 			self.strategyHolidaysBindEvents(strategyHolidaysContainer, strategyData);
 			self.strategyCallsBindEvents(strategyCallsContainer, strategyData);
 		},
@@ -713,116 +712,16 @@ define(function(require) {
 
 					break;
 				case 'hours':
-					var is12hMode = monster.apps.auth.currentUser.ui_flags && monster.apps.auth.currentUser.ui_flags.twelve_hours_mode ? true : false,
-						secondsToTime = function(seconds) {
-							var hours = parseInt(seconds / 3600) % 24,
-								minutes = (parseInt(seconds / 60) % 60).toString(),
-								suffix = '';
-
-							if (is12hMode) {
-								suffix = hours >= 12 ? 'PM' : 'AM';
-								hours = hours > 12 ? hours - 12 : (hours === 0 ? 12 : hours);
-							}
-							return hours.toString() + ':' + (minutes.length < 2 ? '0' + minutes : minutes) + suffix;
-						},
-						weekdaysRules = strategyData.temporalRules.weekdays,
-						templateData = {
-							alwaysOpen: true,
-							companyTimezone: timezone.formatTimezone(strategyData.callflows.MainCallflow.flow.data.timezone || monster.apps.auth.currentAccount.timezone),
-							days: [],
-							lunchbreak: {
-								enabled: (strategyData.temporalRules.lunchbreak.id in strategyData.callflows.MainCallflow.flow.children),
-								from: secondsToTime(parseInt(strategyData.temporalRules.lunchbreak.time_window_start, 10)),
-								to: secondsToTime(parseInt(strategyData.temporalRules.lunchbreak.time_window_stop, 10))
-							}
-						},
-						template;
-
-					_.each(self.weekdayLabels, function(val) {
-						var isOpen = (weekdaysRules[val].id in strategyData.callflows.MainCallflow.flow.children);
-						templateData.days.push({
-							name: val,
-							label: self.i18n.active().strategy.weekdays[val.substring(4).toLowerCase()],
-							open: isOpen,
-							from: secondsToTime(parseInt(weekdaysRules[val].time_window_start, 10)),
-							to: secondsToTime(parseInt(weekdaysRules[val].time_window_stop, 10))
-						});
-
-						if (isOpen) {
-							templateData.alwaysOpen = false;
-						}
+					monster.pub('voip.strategyHours.render', {
+						container: $container,
+						strategyData: strategyData,
+						callback: callback
 					});
-
-					// Setting Monday to Friday enabled by default for 9AM-5PM, when switching from 24hours Open to Custom Hours.
-					if (templateData.alwaysOpen) {
-						_.each(templateData.days, function(val) {
-							if (val.name !== 'MainSaturday' && val.name !== 'MainSunday') {
-								val.open = true;
-								val.from = is12hMode ? '9:00AM' : '9:00';
-								val.to = is12hMode ? '5:00PM' : '17:00';
-							}
-						});
-					}
-
-					template = $(self.getTemplate({
-						name: 'strategy-' + templateName,
-						data: templateData,
-						submodule: 'strategy'
-					}));
-
-					var validationOptions = {
-						rules: {
-							'lunchbreak.from': {},
-							'lunchbreak.to': {
-								greaterDate: template.find('input[name="lunchbreak.from"]')
-							}
-						},
-						groups: {
-							lunchbreak: 'lunchbreak.from lunchbreak.to'
-						},
-						errorPlacement: function(error, element) {
-							error.appendTo(element.parent());
-						}
-					};
-
-					if (is12hMode) {
-						validationOptions.rules['lunchbreak.from'].time12h = true;
-						validationOptions.rules['lunchbreak.to'].time12h = true;
-					} else {
-						validationOptions.rules['lunchbreak.from'].time24h = true;
-						validationOptions.rules['lunchbreak.to'].time24h = true;
-					}
-
-					_.each(self.weekdayLabels, function(wday) {
-						validationOptions.rules['weekdays.' + wday + '.from'] = {};
-						validationOptions.rules['weekdays.' + wday + '.to'] = {
-							greaterDate: template.find('input[name="weekdays.' + wday + '.from"]')
-						};
-						if (is12hMode) {
-							validationOptions.rules['weekdays.' + wday + '.from'].time12h = true;
-							validationOptions.rules['weekdays.' + wday + '.to'].time12h = true;
-						} else {
-							validationOptions.rules['weekdays.' + wday + '.from'].time24h = true;
-							validationOptions.rules['weekdays.' + wday + '.to'].time24h = true;
-						}
-						validationOptions.groups[wday] = 'weekdays.' + wday + '.from weekdays.' + wday + '.to';
-					});
-
-					monster.ui.validate(template.find('#strategy_custom_hours_form'), validationOptions);
-
-					$container
-						.find('.element-content')
-							.empty()
-							.append(template);
-
-					monster.ui.timepicker(template.find('.timepicker'));
-
-					callback && callback();
 
 					break;
 				case 'holidays':
 					var templateData = {
-							enabled: !$.isEmptyObject(strategyData.temporalRules.holidays)
+							enabled: !_.isEmpty(strategyData.temporalRules.holidays)
 						},
 						template = $(self.getTemplate({
 							name: 'strategy-' + templateName,
@@ -838,7 +737,7 @@ define(function(require) {
 
 					holidayList.empty();
 
-					_.each(strategyData.temporalRules.holidays, function(val, key) {
+					_.each(_.get(strategyData.temporalRules, 'holidays', {}), function(val, key) {
 						if (val.id in strategyData.callflows.MainCallflow.flow.children) {
 							var holidayType,
 								holidayData = {
@@ -880,18 +779,17 @@ define(function(require) {
 
 					break;
 				case 'calls':
-					var templateData = {
-							lunchbreak: (strategyData.temporalRules.lunchbreak.id in strategyData.callflows.MainCallflow.flow.children),
-							holidays: !$.isEmptyObject(strategyData.temporalRules.holidays),
-							afterhours: false
+					var isRuleIdActive = _.partial(_.includes, _.keys(strategyData.callflows.MainCallflow.flow.children)),
+						hasAtLeatOneActiveRule = _.flow(
+							_.partial(_.map, _, 'id'),
+							_.partial(_.some, _, isRuleIdActive)
+						),
+						templateData = {
+							holidays: hasAtLeatOneActiveRule(strategyData.temporalRules.holidays),
+							lunchbreak: hasAtLeatOneActiveRule(strategyData.temporalRules.lunchbreak),
+							afterhours: hasAtLeatOneActiveRule(strategyData.temporalRules.weekdays)
 						},
 						template;
-
-					_.each(self.weekdayLabels, function(val) {
-						if (strategyData.temporalRules.weekdays[val].id in strategyData.callflows.MainCallflow.flow.children) {
-							templateData.afterhours = true;
-						}
-					});
 
 					template = $(self.getTemplate({
 						name: 'strategy-' + templateName,
@@ -1783,141 +1681,6 @@ define(function(require) {
 			});
 		},
 
-		strategyHoursBindEvents: function(container, strategyData) {
-			var self = this;
-
-			container.on('change', '.custom-hours-toggler input[type="radio"]', function(e) {
-				var toggleDiv = container.find('.custom-hours-div');
-				if ($(this).val() === 'true') {
-					toggleDiv.slideDown();
-				} else {
-					toggleDiv.slideUp();
-				}
-			});
-
-			container.on('change', '.custom-days input[type="checkbox"]', function(e) {
-				var parent = $(this).parents('.custom-day'),
-					timepickers = parent.find('.timepickers'),
-					status = parent.find('.status');
-				if ($(this).prop('checked')) {
-					timepickers.fadeIn(200);
-					status.fadeOut(100, function() {
-						status.html(self.i18n.active().strategy.open);
-						status.fadeIn(100);
-					});
-				} else {
-					timepickers.fadeOut(200);
-					status.fadeOut(100, function() {
-						status.html(self.i18n.active().strategy.closed);
-						status.fadeIn(100);
-					});
-				}
-			});
-
-			container.on('change', '.custom-hours-lunchbreak input[type="checkbox"]', function(e) {
-				if ($(this).prop('checked')) {
-					$(this).parents('.custom-hours-lunchbreak').find('.timepickers').fadeIn(200);
-				} else {
-					$(this).parents('.custom-hours-lunchbreak').find('.timepickers').fadeOut(200);
-				}
-			});
-
-			container.on('click', '.save-button', function(e) {
-				e.preventDefault();
-
-				if (monster.ui.valid(container.find('#strategy_custom_hours_form'))) {
-					var parent = $(this).parents('.element-container'),
-						customHours = monster.ui.getFormData('strategy_custom_hours_form'),
-						mainCallflow = strategyData.callflows.MainCallflow,
-						formatChildModule = function(callflowId) {
-							return {
-								children: {},
-								data: {
-									id: callflowId
-								},
-								module: 'callflow'
-							};
-						};
-
-					_.each(strategyData.temporalRules.weekdays, function(val, key) {
-						delete mainCallflow.flow.children[val.id];
-					});
-					delete mainCallflow.flow.children[strategyData.temporalRules.lunchbreak.id];
-
-					if (customHours.enabled === 'false' || !customHours.opendays || customHours.opendays.length === 0) {
-						mainCallflow.flow.children._ = formatChildModule(strategyData.callflows.MainOpenHours.id);
-					} else {
-						var tmpRulesRequests = {};
-
-						mainCallflow.flow.children._ = formatChildModule(strategyData.callflows.MainAfterHours.id);
-
-						if (customHours.lunchbreak.enabled) {
-							var lunchbreakRule = strategyData.temporalRules.lunchbreak;
-
-							_.assign(lunchbreakRule, {
-								wdays: _.map(customHours.opendays, function(item) {
-									// make sure the lunch rule is only valid on days the business is open
-									return _
-										.chain(item)
-										.toLower()
-										.replace(/^main/, '')
-										.value();
-								}),
-								time_window_start: monster.util.timeToSeconds(customHours.lunchbreak.from),
-								time_window_stop: monster.util.timeToSeconds(customHours.lunchbreak.to)
-							});
-
-							tmpRulesRequests.lunchbreak = function(callback) {
-								self.callApi({
-									resource: 'temporalRule.update',
-									data: {
-										accountId: self.accountId,
-										ruleId: lunchbreakRule.id,
-										data: lunchbreakRule
-									},
-									success: function(data, status) {
-										callback(null, data.data);
-									}
-								});
-							};
-
-							mainCallflow.flow.children[lunchbreakRule.id] = formatChildModule(strategyData.callflows.MainLunchHours.id);
-						}
-
-						_.each(customHours.opendays, function(val) {
-							var temporalRule = strategyData.temporalRules.weekdays[val];
-							temporalRule.time_window_start = monster.util.timeToSeconds(customHours.weekdays[val].from);
-							temporalRule.time_window_stop = monster.util.timeToSeconds(customHours.weekdays[val].to);
-							tmpRulesRequests[val] = function(callback) {
-								self.callApi({
-									resource: 'temporalRule.update',
-									data: {
-										accountId: self.accountId,
-										ruleId: temporalRule.id,
-										data: temporalRule
-									},
-									success: function(data, status) {
-										callback(null, data.data);
-									}
-								});
-							};
-
-							mainCallflow.flow.children[temporalRule.id] = formatChildModule(strategyData.callflows.MainOpenHours.id);
-						});
-
-						monster.parallel(tmpRulesRequests, function(err, results) {});
-					}
-
-					self.strategyRebuildMainCallflowRuleArray(strategyData);
-					self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
-						strategyData.callflows.MainCallflow = updatedCallflow;
-						parent.find('.element-content').hide();
-						parent.removeClass('open');
-					});
-				}
-			});
-		},
-
 		strategyHolidaysBindEvents: function(container, strategyData) {
 			var self = this;
 
@@ -1948,7 +1711,7 @@ define(function(require) {
 						self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
 							strategyData.callflows.MainCallflow = updatedCallflow;
 							var afterDelete = function(data) {
-								delete strategyData.temporalRules.holidays[data.name];
+								_.unset(strategyData.temporalRules, ['holidays', data.name]);
 								holidaysElement.remove();
 							};
 
@@ -2027,7 +1790,7 @@ define(function(require) {
 									},
 									module: 'callflow'
 								};
-								strategyData.temporalRules.holidays[val.name] = val;
+								_.set(strategyData.temporalRules, ['holidays', val.name], val);
 							});
 
 							self.strategyRebuildMainCallflowRuleArray(strategyData);
@@ -2044,7 +1807,7 @@ define(function(require) {
 					}
 				} else {
 					monster.ui.confirm(self.i18n.active().strategy.confirmMessages.disableHolidays, function() {
-						_.each(strategyData.temporalRules.holidays, function(val, key) {
+						_.each(_.get(strategyData.temporalRules, 'holidays', {}), function(val, key) {
 							holidayRulesRequests[key] = function(callback) {
 								if (val.hasOwnProperty('temporal_rules')) {
 									self.strategyDeleteRuleSetAndRules(val.id, function() {
@@ -2061,7 +1824,7 @@ define(function(require) {
 						});
 
 						monster.parallel(holidayRulesRequests, function(err, results) {
-							strategyData.temporalRules.holidays = {};
+							_.set(strategyData.temporalRules, 'holidays', {});
 							self.strategyRebuildMainCallflowRuleArray(strategyData);
 							self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
 								strategyData.callflows.MainCallflow = updatedCallflow;
@@ -3594,100 +3357,49 @@ define(function(require) {
 		},
 
 		strategyGetTemporalRules: function(callback) {
-			var self = this;
+			var self = this,
+				types = [
+					'main_holidays',
+					'main_lunchbreak',
+					'main_weekdays'
+				],
+				getTypeProp = _.partial(_.get, _, 'type'),
+				isTypeValid = _.flow(
+					getTypeProp,
+					_.partial(_.includes, types)
+				),
+				getStripedType = _.flow(
+					getTypeProp,
+					_.partial(_.replace, _, 'main_', '')
+				),
+				getRule = function(ruleId, next) {
+					self.strategyGetRule(ruleId, _.partial(next, null));
+				};
 
-			self.strategyGetAllRules(function(data) {
-				var parallelRequests = {};
-
-				_.each(data.rules, function(val, key) {
-					parallelRequests[val.name] = function(callback) {
-						self.strategyGetRule(val.id, function(data) {
-							callback(null, data);
-						});
-					};
-				});
-
-				// Always check that the necessary time rules exist, or re-create them
-				_.each(self.weekdayLabels, function(val) {
-					if (!(val in parallelRequests)) {
-						parallelRequests[val] = function(callback) {
-							self.callApi({
-								resource: 'temporalRule.create',
-								data: {
-									accountId: self.accountId,
-									data: {
-										cycle: 'weekly',
-										interval: 1,
-										name: val,
-										type: 'main_weekdays',
-										time_window_start: 32400, // 9:00AM
-										time_window_stop: 61200, // 5:00PM
-										wdays: [val.substring(4).toLowerCase()]
-									}
-								},
-								success: function(data, status) {
-									callback(null, data.data);
-								}
-							});
-						};
-					}
-				});
-
-				if (!('MainLunchHours' in parallelRequests)) {
-					parallelRequests.MainLunchHours = function(callback) {
-						self.callApi({
-							resource: 'temporalRule.create',
-							data: {
-								accountId: self.accountId,
-								data: {
-									cycle: 'weekly',
-									interval: 1,
-									name: 'MainLunchHours',
-									type: 'main_lunchbreak',
-									time_window_start: 43200,
-									time_window_stop: 46800,
-									wdays: self.weekdays
-								}
-							},
-							success: function(data, status) {
-								callback(null, data.data);
-							}
-						});
-					};
+			monster.waterfall([
+				function(next) {
+					self.strategyGetAllRules(_.partial(next, null));
+				},
+				function(data, next) {
+					monster.parallel(_.map(data.rules, function(rule) {
+						return _.partial(getRule, rule.id);
+					}), _.partialRight(next, data.sets));
 				}
-
-				monster.parallel(parallelRequests, function(err, results) {
-					var temporalRules = {
-						weekdays: {},
-						lunchbreak: {},
-						holidays: {}
-					};
-
-					_.each(results, function(val, key) {
-						switch (val.type) {
-							case 'main_weekdays':
-								temporalRules.weekdays[key] = val;
-
-								break;
-							case 'main_lunchbreak':
-								temporalRules.lunchbreak = val;
-
-								break;
-							case 'main_holidays':
-								temporalRules.holidays[key] = val;
-
-								break;
-						}
-					});
-
-					_.each(data.sets, function(set) {
-						if (!_.isEmpty(set)) {
-							temporalRules.holidays[set.name] = set;
-						}
-					});
-
-					callback(temporalRules);
-				});
+			], function(err, rules, sets) {
+				callback(_
+					.chain(rules)
+					.filter(isTypeValid)
+					.groupBy(getStripedType)
+					.mapValues(_.partial(_.keyBy, _, 'id'))
+					.merge({
+						holidays: _
+							.chain(sets)
+							.reject(_.isEmpty)
+							.keyBy('name')
+							.value()
+					})
+					.value()
+				);
 			});
 		},
 
@@ -3933,7 +3645,7 @@ define(function(require) {
 			mainCallflow.flow.data.rules = _
 				.chain([
 					_.map(rules.holidays, 'id'),
-					_.has(rules.lunchbreak, 'id') ? [rules.lunchbreak.id] : [],
+					_.keys(rules.lunchbreak),
 					_.map(rules.weekdays, 'id')
 				])
 				.flatten()
@@ -4566,6 +4278,157 @@ define(function(require) {
 
 			return _.filter(mainCallflow.numbers, function(val) {
 				return val !== '0' && val !== 'undefinedMainNumber';
+			});
+		},
+
+		strategyAddOfficeHoursPopup: function(args) {
+			var self = this,
+				meta = _.pick(self.appFlags.strategyHours.intervals, ['max', 'unit', 'step']),
+				existing = args.existing,
+				callback = args.callback,
+				$template = $(self.getTemplate({
+					name: 'addOfficeHours',
+					data: {
+						days: _.map(
+							self.weekdays,
+							_.partial(monster.util.tryI18n, self.i18n.active().strategy.hours.days)
+						)
+					},
+					submodule: 'strategy'
+				})),
+				$startTimepicker = $template.find('.start-time'),
+				$endTimepicker = $template.find('.end-time'),
+				timepickerOptions = {
+					step: meta.step / 60
+				},
+				popup;
+
+			$template.find('input[name="days[]"]').on('change', function(event) {
+				event.preventDefault();
+
+				var atLeastOneChecked = _.some($template.find('input[name="days[]"]'), function(input) {
+					return $(input).prop('checked');
+				});
+
+				$template.find('.no-days-error')[atLeastOneChecked ? 'slideUp' : 'slideDown'](200);
+			});
+
+			monster.ui.timepicker($startTimepicker, _.merge({
+				useSelect: true,
+				maxTime: meta.max - meta.step
+			}, timepickerOptions));
+			monster.ui.timepicker($endTimepicker, _.merge({
+				useSelect: true,
+				minTime: meta.step,
+				maxTime: meta.max
+			}, timepickerOptions));
+			$endTimepicker.timepicker('setTime', meta.max);
+
+			$startTimepicker.on('changeTime', function() {
+				$template.find('.overlapping-hours-error').slideUp(200);
+
+				var startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
+					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight');
+
+				$endTimepicker.timepicker('option', 'minTime', startSeconds + meta.step);
+				if (!_.isNull(endSeconds)) {
+					$endTimepicker.timepicker('setTime', endSeconds);
+				}
+			});
+
+			$endTimepicker.on('changeTime', function() {
+				$template.find('.overlapping-hours-error').slideUp(200);
+
+				var startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
+					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight');
+
+				$startTimepicker.timepicker('option', 'maxTime', endSeconds - meta.step);
+				if (!_.isNull(endSeconds)) {
+					$startTimepicker.timepicker('setTime', startSeconds);
+				}
+			});
+
+			$template.find('.cancel').on('click', function(event) {
+				event.preventDefault();
+				popup.dialog('close');
+			});
+
+			$template.on('submit', function(event) {
+				event.preventDefault();
+				var formData = monster.ui.getFormData($template.get(0)),
+					endTime = $endTimepicker.timepicker('getSecondsFromMidnight'),
+					formattedData = _.merge({
+						start: $startTimepicker.timepicker('getSecondsFromMidnight'),
+						end: endTime === 0 ? meta.max : endTime,
+						type: formData.type
+					}, _.pick(formData, [
+						'days'
+					])),
+					overlapsExisting = _
+						.chain(formattedData.days)
+						.map(function(v, index) {
+							return {
+								selected: v,
+								overlaps: _
+									.chain((existing || [])[index])
+									.map(function(interval) {
+										var start = interval.start,
+											end = interval.end,
+											startsWithinExistingInterval = formattedData.start >= start && formattedData.start < end,
+											endsWithinExistingInterval = formattedData.end > start && formattedData.end <= end,
+											overlapsExistingInterval = formattedData.start <= start && formattedData.end >= end;
+
+										return startsWithinExistingInterval
+											|| endsWithinExistingInterval
+											|| overlapsExistingInterval;
+									})
+									.some()
+									.value()
+							};
+						})
+						.filter('selected')
+						.map('overlaps')
+						.some()
+						.value();
+
+				if (!monster.ui.valid($template)) {
+					return;
+				}
+
+				if (!_.some(formattedData.days)) {
+					$template.find('.no-days-error').slideDown(200);
+					return;
+				}
+
+				if (overlapsExisting) {
+					$template.find('.overlapping-hours-error').slideDown(200);
+					return;
+				}
+
+				popup.dialog('close');
+
+				callback(null, _
+					.chain(existing)
+					.map(function(intervals, index) {
+						var isDaySelected = formattedData.days[index];
+
+						return _
+							.chain(intervals)
+							.concat(isDaySelected ? [_.pick(formattedData, [
+								'start',
+								'end',
+								'type'
+							])] : [])
+							.sortBy('start')
+							.value();
+					})
+					.value()
+				);
+			});
+
+			popup = monster.ui.dialog($template, {
+				autoScroll: false,
+				title: self.i18n.active().strategy.addOfficeHours.title
 			});
 		}
 	};

@@ -1,0 +1,210 @@
+$border-color: $french-gray2;
+
+form {
+	margin: 0px;
+}
+
+.custom-hours-toggler {
+	padding: 20px;
+
+	.title {
+		line-height: 30px;
+
+		span {
+			font-size: 14px;
+		}
+
+		input:checked ~ span {
+			font-weight: 600;
+		}
+
+		& > input {
+			margin: 0 16px 4px 0;
+		}
+	}
+
+	& > label:first-of-type {
+		margin-bottom: 20px;
+	}
+
+	.description {
+		margin: 5px 0 0 20px;
+	}
+}
+
+.custom-hours-div {
+	padding: 20px;
+	display: none;
+
+	.custom-hours-header {
+		font-size: 18px;
+		padding: 0 0 15px;
+
+		.timezone {
+			margin-left: 5px;
+		}
+	}
+}
+
+.custom-hours-wrapper {
+	margin-top: 1.5rem;
+
+	.monster-button-svg {
+		display: flex;
+		align-items: center;
+
+		span {
+			margin-left: .5rem
+		}
+	}
+
+	.office-hours-wrapper {
+		margin-top: 1rem;
+
+		.office-hours-nav {
+			list-style: none;
+			margin: 0;
+			display: flex;
+			border: 1px solid $border-color;
+			border-bottom: 0;
+			border-radius: 2px 2px 0 0;
+			background-color: $athens-gray;
+
+			.nav-item {
+				padding: 1rem;
+				border-right: 1px solid $border-color;
+				border-bottom: 1px solid $border-color;
+				position: relative;
+
+				&.active {
+					background-color: $white;
+					color: $primary-color;
+					border-bottom: 0;
+
+					&::before {
+						content: '';
+						display: block;
+						width: 100%;
+						position: absolute;
+						top: 0;
+						left: 0;
+						height: 3px;
+						background-color: $primary-color;
+					}
+				}
+
+				&.disabled {
+					background-color: $border-color;
+				}
+
+				&:hover:not(.active):not(.disabled) {
+					cursor: pointer;
+					background-color: $mischka;
+				}
+			}
+
+			.nav-item-filler {
+				max-width: 100%;
+				height: 52px;
+				flex: 1 1 auto;
+				border-bottom: 1px solid $border-color;
+			}
+		}
+
+		.office-hours-content {
+			border: 1px solid $border-color;
+			border-top: 0;
+			border-bottom: 0;
+			border-radius: 0 0 2px 2px;
+
+			.empty-state {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				padding: 2.5rem 0;
+				border-bottom: 1px solid $border-color;
+
+				.title {
+					display: flex;
+					align-items: center;
+
+					.svg-icon {
+						color: $manatee;
+						margin-right: 12px;
+						width: 1.5rem;
+						height: 1.5rem;
+					}
+
+					.text {
+						font-size: 1rem;
+						font-weight: 600;
+					}
+				}
+
+				.content {
+					display: flex;
+					flex-direction: column;
+
+					.info-text {
+						padding: 2.5rem 0 1rem;
+					}
+
+					select {
+						width: 100%;
+						margin: 0;
+						height: 2rem;
+						border-radius: 2px;
+					}
+				}
+			}
+
+			.office-hours {
+				display: flex;
+				padding: 1.5rem 1rem;
+				border-bottom: 1px solid $border-color;
+
+				select {
+					margin: 0;
+				}
+
+				.day {
+					font-size: 12px;
+					font-weight: 600;
+					width: 100px;
+					line-height: 38px;
+				}
+
+				.intervals {
+					list-style: none;
+					margin: 0;
+					flex-grow: 1;
+
+					.interval {
+						display: flex;
+						align-items: center;
+						justify-content: space-between;
+
+						&:not(:first-child) {
+							margin-top: 1rem;
+						}
+
+						select {
+							height: 2rem;
+							border-radius: 2px;
+						}
+
+						.hours {
+							.separator {
+								margin: 0 1rem;
+							}
+						}
+
+						.ui-timepicker-select {
+							max-width: 90px;
+						}
+					}
+				}
+			}
+		}
+	}
+}

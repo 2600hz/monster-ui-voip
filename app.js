@@ -11,6 +11,7 @@ define(function(require) {
 		'myOffice',
 		'numbers',
 		'strategy',
+		'strategyHours',
 		'users',
 		'vmboxes'
 	];

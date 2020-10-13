@@ -1,0 +1,162 @@
+.calls-tabs {
+	height: 34px;
+	margin: 0;
+	padding: 20px;
+
+	.open-hours-tab:hover {
+		a, i {
+			color: #74b814;
+		}
+	}
+
+	.open-hours-tab.active a {
+		background-color: #74b814;
+	}
+
+	.lunch-hours-tab:hover {
+		a, i {
+			color: #f89406;
+		}
+	}
+
+	.lunch-hours-tab.active a {
+		background-color: #f89406;
+	}
+
+	.after-hours-tab:hover {
+		a, i {
+			color: #363636;
+		}
+	}
+
+	.after-hours-tab.active a {
+		background-color: #363636;
+	}
+
+	.holidays-tab:hover {
+		a, i {
+			color: #49afcd;
+		}
+	}
+
+	.holidays-tab.active a {
+		background-color: #49afcd;
+	}
+
+	.open-hours-tab.active a:hover,
+	.open-hours-tab.active a:focus,
+	.open-hours-tab.active a:hover i,
+	.open-hours-tab.active a:focus i,
+	.lunch-hours-tab.active a:hover,
+	.lunch-hours-tab.active a:focus,
+	.lunch-hours-tab.active a:hover i,
+	.lunch-hours-tab.active a:focus i,
+	.after-hours-tab.active a:hover,
+	.after-hours-tab.active a:focus,
+	.after-hours-tab.active a:hover i,
+	.after-hours-tab.active a:focus i,
+	.holidays-tab.active a:hover,
+	.holidays-tab.active a:focus,
+	.holidays-tab.active a:hover i,
+	.holidays-tab.active a:focus i {
+		color: #fff;
+	}
+}
+
+.callflow-tabs {
+	overflow: visible;
+	padding: 20px;
+	border: none;
+	background: transparent;
+
+	.call-option {
+		display: inline-block;
+		vertical-align: top;
+		padding: 10px;
+		border: solid 2px #ccc;
+		border-radius: 10px;
+		text-align: center;
+		background-color: #f9f9f9;
+
+		i {
+			color: #aaa;
+		}
+
+		.radio-div .iradio_flat {
+			margin: 0;
+		}
+
+		select {
+			width: 160px;
+		}
+
+		&.active {
+			.menu-div {
+				.menu-icon {
+					i {
+						color: rgba(238, 18, 18, 0.8);
+					}
+				}
+			}
+
+			.menu-div.has-menu {
+				.menu-icon {
+					i {
+						color: #22a5ff;
+					}
+				}
+			}
+		}
+	}
+
+	#strategy_calls_open_hours_tab .call-option.active {
+		border-color: #74B814;
+	}
+
+	#strategy_calls_lunch_hours_tab .call-option.active {
+		border-color: #f89406;
+	}
+
+	#strategy_calls_after_hours_tab .call-option.active {
+		border-color: #363636;
+	}
+
+	#strategy_calls_holidays_tab .call-option.active {
+		border-color: #49afcd;
+	}
+}
+
+.call-options-container {
+	.call-option {
+		margin: 14px 14px 0 0;
+
+		&:last-child {
+			margin-right: 0;
+		}
+	}
+}
+
+.callflow-tabs {
+	.call-option {
+		& > div:not(:first-of-type) {
+			margin-top: 10px;
+		}
+
+		.chosen-container {
+			text-align: left;
+		}
+
+		.menu-div .link-icon i {
+			margin-right: 5px;
+		}
+
+		.menu-div .link a {
+			color: #333;
+			text-decoration: underline;
+		}
+
+		&.active {
+			background-color: #f0f0f0;
+		}
+	}
+}

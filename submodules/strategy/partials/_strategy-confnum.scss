@@ -1,0 +1,19 @@
+.greeting-link {
+	margin-right: 30px !important;
+	position: relative;
+}
+.greeting-link:after {
+	content: "";
+	position: absolute;
+	width: 0px;
+	height: 50px;
+	border-right: solid 1px #c0c0c9;
+	top: -15px;
+	right: -15px;
+}
+
+.custom-greeting-icon {
+	position: absolute;
+	right: 45px;
+	top: 23px;
+}
