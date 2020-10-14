@@ -25,8 +25,10 @@ define(function(require) {
 
 	return {
 		subscribe: {
-			'voip.strategyHours.render': 'strategyHoursRender'
+			'voip.strategyHours.render': 'strategyHoursRender',
+			'voip.strategyHours.listing.onUpdate': 'strategyHoursListingOnUpdate'
 		},
+
 		appFlags: {
 			strategyHours: {
 				intervals: {
@@ -146,6 +148,8 @@ define(function(require) {
 				.find('.office-hours-wrapper')
 					.empty()
 					.append(initTemplate(templateData));
+
+			monster.pub('voip.strategyHours.listing.onUpdate', $container);
 		},
 
 		strategyHoursBindEvents: function(parent, template, strategyData) {
@@ -298,6 +302,8 @@ define(function(require) {
 				$interval.slideUp(200, function() {
 					$interval.remove();
 
+					monster.pub('voip.strategyHours.listing.onUpdate', parent);
+
 					$prevPicker.trigger('change');
 					$nextPicker.trigger('change');
 
@@ -319,6 +325,15 @@ define(function(require) {
 					}
 				});
 			});
+		},
+
+		strategyHoursListingOnUpdate: function(parent) {
+			var self = this,
+				intervalsByDays = self.strategyHoursGetDaysIntervalsFromTemplate(parent),
+				isEmpty = _.every(intervalsByDays, _.isEmpty),
+				method = isEmpty ? 'fadeOut' : 'fadeIn';
+
+			parent.find('.export-csv')[method](200);
 		},
 
 		/**
