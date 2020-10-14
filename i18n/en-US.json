@@ -870,6 +870,7 @@
 			"open": "Open",
 			"lunch": "Lunch Hours",
 			"addHours": "Add Hours",
+			"downloadCsv": "Download CSV",
 			"info": "Info",
 			"infoOne": "If a timeframe is not listed in the table below, it is assumed the office is closed and will follow the closed call path.",
 			"infoTwo": "Don’t forget to set the call routing for when your office is closed. To set call routing for when your office is closed, go in the “Incoming Call Handling” section of this page and select the “After Hours” tab. For setting call routing for lunch hours, select the “Lunch Hours” tab.",
