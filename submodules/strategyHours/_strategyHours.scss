@@ -49,9 +49,13 @@ form {
 .custom-hours-wrapper {
 	margin-top: 1.5rem;
 
-	.actions {
+	.actions-wrapper {
 		display: flex;
 		justify-content: space-between;
+
+		button:not(:first-child) {
+			margin-left: 1rem;
+		}
 	}
 
 	.monster-button-svg {
