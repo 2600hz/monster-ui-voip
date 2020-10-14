@@ -2,7 +2,10 @@ define(function(require) {
 	var monster = require('monster'),
 		_ = require('lodash'),
 		$ = require('jquery'),
+		Papa = require('papaparse'),
 		timezone = require('monster-timezone');
+
+	require('file-saver');
 
 	var isNotUndefined = _.negate(_.isUndefined),
 		/**
@@ -30,6 +33,7 @@ define(function(require) {
 					max: 86400,
 					unit: 3600,
 					step: 1800,
+					exportFilename: 'office-hours',
 					typesOrderSignificance: [
 						'lunch',
 						'open'
@@ -164,6 +168,37 @@ define(function(require) {
 						self.strategyHoursListingRender(parent, existing);
 					}
 				});
+			});
+
+			template.on('click', '.export-csv', function(event) {
+				event.preventDefault();
+
+				var weekdays = self.weekdays,
+					meta = self.appFlags.strategyHours.intervals,
+					formatIntervalsToCsv = function(intervals, index) {
+						return _.map(intervals, function(interval) {
+							return {
+								day: weekdays[index],
+								start: interval.start / meta.unit,
+								end: interval.end / meta.unit,
+								type: interval.type
+							};
+						});
+					},
+					getBlobFromCsv = function(csv) {
+						return new Blob([csv], {
+							type: 'text/csv;chartset=utf-8'
+						});
+					},
+					saveIntervalsAsCsv = _.flow(
+						_.bind(self.strategyHoursGetDaysIntervalsFromTemplate, self),
+						_.partial(_.flatMap, _, formatIntervalsToCsv),
+						Papa.unparse,
+						getBlobFromCsv,
+						_.partial(saveAs, _, meta.exportFilename + '.csv')
+					);
+
+				saveIntervalsAsCsv(parent);
 			});
 
 			template.find('form').on('submit', function(event) {
