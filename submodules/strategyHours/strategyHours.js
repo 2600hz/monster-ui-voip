@@ -179,7 +179,11 @@ define(function(require) {
 
 				monster.pub('common.csvUploader.renderPopup', {
 					title: self.i18n.active().strategy.hours.importOfficeHours.title,
-					onSuccess: console.log
+					onSuccess: _.flow(
+						_.bind(self.strategyHoursExtractDaysIntervalsFromCsvData, self),
+						_.bind(self.strategyHoursNormalizeDaysIntervals, self),
+						_.bind(self.strategyHoursListingRender, self, parent)
+					)
 				});
 			});
 
@@ -431,6 +435,98 @@ define(function(require) {
 				_.partial(_.sortBy, _, 'start'),
 				_.partial(_.thru, _, _.partial(combine, meta.step)),
 			));
+		},
+
+		/**
+		 * Returns an array of arrays containing intervals for each day of the week.
+		 * @param  {Array} csvData
+		 * @return {Array[]}
+		 *
+		 * Intervals are extracted from CSV data and are not necessarily linear and/or concurrent.
+		 */
+		strategyHoursExtractDaysIntervalsFromCsvData: function(csvData) {
+			var self = this,
+				weekdays = self.weekdays,
+				meta = self.appFlags.strategyHours.intervals,
+				validTypes = _.map(self.appFlags.strategyHours.apiToTemplateTypesMap),
+				expectedHeader = ['day', 'start', 'end', 'type'],
+				potentialHeader = _
+					.chain(csvData)
+					.head()
+					.map(_.toLower)
+					.value(),
+				hasHeader = _.isEqual(
+					_.sortBy(potentialHeader),
+					_.sortBy(expectedHeader)
+				),
+				header = hasHeader ? potentialHeader : expectedHeader,
+				entries = hasHeader ? _.tail(csvData) : csvData,
+				extractObjects = function(entry) {
+					return _.reduce(header, function(acc, prop, index) {
+						return _.merge(
+							_.set({}, prop, entry[index]),
+							acc
+						);
+					}, {});
+				},
+				sanitizeString = _.flow(
+					_.toString,
+					_.toLower
+				),
+				parseTime = function(time) {
+					return time <= 24 ? time * meta.unit : time;
+				},
+				sanitizeTime = _.flow(
+					_.toNumber,
+					parseTime,
+					_.floor
+				),
+				sanitize = function(entry) {
+					return {
+						day: sanitizeString(entry.day),
+						start: sanitizeTime(entry.start),
+						end: sanitizeTime(entry.end),
+						type: sanitizeString(entry.type)
+					};
+				},
+				isTimeValid = function(time, lower, upper) {
+					return _.every([
+						_.inRange(time, lower, upper),
+						time % meta.step === 0
+					]);
+				},
+				isValid = function(entry) {
+					var start = entry.start,
+						end = entry.end,
+						isDayValid = _.includes(self.weekdays, entry.day),
+						isTypeValid = _.includes(validTypes, entry.type),
+						areTimesValid = _.every([
+							isTimeValid(start, 0, end),
+							isTimeValid(end, start + 1, meta.max + 1)
+						]);
+
+					return _.every([
+						isDayValid,
+						isTypeValid,
+						areTimesValid
+					]);
+				},
+				intervalsPerDays = _
+					.chain(entries)
+					.map(extractObjects)
+					.map(sanitize)
+					.filter(isValid)
+					.groupBy('day')
+					.value();
+
+			return _.map(weekdays, function(day, index) {
+				return _
+					.chain(intervalsPerDays)
+					.get(day, [])
+					.map(_.partial(_.omit, _, 'day'))
+					.sortBy('start')
+					.value();
+			});
 		},
 
 		/**
