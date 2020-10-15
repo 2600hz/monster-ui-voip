@@ -850,6 +850,9 @@
 			"port": "Port Numbers"
 		},
 		"hours": {
+			"importOfficeHours": {
+				"title": "Import Office Hours"
+			},
 			"emptyState": {
 				"title": "Your Office Hours Are Empty",
 				"text": "Get started quickly by populating your office hours using one of our templates.",
