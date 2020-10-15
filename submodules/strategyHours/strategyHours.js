@@ -174,6 +174,15 @@ define(function(require) {
 				});
 			});
 
+			template.on('click', '.import-csv', function(event) {
+				event.preventDefault();
+
+				monster.pub('common.csvUploader.renderPopup', {
+					title: self.i18n.active().strategy.hours.importOfficeHours.title,
+					onSuccess: console.log
+				});
+			});
+
 			template.on('click', '.export-csv', function(event) {
 				event.preventDefault();
 
