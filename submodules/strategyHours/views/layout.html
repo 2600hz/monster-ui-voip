@@ -32,19 +32,27 @@
 				<p>{{i18n.strategy.hours.infoTwo}}</p>
 			{{/monsterPanelText}}
 			<div class="custom-hours-wrapper">
-				<div class="actions">
+				<div class="actions-wrapper">
 					<button type="button" class="monster-button-primary monster-button-svg add-hours">
 						{{telicon "plus"}}
 						<span>
 							{{i18n.strategy.hours.addHours}}
 						</span>
 					</button>
-					<button class="monster-button monster-button-svg export-csv">
-						{{telicon "download"}}
-						<span>
-							{{i18n.strategy.hours.downloadCsv}}
-						</span>
-					</button>
+					<div class="actions-wrapper">
+						<button class="monster-button monster-button-svg import-csv">
+							{{telicon "file"}}
+							<span>
+								{{i18n.strategy.hours.importCsv}}
+							</span>
+						</button>
+						<button class="monster-button monster-button-svg export-csv">
+							{{telicon "download"}}
+							<span>
+								{{i18n.strategy.hours.downloadCsv}}
+							</span>
+						</button>
+					</div>
 				</div>
 				<div class="office-hours-wrapper"></div>
 			</div>

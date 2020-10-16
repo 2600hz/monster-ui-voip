@@ -850,6 +850,9 @@
 			"port": "Port Numbers"
 		},
 		"hours": {
+			"importOfficeHours": {
+				"title": "Import Office Hours"
+			},
 			"emptyState": {
 				"title": "Your Office Hours Are Empty",
 				"text": "Get started quickly by populating your office hours using one of our templates.",
@@ -870,6 +873,7 @@
 			"open": "Open",
 			"lunch": "Lunch Hours",
 			"addHours": "Add Hours",
+			"importCsv": "Import CSV",
 			"downloadCsv": "Download CSV",
 			"info": "Info",
 			"infoOne": "If a timeframe is not listed in the table below, it is assumed the office is closed and will follow the closed call path.",
