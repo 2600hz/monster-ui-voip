@@ -2,7 +2,10 @@ define(function(require) {
 	var monster = require('monster'),
 		_ = require('lodash'),
 		$ = require('jquery'),
+		Papa = require('papaparse'),
 		timezone = require('monster-timezone');
+
+	require('file-saver');
 
 	var isNotUndefined = _.negate(_.isUndefined),
 		/**
@@ -22,14 +25,17 @@ define(function(require) {
 
 	return {
 		subscribe: {
-			'voip.strategyHours.render': 'strategyHoursRender'
+			'voip.strategyHours.render': 'strategyHoursRender',
+			'voip.strategyHours.listing.onUpdate': 'strategyHoursListingOnUpdate'
 		},
+
 		appFlags: {
 			strategyHours: {
 				intervals: {
 					max: 86400,
 					unit: 3600,
 					step: 1800,
+					exportFilename: 'office-hours',
 					typesOrderSignificance: [
 						'lunch',
 						'open'
@@ -142,6 +148,8 @@ define(function(require) {
 				.find('.office-hours-wrapper')
 					.empty()
 					.append(initTemplate(templateData));
+
+			monster.pub('voip.strategyHours.listing.onUpdate', $container);
 		},
 
 		strategyHoursBindEvents: function(parent, template, strategyData) {
@@ -164,6 +172,37 @@ define(function(require) {
 						self.strategyHoursListingRender(parent, existing);
 					}
 				});
+			});
+
+			template.on('click', '.export-csv', function(event) {
+				event.preventDefault();
+
+				var weekdays = self.weekdays,
+					meta = self.appFlags.strategyHours.intervals,
+					formatIntervalsToCsv = function(intervals, index) {
+						return _.map(intervals, function(interval) {
+							return {
+								day: weekdays[index],
+								start: interval.start / meta.unit,
+								end: interval.end / meta.unit,
+								type: interval.type
+							};
+						});
+					},
+					getBlobFromCsv = function(csv) {
+						return new Blob([csv], {
+							type: 'text/csv;chartset=utf-8'
+						});
+					},
+					saveIntervalsAsCsv = _.flow(
+						_.bind(self.strategyHoursGetDaysIntervalsFromTemplate, self),
+						_.partial(_.flatMap, _, formatIntervalsToCsv),
+						Papa.unparse,
+						getBlobFromCsv,
+						_.partial(saveAs, _, meta.exportFilename + '.csv')
+					);
+
+				saveIntervalsAsCsv(parent);
 			});
 
 			template.find('form').on('submit', function(event) {
@@ -263,6 +302,8 @@ define(function(require) {
 				$interval.slideUp(200, function() {
 					$interval.remove();
 
+					monster.pub('voip.strategyHours.listing.onUpdate', parent);
+
 					$prevPicker.trigger('change');
 					$nextPicker.trigger('change');
 
@@ -284,6 +325,15 @@ define(function(require) {
 					}
 				});
 			});
+		},
+
+		strategyHoursListingOnUpdate: function(parent) {
+			var self = this,
+				intervalsByDays = self.strategyHoursGetDaysIntervalsFromTemplate(parent),
+				isEmpty = _.every(intervalsByDays, _.isEmpty),
+				method = isEmpty ? 'fadeOut' : 'fadeIn';
+
+			parent.find('.export-csv')[method](200);
 		},
 
 		/**
