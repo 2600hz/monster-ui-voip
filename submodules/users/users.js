@@ -430,19 +430,12 @@ define(function(require) {
 						additionalExtensions: getTailSize(extensions)
 					};
 				},
-				isRegistered = _.partial(function(registeredIds, device) {
-					var canRegister = _.includes([
-							'sip_device',
-							'smartphone',
-							'softphone',
-							'fax',
-							'ata',
-							'application'
-						], device.device_type),
-						isOnline = device.enabled && _.includes(registeredIds, device.id);
-
-					return canRegister ? isOnline : device.enabled;
-				}, _.map(data.deviceStatus, 'device_id')),
+				isRegistered = function(device) {
+					return _.every([
+						device.enabled,
+						device.registrable ? device.registered : true
+					]);
+				},
 				formatDevice = function(device) {
 					return _.merge({
 						id: device.id,
@@ -3505,17 +3498,19 @@ define(function(require) {
 			});
 		},
 
-		usersGetDevicesData: function(callback) {
-			var self = this;
+		usersGetDevicesData: function(data, pCallback) {
+			var self = this,
+				callback = _.isFunction(data) ? data : pCallback,
+				data = _.isFunction(data) ? {} : data;
 
 			self.callApi({
 				resource: 'device.list',
-				data: {
+				data: _.merge({
 					accountId: self.accountId,
 					filters: {
 						paginate: 'false'
 					}
-				},
+				}, data.data),
 				success: function(data) {
 					callback && callback(data.data);
 				}
@@ -4789,22 +4784,14 @@ define(function(require) {
 					});
 				},
 				devices: function(callback) {
-					self.usersGetDevicesData(function(devices) {
-						callback(null, devices);
-					});
-				},
-				deviceStatus: function(callback) {
-					self.callApi({
-						resource: 'device.getStatus',
+					self.usersGetDevicesData({
 						data: {
-							accountId: self.accountId,
 							filters: {
-								paginate: 'false'
+								with_status: 'true'
 							}
-						},
-						success: function(data, status) {
-							callback(null, data.data);
 						}
+					}, function(devices) {
+						callback(null, devices);
 					});
 				}
 			}, function(err, results) {
