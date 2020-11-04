@@ -858,7 +858,7 @@ define(function(require) {
 						hasActiveRules = _.every(rulesIds, _.partial(_.includes, activeRulesIds)),
 						catchAllCallflowId = _.get(
 							strategyData.callflows,
-							[hasActiveRules ? 'MainOpenHours' : 'MainAfterHours', 'id']
+							[hasActiveRules ? 'MainAfterHours' : 'MainOpenHours', 'id']
 						);
 
 					strategyData.callflows.MainCallflow.flow.children._ = {
