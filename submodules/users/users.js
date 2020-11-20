@@ -386,135 +386,133 @@ define(function(require) {
 
 		usersFormatListData: function(data, _sortBy) {
 			var self = this,
-				dataTemplate = {
-					showLicensedUserRoles: false,
-					existingExtensions: [],
-					countUsers: data.users.length
-				},
-				mapUsers = {},
-				mapCallflows = _.chain(data.callflows)
-					.filter(function(callflow) {
-						return callflow.type === 'mainUserCallflow';
-					})
+				userSort = _.flow(
+					_.partial(_.get, _, _sortBy || 'first_name'),
+					_.toLower
+				),
+				getTailSize = _.flow(
+					_.tail,
+					_.size
+				),
+				mainUserCallflowsPerUserId = _
+					.chain(data.callflows)
+					.filter({ type: 'mainUserCallflow' })
 					.groupBy('owner_id')
+					.mapValues(_.head)
 					.value(),
-				registeredDevices = _.map(data.deviceStatus, function(device) { return device.device_id; });
-
-			if (_.size(self.appFlags.global.servicePlansRole) > 0) {
-				dataTemplate.showLicensedUserRoles = true;
-			}
-
-			_.each(data.users, function(user) {
-				var userCallflows = _.get(mapCallflows, user.id),
-					userMainCallflow = _.head(userCallflows);
-
-				mapUsers[user.id] = self.usersFormatUserData({
-					user: user,
-					userMainCallflow: userMainCallflow
-				});
-			});
-
-			_.each(data.callflows, function(callflow) {
-				if (callflow.type !== 'faxing') {
-					var userId = callflow.owner_id;
-
-					_.each(callflow.numbers, function(number) {
-						if (number && number.length < 7) {
-							dataTemplate.existingExtensions.push(number);
-						}
+				formatUser = _.partial(function(mainUserCallflowsPerUserId, user) {
+					return self.usersFormatUserData({
+						user: user,
+						userMainCallflowId: _.get(mainUserCallflowsPerUserId, user.id)
 					});
-
-					if (userId in mapUsers) {
-						var user = mapUsers[userId];
-
-						//User can only have one phoneNumber and one extension displayed with this code
-						_.each(callflow.numbers, function(number) {
-							if (number.length < 7) {
-								user.extra.listExtensions.push(number);
-							} else {
-								user.extra.listCallerId.push(number);
-
-								user.extra.listNumbers.push(number);
-
-								if (user.extra.phoneNumber === '') {
-									user.extra.phoneNumber = number;
-								} else {
-									user.extra.additionalNumbers++;
-								}
-							}
+				}, mainUserCallflowsPerUserId),
+				getNumbersExtra = function(numbers, extra) {
+					var extensions = _
+							.chain(numbers)
+							.filter(function(number) {
+								return _.size(number) < 7;
+							})
+							.concat(extra.listExtensions)
+							.value(),
+						phoneNumbers = _.filter(numbers, function(number) {
+							return _.size(number) >= 7;
 						});
 
-						// The additional extensions show how many more extensions than 1 a user has.
-						// So if the user has at least 1 extension, then we count how many he has minus the one we already display, otherwise we display 0.
-						user.extra.additionalExtensions = user.extra.listExtensions.length >= 1 ? user.extra.listExtensions.length - 1 : 0;
-
-						// If the main extension hasn't been defined because the presence_id isn't set, just pick the first extension
-						if (user.extra.extension === '' && user.extra.listExtensions.length > 0) {
-							user.extra.extension = user.extra.listExtensions[0];
-						}
-					}
-				}
-			});
-
-			dataTemplate.existingExtensions.sort(self.usersSortExtensions);
-
-			_.each(data.devices, function(device) {
-				var userId = device.owner_id;
-
-				if (userId in mapUsers) {
-					var isRegistered = device.enabled && (['sip_device', 'smartphone', 'softphone', 'fax', 'ata', 'application'].indexOf(device.device_type) >= 0 ? registeredDevices.indexOf(device.id) >= 0 : true);
-					var isEnabled = device.enabled;
-
-					if (mapUsers[userId].extra.devices.length >= 2) {
-						if (mapUsers[userId].extra.additionalDevices === 0) {
-							mapUsers[userId].extra.additionalDevices = {
-								count: 0,
-								tooltip: ''
-							};
-						}
-
-						mapUsers[userId].extra.additionalDevices.count++;
-						mapUsers[userId].extra.additionalDevices.tooltip += '<i class="device-popover-icon ' + self.deviceIcons[device.device_type] + (isEnabled ? (isRegistered ? ' monster-green' : ' monster-red') : ' monster-grey') + '"></i>'
-																			+ device.name + ' (' + device.device_type.replace('_', ' ') + ')<br>';
-					}
-
-					var deviceDataToTemplate = {
+					return {
+						listExtensions: extensions,
+						listCallerId: phoneNumbers,
+						listNumbers: phoneNumbers,
+						phoneNumber: _.head(phoneNumbers),
+						extension: _.isEmpty(extra.extension)
+							? _.head(extensions)
+							: extra.extension,
+						additionalNumbers: getTailSize(phoneNumbers),
+						additionalExtensions: getTailSize(extensions)
+					};
+				},
+				isRegistered = function(device) {
+					return _.every([
+						device.enabled,
+						device.registrable ? device.registered : true
+					]);
+				},
+				formatDevice = function(device) {
+					return _.merge({
 						id: device.id,
 						name: device.name + ' (' + device.device_type.replace('_', ' ') + ')',
 						type: device.device_type,
-						registered: isRegistered,
-						enabled: isEnabled,
+						registered: isRegistered(device),
+						enabled: device.enabled,
 						icon: self.deviceIcons[device.device_type]
-					};
+					}, device.device_type === 'mobile' ? {
+						mobile: device.mobile
+					} : {});
+				},
+				getTooltip = function(device) {
+					var statusClass = !device.enabled ? 'monster-grey'
+						: device.registered ? 'monster-green'
+						: 'monster-red';
 
-					if (device.device_type === 'mobile') {
-						deviceDataToTemplate.mobile = device.mobile;
-					}
+					return '<i class="' + _.join(['device-popover-icon', self.deviceIcons[device.type], statusClass], ' ') + '"></i>'
+						+ device.name
+						+ '<br>';
+				},
+				getDevicesExtra = function(devices) {
+					var additionals = _.slice(devices, 2);
 
-					mapUsers[userId].extra.devices.push(deviceDataToTemplate);
-				}
-			});
+					return _.merge({
+						devices: devices
+					}, !_.isEmpty(additionals) ? {
+						additionalDevices: {
+							count: _.size(additionals),
+							tooltip: _
+								.chain(additionals)
+								.map(getTooltip)
+								.join('')
+								.value()
+						}
+					} : {});
+				},
+				usableCallflows = _.reject(data.callflows, { type: 'faxing' }),
+				numbersPerUserId = _
+					.chain(usableCallflows)
+					.groupBy('owner_id')
+					.mapValues(_.partial(_.flatMap, _, 'numbers'))
+					.value(),
+				devicesPerUserId = _
+					.chain(data.devices)
+					.groupBy('owner_id')
+					.mapValues(_.partial(_.map, _, formatDevice))
+					.value(),
+				augmentUserExtras = _.partial(function(numbersPerUserId, devicesPerUserId, user) {
+					return _.merge({}, user, {
+						extra: _.merge(
+							getNumbersExtra(_.get(numbersPerUserId, user.id), user.extra),
+							getDevicesExtra(_.get(devicesPerUserId, user.id))
+						)
+					});
+				}, numbersPerUserId, devicesPerUserId);
 
-			var sortedUsers = [];
-			//Set blank presence_id for ability to sort by presence_id
-			_.each(mapUsers, function(user) {
-				if (!user.hasOwnProperty('presence_id')) {
-					user.presence_id = '';
-				}
-
-				sortedUsers.push(user);
-			});
-
-			//Default sort by presence_id
-			if (typeof _sortBy === 'undefined') {
-				_sortBy = 'first_name';
-			}
-
-			sortedUsers = self.sort(sortedUsers, _sortBy);
-
-			dataTemplate.users = sortedUsers;
-
-			return dataTemplate;
+			return {
+				countUsers: _.size(data.users),
+				existingExtensions: _
+					.chain(usableCallflows)
+					.flatMap('numbers')
+					.filter(function(string) {
+						return string && _.size(string) < 7;
+					})
+					.sort(self.usersSortExtensions)
+					.value(),
+				showLicensedUserRoles: !_.isEmpty(self.appFlags.global.servicePlansRole),
+				users: _
+					.chain(data.users)
+					.map(_.flow(
+						formatUser,
+						augmentUserExtras
+					))
+					.sortBy(userSort)
+					.value()
+			};
 		},
 
 		/* Automatically sorts an array of objects. secondArg can either be a custom sort to be applied to the dataset, or a fieldName to sort alphabetically on */
@@ -3500,17 +3498,19 @@ define(function(require) {
 			});
 		},
 
-		usersGetDevicesData: function(callback) {
-			var self = this;
+		usersGetDevicesData: function(data, pCallback) {
+			var self = this,
+				callback = _.isFunction(data) ? data : pCallback,
+				data = _.isFunction(data) ? {} : data;
 
 			self.callApi({
 				resource: 'device.list',
-				data: {
+				data: _.merge({
 					accountId: self.accountId,
 					filters: {
 						paginate: 'false'
 					}
-				},
+				}, data.data),
 				success: function(data) {
 					callback && callback(data.data);
 				}
@@ -4784,22 +4784,14 @@ define(function(require) {
 					});
 				},
 				devices: function(callback) {
-					self.usersGetDevicesData(function(devices) {
-						callback(null, devices);
-					});
-				},
-				deviceStatus: function(callback) {
-					self.callApi({
-						resource: 'device.getStatus',
+					self.usersGetDevicesData({
 						data: {
-							accountId: self.accountId,
 							filters: {
-								paginate: 'false'
+								with_status: 'true'
 							}
-						},
-						success: function(data, status) {
-							callback(null, data.data);
 						}
+					}, function(devices) {
+						callback(null, devices);
 					});
 				}
 			}, function(err, results) {

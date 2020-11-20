@@ -1203,8 +1203,7 @@ define(function(require) {
 					return _.get(self.appFlags.devices.iconClassesByDeviceTypes, knownType);
 				},
 				usersById = _.keyBy(data.users, 'id'),
-				unassignedString = self.i18n.active().devices.unassignedDevice,
-				registeredDevicesById = _.map(data.status, 'device_id');
+				unassignedString = self.i18n.active().devices.unassignedDevice;
 
 			return {
 				countDevices: _.size(data.devices),
@@ -1213,9 +1212,7 @@ define(function(require) {
 					.map(function(device) {
 						var staticStatusClasses = ['unregistered', 'registered'],
 							deviceType = device.device_type,
-							isRegistered = _.includes(['sip_device', 'smartphone', 'softphone', 'fax', 'ata'], deviceType)
-								? _.includes(registeredDevicesById, device.id)
-								: true,
+							isRegistered = device.registrable ? device.registered : true,
 							isEnabled = _.get(device, 'enabled', false),
 							userName = _
 								.chain(usersById)
@@ -1569,26 +1566,13 @@ define(function(require) {
 						}
 					});
 				},
-				status: function(callback) {
-					self.callApi({
-						resource: 'device.getStatus',
-						data: {
-							accountId: self.accountId,
-							filters: {
-								paginate: 'false'
-							}
-						},
-						success: function(dataStatus) {
-							callback && callback(null, dataStatus.data);
-						}
-					});
-				},
 				devices: function(callback) {
 					self.callApi({
 						resource: 'device.list',
 						data: {
 							accountId: self.accountId,
 							filters: {
+								with_status: 'true',
 								paginate: 'false'
 							}
 						},
