@@ -1034,7 +1034,7 @@ define(function(require) {
 				refreshNumbersTemplate = function() {
 					var mainCallflow = strategyData.callflows.MainCallflow,
 						parentContainer = container.parents('.element-container'),
-						headerSpan = parentContainer.find('.element-header-inner .summary > span');
+						headerSpan = parentContainer.find('.element-header-inner .summary .content');
 
 					// Refresh headers
 					if (mainCallflow.numbers.length > 1) {
@@ -1248,7 +1248,7 @@ define(function(require) {
 				},
 				refreshConfNumHeader = function(parentContainer) {
 					var mainConference = strategyData.callflows.MainConference,
-						headerSpan = parentContainer.find('.element-header-inner .summary > span');
+						headerSpan = parentContainer.find('.element-header-inner .summary .content');
 					if (mainConference.numbers.length > 0 && mainConference.numbers[0] !== 'undefinedconf') {
 						headerSpan.html(monster.util.formatPhoneNumber(mainConference.numbers[0]));
 						if (mainConference.numbers.length > 2) {
@@ -1502,7 +1502,7 @@ define(function(require) {
 				},
 				refreshFaxingNumHeader = function(parentContainer) {
 					var mainFaxing = strategyData.callflows.MainFaxing,
-						headerSpan = parentContainer.find('.element-header-inner .summary > span');
+						headerSpan = parentContainer.find('.element-header-inner .summary .content');
 					if (mainFaxing.numbers.length > 0 && mainFaxing.numbers[0] !== 'undefinedfaxing') {
 						headerSpan.html(monster.util.formatPhoneNumber(mainFaxing.numbers[0]));
 						if (mainFaxing.numbers.length > 2) {
