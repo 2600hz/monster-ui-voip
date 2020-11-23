@@ -403,7 +403,7 @@ define(function(require) {
 				formatUser = _.partial(function(mainUserCallflowsPerUserId, user) {
 					return self.usersFormatUserData({
 						user: user,
-						userMainCallflowId: _.get(mainUserCallflowsPerUserId, user.id)
+						userMainCallflow: _.get(mainUserCallflowsPerUserId, user.id)
 					});
 				}, mainUserCallflowsPerUserId),
 				getNumbersExtra = function(numbers, extra) {
