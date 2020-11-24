@@ -886,7 +886,7 @@ define(function(require) {
 				$container = args.container,
 				strategyData = args.strategyData,
 				callback = args.callback,
-				getRulesStatuses = function(strategyData) {
+				getRulesStatuses = _.partial(function(strategyData) {
 					var isRuleIdActive = _.partial(_.includes, _.keys(strategyData.callflows.MainCallflow.flow.children)),
 						hasAtLeatOneActiveRule = _.flow(
 							_.partial(_.map, _, 'id'),
@@ -898,21 +898,22 @@ define(function(require) {
 						lunchbreak: hasAtLeatOneActiveRule(strategyData.temporalRules.lunchbreak),
 						afterhours: hasAtLeatOneActiveRule(strategyData.temporalRules.weekdays)
 					};
+				}, strategyData),
+				initTemplate = function() {
+					return $(self.getTemplate({
+						name: 'strategy-calls',
+						data: getRulesStatuses(),
+						submodule: 'strategy'
+					}));
 				},
-				template;
-
-			template = $(self.getTemplate({
-				name: 'strategy-calls',
-				data: getRulesStatuses(strategyData),
-				submodule: 'strategy'
-			}));
+				$template = initTemplate();
 
 			$container
 				.find('.element-content')
 					.empty()
-					.append(template);
+					.append($template);
 
-			$.each(template.find('.callflow-tab'), function() {
+			$.each($template.find('.callflow-tab'), function() {
 				var $this = $(this),
 					callflowName = $this.data('callflow'),
 					menuName = callflowName + 'Menu',
@@ -958,7 +959,7 @@ define(function(require) {
 						})));
 			});
 
-			$.each(template.find('.user-select select'), function() {
+			$.each($template.find('.user-select select'), function() {
 				var $this = $(this);
 				monster.ui.chosen($this, {
 					width: '160px'
@@ -966,11 +967,11 @@ define(function(require) {
 				$this.siblings('.title').text($this.find('option:selected').closest('optgroup').prop('label'));
 			});
 
-			monster.ui.chosen(template.find('.voicemail-select select'), {
+			monster.ui.chosen($template.find('.voicemail-select select'), {
 				width: '160px'
 			});
 
-			monster.ui.chosen(template.find('.advancedCallflows-select select'), {
+			monster.ui.chosen($template.find('.advancedCallflows-select select'), {
 				width: '160px'
 			});
 
