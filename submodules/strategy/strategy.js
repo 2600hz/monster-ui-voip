@@ -886,21 +886,24 @@ define(function(require) {
 				$container = args.container,
 				strategyData = args.strategyData,
 				callback = args.callback,
-				isRuleIdActive = _.partial(_.includes, _.keys(strategyData.callflows.MainCallflow.flow.children)),
-				hasAtLeatOneActiveRule = _.flow(
-					_.partial(_.map, _, 'id'),
-					_.partial(_.some, _, isRuleIdActive)
-				),
-				templateData = {
-					holidays: hasAtLeatOneActiveRule(strategyData.temporalRules.holidays),
-					lunchbreak: hasAtLeatOneActiveRule(strategyData.temporalRules.lunchbreak),
-					afterhours: hasAtLeatOneActiveRule(strategyData.temporalRules.weekdays)
+				getRulesStatuses = function(strategyData) {
+					var isRuleIdActive = _.partial(_.includes, _.keys(strategyData.callflows.MainCallflow.flow.children)),
+						hasAtLeatOneActiveRule = _.flow(
+							_.partial(_.map, _, 'id'),
+							_.partial(_.some, _, isRuleIdActive)
+						);
+
+					return {
+						holidays: hasAtLeatOneActiveRule(strategyData.temporalRules.holidays),
+						lunchbreak: hasAtLeatOneActiveRule(strategyData.temporalRules.lunchbreak),
+						afterhours: hasAtLeatOneActiveRule(strategyData.temporalRules.weekdays)
+					};
 				},
 				template;
 
 			template = $(self.getTemplate({
 				name: 'strategy-calls',
-				data: templateData,
+				data: getRulesStatuses(strategyData),
 				submodule: 'strategy'
 			}));
 
