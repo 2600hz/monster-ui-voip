@@ -901,30 +901,10 @@ define(function(require) {
 				}, strategyData),
 				initTemplate = function() {
 					var $template = $(self.getTemplate({
-							name: 'strategy-calls',
-							data: getRulesStatuses(),
-							submodule: 'strategy'
-						})),
-						$voicemailSelects = $template.find('.voicemail-select select'),
-						$advCallflowsSelects = $template.find('.advancedCallflows-select select'),
-						$entitiesSelects = $template.find('.user-select select');
-
-					$.each($entitiesSelects, function() {
-						var $select = $(this),
-							selectedOptionGroupLabel = $select.find('option:selected').closest('optgroup').prop('label');
-
-						$select.siblings('.title').text(selectedOptionGroupLabel);
-					});
-
-					_.forEach([
-						$voicemailSelects,
-						$advCallflowsSelects,
-						$entitiesSelects
-					], function($select) {
-						monster.ui.chosen($select, {
-							width: '160'
-						});
-					});
+						name: 'strategy-calls',
+						data: getRulesStatuses(),
+						submodule: 'strategy'
+					}));
 
 					$.each($template.find('.callflow-tab'), renderTabContent);
 
@@ -935,11 +915,33 @@ define(function(require) {
 						callflowName = $tabContentWrapper.data('callflow'),
 						menuName = callflowName + 'Menu',
 						initTemplate = function() {
-							return $(self.getTemplate({
-								name: 'callsTab',
-								data: getTabData(),
-								submodule: 'strategy'
-							}));
+							var $template = $(self.getTemplate({
+									name: 'callsTab',
+									data: getTabData(),
+									submodule: 'strategy'
+								})),
+								$voicemailSelects = $template.find('.voicemail-select select'),
+								$advCallflowsSelects = $template.find('.advancedCallflows-select select'),
+								$entitiesSelects = $template.find('.user-select select');
+
+							$.each($entitiesSelects, function() {
+								var $select = $(this),
+									selectedOptionGroupLabel = $select.find('option:selected').closest('optgroup').prop('label');
+
+								$select.siblings('.title').text(selectedOptionGroupLabel);
+							});
+
+							_.forEach([
+								$voicemailSelects,
+								$advCallflowsSelects,
+								$entitiesSelects
+							], function($select) {
+								monster.ui.chosen($select, {
+									width: '160'
+								});
+							});
+
+							return $template;
 						},
 						getTabData = _.partial(function(strategyData, callflowName, menuName) {
 							var tabData = {
