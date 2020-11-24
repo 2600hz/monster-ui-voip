@@ -926,60 +926,60 @@ define(function(require) {
 						});
 					});
 
+					$.each($template.find('.callflow-tab'), renderTabContent);
+
 					return $template;
 				},
-				$template = initTemplate();
+				renderTabContent = _.partial(function(strategyData) {
+					var $tabContentWrapper = $(this),
+						callflowName = $tabContentWrapper.data('callflow'),
+						menuName = callflowName + 'Menu',
+						tabData = {
+							callOption: {
+								type: 'default'
+							},
+							hideAdvancedCallflows: _.isEmpty(strategyData.callEntities.advancedCallflows),
+							callflow: callflowName,
+							callEntities: self.strategyGetCallEntitiesDropdownData(strategyData.callEntities, true, true),
+							voicemails: strategyData.voicemails,
+							tabMessage: self.i18n.active().strategy.calls.callTabsMessages[callflowName]
+						};
+
+					if (strategyData.callflows[callflowName].flow.hasOwnProperty('is_main_number_cf')) {
+						tabData.callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
+						tabData.callOption.type = 'advanced-callflow';
+					} else if (strategyData.callflows[callflowName].flow.module === 'voicemail') {
+						tabData.callOption.callEntityId = 'none';
+						tabData.callOption.voicemailId = strategyData.callflows[callflowName].flow.data.id;
+						tabData.callOption.type = 'user-voicemail';
+					} else if (!_.isEmpty(strategyData.callflows[callflowName].flow.children)) {
+						tabData.callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
+						if ('_' in strategyData.callflows[callflowName].flow.children
+						&& strategyData.callflows[callflowName].flow.children._.module === 'voicemail') {
+							tabData.callOption.type = 'user-voicemail';
+							tabData.callOption.voicemailId = strategyData.callflows[callflowName].flow.children._.data.id;
+						} else {
+							tabData.callOption.type = 'user-menu';
+						}
+					}
+
+					if (menuName in strategyData.callflows) {
+						tabData.menu = menuName;
+					}
+
+					$tabContentWrapper
+						.empty()
+							.append($(self.getTemplate({
+								name: 'callsTab',
+								data: tabData,
+								submodule: 'strategy'
+							})));
+				}, strategyData);
 
 			$container
 				.find('.element-content')
 					.empty()
-					.append($template);
-
-			$.each($template.find('.callflow-tab'), function() {
-				var $this = $(this),
-					callflowName = $this.data('callflow'),
-					menuName = callflowName + 'Menu',
-					tabData = {
-						callOption: {
-							type: 'default'
-						},
-						hideAdvancedCallflows: _.isEmpty(strategyData.callEntities.advancedCallflows),
-						callflow: callflowName,
-						callEntities: self.strategyGetCallEntitiesDropdownData(strategyData.callEntities, true, true),
-						voicemails: strategyData.voicemails,
-						tabMessage: self.i18n.active().strategy.calls.callTabsMessages[callflowName]
-					};
-
-				if (strategyData.callflows[callflowName].flow.hasOwnProperty('is_main_number_cf')) {
-					tabData.callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
-					tabData.callOption.type = 'advanced-callflow';
-				} else if (strategyData.callflows[callflowName].flow.module === 'voicemail') {
-					tabData.callOption.callEntityId = 'none';
-					tabData.callOption.voicemailId = strategyData.callflows[callflowName].flow.data.id;
-					tabData.callOption.type = 'user-voicemail';
-				} else if (!_.isEmpty(strategyData.callflows[callflowName].flow.children)) {
-					tabData.callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
-					if ('_' in strategyData.callflows[callflowName].flow.children
-					&& strategyData.callflows[callflowName].flow.children._.module === 'voicemail') {
-						tabData.callOption.type = 'user-voicemail';
-						tabData.callOption.voicemailId = strategyData.callflows[callflowName].flow.children._.data.id;
-					} else {
-						tabData.callOption.type = 'user-menu';
-					}
-				}
-
-				if (menuName in strategyData.callflows) {
-					tabData.menu = menuName;
-				}
-
-				$(this)
-					.empty()
-						.append($(self.getTemplate({
-							name: 'callsTab',
-							data: tabData,
-							submodule: 'strategy'
-						})));
-			});
+					.append(initTemplate());
 
 			callback && callback();
 		},
