@@ -900,11 +900,33 @@ define(function(require) {
 					};
 				}, strategyData),
 				initTemplate = function() {
-					return $(self.getTemplate({
-						name: 'strategy-calls',
-						data: getRulesStatuses(),
-						submodule: 'strategy'
-					}));
+					var $template = $(self.getTemplate({
+							name: 'strategy-calls',
+							data: getRulesStatuses(),
+							submodule: 'strategy'
+						})),
+						$voicemailSelects = $template.find('.voicemail-select select'),
+						$advCallflowsSelects = $template.find('.advancedCallflows-select select'),
+						$entitiesSelects = $template.find('.user-select select');
+
+					$.each($entitiesSelects, function() {
+						var $select = $(this),
+							selectedOptionGroupLabel = $select.find('option:selected').closest('optgroup').prop('label');
+
+						$select.siblings('.title').text(selectedOptionGroupLabel);
+					});
+
+					_.forEach([
+						$voicemailSelects,
+						$advCallflowsSelects,
+						$entitiesSelects
+					], function($select) {
+						monster.ui.chosen($select, {
+							width: '160'
+						});
+					});
+
+					return $template;
 				},
 				$template = initTemplate();
 
@@ -957,22 +979,6 @@ define(function(require) {
 							data: tabData,
 							submodule: 'strategy'
 						})));
-			});
-
-			$.each($template.find('.user-select select'), function() {
-				var $this = $(this);
-				monster.ui.chosen($this, {
-					width: '160px'
-				});
-				$this.siblings('.title').text($this.find('option:selected').closest('optgroup').prop('label'));
-			});
-
-			monster.ui.chosen($template.find('.voicemail-select select'), {
-				width: '160px'
-			});
-
-			monster.ui.chosen($template.find('.advancedCallflows-select select'), {
-				width: '160px'
 			});
 
 			callback && callback();
