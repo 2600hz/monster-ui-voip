@@ -900,11 +900,47 @@ define(function(require) {
 					};
 				}, strategyData),
 				initTemplate = function() {
-					var $template = $(self.getTemplate({
-						name: 'strategy-calls',
-						data: getRulesStatuses(),
-						submodule: 'strategy'
-					}));
+					var rulesStatuses = getRulesStatuses(),
+						shouldTabBeRendered = _.flow(
+							_.partial(_.get, _, 'type'),
+							_.partial(_.get, rulesStatuses)
+						),
+						tabs = _.filter([{
+							type: 'weekdays',
+							cssClass: 'open-hours-tab',
+							href: 'strategy_calls_open_hours_tab',
+							iconClass: 'fa fa-sun-o',
+							label: self.i18n.active().strategy.calls.openHoursTitle,
+							callflowType: 'MainOpenHours'
+						}, {
+							type: 'lunchbreak',
+							cssClass: 'lunch-hours-tab',
+							href: 'strategy_calls_lunch_hours_tab',
+							iconClass: 'fa fa-cutlery',
+							label: self.i18n.active().strategy.calls.lunchHoursTitle,
+							callflowType: 'MainLunchHours'
+						}, {
+							type: 'afterhours',
+							cssClass: 'after-hours-tab',
+							href: 'strategy_calls_after_hours_tab',
+							iconClass: 'fa fa-moon-o',
+							label: self.i18n.active().strategy.calls.afterHoursTitle,
+							callflowType: 'MainAfterHours'
+						}, {
+							type: 'holidays',
+							cssClass: 'holidays-tab',
+							href: 'strategy_calls_holidays_tab',
+							iconClass: 'fa fa-glass',
+							label: self.i18n.active().strategy.calls.holidaysTitle,
+							callflowType: 'MainHolidays'
+						}], shouldTabBeRendered),
+						$template = $(self.getTemplate({
+							name: 'strategy-calls',
+							data: {
+								tabs: tabs
+							},
+							submodule: 'strategy'
+						}));
 
 					$.each($template.find('.callflow-tab'), renderTabContent);
 
