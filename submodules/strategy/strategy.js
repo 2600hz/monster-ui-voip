@@ -891,12 +891,18 @@ define(function(require) {
 						hasAtLeatOneActiveRule = _.flow(
 							_.partial(_.map, _, 'id'),
 							_.partial(_.some, _, isRuleIdActive)
-						);
+						),
+						rules = strategyData.temporalRules,
+						hasWeekdays = hasAtLeatOneActiveRule(rules.weekdays),
+						hasLunchbreak = hasAtLeatOneActiveRule(rules.lunchbreak),
+						isAlwaysOpen = !_.every([hasWeekdays, hasLunchbreak]),
+						hasCustomHours = _.some([hasWeekdays, hasLunchbreak]);
 
 					return {
-						holidays: hasAtLeatOneActiveRule(strategyData.temporalRules.holidays),
-						lunchbreak: hasAtLeatOneActiveRule(strategyData.temporalRules.lunchbreak),
-						afterhours: hasAtLeatOneActiveRule(strategyData.temporalRules.weekdays)
+						weekdays: hasWeekdays || isAlwaysOpen,
+						holidays: hasAtLeatOneActiveRule(rules.holidays),
+						lunchbreak: hasLunchbreak,
+						afterhours: hasCustomHours
 					};
 				}, strategyData),
 				initTemplate = function() {
