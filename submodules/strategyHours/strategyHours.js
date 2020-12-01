@@ -788,13 +788,13 @@ define(function(require) {
 				openHoursRules = _.get(strategyData.temporalRules, 'weekdays', {}),
 				reconcileOpenHoursRules = _.bind(self.strategyHoursReconcileTemporalRules, self, openHoursIntervals, openHoursRules, {
 					type: 'main_weekdays',
-					name: 'mainOpenHours'
+					name: 'MainOpenHours'
 				}),
 				lunchHoursIntervals = _.map(normalizedIntervals, _.partial(_.filter, _, { type: 'lunch' })),
 				lunchHoursRules = _.get(strategyData.temporalRules, 'lunchbreak', {}),
 				reconcileLunchHoursRules = _.bind(self.strategyHoursReconcileTemporalRules, self, lunchHoursIntervals, lunchHoursRules, {
 					type: 'main_lunchbreak',
-					name: 'mainLunchHours'
+					name: 'MainLunchHours'
 				}),
 				reconcileTemporalRules = _.partial(monster.parallel, {
 					weekdays: reconcileOpenHoursRules,
