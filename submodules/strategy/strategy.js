@@ -779,92 +779,11 @@ define(function(require) {
 
 					break;
 				case 'calls':
-					var isRuleIdActive = _.partial(_.includes, _.keys(strategyData.callflows.MainCallflow.flow.children)),
-						hasAtLeatOneActiveRule = _.flow(
-							_.partial(_.map, _, 'id'),
-							_.partial(_.some, _, isRuleIdActive)
-						),
-						templateData = {
-							holidays: hasAtLeatOneActiveRule(strategyData.temporalRules.holidays),
-							lunchbreak: hasAtLeatOneActiveRule(strategyData.temporalRules.lunchbreak),
-							afterhours: hasAtLeatOneActiveRule(strategyData.temporalRules.weekdays)
-						},
-						template;
-
-					template = $(self.getTemplate({
-						name: 'strategy-' + templateName,
-						data: templateData,
-						submodule: 'strategy'
-					}));
-
-					$container
-						.find('.element-content')
-							.empty()
-							.append(template);
-
-					$.each(template.find('.callflow-tab'), function() {
-						var $this = $(this),
-							callflowName = $this.data('callflow'),
-							menuName = callflowName + 'Menu',
-							tabData = {
-								callOption: {
-									type: 'default'
-								},
-								hideAdvancedCallflows: _.isEmpty(strategyData.callEntities.advancedCallflows),
-								callflow: callflowName,
-								callEntities: self.strategyGetCallEntitiesDropdownData(strategyData.callEntities, true, true),
-								voicemails: strategyData.voicemails,
-								tabMessage: self.i18n.active().strategy.calls.callTabsMessages[callflowName]
-							};
-
-						if (strategyData.callflows[callflowName].flow.hasOwnProperty('is_main_number_cf')) {
-							tabData.callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
-							tabData.callOption.type = 'advanced-callflow';
-						} else if (strategyData.callflows[callflowName].flow.module === 'voicemail') {
-							tabData.callOption.callEntityId = 'none';
-							tabData.callOption.voicemailId = strategyData.callflows[callflowName].flow.data.id;
-							tabData.callOption.type = 'user-voicemail';
-						} else if (!_.isEmpty(strategyData.callflows[callflowName].flow.children)) {
-							tabData.callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
-							if ('_' in strategyData.callflows[callflowName].flow.children
-							&& strategyData.callflows[callflowName].flow.children._.module === 'voicemail') {
-								tabData.callOption.type = 'user-voicemail';
-								tabData.callOption.voicemailId = strategyData.callflows[callflowName].flow.children._.data.id;
-							} else {
-								tabData.callOption.type = 'user-menu';
-							}
-						}
-
-						if (menuName in strategyData.callflows) {
-							tabData.menu = menuName;
-						}
-
-						$(this)
-							.empty()
-								.append($(self.getTemplate({
-									name: 'callsTab',
-									data: tabData,
-									submodule: 'strategy'
-								})));
-					});
-
-					$.each(template.find('.user-select select'), function() {
-						var $this = $(this);
-						monster.ui.chosen($this, {
-							width: '160px'
-						});
-						$this.siblings('.title').text($this.find('option:selected').closest('optgroup').prop('label'));
-					});
-
-					monster.ui.chosen(template.find('.voicemail-select select'), {
-						width: '160px'
-					});
-
-					monster.ui.chosen(template.find('.advancedCallflows-select select'), {
-						width: '160px'
-					});
-
-					callback && callback();
+					self.strategyRefreshTemplateCalls(_.pick(args, [
+						'container',
+						'strategyData',
+						'callback'
+					]));
 
 					break;
 				default:
@@ -954,6 +873,166 @@ define(function(require) {
 
 				callback && callback();
 			});
+		},
+
+		/**
+		 * @param  {Object} args
+		 * @param  {jQuery} args.container
+		 * @param  {Object} args.strategyData
+		 * @param  {Function} args.callback
+		 */
+		strategyRefreshTemplateCalls: function(args) {
+			var self = this,
+				$container = args.container,
+				strategyData = args.strategyData,
+				callback = args.callback,
+				getRulesStatuses = _.partial(function(strategyData) {
+					var isRuleIdActive = _.partial(_.includes, _.keys(strategyData.callflows.MainCallflow.flow.children)),
+						hasAtLeatOneActiveRule = _.flow(
+							_.partial(_.map, _, 'id'),
+							_.partial(_.some, _, isRuleIdActive)
+						),
+						rules = strategyData.temporalRules,
+						hasWeekdays = hasAtLeatOneActiveRule(rules.weekdays),
+						hasLunchbreak = hasAtLeatOneActiveRule(rules.lunchbreak),
+						isAlwaysOpen = !_.every([hasWeekdays, hasLunchbreak]),
+						hasCustomHours = _.some([hasWeekdays, hasLunchbreak]);
+
+					return {
+						weekdays: hasWeekdays || isAlwaysOpen,
+						holidays: hasAtLeatOneActiveRule(rules.holidays),
+						lunchbreak: hasLunchbreak,
+						afterhours: hasCustomHours
+					};
+				}, strategyData),
+				initTemplate = function() {
+					var rulesStatuses = getRulesStatuses(),
+						shouldTabBeRendered = _.flow(
+							_.partial(_.get, _, 'type'),
+							_.partial(_.get, rulesStatuses)
+						),
+						tabs = _.filter([{
+							type: 'weekdays',
+							cssClass: 'open-hours-tab',
+							href: 'strategy_calls_open_hours_tab',
+							iconClass: 'fa fa-sun-o',
+							label: self.i18n.active().strategy.calls.openHoursTitle,
+							callflowType: 'MainOpenHours'
+						}, {
+							type: 'lunchbreak',
+							cssClass: 'lunch-hours-tab',
+							href: 'strategy_calls_lunch_hours_tab',
+							iconClass: 'fa fa-cutlery',
+							label: self.i18n.active().strategy.calls.lunchHoursTitle,
+							callflowType: 'MainLunchHours'
+						}, {
+							type: 'afterhours',
+							cssClass: 'after-hours-tab',
+							href: 'strategy_calls_after_hours_tab',
+							iconClass: 'fa fa-moon-o',
+							label: self.i18n.active().strategy.calls.afterHoursTitle,
+							callflowType: 'MainAfterHours'
+						}, {
+							type: 'holidays',
+							cssClass: 'holidays-tab',
+							href: 'strategy_calls_holidays_tab',
+							iconClass: 'fa fa-glass',
+							label: self.i18n.active().strategy.calls.holidaysTitle,
+							callflowType: 'MainHolidays'
+						}], shouldTabBeRendered),
+						$template = $(self.getTemplate({
+							name: 'strategy-calls',
+							data: {
+								tabs: tabs
+							},
+							submodule: 'strategy'
+						}));
+
+					$.each($template.find('.callflow-tab'), renderTabContent);
+
+					return $template;
+				},
+				renderTabContent = _.partial(function(strategyData) {
+					var $tabContentWrapper = $(this),
+						callflowName = $tabContentWrapper.data('callflow'),
+						menuName = callflowName + 'Menu',
+						initTemplate = function() {
+							var $template = $(self.getTemplate({
+									name: 'callsTab',
+									data: getTabData(),
+									submodule: 'strategy'
+								})),
+								$voicemailSelects = $template.find('.voicemail-select select'),
+								$advCallflowsSelects = $template.find('.advancedCallflows-select select'),
+								$entitiesSelects = $template.find('.user-select select');
+
+							$.each($entitiesSelects, function() {
+								var $select = $(this),
+									selectedOptionGroupLabel = $select.find('option:selected').closest('optgroup').prop('label');
+
+								$select.siblings('.title').text(selectedOptionGroupLabel);
+							});
+
+							_.forEach([
+								$voicemailSelects,
+								$advCallflowsSelects,
+								$entitiesSelects
+							], function($select) {
+								monster.ui.chosen($select, {
+									width: '160'
+								});
+							});
+
+							return $template;
+						},
+						getTabData = _.partial(function(strategyData, callflowName, menuName) {
+							var tabData = {
+								callOption: {
+									type: 'default'
+								},
+								hideAdvancedCallflows: _.isEmpty(strategyData.callEntities.advancedCallflows),
+								callflow: callflowName,
+								callEntities: self.strategyGetCallEntitiesDropdownData(strategyData.callEntities, true, true),
+								voicemails: strategyData.voicemails,
+								tabMessage: self.i18n.active().strategy.calls.callTabsMessages[callflowName]
+							};
+
+							if (strategyData.callflows[callflowName].flow.hasOwnProperty('is_main_number_cf')) {
+								tabData.callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
+								tabData.callOption.type = 'advanced-callflow';
+							} else if (strategyData.callflows[callflowName].flow.module === 'voicemail') {
+								tabData.callOption.callEntityId = 'none';
+								tabData.callOption.voicemailId = strategyData.callflows[callflowName].flow.data.id;
+								tabData.callOption.type = 'user-voicemail';
+							} else if (!_.isEmpty(strategyData.callflows[callflowName].flow.children)) {
+								tabData.callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
+								if ('_' in strategyData.callflows[callflowName].flow.children
+								&& strategyData.callflows[callflowName].flow.children._.module === 'voicemail') {
+									tabData.callOption.type = 'user-voicemail';
+									tabData.callOption.voicemailId = strategyData.callflows[callflowName].flow.children._.data.id;
+								} else {
+									tabData.callOption.type = 'user-menu';
+								}
+							}
+
+							if (menuName in strategyData.callflows) {
+								tabData.menu = menuName;
+							}
+
+							return tabData;
+						}, strategyData, callflowName, menuName);
+
+					$tabContentWrapper
+						.empty()
+							.append(initTemplate());
+				}, strategyData);
+
+			$container
+				.find('.element-content')
+					.empty()
+					.append(initTemplate());
+
+			callback && callback();
 		},
 
 		/**
