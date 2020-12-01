@@ -541,6 +541,16 @@ define(function(require) {
 			var self = this,
 				weekdays = self.weekdays,
 				types = self.appFlags.strategyHours.apiToTemplateTypesMap,
+				activeRuleIds = _
+					.chain(strategyData.callflows.MainCallflow)
+					.get('flow.children', {})
+					.omit('_')
+					.keys()
+					.value(),
+				isRuleActive = _.flow(
+					_.partial(_.get, _, 'id'),
+					_.partial(_.includes, activeRuleIds)
+				),
 				extractIntervalsForRule = function(types, rule) {
 					var type = _.get(types, rule.type);
 
@@ -557,6 +567,7 @@ define(function(require) {
 					.chain(strategyData.temporalRules)
 					.pick(['weekdays', 'lunchbreak'])
 					.flatMap(_.values)
+					.filter(isRuleActive)
 					.flatMap(_.partial(extractIntervalsForRule, types))
 					.groupBy('day')
 					.value();
