@@ -66,29 +66,26 @@ define(function(require) {
 			var self = this,
 				$container = args.container,
 				strategyData = args.strategyData,
-				callback = args.callback;
+				callback = args.callback,
+				intervals = self.strategyHoursExtractDaysIntervalsFromStrategyData(strategyData),
+				template = $(self.getTemplate({
+					name: 'layout',
+					data: {
+						alwaysOpen: _.every(intervals, _.isEmpty),
+						companyTimezone: timezone.formatTimezone(strategyData.callflows.MainCallflow.flow.data.timezone || monster.apps.auth.currentAccount.timezone)
+					},
+					submodule: 'strategyHours'
+				}));
 
-			self.strategyHoursMigrateTemporalRules(strategyData, function() {
-				var intervals = self.strategyHoursExtractDaysIntervalsFromStrategyData(strategyData),
-					template = $(self.getTemplate({
-						name: 'layout',
-						data: {
-							alwaysOpen: _.every(intervals, _.isEmpty),
-							companyTimezone: timezone.formatTimezone(strategyData.callflows.MainCallflow.flow.data.timezone || monster.apps.auth.currentAccount.timezone)
-						},
-						submodule: 'strategyHours'
-					}));
+			$container
+				.find('.element-content')
+					.empty()
+					.append(template);
 
-				$container
-					.find('.element-content')
-						.empty()
-						.append(template);
+			self.strategyHoursListingRender($container, intervals);
+			self.strategyHoursBindEvents($container, template, strategyData);
 
-				self.strategyHoursListingRender($container, intervals);
-				self.strategyHoursBindEvents($container, template, strategyData);
-
-				callback && callback();
-			});
+			callback && callback();
 		},
 
 		strategyHoursListingRender: function($container, intervals) {
@@ -347,21 +344,6 @@ define(function(require) {
 				method = isEmpty ? 'fadeOut' : 'fadeIn';
 
 			parent.find('.export-csv')[method](200);
-		},
-
-		/**
-		 * Enforces nonoverlapping temporal rules by CRUDing them as necessary.
-		 * @param  {Object}   strategyData
-		 * @param  {Function} callback
-		 */
-		strategyHoursMigrateTemporalRules: function(strategyData, callback) {
-			var self = this;
-
-			self.strategyHoursUpdateStrategyData(
-				self.strategyHoursExtractDaysIntervalsFromStrategyData(strategyData),
-				strategyData,
-				callback
-			);
 		},
 
 		/**
