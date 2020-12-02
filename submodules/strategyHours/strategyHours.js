@@ -66,29 +66,26 @@ define(function(require) {
 			var self = this,
 				$container = args.container,
 				strategyData = args.strategyData,
-				callback = args.callback;
+				callback = args.callback,
+				intervals = self.strategyHoursExtractDaysIntervalsFromStrategyData(strategyData),
+				template = $(self.getTemplate({
+					name: 'layout',
+					data: {
+						alwaysOpen: _.every(intervals, _.isEmpty),
+						companyTimezone: timezone.formatTimezone(strategyData.callflows.MainCallflow.flow.data.timezone || monster.apps.auth.currentAccount.timezone)
+					},
+					submodule: 'strategyHours'
+				}));
 
-			self.strategyHoursMigrateTemporalRules(strategyData, function() {
-				var intervals = self.strategyHoursExtractDaysIntervalsFromStrategyData(strategyData),
-					template = $(self.getTemplate({
-						name: 'layout',
-						data: {
-							alwaysOpen: _.every(intervals, _.isEmpty),
-							companyTimezone: timezone.formatTimezone(strategyData.callflows.MainCallflow.flow.data.timezone || monster.apps.auth.currentAccount.timezone)
-						},
-						submodule: 'strategyHours'
-					}));
+			$container
+				.find('.element-content')
+					.empty()
+					.append(template);
 
-				$container
-					.find('.element-content')
-						.empty()
-						.append(template);
+			self.strategyHoursListingRender($container, intervals);
+			self.strategyHoursBindEvents($container, template, strategyData);
 
-				self.strategyHoursListingRender($container, intervals);
-				self.strategyHoursBindEvents($container, template, strategyData);
-
-				callback && callback();
-			});
+			callback && callback();
 		},
 
 		strategyHoursListingRender: function($container, intervals) {
@@ -350,21 +347,6 @@ define(function(require) {
 		},
 
 		/**
-		 * Enforces nonoverlapping temporal rules by CRUDing them as necessary.
-		 * @param  {Object}   strategyData
-		 * @param  {Function} callback
-		 */
-		strategyHoursMigrateTemporalRules: function(strategyData, callback) {
-			var self = this;
-
-			self.strategyHoursUpdateStrategyData(
-				self.strategyHoursExtractDaysIntervalsFromStrategyData(strategyData),
-				strategyData,
-				callback
-			);
-		},
-
-		/**
 		 * Returns an array of arrays containing nonoverlapping intervals.
 		 * @param  {Array[]} intervalsByDays
 		 * @return {Array[]}
@@ -541,6 +523,16 @@ define(function(require) {
 			var self = this,
 				weekdays = self.weekdays,
 				types = self.appFlags.strategyHours.apiToTemplateTypesMap,
+				activeRuleIds = _
+					.chain(strategyData.callflows.MainCallflow)
+					.get('flow.children', {})
+					.omit('_')
+					.keys()
+					.value(),
+				isRuleActive = _.flow(
+					_.partial(_.get, _, 'id'),
+					_.partial(_.includes, activeRuleIds)
+				),
 				extractIntervalsForRule = function(types, rule) {
 					var type = _.get(types, rule.type);
 
@@ -557,6 +549,7 @@ define(function(require) {
 					.chain(strategyData.temporalRules)
 					.pick(['weekdays', 'lunchbreak'])
 					.flatMap(_.values)
+					.filter(isRuleActive)
 					.flatMap(_.partial(extractIntervalsForRule, types))
 					.groupBy('day')
 					.value();
@@ -795,13 +788,13 @@ define(function(require) {
 				openHoursRules = _.get(strategyData.temporalRules, 'weekdays', {}),
 				reconcileOpenHoursRules = _.bind(self.strategyHoursReconcileTemporalRules, self, openHoursIntervals, openHoursRules, {
 					type: 'main_weekdays',
-					name: 'mainOpenHours'
+					name: 'MainOpenHours'
 				}),
 				lunchHoursIntervals = _.map(normalizedIntervals, _.partial(_.filter, _, { type: 'lunch' })),
 				lunchHoursRules = _.get(strategyData.temporalRules, 'lunchbreak', {}),
 				reconcileLunchHoursRules = _.bind(self.strategyHoursReconcileTemporalRules, self, lunchHoursIntervals, lunchHoursRules, {
 					type: 'main_lunchbreak',
-					name: 'mainLunchHours'
+					name: 'MainLunchHours'
 				}),
 				reconcileTemporalRules = _.partial(monster.parallel, {
 					weekdays: reconcileOpenHoursRules,
