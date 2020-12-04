@@ -33,8 +33,8 @@ define(function(require) {
 			strategyHours: {
 				intervals: {
 					max: 86400,
-					unit: 3600,
-					step: 1800,
+					unit: 60,
+					step: 60,
 					exportFilename: 'office-hours',
 					typesOrderSignificance: [
 						'lunch',
