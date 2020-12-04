@@ -203,13 +203,23 @@ form {
 						}
 
 						.hours {
+							display: flex;
+							align-items: center;
+
+							input {
+								height: 2rem;
+								border-radius: 2px;
+								border: 1px solid #c0c0ca;
+								max-width: 88px;
+							}
+
 							.separator {
 								margin: 0 1rem;
 							}
 						}
 
 						.ui-timepicker-select {
-							max-width: 90px;
+							max-width: 88px;
 						}
 					}
 				}

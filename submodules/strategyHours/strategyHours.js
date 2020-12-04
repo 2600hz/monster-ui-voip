@@ -122,12 +122,10 @@ define(function(require) {
 								nextBound = intervals[index + 1] ? intervals[index + 1].start : 86400;
 
 							monster.ui.timepicker($startPicker, {
-								useSelect: true,
 								minTime: previousBound,
 								maxTime: interval.end - minIntervalStep
 							});
 							monster.ui.timepicker($endPicker, {
-								useSelect: true,
 								minTime: interval.start + minIntervalStep,
 								maxTime: nextBound
 							});
