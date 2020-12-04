@@ -32,9 +32,13 @@ define(function(require) {
 		appFlags: {
 			strategyHours: {
 				intervals: {
+					min: 0,
 					max: 86400,
 					unit: 60,
 					step: 60,
+					timepicker: {
+						step: 1800
+					},
 					exportFilename: 'office-hours',
 					typesOrderSignificance: [
 						'lunch',
@@ -91,7 +95,6 @@ define(function(require) {
 		strategyHoursListingRender: function($container, intervals) {
 			var self = this,
 				days = self.weekdays,
-				minIntervalStep = self.appFlags.strategyHours.intervals.step,
 				templateData = {
 					isEmpty: _.every(intervals, _.isEmpty),
 					templates: _.keys(self.appFlags.strategyHours.templatePresets),
@@ -107,26 +110,30 @@ define(function(require) {
 					})
 				},
 				initTemplate = function initTemplate(data) {
-					var $template = $(self.getTemplate({
-						name: 'listing',
-						data: data,
-						submodule: 'strategyHours'
-					}));
+					var meta = self.appFlags.strategyHours.intervals,
+						timepickerStep = meta.timepicker.step,
+						intervalLowerBound = meta.min,
+						intervalUpperBound = meta.max,
+						$template = $(self.getTemplate({
+							name: 'listing',
+							data: data,
+							submodule: 'strategyHours'
+						}));
 
 					_.forEach(data.days, function(day) {
 						_.forEach(day.intervals, function(interval, index) {
 							var $startPicker = $template.find('input[class*="' + day.id + '[' + index + '].start"]'),
 								$endPicker = $template.find('input[class*="' + day.id + '[' + index + '].end"]'),
 								intervals = day.intervals,
-								previousBound = intervals[index - 1] ? intervals[index - 1].end : 0,
-								nextBound = intervals[index + 1] ? intervals[index + 1].start : 86400;
+								previousBound = intervals[index - 1] ? intervals[index - 1].end : intervalLowerBound,
+								nextBound = intervals[index + 1] ? intervals[index + 1].start : intervalUpperBound;
 
 							monster.ui.timepicker($startPicker, {
 								minTime: previousBound,
-								maxTime: interval.end - minIntervalStep
+								maxTime: interval.end - timepickerStep
 							});
 							monster.ui.timepicker($endPicker, {
-								minTime: interval.start + minIntervalStep,
+								minTime: interval.start + timepickerStep,
 								maxTime: nextBound
 							});
 							$startPicker.timepicker('setTime', interval.start);
@@ -235,7 +242,11 @@ define(function(require) {
 		},
 
 		strategyHoursListingBindEvents: function(parent, template) {
-			var self = this;
+			var self = this,
+				meta = self.appFlags.strategyHours.intervals,
+				intervalStep = meta.step,
+				intervalLowerBound = meta.min,
+				intervalUpperBound = meta.max;
 
 			template.on('click', '.office-hours-nav .nav-item:not(.active):not(.disabled)', function(event) {
 				var $this = $(this),
@@ -272,7 +283,7 @@ define(function(require) {
 					$boundPicker = $picker.siblings('input'),
 					isFrom = _.endsWith($picker.prop('name'), '.start'),
 					method = isFrom ? 'minTime' : 'maxTime',
-					newTime = isFrom ? seconds + (3600 / 2) : seconds - (3600 / 2);
+					newTime = isFrom ? seconds + intervalStep : seconds - intervalStep;
 
 				$boundPicker.timepicker('option', method, newTime);
 			});
@@ -293,7 +304,7 @@ define(function(require) {
 				$boundPicker.timepicker('option', method, seconds);
 
 				if (isExtremity) {
-					$picker.timepicker('option', isFrom ? 'minTime' : 'maxTime', isFrom ? 0 : 3600 * 24);
+					$picker.timepicker('option', isFrom ? 'minTime' : 'maxTime', isFrom ? intervalLowerBound : intervalUpperBound);
 				}
 			});
 

@@ -4336,9 +4336,6 @@ define(function(require) {
 				})),
 				$startTimepicker = $template.find('.start-time'),
 				$endTimepicker = $template.find('.end-time'),
-				timepickerOptions = {
-					step: meta.step / 60
-				},
 				popup;
 
 			$template.find('input[name="days[]"]').on('change', function(event) {
@@ -4353,13 +4350,14 @@ define(function(require) {
 
 			monster.ui.timepicker($startTimepicker, _.merge({
 				useSelect: true,
+				minTime: meta.min,
 				maxTime: meta.max - meta.step
-			}, timepickerOptions));
+			}));
 			monster.ui.timepicker($endTimepicker, _.merge({
 				useSelect: true,
 				minTime: meta.step,
 				maxTime: meta.max
-			}, timepickerOptions));
+			}));
 			$endTimepicker.timepicker('setTime', meta.max);
 
 			$startTimepicker.on('changeTime', function() {
