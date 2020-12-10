@@ -538,8 +538,8 @@ define(function(require) {
 
 					return _.map(rule.wdays, function(day) {
 						return {
-							start: rule.time_window_start,
-							end: rule.time_window_stop,
+							start: _.parseInt(rule.time_window_start),
+							end: _.parseInt(rule.time_window_stop),
 							type: type,
 							day: day
 						};
