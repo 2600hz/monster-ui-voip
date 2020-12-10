@@ -279,30 +279,17 @@ define(function(require) {
 			if (type === 'sip_device' && monster.config.api.provisioner) {
 				monster.pub('common.chooseModel.render', {
 					callback: function(dataModel, callbackCommonSuccess) {
-						monster.waterfall([
-							function(next) {
-								self.devicesGetEditData(dataModel, _.flow(
-									_.partial(_.omit, _, 'extra'),
-									_.partial(next, null)
-								));
+						self.callApi({
+							resource: 'device.create',
+							data: {
+								accountId: self.accountId,
+								data: dataModel
 							},
-							function(dataModel, next) {
-								self.callApi({
-									resource: 'device.create',
-									data: {
-										accountId: self.accountId,
-										data: dataModel
-									},
-									success: _.flow(
-										_.partial(_.get, _, 'data'),
-										_.partial(next, null)
-									)
-								});
-							}
-						], function(err, device) {
-							callback(device);
+							success: function(data, status) {
+								callback(data.data);
 
-							callbackCommonSuccess && callbackCommonSuccess();
+								callbackCommonSuccess && callbackCommonSuccess();
+							}
 						});
 					},
 					callbackMissingBrand: function() {
