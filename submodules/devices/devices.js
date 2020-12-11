@@ -935,7 +935,6 @@ define(function(require) {
 		 */
 		devicesFormatData: function(data, dataList) {
 			var self = this,
-				isNewDevice = !_.has(data.device, 'id'),
 				keyActionsMod = _.get(
 					self.appFlags.devices.provisionerConfigFlags,
 					['brands', _.get(data.device, 'provision.endpoint_brand'), 'keyFunctions'],
@@ -955,10 +954,7 @@ define(function(require) {
 						video: {}
 					}
 				},
-				deviceDefaults = _.merge({},
-					isNewDevice && self.devicesGetBaseDefaults(),
-					self.devicesGetDefaultsForType(data.device.device_type)
-				),
+				deviceDefaults = self.devicesGetDefaults(data.device),
 				deviceOverrides = {
 					provision: _
 						.chain(data.template)
@@ -1127,6 +1123,27 @@ define(function(require) {
 					})
 				}
 			}, mergedDevice);
+		},
+
+		/**
+		 * @param  {Object} device
+		 * @param  {String} device.device_type
+		 * @param  {String} [device.id]
+		 * @return {Object}
+		 */
+		devicesGetDefaults: function(device) {
+			var self = this,
+				isNew = !_.has(device, 'id'),
+				type = _.get(device, 'device_type'),
+				overrideDestArray = function(obj, src) {
+					return _.every([obj, src], _.isArray) ? src : undefined;
+				};
+
+			return _.mergeWith(
+				isNew ? self.devicesGetBaseDefaults() : {},
+				self.devicesGetDefaultsForType(type),
+				overrideDestArray
+			);
 		},
 
 		devicesGetBaseDefaults: function() {
