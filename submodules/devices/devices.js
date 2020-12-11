@@ -3,6 +3,10 @@ define(function(require) {
 		_ = require('lodash'),
 		monster = require('monster');
 
+	var overrideDestArray = function(dest, src) {
+		return _.every([dest, src], _.isArray) ? src : undefined;
+	};
+
 	var app = {
 
 		requests: {
@@ -283,7 +287,7 @@ define(function(require) {
 							resource: 'device.create',
 							data: {
 								accountId: self.accountId,
-								data: dataModel
+								data: self.devicesApplyDefaults(dataModel)
 							},
 							success: function(data, status) {
 								callback(data.data);
@@ -954,7 +958,7 @@ define(function(require) {
 						video: {}
 					}
 				},
-				deviceDefaults = self.devicesGetDefaults(data.device),
+				deviceWithDefaults = self.devicesApplyDefaults(data.device),
 				deviceOverrides = {
 					provision: _
 						.chain(data.template)
@@ -981,11 +985,8 @@ define(function(require) {
 				deviceData = _.mergeWith(
 					{},
 					templateDefaults,
-					deviceDefaults,
-					data.device,
-					function(dest, src) {
-						return _.every([dest, src], _.isArray) ? src : undefined;
-					}
+					deviceWithDefaults,
+					overrideDestArray
 				),
 				mergedDevice = _.merge(
 					{},
@@ -1131,13 +1132,26 @@ define(function(require) {
 		 * @param  {String} [device.id]
 		 * @return {Object}
 		 */
+		devicesApplyDefaults: function(device) {
+			var self = this;
+
+			return _.mergeWith(
+				self.devicesGetDefaults(device),
+				device,
+				overrideDestArray
+			);
+		},
+
+		/**
+		 * @param  {Object} device
+		 * @param  {String} device.device_type
+		 * @param  {String} [device.id]
+		 * @return {Object}
+		 */
 		devicesGetDefaults: function(device) {
 			var self = this,
 				isNew = !_.has(device, 'id'),
-				type = _.get(device, 'device_type'),
-				overrideDestArray = function(obj, src) {
-					return _.every([obj, src], _.isArray) ? src : undefined;
-				};
+				type = _.get(device, 'device_type');
 
 			return _.mergeWith(
 				isNew ? self.devicesGetBaseDefaults() : {},
