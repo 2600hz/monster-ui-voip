@@ -955,52 +955,9 @@ define(function(require) {
 						video: {}
 					}
 				},
-				callForwardSettings = {
-					call_forward: {
-						require_keypress: true,
-						keep_caller_id: true
-					},
-					contact_list: {
-						exclude: true
-					}
-				},
-				sipSettings = {
-					sip: {
-						password: monster.util.randomString(12),
-						realm: monster.apps.auth.currentAccount.realm,
-						username: 'user_' + monster.util.randomString(10)
-					}
-				},
-				deviceDefaultsForType = _.get({
-					ata: _.merge({}, sipSettings),
-					cellphone: _.merge({}, callForwardSettings),
-					fax: _.merge({
-						media: {
-							fax_option: 'false'
-						},
-						outbound_flags: [
-							'fax'
-						]
-					}, sipSettings),
-					landline: _.merge({}, callForwardSettings),
-					mobile: _.merge({}, sipSettings),
-					sip_device: _.merge({}, sipSettings),
-					sip_uri: {
-						sip: _.merge({
-							expire_seconds: 360,
-							invite_format: 'route',
-							method: 'password'
-						}, _.pick(sipSettings.sip, [
-							'password',
-							'username'
-						]))
-					},
-					smartphone: _.merge({}, sipSettings, callForwardSettings),
-					softphone: _.merge({}, sipSettings)
-				}, data.device.device_type, {}),
 				deviceDefaults = _.merge({},
 					isNewDevice && self.devicesGetBaseDefaults(),
-					deviceDefaultsForType
+					self.devicesGetDefaultsForType(data.device.device_type)
 				),
 				deviceOverrides = {
 					provision: _
@@ -1190,6 +1147,54 @@ define(function(require) {
 				},
 				suppress_unregister_notifications: true
 			};
+		},
+
+		devicesGetDefaultsForType: function(type) {
+			var callForwardSettings = {
+					call_forward: {
+						require_keypress: true,
+						keep_caller_id: true
+					},
+					contact_list: {
+						exclude: true
+					}
+				},
+				sipSettings = {
+					sip: {
+						password: monster.util.randomString(12),
+						realm: monster.apps.auth.currentAccount.realm,
+						username: 'user_' + monster.util.randomString(10)
+					}
+				},
+				defaultsPerType = {
+					ata: _.merge({}, sipSettings),
+					cellphone: _.merge({}, callForwardSettings),
+					fax: _.merge({
+						media: {
+							fax_option: 'false'
+						},
+						outbound_flags: [
+							'fax'
+						]
+					}, sipSettings),
+					landline: _.merge({}, callForwardSettings),
+					mobile: _.merge({}, sipSettings),
+					sip_device: _.merge({}, sipSettings),
+					sip_uri: {
+						sip: _.merge({
+							expire_seconds: 360,
+							invite_format: 'route',
+							method: 'password'
+						}, _.pick(sipSettings.sip, [
+							'password',
+							'username'
+						]))
+					},
+					smartphone: _.merge({}, sipSettings, callForwardSettings),
+					softphone: _.merge({}, sipSettings)
+				};
+
+			return _.get(defaultsPerType, type, {});
 		},
 
 		/**
