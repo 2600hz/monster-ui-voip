@@ -955,23 +955,6 @@ define(function(require) {
 						video: {}
 					}
 				},
-				deviceBaseDefaults = {
-					call_restriction: {},
-					device_type: 'sip_device',
-					enabled: true,
-					media: {
-						audio: {
-							codecs: ['PCMA', 'PCMU']
-						},
-						encryption: {
-							enforce_security: false
-						},
-						video: {
-							codecs: []
-						}
-					},
-					suppress_unregister_notifications: true
-				},
 				callForwardSettings = {
 					call_forward: {
 						require_keypress: true,
@@ -1016,7 +999,7 @@ define(function(require) {
 					softphone: _.merge({}, sipSettings)
 				}, data.device.device_type, {}),
 				deviceDefaults = _.merge({},
-					isNewDevice && deviceBaseDefaults,
+					isNewDevice && self.devicesGetBaseDefaults(),
 					deviceDefaultsForType
 				),
 				deviceOverrides = {
@@ -1187,6 +1170,26 @@ define(function(require) {
 					})
 				}
 			}, mergedDevice);
+		},
+
+		devicesGetBaseDefaults: function() {
+			return {
+				call_restriction: {},
+				device_type: 'sip_device',
+				enabled: true,
+				media: {
+					audio: {
+						codecs: ['PCMA', 'PCMU']
+					},
+					encryption: {
+						enforce_security: false
+					},
+					video: {
+						codecs: []
+					}
+				},
+				suppress_unregister_notifications: true
+			};
 		},
 
 		/**
