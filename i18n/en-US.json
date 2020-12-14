@@ -893,12 +893,30 @@
 		},
 		"holidays": {
 			"enableTitle": "Are you closed for holidays?",
-			"addLink": "Add Holiday",
-			"singleLink": "Single Day",
-			"rangeLink": "Date Range",
-			"advancedLink": "Advanced",
-			"__comment": "UI-1250: Adding help boxes",
-			"__version": "3.20_s2",
+			"title": "Holidays",
+			"holidaySchedule": "Holiday Schedule",
+			"buttons": {
+				"addHoliday": "Add Holiday",
+				"importHolidays": "Import Holidays",
+				"includeNationalHolidays": "Include National Holidays"
+			},
+			"listing": {
+				"headers": {
+					"name": "Name",
+					"date": "Date",
+					"actions": "Actions"
+				},
+				"search": "Search..."
+			},
+			"days": {
+				"monday": "Mon",
+				"tuesday": "Tue",
+				"wednesday": "Wed",
+				"thursday": "Thu",
+				"friday": "Fri",
+				"saturday": "Sat",
+				"sunday": "Sun"
+			},
 			"helpHolidays": "Do not forget to set the call routing for when your office is closed for the holidays! To set it up, go in the \"Incoming Call Handling\" section of this page, and select the \"Holidays\" tab."
 		},
 		"calls": {

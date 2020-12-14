@@ -125,7 +125,7 @@
 
 		&.strategy-holidays {
 			.element-content {
-				@import "./partials/strategy-holidays.scss";
+				@import "../strategyHolidays/strategyHolidays.scss";
 			}
 		}
 
