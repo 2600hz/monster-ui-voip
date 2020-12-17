@@ -1862,6 +1862,8 @@ define(function(require) {
 							});
 
 							_.each(results, function(val, key) {
+								var identifier = _.get(val, _.has(val, 'temporal_rules') ? 'name' : 'id');
+
 								mainCallflow.flow.children[val.id] = {
 									children: {},
 									data: {
@@ -1869,7 +1871,7 @@ define(function(require) {
 									},
 									module: 'callflow'
 								};
-								_.set(strategyData.temporalRules, ['holidays', val.name], val);
+								_.set(strategyData.temporalRules, ['holidays', identifier], val);
 							});
 
 							self.strategyRebuildMainCallflowRuleArray(strategyData);
