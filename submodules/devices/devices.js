@@ -977,15 +977,11 @@ define(function(require) {
 					templateDefaults,
 					deviceWithDefaults,
 					overrideDestArray
-				),
-				mergedDevice = _.merge(
-					{},
-					deviceData
 				);
 
 			return _.merge({
 				extra: {
-					allowVMCellphone: !_.get(mergedDevice, 'call_forward.require_keypress', true),
+					allowVMCellphone: !_.get(deviceData, 'call_forward.require_keypress', true),
 					availableCodecs: {
 						audio: [],
 						video: []
@@ -1097,8 +1093,8 @@ define(function(require) {
 							help: _.get(i18n, 'help')
 						};
 					}),
-					rtpMethod: _.get(mergedDevice, 'media.encryption.enforce_security', false)
-						? _.head(mergedDevice.media.encryption.methods)
+					rtpMethod: _.get(deviceData, 'media.encryption.enforce_security', false)
+						? _.head(deviceData.media.encryption.methods)
 						: '',
 					selectedCodecs: {
 						audio: [],
@@ -1112,7 +1108,7 @@ define(function(require) {
 							.value();
 					})
 				}
-			}, mergedDevice);
+			}, deviceData);
 		},
 
 		/**
