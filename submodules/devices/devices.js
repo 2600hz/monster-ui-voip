@@ -939,6 +939,19 @@ define(function(require) {
 		 */
 		devicesFormatData: function(data, dataList) {
 			var self = this,
+				getNormalizedProvisionEntriesForKeyType = _.partial(function(device, template, keyType) {
+					var iterate = _.get(template, [keyType, 'iterate'], 0),
+						entries = _.get(device, ['provision', keyType], {}),
+						getEntryValueOrDefault = _.partial(_.get, entries, _, {
+							type: 'none'
+						});
+
+					return _
+						.chain(iterate)
+						.range()
+						.map(getEntryValueOrDefault)
+						.value();
+				}, data.device, data.template),
 				keyActionsMod = _.get(
 					self.appFlags.devices.provisionerConfigFlags,
 					['brands', _.get(data.device, 'provision.endpoint_brand'), 'keyFunctions'],
@@ -959,44 +972,16 @@ define(function(require) {
 					}
 				},
 				deviceWithDefaults = self.devicesApplyDefaults(data.device),
-				deviceOverrides = {
-					provision: _
-						.chain(data.template)
-						.thru(self.getKeyTypes)
-						.map(function(type) {
-							return {
-								type: type,
-								data: _
-									.chain(data.template)
-									.get([type, 'iterate'], 0)
-									.range()
-									.map(function(index) {
-										return _.get(data.device, ['provision', type, index], {
-											type: 'none'
-										});
-									})
-									.value()
-							};
-						})
-						.keyBy('type')
-						.mapValues('data')
-						.value()
-				},
 				deviceData = _.mergeWith(
 					{},
 					templateDefaults,
 					deviceWithDefaults,
 					overrideDestArray
-				),
-				mergedDevice = _.merge(
-					{},
-					deviceData,
-					deviceOverrides
 				);
 
 			return _.merge({
 				extra: {
-					allowVMCellphone: !_.get(mergedDevice, 'call_forward.require_keypress', true),
+					allowVMCellphone: !_.get(deviceData, 'call_forward.require_keypress', true),
 					availableCodecs: {
 						audio: [],
 						video: []
@@ -1020,7 +1005,7 @@ define(function(require) {
 							.map(function(type) {
 								var camelCasedType = _.camelCase(type),
 									i18n = _.get(self.i18n.active().devices.popupSettings.keys, camelCasedType),
-									entries = _.get(mergedDevice, ['provision', type], []),
+									entries = getNormalizedProvisionEntriesForKeyType(type),
 									entriesCount = _.size(entries);
 
 								return _.merge({
@@ -1108,8 +1093,8 @@ define(function(require) {
 							help: _.get(i18n, 'help')
 						};
 					}),
-					rtpMethod: _.get(mergedDevice, 'media.encryption.enforce_security', false)
-						? _.head(mergedDevice.media.encryption.methods)
+					rtpMethod: _.get(deviceData, 'media.encryption.enforce_security', false)
+						? _.head(deviceData.media.encryption.methods)
 						: '',
 					selectedCodecs: {
 						audio: [],
@@ -1123,7 +1108,7 @@ define(function(require) {
 							.value();
 					})
 				}
-			}, mergedDevice);
+			}, deviceData);
 		},
 
 		/**
