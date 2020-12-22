@@ -12,7 +12,8 @@ define(function(require) {
 		subscribe: {
 			'voip.strategy.addOfficeHours': 'strategyAddOfficeHoursPopup',
 			'voip.strategy.render': 'strategyRender',
-			'auth.currentAccountUpdated': '_strategyOnCurrentAccountUpdated'
+			'auth.currentAccountUpdated': '_strategyOnCurrentAccountUpdated',
+			'voip.strategy.addEditOfficeHolidays': 'strategyAddEditOfficeHolidaysPopup'
 		},
 
 		weekdays: [
@@ -23,6 +24,30 @@ define(function(require) {
 			'friday',
 			'saturday',
 			'sunday'
+		],
+
+		ordinals: [
+			'first',
+			'second',
+			'third',
+			'fourth',
+			'fifth',
+			'last'
+		],
+
+		months: [
+			'january',
+			'february',
+			'march',
+			'april',
+			'may',
+			'june',
+			'july',
+			'august',
+			'september',
+			'october',
+			'november',
+			'december'
 		],
 
 		weekdayLabels: [
@@ -4106,6 +4131,90 @@ define(function(require) {
 			popup = monster.ui.dialog($template, {
 				autoScroll: false,
 				title: self.i18n.active().strategy.addOfficeHours.title
+			});
+		},
+
+		strategyAddEditOfficeHolidaysPopup: function(args) {
+			console.log(args);
+			var self = this,
+				callback = args.callback,
+				getListOfYears = function getListOfYears() {
+					var date = new Date(),
+						year = parseInt(date.getFullYear()),
+						totalYears = 3,
+						yearsArray = [];
+
+					while (totalYears >= 0) {
+						yearsArray.push(year);
+						year++;
+						totalYears--;
+					}
+
+					return yearsArray;
+				},
+				getListOfDates = function getListOfDates() {
+					var date = 0,
+						datesArray = [];
+
+					while (date < 31) {
+						date++;
+						datesArray.push(date);
+					}
+
+					return datesArray;
+				},
+				$template = $(self.getTemplate({
+					name: 'addEditOfficeHolidays',
+					data: {
+						months: _.map(
+							self.months,
+							_.partial(monster.util.tryI18n, self.i18n.active().strategy.holidays.months)
+						),
+						ordinals: _.map(
+							self.ordinals,
+							_.partial(monster.util.tryI18n, self.i18n.active().strategy.holidays.ordinals)
+						),
+						days: _.map(
+							self.weekdays,
+							_.partial(monster.util.tryI18n, self.i18n.active().strategy.holidays.days)
+						),
+						years: getListOfYears(),
+						dates: getListOfDates()
+					},
+					submodule: 'strategy'
+				})),
+				popup;
+
+			$template.find('.cancel').on('click', function(event) {
+				event.preventDefault();
+				popup.dialog('close');
+			});
+
+			$template.find('#date_type').on('change', function(event) {
+				event.preventDefault();
+
+				var $this = $(this),
+					className = $this.val();
+
+				$template
+					.find('.row-fluid')
+					.removeClass('selected');
+
+				$template
+					.find('.row-fluid.' + className)
+					.addClass('selected');
+			});
+
+			$template.on('submit', function(event) {
+				event.preventDefault();
+
+				console.log('submitting');
+			});
+
+			popup = monster.ui.dialog($template, {
+				autoScroll: false,
+				title: self.i18n.active().strategy.addEditOfficeHolidays.title,
+				dialogClass: 'monster-dialog holiday-add-edit-dialog'
 			});
 		}
 	};

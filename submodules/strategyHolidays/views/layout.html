@@ -25,9 +25,11 @@
 
 		<div class="controls">
 			<select class="years-list" name="year" id="year">
-				<option value="2020">
-					2020
+				{{#each years as |label|}}
+				<option value="{{label}}">
+					{{label}}
 				</option>
+				{{/each}}
 			</select>
 		</div>
 	</div>

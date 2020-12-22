@@ -77,7 +77,6 @@ define(function(require) {
 					submodule: 'strategyHours'
 				}));
 
-			console.log(intervals);
 			$container
 				.find('.element-content')
 					.empty()
@@ -116,7 +115,6 @@ define(function(require) {
 
 					_.forEach(data.days, function(day) {
 						_.forEach(day.intervals, function(interval, index) {
-							console.log(interval);
 							var $startPicker = $template.find('input[class*="' + day.id + '[' + index + '].start"]'),
 								$endPicker = $template.find('input[class*="' + day.id + '[' + index + '].end"]'),
 								intervals = day.intervals,

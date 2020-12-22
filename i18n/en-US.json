@@ -825,6 +825,25 @@
 				"overlappingHours": "Selected hours overlap existing hours."
 			}
 		},
+		"addEditOfficeHolidays": {
+			"title": "Add Holiday",
+			"labels": {
+				"addHoliday": "Add Holiday",
+				"holidayName": "Holiday Name",
+				"dateType": "Date Type",
+				"date": "Date",
+				"recurringAnnually": "Recurring Annually"
+			},
+			"dateType": {
+				"singleDate": "Single Date",
+				"dateRange": "Date Range",
+				"advancedDate": "Advanced Date"
+
+			},
+			"placeholders": {
+				"holidayName": "Holiday Name"
+			}
+		},
 		"noNumberHelp": "Note: Please add a Main Office Number to your account first. Once you add a main number, you will be able to set up Office Hours, Holidays and Incoming Call Handling (Call-Flow) for your office.",
 		"sectionTitles": {
 			"numbers": "Main Company Numbers",
@@ -917,6 +936,39 @@
 				"saturday": "Sat",
 				"sunday": "Sun"
 			},
+			"ordinals": {
+				"first": "First",
+				"second": "Second",
+				"third": "Third",
+				"fourth": "Fourth",
+				"fifth": "Fifth",
+				"last": "Last"
+			},
+			"months": {
+				"january": "Jan",
+				"february": "Feb",
+				"march": "Mar",
+				"april": "Apr",
+				"may": "May",
+				"june": "Jun",
+				"july": "Jul",
+				"august": "Aug",
+				"september": "Sep",
+				"october": "Oct",
+				"november": "Nov",
+				"december": "Dec"
+			},
+			"to": "to",
+			"dialogs": {
+				"delete": {
+					"title": "Delete Time Slot?",
+					"message": "Delete holiday \"{{variable}}\"? Deleting a holiday will permanently remove it.",
+					"buttons": {
+						"yes": "Yes, Delete Holiday",
+						"no": "Keep Time Slot"
+					}
+				}
+			},
 			"helpHolidays": "Do not forget to set the call routing for when your office is closed for the holidays! To set it up, go in the \"Incoming Call Handling\" section of this page, and select the \"Holidays\" tab."
 		},
 		"calls": {
@@ -969,37 +1021,6 @@
 		},
 		"open": "Open",
 		"closed": "Closed",
-		"weekdays": {
-			"monday": "Monday",
-			"tuesday": "Tuesday",
-			"wednesday": "Wednesday",
-			"thursday": "Thursday",
-			"friday": "Friday",
-			"saturday": "Saturday",
-			"sunday": "Sunday"
-		},
-		"ordinals": {
-			"first": "First",
-			"second": "Second",
-			"third": "Third",
-			"fourth": "Fourth",
-			"fifth": "Fifth",
-			"last": "Last"
-		},
-		"monthsShort": {
-			"january": "Jan",
-			"february": "Feb",
-			"march": "Mar",
-			"april": "Apr",
-			"may": "May",
-			"june": "Jun",
-			"july": "Jul",
-			"august": "Aug",
-			"september": "Sep",
-			"october": "Oct",
-			"november": "Nov",
-			"december": "Dec"
-		},
 		"callEntities": {
 			"qubicle": "Call Queues",
 			"user": "Users",
