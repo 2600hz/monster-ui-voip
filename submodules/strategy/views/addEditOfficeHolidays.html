@@ -2,13 +2,15 @@
 	<div class="form-content">
 		<div class="control-group">
 			<label class="control-label">
-				{{i18n.strategy.addEditOfficeHolidays.labels.holidayName}}
+				{{i18n.strategy.addEditOfficeHolidays.labels.name}}
 			</label>
-			<input id="holidayName" name="holidayName" type="text" placeholder="{{i18n.strategy.addEditOfficeHolidays.placeholders.holidayName}}" value="{{holidayName}}" class="form-control">
+			<input id="name" name="name" type="text" placeholder="{{i18n.strategy.addEditOfficeHolidays.placeholders.name}}" value="{{ame}}" class="form-control">
 		</div>
+		{{#monsterPanelText i18n.strategy.addEditOfficeHolidays.errors.noName "danger" "fill-width no-name-error"}}
+		{{/monsterPanelText}}
 		<div class="control-group">
 			{{#monsterCheckbox i18n.strategy.addEditOfficeHolidays.labels.recurringAnnually}}
-				<input type="checkbox" name="recurring">
+				<input type="checkbox" name="recurring" id="recurring">
 			{{/monsterCheckbox}}
 		</div>
 		<div class="control-group">
@@ -34,21 +36,21 @@
 				{{i18n.strategy.addEditOfficeHolidays.labels.date}}
 			</label>
 			<div class="row-fluid advanced-date selected">
-				<select id="month">
+				<select class="month">
 				{{#each months as |label|}}
 					<option value="{{label}}">
 						{{label}}
 					</option>
 				{{/each}}
 				</select>
-				<select id="ordinal">
+				<select class="ordinal">
 				{{#each ordinals as |label|}}
 					<option value="{{label}}">
 						{{label}}
 					</option>
 				{{/each}}
 				</select>
-				<select id="day">
+				<select class="day">
 				{{#each days as |label|}}
 					<option value="{{label}}">
 						{{label}}
@@ -57,7 +59,7 @@
 				</select>
 			</div>
 			<div class="row-fluid date-range">
-				<select id="start_month">
+				<select class="start_month">
 				{{#each months as |label|}}
 					<option value="{{label}}">
 						{{label}}
@@ -88,21 +90,21 @@
 				</select>
 			</div>
 			<div class="row-fluid single-date">
-				<select id="month">
+				<select class="month">
 				{{#each months as |label|}}
 					<option value="{{label}}">
 						{{label}}
 					</option>
 				{{/each}}
 				</select>
-				<select id="ordinal">
+				<select class="dates">
 				{{#each dates as |label|}}
 					<option value="{{label}}">
 						{{label}}
 					</option>
 				{{/each}}
 				</select>
-				<select id="year">
+				<select class="year">
 				{{#each years as |label|}}
 					<option value="{{label}}">
 						{{label}}

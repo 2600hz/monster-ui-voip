@@ -829,7 +829,7 @@
 			"title": "Add Holiday",
 			"labels": {
 				"addHoliday": "Add Holiday",
-				"holidayName": "Holiday Name",
+				"name": "Holiday Name",
 				"dateType": "Date Type",
 				"date": "Date",
 				"recurringAnnually": "Recurring Annually"
@@ -841,7 +841,10 @@
 
 			},
 			"placeholders": {
-				"holidayName": "Holiday Name"
+				"name": "Holiday Name"
+			},
+			"errors": {
+				"noName": "Please enter a name for this holiday"
 			}
 		},
 		"noNumberHelp": "Note: Please add a Main Office Number to your account first. Once you add a main number, you will be able to set up Office Hours, Holidays and Incoming Call Handling (Call-Flow) for your office.",
@@ -959,6 +962,10 @@
 				"december": "Dec"
 			},
 			"to": "to",
+			"empty": {
+				"title": "Your Office Holidays Are Empty",
+				"description": "Please use the Add holiday or Import Holidays buttons to enter holidays."
+			},
 			"dialogs": {
 				"delete": {
 					"title": "Delete Time Slot?",

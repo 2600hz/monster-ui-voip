@@ -4135,9 +4135,7 @@ define(function(require) {
 		},
 
 		strategyAddEditOfficeHolidaysPopup: function(args) {
-			console.log(args);
 			var self = this,
-				callback = args.callback,
 				getListOfYears = function getListOfYears() {
 					var date = new Date(),
 						year = parseInt(date.getFullYear()),
@@ -4190,11 +4188,35 @@ define(function(require) {
 				popup.dialog('close');
 			});
 
+			$template.find('#name').on('keyup', function(event) {
+				var $this = $(this),
+					isEmpty = _.isEmpty($this.val());
+
+				$template.find('.no-name-error')[isEmpty ? 'slideDown' : 'slideUp'](200);
+			});
+
+			$template.find('#recurring').on('change', function(event) {
+				var $this = $(this),
+					isChecked = $this.prop('checked'),
+					dateType = $template.find('#date_type').val(),
+					$singleDateYearElement = $template.find('.single-date .year');
+
+				if (dateType === 'single-date' && isChecked) {
+					$singleDateYearElement
+						.addClass('hide');
+				} else {
+					$singleDateYearElement
+						.removeClass('hide');
+				}
+			});
+
 			$template.find('#date_type').on('change', function(event) {
 				event.preventDefault();
 
 				var $this = $(this),
-					className = $this.val();
+					className = $this.val(),
+					isRecurringChecked = $template.find('#recurring').prop('checked'),
+					$singleDateYearElement = $template.find('.single-date .year');
 
 				$template
 					.find('.row-fluid')
@@ -4203,12 +4225,31 @@ define(function(require) {
 				$template
 					.find('.row-fluid.' + className)
 					.addClass('selected');
+
+				if (className === 'single-date' && isRecurringChecked) {
+					$singleDateYearElement
+						.addClass('hide');
+				} else {
+					$singleDateYearElement
+						.removeClass('hide');
+				}
 			});
 
 			$template.on('submit', function(event) {
 				event.preventDefault();
 
-				console.log('submitting');
+				var formData = monster.ui.getFormData($template.get(0));
+
+				if (!monster.ui.valid($template)) {
+					return;
+				}
+
+				if (_.isEmpty(formData.name)) {
+					$template.find('.no-name-error').slideDown(200);
+					return;
+				}
+
+				popup.dialog('close');
 			});
 
 			popup = monster.ui.dialog($template, {

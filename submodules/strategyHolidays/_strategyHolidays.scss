@@ -121,6 +121,50 @@
 					padding: 0 10px;
 					cursor: pointer;
 				}
+
+				&.footable-empty {
+					display: none;
+				}
+			}
+		}
+	}
+
+	.custom-footable-empty {
+		color: $woodsmoke;
+		display: none;
+		border-radius: 2px;
+		border: 1px solid $mischka;
+		border-top: none;
+		text-align: center;
+
+		&.show {
+			display: block;
+		}
+
+		svg {
+			color: $manatee;
+			height: 1.5rem;
+			width: 1.5rem;
+			cursor: default;
+			margin-right: 12px;
+		}
+
+		.title-row {
+			padding: 44px 0;
+			display: inline-flex;
+			align-items: center;
+
+			span {
+				font-size: 16px;
+				font-weight: 600;
+			}
+		}
+
+		.description-row {
+			margin-bottom: 40px;
+
+			.description {
+				font-size: 14px;
 			}
 		}
 	}

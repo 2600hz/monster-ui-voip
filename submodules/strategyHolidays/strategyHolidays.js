@@ -66,7 +66,6 @@ define(function(require) {
 					submodule: 'strategyHolidays'
 				}));
 
-
 			$container
 				.find('.element-content')
 					.empty()
@@ -79,7 +78,21 @@ define(function(require) {
 				paging: {
 					enabled: false
 				},
-				empty: "There are no results"
+				on: {
+					'postdraw.ft.table': function(event, ft) {
+						var dataArray = ft.rows.array;
+
+						if (_.size(dataArray) < 1) {
+							template
+								.find('.custom-footable-empty')
+									.addClass('show');
+						} else {
+							template
+								.find('.custom-footable-empty')
+									.removeClass('show');
+						}
+					}
+				}
 			});
 
 			self.strategyHolidaysListingRender($container, holidaysData);
@@ -93,12 +106,11 @@ define(function(require) {
 				table = footable.get('#holidays_list_table'),
 				holidaysDataArray = [],
 				initTemplate = function initTemplate(data) {
-						var dateToDisplay = function dateToDisplay($container, data) {
-							var getNumberWithOrdinal = function getNumberWithOrdinal(n) {
-								var s = ['th', 'st', 'nd', 'rd'],
-									v = n % 100;
-
-									return n + (s[(v - 20) % 10] || s[v] || s[0]);
+					var dateToDisplay = function dateToDisplay($container, data) {
+							var getNumberWithOrdinal = function getNumberWithOrdinal(date) {
+									var ordinal = ['th', 'st', 'nd', 'rd'],
+										v = date % 100;
+									return date + (ordinal[(v - 20) % 10] || ordinal[v] || ordinal[0]);
 								},
 								holidayData = data.holidayData,
 								months = self.appFlags.strategyHolidays.months,
@@ -149,6 +161,7 @@ define(function(require) {
 				};
 
 			_.each(holidaysData, function(value, key) {
+				console.log(value);
 				holidaysDataArray.push(initTemplate(value));
 			});
 
@@ -345,7 +358,7 @@ define(function(require) {
 						});
 					});
 				}
-			});	
+			});
 		},
 
 		strategyHolidaysListingBindEvents: function(parent, template) {
@@ -362,7 +375,7 @@ define(function(require) {
 					var holidayName = $this.parents('tr').find('td:first-child').html();
 
 					self.strategyHolidaysDeleteDialogRender(parent,
-						data = {
+						{
 							holidayName: holidayName,
 							holidayId: id
 						}
@@ -401,9 +414,13 @@ define(function(require) {
 			template.find('.delete').on('click', function(event) {
 				event.preventDefault();
 
-				parent
-					.find('#holidays_list_table tbody tr[data-id="' + holidayId + '"]')
-					.remove();
+				var $this = $(this),
+					table = footable.get('#holidays_list_table'),
+					$row = parent.find('#holidays_list_table tbody tr[data-id="' + holidayId + '"]'),
+					rowId = $row.index(),
+					tableRows = table.rows.all;
+
+				tableRows[rowId].delete();
 
 				popup.dialog('close').remove();
 			});
@@ -453,7 +470,7 @@ define(function(require) {
 						}
 					}
 
-					holidaysData.push({holidayType: holidayType, holidayData: holidayData});
+					holidaysData.push({ holidayType: holidayType, holidayData: holidayData });
 				}
 			});
 
@@ -461,42 +478,42 @@ define(function(require) {
 		},
 
 		strategyDeleteRuleSetAndRules: function(id, globalCallback) {
-                        var self = this;
+			var self = this;
 
-                        self.strategyGetRuleSet(id, function(data) {
-                                var parallelRequests = {};
+			self.strategyGetRuleSet(id, function(data) {
+				var parallelRequests = {};
 
-                                _.each(data.temporal_rules, function(id) {
-                                        parallelRequests[id] = function(callback) {
-                                                self.strategyDeleteHoliday(id, function() {
-                                                        callback && callback(null, {});
-                                                });
-                                        };
-                                });
+				_.each(data.temporal_rules, function(id) {
+					parallelRequests[id] = function(callback) {
+						self.strategyDeleteHoliday(id, function() {
+							callback && callback(null, {});
+						});
+					};
+				});
 
-                                monster.parallel(parallelRequests, function(err, results) {
-                                        self.strategyDeleteRuleSet(id, function(data) {
-                                                globalCallback && globalCallback(data);
-                                        });
-                                });
-                        });
-                },
+				monster.parallel(parallelRequests, function(err, results) {
+					self.strategyDeleteRuleSet(id, function(data) {
+						globalCallback && globalCallback(data);
+					});
+				});
+			});
+		},
 
 		strategyDeleteRuleSet: function(id, callback) {
-                        var self = this;
+			var self = this;
 
-                        self.callApi({
-                                resource: 'temporalSet.delete',
-                                data: {
-                                        accountId: self.accountId,
-                                        setId: id
-                                },
-                                success: function(data, status) {
-                                        callback && callback(data.data);
-                                }
-                        });
-                },
-	
+			self.callApi({
+				resource: 'temporalSet.delete',
+				data: {
+					accountId: self.accountId,
+					setId: id
+				},
+				success: function(data, status) {
+					callback && callback(data.data);
+				}
+			});
+		},
+
 		strategyCleanUpdateHoliday: function(data, callback) {
 			var self = this,
 				updateHoliday = function() {
@@ -560,10 +577,10 @@ define(function(require) {
 
 				for (var loopMonth = firstMonthLoop; (loopMonth !== toMonth && (loopMonth - 12) !== toMonth); loopMonth++) {
 					if (loopMonth === 13) { loopMonth = 1; }
-						rulesToCreate.push(getMonthRule(junkName, loopMonth, 1, 31));
-					}
+					rulesToCreate.push(getMonthRule(junkName, loopMonth, 1, 31));
+				}
 
-					rulesToCreate.push(getMonthRule(junkName, toMonth, 1, toDay));
+				rulesToCreate.push(getMonthRule(junkName, toMonth, 1, toDay));
 			} else {
 				rulesToCreate.push(getMonthRule(junkName, fromMonth, fromDay, toDay));
 			}
