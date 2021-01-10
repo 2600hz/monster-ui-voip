@@ -95,6 +95,8 @@ define(function(require) {
 		strategyHoursListingRender: function($container, intervals) {
 			var self = this,
 				days = self.weekdays,
+				meta = self.appFlags.strategyHours.intervals,
+				timepickerStep = meta.timepicker.step,
 				templateData = {
 					isEmpty: _.every(intervals, _.isEmpty),
 					templates: _.keys(self.appFlags.strategyHours.templatePresets),
@@ -124,20 +126,24 @@ define(function(require) {
 						_.forEach(day.intervals, function(interval, index) {
 							var $startPicker = $template.find('input[class*="' + day.id + '[' + index + '].start"]'),
 								$endPicker = $template.find('input[class*="' + day.id + '[' + index + '].end"]'),
-								intervals = day.intervals,
-								previousBound = intervals[index - 1] ? intervals[index - 1].end : intervalLowerBound,
-								nextBound = intervals[index + 1] ? intervals[index + 1].start : intervalUpperBound;
+								endTime = interval.end,
+								endRemainder = endTime % timepickerStep,
+								startPickerMaxTime = endTime - endRemainder - (endRemainder > 0 ? 0 : timepickerStep),
+								startTime = interval.start,
+								startRemainder = startTime % timepickerStep,
+								endPickerMinTime = startTime - startRemainder + timepickerStep;
 
 							monster.ui.timepicker($startPicker, {
-								minTime: previousBound,
-								maxTime: interval.end - timepickerStep
+								minTime: intervalLowerBound,
+								maxTime: startPickerMaxTime
 							});
+							$startPicker.timepicker('setTime', startTime);
+
 							monster.ui.timepicker($endPicker, {
-								minTime: interval.start + timepickerStep,
-								maxTime: nextBound
+								minTime: endPickerMinTime,
+								maxTime: intervalUpperBound
 							});
-							$startPicker.timepicker('setTime', interval.start);
-							$endPicker.timepicker('setTime', interval.end);
+							$endPicker.timepicker('setTime', endTime);
 						});
 					});
 
@@ -244,9 +250,115 @@ define(function(require) {
 		strategyHoursListingBindEvents: function(parent, template) {
 			var self = this,
 				meta = self.appFlags.strategyHours.intervals,
+				timepickerStep = meta.timepicker.step,
+				updateEndPickerMinTime = function(event) {
+					event.preventDefault();
+
+					var $startPicker = $(this),
+						$endPicker = $startPicker.siblings('input'),
+						startSeconds = $startPicker.timepicker('getSecondsFromMidnight'),
+						remainder = startSeconds % timepickerStep;
+
+					$endPicker.timepicker('option', 'minTime',
+						startSeconds - remainder + timepickerStep
+					);
+				},
+				updateStartPickerMaxTime = function(event) {
+					event.preventDefault();
+
+					var $endPicker = $(this),
+						$startPicker = $endPicker.siblings('input'),
+						endSeconds = $endPicker.timepicker('getSecondsFromMidnight'),
+						remainder = endSeconds % timepickerStep;
+
+					$startPicker.timepicker('option', 'maxTime',
+						endSeconds - remainder - (remainder > 0 ? 0 : timepickerStep)
+					);
+				},
 				intervalStep = meta.step,
-				intervalLowerBound = meta.min,
-				intervalUpperBound = meta.max;
+				enforceStartPickerMax = function(event) {
+					event.preventDefault();
+
+					var $startPicker = $(this),
+						$endPicker = $startPicker.siblings('input'),
+						startSeconds = $startPicker.timepicker('getSecondsFromMidnight'),
+						endSeconds = $endPicker.timepicker('getSecondsFromMidnight'),
+						isValidTime = startSeconds < endSeconds;
+
+					if (isValidTime) {
+						return;
+					}
+
+					$endPicker
+						.timepicker('setTime', endSeconds + intervalStep)
+						.change();
+				},
+				enforceEndPickerMin = function(event) {
+					event.preventDefault();
+
+					var $endPicker = $(this),
+						$startPicker = $endPicker.siblings('input'),
+						endSeconds = $endPicker.timepicker('getSecondsFromMidnight'),
+						startSeconds = $startPicker.timepicker('getSecondsFromMidnight'),
+						isValidTime = endSeconds > startSeconds;
+
+					if (isValidTime) {
+						return;
+					}
+
+					$startPicker
+						.timepicker('setTime', startSeconds - intervalStep)
+						.change();
+				},
+				updatePrevIntervalOverlaps = function(event) {
+					event.preventDefault();
+
+					var $picker = $(this),
+						seconds = $picker.timepicker('getSecondsFromMidnight'),
+						$interval = $picker.parents('.interval'),
+						$prevIntervals = $interval.prevAll('.interval');
+
+					$.each($prevIntervals, function() {
+						var $prevInterval = $(this),
+							$startPicker = $prevInterval.find('input.ui-timepicker-input[name$=".start"]'),
+							$endPicker = $startPicker.siblings('input'),
+							startSeconds = $startPicker.timepicker('getSecondsFromMidnight'),
+							endSeconds = $endPicker.timepicker('getSecondsFromMidnight');
+
+						if (seconds <= startSeconds) {
+							triggerDeleteInterval($prevInterval);
+						} else if (seconds < endSeconds) {
+							$endPicker.timepicker('setTime', seconds);
+						}
+					});
+				},
+				updateNextIntervalOverlaps = function(event) {
+					event.preventDefault();
+
+					var $picker = $(this),
+						seconds = $picker.timepicker('getSecondsFromMidnight'),
+						$interval = $picker.parents('.interval'),
+						$nextIntervals = $interval.nextAll('.interval');
+
+					$.each($nextIntervals, function() {
+						var $nextInterval = $(this),
+							$startPicker = $nextInterval.find('input.ui-timepicker-input[name$=".start"]'),
+							$endPicker = $startPicker.siblings('input'),
+							startSeconds = $startPicker.timepicker('getSecondsFromMidnight'),
+							endSeconds = $endPicker.timepicker('getSecondsFromMidnight');
+
+						if (seconds >= endSeconds) {
+							triggerDeleteInterval($nextInterval);
+						} else if (seconds > startSeconds) {
+							$startPicker.timepicker('setTime', seconds);
+						}
+					});
+				},
+				triggerDeleteInterval = function($interval) {
+					$interval
+						.find('.delete-interval')
+							.click();
+				};
 
 			template.on('click', '.office-hours-nav .nav-item:not(.active):not(.disabled)', function(event) {
 				var $this = $(this),
@@ -275,38 +387,14 @@ define(function(require) {
 				self.strategyHoursListingRender(parent, self.appFlags.strategyHours.templatePresets[option]);
 			});
 
-			template.on('change', 'input.ui-timepicker-input', function(event) {
-				event.preventDefault();
+			template.on('change', 'input.ui-timepicker-input[name$=".start"]', enforceStartPickerMax);
+			template.on('change', 'input.ui-timepicker-input[name$=".end"]', enforceEndPickerMin);
 
-				var $picker = $(this),
-					seconds = $picker.timepicker('getSecondsFromMidnight'),
-					$boundPicker = $picker.siblings('input'),
-					isFrom = _.endsWith($picker.prop('name'), '.start'),
-					method = isFrom ? 'minTime' : 'maxTime',
-					newTime = isFrom ? seconds + intervalStep : seconds - intervalStep;
+			template.on('change', 'input.ui-timepicker-input[name$=".start"]', updateEndPickerMinTime);
+			template.on('change', 'input.ui-timepicker-input[name$=".end"]', updateStartPickerMaxTime);
 
-				$boundPicker.timepicker('option', method, newTime);
-			});
-
-			template.on('change', 'input.ui-timepicker-input', function(event) {
-				event.preventDefault();
-
-				var $picker = $(this),
-					seconds = $picker.timepicker('getSecondsFromMidnight'),
-					$interval = $picker.parents('.interval'),
-					isFrom = _.endsWith($picker.prop('name'), '.start'),
-					$boundPicker = isFrom
-						? $interval.prev().find('input[name$=".end"]')
-						: $interval.next().find('input[name$=".start"]'),
-					isExtremity = !$boundPicker.is(':empty'),
-					method = isFrom ? 'maxTime' : 'minTime';
-
-				$boundPicker.timepicker('option', method, seconds);
-
-				if (isExtremity) {
-					$picker.timepicker('option', isFrom ? 'minTime' : 'maxTime', isFrom ? intervalLowerBound : intervalUpperBound);
-				}
-			});
+			template.on('change', 'input.ui-timepicker-input[name$=".start"]', updatePrevIntervalOverlaps);
+			template.on('change', 'input.ui-timepicker-input[name$=".end"]', updateNextIntervalOverlaps);
 
 			template.on('click', '.office-hours .delete-interval', function() {
 				var $this = $(this),
@@ -314,17 +402,12 @@ define(function(require) {
 					$intervals = $interval.parents('.intervals'),
 					$dayContainer = $interval.parents('.office-hours'),
 					$navItems = template.find('.office-hours-nav .nav-item'),
-					day = $dayContainer.data('day'),
-					$prevPicker = $interval.prev().find('input[name$=".end"]'),
-					$nextPicker = $interval.next().find('input[name$=".start"]');
+					day = $dayContainer.data('day');
 
 				$interval.slideUp(200, function() {
 					$interval.remove();
 
 					monster.pub('voip.strategyHours.listing.onUpdate', parent);
-
-					$prevPicker.trigger('change');
-					$nextPicker.trigger('change');
 
 					if ($intervals.is(':empty')) {
 						$dayContainer.slideUp(200, function() {
@@ -399,7 +482,7 @@ define(function(require) {
 					while (pointer < intervals.length - 1) {
 						var current = intervals[pointer],
 							nextIndex = _.findIndex(intervals, function(interval, index) {
-								var isNonLinear = intervals[index - 1].end + step < interval.start,
+								var isNonLinear = intervals[index - 1].end < interval.start,
 									isDifferentType = !_.isEqual(interval.type, current.type);
 
 								return isNonLinear || isDifferentType;
