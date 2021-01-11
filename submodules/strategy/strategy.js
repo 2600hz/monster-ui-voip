@@ -4321,7 +4321,14 @@ define(function(require) {
 
 		strategyAddOfficeHoursPopup: function(args) {
 			var self = this,
-				meta = _.pick(self.appFlags.strategyHours.intervals, ['max', 'unit', 'step']),
+				meta = _.pick(self.appFlags.strategyHours.intervals, [
+					'max',
+					'min',
+					'unit',
+					'step',
+					'timepicker'
+				]),
+				timepickerStep = meta.timepicker.step,
 				existing = args.existing,
 				callback = args.callback,
 				$template = $(self.getTemplate({
@@ -4336,6 +4343,12 @@ define(function(require) {
 				})),
 				$startTimepicker = $template.find('.start-time'),
 				$endTimepicker = $template.find('.end-time'),
+				endTime = 3600 * 17,
+				endRemainder = endTime % timepickerStep,
+				startPickerMaxTime = endTime - endRemainder - (endRemainder > 0 ? 0 : timepickerStep),
+				startTime = 3600 * 9,
+				startRemainder = startTime % timepickerStep,
+				endPickerMinTime = startTime - startRemainder + timepickerStep,
 				popup;
 
 			$template.find('input[name="days[]"]').on('change', function(event) {
@@ -4348,40 +4361,108 @@ define(function(require) {
 				$template.find('.no-days-error')[atLeastOneChecked ? 'slideUp' : 'slideDown'](200);
 			});
 
-			monster.ui.timepicker($startTimepicker, _.merge({
-				useSelect: true,
+			monster.ui.timepicker($startTimepicker, {
+				listWidth: 1,
 				minTime: meta.min,
-				maxTime: meta.max - meta.step
-			}));
-			monster.ui.timepicker($endTimepicker, _.merge({
-				useSelect: true,
-				minTime: meta.step,
-				maxTime: meta.max
-			}));
-			$endTimepicker.timepicker('setTime', meta.max);
+				maxTime: startPickerMaxTime
+			});
+			$startTimepicker.timepicker('setTime', startTime);
 
-			$startTimepicker.on('changeTime', function() {
+			monster.ui.timepicker($endTimepicker, {
+				listWidth: 1,
+				minTime: endPickerMinTime,
+				maxTime: meta.max
+			});
+			$endTimepicker.timepicker('setTime', endTime);
+
+			$startTimepicker.on('change', function(event) {
+				event.preventDefault();
+
+				var startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
+					isValidTime = startSeconds < meta.max;
+
+				if (isValidTime) {
+					return;
+				}
+
+				$startTimepicker
+					.timepicker('setTime', meta.max - meta.step);
+			});
+
+			$endTimepicker.on('change', function(event) {
+				event.preventDefault();
+
+				var endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight'),
+					isValidTime = endSeconds > meta.min;
+
+				if (isValidTime) {
+					return;
+				}
+
+				$endTimepicker
+					.timepicker('setTime', meta.min + meta.step);
+			});
+
+			$startTimepicker.on('change', function() {
 				$template.find('.overlapping-hours-error').slideUp(200);
 
 				var startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
-					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight');
+					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight'),
+					remainder = startSeconds % timepickerStep;
 
-				$endTimepicker.timepicker('option', 'minTime', startSeconds + meta.step);
+				$endTimepicker.timepicker('option', 'minTime',
+					startSeconds - remainder + timepickerStep
+				);
+
 				if (!_.isNull(endSeconds)) {
 					$endTimepicker.timepicker('setTime', endSeconds);
 				}
 			});
 
-			$endTimepicker.on('changeTime', function() {
+			$endTimepicker.on('change', function() {
 				$template.find('.overlapping-hours-error').slideUp(200);
 
 				var startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
-					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight');
+					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight'),
+					remainder = endSeconds % timepickerStep;
 
-				$startTimepicker.timepicker('option', 'maxTime', endSeconds - meta.step);
+				$startTimepicker.timepicker('option', 'maxTime',
+					endSeconds - remainder - (remainder > 0 ? 0 : timepickerStep)
+				);
+
 				if (!_.isNull(endSeconds)) {
 					$startTimepicker.timepicker('setTime', startSeconds);
 				}
+			});
+
+			$startTimepicker.on('change', function(event) {
+				event.preventDefault();
+
+				var startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
+					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight'),
+					isValidTime = startSeconds < endSeconds;
+
+				if (isValidTime) {
+					return;
+				}
+
+				$endTimepicker
+					.timepicker('setTime', endSeconds + meta.step);
+			});
+
+			$endTimepicker.on('change', function(event) {
+				event.preventDefault();
+
+				var endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight'),
+					startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
+					isValidTime = endSeconds > startSeconds;
+
+				if (isValidTime) {
+					return;
+				}
+
+				$startTimepicker
+					.timepicker('setTime', startSeconds - meta.step);
 			});
 
 			$template.find('.cancel').on('click', function(event) {

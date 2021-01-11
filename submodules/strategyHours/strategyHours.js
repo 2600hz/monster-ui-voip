@@ -95,8 +95,6 @@ define(function(require) {
 		strategyHoursListingRender: function($container, intervals) {
 			var self = this,
 				days = self.weekdays,
-				meta = self.appFlags.strategyHours.intervals,
-				timepickerStep = meta.timepicker.step,
 				templateData = {
 					isEmpty: _.every(intervals, _.isEmpty),
 					templates: _.keys(self.appFlags.strategyHours.templatePresets),
@@ -134,12 +132,14 @@ define(function(require) {
 								endPickerMinTime = startTime - startRemainder + timepickerStep;
 
 							monster.ui.timepicker($startPicker, {
+								listWidth: 1,
 								minTime: intervalLowerBound,
 								maxTime: startPickerMaxTime
 							});
 							$startPicker.timepicker('setTime', startTime);
 
 							monster.ui.timepicker($endPicker, {
+								listWidth: 1,
 								minTime: endPickerMinTime,
 								maxTime: intervalUpperBound
 							});
