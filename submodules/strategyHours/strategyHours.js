@@ -31,6 +31,8 @@ define(function(require) {
 
 		appFlags: {
 			strategyHours: {
+				secondsInMinute: 60,
+				minutesInHour: 60,
 				intervals: {
 					min: 0,
 					max: 86400,
@@ -200,16 +202,42 @@ define(function(require) {
 
 				var weekdays = self.weekdays,
 					meta = self.appFlags.strategyHours.intervals,
+					secondsInMinute = self.appFlags.strategyHours.secondsInMinute,
+					minutesInHour = self.appFlags.strategyHours.minutesInHour,
 					formatIntervalsToCsv = function(intervals, index) {
 						return _.map(intervals, function(interval) {
 							return {
 								day: weekdays[index],
-								start: interval.start / meta.unit,
-								end: interval.end / meta.unit,
+								start: getHumanReadableTime(interval.start),
+								end: getHumanReadableTime(interval.end),
 								type: interval.type
 							};
 						});
 					},
+					secondsToHours = _.partial(_.reduce, [
+						secondsInMinute,
+						minutesInHour
+					], _.divide),
+					mod = function(value, modulo) {
+						return value % modulo;
+					},
+					secondsToRemainingMinutes = _.flow(
+						_.partial(_.divide, _, secondsInMinute),
+						_.partial(mod, _, minutesInHour)
+					),
+					toTwoDigits = _.partial(_.padStart, _, 2, '0'),
+					parseHoursMinutes = _.over([
+						secondsToHours,
+						secondsToRemainingMinutes
+					]),
+					getHumanReadableTime = _.flow(
+						parseHoursMinutes,
+						_.partial(_.map, _, _.flow(
+							_.unary(_.floor),
+							toTwoDigits
+						)),
+						_.partial(_.join, _, ':')
+					),
 					getBlobFromCsv = function(csv) {
 						return new Blob([csv], {
 							type: 'text/csv;chartset=utf-8'
@@ -555,10 +583,30 @@ define(function(require) {
 					_.toLower
 				),
 				parseTime = function(time) {
-					return time <= 24 ? time * meta.unit : time;
+					var modifiers = [
+						hoursToSeconds,
+						minutesToSeconds
+					];
+
+					return _
+						.chain(time)
+						.split(':')
+						.map(_.toNumber)
+						.slice(0, 2)
+						.map(function(value, index) {
+							return modifiers[index](value);
+						})
+						.sum()
+						.value();
 				},
+				minutesInHour = self.appFlags.strategyHours.minutesInHour,
+				secondsInMinute = self.appFlags.strategyHours.secondsInMinute,
+				hoursToSeconds = _.partial(_.reduce, [
+					minutesInHour,
+					secondsInMinute
+				], _.multiply),
+				minutesToSeconds = _.partial(_.multiply, secondsInMinute),
 				sanitizeTime = _.flow(
-					_.toNumber,
 					parseTime,
 					_.floor
 				),
