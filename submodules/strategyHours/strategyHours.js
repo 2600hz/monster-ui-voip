@@ -141,7 +141,7 @@ define(function(require) {
 							monster.ui.timepicker($endPicker, {
 								listWidth: 1,
 								minTime: endPickerMinTime,
-								maxTime: intervalUpperBound
+								maxTime: intervalUpperBound - timepickerStep
 							});
 							$endPicker.timepicker('setTime', endTime);
 						});
@@ -283,15 +283,17 @@ define(function(require) {
 						$endPicker = $startPicker.siblings('input'),
 						startSeconds = $startPicker.timepicker('getSecondsFromMidnight'),
 						endSeconds = $endPicker.timepicker('getSecondsFromMidnight'),
-						isValidTime = startSeconds < endSeconds;
+						isBumping = startSeconds >= endSeconds,
+						isOverMax = (startSeconds + intervalStep) >= meta.max;
 
-					if (isValidTime) {
-						return;
+					if (isBumping && isOverMax) {
+						$startPicker
+							.timepicker('setTime', endSeconds - intervalStep);
+					} else if (isBumping) {
+						$endPicker
+							.timepicker('setTime', startSeconds + intervalStep)
+							.change();
 					}
-
-					$endPicker
-						.timepicker('setTime', endSeconds + intervalStep)
-						.change();
 				},
 				enforceEndPickerMin = function(event) {
 					event.preventDefault();
@@ -300,15 +302,20 @@ define(function(require) {
 						$startPicker = $endPicker.siblings('input'),
 						endSeconds = $endPicker.timepicker('getSecondsFromMidnight'),
 						startSeconds = $startPicker.timepicker('getSecondsFromMidnight'),
-						isValidTime = endSeconds > startSeconds;
+						isUnderMin = endSeconds === meta.min,
+						isBumping = endSeconds <= startSeconds;
 
-					if (isValidTime) {
-						return;
+					if (isUnderMin) {
+						$endPicker
+							.timepicker('setTime', meta.min + intervalStep);
+						$startPicker
+							.timepicker('setTime', meta.min)
+							.change();
+					} else if (isBumping) {
+						$startPicker
+							.timepicker('setTime', endSeconds - intervalStep)
+							.change();
 					}
-
-					$startPicker
-						.timepicker('setTime', startSeconds - intervalStep)
-						.change();
 				},
 				updatePrevIntervalOverlaps = function(event) {
 					event.preventDefault();
