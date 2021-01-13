@@ -1841,114 +1841,6 @@ define(function(require) {
 			});
 		},
 
-		strategyBuildHolidayRule: function(container, rules) {
-			var self = this,
-				$this = $(container),
-				name = $this.find('.name').val().trim(),
-				month = parseInt($this.find('.month.from :selected').val()),
-				toMonth = parseInt($this.find('.month.to :selected').val()),
-				fromDay = parseInt($this.find('.day.from :selected').val()),
-				toDay = parseInt($this.find('.day.to :selected').val()),
-				ordinal = $this.find('.ordinal :selected').val(),
-				wday = $this.find('.wday :selected').val(),
-				id = $this.data('id'),
-				type = $this.data('type'),
-				holidayRule = {};
-
-			if (!name || _.keys(rules).indexOf(name) >= 0) {
-				holidayRule = false;
-			} else if (toMonth && month !== toMonth) {
-				holidayRule = {
-					isRange: true,
-					name: name,
-					fromDay: fromDay,
-					fromMonth: month,
-					toDay: toDay,
-					toMonth: toMonth
-				};
-			} else {
-				holidayRule = {
-					name: name,
-					cycle: 'yearly',
-					interval: 1,
-					month: month,
-					type: 'main_holidays'
-				};
-
-				if (fromDay) {
-					var firstDay = fromDay;
-					holidayRule.days = [firstDay];
-					if (toDay) {
-						for (var day = firstDay + 1; day <= toDay; day++) {
-							holidayRule.days.push(day);
-						}
-					}
-				} else {
-					holidayRule.ordinal = ordinal;
-					holidayRule.wdays = [wday];
-				}
-			}
-
-			if (id) {
-				holidayRule.id = id;
-			}
-
-			holidayRule.extra = {
-				oldType: type
-			};
-
-			return holidayRule;
-		},
-
-		strategyUpdateHoliday: function(data, callback) {
-			var self = this;
-
-			if (data.id) {
-				self.callApi({
-					resource: 'temporalRule.update',
-					data: {
-						accountId: self.accountId,
-						ruleId: data.id,
-						data: data
-					},
-					success: function(data, status) {
-						callback(data.data);
-					}
-				});
-			} else {
-				self.callApi({
-					resource: 'temporalRule.create',
-					data: {
-						accountId: self.accountId,
-						data: data
-					},
-					success: function(data, status) {
-						callback(data.data);
-					}
-				});
-			}
-		},
-
-		strategyDeleteHoliday: function(id, callback) {
-			var self = this;
-
-			self.callApi({
-				resource: 'temporalRule.delete',
-				data: {
-					accountId: self.accountId,
-					ruleId: id,
-					generateError: false
-				},
-				success: function(data, status) {
-					callback(data.data);
-				},
-				// Sometimes we'll try to delete a time of day which no longer exist, but still need to execute the callback
-				error: function(data, status) {
-					callback(data.data);
-				}
-			});
-		},
-
 		strategyCallsBindEvents: function(container, strategyData) {
 			var self = this;
 
@@ -4136,6 +4028,7 @@ define(function(require) {
 
 		strategyAddEditOfficeHolidaysPopup: function(args) {
 			var self = this,
+				callback = args.callback,
 				getListOfYears = function getListOfYears() {
 					var date = new Date(),
 						year = parseInt(date.getFullYear()),
@@ -4172,10 +4065,7 @@ define(function(require) {
 							self.ordinals,
 							_.partial(monster.util.tryI18n, self.i18n.active().strategy.holidays.ordinals)
 						),
-						days: _.map(
-							self.weekdays,
-							_.partial(monster.util.tryI18n, self.i18n.active().strategy.holidays.days)
-						),
+						days: self.i18n.active().strategy.holidays.days,
 						years: getListOfYears(),
 						dates: getListOfDates()
 					},
@@ -4199,9 +4089,9 @@ define(function(require) {
 				var $this = $(this),
 					isChecked = $this.prop('checked'),
 					dateType = $template.find('#date_type').val(),
-					$singleDateYearElement = $template.find('.single-date .year');
+					$singleDateYearElement = $template.find('.single .year');
 
-				if (dateType === 'single-date' && isChecked) {
+				if (dateType === 'single' && isChecked) {
 					$singleDateYearElement
 						.addClass('hide');
 				} else {
@@ -4216,7 +4106,7 @@ define(function(require) {
 				var $this = $(this),
 					className = $this.val(),
 					isRecurringChecked = $template.find('#recurring').prop('checked'),
-					$singleDateYearElement = $template.find('.single-date .year');
+					$singleDateYearElement = $template.find('.single .year');
 
 				$template
 					.find('.row-fluid')
@@ -4226,7 +4116,7 @@ define(function(require) {
 					.find('.row-fluid.' + className)
 					.addClass('selected');
 
-				if (className === 'single-date' && isRecurringChecked) {
+				if (className === 'single' && isRecurringChecked) {
 					$singleDateYearElement
 						.addClass('hide');
 				} else {
@@ -4238,7 +4128,12 @@ define(function(require) {
 			$template.on('submit', function(event) {
 				event.preventDefault();
 
-				var formData = monster.ui.getFormData($template.get(0));
+				var formData = monster.ui.getFormData($template.get(0)),
+					$optionDiv = $template.find('.row-fluid.' + formData.type + ' select:not(.hide)');
+					holidayData = {
+						id: 'new-' + Date.now()
+					},
+					endDate = '';
 
 				if (!monster.ui.valid($template)) {
 					return;
@@ -4249,7 +4144,30 @@ define(function(require) {
 					return;
 				}
 
+				_.each($optionDiv, function(element) {
+					var $element = $(element),
+						elementName = $element.data('name'),
+						value = _.includes(['ordinal', 'wday'], elementName)
+							? _.lowerCase($element.val())
+							: parseInt($element.val());
+
+					holidayData[elementName] = _.includes(['fromMonth', 'toMonth'], elementName)
+						? value + 1
+						: value;
+
+				});
+
+				if (!formData.recurring && formData.type !== 'single') {
+					holidayData.endYear = args.yearSelected;
+				}
+
 				popup.dialog('close');
+
+				callback(null, {
+					holidayType: formData.type,
+					holidayData: _.assign({}, holidayData, formData),
+					modified: true
+				});
 			});
 
 			popup = monster.ui.dialog($template, {

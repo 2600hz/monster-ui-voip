@@ -19,13 +19,13 @@
 			</label>
 			<div class="controls">
 				<select name="type" id="date_type">
-					<option value="advanced-date">
+					<option value="advanced">
 						{{i18n.strategy.addEditOfficeHolidays.dateType.advancedDate}}
 					</option>
-					<option value="date-range">
+					<option value="range">
 						{{i18n.strategy.addEditOfficeHolidays.dateType.dateRange}}
 					</option>
-					<option value="single-date">
+					<option value="single">
 						{{i18n.strategy.addEditOfficeHolidays.dateType.singleDate}}
 					</option>
 				</select>
@@ -35,38 +35,38 @@
 			<label class="control-label">
 				{{i18n.strategy.addEditOfficeHolidays.labels.date}}
 			</label>
-			<div class="row-fluid advanced-date selected">
-				<select class="month">
+			<div class="row-fluid advanced selected">
+				<select class="month from" data-name="fromMonth" >
 				{{#each months as |label|}}
-					<option value="{{label}}">
+					<option value="{{@key}}">
 						{{label}}
 					</option>
 				{{/each}}
 				</select>
-				<select class="ordinal">
+				<select class="ordinal" data-name="ordinal">
 				{{#each ordinals as |label|}}
 					<option value="{{label}}">
 						{{label}}
 					</option>
 				{{/each}}
 				</select>
-				<select class="day">
+				<select class="wday" data-name="wday">
 				{{#each days as |label|}}
-					<option value="{{label}}">
+					<option value="{{@key}}">
 						{{label}}
 					</option>
 				{{/each}}
 				</select>
 			</div>
-			<div class="row-fluid date-range">
-				<select class="start_month">
+			<div class="row-fluid range">
+				<select class="month from" data-name="fromMonth">
 				{{#each months as |label|}}
-					<option value="{{label}}">
+					<option value="{{@key}}">
 						{{label}}
 					</option>
 				{{/each}}
 				</select>
-				<select class="date" id="start_date">
+				<select class="day from" data-name="fromDay">
 				{{#each dates as |label|}}
 					<option value="{{label}}">
 						{{label}}
@@ -74,14 +74,14 @@
 				{{/each}}
 				</select>
 				<span class="separator">{{i18n.strategy.holidays.to}}</span>
-				<select id="end_month">
+				<select class="month to" data-name="toMonth">
 				{{#each months as |label|}}
-					<option value="{{label}}">
+					<option value="{{@key}}">
 						{{label}}
 					</option>
 				{{/each}}
 				</select>
-				<select class="date" id="end_date">
+				<select class="day to" data-name="toDay">
 				{{#each dates as |label|}}
 					<option value="{{label}}">
 						{{label}}
@@ -89,22 +89,22 @@
 				{{/each}}
 				</select>
 			</div>
-			<div class="row-fluid single-date">
-				<select class="month">
+			<div class="row-fluid single">
+				<select class="month from" data-name="fromMonth">
 				{{#each months as |label|}}
-					<option value="{{label}}">
+					<option value="{{@key}}">
 						{{label}}
 					</option>
 				{{/each}}
 				</select>
-				<select class="dates">
+				<select class="day from" data-name="fromDay">
 				{{#each dates as |label|}}
 					<option value="{{label}}">
 						{{label}}
 					</option>
 				{{/each}}
 				</select>
-				<select class="year">
+				<select class="year" data-name="endYear">
 				{{#each years as |label|}}
 					<option value="{{label}}">
 						{{label}}
