@@ -4117,6 +4117,8 @@ define(function(require) {
 					isEmpty = _.isEmpty($this.val());
 
 				$template.find('.no-name-error')[isEmpty ? 'slideDown' : 'slideUp'](200);
+				$template.find('.minimum-name-error').slideUp(200)
+				$template.find('.maximum-name-error').slideUp(200)
 			});
 
 			$template.find('#recurring').on('change', function(event) {
@@ -4167,7 +4169,8 @@ define(function(require) {
 					holidayData = {
 						id: _.isEmpty(holidayRule) ? 'new-' + Date.now() : holidayRule.holidayData.id
 					},
-					holidayRuleToSave = {};
+					holidayRuleToSave = {},
+					nameLength = formData.name.length;
 
 				if (!monster.ui.valid($template)) {
 					return;
@@ -4175,6 +4178,12 @@ define(function(require) {
 
 				if (_.isEmpty(formData.name)) {
 					$template.find('.no-name-error').slideDown(200);
+					return;
+				} else if (nameLength < 4) {
+					$template.find('.minimum-name-error').slideDown(200);
+					return;
+				} else if (nameLength > 60) {
+					$template.find('.maximum-name-error').slideDown(200);
 					return;
 				}
 

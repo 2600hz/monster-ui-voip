@@ -8,6 +8,10 @@
 		</div>
 		{{#monsterPanelText i18n.strategy.addEditOfficeHolidays.errors.noName "danger" "fill-width no-name-error"}}
 		{{/monsterPanelText}}
+		{{#monsterPanelText i18n.strategy.addEditOfficeHolidays.errors.minimum "danger" "fill-width minimum-name-error"}}
+		{{/monsterPanelText}}
+		{{#monsterPanelText i18n.strategy.addEditOfficeHolidays.errors.maximum "danger" "fill-width maximum-name-error"}}
+		{{/monsterPanelText}}
 		<div class="control-group">
 			{{#monsterCheckbox i18n.strategy.addEditOfficeHolidays.labels.recurringAnnually}}
 				<input type="checkbox" name="recurring" id="recurring" {{#if holidayData.recurring}} checked {{/if}}>
@@ -19,14 +23,14 @@
 			</label>
 			<div class="controls">
 				<select name="type" id="date_type">
-					<option value="advanced">
-						{{i18n.strategy.addEditOfficeHolidays.dateType.advancedDate}}
+					<option value="single">
+						{{i18n.strategy.addEditOfficeHolidays.dateType.singleDate}}
 					</option>
 					<option value="range">
 						{{i18n.strategy.addEditOfficeHolidays.dateType.dateRange}}
 					</option>
-					<option value="single">
-						{{i18n.strategy.addEditOfficeHolidays.dateType.singleDate}}
+					<option value="advanced">
+						{{i18n.strategy.addEditOfficeHolidays.dateType.advancedDate}}
 					</option>
 				</select>
 			</div>
@@ -35,7 +39,36 @@
 			<label class="control-label">
 				{{i18n.strategy.addEditOfficeHolidays.labels.date}}
 			</label>
-			<div class="row-fluid advanced selected">
+			<div class="row-fluid single selected">
+				<select class="month from" data-name="fromMonth">
+				{{#select holidayData.fromMonth}}
+					{{#each months as |label|}}
+						<option value="{{@key}}">
+							{{label}}
+						</option>
+					{{/each}}
+				{{/select}}
+				</select>
+				<select class="day from" data-name="fromDay">
+				{{#select holidayData.fromDay}}
+					{{#each dates as |label|}}
+						<option value="{{label}}">
+							{{label}}
+						</option>
+					{{/each}}
+				{{/select}}
+				</select>
+				<select class="year" data-name="endYear">
+				{{#select holidayData.endYear}}
+					{{#each years as |label|}}
+						<option value="{{label}}">
+							{{label}}
+						</option>
+					{{/each}}
+				{{/select}}
+				</select>
+			</div>
+			<div class="row-fluid advanced">
 				<select class="month from" data-name="fromMonth" >
 				{{#select holidayData.fromMonth}}
 					{{#each months as |label|}}
@@ -96,35 +129,6 @@
 				<select class="day to" data-name="toDay">
 				{{#select holidayData.toDay}}
 					{{#each dates as |label|}}
-						<option value="{{label}}">
-							{{label}}
-						</option>
-					{{/each}}
-				{{/select}}
-				</select>
-			</div>
-			<div class="row-fluid single">
-				<select class="month from" data-name="fromMonth">
-				{{#select holidayData.fromMonth}}
-					{{#each months as |label|}}
-						<option value="{{@key}}">
-							{{label}}
-						</option>
-					{{/each}}
-				{{/select}}
-				</select>
-				<select class="day from" data-name="fromDay">
-				{{#select holidayData.fromDay}}
-					{{#each dates as |label|}}
-						<option value="{{label}}">
-							{{label}}
-						</option>
-					{{/each}}
-				{{/select}}
-				</select>
-				<select class="year" data-name="endYear">
-				{{#select holidayData.endYear}}
-					{{#each years as |label|}}
 						<option value="{{label}}">
 							{{label}}
 						</option>
