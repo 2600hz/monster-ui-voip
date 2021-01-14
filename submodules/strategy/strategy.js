@@ -4029,6 +4029,7 @@ define(function(require) {
 		strategyAddEditOfficeHolidaysPopup: function(args) {
 			var self = this,
 				callback = args.callback,
+				holidayRule = args.holidayRule ? args.holidayRule : {},
 				getListOfYears = function getListOfYears() {
 					var date = new Date(),
 						year = parseInt(date.getFullYear()),
@@ -4054,24 +4055,57 @@ define(function(require) {
 
 					return datesArray;
 				},
+				formatHolidayRule = function formatHolidayRule(holidayRule) {
+					var fromMonth = _.get(holidayRule, 'holidayData.fromMonth'),
+						toMonth = _.get(holidayRule, 'holidayData.toMonth');
+
+					if (fromMonth) {
+						holidayRule.holidayData.fromMonth = fromMonth - 1;
+					}
+					if (toMonth) {
+						holidayRule.holidayData.fromMonth = toMonth - 1;
+					}
+
+					return holidayRule;
+				},
+				dataToTemplate = _.merge({}, formatHolidayRule(holidayRule), {
+					months: _.map(
+						self.months,
+						_.partial(monster.util.tryI18n, self.i18n.active().strategy.holidays.months)
+					),
+					ordinals: self.i18n.active().strategy.holidays.ordinals,
+					days: self.i18n.active().strategy.holidays.days,
+					years: getListOfYears(),
+					dates: getListOfDates()
+				}),
 				$template = $(self.getTemplate({
 					name: 'addEditOfficeHolidays',
-					data: {
-						months: _.map(
-							self.months,
-							_.partial(monster.util.tryI18n, self.i18n.active().strategy.holidays.months)
-						),
-						ordinals: _.map(
-							self.ordinals,
-							_.partial(monster.util.tryI18n, self.i18n.active().strategy.holidays.ordinals)
-						),
-						days: self.i18n.active().strategy.holidays.days,
-						years: getListOfYears(),
-						dates: getListOfDates()
-					},
+					data: dataToTemplate,
 					submodule: 'strategy'
 				})),
 				popup;
+
+			if (!_.isEmpty(holidayRule)) {
+				var selectedType = holidayRule.holidayType;
+
+				$template
+					.find('#date_type')
+					.val(holidayRule.holidayType);
+
+				$template
+					.find('.row-fluid')
+					.removeClass('selected');
+
+				$template
+					.find('.row-fluid.' + selectedType)
+					.addClass('selected');
+
+				if (selectedType === 'single' && holidayRule.holidayData.recurring) {
+					$template
+						.find('.single .year')
+						.addClass('hide');
+				}
+			}
 
 			$template.find('.cancel').on('click', function(event) {
 				event.preventDefault();
@@ -4129,11 +4163,11 @@ define(function(require) {
 				event.preventDefault();
 
 				var formData = monster.ui.getFormData($template.get(0)),
-					$optionDiv = $template.find('.row-fluid.' + formData.type + ' select:not(.hide)');
+					$optionDiv = $template.find('.row-fluid.' + formData.type + ' select:not(.hide)'),
 					holidayData = {
-						id: 'new-' + Date.now()
+						id: _.isEmpty(holidayRule) ? 'new-' + Date.now() : holidayRule.holidayData.id
 					},
-					endDate = '';
+					holidayRuleToSave = {};
 
 				if (!monster.ui.valid($template)) {
 					return;
@@ -4148,31 +4182,34 @@ define(function(require) {
 					var $element = $(element),
 						elementName = $element.data('name'),
 						value = _.includes(['ordinal', 'wday'], elementName)
-							? _.lowerCase($element.val())
+							? $element.val()
 							: parseInt($element.val());
 
 					holidayData[elementName] = _.includes(['fromMonth', 'toMonth'], elementName)
 						? value + 1
 						: value;
-
 				});
 
 				if (!formData.recurring && formData.type !== 'single') {
 					holidayData.endYear = args.yearSelected;
 				}
 
-				popup.dialog('close');
-
-				callback(null, {
+				holidayRuleToSave = {
 					holidayType: formData.type,
 					holidayData: _.assign({}, holidayData, formData),
 					modified: true
-				});
+				};
+
+				popup.dialog('close');
+
+				callback(null, holidayRuleToSave);
 			});
 
 			popup = monster.ui.dialog($template, {
 				autoScroll: false,
-				title: self.i18n.active().strategy.addEditOfficeHolidays.title,
+				title: _.isEmpty(holidayRule)
+					? self.i18n.active().strategy.addEditOfficeHolidays.title.add
+					: self.i18n.active().strategy.addEditOfficeHolidays.title.edit,
 				dialogClass: 'monster-dialog holiday-add-edit-dialog'
 			});
 		}

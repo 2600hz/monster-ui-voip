@@ -4,13 +4,13 @@
 			<label class="control-label">
 				{{i18n.strategy.addEditOfficeHolidays.labels.name}}
 			</label>
-			<input id="name" name="name" type="text" placeholder="{{i18n.strategy.addEditOfficeHolidays.placeholders.name}}" value="{{ame}}" class="form-control">
+			<input id="name" name="name" type="text" placeholder="{{i18n.strategy.addEditOfficeHolidays.placeholders.name}}" value="{{holidayData.name}}" class="form-control">
 		</div>
 		{{#monsterPanelText i18n.strategy.addEditOfficeHolidays.errors.noName "danger" "fill-width no-name-error"}}
 		{{/monsterPanelText}}
 		<div class="control-group">
 			{{#monsterCheckbox i18n.strategy.addEditOfficeHolidays.labels.recurringAnnually}}
-				<input type="checkbox" name="recurring" id="recurring">
+				<input type="checkbox" name="recurring" id="recurring" {{#if holidayData.recurring}} checked {{/if}}>
 			{{/monsterCheckbox}}
 		</div>
 		<div class="control-group">
@@ -37,79 +37,99 @@
 			</label>
 			<div class="row-fluid advanced selected">
 				<select class="month from" data-name="fromMonth" >
-				{{#each months as |label|}}
-					<option value="{{@key}}">
-						{{label}}
-					</option>
-				{{/each}}
+				{{#select holidayData.fromMonth}}
+					{{#each months as |label|}}
+						<option value="{{@key}}">
+							{{label}}
+						</option>
+					{{/each}}
+				{{/select}}
 				</select>
 				<select class="ordinal" data-name="ordinal">
-				{{#each ordinals as |label|}}
-					<option value="{{label}}">
-						{{label}}
-					</option>
-				{{/each}}
+				{{#select holidayData.ordinal}}
+					{{#each ordinals as |label|}}
+						<option value="{{@key}}">
+							{{label}}
+						</option>
+					{{/each}}
+				{{/select}}
 				</select>
 				<select class="wday" data-name="wday">
-				{{#each days as |label|}}
-					<option value="{{@key}}">
-						{{label}}
+				{{#select holidayData.wday}}
+					{{#each days as |label|}}
+						<option value="{{@key}}">
+							{{label}}
 					</option>
-				{{/each}}
+					{{/each}}
+				{{/select}}
 				</select>
 			</div>
 			<div class="row-fluid range">
 				<select class="month from" data-name="fromMonth">
-				{{#each months as |label|}}
-					<option value="{{@key}}">
-						{{label}}
-					</option>
-				{{/each}}
+				{{#select holidayData.fromMonth}}
+					{{#each months as |label|}}
+						<option value="{{@key}}">
+							{{label}}
+						</option>
+					{{/each}}
+				{{/select}}
 				</select>
 				<select class="day from" data-name="fromDay">
-				{{#each dates as |label|}}
-					<option value="{{label}}">
-						{{label}}
-					</option>
-				{{/each}}
+				{{#select holidayData.fromDay}}
+					{{#each dates as |label|}}
+						<option value="{{label}}">
+							{{label}}
+						</option>
+					{{/each}}
+				{{/select}}
 				</select>
 				<span class="separator">{{i18n.strategy.holidays.to}}</span>
 				<select class="month to" data-name="toMonth">
-				{{#each months as |label|}}
-					<option value="{{@key}}">
-						{{label}}
-					</option>
-				{{/each}}
+				{{#select holidayData.toMonth}}
+					{{#each months as |label|}}
+						<option value="{{@key}}">
+							{{label}}
+						</option>
+					{{/each}}
+				{{/select}}
 				</select>
 				<select class="day to" data-name="toDay">
-				{{#each dates as |label|}}
-					<option value="{{label}}">
-						{{label}}
-					</option>
-				{{/each}}
+				{{#select holidayData.toDay}}
+					{{#each dates as |label|}}
+						<option value="{{label}}">
+							{{label}}
+						</option>
+					{{/each}}
+				{{/select}}
 				</select>
 			</div>
 			<div class="row-fluid single">
 				<select class="month from" data-name="fromMonth">
-				{{#each months as |label|}}
-					<option value="{{@key}}">
-						{{label}}
-					</option>
-				{{/each}}
+				{{#select holidayData.fromMonth}}
+					{{#each months as |label|}}
+						<option value="{{@key}}">
+							{{label}}
+						</option>
+					{{/each}}
+				{{/select}}
 				</select>
 				<select class="day from" data-name="fromDay">
-				{{#each dates as |label|}}
-					<option value="{{label}}">
-						{{label}}
-					</option>
-				{{/each}}
+				{{#select holidayData.fromDay}}
+					{{#each dates as |label|}}
+						<option value="{{label}}">
+							{{label}}
+						</option>
+					{{/each}}
+				{{/select}}
 				</select>
 				<select class="year" data-name="endYear">
-				{{#each years as |label|}}
-					<option value="{{label}}">
-						{{label}}
-					</option>
-				{{/each}}
+				{{#select holidayData.endYear}}
+					{{#each years as |label|}}
+						<option value="{{label}}">
+							{{label}}
+						</option>
+					{{/each}}
+				{{/select}}
 				</select>
 			</div>
 		</div>

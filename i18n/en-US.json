@@ -826,7 +826,10 @@
 			}
 		},
 		"addEditOfficeHolidays": {
-			"title": "Add Holiday",
+			"title": {
+				"add": "Add Holiday",
+				"edit": "Edit Holiday"
+			},
 			"labels": {
 				"addHoliday": "Add Holiday",
 				"name": "Holiday Name",
