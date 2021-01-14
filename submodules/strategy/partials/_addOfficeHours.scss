@@ -55,6 +55,14 @@
 				}
 			}
 		}
+
+		.ui-timepicker-input {
+			height: 2rem;
+			border-radius: 2px;
+			border: 1px solid #c0c0ca;
+			width: auto;
+			padding: 0 6px;
+		}
 	}
 
 	.form-actions {
