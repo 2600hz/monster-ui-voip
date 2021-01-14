@@ -825,6 +825,31 @@
 				"overlappingHours": "Selected hours overlap existing hours."
 			}
 		},
+		"addEditOfficeHolidays": {
+			"title": {
+				"add": "Add Holiday",
+				"edit": "Edit Holiday"
+			},
+			"labels": {
+				"addHoliday": "Add Holiday",
+				"name": "Holiday Name",
+				"dateType": "Date Type",
+				"date": "Date",
+				"recurringAnnually": "Recurring Annually"
+			},
+			"dateType": {
+				"singleDate": "Single Date",
+				"dateRange": "Date Range",
+				"advancedDate": "Advanced Date"
+
+			},
+			"placeholders": {
+				"name": "Holiday Name"
+			},
+			"errors": {
+				"noName": "Please enter a name for this holiday"
+			}
+		},
 		"noNumberHelp": "Note: Please add a Main Office Number to your account first. Once you add a main number, you will be able to set up Office Hours, Holidays and Incoming Call Handling (Call-Flow) for your office.",
 		"sectionTitles": {
 			"numbers": "Main Company Numbers",
@@ -893,12 +918,67 @@
 		},
 		"holidays": {
 			"enableTitle": "Are you closed for holidays?",
-			"addLink": "Add Holiday",
-			"singleLink": "Single Day",
-			"rangeLink": "Date Range",
-			"advancedLink": "Advanced",
-			"__comment": "UI-1250: Adding help boxes",
-			"__version": "3.20_s2",
+			"title": "Holidays",
+			"holidaySchedule": "Holiday Schedule",
+			"buttons": {
+				"addHoliday": "Add Holiday",
+				"importHolidays": "Import Holidays",
+				"includeNationalHolidays": "Include National Holidays"
+			},
+			"listing": {
+				"headers": {
+					"name": "Name",
+					"date": "Date",
+					"actions": "Actions"
+				},
+				"search": "Search..."
+			},
+			"days": {
+				"monday": "Mon",
+				"tuesday": "Tue",
+				"wednesday": "Wed",
+				"thursday": "Thu",
+				"friday": "Fri",
+				"saturday": "Sat",
+				"sunday": "Sun"
+			},
+			"ordinals": {
+				"first": "First",
+				"second": "Second",
+				"third": "Third",
+				"fourth": "Fourth",
+				"fifth": "Fifth",
+				"last": "Last"
+			},
+			"months": {
+				"january": "Jan",
+				"february": "Feb",
+				"march": "Mar",
+				"april": "Apr",
+				"may": "May",
+				"june": "Jun",
+				"july": "Jul",
+				"august": "Aug",
+				"september": "Sep",
+				"october": "Oct",
+				"november": "Nov",
+				"december": "Dec"
+			},
+			"to": "to",
+			"empty": {
+				"title": "Your Office Holidays Are Empty",
+				"description": "Please use the Add holiday or Import Holidays buttons to enter holidays."
+			},
+			"dialogs": {
+				"delete": {
+					"title": "Delete Time Slot?",
+					"message": "Delete holiday \"{{variable}}\"? Deleting a holiday will permanently remove it.",
+					"buttons": {
+						"yes": "Yes, Delete Holiday",
+						"no": "Keep Time Slot"
+					}
+				}
+			},
 			"helpHolidays": "Do not forget to set the call routing for when your office is closed for the holidays! To set it up, go in the \"Incoming Call Handling\" section of this page, and select the \"Holidays\" tab."
 		},
 		"calls": {
@@ -951,37 +1031,6 @@
 		},
 		"open": "Open",
 		"closed": "Closed",
-		"weekdays": {
-			"monday": "Monday",
-			"tuesday": "Tuesday",
-			"wednesday": "Wednesday",
-			"thursday": "Thursday",
-			"friday": "Friday",
-			"saturday": "Saturday",
-			"sunday": "Sunday"
-		},
-		"ordinals": {
-			"first": "First",
-			"second": "Second",
-			"third": "Third",
-			"fourth": "Fourth",
-			"fifth": "Fifth",
-			"last": "Last"
-		},
-		"monthsShort": {
-			"january": "Jan",
-			"february": "Feb",
-			"march": "Mar",
-			"april": "Apr",
-			"may": "May",
-			"june": "Jun",
-			"july": "Jul",
-			"august": "Aug",
-			"september": "Sep",
-			"october": "Oct",
-			"november": "Nov",
-			"december": "Dec"
-		},
 		"callEntities": {
 			"qubicle": "Call Queues",
 			"user": "Users",
