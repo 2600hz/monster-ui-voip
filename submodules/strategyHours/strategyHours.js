@@ -31,10 +31,16 @@ define(function(require) {
 
 		appFlags: {
 			strategyHours: {
+				secondsInMinute: 60,
+				minutesInHour: 60,
 				intervals: {
+					min: 0,
 					max: 86400,
-					unit: 3600,
-					step: 1800,
+					unit: 60,
+					step: 60,
+					timepicker: {
+						step: 1800
+					},
 					exportFilename: 'office-hours',
 					typesOrderSignificance: [
 						'lunch',
@@ -91,7 +97,6 @@ define(function(require) {
 		strategyHoursListingRender: function($container, intervals) {
 			var self = this,
 				days = self.weekdays,
-				minIntervalStep = self.appFlags.strategyHours.intervals.step,
 				templateData = {
 					isEmpty: _.every(intervals, _.isEmpty),
 					templates: _.keys(self.appFlags.strategyHours.templatePresets),
@@ -107,32 +112,40 @@ define(function(require) {
 					})
 				},
 				initTemplate = function initTemplate(data) {
-					var $template = $(self.getTemplate({
-						name: 'listing',
-						data: data,
-						submodule: 'strategyHours'
-					}));
+					var meta = self.appFlags.strategyHours.intervals,
+						timepickerStep = meta.timepicker.step,
+						intervalLowerBound = meta.min,
+						intervalUpperBound = meta.max,
+						$template = $(self.getTemplate({
+							name: 'listing',
+							data: data,
+							submodule: 'strategyHours'
+						}));
 
 					_.forEach(data.days, function(day) {
 						_.forEach(day.intervals, function(interval, index) {
 							var $startPicker = $template.find('input[class*="' + day.id + '[' + index + '].start"]'),
 								$endPicker = $template.find('input[class*="' + day.id + '[' + index + '].end"]'),
-								intervals = day.intervals,
-								previousBound = intervals[index - 1] ? intervals[index - 1].end : 0,
-								nextBound = intervals[index + 1] ? intervals[index + 1].start : 86400;
+								endTime = interval.end,
+								endRemainder = endTime % timepickerStep,
+								startPickerMaxTime = endTime - endRemainder - (endRemainder > 0 ? 0 : timepickerStep),
+								startTime = interval.start,
+								startRemainder = startTime % timepickerStep,
+								endPickerMinTime = startTime - startRemainder + timepickerStep;
 
 							monster.ui.timepicker($startPicker, {
-								useSelect: true,
-								minTime: previousBound,
-								maxTime: interval.end - minIntervalStep
+								listWidth: 1,
+								minTime: intervalLowerBound,
+								maxTime: startPickerMaxTime
 							});
+							$startPicker.timepicker('setTime', startTime);
+
 							monster.ui.timepicker($endPicker, {
-								useSelect: true,
-								minTime: interval.start + minIntervalStep,
-								maxTime: nextBound
+								listWidth: 1,
+								minTime: endPickerMinTime,
+								maxTime: intervalUpperBound - timepickerStep
 							});
-							$startPicker.timepicker('setTime', interval.start);
-							$endPicker.timepicker('setTime', interval.end);
+							$endPicker.timepicker('setTime', endTime);
 						});
 					});
 
@@ -189,16 +202,42 @@ define(function(require) {
 
 				var weekdays = self.weekdays,
 					meta = self.appFlags.strategyHours.intervals,
+					secondsInMinute = self.appFlags.strategyHours.secondsInMinute,
+					minutesInHour = self.appFlags.strategyHours.minutesInHour,
 					formatIntervalsToCsv = function(intervals, index) {
 						return _.map(intervals, function(interval) {
 							return {
 								day: weekdays[index],
-								start: interval.start / meta.unit,
-								end: interval.end / meta.unit,
+								start: getHumanReadableTime(interval.start),
+								end: getHumanReadableTime(interval.end),
 								type: interval.type
 							};
 						});
 					},
+					secondsToHours = _.partial(_.reduce, [
+						secondsInMinute,
+						minutesInHour
+					], _.divide),
+					mod = function(value, modulo) {
+						return value % modulo;
+					},
+					secondsToRemainingMinutes = _.flow(
+						_.partial(_.divide, _, secondsInMinute),
+						_.partial(mod, _, minutesInHour)
+					),
+					toTwoDigits = _.partial(_.padStart, _, 2, '0'),
+					parseHoursMinutes = _.over([
+						secondsToHours,
+						secondsToRemainingMinutes
+					]),
+					getHumanReadableTime = _.flow(
+						parseHoursMinutes,
+						_.partial(_.map, _, _.flow(
+							_.unary(_.floor),
+							toTwoDigits
+						)),
+						_.partial(_.join, _, ':')
+					),
 					getBlobFromCsv = function(csv) {
 						return new Blob([csv], {
 							type: 'text/csv;chartset=utf-8'
@@ -237,7 +276,124 @@ define(function(require) {
 		},
 
 		strategyHoursListingBindEvents: function(parent, template) {
-			var self = this;
+			var self = this,
+				meta = self.appFlags.strategyHours.intervals,
+				timepickerStep = meta.timepicker.step,
+				updateEndPickerMinTime = function(event) {
+					event.preventDefault();
+
+					var $startPicker = $(this),
+						$endPicker = $startPicker.siblings('input'),
+						startSeconds = $startPicker.timepicker('getSecondsFromMidnight'),
+						remainder = startSeconds % timepickerStep;
+
+					$endPicker.timepicker('option', 'minTime',
+						startSeconds - remainder + timepickerStep
+					);
+				},
+				updateStartPickerMaxTime = function(event) {
+					event.preventDefault();
+
+					var $endPicker = $(this),
+						$startPicker = $endPicker.siblings('input'),
+						endSeconds = $endPicker.timepicker('getSecondsFromMidnight'),
+						remainder = endSeconds % timepickerStep;
+
+					$startPicker.timepicker('option', 'maxTime',
+						endSeconds - remainder - (remainder > 0 ? 0 : timepickerStep)
+					);
+				},
+				intervalStep = meta.step,
+				enforceStartPickerMax = function(event) {
+					event.preventDefault();
+
+					var $startPicker = $(this),
+						$endPicker = $startPicker.siblings('input'),
+						startSeconds = $startPicker.timepicker('getSecondsFromMidnight'),
+						endSeconds = $endPicker.timepicker('getSecondsFromMidnight'),
+						isBumping = startSeconds >= endSeconds,
+						isOverMax = (startSeconds + intervalStep) >= meta.max;
+
+					if (isBumping && isOverMax) {
+						$startPicker
+							.timepicker('setTime', endSeconds - intervalStep);
+					} else if (isBumping) {
+						$endPicker
+							.timepicker('setTime', startSeconds + intervalStep)
+							.change();
+					}
+				},
+				enforceEndPickerMin = function(event) {
+					event.preventDefault();
+
+					var $endPicker = $(this),
+						$startPicker = $endPicker.siblings('input'),
+						endSeconds = $endPicker.timepicker('getSecondsFromMidnight'),
+						startSeconds = $startPicker.timepicker('getSecondsFromMidnight'),
+						isUnderMin = endSeconds === meta.min,
+						isBumping = endSeconds <= startSeconds;
+
+					if (isUnderMin) {
+						$endPicker
+							.timepicker('setTime', meta.min + intervalStep);
+						$startPicker
+							.timepicker('setTime', meta.min)
+							.change();
+					} else if (isBumping) {
+						$startPicker
+							.timepicker('setTime', endSeconds - intervalStep)
+							.change();
+					}
+				},
+				updatePrevIntervalOverlaps = function(event) {
+					event.preventDefault();
+
+					var $picker = $(this),
+						seconds = $picker.timepicker('getSecondsFromMidnight'),
+						$interval = $picker.parents('.interval'),
+						$prevIntervals = $interval.prevAll('.interval');
+
+					$.each($prevIntervals, function() {
+						var $prevInterval = $(this),
+							$startPicker = $prevInterval.find('input.ui-timepicker-input[name$=".start"]'),
+							$endPicker = $startPicker.siblings('input'),
+							startSeconds = $startPicker.timepicker('getSecondsFromMidnight'),
+							endSeconds = $endPicker.timepicker('getSecondsFromMidnight');
+
+						if (seconds <= startSeconds) {
+							triggerDeleteInterval($prevInterval);
+						} else if (seconds < endSeconds) {
+							$endPicker.timepicker('setTime', seconds);
+						}
+					});
+				},
+				updateNextIntervalOverlaps = function(event) {
+					event.preventDefault();
+
+					var $picker = $(this),
+						seconds = $picker.timepicker('getSecondsFromMidnight'),
+						$interval = $picker.parents('.interval'),
+						$nextIntervals = $interval.nextAll('.interval');
+
+					$.each($nextIntervals, function() {
+						var $nextInterval = $(this),
+							$startPicker = $nextInterval.find('input.ui-timepicker-input[name$=".start"]'),
+							$endPicker = $startPicker.siblings('input'),
+							startSeconds = $startPicker.timepicker('getSecondsFromMidnight'),
+							endSeconds = $endPicker.timepicker('getSecondsFromMidnight');
+
+						if (seconds >= endSeconds) {
+							triggerDeleteInterval($nextInterval);
+						} else if (seconds > startSeconds) {
+							$startPicker.timepicker('setTime', seconds);
+						}
+					});
+				},
+				triggerDeleteInterval = function($interval) {
+					$interval
+						.find('.delete-interval')
+							.click();
+				};
 
 			template.on('click', '.office-hours-nav .nav-item:not(.active):not(.disabled)', function(event) {
 				var $this = $(this),
@@ -266,38 +422,14 @@ define(function(require) {
 				self.strategyHoursListingRender(parent, self.appFlags.strategyHours.templatePresets[option]);
 			});
 
-			template.on('change', 'input.ui-timepicker-input', function(event) {
-				event.preventDefault();
+			template.on('change', 'input.ui-timepicker-input[name$=".start"]', enforceStartPickerMax);
+			template.on('change', 'input.ui-timepicker-input[name$=".end"]', enforceEndPickerMin);
 
-				var $picker = $(this),
-					seconds = $picker.timepicker('getSecondsFromMidnight'),
-					$boundPicker = $picker.siblings('input'),
-					isFrom = _.endsWith($picker.prop('name'), '.start'),
-					method = isFrom ? 'minTime' : 'maxTime',
-					newTime = isFrom ? seconds + (3600 / 2) : seconds - (3600 / 2);
+			template.on('change', 'input.ui-timepicker-input[name$=".start"]', updateEndPickerMinTime);
+			template.on('change', 'input.ui-timepicker-input[name$=".end"]', updateStartPickerMaxTime);
 
-				$boundPicker.timepicker('option', method, newTime);
-			});
-
-			template.on('change', 'input.ui-timepicker-input', function(event) {
-				event.preventDefault();
-
-				var $picker = $(this),
-					seconds = $picker.timepicker('getSecondsFromMidnight'),
-					$interval = $picker.parents('.interval'),
-					isFrom = _.endsWith($picker.prop('name'), '.start'),
-					$boundPicker = isFrom
-						? $interval.prev().find('input[name$=".end"]')
-						: $interval.next().find('input[name$=".start"]'),
-					isExtremity = !$boundPicker.is(':empty'),
-					method = isFrom ? 'maxTime' : 'minTime';
-
-				$boundPicker.timepicker('option', method, seconds);
-
-				if (isExtremity) {
-					$picker.timepicker('option', isFrom ? 'minTime' : 'maxTime', isFrom ? 0 : 3600 * 24);
-				}
-			});
+			template.on('change', 'input.ui-timepicker-input[name$=".start"]', updatePrevIntervalOverlaps);
+			template.on('change', 'input.ui-timepicker-input[name$=".end"]', updateNextIntervalOverlaps);
 
 			template.on('click', '.office-hours .delete-interval', function() {
 				var $this = $(this),
@@ -305,17 +437,12 @@ define(function(require) {
 					$intervals = $interval.parents('.intervals'),
 					$dayContainer = $interval.parents('.office-hours'),
 					$navItems = template.find('.office-hours-nav .nav-item'),
-					day = $dayContainer.data('day'),
-					$prevPicker = $interval.prev().find('input[name$=".end"]'),
-					$nextPicker = $interval.next().find('input[name$=".start"]');
+					day = $dayContainer.data('day');
 
 				$interval.slideUp(200, function() {
 					$interval.remove();
 
 					monster.pub('voip.strategyHours.listing.onUpdate', parent);
-
-					$prevPicker.trigger('change');
-					$nextPicker.trigger('change');
 
 					if ($intervals.is(':empty')) {
 						$dayContainer.slideUp(200, function() {
@@ -390,7 +517,7 @@ define(function(require) {
 					while (pointer < intervals.length - 1) {
 						var current = intervals[pointer],
 							nextIndex = _.findIndex(intervals, function(interval, index) {
-								var isNonLinear = intervals[index - 1].end + step < interval.start,
+								var isNonLinear = intervals[index - 1].end < interval.start,
 									isDifferentType = !_.isEqual(interval.type, current.type);
 
 								return isNonLinear || isDifferentType;
@@ -456,10 +583,30 @@ define(function(require) {
 					_.toLower
 				),
 				parseTime = function(time) {
-					return time <= 24 ? time * meta.unit : time;
+					var modifiers = [
+						hoursToSeconds,
+						minutesToSeconds
+					];
+
+					return _
+						.chain(time)
+						.split(':')
+						.map(_.toNumber)
+						.slice(0, 2)
+						.map(function(value, index) {
+							return modifiers[index](value);
+						})
+						.sum()
+						.value();
 				},
+				minutesInHour = self.appFlags.strategyHours.minutesInHour,
+				secondsInMinute = self.appFlags.strategyHours.secondsInMinute,
+				hoursToSeconds = _.partial(_.reduce, [
+					minutesInHour,
+					secondsInMinute
+				], _.multiply),
+				minutesToSeconds = _.partial(_.multiply, secondsInMinute),
 				sanitizeTime = _.flow(
-					_.toNumber,
 					parseTime,
 					_.floor
 				),
