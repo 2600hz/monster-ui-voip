@@ -1152,7 +1152,7 @@ define(function(require) {
 				enabled: true,
 				media: {
 					audio: {
-						codecs: ['PCMA', 'PCMU']
+						codecs: []
 					},
 					encryption: {
 						enforce_security: false
