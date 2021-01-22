@@ -2751,24 +2751,6 @@ define(function(require) {
 
 		strategyHandleFeatureCodes: function() {
 			var self = this,
-				featureCodeConfigs = _.keyBy(self.featureCodeConfigs, 'name'),
-				configToEntries = {
-					pattern: 'patterns',
-					callflowNumber: 'numbers'
-				},
-				isMalformed = function isMalformed(featureCode) {
-					var config = _.get(featureCodeConfigs, featureCode.featurecode.name),
-						configProp = _
-							.chain(configToEntries)
-							.keys()
-							.find(_.partial(_.has, config))
-							.value(),
-						expectedEntry = _.get(config, configProp),
-						entriesProp = _.get(configToEntries, configProp),
-						entries = _.get(featureCode, entriesProp);
-
-					return !_.isUndefined(config) && !_.isEqual(entries, [expectedEntry]);
-				},
 				createFeatureCodeFactory = function createFeatureCodeFactory(featureCode) {
 					return function(callback) {
 						self.strategyCreateCallflow({
@@ -2803,31 +2785,6 @@ define(function(require) {
 			monster.waterfall([
 				function fetchExistingFeatureCodes(callback) {
 					self.strategyGetFeatureCodes(_.partial(callback, null));
-				},
-				function maybeDeleteMalformedFeatureCodes(existing, callback) {
-					monster.parallel(_
-						.chain(existing)
-						.filter(isMalformed)
-						.keyBy('id')
-						.mapValues(function(featureCode) {
-							return function(callback) {
-								self.strategyDeleteCallflow({
-									bypassProgressIndicator: true,
-									data: {
-										callflowId: featureCode.id
-									},
-									success: _.partial(callback, null),
-									error: _.partial(callback, null)
-								});
-							};
-						})
-						.value()
-					, function(err, results) {
-						callback(null, _.reject(existing, _.flow([
-							_.partial(_.get, _, 'id'),
-							_.partial(_.includes, _.keys(results))
-						])));
-					});
 				},
 				function maybeCreateMissingFeatureCodes(existing, callback) {
 					monster.parallel(_
@@ -3852,7 +3809,14 @@ define(function(require) {
 
 		strategyAddOfficeHoursPopup: function(args) {
 			var self = this,
-				meta = _.pick(self.appFlags.strategyHours.intervals, ['max', 'unit', 'step']),
+				meta = _.pick(self.appFlags.strategyHours.intervals, [
+					'max',
+					'min',
+					'unit',
+					'step',
+					'timepicker'
+				]),
+				timepickerStep = meta.timepicker.step,
 				existing = args.existing,
 				callback = args.callback,
 				$template = $(self.getTemplate({
@@ -3867,9 +3831,12 @@ define(function(require) {
 				})),
 				$startTimepicker = $template.find('.start-time'),
 				$endTimepicker = $template.find('.end-time'),
-				timepickerOptions = {
-					step: meta.step / 60
-				},
+				endTime = 3600 * 17,
+				endRemainder = endTime % timepickerStep,
+				startPickerMaxTime = endTime - endRemainder - (endRemainder > 0 ? 0 : timepickerStep),
+				startTime = 3600 * 9,
+				startRemainder = startTime % timepickerStep,
+				endPickerMinTime = startTime - startRemainder + timepickerStep,
 				popup;
 
 			$template.find('input[name="days[]"]').on('change', function(event) {
@@ -3882,36 +3849,86 @@ define(function(require) {
 				$template.find('.no-days-error')[atLeastOneChecked ? 'slideUp' : 'slideDown'](200);
 			});
 
-			monster.ui.timepicker($startTimepicker, _.merge({
-				useSelect: true,
-				maxTime: meta.max - meta.step
-			}, timepickerOptions));
-			monster.ui.timepicker($endTimepicker, _.merge({
-				useSelect: true,
-				minTime: meta.step,
-				maxTime: meta.max
-			}, timepickerOptions));
-			$endTimepicker.timepicker('setTime', meta.max);
+			monster.ui.timepicker($startTimepicker, {
+				listWidth: 1,
+				minTime: meta.min,
+				maxTime: startPickerMaxTime
+			});
+			$startTimepicker.timepicker('setTime', startTime);
 
-			$startTimepicker.on('changeTime', function() {
+			monster.ui.timepicker($endTimepicker, {
+				listWidth: 1,
+				minTime: endPickerMinTime,
+				maxTime: meta.max - timepickerStep
+			});
+			$endTimepicker.timepicker('setTime', endTime);
+
+			$startTimepicker.on('change', function(event) {
+				event.preventDefault();
+
+				var startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
+					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight'),
+					isBumping = startSeconds >= endSeconds,
+					isOverMax = (startSeconds + meta.step) >= meta.max;
+
+				if (isBumping && isOverMax) {
+					$startTimepicker
+						.timepicker('setTime', endSeconds - meta.step);
+				} else if (isBumping) {
+					$endTimepicker
+						.timepicker('setTime', startSeconds + meta.step)
+						.change();
+				}
+			});
+
+			$endTimepicker.on('change', function(event) {
+				event.preventDefault();
+
+				var endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight'),
+					startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
+					isUnderMin = endSeconds === meta.min,
+					isBumping = endSeconds <= startSeconds;
+
+				if (isUnderMin) {
+					$endTimepicker
+						.timepicker('setTime', meta.min + meta.step);
+					$startTimepicker
+						.timepicker('setTime', meta.min)
+						.change();
+				} else if (isBumping) {
+					$startTimepicker
+						.timepicker('setTime', endSeconds - meta.step)
+						.change();
+				}
+			});
+
+			$startTimepicker.on('change', function() {
 				$template.find('.overlapping-hours-error').slideUp(200);
 
 				var startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
-					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight');
+					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight'),
+					remainder = startSeconds % timepickerStep;
 
-				$endTimepicker.timepicker('option', 'minTime', startSeconds + meta.step);
+				$endTimepicker.timepicker('option', 'minTime',
+					startSeconds - remainder + timepickerStep
+				);
+
 				if (!_.isNull(endSeconds)) {
 					$endTimepicker.timepicker('setTime', endSeconds);
 				}
 			});
 
-			$endTimepicker.on('changeTime', function() {
+			$endTimepicker.on('change', function() {
 				$template.find('.overlapping-hours-error').slideUp(200);
 
 				var startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
-					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight');
+					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight'),
+					remainder = endSeconds % timepickerStep;
 
-				$startTimepicker.timepicker('option', 'maxTime', endSeconds - meta.step);
+				$startTimepicker.timepicker('option', 'maxTime',
+					endSeconds - remainder - (remainder > 0 ? 0 : timepickerStep)
+				);
+
 				if (!_.isNull(endSeconds)) {
 					$startTimepicker.timepicker('setTime', startSeconds);
 				}
