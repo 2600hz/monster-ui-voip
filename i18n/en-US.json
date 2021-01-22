@@ -944,6 +944,16 @@
 				"title": "Your Office Holidays Are Empty",
 				"description": "Please use the Add holiday or Import Holidays buttons to enter holidays."
 			},
+			"dialogs": {
+				"delete": {
+					"title": "Delete Time Slot?",
+					"message": "Delete holiday \"{{variable}}\"? Deleting a holiday will permanently remove it.",
+					"buttons": {
+						"yes": "Yes, Delete Holiday",
+						"no": "Keep Time Slot"
+					}
+				}
+			},
 			"helpHolidays": "Do not forget to set the call routing for when your office is closed for the holidays! To set it up, go in the \"Incoming Call Handling\" section of this page, and select the \"Holidays\" tab."
 		},
 		"calls": {
