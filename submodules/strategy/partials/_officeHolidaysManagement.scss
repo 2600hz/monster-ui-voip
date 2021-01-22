@@ -1,0 +1,59 @@
+.monster-alert {
+	&.holiday-delete-dialog {
+		font-size: 14px;
+
+		.ui-dialog-titlebar {
+			padding: 24px;
+
+			.ui-dialog-title {
+	        		font-size: 18px;
+				line-height: 18px;
+				text-align: left;
+				color: $woodsmoke;
+
+				.fa {
+					font-size: 2rem;
+					margin-right: 16px;
+				}
+
+				.fa, .title {
+					display: inline-block;
+					vertical-align: middle;
+				}
+			}
+		}
+
+		.dialog-content-wrapper {
+			padding: 0 24px 32px;
+			width: 400px;
+			color: $woodsmoke;
+		}
+
+		.action-buttons {
+			padding: 0 24px 24px;
+			text-align: right;
+
+			.cancel {
+				margin-right: 12px;	
+			}
+
+			.delete {
+				color: $woodsmoke;
+				background: #2ed022;
+				border: 1px solid #209218;
+			}
+		}
+	}
+}
+
+.monster-dialog {
+	&.holiday-add-edit-dialog {
+		.ui-dialog-titlebar {
+			background: $woodsmoke;
+		}
+
+		.ui-dialog-titlebar-close {
+			color: $white;
+		}
+	}
+}

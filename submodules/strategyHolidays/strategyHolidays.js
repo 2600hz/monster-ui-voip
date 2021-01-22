@@ -178,6 +178,25 @@ define(function(require) {
 			table.rows.load(holidaysDataArray, true);
 		},
 
+		strategyHolidaysDeleteDialogRender: function(parent, data) {
+			var self = this,
+				template = $(self.getTemplate({
+					name: 'deleteHolidayDialog',
+					data: {
+						holidayName: data.holidayName
+					},
+					submodule: 'strategyHolidays'
+				})),
+				optionsPopup = {
+					position: ['center', 20],
+					title: '<i class="fa fa-warning monster-red"></i><div class="title">' + self.i18n.active().strategy.holidays.dialogs.delete.title + '</div>',
+					dialogClass: 'monster-alert holiday-delete-dialog'
+				},
+				popup = monster.ui.dialog(template, optionsPopup);
+
+			self.strategyHolidaysDeleteDialogBindsEvents(template, parent, popup, data.holidayId);
+		},
+
 		strategyHolidaysBindEvents: function(parent, template, holidaysData) {
 			var self = this;
 
@@ -320,6 +339,46 @@ define(function(require) {
 
 		strategyHolidaysListingBindEvents: function(parent, template) {
 			var self = this;
+
+			template.on('click', '.delete-holiday', function(event) {
+				event.preventDefault();
+
+				var $this = $(this),
+					holidayName = $this.parents('tr').find('td:first-child').html(),
+					id = $this.parents('tr').data('id'),
+					data = {
+						holidayName: holidayName,
+						holidayId: id
+					};
+
+				self.strategyHolidaysDeleteDialogRender(parent, data);
+			});
+		},
+
+		strategyHolidaysDeleteDialogBindsEvents: function(template, parent, popup, holidayId) {
+			var self = this;
+
+			template.find('.cancel').on('click', function(event) {
+				popup.dialog('close').remove();
+			});
+
+			template.find('.delete').on('click', function(event) {
+				event.preventDefault();
+
+				var table = footable.get('#holidays_list_table'),
+					allHolidays = self.appFlags.strategyHolidays.allHolidays,
+					holidayRuleId = _.findKey(allHolidays, function(holiday) {
+						return holiday.holidayData.id === holidayId;
+					}),
+					$row = parent.find('#holidays_list_table tbody tr[data-id="' + holidayId + '"]'),
+					rowId = $row.index(),
+					tableRows = table.rows.all;
+
+				delete allHolidays.splice(holidayRuleId, 1);
+
+				tableRows[rowId].delete();
+				popup.dialog('close').remove();
+			});
 		},
 
 		/**
