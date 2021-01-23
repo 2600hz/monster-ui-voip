@@ -163,7 +163,27 @@ define(function(require) {
 		},
 
 		strategyHoursBindEvents: function(parent, template, strategyData) {
-			var self = this;
+			var self = this,
+				meta = self.appFlags.strategyHours.intervals,
+				sanitizeString = _.flow(
+					_.toString,
+					_.toLower
+				),
+				parseTime = function(time) {
+					return time <= 24 ? time * meta.unit : time;
+				},
+				sanitizeTime = _.flow(
+					_.toNumber,
+					parseTime,
+					_.floor
+				),
+				validTypes = _.map(self.appFlags.strategyHours.apiToTemplateTypesMap),
+				isTimeValid = function(time, lower, upper) {
+					return _.every([
+						_.inRange(time, lower, upper),
+						time % meta.step === 0
+					]);
+				};
 
 			template.on('change', '.custom-hours-toggler input[type="radio"]', function(e) {
 				var toggleDiv = template.find('.custom-hours-div'),
@@ -189,6 +209,33 @@ define(function(require) {
 
 				monster.pub('common.csvUploader.renderPopup', {
 					title: self.i18n.active().strategy.hours.importOfficeHours.title,
+					header: ['day', 'start', 'end', 'type'],
+					row: {
+						sanitizer: function(row) {
+							return {
+								day: sanitizeString(row.day),
+								start: sanitizeTime(row.start),
+								end: sanitizeTime(row.end),
+								type: sanitizeString(row.type)
+							};
+						},
+						validator: function(row) {
+							var start = row.start,
+								end = row.end,
+								isDayValid = _.includes(self.weekdays, row.day),
+								isTypeValid = _.includes(validTypes, row.type),
+								areTimesValid = _.every([
+									isTimeValid(start, 0, end),
+									isTimeValid(end, start + 1, meta.max + 1)
+								]);
+
+							return _.every([
+								isDayValid,
+								isTypeValid,
+								areTimesValid
+							]);
+						}
+					},
 					onSuccess: _.flow(
 						_.bind(self.strategyHoursExtractDaysIntervalsFromCsvData, self),
 						_.bind(self.strategyHoursNormalizeDaysIntervals, self),
@@ -556,97 +603,7 @@ define(function(require) {
 		strategyHoursExtractDaysIntervalsFromCsvData: function(csvData) {
 			var self = this,
 				weekdays = self.weekdays,
-				meta = self.appFlags.strategyHours.intervals,
-				validTypes = _.map(self.appFlags.strategyHours.apiToTemplateTypesMap),
-				expectedHeader = ['day', 'start', 'end', 'type'],
-				potentialHeader = _
-					.chain(csvData)
-					.head()
-					.map(_.toLower)
-					.value(),
-				hasHeader = _.isEqual(
-					_.sortBy(potentialHeader),
-					_.sortBy(expectedHeader)
-				),
-				header = hasHeader ? potentialHeader : expectedHeader,
-				entries = hasHeader ? _.tail(csvData) : csvData,
-				extractObjects = function(entry) {
-					return _.reduce(header, function(acc, prop, index) {
-						return _.merge(
-							_.set({}, prop, entry[index]),
-							acc
-						);
-					}, {});
-				},
-				sanitizeString = _.flow(
-					_.toString,
-					_.toLower
-				),
-				parseTime = function(time) {
-					var modifiers = [
-						hoursToSeconds,
-						minutesToSeconds
-					];
-
-					return _
-						.chain(time)
-						.split(':')
-						.map(_.toNumber)
-						.slice(0, 2)
-						.map(function(value, index) {
-							return modifiers[index](value);
-						})
-						.sum()
-						.value();
-				},
-				minutesInHour = self.appFlags.strategyHours.minutesInHour,
-				secondsInMinute = self.appFlags.strategyHours.secondsInMinute,
-				hoursToSeconds = _.partial(_.reduce, [
-					minutesInHour,
-					secondsInMinute
-				], _.multiply),
-				minutesToSeconds = _.partial(_.multiply, secondsInMinute),
-				sanitizeTime = _.flow(
-					parseTime,
-					_.floor
-				),
-				sanitize = function(entry) {
-					return {
-						day: sanitizeString(entry.day),
-						start: sanitizeTime(entry.start),
-						end: sanitizeTime(entry.end),
-						type: sanitizeString(entry.type)
-					};
-				},
-				isTimeValid = function(time, lower, upper) {
-					return _.every([
-						_.inRange(time, lower, upper),
-						time % meta.step === 0
-					]);
-				},
-				isValid = function(entry) {
-					var start = entry.start,
-						end = entry.end,
-						isDayValid = _.includes(self.weekdays, entry.day),
-						isTypeValid = _.includes(validTypes, entry.type),
-						areTimesValid = _.every([
-							isTimeValid(start, 0, end),
-							isTimeValid(end, start + 1, meta.max + 1)
-						]);
-
-					return _.every([
-						isDayValid,
-						isTypeValid,
-						areTimesValid
-					]);
-				},
-				intervalsPerDays = _
-					.chain(entries)
-					.map(extractObjects)
-					.map(sanitize)
-					.filter(isValid)
-					.groupBy('day')
-					.value();
+				intervalsPerDays = _.groupBy(csvData, 'day');
 
 			return _.map(weekdays, function(day, index) {
 				return _
