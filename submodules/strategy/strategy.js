@@ -4047,7 +4047,7 @@ define(function(require) {
 			var self = this,
 				callback = args.callback,
 				holidayRule = args.holidayRule ? args.holidayRule : {},
-				allHolidaysNames = args.allHolidaysNames,
+				existingHolidays = args.existingHolidays,
 				getListOfYears = function getListOfYears() {
 					var date = new Date(),
 						year = parseInt(date.getFullYear()),
@@ -4189,7 +4189,8 @@ define(function(require) {
 						id: _.isEmpty(holidayRule) ? 'new-' + Date.now() : holidayRule.holidayData.id
 					},
 					holidayRuleToSave = {},
-					nameLength = formData.name.length;
+					nameLength = formData.name.length,
+					nameExists = _.find(existingHolidays, { name: formData.name });
 
 				if (!monster.ui.valid($template)) {
 					return;
@@ -4204,7 +4205,7 @@ define(function(require) {
 				} else if (nameLength > 60) {
 					$template.find('.maximum-name-error').slideDown(200);
 					return;
-				} else if (_.indexOf(allHolidaysNames, formData.name) > -1) {
+				} else if (nameExists && nameExists.name === formData.name && nameExists.id !== holidayData.id) {
 					$template.find('.duplicate-name-error').slideDown(200);
 					return;
 				}
