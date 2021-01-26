@@ -12,7 +12,8 @@ define(function(require) {
 		subscribe: {
 			'voip.strategy.addOfficeHours': 'strategyAddOfficeHoursPopup',
 			'voip.strategy.render': 'strategyRender',
-			'auth.currentAccountUpdated': '_strategyOnCurrentAccountUpdated'
+			'auth.currentAccountUpdated': '_strategyOnCurrentAccountUpdated',
+			'voip.strategy.addEditOfficeHolidays': 'strategyAddEditOfficeHolidaysPopup'
 		},
 
 		weekdays: [
@@ -23,6 +24,30 @@ define(function(require) {
 			'friday',
 			'saturday',
 			'sunday'
+		],
+
+		ordinals: [
+			'first',
+			'second',
+			'third',
+			'fourth',
+			'fifth',
+			'last'
+		],
+
+		months: [
+			'january',
+			'february',
+			'march',
+			'april',
+			'may',
+			'june',
+			'july',
+			'august',
+			'september',
+			'october',
+			'november',
+			'december'
 		],
 
 		weekdayLabels: [
@@ -4015,6 +4040,203 @@ define(function(require) {
 			popup = monster.ui.dialog($template, {
 				autoScroll: false,
 				title: self.i18n.active().strategy.addOfficeHours.title
+			});
+		},
+
+		strategyAddEditOfficeHolidaysPopup: function(args) {
+			var self = this,
+				callback = args.callback,
+				holidayRule = args.holidayRule ? args.holidayRule : {},
+				getListOfYears = function getListOfYears() {
+					var date = new Date(),
+						year = parseInt(date.getFullYear()),
+						totalYears = 3,
+						yearsArray = [];
+
+					while (totalYears >= 0) {
+						yearsArray.push(year);
+						year++;
+						totalYears--;
+					}
+
+					return yearsArray;
+				},
+				getListOfDates = function getListOfDates() {
+					var date = 0,
+						datesArray = [];
+
+					while (date < 31) {
+						date++;
+						datesArray.push(date);
+					}
+
+					return datesArray;
+				},
+				formatHolidayRule = function formatHolidayRule(holidayRule) {
+					var fromMonth = _.get(holidayRule, 'holidayData.fromMonth'),
+						toMonth = _.get(holidayRule, 'holidayData.toMonth');
+
+					if (fromMonth) {
+						holidayRule.holidayData.fromMonth = fromMonth - 1;
+					}
+					if (toMonth) {
+						holidayRule.holidayData.fromMonth = toMonth - 1;
+					}
+
+					return holidayRule;
+				},
+				dataToTemplate = _.merge({}, formatHolidayRule(holidayRule), {
+					months: _.map(
+						self.months,
+						_.partial(monster.util.tryI18n, self.i18n.active().strategy.holidays.months)
+					),
+					ordinals: self.i18n.active().strategy.holidays.ordinals,
+					days: self.i18n.active().strategy.holidays.days,
+					years: getListOfYears(),
+					dates: getListOfDates()
+				}),
+				$template = $(self.getTemplate({
+					name: 'addEditOfficeHolidays',
+					data: dataToTemplate,
+					submodule: 'strategy'
+				})),
+				popup;
+
+			if (!_.isEmpty(holidayRule)) {
+				var selectedType = holidayRule.holidayType;
+
+				$template
+					.find('#date_type')
+					.val(holidayRule.holidayType);
+
+				$template
+					.find('.row-fluid')
+					.removeClass('selected');
+
+				$template
+					.find('.row-fluid.' + selectedType)
+					.addClass('selected');
+
+				if (selectedType === 'single' && holidayRule.holidayData.recurring) {
+					$template
+						.find('.single .year')
+						.addClass('hide');
+				}
+			}
+
+			$template.find('.cancel').on('click', function(event) {
+				event.preventDefault();
+				popup.dialog('close');
+			});
+
+			$template.find('#name').on('keyup', function(event) {
+				var $this = $(this),
+					isEmpty = _.isEmpty($this.val());
+
+				$template.find('.no-name-error')[isEmpty ? 'slideDown' : 'slideUp'](200);
+				$template.find('.minimum-name-error').slideUp(200)
+				$template.find('.maximum-name-error').slideUp(200)
+			});
+
+			$template.find('#recurring').on('change', function(event) {
+				var $this = $(this),
+					isChecked = $this.prop('checked'),
+					dateType = $template.find('#date_type').val(),
+					$singleDateYearElement = $template.find('.single .year');
+
+				if (dateType === 'single' && isChecked) {
+					$singleDateYearElement
+						.addClass('hide');
+				} else {
+					$singleDateYearElement
+						.removeClass('hide');
+				}
+			});
+
+			$template.find('#date_type').on('change', function(event) {
+				event.preventDefault();
+
+				var $this = $(this),
+					className = $this.val(),
+					isRecurringChecked = $template.find('#recurring').prop('checked'),
+					$singleDateYearElement = $template.find('.single .year');
+
+				$template
+					.find('.row-fluid')
+					.removeClass('selected');
+
+				$template
+					.find('.row-fluid.' + className)
+					.addClass('selected');
+
+				if (className === 'single' && isRecurringChecked) {
+					$singleDateYearElement
+						.addClass('hide');
+				} else {
+					$singleDateYearElement
+						.removeClass('hide');
+				}
+			});
+
+			$template.on('submit', function(event) {
+				event.preventDefault();
+
+				var formData = monster.ui.getFormData($template.get(0)),
+					$optionDiv = $template.find('.row-fluid.' + formData.type + ' select:not(.hide)'),
+					holidayData = {
+						id: _.isEmpty(holidayRule) ? 'new-' + Date.now() : holidayRule.holidayData.id
+					},
+					holidayRuleToSave = {},
+					nameLength = formData.name.length;
+
+				if (!monster.ui.valid($template)) {
+					return;
+				}
+
+				if (_.isEmpty(formData.name)) {
+					$template.find('.no-name-error').slideDown(200);
+					return;
+				} else if (nameLength < 4) {
+					$template.find('.minimum-name-error').slideDown(200);
+					return;
+				} else if (nameLength > 60) {
+					$template.find('.maximum-name-error').slideDown(200);
+					return;
+				}
+
+				_.each($optionDiv, function(element) {
+					var $element = $(element),
+						elementName = $element.data('name'),
+						value = _.includes(['ordinal', 'wday'], elementName)
+							? $element.val()
+							: parseInt($element.val());
+
+					holidayData[elementName] = _.includes(['fromMonth', 'toMonth'], elementName)
+						? value + 1
+						: value;
+				});
+
+				if (!formData.recurring && formData.type !== 'single') {
+					holidayData.endYear = args.yearSelected;
+				}
+
+				holidayRuleToSave = {
+					holidayType: formData.type,
+					holidayData: _.assign({}, holidayData, formData),
+					modified: true
+				};
+
+				popup.dialog('close');
+
+				callback(null, holidayRuleToSave);
+			});
+
+			popup = monster.ui.dialog($template, {
+				autoScroll: false,
+				title: _.isEmpty(holidayRule)
+					? self.i18n.active().strategy.addEditOfficeHolidays.title.add
+					: self.i18n.active().strategy.addEditOfficeHolidays.title.edit,
+				dialogClass: 'monster-dialog holiday-add-edit-dialog'
 			});
 		}
 	};

@@ -57,3 +57,90 @@
 		}
 	}
 }
+
+#form_add_edit_office_holidays {
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+	max-height: inherit;
+	width: 398px;
+
+	#date_type, .form-control {
+		width: 100%;
+	}
+
+	select, .form-control {
+		height: 36px;
+		border-radius: 2px;
+		box-sizing: border-box;
+		margin: 0;
+	}
+
+	.form-content {
+		overflow-y: auto;
+		padding: 1.5rem 1rem;
+		color: $woodsmoke;
+
+		.control-label {
+			margin-bottom: 4px;
+		}
+
+		.control-group {
+			margin-bottom: 1.5rem;
+
+			&:last-child {
+				margin-bottom: 0;
+			}
+
+			.row-fluid {
+				align-items: center;
+				display: none;
+
+				select:not(:last-child) {
+					margin-right: 12px;
+				}
+
+				.separator {
+					margin-right: 1rem;
+				}
+
+				&.date-range .date {
+					width: 60px;
+				}
+
+				&.selected {
+					display: flex;
+				}
+			}
+		}
+
+		.monster-checkbox {
+			span {
+				font-weight: 600;
+			}
+		}
+
+		.no-name-error, .minimum-name-error, .maximum-name-error {
+			display: none;
+		}
+
+	}
+
+	.form-actions {
+		display: flex;
+		justify-content: flex-end;
+		margin: 0;
+		padding: 1rem;
+		background-color: $athens-gray;
+		border-top-color: #dbdbde;
+
+		button {
+			color: $woodsmoke;
+		}
+
+		& > *:not(:last-child) {
+			margin-right: .75rem;
+		}
+	}
+
+}

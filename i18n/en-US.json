@@ -825,6 +825,34 @@
 				"overlappingHours": "Selected hours overlap existing hours."
 			}
 		},
+		"addEditOfficeHolidays": {
+			"title": {
+				"add": "Add Holiday",
+				"edit": "Edit Holiday"
+			},
+			"labels": {
+				"addHoliday": "Add Holiday",
+				"updateHoliday": "Update Holiday",
+				"name": "Holiday Name",
+				"dateType": "Date Type",
+				"date": "Date",
+				"recurringAnnually": "Recurring Annually"
+			},
+			"dateType": {
+				"singleDate": "Single Date",
+				"dateRange": "Date Range",
+				"advancedDate": "Advanced Date"
+			},
+			"placeholders": {
+				"name": "Holiday Name"
+			},
+			"errors": {
+				"noName": "Please enter a name for this holiday",
+				"minimum": "Holiday name must be 4 characters or greater",
+				"maximum": "Holiday name must be limited to 60 characters"
+
+			}
+		},
 		"noNumberHelp": "Note: Please add a Main Office Number to your account first. Once you add a main number, you will be able to set up Office Hours, Holidays and Incoming Call Handling (Call-Flow) for your office.",
 		"sectionTitles": {
 			"numbers": "Main Company Numbers",
