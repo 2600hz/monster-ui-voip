@@ -4135,9 +4135,9 @@ define(function(require) {
 					isEmpty = _.isEmpty($this.val());
 
 				$template.find('.no-name-error')[isEmpty ? 'slideDown' : 'slideUp'](200);
-				$template.find('.minimum-name-error').slideUp(200)
-				$template.find('.maximum-name-error').slideUp(200)
-				$template.find('.duplicate-name-error').slideUp(200)
+				$template.find('.minimum-name-error').slideUp(200);
+				$template.find('.maximum-name-error').slideUp(200);
+				$template.find('.duplicate-name-error').slideUp(200);
 			});
 
 			$template.find('#recurring').on('change', function(event) {
