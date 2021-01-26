@@ -4047,6 +4047,7 @@ define(function(require) {
 			var self = this,
 				callback = args.callback,
 				holidayRule = args.holidayRule ? args.holidayRule : {},
+				allHolidaysNames = args.allHolidaysNames,
 				getListOfYears = function getListOfYears() {
 					var date = new Date(),
 						year = parseInt(date.getFullYear()),
@@ -4136,6 +4137,7 @@ define(function(require) {
 				$template.find('.no-name-error')[isEmpty ? 'slideDown' : 'slideUp'](200);
 				$template.find('.minimum-name-error').slideUp(200)
 				$template.find('.maximum-name-error').slideUp(200)
+				$template.find('.duplicate-name-error').slideUp(200)
 			});
 
 			$template.find('#recurring').on('change', function(event) {
@@ -4201,6 +4203,9 @@ define(function(require) {
 					return;
 				} else if (nameLength > 60) {
 					$template.find('.maximum-name-error').slideDown(200);
+					return;
+				} else if (_.indexOf(allHolidaysNames, formData.name) > -1) {
+					$template.find('.duplicate-name-error').slideDown(200);
 					return;
 				}
 

@@ -12,6 +12,8 @@
 		{{/monsterPanelText}}
 		{{#monsterPanelText i18n.strategy.addEditOfficeHolidays.errors.maximum "danger" "fill-width maximum-name-error"}}
 		{{/monsterPanelText}}
+		{{#monsterPanelText i18n.strategy.addEditOfficeHolidays.errors.nameExists "danger" "fill-width duplicate-name-error"}}
+		{{/monsterPanelText}}
 		<div class="control-group">
 			{{#monsterCheckbox i18n.strategy.addEditOfficeHolidays.labels.recurringAnnually}}
 				<input type="checkbox" name="recurring" id="recurring" {{#if holidayData.recurring}} checked {{/if}}>

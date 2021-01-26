@@ -849,8 +849,8 @@
 			"errors": {
 				"noName": "Please enter a name for this holiday",
 				"minimum": "Holiday name must be 4 characters or greater",
-				"maximum": "Holiday name must be limited to 60 characters"
-
+				"maximum": "Holiday name must be limited to 60 characters",
+				"nameExists": "Holiday name already exists. Please specificy a unique name"
 			}
 		},
 		"noNumberHelp": "Note: Please add a Main Office Number to your account first. Once you add a main number, you will be able to set up Office Hours, Holidays and Incoming Call Handling (Call-Flow) for your office.",

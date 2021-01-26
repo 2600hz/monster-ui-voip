@@ -227,6 +227,7 @@ define(function(require) {
 
 				monster.pub('voip.strategy.addEditOfficeHolidays', {
 					yearSelected: parseInt(parent.find('#year').val()),
+					allHolidaysNames: _.map(self.appFlags.strategyHolidays.allHolidays, 'holidayData.name'),
 					callback: function(err, data) {
 						self.appFlags.strategyHolidays.allHolidays.push(data);
 						self.strategyHolidaysListingRender(parent, [data]);
@@ -387,6 +388,7 @@ define(function(require) {
 
 				monster.pub('voip.strategy.addEditOfficeHolidays', {
 					yearSelected: parseInt(parent.find('#year').val()),
+					allHolidaysNames: _.map(self.appFlags.strategyHolidays.allHolidays, 'holidayData.name'),
 					holidayRule: holidayRule,
 					callback: function(err, data) {
 						tableRows[rowId].delete();
