@@ -222,6 +222,18 @@ define(function(require) {
 				self.strategyHolidaysListingRender(parent, holidaysData);
 			});
 
+			template.on('click', '.add-holiday', function(event) {
+				event.preventDefault();
+
+				monster.pub('voip.strategy.addEditOfficeHolidays', {
+					yearSelected: parseInt(parent.find('#year').val()),
+					callback: function(err, data) {
+						self.appFlags.strategyHolidays.allHolidays.push(data);
+						self.strategyHolidaysListingRender(parent, [data]);
+					}
+				});
+			});
+
 			template.on('click', '.save-button', function(event) {
 				event.preventDefault();
 
@@ -352,6 +364,36 @@ define(function(require) {
 					};
 
 				self.strategyHolidaysDeleteDialogRender(parent, data);
+			});
+
+			template.on('click', '.edit-holiday', function(event) {
+				event.preventDefault();
+
+				var $this = $(this),
+					id = $this.parents('tr').data('id'),
+					table = footable.get('#holidays_list_table'),
+					allHolidays = self.appFlags.strategyHolidays.allHolidays,
+					holidayRuleId = _.findKey(allHolidays, function(holiday) {
+						return holiday.holidayData.id === id;
+					}),
+					holidayRule = allHolidays[holidayRuleId],
+					allHolidays = self.appFlags.strategyHolidays.allHolidays,
+					holidayRuleId = _.findKey(allHolidays, function(holiday) {
+						return holiday.holidayData.id === id;
+					}),
+					$row = parent.find('#holidays_list_table tbody tr[data-id="' + id + '"]'),
+					rowId = $row.index(),
+					tableRows = table.rows.all;
+
+				monster.pub('voip.strategy.addEditOfficeHolidays', {
+					yearSelected: parseInt(parent.find('#year').val()),
+					holidayRule: holidayRule,
+					callback: function(err, data) {
+						tableRows[rowId].delete();
+						self.appFlags.strategyHolidays.allHolidays[holidayRuleId] = data;
+						self.strategyHolidaysListingRender(parent, [data]);
+					}
+				});
 			});
 		},
 
