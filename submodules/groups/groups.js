@@ -576,7 +576,12 @@ define(function(require) {
 
 			monster.ui.validate(featureForm, {
 				rules: {
+					url: {
+						required: true,
+						url: true
+					},
 					'time_limit': {
+						required: true,
 						digits: true
 					}
 				}
