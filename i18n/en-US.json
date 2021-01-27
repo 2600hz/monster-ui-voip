@@ -90,6 +90,7 @@
 			"formatLabel": "Format:",
 			"urlLabel": "URL:",
 			"urlPlaceholder": "http://your.server.com/place/to/store/recordings",
+			"urlInvalid": "Only HTTP\\S, FTP\\S and SFTP are supported",
 			"timeLimitLabel": "Time Limit (sec):"
 		},
 		"ringback": {

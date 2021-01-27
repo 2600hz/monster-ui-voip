@@ -578,11 +578,16 @@ define(function(require) {
 				rules: {
 					url: {
 						required: true,
-						url: true
+						regex: /^(https?|ftps?|sftp):\/\//
 					},
 					'time_limit': {
 						required: true,
 						digits: true
+					}
+				},
+				messages: {
+					url: {
+						regex: self.i18n.active().groups.callRecording.urlInvalid
 					}
 				}
 			});
