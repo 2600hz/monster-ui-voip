@@ -97,7 +97,7 @@ define(function(require) {
 			});
 
 			self.strategyHolidaysListingRender($container, holidaysData);
-			self.strategyHolidaysBindEvents($container, template, holidaysData);
+			self.strategyHolidaysBindEvents($container, template, holidaysData, strategyData);
 
 			callback && callback();
 		},
@@ -197,7 +197,7 @@ define(function(require) {
 			self.strategyHolidaysDeleteDialogBindsEvents(template, parent, popup, data.holidayId);
 		},
 
-		strategyHolidaysBindEvents: function(parent, template, holidaysData) {
+		strategyHolidaysBindEvents: function(parent, template, holidaysData, strategyData) {
 			var self = this;
 
 			parent.on('change', '.holidays-toggler input[type="checkbox"]', function() {
@@ -243,20 +243,15 @@ define(function(require) {
 			template.on('click', '.save-button', function(event) {
 				event.preventDefault();
 
-				/*var parent = $(this).parents('.element-container'),
+				var $this = $(this),
+					allHolidays = self.appFlags.strategyHolidays.allHolidays,
 					mainCallflow = strategyData.callflows.MainCallflow,
 					holidaysEnabled = parent.find('.holidays-toggler input[type="checkbox"]')[0].checked,
-					holidayRulesRequests = {},
-					invalidData = false;
+					holidayRulesRequests = {};
 
 				if (holidaysEnabled) {
-					_.each(parent.find('.holidays-element'), function() {
-						var holidayRule = self.strategyHolidaysBuildHolidayRule($(this), holidayRulesRequests);
-
-						if (!holidayRule) {
-							invalidData = true;
-							return false;
-						}
+					_.each(allHolidays, function(holiday) {
+						var holidayRule = self.strategyHolidaysBuildHolidayRule(holiday, holidayRulesRequests);
 
 						holidayRulesRequests[holidayRule.name] = function(callback) {
 							// ghetto strategyBuildHoliday builds a complete different object for a range, so we check if one of the different key is in there, if yes, this is a range spanning multiple months
@@ -273,52 +268,46 @@ define(function(require) {
 						};
 					});
 
-					if (invalidData) {
-						monster.ui.alert(self.i18n.active().strategy.alertMessages.uniqueHoliday);
-					} else {
-						monster.parallel(holidayRulesRequests, function(err, results) {
-							// First extract all ids from the new holidayList
-							var existingHolidaysCallflowsIds = [],
-								newHolidayCallflowsIds = _.map(holidayRulesRequests, 'id');
+					monster.parallel(holidayRulesRequests, function(err, results) {
+						// First extract all ids from the new holidayList
+						var existingHolidaysCallflowsIds = [],
+							newHolidayCallflowsIds = _.map(holidayRulesRequests, 'id');
 
-							// Find all IDs of existing Callflows in the Main Callflow that are linking to the Main Holidays
-							_.each(mainCallflow.flow.children, function(directChild, id) {
-								if (id !== '_' && directChild.data.id === strategyData.callflows.MainHolidays.id) {
-									existingHolidaysCallflowsIds.push(id);
-								}
-							});
+						// Find all IDs of existing Callflows in the Main Callflow that are linking to the Main Holidays
+						_.each(mainCallflow.flow.children, function(directChild, id) {
+							if (id !== '_' && directChild.data.id === strategyData.callflows.MainHolidays.id) {
+								existingHolidaysCallflowsIds.push(id);
+							}
+						});
 
-							// Now see if any of these existing IDs that are no longer in the list of holidays
-							// If we find orphans, remove them from the main callflow
-							_.each(existingHolidaysCallflowsIds, function(id) {
-								if (newHolidayCallflowsIds.indexOf(id) < 0) {
-									delete mainCallflow.flow.children[id];
-								}
-							});
+						// Now see if any of these existing IDs that are no longer in the list of holidays
+						// If we find orphans, remove them from the main callflow
+						_.each(existingHolidaysCallflowsIds, function(id) {
+							if (newHolidayCallflowsIds.indexOf(id) < 0) {
+								delete mainCallflow.flow.children[id];
+							}
+						});
 
-							_.each(results, function(val, key) {
-								mainCallflow.flow.children[val.id] = {
-									children: {},
-									data: {
-										id: strategyData.callflows.MainHolidays.id
-									},
-									module: 'callflow'
-								};
-								_.set(strategyData.temporalRules, ['holidays', val.name], val);
-							});
+						_.each(results, function(val, key) {
+							mainCallflow.flow.children[val.id] = {
+								children: {},
+								data: {
+									id: strategyData.callflows.MainHolidays.id
+								},
+								module: 'callflow'
+							};
+							_.set(strategyData.temporalRules, ['holidays', val.name], val);
+						});
 
-							self.strategyRebuildMainCallflowRuleArray(strategyData);
-							self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
-								strategyData.callflows.MainCallflow = updatedCallflow;
-								parent.find('.element-content').hide();
-								parent.removeClass('open');
-								monster.ui.toast({
-									type: 'success',
-									message: self.i18n.active().strategy.toastrMessages.updateHolidaySuccess
-								});
+						self.strategyRebuildMainCallflowRuleArray(strategyData);
+						self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
+							strategyData.callflows.MainCallflow = updatedCallflow;
+							monster.ui.toast({
+								type: 'success',
+								message: self.i18n.active().strategy.toastrMessages.updateHolidaySuccess
 							});
 						});
-					}
+					});
 				} else {
 					monster.ui.confirm(self.i18n.active().strategy.confirmMessages.disableHolidays, function() {
 						_.each(_.get(strategyData.temporalRules, 'holidays', {}), function(val, key) {
@@ -351,7 +340,7 @@ define(function(require) {
 							});
 						});
 					});
-				}*/
+				}
 			});
 		},
 
@@ -386,7 +375,7 @@ define(function(require) {
 
 				monster.pub('voip.strategy.addEditOfficeHolidays', {
 					yearSelected: parseInt(parent.find('#year').val()),
-					existingHolidays: _.map(self.appFlags.strategyHolidays.allHolidays, function(holiday) {
+					existingHolidays: _.map(allHolidays, function(holiday) {
 						return {
 							id: holiday.holidayData.id,
 							name: holiday.holidayData.name
@@ -478,7 +467,7 @@ define(function(require) {
 					}
 
 					if (endDate) {
-						holidayData.endDate = monster.util.gregorianToDate(endDate);
+						holidayData.endYear = monster.util.gregorianToDate(endDate).getFullYear();
 						holidayData.recurring = false;
 					}
 					holidaysData.push({ holidayType: holidayType, holidayData: holidayData });
@@ -650,23 +639,19 @@ define(function(require) {
 			}
 		},
 
-		strategyHolidaysBuildHolidayRule: function(template, rules) {
+		strategyHolidaysBuildHolidayRule: function(holiday, rules) {
 			var self = this,
-				$this = $(template),
-				name = $this.find('#name').val().trim(),
-				month = parseInt($this.find('.month.from :selected').val()),
-				toMonth = parseInt($this.find('.month.to :selected').val()),
-				fromDay = parseInt($this.find('.day.from :selected').val()),
-				toDay = parseInt($this.find('.day.to :selected').val()),
-				ordinal = $this.find('.ordinal :selected').val(),
-				wday = $this.find('.wday :selected').val(),
-				id = $this.data('id'),
-				type = $this.data('type'),
+				holidayData = holiday.holidayData,
+				name = holidayData.name,
+				month = holidayData.fromMonth,
+				toMonth = holidayData.toMonth,
+				fromDay = holidayData.fromDay,
+				toDay = holidayData.toDay,
+				id = holidayData.id,
+				endDate = '',
 				holidayRule = {};
 
-			if (!name || _.keys(rules).indexOf(name) >= 0) {
-				holidayRule = false;
-			} else if (toMonth && month !== toMonth) {
+			if (toMonth && month !== toMonth) {
 				holidayRule = {
 					isRange: true,
 					name: name,
@@ -693,17 +678,34 @@ define(function(require) {
 						}
 					}
 				} else {
-					holidayRule.ordinal = ordinal;
-					holidayRule.wdays = [wday];
+					holidayRule.ordinal = holidayData.ordinal;
+					holidayRule.wdays = [holidayData.wday];
 				}
 			}
 
-			if (id) {
+			if (!_.includes(id, 'new-')) {
 				holidayRule.id = id;
 			}
 
+			if (!holidayData.recurring) {
+				switch (holiday.holidayType) {
+					case 'advanced':
+						endDate = new Date(holidayData.endYear, month - 1, self.strategyHolidaysGetOrdinalWday(holidayData, holidayData.endYear));
+						break;
+
+					case 'range':
+						endDate = new Date(holidayData.endYear, toMonth - 1, toDay);
+						break;
+
+					case 'single':
+						endDate = new Date(holidayData.endYear, month - 1, fromDay);
+						break;
+				}
+				holidayRule.end_date = monster.util.dateToEndOfGregorianDay(endDate);
+			}
+
 			holidayRule.extra = {
-				oldType: type
+				oldType: holidayData.set ? 'set' : 'rule'
 			};
 
 			return holidayRule;

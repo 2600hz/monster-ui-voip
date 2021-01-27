@@ -4081,7 +4081,7 @@ define(function(require) {
 						holidayRule.holidayData.fromMonth = fromMonth - 1;
 					}
 					if (toMonth) {
-						holidayRule.holidayData.fromMonth = toMonth - 1;
+						holidayRule.holidayData.toMonth = toMonth - 1;
 					}
 
 					return holidayRule;
@@ -4190,7 +4190,8 @@ define(function(require) {
 					},
 					holidayRuleToSave = {},
 					nameLength = formData.name.length,
-					nameExists = _.find(existingHolidays, { name: formData.name });
+					nameExists = _.find(existingHolidays, { name: formData.name }),
+					isSet = $template.find('.form-content').data('type') === 'set';
 
 				if (!monster.ui.valid($template)) {
 					return;
@@ -4224,6 +4225,10 @@ define(function(require) {
 
 				if (!formData.recurring && formData.type !== 'single') {
 					holidayData.endYear = args.yearSelected;
+				}
+
+				if (isSet) {
+					holidayData.set = true;
 				}
 
 				holidayRuleToSave = {
