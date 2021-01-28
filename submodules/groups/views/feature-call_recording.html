@@ -19,7 +19,7 @@
 		<form id="call_recording_form">
 			<div>
 				<span>{{ i18n.groups.callRecording.urlLabel }}</span>
-				<input required name="url" type="url" placeholder="{{ i18n.groups.callRecording.urlPlaceholder }}" value="{{url}}">
+				<input name="url" type="text" placeholder="{{ i18n.groups.callRecording.urlPlaceholder }}" value="{{url}}">
 			</div>
 			<div>
 				<span>{{ i18n.groups.callRecording.formatLabel }}</span>
@@ -32,7 +32,7 @@
 			</div>
 			<div>
 				<span>{{ i18n.groups.callRecording.timeLimitLabel }}</span>
-				<input required name="time_limit" type="text" class="input-small" value="{{#if timeLimit}}{{timeLimit}}{{else}}600{{/if}}">
+				<input name="time_limit" type="text" class="input-small" value="{{#if timeLimit}}{{timeLimit}}{{else}}600{{/if}}">
 			</div>
 		</form>
 	</div>
