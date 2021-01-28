@@ -576,8 +576,18 @@ define(function(require) {
 
 			monster.ui.validate(featureForm, {
 				rules: {
+					url: {
+						required: true,
+						regex: /^(https?|ftps?|sftp):\/\//
+					},
 					'time_limit': {
+						required: true,
 						digits: true
+					}
+				},
+				messages: {
+					url: {
+						regex: self.i18n.active().groups.callRecording.urlInvalid
 					}
 				}
 			});
