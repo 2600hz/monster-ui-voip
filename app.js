@@ -39,6 +39,10 @@ define(function(require) {
 			common: {
 				hasProvisioner: false,
 				callRecording: {
+					supportedAudioFormats: [
+						'mp3',
+						'wav'
+					],
 					validationConfig: {
 						rules: {
 							time_limit: {

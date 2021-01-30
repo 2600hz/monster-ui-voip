@@ -25,8 +25,11 @@
 				<span>{{ i18n.groups.callRecording.formatLabel }}</span>
 				<select name="format" class="input-medium">
 					{{#select format}}
-						<option value="mp3">mp3</option>
-						<option value="wav">wav</option>
+						{{#each @root.supportedAudioFormats}}
+							<option value="{{this}}">
+								{{this}}
+							</option>
+						{{/each}}
 					{{/select}}
 				</select>
 			</div>
