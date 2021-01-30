@@ -2828,6 +2828,7 @@ define(function(require) {
 		usersFormatCallRecording: function(params) {
 			var self = this,
 				formattedData = $.extend(true, {}, {
+					supportedAudioFormats: self.appFlags.common.callRecording.supportedAudioFormats,
 					user: params.currentUser,
 					hasStorageConfigured: params.hasStorageConfigured,
 					canShowFields: false,
