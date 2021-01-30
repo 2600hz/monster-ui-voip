@@ -3056,16 +3056,7 @@ define(function(require) {
 				featureForm = featureTemplate.find('#call_recording_form'),
 				popup;
 
-			monster.ui.validate(featureForm, {
-				rules: {
-					'time_limit': {
-						digits: true
-					},
-					'url': {
-						required: true
-					}
-				}
-			});
+			monster.ui.validate(featureForm, self.appFlags.common.callRecording.validationConfig);
 
 			switchFeature.on('change', function() {
 				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
