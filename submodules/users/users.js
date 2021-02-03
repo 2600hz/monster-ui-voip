@@ -3826,6 +3826,15 @@ define(function(require) {
 			var self = this,
 				fullName = monster.util.getUserFullName(data.user),
 				callerIdName = fullName.substring(0, 15),
+				provisionData = _
+					.chain(data.user.device)
+					.pick([
+						'brand',
+						'family',
+						'model'
+					])
+					.mapValues(_.toLower)
+					.value(),
 				formattedData = {
 					user: $.extend(true, {}, {
 						service: {
@@ -3902,9 +3911,9 @@ define(function(require) {
 				mac_address: data.user.device.mac_address,
 				name: data.user.device.name,
 				provision: {
-					endpoint_brand: data.user.device.brand,
-					endpoint_family: data.user.device.family,
-					endpoint_model: data.user.device.model
+					endpoint_brand: provisionData.brand,
+					endpoint_family: provisionData.family,
+					endpoint_model: provisionData.model
 				},
 				sip: {
 					password: monster.util.randomString(12),
