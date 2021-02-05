@@ -38,13 +38,30 @@ define(function(require) {
 		appFlags: {
 			common: {
 				hasProvisioner: false,
-				outboundPrivacy: [
-					'default',
-					'none',
-					'number',
-					'name',
-					'full'
-				]
+				callRecording: {
+					supportedAudioFormats: [
+						'mp3',
+						'wav'
+					],
+					validationConfig: {
+						rules: {
+							time_limit: {
+								digits: true,
+								required: true
+							},
+							url: {
+								protocols: [
+									'http',
+									'https',
+									'ftp',
+									'ftps',
+									'sftp'
+								],
+								required: true
+							}
+						}
+					}
+				}
 			},
 			global: {}
 		},

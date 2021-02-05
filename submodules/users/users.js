@@ -2827,114 +2827,116 @@ define(function(require) {
 
 		usersFormatCallRecording: function(params) {
 			var self = this,
-				formattedData = $.extend(true, {}, {
-					user: params.currentUser,
-					hasStorageConfigured: params.hasStorageConfigured,
-					canShowFields: false,
-					timeLimit: 3600
-				}),
-				setValueSetting = function(category, direction) {
-					var found = false,
-						currentAccount = monster.apps.auth.currentAccount;
-
-					if (params.currentUser.hasOwnProperty('call_recording')) {
-						if (params.currentUser.call_recording.hasOwnProperty(category)) {
-							if (params.currentUser.call_recording[category].hasOwnProperty(direction) && params.currentUser.call_recording[category][direction].hasOwnProperty('enabled')) {
-								found = true;
-
-								formattedData.extra[category][direction].enabled = params.currentUser.call_recording[category][direction].enabled;
-							}
-						}
-					}
-
-					if (currentAccount.hasOwnProperty('call_recording') && currentAccount.call_recording.hasOwnProperty('endpoint')) {
-						if (currentAccount.call_recording.endpoint.hasOwnProperty(category)) {
-							if (currentAccount.call_recording.endpoint[category].hasOwnProperty(direction) && currentAccount.call_recording.endpoint[category][direction].hasOwnProperty('enabled')) {
-								formattedData.extra[category][direction].accountValue = currentAccount.call_recording.endpoint[category][direction].enabled === true ? self.i18n.active().users.callRecording.toggleValues.on : self.i18n.active().users.callRecording.toggleValues.off;
-
-								if (!found) {
-									formattedData.extra[category][direction].enabled = 'default';
-								}
-							}
-						}
-					}
-				};
-
-			// First set the defaults, then we'll try to set them based on the hierarchy user > account
-			formattedData.extra = {
-				inbound: {
-					onnet: {
+				getDefaultValue = function() {
+					return {
 						enabled: 'default',
 						accountValue: self.i18n.active().users.callRecording.toggleValues.off
-					},
-					offnet: {
-						enabled: 'default',
-						accountValue: self.i18n.active().users.callRecording.toggleValues.off
-					}
+					};
 				},
-				outbound: {
-					onnet: {
-						enabled: 'default',
-						accountValue: self.i18n.active().users.callRecording.toggleValues.off
-					},
-					offnet: {
-						enabled: 'default',
-						accountValue: self.i18n.active().users.callRecording.toggleValues.off
-					}
-				}
-			};
+				getCallflowValue = function(direction) {
+					var defaultValue = getDefaultValue();
 
-			_.each(formattedData.extra, function(category, categoryName) {
-				_.each(category, function(direction, directionName) {
-					setValueSetting(categoryName, directionName);
-				});
-			});
-
-			// If feature is active then we search for value of the 3 other fields
-			if (params.currentUser.extra.mapFeatures.call_recording.active) {
-				// If it's using new data structure, then we look for a customization at any level.
-				// Since the app only lets you set it thru 3 generic fields, we know it will all be the same so we can just take the first results we find
-				if (params.currentUser.hasOwnProperty('call_recording')) {
-					_.each(params.currentUser.call_recording, function(category, categoryName) {
-						_.each(category, function(direction, directionName) {
-							if (direction.enabled === true && !formattedData.hasOwnProperty('url')) {
-								formattedData.url = direction.url;
-								formattedData.format = direction.format;
-								formattedData.timeLimit = direction.time_limit;
-							}
-						});
+					return _.merge({}, defaultValue, direction === 'inbound' && {
+						enabled: true
 					});
-				} else if (params.userCallflow && params.userCallflow.hasOwnProperty('flow') && params.userCallflow.flow.module === 'record_call') {
-					// Otherwise it's using the old callflow logic
-					formattedData = $.extend(true, formattedData, {
-						url: params.userCallflow.flow.data.url,
-						format: params.userCallflow.flow.data.format,
-						timeLimit: params.userCallflow.flow.data.time_limit,
-						// In old logic we were setting the call recording on the inbound calls only
-						extra: {
-							inbound: {
-								onnet: {
-									enabled: true
-								},
-								offnet: {
-									enabled: true
-								}
-							}
-						}
+				},
+				getHierarchicalValue = _.partial(function(entities, direction, network) {
+					var isUserEnabled = _.get(entities.user, ['call_recording', direction, network, 'enabled']),
+						isUserConfigured = _.isBoolean(isUserEnabled),
+						isAccountEnabled = _.get(entities.account, ['call_recording', direction, network, 'enabled']),
+						isAccountConfigured = _.every([
+							_.isBoolean(isAccountEnabled),
+							_.has(entities.account, 'call_recording.endpoint')
+						]),
+						accountValueProp = isAccountEnabled ? 'on' : 'off',
+						defaultValue = getDefaultValue();
+
+					return _.merge({}, defaultValue, isUserConfigured && {
+						enabled: isUserEnabled
+					}, isAccountConfigured && {
+						accountValue: monster.util.tryI18n(self.i18n.active().users.callRecording.toggleValues, accountValueProp)
 					});
-				}
-			}
+				}, {
+					account: monster.apps.auth.currentAccount,
+					user: params.currentUser
+				}),
+				getCallRecordingStructure = function(valueGetter) {
+					var callDirections = [
+							'inbound',
+							'outbound'
+						],
+						networkTypes = [
+							'onnet',
+							'offnet'
+						];
 
-			// We only display the storage settings if one of the toggle is set to On
-			_.each(formattedData.extra, function(category, categoryName) {
-				_.each(category, function(direction, directionName) {
-					if (formattedData.extra[categoryName][directionName].enabled === true) {
-						formattedData.canShowFields = true;
-					}
-				});
-			});
+					return _
+						.chain(callDirections)
+						.flatMap(function(direction) {
+							return _.map(networkTypes, function(network) {
+								return {
+									direction: direction,
+									network: network,
+									config: valueGetter(direction, network)
+								};
+							});
+						})
+						.keyBy('direction')
+						.mapValues(_.flow(
+							_.partial(_.keyBy, _, 'network'),
+							_.partial(_.mapValues, _, 'config')
+						));
+				},
+				getConfigForSettings = function(settings, valueGetter) {
+					return _.merge({
+						timeLimit: _.get(settings, 'time_limit'),
+						extra: getCallRecordingStructure(valueGetter)
+					}, _.pick(settings, [
+						'url',
+						'format'
+					]));
+				},
+				defaultSettings = {
+					time_limit: 3600
+				},
+				callflowSettings = _.get(params.userCallflow, 'flow.data', {}),
+				userSettings = _
+					.chain(params.currentUser)
+					.get('call_recording', {})
+					.flatMap(_.unary(_.map))
+					.find('enabled')
+					.value(),
+				configGeneratorsPerType = {
+					defaults: _.partial(getConfigForSettings, defaultSettings, getDefaultValue),
+					callflow: _.partial(getConfigForSettings, callflowSettings, getCallflowValue),
+					hierarchical: _.partial(getConfigForSettings, userSettings, getHierarchicalValue)
+				},
+				isFeatureEnabled = params.currentUser.extra.mapFeatures.call_recording.active,
+				isUserConfigured = _.has(params.currentUser, 'call_recording'),
+				isCallflowConfigured = _.get(params.userCallflow, 'flow.module') === 'record_call',
+				configType = _
+					.chain(isFeatureEnabled ? [
+						isUserConfigured && 'hierarchical',
+						isCallflowConfigured && 'callflow'
+					] : [])
+					.find(_.isString)
+					.defaultTo('defaults')
+					.value(),
+				config = configGeneratorsPerType[configType]();
 
-			return formattedData;
+			return _.merge({
+				user: params.currentUser,
+				canShowFields: _
+					.chain(config.extra)
+					.flatMap(_.unary(_.map))
+					.find('enabled')
+					.thru(_.negate(_.isUndefined))
+					.value()
+			}, _.pick(params, [
+				'hasStorageConfigured'
+			]), _.pick(self.appFlags.common.callRecording, [
+				'supportedAudioFormats'
+			]), config);
 		},
 
 		usersAnalyzeCallRecordingCallflow: function(callflow) {
@@ -3056,16 +3058,7 @@ define(function(require) {
 				featureForm = featureTemplate.find('#call_recording_form'),
 				popup;
 
-			monster.ui.validate(featureForm, {
-				rules: {
-					'time_limit': {
-						digits: true
-					},
-					'url': {
-						required: true
-					}
-				}
-			});
+			monster.ui.validate(featureForm, self.appFlags.common.callRecording.validationConfig);
 
 			switchFeature.on('change', function() {
 				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
