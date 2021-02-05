@@ -3042,99 +3042,101 @@ define(function(require) {
 		},
 
 		strategyGetMainCallflows: function(mainCallback) {
-			var self = this;
+			var self = this,
+				getMainCallflowLabel = function getMainCallflowLabel(callflow) {
+					var name = _.get(callflow, 'name'),
+						type = callflow.type;
+
+					return _.isUndefined(name) ? _.head(callflow.numbers)
+						: type === 'conference' ? 'MainConference'
+						: type === 'faxing' ? 'MainFaxing'
+						: name;
+				},
+				smartTypes = ['conference', 'faxing', 'main'];
+
 			monster.waterfall([
-				function(waterfallCallback) {
+				function fetchMainCallflows(waterfallCallback) {
 					self.strategyListCallflows({
 						filters: {
 							'has_value': 'type',
 							'key_missing': ['owner_id', 'group_id']
 						},
-						success: function(data) {
-							waterfallCallback(null, data);
+						success: function(callflows) {
+							waterfallCallback(null, _.filter(callflows, _.flow(
+								_.partial(_.get, _, 'type'),
+								_.partial(_.includes, smartTypes)
+							)));
 						},
 						error: function() {
 							waterfallCallback(true);
 						}
 					});
 				},
-				function(data, waterfallCallback) {
-					var parallelRequests = {},
+				function maybeCreateOfficeHourMenuEntities(existingMainCallflows, waterfallCallback) {
+					var parallelRequests = _.merge({
+							MainConference: function(callback) {
+								self.strategyCreateCallflow({
+									data: {
+										data: {
+											contact_list: {
+												exclude: false
+											},
+											numbers: ['undefinedconf'],
+											name: 'MainConference',
+											type: 'conference',
+											flow: {
+												children: {},
+												data: {},
+												module: 'conference'
+											}
+										}
+									},
+									success: _.partial(callback, null)
+								});
+							},
+							MainFaxing: function(callback) {
+								self.strategyCreateCallflow({
+									data: {
+										data: {
+											contact_list: {
+												exclude: false
+											},
+											numbers: ['undefinedfaxing'],
+											name: 'MainFaxing',
+											type: 'faxing',
+											flow: {
+												children: {},
+												data: {},
+												module: 'faxbox'
+											}
+										}
+									},
+									success: _.partial(callback, null)
+								});
+							}
+						}, _
+							.chain(existingMainCallflows)
+							.map(function(callflow) {
+								return _.merge({
+									label: getMainCallflowLabel(callflow)
+								}, _.pick(callflow, [
+									'id'
+								]));
+							})
+							.keyBy('label')
+							.mapValues(function(value) {
+								return function(callback) {
+									self.strategyGetCallflow({
+										data: {
+											id: value.id
+										},
+										success: _.partial(callback, null)
+									});
+								};
+							})
+							.value()
+						),
 						menuRequests = {};
-
-					_.each(data, function(val, key) {
-						if (!_.includes(['main', 'conference', 'faxing'], val.type)) {
-							return;
-						}
-
-						var name = val.name || val.numbers[0];
-						if (val.type === 'conference') {
-							name = 'MainConference';
-						} else if (val.type === 'faxing') {
-							name = 'MainFaxing';
-						}
-
-						parallelRequests[name] = function(callback) {
-							self.strategyGetCallflow({
-								data: {
-									id: val.id
-								},
-								success: function(data) {
-									callback(null, data);
-								}
-							});
-						};
-					});
-
-					if (!parallelRequests.MainConference) {
-						parallelRequests.MainConference = function(callback) {
-							self.strategyCreateCallflow({
-								data: {
-									data: {
-										contact_list: {
-											exclude: false
-										},
-										numbers: ['undefinedconf'],
-										name: 'MainConference',
-										type: 'conference',
-										flow: {
-											children: {},
-											data: {},
-											module: 'conference'
-										}
-									}
-								},
-								success: function(data) {
-									callback(null, data);
-								}
-							});
-						};
-					}
-
-					if (!parallelRequests.MainFaxing) {
-						parallelRequests.MainFaxing = function(callback) {
-							self.strategyCreateCallflow({
-								data: {
-									data: {
-										contact_list: {
-											exclude: false
-										},
-										numbers: ['undefinedfaxing'],
-										name: 'MainFaxing',
-										type: 'faxing',
-										flow: {
-											children: {},
-											data: {},
-											module: 'faxbox'
-										}
-									}
-								},
-								success: function(data) {
-									callback(null, data);
-								}
-							});
-						};
-					}
 
 					_.each(self.subCallflowsLabel, function(val) {
 						var menuName = val + 'Menu';
@@ -3184,73 +3186,79 @@ define(function(require) {
 					});
 
 					monster.parallel(menuRequests, function(err, mainCallflows) {
-						_.each(self.subCallflowsLabel, function(val) {
-							if (parallelRequests[val]) {
-								return;
-							}
+						waterfallCallback(null, parallelRequests, mainCallflows);
+					});
+				},
+				function maybeCreateOfficeHoursCallflows(parallelRequests, mainCallflows, waterfallCallback) {
+					_.each(self.subCallflowsLabel, function(val) {
+						if (parallelRequests[val]) {
+							return;
+						}
 
-							parallelRequests[val] = function(callback) {
-								self.strategyCreateCallflow({
-									data: {
-										data: self.strategyGetDefaultMainSubCallflow({
-											label: val,
-											subMenuCallflowId: mainCallflows[val + 'Menu'].id
-										})
-									},
-									success: function(data) {
-										callback(null, data);
-									}
-								});
-							};
-						});
-
-						monster.parallel(parallelRequests, function(err, results) {
-							if (parallelRequests.MainCallflow) {
-								// For users who had undesired callflow with only "0" in it, we migrate it to our new empty main callflow "undefinedMainNumber"
-								if (results.MainCallflow.numbers && results.MainCallflow.numbers.length === 1 && results.MainCallflow.numbers[0] === '0') {
-									results.MainCallflow.numbers[0] = 'undefinedMainNumber';
-
-									self.strategyUpdateCallflow(results.MainCallflow, function(updatedCallflow) {
-										results.MainCallflow = updatedCallflow;
-										waterfallCallback(null, _.merge(mainCallflows, results));
-									});
-									return;
-								}
-
-								waterfallCallback(null, _.merge(mainCallflows, results));
-								return;
-							}
-
+						parallelRequests[val] = function(callback) {
 							self.strategyCreateCallflow({
 								data: {
-									data: {
-										contact_list: {
-											exclude: false
-										},
-										numbers: ['undefinedMainNumber'],
-										name: 'MainCallflow',
-										type: 'main',
-										flow: {
-											children: {
-												'_': {
-													children: {},
-													data: {
-														id: results.MainOpenHours.id
-													},
-													module: 'callflow'
-												}
-											},
-											data: {},
-											module: 'temporal_route'
-										}
-									}
+									data: self.strategyGetDefaultMainSubCallflow({
+										label: val,
+										subMenuCallflowId: mainCallflows[val + 'Menu'].id
+									})
 								},
 								success: function(data) {
-									results.MainCallflow = data;
-									waterfallCallback(null, $.extend(true, mainCallflows, results));
+									callback(null, data);
 								}
 							});
-						});
+						};
+					});
+
+					monster.parallel(parallelRequests, function(err, results) {
+						waterfallCallback(null, parallelRequests, mainCallflows, results);
+					});
+				},
+				function maybeCreateOrUpdateMainCallflow(parallelRequests, mainCallflows, results, waterfallCallback) {
+					if (parallelRequests.MainCallflow) {
+						// For users who had undesired callflow with only "0" in it, we migrate it to our new empty main callflow "undefinedMainNumber"
+						if (results.MainCallflow.numbers && results.MainCallflow.numbers.length === 1 && results.MainCallflow.numbers[0] === '0') {
+							results.MainCallflow.numbers[0] = 'undefinedMainNumber';
+
+							self.strategyUpdateCallflow(results.MainCallflow, function(updatedCallflow) {
+								results.MainCallflow = updatedCallflow;
+								waterfallCallback(null, _.merge(mainCallflows, results));
+							});
+							return;
+						}
+
+						waterfallCallback(null, _.merge(mainCallflows, results));
+						return;
+					}
+
+					self.strategyCreateCallflow({
+						data: {
+							data: {
+								contact_list: {
+									exclude: false
+								},
+								numbers: ['undefinedMainNumber'],
+								name: 'MainCallflow',
+								type: 'main',
+								flow: {
+									children: {
+										'_': {
+											children: {},
+											data: {
+												id: results.MainOpenHours.id
+											},
+											module: 'callflow'
+										}
+									},
+									data: {},
+									module: 'temporal_route'
+								}
+							}
+						},
+						success: function(data) {
+							results.MainCallflow = data;
+							waterfallCallback(null, $.extend(true, mainCallflows, results));
+						}
 					});
 				}
 			], function(err, result) {
