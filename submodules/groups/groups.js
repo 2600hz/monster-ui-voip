@@ -558,6 +558,7 @@ define(function(require) {
 			var self = this,
 				recordCallNode = monster.util.findCallflowNode(data.callflow, 'record_call'),
 				templateData = $.extend(true, {
+					supportedAudioFormats: self.appFlags.common.callRecording.supportedAudioFormats,
 					group: data.group
 				},
 				(data.group.extra.mapFeatures.call_recording.active && recordCallNode ? {
@@ -574,23 +575,7 @@ define(function(require) {
 				featureForm = featureTemplate.find('#call_recording_form'),
 				popup;
 
-			monster.ui.validate(featureForm, {
-				rules: {
-					url: {
-						required: true,
-						regex: /^(https?|ftps?|sftp):\/\//
-					},
-					'time_limit': {
-						required: true,
-						digits: true
-					}
-				},
-				messages: {
-					url: {
-						regex: self.i18n.active().groups.callRecording.urlInvalid
-					}
-				}
-			});
+			monster.ui.validate(featureForm, self.appFlags.common.callRecording.validationConfig);
 
 			featureTemplate.find('.cancel-link').on('click', function() {
 				popup.dialog('close').remove();

@@ -57,20 +57,23 @@
 				<div class="fields-settings{{#if canShowFields}} active{{/if}}">
 					<div>
 						<span>{{ i18n.users.callRecording.urlLabel }}</span>
-						<input required name="url" type="url" placeholder="{{ i18n.users.callRecording.urlPlaceholder }}" value="{{url}}">
+						<input name="url" type="text" placeholder="{{ i18n.users.callRecording.urlPlaceholder }}" value="{{url}}">
 					</div>
 					<div>
 						<span>{{ i18n.users.callRecording.formatLabel }}</span>
 						<select name="format" class="input-medium">
 							{{#select format}}
-								<option value="mp3">mp3</option>
-								<option value="wav">wav</option>
+								{{#each @root.supportedAudioFormats}}
+									<option value="{{this}}">
+										{{this}}
+									</option>
+								{{/each}}
 							{{/select}}
 						</select>
 					</div>
 					<div>
 						<span>{{ i18n.users.callRecording.timeLimitLabel }}</span>
-						<input required name="time_limit" type="text" class="input-small" value="{{timeLimit}}">
+						<input name="time_limit" type="text" class="input-small" value="{{timeLimit}}">
 					</div>
 				</div>
 			{{/unless}}
