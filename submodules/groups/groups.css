@@ -477,8 +477,8 @@
 	text-align: right;
 }
 .monster-feature-popup-container[data-feature="call_recording"] form label.monster-invalid {
-	top: 30px;
-	left: 150px;
+	margin-left: 150px;
+	margin-top: -15px;
 }
 
 .monster-feature-popup-container[data-feature="call_recording"] form input.monster-invalid {
