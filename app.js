@@ -50,7 +50,7 @@ define(function(require) {
 								required: true
 							},
 							url: {
-								protocols: [
+								protocol: [
 									'http',
 									'https',
 									'ftp',
