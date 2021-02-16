@@ -43,7 +43,7 @@
 			</label>
 			<div class="row-fluid single selected">
 				<select class="month from" data-name="fromMonth">
-				{{#select holidayData.fromMonth}}
+				{{#select fromMonth}}
 					{{#each months as |label|}}
 						<option value="{{@key}}">
 							{{label}}
@@ -72,7 +72,7 @@
 			</div>
 			<div class="row-fluid advanced">
 				<select class="month from" data-name="fromMonth" >
-				{{#select holidayData.fromMonth}}
+				{{#select fromMonth}}
 					{{#each months as |label|}}
 						<option value="{{@key}}">
 							{{label}}
@@ -101,7 +101,7 @@
 			</div>
 			<div class="row-fluid range">
 				<select class="month from" data-name="fromMonth">
-				{{#select holidayData.fromMonth}}
+				{{#select fromMonth}}
 					{{#each months as |label|}}
 						<option value="{{@key}}">
 							{{label}}
@@ -120,7 +120,7 @@
 				</select>
 				<span class="separator">{{i18n.strategy.holidays.to}}</span>
 				<select class="month to" data-name="toMonth">
-				{{#select holidayData.toMonth}}
+				{{#select toMonth}}
 					{{#each months as |label|}}
 						<option value="{{@key}}">
 							{{label}}

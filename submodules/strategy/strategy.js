@@ -1826,21 +1826,6 @@ define(function(require) {
 			});
 		},
 
-		strategyCreateRuleSet: function(data, callback) {
-			var self = this;
-
-			self.callApi({
-				resource: 'temporalSet.create',
-				data: {
-					accountId: self.accountId,
-					data: data
-				},
-				success: function(data, status) {
-					callback(data.data);
-				}
-			});
-		},
-
 		strategyCallsBindEvents: function(container, strategyData) {
 			var self = this;
 
@@ -4073,20 +4058,11 @@ define(function(require) {
 
 					return datesArray;
 				},
-				formatHolidayRule = function formatHolidayRule(holidayRule) {
-					var fromMonth = _.get(holidayRule, 'holidayData.fromMonth'),
-						toMonth = _.get(holidayRule, 'holidayData.toMonth');
-
-					if (fromMonth) {
-						holidayRule.holidayData.fromMonth = fromMonth - 1;
-					}
-					if (toMonth) {
-						holidayRule.holidayData.toMonth = toMonth - 1;
-					}
-
-					return holidayRule;
+				formatMonth = function formatMonth(holidayRule, type) {
+					var month = _.get(holidayRule, 'holidayData.' + type);
+					return month ? month - 1 : 0;
 				},
-				dataToTemplate = _.merge({}, formatHolidayRule(holidayRule), {
+				dataToTemplate = _.merge({}, holidayRule, {
 					months: _.map(
 						self.months,
 						_.partial(monster.util.tryI18n, self.i18n.active().strategy.holidays.months)
@@ -4094,7 +4070,9 @@ define(function(require) {
 					ordinals: self.i18n.active().strategy.holidays.ordinals,
 					days: self.i18n.active().strategy.holidays.days,
 					years: getListOfYears(),
-					dates: getListOfDates()
+					dates: getListOfDates(),
+					toMonth: formatMonth(holidayRule, 'toMonth'),
+					fromMonth: formatMonth(holidayRule, 'fromMonth')
 				}),
 				$template = $(self.getTemplate({
 					name: 'addEditOfficeHolidays',
