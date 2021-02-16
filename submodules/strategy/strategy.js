@@ -4163,8 +4163,12 @@ define(function(require) {
 
 				var formData = monster.ui.getFormData($template.get(0)),
 					$optionDiv = $template.find('.row-fluid.' + formData.type + ' select:not(.hide)'),
+					isHolidayRecurring = _.get(holidayRule, 'holidayData.recurring', false),
+					holidayId = _.get(holidayRule, 'holidayData.id', 'new-' + Date.now()),
 					holidayData = {
-						id: _.isEmpty(holidayRule) ? 'new-' + Date.now() : holidayRule.holidayData.id
+						id: !_.includes(holidayId, 'new-') && isHolidayRecurring
+							? 'new-' + Date.now()
+							: holidayId
 					},
 					holidayRuleToSave = {},
 					nameLength = formData.name.length,

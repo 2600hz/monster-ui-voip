@@ -169,9 +169,10 @@ define(function(require) {
 				};
 
 			_.each(holidaysData, function(value, key) {
-				var endYear = _.get(value, 'holidayData.endYear', yearSelected);
+				var endYear = _.get(value, 'holidayData.endYear', yearSelected),
+					excludeYear = _.get(value, 'holidayData.excludeYear', []);
 
-				if (endYear === yearSelected) {
+				if (endYear === yearSelected && !_.includes(excludeYear, yearSelected)) {
 					holidaysDataArray.push(initTemplate(value));
 				}
 			});
@@ -299,6 +300,7 @@ define(function(require) {
 				var $this = $(this),
 					id = $this.parents('tr').data('id'),
 					table = footable.get('#holidays_list_table'),
+					yearSelected = parseInt(parent.find('#year').val()),
 					allHolidays = self.appFlags.strategyHolidays.allHolidays,
 					holidayRuleId = _.findKey(allHolidays, function(holiday) {
 						return _.get(holiday, 'holidayData.id') === id;
@@ -315,7 +317,24 @@ define(function(require) {
 					}),
 					holidayRule: holidayRule,
 					callback: function(err, data) {
-						self.appFlags.strategyHolidays.allHolidays[holidayRuleId] = data;
+						/*Compare old date with new data if it's recurring*/
+						var isOldRecurring = _.get(holidayRule, 'holidayData.recurring', false),
+							isNewRecurring = _.get(data, 'holidayData.recurring', false);
+
+						if (isOldRecurring) {
+							/* update existing rule */
+							if (_.isUndefined(holidayRule.holidayData.excludeYear)) {
+								holidayRule.holidayData.excludeYear = [];
+							}
+							holidayRule.holidayData.excludeYear.push(yearSelected);
+							holidayRule.modified = true;
+							self.appFlags.strategyHolidays.allHolidays[holidayRuleId] = holidayRule; 
+
+							/* add new rule */
+							self.appFlags.strategyHolidays.allHolidays.push(data);
+						} else {
+							self.appFlags.strategyHolidays.allHolidays[holidayRuleId] = data;
+						}
 
 						/*empty table before re-loading all rows*/
 						table.rows.load([]);
@@ -336,16 +355,28 @@ define(function(require) {
 				event.preventDefault();
 
 				var table = footable.get('#holidays_list_table'),
+					yearSelected = parseInt(parent.find('#year').val()),
 					allHolidays = self.appFlags.strategyHolidays.allHolidays,
 					holidayRuleId = _.findKey(allHolidays, function(holiday) {
 						return _.get(holiday, 'holidayData.id') === holidayId;
 					}),
-					holidayRule = allHolidays[holidayRuleId];
+					holidayRule = allHolidays[holidayRuleId],
+					isRecurring = _.get(holidayRule, 'holidayData.recurring', false);
 
-				if (!_.includes(holidayId, 'new-')) {
-					self.appFlags.strategyHolidays.deletedHolidays.push(holidayId);
+				if (isRecurring) {
+					if (_.isUndefined(holidayRule.holidayData.excludeYear)) {
+						holidayRule.holidayData.excludeYear = [];
+					}
+					holidayRule.modified = true;
+					holidayRule.holidayData.excludeYear.push(yearSelected);
+
+					self.appFlags.strategyHolidays.allHolidays[holidayRuleId] = holidayRule;
+				} else {
+					if (!_.includes(holidayId, 'new-')) {
+						self.appFlags.strategyHolidays.deletedHolidays.push(holidayId);
+					}
+					delete allHolidays.splice(holidayRuleId, 1);
 				}
-				delete allHolidays.splice(holidayRuleId, 1);
 
 				/*empty table before re-loading all rows*/
 				table.rows.load([]);
@@ -409,6 +440,15 @@ define(function(require) {
 						holidayData.recurring = false;
 					}
 					holidaysData.push({ holidayType: holidayType, holidayData: holidayData });
+
+					if (val.hasOwnProperty('exclude')) {
+						holidayData.excludeYear = [];
+
+						_.forEach(val.exclude, function(date) {
+							var year = parseInt(date.substring(0, 4));
+							holidayData.excludeYear.push(year);
+						});
+					}
 				}
 				self.appFlags.strategyHolidays.allHolidays = holidaysData;
 			});
@@ -449,6 +489,26 @@ define(function(require) {
 		},
 
 		/**
+		 * Returns Date
+		 * @param  {string} endYear
+		 * @param  {Object} holiday
+		 * @return {Date}
+		 */
+		strategyHolidaysGetEndDate: function(endYear, holiday) {
+			var self = this,
+				holidayData = holiday.holidayData;
+
+			switch (holiday.holidayType) {
+				case 'advanced':
+					return new Date(endYear, holidayData.fromMonth - 1, self.strategyHolidaysGetOrdinalWday(holidayData, holidayData.endYear));
+				case 'range':
+					return new Date(endYear, holidayData.toMonth - 1, holidayData.toDay);
+				case 'single':
+					return new Date(endYear, holidayData.fromMonth - 1, holidayData.fromDay);
+			}
+		},
+
+		/**
 		 * Returns an objects with formatted data for a holiday.
 		 * @param  {Object} holiday
 		 * @param  {Object} rules
@@ -463,17 +523,9 @@ define(function(require) {
 				fromDay = holidayData.fromDay,
 				toDay = holidayData.toDay,
 				id = _.includes(holidayData.id, 'new-') ? null : holidayData.id,
-				getEndDate = function getEndDate(holidayData) {
-					switch (holiday.holidayType) {
-						case 'advanced':
-							return new Date(holidayData.endYear, holidayData.fromMonth - 1, self.strategyHolidaysGetOrdinalWday(holidayData, holidayData.endYear));
-						case 'range':
-							return new Date(holidayData.endYear, holidayData.toMonth - 1, holidayData.toDay);
-						case 'single':
-							return new Date(holidayData.endYear, holidayData.fromMonth - 1, holidayData.fromDay);
-					}
-				},
-				endDate = holidayData.recurring ? null : monster.util.dateToEndOfGregorianDay(getEndDate(holidayData)),
+				endDate = holidayData.recurring
+					? null
+					: monster.util.dateToEndOfGregorianDay(self.strategyHolidaysGetEndDate(holidayData.endYear, holiday)),
 				holidayRule = {};
 
 			if (toMonth && month !== toMonth) {
@@ -503,6 +555,15 @@ define(function(require) {
 					holidayRule.ordinal = holidayData.ordinal;
 					holidayRule.wdays = [holidayData.wday];
 				}
+			}
+
+			if (holidayData.excludeYear) {
+				holidayRule.exclude = [];
+
+				_.forEach(holidayData.excludeYear, function(year) {
+					var excludeDate = self.strategyHolidaysGetEndDate(year, holiday).toISOString().split('T')[0].split('-').join('');
+					holidayRule.exclude.push(excludeDate);
+				});
 			}
 
 			if (id) {
