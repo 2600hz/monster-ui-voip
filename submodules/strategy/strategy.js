@@ -1826,21 +1826,6 @@ define(function(require) {
 			});
 		},
 
-		strategyCreateRuleSet: function(data, callback) {
-			var self = this;
-
-			self.callApi({
-				resource: 'temporalSet.create',
-				data: {
-					accountId: self.accountId,
-					data: data
-				},
-				success: function(data, status) {
-					callback(data.data);
-				}
-			});
-		},
-
 		strategyCallsBindEvents: function(container, strategyData) {
 			var self = this;
 
@@ -4048,6 +4033,7 @@ define(function(require) {
 				callback = args.callback,
 				holidayRule = args.holidayRule ? args.holidayRule : {},
 				existingHolidays = args.existingHolidays,
+				isRecurring = _.get(holidayRule, 'holidayData.recurring', false),
 				getListOfYears = function getListOfYears() {
 					var date = new Date(),
 						year = parseInt(date.getFullYear()),
@@ -4073,20 +4059,11 @@ define(function(require) {
 
 					return datesArray;
 				},
-				formatHolidayRule = function formatHolidayRule(holidayRule) {
-					var fromMonth = _.get(holidayRule, 'holidayData.fromMonth'),
-						toMonth = _.get(holidayRule, 'holidayData.toMonth');
-
-					if (fromMonth) {
-						holidayRule.holidayData.fromMonth = fromMonth - 1;
-					}
-					if (toMonth) {
-						holidayRule.holidayData.fromMonth = toMonth - 1;
-					}
-
-					return holidayRule;
+				formatMonth = function formatMonth(holidayRule, type) {
+					var month = _.get(holidayRule, 'holidayData.' + type);
+					return month ? month - 1 : 0;
 				},
-				dataToTemplate = _.merge({}, formatHolidayRule(holidayRule), {
+				dataToTemplate = _.merge({}, holidayRule, {
 					months: _.map(
 						self.months,
 						_.partial(monster.util.tryI18n, self.i18n.active().strategy.holidays.months)
@@ -4094,7 +4071,9 @@ define(function(require) {
 					ordinals: self.i18n.active().strategy.holidays.ordinals,
 					days: self.i18n.active().strategy.holidays.days,
 					years: getListOfYears(),
-					dates: getListOfDates()
+					dates: getListOfDates(),
+					toMonth: formatMonth(holidayRule, 'toMonth'),
+					fromMonth: formatMonth(holidayRule, 'fromMonth')
 				}),
 				$template = $(self.getTemplate({
 					name: 'addEditOfficeHolidays',
@@ -4118,7 +4097,7 @@ define(function(require) {
 					.find('.row-fluid.' + selectedType)
 					.addClass('selected');
 
-				if (selectedType === 'single' && holidayRule.holidayData.recurring) {
+				if (selectedType === 'single' && isRecurring) {
 					$template
 						.find('.single .year')
 						.addClass('hide');
@@ -4185,12 +4164,17 @@ define(function(require) {
 
 				var formData = monster.ui.getFormData($template.get(0)),
 					$optionDiv = $template.find('.row-fluid.' + formData.type + ' select:not(.hide)'),
+					isHolidayRecurring = _.get(holidayRule, 'holidayData.recurring', false),
+					holidayId = _.get(holidayRule, 'holidayData.id', 'new-' + Date.now()),
 					holidayData = {
-						id: _.isEmpty(holidayRule) ? 'new-' + Date.now() : holidayRule.holidayData.id
+						id: !_.includes(holidayId, 'new-') && isHolidayRecurring
+							? 'new-' + Date.now()
+							: holidayId
 					},
 					holidayRuleToSave = {},
 					nameLength = formData.name.length,
-					nameExists = _.find(existingHolidays, { name: formData.name });
+					nameExists = _.find(existingHolidays, { name: formData.name }),
+					isSet = $template.find('.form-content').data('type') === 'set';
 
 				if (!monster.ui.valid($template)) {
 					return;
@@ -4224,6 +4208,10 @@ define(function(require) {
 
 				if (!formData.recurring && formData.type !== 'single') {
 					holidayData.endYear = args.yearSelected;
+				}
+
+				if (isSet) {
+					holidayData.set = true;
 				}
 
 				holidayRuleToSave = {

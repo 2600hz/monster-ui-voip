@@ -12,6 +12,7 @@ define(function(require) {
 		appFlags: {
 			strategyHolidays: {
 				allHolidays: [],
+				deletedHolidays: [],
 				months: [
 					'Jan',
 					'Feb',
@@ -97,7 +98,7 @@ define(function(require) {
 			});
 
 			self.strategyHolidaysListingRender($container, holidaysData);
-			self.strategyHolidaysBindEvents($container, template, holidaysData);
+			self.strategyHolidaysBindEvents($container, template, holidaysData, strategyData);
 
 			callback && callback();
 		},
@@ -168,9 +169,10 @@ define(function(require) {
 				};
 
 			_.each(holidaysData, function(value, key) {
-				var endYear = _.get(value, 'holidayData.endYear', yearSelected);
+				var endYear = _.get(value, 'holidayData.endYear', yearSelected),
+					excludeYear = _.get(value, 'holidayData.excludeYear', []);
 
-				if (endYear === yearSelected) {
+				if (endYear === yearSelected && !_.includes(excludeYear, yearSelected)) {
 					holidaysDataArray.push(initTemplate(value));
 				}
 			});
@@ -197,7 +199,7 @@ define(function(require) {
 			self.strategyHolidaysDeleteDialogBindsEvents(template, parent, popup, data.holidayId);
 		},
 
-		strategyHolidaysBindEvents: function(parent, template, holidaysData) {
+		strategyHolidaysBindEvents: function(parent, template, holidaysData, strategyData) {
 			var self = this;
 
 			parent.on('change', '.holidays-toggler input[type="checkbox"]', function() {
@@ -215,11 +217,12 @@ define(function(require) {
 			});
 
 			parent.on('change', '#year', function() {
-				var table = footable.get('#holidays_list_table');
+				var table = footable.get('#holidays_list_table'),
+					allHolidays = self.appFlags.strategyHolidays.allHolidays;
 
 				/*empty table before loading the rows for the year selected*/
 				table.rows.load([]);
-				self.strategyHolidaysListingRender(parent, holidaysData);
+				self.strategyHolidaysListingRender(parent, allHolidays);
 			});
 
 			template.on('click', '.add-holiday', function(event) {
@@ -229,8 +232,8 @@ define(function(require) {
 					yearSelected: parseInt(parent.find('#year').val()),
 					existingHolidays: _.map(self.appFlags.strategyHolidays.allHolidays, function(holiday) {
 						return {
-							id: holiday.holidayData.id,
-							name: holiday.holidayData.name
+							id: _.get(holiday, 'holidayData.id'),
+							name: _.get(holiday, 'holidayData.name')
 						};
 					}),
 					callback: function(err, data) {
@@ -243,115 +246,34 @@ define(function(require) {
 			template.on('click', '.save-button', function(event) {
 				event.preventDefault();
 
-				/*var parent = $(this).parents('.element-container'),
-					mainCallflow = strategyData.callflows.MainCallflow,
-					holidaysEnabled = parent.find('.holidays-toggler input[type="checkbox"]')[0].checked,
-					holidayRulesRequests = {},
-					invalidData = false;
-
-				if (holidaysEnabled) {
-					_.each(parent.find('.holidays-element'), function() {
-						var holidayRule = self.strategyHolidaysBuildHolidayRule($(this), holidayRulesRequests);
-
-						if (!holidayRule) {
-							invalidData = true;
-							return false;
-						}
-
-						holidayRulesRequests[holidayRule.name] = function(callback) {
-							// ghetto strategyBuildHoliday builds a complete different object for a range, so we check if one of the different key is in there, if yes, this is a range spanning multiple months
-							if (holidayRule.hasOwnProperty('isRange')) {
-								self.strategyHolidaysBuildMultiMonthRangeHoliday(holidayRule, function(data) {
-									data.viewData = holidayRule;
-									callback && callback(null, data);
-								});
-							} else {
-								self.strategyHolidaysCleanUpdateHoliday(holidayRule, function(data) {
-									callback && callback(null, data);
-								});
-							}
-						};
-					});
-
-					if (invalidData) {
-						monster.ui.alert(self.i18n.active().strategy.alertMessages.uniqueHoliday);
-					} else {
-						monster.parallel(holidayRulesRequests, function(err, results) {
-							// First extract all ids from the new holidayList
-							var existingHolidaysCallflowsIds = [],
-								newHolidayCallflowsIds = _.map(holidayRulesRequests, 'id');
-
-							// Find all IDs of existing Callflows in the Main Callflow that are linking to the Main Holidays
-							_.each(mainCallflow.flow.children, function(directChild, id) {
-								if (id !== '_' && directChild.data.id === strategyData.callflows.MainHolidays.id) {
-									existingHolidaysCallflowsIds.push(id);
-								}
-							});
-
-							// Now see if any of these existing IDs that are no longer in the list of holidays
-							// If we find orphans, remove them from the main callflow
-							_.each(existingHolidaysCallflowsIds, function(id) {
-								if (newHolidayCallflowsIds.indexOf(id) < 0) {
-									delete mainCallflow.flow.children[id];
-								}
-							});
-
-							_.each(results, function(val, key) {
-								mainCallflow.flow.children[val.id] = {
-									children: {},
-									data: {
-										id: strategyData.callflows.MainHolidays.id
-									},
-									module: 'callflow'
-								};
-								_.set(strategyData.temporalRules, ['holidays', val.name], val);
-							});
-
-							self.strategyRebuildMainCallflowRuleArray(strategyData);
-							self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
-								strategyData.callflows.MainCallflow = updatedCallflow;
-								parent.find('.element-content').hide();
-								parent.removeClass('open');
-								monster.ui.toast({
-									type: 'success',
-									message: self.i18n.active().strategy.toastrMessages.updateHolidaySuccess
-								});
-							});
+				var $button = $(event.originalEvent.submitter),
+					$section = $(this).parents('.element-container'),
+					isEnabled = parent.find('.holidays-toggler input[type="checkbox"]')[0].checked,
+					allHolidays = self.appFlags.strategyHolidays.allHolidays,
+					updateStrategyData = function updateStrategyData(strategyData) {
+						self.strategyHolidaysUpdateStrategyData(strategyData, function() {
+							$section.find('.element-content').slideUp();
+							$section.removeClass('open');
 						});
-					}
-				} else {
+					};
+
+				$button.prop('disabled', 'disabled');
+
+				if (!isEnabled) {
 					monster.ui.confirm(self.i18n.active().strategy.confirmMessages.disableHolidays, function() {
-						_.each(_.get(strategyData.temporalRules, 'holidays', {}), function(val, key) {
-							holidayRulesRequests[key] = function(callback) {
-								if (val.hasOwnProperty('temporal_rules')) {
-									self.strategyHolidaysDeleteRuleSetAndRules(val.id, function() {
-										delete mainCallflow.flow.children[val.id];
-										callback(null, {});
-									});
-								} else {
-									self.strategyHolidaysDeleteHoliday(val.id, function() {
-										delete mainCallflow.flow.children[val.id];
-										callback(null, {});
-									});
-								}
-							};
-						});
+						_.forEach(allHolidays, function(holiday, key) {
+							var holidayId = _.get(holiday, 'holidayData.id');
 
-						monster.parallel(holidayRulesRequests, function(err, results) {
-							_.set(strategyData.temporalRules, 'holidays', {});
-							self.strategyRebuildMainCallflowRuleArray(strategyData);
-							self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
-								strategyData.callflows.MainCallflow = updatedCallflow;
-								parent.find('.element-content').hide();
-								parent.removeClass('open');
-								monster.ui.toast({
-									type: 'success',
-									message: self.i18n.active().strategy.toastrMessages.updateHolidaySuccess
-								});
-							});
+							if (!_.includes(holidayId, 'new-')) {
+								self.appFlags.strategyHolidays.deletedHolidays.push(holidayId);
+							}
 						});
+						self.appFlags.strategyHolidays.allHolidays = {};
+						updateStrategyData(strategyData);
 					});
-				}*/
+				} else {
+					updateStrategyData(strategyData);
+				}
 			});
 		},
 
@@ -378,23 +300,41 @@ define(function(require) {
 				var $this = $(this),
 					id = $this.parents('tr').data('id'),
 					table = footable.get('#holidays_list_table'),
+					yearSelected = parseInt(parent.find('#year').val()),
 					allHolidays = self.appFlags.strategyHolidays.allHolidays,
 					holidayRuleId = _.findKey(allHolidays, function(holiday) {
-						return holiday.holidayData.id === id;
+						return _.get(holiday, 'holidayData.id') === id;
 					}),
 					holidayRule = allHolidays[holidayRuleId];
 
 				monster.pub('voip.strategy.addEditOfficeHolidays', {
 					yearSelected: parseInt(parent.find('#year').val()),
-					existingHolidays: _.map(self.appFlags.strategyHolidays.allHolidays, function(holiday) {
+					existingHolidays: _.map(allHolidays, function(holiday) {
 						return {
-							id: holiday.holidayData.id,
-							name: holiday.holidayData.name
+							id: _.get(holiday, 'holidayData.id'),
+							name: _.get(holiday, 'holidayData.name')
 						};
 					}),
 					holidayRule: holidayRule,
 					callback: function(err, data) {
-						self.appFlags.strategyHolidays.allHolidays[holidayRuleId] = data;
+						/*Compare old date with new data if it's recurring*/
+						var isOldRecurring = _.get(holidayRule, 'holidayData.recurring', false),
+							isNewRecurring = _.get(data, 'holidayData.recurring', false);
+
+						if (isOldRecurring) {
+							/* update existing rule */
+							if (_.isUndefined(holidayRule.holidayData.excludeYear)) {
+								holidayRule.holidayData.excludeYear = [];
+							}
+							holidayRule.holidayData.excludeYear.push(yearSelected);
+							holidayRule.modified = true;
+							self.appFlags.strategyHolidays.allHolidays[holidayRuleId] = holidayRule; 
+
+							/* add new rule */
+							self.appFlags.strategyHolidays.allHolidays.push(data);
+						} else {
+							self.appFlags.strategyHolidays.allHolidays[holidayRuleId] = data;
+						}
 
 						/*empty table before re-loading all rows*/
 						table.rows.load([]);
@@ -415,12 +355,29 @@ define(function(require) {
 				event.preventDefault();
 
 				var table = footable.get('#holidays_list_table'),
+					yearSelected = parseInt(parent.find('#year').val()),
+					isChecked = template.find('.deleteAll').prop('checked'),
 					allHolidays = self.appFlags.strategyHolidays.allHolidays,
 					holidayRuleId = _.findKey(allHolidays, function(holiday) {
-						return holiday.holidayData.id === holidayId;
-					});
+						return _.get(holiday, 'holidayData.id') === holidayId;
+					}),
+					holidayRule = allHolidays[holidayRuleId],
+					isRecurring = _.get(holidayRule, 'holidayData.recurring', false);
 
-				delete allHolidays.splice(holidayRuleId, 1);
+				if (isRecurring && isChecked || !isRecurring) {
+					if (!_.includes(holidayId, 'new-')) {
+						self.appFlags.strategyHolidays.deletedHolidays.push(holidayId);
+					}
+					delete allHolidays.splice(holidayRuleId, 1);
+				} else {
+					if (_.isUndefined(holidayRule.holidayData.excludeYear)) {
+						holidayRule.holidayData.excludeYear = [];
+					}
+					holidayRule.modified = true;
+					holidayRule.holidayData.excludeYear.push(yearSelected);
+
+					self.appFlags.strategyHolidays.allHolidays[holidayRuleId] = holidayRule;
+				}
 
 				/*empty table before re-loading all rows*/
 				table.rows.load([]);
@@ -441,7 +398,9 @@ define(function(require) {
 				holidaysData = [];
 
 			_.each(_.get(strategyData.temporalRules, 'holidays', {}), function(val, key) {
-				var endDate = _.get(val, 'end_date');
+				var endDate = val.hasOwnProperty('viewData')
+					? _.get(val, 'viewData.end_date')
+					: _.get(val, 'end_date');
 
 				if (val.id in strategyData.callflows.MainCallflow.flow.children) {
 					var holidayType,
@@ -478,10 +437,19 @@ define(function(require) {
 					}
 
 					if (endDate) {
-						holidayData.endDate = monster.util.gregorianToDate(endDate);
+						holidayData.endYear = monster.util.gregorianToDate(endDate).getFullYear();
 						holidayData.recurring = false;
 					}
 					holidaysData.push({ holidayType: holidayType, holidayData: holidayData });
+
+					if (val.hasOwnProperty('exclude')) {
+						holidayData.excludeYear = [];
+
+						_.forEach(val.exclude, function(date) {
+							var year = parseInt(date.substring(0, 4));
+							holidayData.excludeYear.push(year);
+						});
+					}
 				}
 				self.appFlags.strategyHolidays.allHolidays = holidaysData;
 			});
@@ -521,49 +489,106 @@ define(function(require) {
 			return ordinalId === 5 ? _.last(datesArray) : datesArray[ordinalId];
 		},
 
-		strategyHolidaysDeleteRuleSetAndRules: function(id, globalCallback) {
-			var self = this;
-
-			self.strategyGetRuleSet(id, function(data) {
-				var parallelRequests = {};
-
-				_.each(data.temporal_rules, function(id) {
-					parallelRequests[id] = function(callback) {
-						self.strategyHolidaysDeleteHoliday(id, function() {
-							callback && callback(null, {});
-						});
-					};
-				});
-
-				monster.parallel(parallelRequests, function(err, results) {
-					self.strategyHolidaysDeleteRuleSet(id, function(data) {
-						globalCallback && globalCallback(data);
-					});
-				});
-			});
-		},
-
-		strategyHolidaysCleanUpdateHoliday: function(data, callback) {
+		/**
+		 * Returns Date
+		 * @param  {string} endYear
+		 * @param  {Object} holiday
+		 * @return {Date}
+		 */
+		strategyHolidaysGetEndDate: function(endYear, holiday) {
 			var self = this,
-				updateHoliday = function() {
-					delete data.extra;
+				holidayData = holiday.holidayData,
+				advancedEndYear = holidayData.endYear ? holidayData.endYear : endYear;
 
-					self.strategyHolidaysUpdateHoliday(data, function(data) {
-						callback && callback(data);
-					});
-				};
-
-			if (data.extra.oldType === 'set') {
-				self.strategyHolidaysDeleteRuleSetAndRules(data.id, function() {
-					delete data.id;
-
-					updateHoliday();
-				});
-			} else {
-				updateHoliday();
+			switch (holiday.holidayType) {
+				case 'advanced':
+					return new Date(endYear, holidayData.fromMonth - 1, self.strategyHolidaysGetOrdinalWday(holidayData, advancedEndYear));
+				case 'range':
+					return new Date(endYear, holidayData.toMonth - 1, holidayData.toDay);
+				case 'single':
+					return new Date(endYear, holidayData.fromMonth - 1, holidayData.fromDay);
 			}
 		},
 
+		/**
+		 * Returns an objects with formatted data for a holiday.
+		 * @param  {Object} holiday
+		 * @param  {Object} rules
+		 * @return {Object[]}
+		 */
+		strategyHolidaysBuildHolidayRule: function(holiday) {
+			var self = this,
+				holidayData = _.get(holiday, 'holidayData', {}),
+				name = holidayData.name,
+				month = holidayData.fromMonth,
+				toMonth = holidayData.toMonth,
+				fromDay = holidayData.fromDay,
+				toDay = holidayData.toDay,
+				id = _.includes(holidayData.id, 'new-') ? null : holidayData.id,
+				endDate = holidayData.recurring
+					? null
+					: monster.util.dateToEndOfGregorianDay(self.strategyHolidaysGetEndDate(holidayData.endYear, holiday)),
+				holidayRule = {};
+
+			if (toMonth && month !== toMonth) {
+				holidayRule = {
+					isRange: true,
+					name: name,
+					fromDay: fromDay,
+					fromMonth: month,
+					toDay: toDay,
+					toMonth: toMonth
+				};
+			} else {
+				holidayRule = {
+					name: name,
+					cycle: 'yearly',
+					interval: 1,
+					month: month,
+					type: 'main_holidays'
+				};
+
+				if (fromDay) {
+					holidayRule.days = [fromDay];
+					if (toDay) {
+						holidayRule.days = _.range(fromDay, toDay + 1);
+					}
+				} else {
+					holidayRule.ordinal = holidayData.ordinal;
+					holidayRule.wdays = [holidayData.wday];
+				}
+			}
+
+			if (holidayData.excludeYear) {
+				holidayRule.exclude = [];
+
+				_.forEach(holidayData.excludeYear, function(year) {
+					var excludeDate = self.strategyHolidaysGetEndDate(year, holiday).toISOString().split('T')[0].split('-').join('');
+					holidayRule.exclude.push(excludeDate);
+				});
+			}
+
+			if (id) {
+				holidayRule.id = id;
+			}
+
+			if (id || endDate) {
+				holidayRule.end_date = endDate;
+			}
+
+			holidayRule.extra = {
+				oldType: holidayData.set ? 'set' : 'rule'
+			};
+
+			return holidayRule;
+		},
+
+		/**
+		 * Returns an objects with formatted data for a holiday with type is 'range' for over a month.
+		 * @param  {Object} data
+		 * @param  {Function} callback
+		 * @return {Object[]}
+		 */
 		strategyHolidaysBuildMultiMonthRangeHoliday: function(data, globalCallback) {
 			var self = this,
 				fromDay = parseInt(data.fromDay),
@@ -575,11 +600,7 @@ define(function(require) {
 					var month = parseInt(pMonth),
 						fromDay = pStartDay || 1,
 						toDay = pEndDay || 31,
-						days = [];
-
-					for (var day = fromDay; day <= toDay; day++) {
-						days.push(day);
-					}
+						days = _.range(fromDay, toDay + 1);
 
 					return {
 						name: name + '_' + month,
@@ -595,7 +616,6 @@ define(function(require) {
 					temporal_rules: [],
 					type: 'main_holidays'
 				},
-
 				parallelRequests = {},
 				junkName = name + '_' + monster.util.randomString(6);
 
@@ -629,8 +649,9 @@ define(function(require) {
 						ruleSet.temporal_rules.push(results[rule.name].id);
 					});
 
-					self.strategyCreateRuleSet(ruleSet, function(data) {
-						globalCallback(data);
+					self.strategyHolidaysCreateRuleSet(ruleSet, function(mainData) {
+						mainData.oldData = data;
+						globalCallback(mainData);
 					});
 				});
 			};
@@ -650,63 +671,230 @@ define(function(require) {
 			}
 		},
 
-		strategyHolidaysBuildHolidayRule: function(template, rules) {
+		/**
+		 * Builds and runs tasks to create/update/delete temporal rules based on intervals.
+		 * @param  {Function} callback
+		 */
+		strategyHolidaysReconcileTemporalRules: function(strategyData, callback) {
 			var self = this,
-				$this = $(template),
-				name = $this.find('#name').val().trim(),
-				month = parseInt($this.find('.month.from :selected').val()),
-				toMonth = parseInt($this.find('.month.to :selected').val()),
-				fromDay = parseInt($this.find('.day.from :selected').val()),
-				toDay = parseInt($this.find('.day.to :selected').val()),
-				ordinal = $this.find('.ordinal :selected').val(),
-				wday = $this.find('.wday :selected').val(),
-				id = $this.data('id'),
-				type = $this.data('type'),
-				holidayRule = {};
+				holidaysToDelete = self.appFlags.strategyHolidays.deletedHolidays,
+				allHolidays = self.appFlags.strategyHolidays.allHolidays,
+				temporalRulesHolidays = _.get(strategyData.temporalRules, 'holidays', {}),
+				groupRulesPerTask = function groupRulesPerTask(allHolidays, rules) {
+					var toUpdate = [],
+						toCreate = [],
+						toCreateUpdateRange = [];
 
-			if (!name || _.keys(rules).indexOf(name) >= 0) {
-				holidayRule = false;
-			} else if (toMonth && month !== toMonth) {
-				holidayRule = {
-					isRange: true,
-					name: name,
-					fromDay: fromDay,
-					fromMonth: month,
-					toDay: toDay,
-					toMonth: toMonth
-				};
-			} else {
-				holidayRule = {
-					name: name,
-					cycle: 'yearly',
-					interval: 1,
-					month: month,
-					type: 'main_holidays'
-				};
+					_.forEach(allHolidays, function(holiday) {
+						if (holiday.hasOwnProperty('modified')) {
+							var holidayRule = self.strategyHolidaysBuildHolidayRule(holiday);
 
-				if (fromDay) {
-					var firstDay = fromDay;
-					holidayRule.days = [firstDay];
-					if (toDay) {
-						for (var day = firstDay + 1; day <= toDay; day++) {
-							holidayRule.days.push(day);
+							if (holidayRule.hasOwnProperty('isRange')) {
+								toCreateUpdateRange.push(holidayRule);
+								return;
+							}
+
+							if (holidayRule.id) {
+								toUpdate.push(holidayRule);
+							} else {
+								toCreate.push(holidayRule);
+							}
 						}
-					}
-				} else {
-					holidayRule.ordinal = ordinal;
-					holidayRule.wdays = [wday];
-				}
-			}
+					});
 
-			if (id) {
-				holidayRule.id = id;
-			}
+					return {
+						toUpdate: toUpdate,
+						toCreate: toCreate,
+						toCreateUpdateRange: toCreateUpdateRange
+					};
+				},
+				getTasksToRun = function getTasksToRun(rulesPerTask) {
+					var toCreate = _.map(rulesPerTask.toCreate, function(rule) {
+							return function(next) {
+								self.strategyHolidaysCreateHoliday(rule, function(data) {
+									next(null, data);
+								});
+							};
+						}),
+						toUpdate = _.map(rulesPerTask.toUpdate, function(rule) {
+							return function(next) {
+								self.callApi({
+									resource: 'temporalRule.patch',
+									data: {
+										accountId: self.accountId,
+										ruleId: rule.id,
+										data: rule
+									},
+									success: _.flow(
+										_.partial(_.get, _, 'data'),
+										_.partial(next, null)
+									),
+									error: _.partial(next, null)
+								});
+							};
+						}),
+						toCreateUpdateRange = _.map(rulesPerTask.toCreateUpdateRange, function(rule) {
+							return function(next) {
+								self.strategyHolidaysBuildMultiMonthRangeHoliday(rule, function(data) {
+									data.viewData = rule;
+									next(null, data);
+								});
+							};
+						}),
+						toDelete = _.map(holidaysToDelete, function(id) {
+							var getRule = _.find(temporalRulesHolidays, { id: id });
 
-			holidayRule.extra = {
-				oldType: type
-			};
+							if (!_.isUndefined(getRule)) {
+								return function(next) {
+									if (getRule.hasOwnProperty('temporal_rules')) {
+										self.strategyHolidaysDeleteRuleSetAndRules(id, function(data) {
+											next(null, data);
+										});
+									} else {
+										self.strategyHolidaysDeleteHoliday(id, function(data) {
+											next(null, data);
+										});
+									}
+								}
+							}
+						});
 
-			return holidayRule;
+					return {
+						toAdd: function(next) {
+							monster.parallel(_.flatten([
+								toUpdate,
+								toCreate,
+								toCreateUpdateRange
+							]), next);
+						},
+						toRemove: function(next) {
+							monster.parallel(toDelete, next);
+						}
+					};
+				};
+
+			monster.parallel(_.flow(
+				_.partial(groupRulesPerTask, _, allHolidays),
+				getTasksToRun
+			)(allHolidays), callback);
+		},
+
+		/**
+		 * Update/create temporal rules for holidays and update main callflow if needed.
+		 * @param  {Boolean}   isEnabled
+		 * @param  {Object}   strategyData
+		 * @param  {Function} callback
+		 */
+		strategyHolidaysUpdateStrategyData: function(strategyData, callback) {
+			var self = this,
+				reconcileTemporalRules = _.bind(self.strategyHolidaysReconcileTemporalRules, self, strategyData),
+				rebuildTemporalRulesInPlace = function(actionsByType, strategyData) {
+					var mainCallflowId = strategyData.callflows.MainCallflow.id;
+
+					_.forEach(actionsByType.toAdd, function(rule) {
+						_.set(strategyData.temporalRules, ['holidays', rule.hasOwnProperty('temporal_rules') ? rule.name : rule.id], rule);
+						strategyData.callflows.MainCallflow.flow.children[rule.id] = {
+							children: {},
+							data: {
+								id: mainCallflowId
+							},
+							module: 'callflow'
+						};
+
+						if (rule.hasOwnProperty('oldData')) {
+							actionsByType.toRemove.push(rule.oldData);
+						}
+					});
+
+					_.forEach(actionsByType.toRemove, function(rule) {
+						_.unset(strategyData.temporalRules, ['holidays', rule.hasOwnProperty('temporal_rules') ? rule.name : rule.id]);
+						_.unset(strategyData.callflows.MainCallflow.flow.children, rule.id);
+					});
+				},
+				updateMainCallflowCatchAllInPlace = function(strategyData) {
+					var rulesIds = _
+							.chain(strategyData.temporalRules)
+							.pick(['holidays'])
+							.flatMap(_.values)
+							.map('id')
+							.value(),
+						activeRulesIds = _
+							.chain(strategyData.callflows.MainCallflow.flow.children)
+							.omit('_')
+							.keys()
+							.value(),
+						hasActiveRules = _.some(rulesIds, _.partial(_.includes, activeRulesIds)),
+						holidayCallflowId = _.get(strategyData.callflows, 'MainHolidays.id');
+
+					strategyData.callflows.MainCallflow.flow.children._ = {
+						children: {},
+						data: {
+							id: holidayCallflowId
+						},
+						module: 'callflow'
+					};
+				},
+				rebuildMainCallflowRulesInPlace = _.bind(self.strategyRebuildMainCallflowRuleArray, self),
+				shouldUpdateMainCallflow = function(current, strategyData) {
+					var currentRules = _.sortBy(current.rules),
+						updatedRules = _.sortBy(strategyData.callflows.MainCallflow.flow.data.rules),
+						currentCatchAll = current.catchAllCallflowId,
+						updatedCatchAll = strategyData.callflows.MainCallflow.flow.children._.data.id;
+
+					return !_.every([
+						_.isEqual(currentRules, updatedRules),
+						currentCatchAll === updatedCatchAll
+					]);
+				},
+				updateStrategyDataInPlace = function updateStrategyDataInPlace(actionsPerType, strategyData) {
+					var current = {
+						rules: _.get(strategyData.callflows.MainCallflow, 'flow.data.rules', []),
+						catchAllCallflowId: _.get(strategyData.callflows.MainCallflow, 'flow.children._.data.id')
+					};
+
+					rebuildTemporalRulesInPlace(actionsPerType, strategyData);
+					updateMainCallflowCatchAllInPlace(strategyData);
+					rebuildMainCallflowRulesInPlace(strategyData);
+
+					monster.waterfall([
+						function(next) {
+							if (!shouldUpdateMainCallflow(current, strategyData)) {
+								return next(null);
+							}
+							self.strategyUpdateCallflow(strategyData.callflows.MainCallflow, function(updatedCallflow) {
+								strategyData.callflows.MainCallflow = updatedCallflow;
+								next(null);
+							});
+						}
+					], callback);
+				};
+
+			monster.waterfall([
+				reconcileTemporalRules,
+				_.partial(updateStrategyDataInPlace, _, strategyData)
+			], callback);
+		},
+
+		strategyHolidaysDeleteRuleSetAndRules: function(id, globalCallback) {
+			var self = this;
+
+			self.strategyGetRuleSet(id, function(data) {
+				var parallelRequests = {};
+
+				_.each(data.temporal_rules, function(id) {
+					parallelRequests[id] = function(callback) {
+						self.strategyHolidaysDeleteHoliday(id, function() {
+							callback && callback(null, {});
+						});
+					};
+				});
+
+				monster.parallel(parallelRequests, function(err, results) {
+					self.strategyHolidaysDeleteRuleSet(id, function(data) {
+						globalCallback && globalCallback(data);
+					});
+				});
+			});
 		},
 
 		strategyHolidaysUpdateHoliday: function(data, callback) {
@@ -725,17 +913,26 @@ define(function(require) {
 					}
 				});
 			} else {
-				self.callApi({
-					resource: 'temporalRule.create',
-					data: {
-						accountId: self.accountId,
-						data: data
-					},
-					success: function(data, status) {
-						callback(data.data);
-					}
+				self.strategyHolidaysCreateHoliday(data, function(data) {
+					callback(data);
 				});
+
 			}
+		},
+
+		strategyHolidaysCreateRuleSet: function(data, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'temporalSet.create',
+				data: {
+					accountId: self.accountId,
+					data: data
+				},
+				success: function(data, status) {
+					callback(data.data);
+				}
+			});
 		},
 
 		strategyHolidaysDeleteRuleSet: function(id, callback) {
@@ -753,6 +950,21 @@ define(function(require) {
 			});
 		},
 
+		strategyHolidaysCreateHoliday: function(data, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'temporalRule.create',
+				data: {
+					accountId: self.accountId,
+					data: data
+				},
+				success: function(data, status) {
+					callback(data.data);
+				}
+			});
+		},
+
 		strategyHolidaysDeleteHoliday: function(id, callback) {
 			var self = this;
 
@@ -766,7 +978,6 @@ define(function(require) {
 				success: function(data, status) {
 					callback(data.data);
 				},
-				// Sometimes we'll try to delete a time of day which no longer exist, but still need to execute the callback
 				error: function(data, status) {
 					callback(data.data);
 				}

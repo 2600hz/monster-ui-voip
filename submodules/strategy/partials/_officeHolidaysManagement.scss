@@ -46,18 +46,6 @@
 	}
 }
 
-.monster-dialog {
-	&.holiday-add-edit-dialog {
-		.ui-dialog-titlebar {
-			background: $woodsmoke;
-		}
-
-		.ui-dialog-titlebar-close {
-			color: $white;
-		}
-	}
-}
-
 #form_add_edit_office_holidays {
 	display: flex;
 	flex-direction: column;
