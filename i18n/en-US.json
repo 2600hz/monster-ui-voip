@@ -974,11 +974,12 @@
 			},
 			"dialogs": {
 				"delete": {
-					"title": "Delete Time Slot?",
+					"title": "Delete Holiday?",
+					"deleteAll": "Delete all recurring instances",
 					"message": "Delete holiday \"{{variable}}\"? Deleting a holiday will permanently remove it.",
 					"buttons": {
 						"yes": "Yes, Delete Holiday",
-						"no": "Keep Time Slot"
+						"no": "No, Keep Holiday"
 					}
 				}
 			},

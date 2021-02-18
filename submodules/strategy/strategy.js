@@ -4033,6 +4033,7 @@ define(function(require) {
 				callback = args.callback,
 				holidayRule = args.holidayRule ? args.holidayRule : {},
 				existingHolidays = args.existingHolidays,
+				isRecurring = _.get(holidayRule, 'holidayData.recurring', false),
 				getListOfYears = function getListOfYears() {
 					var date = new Date(),
 						year = parseInt(date.getFullYear()),
@@ -4096,7 +4097,7 @@ define(function(require) {
 					.find('.row-fluid.' + selectedType)
 					.addClass('selected');
 
-				if (selectedType === 'single' && holidayRule.holidayData.recurring) {
+				if (selectedType === 'single' && isRecurring) {
 					$template
 						.find('.single .year')
 						.addClass('hide');

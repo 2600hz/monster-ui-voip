@@ -356,6 +356,7 @@ define(function(require) {
 
 				var table = footable.get('#holidays_list_table'),
 					yearSelected = parseInt(parent.find('#year').val()),
+					isChecked = template.find('.deleteAll').prop('checked'),
 					allHolidays = self.appFlags.strategyHolidays.allHolidays,
 					holidayRuleId = _.findKey(allHolidays, function(holiday) {
 						return _.get(holiday, 'holidayData.id') === holidayId;
@@ -363,7 +364,12 @@ define(function(require) {
 					holidayRule = allHolidays[holidayRuleId],
 					isRecurring = _.get(holidayRule, 'holidayData.recurring', false);
 
-				if (isRecurring) {
+				if (isRecurring && isChecked || !isRecurring) {
+					if (!_.includes(holidayId, 'new-')) {
+						self.appFlags.strategyHolidays.deletedHolidays.push(holidayId);
+					}
+					delete allHolidays.splice(holidayRuleId, 1);
+				} else {
 					if (_.isUndefined(holidayRule.holidayData.excludeYear)) {
 						holidayRule.holidayData.excludeYear = [];
 					}
@@ -371,11 +377,6 @@ define(function(require) {
 					holidayRule.holidayData.excludeYear.push(yearSelected);
 
 					self.appFlags.strategyHolidays.allHolidays[holidayRuleId] = holidayRule;
-				} else {
-					if (!_.includes(holidayId, 'new-')) {
-						self.appFlags.strategyHolidays.deletedHolidays.push(holidayId);
-					}
-					delete allHolidays.splice(holidayRuleId, 1);
 				}
 
 				/*empty table before re-loading all rows*/
@@ -496,11 +497,12 @@ define(function(require) {
 		 */
 		strategyHolidaysGetEndDate: function(endYear, holiday) {
 			var self = this,
-				holidayData = holiday.holidayData;
+				holidayData = holiday.holidayData,
+				advancedEndYear = holidayData.endYear ? holidayData.endYear : endYear;
 
 			switch (holiday.holidayType) {
 				case 'advanced':
-					return new Date(endYear, holidayData.fromMonth - 1, self.strategyHolidaysGetOrdinalWday(holidayData, holidayData.endYear));
+					return new Date(endYear, holidayData.fromMonth - 1, self.strategyHolidaysGetOrdinalWday(holidayData, advancedEndYear));
 				case 'range':
 					return new Date(endYear, holidayData.toMonth - 1, holidayData.toDay);
 				case 'single':
