@@ -1538,7 +1538,7 @@
 				},
 				"transcription": {
 					"label": "Transcribe Messages",
-					"help": "Control recent enhancements to the voicemail system"
+					"help": "If enabled a voicemail transcription will be sent to the email assigned to the account and can be viewed in the desktop application"
 				},
 				"announceOnly": {
 					"label": "Announce only-mode",

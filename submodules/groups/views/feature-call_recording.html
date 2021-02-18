@@ -19,20 +19,23 @@
 		<form id="call_recording_form">
 			<div>
 				<span>{{ i18n.groups.callRecording.urlLabel }}</span>
-				<input required name="url" type="url" placeholder="{{ i18n.groups.callRecording.urlPlaceholder }}" value="{{url}}">
+				<input name="url" type="text" placeholder="{{ i18n.groups.callRecording.urlPlaceholder }}" value="{{url}}">
 			</div>
 			<div>
 				<span>{{ i18n.groups.callRecording.formatLabel }}</span>
 				<select name="format" class="input-medium">
 					{{#select format}}
-						<option value="mp3">mp3</option>
-						<option value="wav">wav</option>
+						{{#each @root.supportedAudioFormats}}
+							<option value="{{this}}">
+								{{this}}
+							</option>
+						{{/each}}
 					{{/select}}
 				</select>
 			</div>
 			<div>
 				<span>{{ i18n.groups.callRecording.timeLimitLabel }}</span>
-				<input required name="time_limit" type="text" class="input-small" value="{{#if timeLimit}}{{timeLimit}}{{else}}600{{/if}}">
+				<input name="time_limit" type="text" class="input-small" value="{{#if timeLimit}}{{timeLimit}}{{else}}600{{/if}}">
 			</div>
 		</form>
 	</div>
