@@ -36,7 +36,9 @@ define(function(require) {
 					'thursday',
 					'friday',
 					'saturday'
-				]
+				],
+				csvExportFilename: 'template-office-holidays',
+				dateTypes: ['single', 'range', 'advanced']
 			}
 		},
 
@@ -244,23 +246,94 @@ define(function(require) {
 				});
 			});
 
-			template.on('click', '.import-holidays', function(event) {
+			template.on('click', '.import-csv', function(event) {
 				event.preventDefault();
 
 				var data = [],
-					filename = 'office-holidays-template.csv',
+					i18n = self.i18n.active().strategy.holidays,
+					appFlags = self.appFlags.strategyHolidays,
+					filename = appFlags.csvExportFilename + '.csv',
 					csv = Papa.unparse(data, {
 						quotes: true
 					}),
 					blob = new Blob([csv], {
 						type: 'text/csv;charset=utf-8;'
-					});
+					}),
+					dateTypes = appFlags.dateTypes,
+					months = _.map(i18n.months, function(value, key) {
+						return _.toLower(key);
+					}),
+					ordinals = _.map(i18n.ordinals, function(value) {
+						return _.toLower(value);
+					}),
+					sanitizeString = _.flow(
+						_.toString,
+						_.toLower,
+						_.trim
+					),
+					validateDate = function(date) {
+						var dateArray = _.split(date, ' '),
+							day = _.toInteger(dateArray[1]),
+							isMonthValid = _.includes(months, dateArray[0]),
+							isDayValid = day > 0 && day < 32;
+
+						return _.every([
+							isMonthValid,
+							isDayValid
+						]);
+					},
+					validateAdvancedDate = function(date) {
+						var dateArray = _.split(date, ' '),
+							isMonthValid = _.includes(months, dateArray[0]),
+							isOrdinalValid = _.includes(ordinals, dateArray[1]),
+							isWdayValid = _.includes(appFlags.wdays, dateArray[2]);
+
+						return _.every([
+							isMonthValid,
+							isOrdinalValid,
+							isWdayValid
+						]);
+					};
 
 				monster.pub('common.csvUploader.renderPopup', {
-					title: self.i18n.active().strategy.holidays.importOfficeHolidays.title,
+					title: i18n.importOfficeHolidays.title,
 					file: blob,
-					dataLabel: self.i18n.active().strategy.holidays.importOfficeHolidays.dataLabel,
-					filename: filename
+					dataLabel: i18n.importOfficeHolidays.dataLabel,
+					filename: filename,
+					header: ['type', 'name', 'start_date', 'end_date', 'year', 'recurring'],
+					row: {
+						sanitizer: function(row) {
+							return {
+								type: sanitizeString(row.type),
+								name: _.trim(_.toString(row.name)),
+								start_date: sanitizeString(row.start_date),
+								end_date: sanitizeString(row.end_date),
+								year: _.toInteger(row.year),
+								recurring: sanitizeString(row.recurring) === 'yes'
+							};
+						},
+						validator: function(row) {
+							var start_date = row.start_date,
+								end_date = row.end_date,
+								isTypeValid = _.includes(dateTypes, row.type),
+								isStartDateValid = row.type === 'advanced'
+									? validateAdvancedDate(row.start_date)
+									: validateDate(start_date),
+								isEndDateValid = row.type === 'range'
+									? validateDate(end_date)
+									: true;
+
+							return _.every([
+								isTypeValid,
+								isStartDateValid,
+								isEndDateValid
+							]);
+						}
+					},
+					onSuccess: _.flow(
+						_.bind(self.strategyHolidaysExtractDatesFromCsvData, self),
+						_.bind(self.strategyHolidaysListingRender, self, parent)
+					)
 				});
 			});
 
@@ -476,6 +549,56 @@ define(function(require) {
 			});
 
 			return holidaysData;
+		},
+
+		/**
+		 * Returns an array of arrays containing intervals for each day of the week.
+		 * @param  {Array} csvData
+		 * @return {Array[]}
+		 * Intervals are extracted from CSV data and are not necessarily linear and/or concurrent.
+		 */
+
+		strategyHolidaysExtractDatesFromCsvData: function(csvData) {
+			var self = this,
+				months = _.map(self.i18n.active().strategy.holidays.months, function(value, key) {
+					return _.toLower(key);
+				});
+
+			return _.map(csvData, function(row) {
+				var holidayRule = {
+						modified: true,
+						holidayType: row.type
+					},
+					holidayData = {
+						id: 'new-' + Date.now(),
+						name: row.name,
+						recurring: row.recurring
+					},
+					endYear = row.year !== 0 ? row.year : new Date().getFullYear(),
+					dateArray = _.split(row.start_date, ' ');
+
+				if (!row.recurring) {
+					holidayData.endYear = endYear;
+				}
+
+				holidayData.fromMonth = _.indexOf(months, dateArray[0]) + 1;
+				if (row.type === 'advanced') {
+					holidayData.ordinal = dateArray[1];
+					holidayData.wday = dateArray[2];
+				} else {
+					holidayData.fromDay = _.toInteger(dateArray[1]);
+				}
+
+				if (row.type === 'range') {
+					var endDateArray = _.split(row.end_date, ' ');
+					holidayData.toMonth = _.indexOf(months, endDateArray[0]) + 1;
+					holidayData.toDay = _.toInteger(endDateArray[1]);
+				}
+				holidayRule.holidayData = holidayData;
+				self.appFlags.strategyHolidays.allHolidays.push(holidayRule);
+
+				return holidayRule;
+			});
 		},
 
 		/**
@@ -937,7 +1060,6 @@ define(function(require) {
 				self.strategyHolidaysCreateHoliday(data, function(data) {
 					callback(data);
 				});
-
 			}
 		},
 
