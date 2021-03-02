@@ -56,19 +56,15 @@
 		button {
 			font-size: 14px;
 			padding: 8px 7px;
+			border: 1px solid $french-gray2;
+			background: linear-gradient(-180deg, $white 0%, $athens-gray 100%);
+			margin-right: 8px;
+			min-width: 96px;
 		}
 
 		.add-holiday {
 			background: $dodger-blue;
 			border: 1px solid #006bca;
-			min-width: 96px;
-		}
-
-		.import-holidays, .national-holidays {
-			border: 1px solid $french-gray2;
-			background: linear-gradient(-180deg, $white 0%, $athens-gray 100%);
-			margin-left: 8px;
-			min-width: 118px;
 		}
 	}
 
