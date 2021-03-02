@@ -1810,6 +1810,21 @@ define(function(require) {
 			});
 		},
 
+		strategyDeleteRuleSet: function(id, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'temporalSet.delete',
+				data: {
+					accountId: self.accountId,
+					setId: id
+				},
+				success: function(data, status) {
+					callback && callback(data.data);
+				}
+			});
+		},
+
 		strategyUpdateRuleSet: function(data, callback) {
 			var self = this;
 
@@ -4113,10 +4128,8 @@ define(function(require) {
 				var $this = $(this),
 					isEmpty = _.isEmpty($this.val());
 
+				$template.find('.monster-panel-text').slideUp(200);
 				$template.find('.no-name-error')[isEmpty ? 'slideDown' : 'slideUp'](200);
-				$template.find('.minimum-name-error').slideUp(200);
-				$template.find('.maximum-name-error').slideUp(200);
-				$template.find('.duplicate-name-error').slideUp(200);
 			});
 
 			$template.find('#recurring').on('change', function(event) {

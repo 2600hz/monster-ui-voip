@@ -318,8 +318,7 @@ define(function(require) {
 					holidayRule: holidayRule,
 					callback: function(err, data) {
 						/*Compare old date with new data if it's recurring*/
-						var isOldRecurring = _.get(holidayRule, 'holidayData.recurring', false),
-							isNewRecurring = _.get(data, 'holidayData.recurring', false);
+						var isOldRecurring = _.get(holidayRule, 'holidayData.recurring', false);
 
 						if (isOldRecurring) {
 							/* update existing rule */
@@ -328,7 +327,7 @@ define(function(require) {
 							}
 							holidayRule.holidayData.excludeYear.push(yearSelected);
 							holidayRule.modified = true;
-							self.appFlags.strategyHolidays.allHolidays[holidayRuleId] = holidayRule; 
+							self.appFlags.strategyHolidays.allHolidays[holidayRuleId] = holidayRule;
 
 							/* add new rule */
 							self.appFlags.strategyHolidays.allHolidays.push(data);
@@ -364,7 +363,7 @@ define(function(require) {
 					holidayRule = allHolidays[holidayRuleId],
 					isRecurring = _.get(holidayRule, 'holidayData.recurring', false);
 
-				if (isRecurring && isChecked || !isRecurring) {
+				if ((isRecurring && isChecked) || !isRecurring) {
 					if (!_.includes(holidayId, 'new-')) {
 						self.appFlags.strategyHolidays.deletedHolidays.push(holidayId);
 					}
@@ -755,7 +754,7 @@ define(function(require) {
 											next(null, data);
 										});
 									}
-								}
+								};
 							}
 						});
 
@@ -812,19 +811,7 @@ define(function(require) {
 					});
 				},
 				updateMainCallflowCatchAllInPlace = function(strategyData) {
-					var rulesIds = _
-							.chain(strategyData.temporalRules)
-							.pick(['holidays'])
-							.flatMap(_.values)
-							.map('id')
-							.value(),
-						activeRulesIds = _
-							.chain(strategyData.callflows.MainCallflow.flow.children)
-							.omit('_')
-							.keys()
-							.value(),
-						hasActiveRules = _.some(rulesIds, _.partial(_.includes, activeRulesIds)),
-						holidayCallflowId = _.get(strategyData.callflows, 'MainHolidays.id');
+					var holidayCallflowId = _.get(strategyData.callflows, 'MainHolidays.id');
 
 					strategyData.callflows.MainCallflow.flow.children._ = {
 						children: {},
@@ -916,7 +903,6 @@ define(function(require) {
 				self.strategyHolidaysCreateHoliday(data, function(data) {
 					callback(data);
 				});
-
 			}
 		},
 
