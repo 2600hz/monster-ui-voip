@@ -12,6 +12,7 @@ define(function(require) {
 		'numbers',
 		'strategy',
 		'strategyHours',
+		'strategyHolidays',
 		'users',
 		'vmboxes'
 	];

@@ -1,0 +1,74 @@
+<div class="holidays-toggler">
+	<label>
+		{{#monsterCheckbox i18n.strategy.holidays.enableTitle}}
+			<input type="checkbox" name="holidays.enabled" {{#if enabled}}checked{{/if}}>
+		{{/monsterCheckbox}}
+	</label>
+</div>
+
+<div class="holidays-div" {{#if enabled}}style="display:block;"{{/if}}>
+	<div class="title">{{ i18n.strategy.holidays.title }}</div>
+
+	<div class="help-div">
+		<div class="monster-blue help-icon">
+			{{telicon "info--circle"}}
+		</div>
+		<div class="help-text">
+			{{i18n.strategy.holidays.helpHolidays}}
+		</div>
+	</div>
+
+	<div class="year-config">
+		<label for="year" class="control-label">
+			{{i18n.strategy.holidays.holidaySchedule}}
+		</label>
+
+		<div class="controls">
+			<select class="years-list" name="year" id="year">
+				{{#each years as |label|}}
+				<option value="{{label}}">
+					{{label}}
+				</option>
+				{{/each}}
+			</select>
+		</div>
+	</div>
+
+	<div class="holidays-list">
+		<div class="actions-wrapper">
+			<button type="button" class="monster-button add-holiday">
+				{{i18n.strategy.holidays.buttons.addHoliday}}
+			</button>
+		</div>
+		<table id="holidays_list_table" class="monster-table footable">
+			<thead>
+				<tr class="footable-header">
+					<th data-sorted="true">
+						{{i18n.strategy.holidays.listing.headers.name}}
+					</th>
+					<th data-sorted="true">
+						{{i18n.strategy.holidays.listing.headers.date}}
+					</th>
+					<th>
+						{{i18n.strategy.holidays.listing.headers.actions}}
+					</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+		<div class="custom-footable-empty">
+			<div class="title-row">
+				{{telicon "calendar"}}
+				<span>{{i18n.strategy.holidays.empty.title}}</span>
+			</div>
+			<div class="description-row">
+				<span class="description">{{i18n.strategy.holidays.empty.description}}</span>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="holidays-actions basic-actions">
+	<a href="#" class="monster-link cancel-link">{{i18n.cancel}}</a>
+	<button class="monster-button monster-button-success save-button">{{i18n.saveChanges}}</button>
+</div>

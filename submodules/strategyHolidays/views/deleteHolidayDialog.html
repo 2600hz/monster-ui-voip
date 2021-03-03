@@ -1,0 +1,19 @@
+<div id="delete_holiday_dialog" class="delete-dialog">
+	<div class="dialog-content-wrapper">
+		<p>{{replaceVar i18n.strategy.holidays.dialogs.delete.message holidayName}}</p>
+		{{#monsterCheckbox i18n.strategy.holidays.dialogs.delete.deleteAll}}
+			<input class="deleteAll" type="checkbox"></input>
+		{{/monsterCheckbox}}
+	</div>
+
+	<div class="alert-dialog-buttons clearfix">
+		<div class="action-buttons">
+			<button type="button" class="monster-button-ghost monster-button-fit cancel">
+				{{ i18n.strategy.holidays.dialogs.delete.buttons.no }}
+			</a>
+			<button type="button" class="monster-button-success monster-button-fit delete">
+				{{ i18n.strategy.holidays.dialogs.delete.buttons.yes }}
+			</button>
+		</div>
+	</div>
+</div>
