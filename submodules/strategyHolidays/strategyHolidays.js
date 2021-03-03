@@ -2,7 +2,8 @@ define(function(require) {
 	var monster = require('monster'),
 		_ = require('lodash'),
 		$ = require('jquery'),
-		footable = require('footable');
+		footable = require('footable'),
+		Papa = require('papaparse');
 
 	return {
 		subscribe: {
@@ -240,6 +241,26 @@ define(function(require) {
 						self.appFlags.strategyHolidays.allHolidays.push(data);
 						self.strategyHolidaysListingRender(parent, [data]);
 					}
+				});
+			});
+
+			template.on('click', '.import-csv', function(event) {
+				event.preventDefault();
+
+				var data =[],
+					filename = 'office-holidays-template.csv',
+					csv = Papa.unparse(data, {
+						quotes: true
+					}),
+					blob = new Blob([csv], {
+						type: 'text/csv;charset=utf-8;'
+					});
+
+				monster.pub('common.csvUploader.renderPopup', {
+					title: self.i18n.active().strategy.holidays.importOfficeHolidays.title,
+					file: blob,
+					dataLabel: self.i18n.active().strategy.holidays.importOfficeHolidays.dataLabel,
+					filename: filename
 				});
 			});
 
