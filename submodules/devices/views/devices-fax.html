@@ -84,9 +84,9 @@
 					<label class="control-label" for="media_fax_option">{{ i18n.devices.fax.t38 }}</label>
 					<div class="controls">
 						<select id="media_fax_option" name="media.fax_option">
-							<option{{#compare media.fax_option '===' 'auto'}} selected{{/compare}} value="auto">{{ i18n.devices.fax.auto }}</option>
-							<option{{#compare media.fax_option '===' 'true'}} selected{{/compare}} value="true">{{ i18n.devices.fax.force }}</option>
-							<option{{#compare media.fax_option '===' 'false'}} selected{{/compare}} value="false">{{ i18n.devices.fax.disabled }}</option>
+							<option value="auto">{{ i18n.devices.fax.auto }}</option>
+							<option{{#compare media.fax_option '===' true}} selected{{/compare}} value="true">{{ i18n.devices.fax.force }}</option>
+							<option{{#compare media.fax_option '===' false}} selected{{/compare}} value="false">{{ i18n.devices.fax.disabled }}</option>
 						</select>
 					</div>
 				</div>
