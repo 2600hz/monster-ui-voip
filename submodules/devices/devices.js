@@ -339,9 +339,16 @@ define(function(require) {
 						}
 					})
 					: self.i18n.active().devices[type].addTitle,
+				formattedData = mode === 'add' && type === 'fax'
+					? _.merge({}, data, {
+						media: {
+							fax_option: false
+						}
+					})
+					: data,
 				templateDevice = $(self.getTemplate({
 					name: 'devices-' + type,
-					data: $.extend(true, {}, data, {
+					data: $.extend(true, {}, formattedData, {
 						isProvisionerConfigured: monster.config.api.hasOwnProperty('provisioner'),
 						showEmergencyCallerId: monster.util.isNumberFeatureEnabled('e911')
 					}),
@@ -1186,9 +1193,6 @@ define(function(require) {
 					ata: _.merge({}, sipSettings),
 					cellphone: _.merge({}, callForwardSettings),
 					fax: _.merge({
-						media: {
-							fax_option: 'false'
-						},
 						outbound_flags: [
 							'fax'
 						]
