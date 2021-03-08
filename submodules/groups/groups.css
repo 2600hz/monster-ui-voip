@@ -458,6 +458,10 @@
 	width: 530px;
 }
 
+.monster-feature-popup-container[data-feature="call_recording"] .fields-settings > div {
+	position: relative;
+}
+
 .monster-feature-popup-container[data-feature="call_recording"] .account-default {
 	text-align: left;
 	margin-left: 10px;
