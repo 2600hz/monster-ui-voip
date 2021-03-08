@@ -339,10 +339,22 @@ define(function(require) {
 						}
 					})
 					: self.i18n.active().devices[type].addTitle,
-				formattedData = mode === 'add' && type === 'fax'
+				formattedData = type === 'fax'
 					? _.merge({}, data, {
-						media: {
-							fax_option: false
+						extra: {
+							faxOptions: {
+								selected: _.get(data, 'media.fax_option', 'auto'),
+								options: [{
+									labelKey: 'auto',
+									value: 'auto'
+								}, {
+									labelKey: 'force',
+									value: true
+								}, {
+									labelKey: 'disabled',
+									value: false
+								}]
+							}
 						}
 					})
 					: data,
@@ -1147,7 +1159,7 @@ define(function(require) {
 
 			return _.mergeWith(
 				isNew ? self.devicesGetBaseDefaults() : {},
-				self.devicesGetDefaultsForType(type),
+				self.devicesGetDefaultsForType(type, isNew),
 				overrideDestArray
 			);
 		},
@@ -1172,7 +1184,7 @@ define(function(require) {
 			};
 		},
 
-		devicesGetDefaultsForType: function(type) {
+		devicesGetDefaultsForType: function(type, isNew) {
 			var callForwardSettings = {
 					call_forward: {
 						require_keypress: true,
@@ -1196,6 +1208,10 @@ define(function(require) {
 						outbound_flags: [
 							'fax'
 						]
+					}, isNew && {
+						media: {
+							fax_option: false
+						}
 					}, sipSettings),
 					landline: _.merge({}, callForwardSettings),
 					mobile: _.merge({}, sipSettings),
