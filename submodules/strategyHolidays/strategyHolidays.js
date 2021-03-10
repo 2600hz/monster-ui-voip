@@ -37,34 +37,36 @@ define(function(require) {
 					'friday',
 					'saturday'
 				],
-				csvExportFilename: 'template-office-holidays',
 				dateTypes: ['single', 'range', 'advanced'],
-				csvExportTemplate: [
-					{
-						type: 'single',
-						name: 'single_template',
-						start_date: 'February 14',
-						end_date: '',
-						year: '',
-						recurring: 'yes'
-					},
-					{
-						type: 'range',
-						name: 'range_template',
-						start_date: 'October 10',
-						end_date: 'October 12',
-						year: new Date().getFullYear(),
-						recurring: 'no'
-					},
-					{
-						type: 'advanced',
-						name: 'advanced_template',
-						start_date: 'March Second Friday',
-						end_date: '',
-						year: '',
-						recurring: 'yes'
-					}
-				]
+				csvExport: {
+					filename: 'template-office-holidays',
+					sampleTemplate: [
+						{
+							type: 'single',
+							name: 'single_template',
+							start_date: 'February 14',
+							end_date: '',
+							year: '',
+							recurring: 'yes'
+						},
+						{
+							type: 'range',
+							name: 'range_template',
+							start_date: 'October 10',
+							end_date: 'October 12',
+							year: new Date().getFullYear(),
+							recurring: 'no'
+						},
+						{
+							type: 'advanced',
+							name: 'advanced_template',
+							start_date: 'March Second Friday',
+							end_date: '',
+							year: '',
+							recurring: 'yes'
+						}
+					]
+				}
 			}
 		},
 
@@ -277,8 +279,8 @@ define(function(require) {
 
 				var i18n = self.i18n.active().strategy.holidays,
 					appFlags = self.appFlags.strategyHolidays,
-					filename = appFlags.csvExportFilename + '.csv',
-					data = appFlags.csvExportTemplate,
+					filename = appFlags.csvExport.filename + '.csv',
+					data = appFlags.csvExport.sampleTemplate,
 					csv = Papa.unparse(data, {
 						quotes: true
 					}),
