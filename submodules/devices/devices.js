@@ -339,28 +339,9 @@ define(function(require) {
 						}
 					})
 					: self.i18n.active().devices[type].addTitle,
-				formattedData = type === 'fax'
-					? _.merge({}, data, {
-						extra: {
-							faxOptions: {
-								selected: _.get(data, 'media.fax_option', 'auto'),
-								options: [{
-									labelKey: 'auto',
-									value: 'auto'
-								}, {
-									labelKey: 'force',
-									value: true
-								}, {
-									labelKey: 'disabled',
-									value: false
-								}]
-							}
-						}
-					})
-					: data,
 				templateDevice = $(self.getTemplate({
 					name: 'devices-' + type,
-					data: $.extend(true, {}, formattedData, {
+					data: $.extend(true, {}, data, {
 						isProvisionerConfigured: monster.config.api.hasOwnProperty('provisioner'),
 						showEmergencyCallerId: monster.util.isNumberFeatureEnabled('e911')
 					}),
@@ -1125,7 +1106,21 @@ define(function(require) {
 							.thru(monster.util.getUserFullName)
 							.toLower()
 							.value();
-					})
+					}), ...(deviceData.device_type === 'fax') && {
+						faxOptions: {
+							selected: _.get(data.device, 'media.fax_option', 'auto'),
+							options: [{
+								labelKey: 'auto',
+								value: 'auto'
+							}, {
+								labelKey: 'force',
+								value: true
+							}, {
+								labelKey: 'disabled',
+								value: false
+							}]
+						}
+					}
 				}
 			}, deviceData);
 		},
@@ -1158,13 +1153,13 @@ define(function(require) {
 				type = _.get(device, 'device_type');
 
 			return _.mergeWith(
-				isNew ? self.devicesGetBaseDefaults() : {},
-				self.devicesGetDefaultsForType(type, isNew),
+				isNew ? self.devicesGetBaseDefaults(type) : {},
+				self.devicesGetDefaultsForType(type),
 				overrideDestArray
 			);
 		},
 
-		devicesGetBaseDefaults: function() {
+		devicesGetBaseDefaults: function(type) {
 			return {
 				call_restriction: {},
 				device_type: 'sip_device',
@@ -1178,13 +1173,15 @@ define(function(require) {
 					},
 					video: {
 						codecs: []
+					}, ...(type === 'fax') && {
+						fax_option: false
 					}
 				},
 				suppress_unregister_notifications: true
 			};
 		},
 
-		devicesGetDefaultsForType: function(type, isNew) {
+		devicesGetDefaultsForType: function(type) {
 			var callForwardSettings = {
 					call_forward: {
 						require_keypress: true,
@@ -1208,10 +1205,6 @@ define(function(require) {
 						outbound_flags: [
 							'fax'
 						]
-					}, isNew && {
-						media: {
-							fax_option: false
-						}
 					}, sipSettings),
 					landline: _.merge({}, callForwardSettings),
 					mobile: _.merge({}, sipSettings),
