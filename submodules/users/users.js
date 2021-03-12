@@ -2268,7 +2268,7 @@ define(function(require) {
 				vmboxActive = currentUser.extra.mapFeatures.vmbox.active,
 				transcription = monster.util.getCapability('voicemail.transcription'),
 				announcement_only = _.get(vmbox, 'announcement_only', false),
-				vm_to_email_enabled = currentUser.vm_to_email_enabled,
+				vm_to_email_enabled = _.get(currentUser, 'vm_to_email_enabled', true),
 				transcribe = _.get(vmbox, 'transcribe', transcription.defaultValue),
 				featureTemplate = $(self.getTemplate({
 					name: 'feature-vmbox',
