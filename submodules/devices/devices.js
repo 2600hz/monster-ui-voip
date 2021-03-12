@@ -1100,6 +1100,9 @@ define(function(require) {
 						audio: [],
 						video: []
 					},
+					sip: {
+						realm: monster.apps.auth.currentAccount.realm
+					},
 					users: _.sortBy(data.users, function(user) {
 						return _
 							.chain(user)
@@ -1194,7 +1197,6 @@ define(function(require) {
 				sipSettings = {
 					sip: {
 						password: monster.util.randomString(12),
-						realm: monster.apps.auth.currentAccount.realm,
 						username: 'user_' + monster.util.randomString(10)
 					}
 				},
