@@ -145,10 +145,10 @@
 			{{i18n.cancel}}
 		</button>
 		<button type="submit" class="monster-button-success monster-button-fit">
-			{{#if holidayData.id}}
-				{{i18n.strategy.addEditOfficeHolidays.labels.updateHoliday}}
-			{{else}}
+			{{#if isNew}}
 				{{i18n.strategy.addEditOfficeHolidays.labels.addHoliday}}
+			{{else}}
+				{{i18n.strategy.addEditOfficeHolidays.labels.updateHoliday}}
 			{{/if}}
 		</button>
 	</div>
