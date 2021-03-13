@@ -582,48 +582,48 @@ define(function(require) {
 		 * Returns an array of arrays containing intervals for each day of the week.
 		 * @param  {Array} csvData
 		 * @return {Array[]}
-		 * Intervals are extracted from CSV data and are not necessarily linear and/or concurrent.
 		 */
-
 		strategyHolidaysExtractDatesFromCsvData: function(csvData) {
 			var self = this,
-				months = _.map(self.i18n.active().strategy.holidays.months, function(value, key) {
-					return _.toLower(key);
-				});
+				months = _
+					.chain(self.i18n.active().strategy.holidays.months)
+					.keys()
+					.map(_.toLower)
+					.value();
 
 			return _.map(csvData, function(row) {
-				var holidayRule = {
-						modified: true,
-						holidayType: row.type
+				var dateArray = _.split(row.start_date, ' '),
+					endDateArray = _.split(row.end_date, ' '),
+					configsPerType = {
+						advanced: {
+							ordinal: dateArray[1],
+							wday: dateArray[2]
+						},
+						range: {
+							fromDay: _.toInteger(dateArray[1]),
+							toMonth: _.indexOf(months, endDateArray[0]) + 1,
+							toDay: _.toInteger(endDateArray[1])
+						},
+						single: {
+							fromDay: _.toInteger(dateArray[1])
+						}
 					},
-					holidayData = {
-						id: 'new-' + Date.now(),
-						name: row.name,
-						recurring: row.recurring
-					},
+					typeConfig = _.get(configsPerType, row.type),
 					endYear = row.year !== 0 ? row.year : new Date().getFullYear(),
-					dateArray = _.split(row.start_date, ' ');
+					holidayRule = {
+						modified: true,
+						holidayType: row.type,
+						holidayData: _.merge({
+							id: 'new-' + Date.now(),
+							fromMonth: _.indexOf(months, dateArray[0]) + 1,
+							name: row.name,
+							recurring: row.recurring
+						}, !row.recurring && {
+							endYear: endYear
+						}, typeConfig)
+					};
 
-				if (!row.recurring) {
-					holidayData.endYear = endYear;
-				}
-
-				holidayData.fromMonth = _.indexOf(months, dateArray[0]) + 1;
-				if (row.type === 'advanced') {
-					holidayData.ordinal = dateArray[1];
-					holidayData.wday = dateArray[2];
-				} else {
-					holidayData.fromDay = _.toInteger(dateArray[1]);
-				}
-
-				if (row.type === 'range') {
-					var endDateArray = _.split(row.end_date, ' ');
-					holidayData.toMonth = _.indexOf(months, endDateArray[0]) + 1;
-					holidayData.toDay = _.toInteger(endDateArray[1]);
-				}
-				holidayRule.holidayData = holidayData;
 				self.appFlags.strategyHolidays.allHolidays.push(holidayRule);
-
 				return holidayRule;
 			});
 		},
