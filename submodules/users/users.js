@@ -3888,7 +3888,6 @@ define(function(require) {
 				// Remove vmbox from formatted data and user callflow
 				delete formattedData.vmbox;
 				delete formattedData.callflow.flow.children._;
-				formattedData.user.vm_to_email_enabled = false;
 			}
 
 			delete formattedData.user.extra;
