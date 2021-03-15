@@ -2388,16 +2388,18 @@ define(function(require) {
 						});
 					},
 					function(callback) {
-						if (currentUser.vm_to_email_enabled === vmToEmailEnabled) {
-							callback(null);
-							return;
+						if (
+							enabled
+							&& currentUser.vm_to_email_enabled === vmToEmailEnabled
+						) {
+							return callback(null);
 						}
 
 						self.usersPatchUser({
 							data: {
 								userId: userId,
 								data: {
-									vm_to_email_enabled: vmToEmailEnabled
+									vm_to_email_enabled: enabled ? vmToEmailEnabled : true
 								}
 							},
 							success: function() {
