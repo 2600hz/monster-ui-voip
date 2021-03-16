@@ -3,6 +3,10 @@ define(function(require) {
 		_ = require('lodash'),
 		monster = require('monster');
 
+	var overrideDestArray = function(dest, src) {
+		return _.every([dest, src], _.isArray) ? src : undefined;
+	};
+
 	var appSubmodules = [
 		'callLogs',
 		'devices',
@@ -37,7 +41,7 @@ define(function(require) {
 		subscribe: {},
 		appFlags: {
 			common: {
-				hasProvisioner: false,
+				hasProvisioner: _.isString(monster.config.api.provisioner),
 				outboundPrivacy: [
 					'default',
 					'none',
@@ -85,8 +89,6 @@ define(function(require) {
 
 		initApp: function(callback) {
 			var self = this;
-
-			self.appFlags.common.hasProvisioner = _.isString(monster.config.api.provisioner);
 
 			monster.pub('auth.initApp', {
 				app: self,
@@ -340,6 +342,117 @@ define(function(require) {
 				_.partial(getCallflowIds, userId, userMainCallflowId, device.mobile.mdn),
 				_.partial(updateMobileCallflowAssignment, userId, device.id)
 			], mainCallback);
+		},
+
+		/**
+		 * @param  {Object} device
+		 * @param  {String} device.device_type
+		 * @param  {String} [device.id]
+		 * @return {Object}
+		 */
+		applyDeviceDefaults: function(device) {
+			var self = this;
+
+			return _.mergeWith(
+				self.getDeviceDefaults(device),
+				device,
+				overrideDestArray
+			);
+		},
+
+		/**
+		 * @param  {Object} device
+		 * @param  {String} device.device_type
+		 * @param  {String} [device.id]
+		 * @return {Object}
+		 */
+		getDeviceDefaults: function(device) {
+			var self = this,
+				isNew = !_.has(device, 'id'),
+				type = _.get(device, 'device_type');
+
+			return _.mergeWith(
+				isNew ? self.getDeviceBaseDefaults() : {},
+				self.getDeviceDefaultsForType(type),
+				overrideDestArray
+			);
+		},
+
+		/**
+		 * Returns common base config for devices
+		 * @return {Object}
+		 */
+		getDeviceBaseDefaults: function() {
+			return {
+				call_restriction: {},
+				device_type: 'sip_device',
+				enabled: true,
+				media: {
+					audio: {
+						codecs: []
+					},
+					encryption: {
+						enforce_security: false
+					},
+					video: {
+						codecs: []
+					}
+				},
+				suppress_unregister_notifications: true
+			};
+		},
+
+		/**
+		 * Returns device type specific config
+		 * @param  {String} type Device type
+		 * @return {Object}
+		 */
+		getDeviceDefaultsForType: function(type) {
+			var callForwardSettings = {
+					call_forward: {
+						require_keypress: true,
+						keep_caller_id: true
+					},
+					contact_list: {
+						exclude: true
+					}
+				},
+				sipSettings = {
+					sip: {
+						password: monster.util.randomString(12),
+						realm: monster.apps.auth.currentAccount.realm,
+						username: 'user_' + monster.util.randomString(10)
+					}
+				},
+				defaultsPerType = {
+					ata: _.merge({}, sipSettings),
+					cellphone: _.merge({}, callForwardSettings),
+					fax: _.merge({
+						media: {
+							fax_option: 'false'
+						},
+						outbound_flags: [
+							'fax'
+						]
+					}, sipSettings),
+					landline: _.merge({}, callForwardSettings),
+					mobile: _.merge({}, sipSettings),
+					sip_device: _.merge({}, sipSettings),
+					sip_uri: {
+						sip: _.merge({
+							expire_seconds: 360,
+							invite_format: 'route',
+							method: 'password'
+						}, _.pick(sipSettings.sip, [
+							'password',
+							'username'
+						]))
+					},
+					smartphone: _.merge({}, sipSettings, callForwardSettings),
+					softphone: _.merge({}, sipSettings)
+				};
+
+			return _.get(defaultsPerType, type, {});
 		}
 	};
 

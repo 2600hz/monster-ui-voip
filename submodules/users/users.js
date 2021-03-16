@@ -1660,13 +1660,13 @@ define(function(require) {
 							}
 						}
 					}),
-					formattedData = self.usersFormatCreationData(dataForm);
+					formattedData = self.usersNormalizeCreationData(dataForm);
 
 				$buttons.prop('disabled', true);
 
 				self.usersCreate({
 					data: formattedData,
-					success: function(data) {
+					success: function(userId) {
 						popup.dialog('close').remove();
 
 						switch (action) {
@@ -1675,7 +1675,7 @@ define(function(require) {
 								self.usersRenderAddModalDialog();
 								break;
 							default:
-								self.usersRender({ userId: data.user.id });
+								self.usersRender({ userId: userId });
 								break;
 						}
 					},
@@ -3817,108 +3817,78 @@ define(function(require) {
 			callback && callback(response);
 		},
 
-		usersFormatCreationData: function(data) {
+		/**
+		 * @param  {Object} formData
+		 * @return {Object}
+		 */
+		usersNormalizeCreationData: function(formData) {
 			var self = this,
-				fullName = monster.util.getUserFullName(data.user),
-				callerIdName = fullName.substring(0, 15),
-				provisionData = _
-					.chain(data.user.device)
-					.pick([
-						'brand',
-						'family',
-						'model'
-					])
-					.mapValues(_.toLower)
-					.value(),
-				formattedData = {
-					user: $.extend(true, {}, {
-						service: {
-							plans: {}
-						},
-						caller_id: {
-							internal: {
-								name: callerIdName,
-								number: data.callflow.extension
-							}
-						},
-						presence_id: data.callflow.extension,
-						email: data.extra.differentEmail ? data.extra.email : data.user.username,
-						priv_level: 'user',
-						vm_to_email_enabled: true
-					}, data.user),
-					vmbox: self.usersNewMainVMBox(data.callflow.extension, fullName),
-					callflow: {
-						contact_list: {
-							exclude: false
-						},
-						flow: {
-							children: {
-								_: {
-									children: {},
-									data: {},
-									module: 'voicemail'
-								}
-							},
-							data: {
-								can_call_self: false,
-								timeout: 20
-							},
-							module: 'user'
-						},
-						name: fullName + self.appFlags.users.smartPBXCallflowString,
-						numbers: [ (data.callflow || {}).extension ]
+				fullName = monster.util.getUserFullName(formData.user),
+				hasVmbox = formData.extra.createVmbox,
+				licensedRole = _.get(formData.user.extra, 'licensedRole', 'none'),
+				hasLicensedRole = licensedRole !== 'none',
+				hasDevice = _.get(formData, 'user.device.brand', 'none') !== 'none';
+
+			return _.merge({
+				callflow: {
+					contact_list: {
+						exclude: false
 					},
-					extra: data.extra
-				};
-
-			/**
-			 * Only set the `service` property if a user type (e.g. service plan)
-			 * is selected
-			 */
-			if (formattedData.user.hasOwnProperty('extra')
-				&& formattedData.user.extra.hasOwnProperty('licensedRole')
-				&& formattedData.user.extra.licensedRole !== 'none') {
-				formattedData.user.service.plans[formattedData.user.extra.licensedRole] = {
-					accountId: monster.config.resellerId,
-					overrides: {}
-				};
-			} else {
-				delete formattedData.user.service;
-			}
-
-			if (!data.extra.createVmbox) {
-				// Remove vmbox from formatted data and user callflow
-				delete formattedData.vmbox;
-				delete formattedData.callflow.flow.children._;
-			}
-
-			delete formattedData.user.extra;
-
-			if (_.get(data, 'user.device.brand', 'none') === 'none') {
-				delete formattedData.user.device;
-				return formattedData;
-			}
-
-			formattedData.user.device = {
-				device_type: 'sip_device',
-				enabled: true,
-				mac_address: data.user.device.mac_address,
-				name: data.user.device.name,
-				provision: {
-					endpoint_brand: provisionData.brand,
-					endpoint_family: provisionData.family,
-					endpoint_model: provisionData.model
+					flow: {
+						data: {
+							can_call_self: false,
+							timeout: 20
+						},
+						module: 'user'
+					},
+					name: fullName + self.appFlags.users.smartPBXCallflowString,
+					numbers: [ (formData.callflow || {}).extension ]
 				},
-				sip: {
-					password: monster.util.randomString(12),
-					realm: monster.apps.auth.currentAccount.realm,
-					username: 'user_' + monster.util.randomString(10)
-				},
-				suppress_unregister_notifications: false,
-				family: data.user.device.family
-			};
-
-			return formattedData;
+				user: _.merge({
+					caller_id: {
+						internal: {
+							name: fullName.substring(0, 15),
+							number: formData.callflow.extension
+						}
+					},
+					presence_id: formData.callflow.extension,
+					email: formData.extra.differentEmail ? formData.extra.email : formData.user.username,
+					priv_level: 'user',
+					vm_to_email_enabled: true
+				}, _.pick(formData.user, [
+					'first_name',
+					'last_name',
+					'username',
+					'password',
+					'send_email_on_creation'
+				]), hasLicensedRole && {
+					service: {
+						plans: _.set({}, licensedRole, {
+							accountId: monster.config.resellerId,
+							override: {}
+						})
+					}
+				})
+			}, hasDevice && {
+				device: self.applyDeviceDefaults(_.merge({
+					device_type: 'sip_device',
+					provision: _.mapValues({
+						endpoint_brand: 'brand',
+						endpoint_family: 'family',
+						endpoint_model: 'model'
+					}, _.flow(
+						_.partial(_.get, formData.user.device),
+						_.toLower
+					))
+				}, _.pick(formData.user.device, [
+					'mac_address',
+					'name'
+				])))
+			}, hasVmbox && {
+				vmbox: self.usersNewMainVMBox(formData.callflow.extension, fullName)
+			}, _.pick(formData.extra, [
+				'includeInDirectory'
+			]));
 		},
 
 		/* Utils */
@@ -3949,9 +3919,7 @@ define(function(require) {
 		usersCreate: function(args) {
 			var self = this,
 				data = args.data,
-				deviceData = _.get(data, 'user.device');
-
-			delete data.user.device;
+				deviceData = _.get(data, 'device');
 
 			monster.waterfall([
 				function(callback) {
@@ -3972,7 +3940,7 @@ define(function(require) {
 					});
 				},
 				function(_dataUser, callback) {
-					if (!data.extra.createVmbox) {
+					if (!_.has(data, 'vmbox')) {
 						callback(null, _dataUser);
 						return;
 					}
@@ -3983,7 +3951,15 @@ define(function(require) {
 							data: data.vmbox
 						},
 						success: function(_dataVM) {
-							data.callflow.flow.children._.data.id = _dataVM.id;
+							_.merge(data.callflow.flow.children, {
+								_: {
+									children: {},
+									data: {
+										id: _dataVM.id
+									},
+									module: 'voicemail'
+								}
+							});
 							callback(null, _dataUser);
 						},
 						error: function() {
@@ -3991,9 +3967,7 @@ define(function(require) {
 						},
 						onChargesCancelled: function() {
 							// VMBox won't be created, so let's remove its data
-							data.extra.createVmbox = false;
 							delete data.vmbox;
-							delete data.callflow.flow.children._;
 							callback(null, _dataUser);
 						}
 					});
@@ -4009,7 +3983,7 @@ define(function(require) {
 					});
 				},
 				function(_dataUser, _dataCF, callback) {
-					if (!data.extra.includeInDirectory) {
+					if (!data.includeInDirectory) {
 						callback(null, _dataUser);
 						return;
 					}
@@ -4048,7 +4022,7 @@ define(function(require) {
 					return;
 				}
 
-				args.success(data);
+				args.success(data.user.id);
 			});
 		},
 
@@ -5680,12 +5654,14 @@ define(function(require) {
 		usersNewMainVMBox: function(mailbox, userName, userId, deleteAfterNotify) {
 			var self = this;
 
-			return {
-				owner_id: userId,
-				mailbox: mailbox.toString(),	// Force to string
-				name: self.usersGetMainVMBoxName(userName),
+			return _.merge({
+				mailbox: _.toString(mailbox),
+				name: self.usersGetMainVMBoxName(userName)
+			}, _.isString(userId) && {
+				owner_id: userId
+			}, _.isBoolean(deleteAfterNotify) && {
 				delete_after_notify: deleteAfterNotify
-			};
+			});
 		},
 
 		/**
