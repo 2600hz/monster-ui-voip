@@ -3,7 +3,8 @@ define(function(require) {
 		_ = require('lodash'),
 		$ = require('jquery'),
 		footable = require('footable'),
-		Papa = require('papaparse');
+		Papa = require('papaparse'),
+		sugar = require('sugar-date');
 
 	return {
 		subscribe: {
@@ -60,7 +61,7 @@ define(function(require) {
 						{
 							type: 'advanced',
 							name: 'advanced_template',
-							start_date: 'March Second Friday',
+							start_date: 'Second Friday of March',
 							end_date: '',
 							year: '',
 							recurring: 'yes'
@@ -235,9 +236,7 @@ define(function(require) {
 		},
 
 		strategyHolidaysBindEvents: function(parent, template, holidaysData, strategyData) {
-			var self = this,
-				table = footable.get('#holidays_list_table'),
-				allHolidays = self.appFlags.strategyHolidays.allHolidays;
+			var self = this;
 
 			parent.on('change', '.holidays-toggler input[type="checkbox"]', function() {
 				var $this = $(this);
@@ -290,38 +289,38 @@ define(function(require) {
 						type: 'text/csv;charset=utf-8;'
 					}),
 					dateTypes = appFlags.dateTypes,
-					months = _.map(i18n.months, function(value, key) {
-						return _.toLower(key);
-					}),
-					ordinals = _.map(i18n.ordinals, function(value) {
-						return _.toLower(value);
-					}),
+					ordinals = _
+						.chain(i18n.ordinals)
+						.keys()
+						.value(),
 					sanitizeString = _.flow(
 						_.toString,
 						_.toLower,
 						_.trim
 					),
 					validateDate = function(date) {
-						var dateArray = _.split(date, ' '),
-							day = _.toInteger(dateArray[1]),
-							isMonthValid = _.includes(months, dateArray[0]),
-							isDayValid = day > 0 && day < 32;
+						var formattedDate = Sugar.Date.create(date),
+							isValid = formattedDate instanceof Date && !isNaN(formattedDate.getTime());
 
-						return _.every([
-							isMonthValid,
-							isDayValid
-						]);
+						return isValid;
 					},
 					validateAdvancedDate = function(date) {
 						var dateArray = _.split(date, ' '),
-							isMonthValid = _.includes(months, dateArray[0]),
-							isOrdinalValid = _.includes(ordinals, dateArray[1]),
-							isWdayValid = _.includes(appFlags.wdays, dateArray[2]);
+							ordinalInput = '',
+							isOrdinalValid = _.some(dateArray, function(value) {
+								ordinalInput = value;
+								return _.includes(ordinals, value);
+							}),
+							setDateToValidate = _.isEmpty(ordinalInput)
+								? date
+								: _.replace(date, ordinalInput, 'first'),
+							formattedDate = Sugar.Date.create(setDateToValidate),
+							isValid = formattedDate instanceof Date && !isNaN(formattedDate.getTime());
 
 						return _.every([
-							isMonthValid,
 							isOrdinalValid,
-							isWdayValid
+							setDateToValidate,
+							isValid
 						]);
 					};
 
@@ -361,7 +360,7 @@ define(function(require) {
 						}
 					},
 					onSuccess: _.flow(
-						_.bind(self.strategyHolidaysExtractDatesFromCsvData, self),
+						_.bind(self.strategyHolidaysExtractDatesFromCsvData, self, ordinals),
 						_.bind(self.strategyHolidaysListingRender, self, parent)
 					)
 				});
@@ -424,9 +423,7 @@ define(function(require) {
 				event.preventDefault();
 
 				var $this = $(this),
-					id = $this.parents('tr').data('id'),
 					key = $this.parents('tr').data('key'),
-					table = footable.get('#holidays_list_table'),
 					yearSelected = parseInt(parent.find('#year').val()),
 					allHolidays = self.appFlags.strategyHolidays.allHolidays,
 					holidayRule = allHolidays[key];
@@ -476,8 +473,7 @@ define(function(require) {
 			template.find('.delete').on('click', function(event) {
 				event.preventDefault();
 
-				var table = footable.get('#holidays_list_table'),
-					yearSelected = parseInt(parent.find('#year').val()),
+				var yearSelected = parseInt(parent.find('#year').val()),
 					isChecked = template.find('.deleteAll').prop('checked'),
 					allHolidays = self.appFlags.strategyHolidays.allHolidays,
 					holidayRule = allHolidays[data.holidayKey],
@@ -579,29 +575,48 @@ define(function(require) {
 		 * @param  {Array} csvData
 		 * @return {Array[]}
 		 */
-		strategyHolidaysExtractDatesFromCsvData: function(csvData) {
+		strategyHolidaysExtractDatesFromCsvData: function(ordinals, csvData) {
 			var self = this,
-				months = _
-					.chain(self.i18n.active().strategy.holidays.months)
-					.keys()
-					.map(_.toLower)
-					.value();
+				wdays = self.appFlags.strategyHolidays.wdays;
 
 			return _.map(csvData, function(row) {
-				var dateArray = _.split(row.start_date, ' '),
-					endDateArray = _.split(row.end_date, ' '),
+				var type = row.type,
+					advancedDateDetails = function formattedAdvancedDate(date) {
+						var dateArray = _.split(row.start_date, ' '),
+							getOrdinal = _
+								.chain(dateArray)
+								.reject(function(value) {
+									return !_.includes(ordinals, value);
+								})
+								.value(),
+							ordinal = _.get(getOrdinal, '[0]'),
+							updatedDate = _.replace(date, ordinal, 'first');
+
+						return {
+							date: Sugar.Date.create(updatedDate),
+							ordinal: ordinal
+						};
+					},
+					advancedDetails = advancedDateDetails(row.start_date),
+					advancedStartDate = _.get(advancedDetails, 'date'),
+					startDate = type === 'advanced'
+						? advancedStartDate
+						: Sugar.Date.create(row.start_date),
+					endDate = type === 'range'
+						? Sugar.Date.create(row.end_date)
+						: null,
 					configsPerType = {
 						advanced: {
-							ordinal: dateArray[1],
-							wday: dateArray[2]
+							ordinal: _.get(advancedDetails, 'ordinal'),
+							wday: wdays[advancedStartDate.getDay()]
 						},
 						range: {
-							fromDay: _.toInteger(dateArray[1]),
-							toMonth: _.indexOf(months, endDateArray[0]) + 1,
-							toDay: _.toInteger(endDateArray[1])
+							fromDay: startDate.getDate(),
+							toMonth: !_.isNull(endDate) ? endDate.getMonth() + 1 : '',
+							toDay: !_.isNull(endDate) ? endDate.getDate() : ''
 						},
 						single: {
-							fromDay: _.toInteger(dateArray[1])
+							fromDay: startDate.getDate()
 						}
 					},
 					typeConfig = _.get(configsPerType, row.type),
@@ -610,7 +625,7 @@ define(function(require) {
 						modified: true,
 						holidayType: row.type,
 						holidayData: _.merge({
-							fromMonth: _.indexOf(months, dateArray[0]) + 1,
+							fromMonth: startDate.getMonth() + 1,
 							name: row.name,
 							recurring: row.recurring
 						}, !row.recurring && {
