@@ -84,7 +84,7 @@
 					<label class="control-label" for="media_fax_option">{{ i18n.devices.fax.t38 }}</label>
 					<div class="controls">
 						{{#with extra.faxOptions}}
-							<select>
+							<select name="media.fax_option">
 							{{#select selected}}
 								{{#each options}}
 								<option value="{{value}}">
