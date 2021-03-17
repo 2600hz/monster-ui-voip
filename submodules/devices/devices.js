@@ -1109,20 +1109,19 @@ define(function(require) {
 							.thru(monster.util.getUserFullName)
 							.toLower()
 							.value();
-					}), ...(deviceData.device_type === 'fax') && {
-						faxOptions: {
-							selected: _.get(data.device, 'media.fax_option', 'auto'),
-							options: [{
-								labelKey: 'auto',
-								value: 'auto'
-							}, {
-								labelKey: 'force',
-								value: true
-							}, {
-								labelKey: 'disabled',
-								value: false
-							}]
-						}
+					}),
+					faxOptions: {
+						selected: _.get(data.device, 'media.fax_option', 'auto'),
+						options: [{
+							labelKey: 'auto',
+							value: 'auto'
+						}, {
+							labelKey: 'force',
+							value: true
+						}, {
+							labelKey: 'disabled',
+							value: false
+						}]
 					}
 				}
 			}, deviceData);
@@ -1135,10 +1134,12 @@ define(function(require) {
 		 * @return {Object}
 		 */
 		devicesApplyDefaults: function(device) {
-			var self = this;
+			var self = this,
+				isNew = !_.has(device, 'id'),
+				type = _.get(device, 'device_type');
 
 			return _.mergeWith(
-				self.devicesGetDefaults(device),
+				isNew ? self.devicesGetDefaults(type) : {},
 				device,
 				overrideDestArray
 			);
@@ -1150,13 +1151,11 @@ define(function(require) {
 		 * @param  {String} [device.id]
 		 * @return {Object}
 		 */
-		devicesGetDefaults: function(device) {
-			var self = this,
-				isNew = !_.has(device, 'id'),
-				type = _.get(device, 'device_type');
+		devicesGetDefaults: function(type) {
+			var self = this;
 
 			return _.mergeWith(
-				isNew ? self.devicesGetBaseDefaults(type) : {},
+				self.devicesGetBaseDefaults(),
 				self.devicesGetDefaultsForType(type),
 				overrideDestArray
 			);
@@ -1176,7 +1175,8 @@ define(function(require) {
 					},
 					video: {
 						codecs: []
-					}, ...(type === 'fax') && {
+					},
+					fax : {
 						fax_option: false
 					}
 				},
