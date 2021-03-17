@@ -1146,9 +1146,7 @@ define(function(require) {
 		},
 
 		/**
-		 * @param  {Object} device
-		 * @param  {String} device.device_type
-		 * @param  {String} [device.id]
+		 * @param  {String} type
 		 * @return {Object}
 		 */
 		devicesGetDefaults: function(type) {
@@ -1161,7 +1159,7 @@ define(function(require) {
 			);
 		},
 
-		devicesGetBaseDefaults: function(type) {
+		devicesGetBaseDefaults: function() {
 			return {
 				call_restriction: {},
 				device_type: 'sip_device',
@@ -1175,9 +1173,6 @@ define(function(require) {
 					},
 					video: {
 						codecs: []
-					},
-					fax : {
-						fax_option: false
 					}
 				},
 				suppress_unregister_notifications: true
@@ -1204,6 +1199,9 @@ define(function(require) {
 					ata: _.merge({}, sipSettings),
 					cellphone: _.merge({}, callForwardSettings),
 					fax: _.merge({
+						media: {
+							fax_option: false
+						},
 						outbound_flags: [
 							'fax'
 						]
