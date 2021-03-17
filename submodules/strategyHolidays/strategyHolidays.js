@@ -276,99 +276,7 @@ define(function(require) {
 
 			template.on('click', '.import-csv', function(event) {
 				event.preventDefault();
-
-				var i18n = self.i18n.active().strategy.holidays,
-					appFlags = self.appFlags.strategyHolidays,
-					filename = appFlags.csvExport.filename + '.csv',
-					data = appFlags.csvExport.sampleTemplate,
-					csv = Papa.unparse(data, {
-						quotes: true
-					}),
-					blob = new Blob([csv], {
-						type: 'text/csv;charset=utf-8;'
-					}),
-					dateTypes = appFlags.dateTypes,
-					ordinals = _.keys(i18n.ordinals),
-					sanitizeString = _.flow(
-						_.toString,
-						_.toLower,
-						_.trim
-					),
-					validateDate = function(date) {
-						var formattedDate = Sugar.Date.create(date),
-							isValid = formattedDate instanceof Date && !isNaN(formattedDate.getTime());
-
-						return isValid;
-					},
-					validateAdvancedDate = function(date) {
-						var dateArray = _.split(date, ' '),
-							ordinalInput = '',
-							isOrdinalValid = _.some(dateArray, function(value) {
-								ordinalInput = value;
-								return _.includes(ordinals, value);
-							}),
-							setDateToValidate = _.isEmpty(ordinalInput)
-								? date
-								: _.replace(date, ordinalInput, 'first'),
-							formattedDate = Sugar.Date.create(setDateToValidate),
-							isValid = formattedDate instanceof Date && !isNaN(formattedDate.getTime());
-
-						return _.every([
-							isOrdinalValid,
-							isValid
-						]);
-					};
-
-				monster.pub('common.csvUploader.renderPopup', {
-					title: i18n.importOfficeHolidays.title,
-					file: blob,
-					dataLabel: i18n.importOfficeHolidays.dataLabel,
-					filename: filename,
-					header: ['type', 'name', 'start_date', 'end_date', 'year', 'recurring'],
-					row: {
-						sanitizer: function(row) {
-							return {
-								type: sanitizeString(row.type),
-								name: _.trim(_.toString(row.name)),
-								start_date: sanitizeString(row.start_date),
-								end_date: sanitizeString(row.end_date),
-								year: _.toInteger(row.year),
-								recurring: sanitizeString(row.recurring) === 'yes'
-							};
-						},
-						validator: function(row) {
-							var type = row.type,
-								start_date = row.start_date,
-								end_date = row.end_date,
-								isTypeValid = _.includes(dateTypes, type),
-								datesValidator = _.get({
-									advanced: {
-										start: validateAdvancedDate,
-										end: _.stubTrue
-									},
-									range: {
-										start: validateDate,
-										end: validateDate
-									}
-								}, type, {
-									start: validateDate,
-									end: _.stubTrue
-								}),
-								isStartDateValid = datesValidator.start(start_date),
-								isEndDateValid = datesValidator.end(end_date);
-
-							return _.every([
-								isTypeValid,
-								isStartDateValid,
-								isEndDateValid
-							]);
-						}
-					},
-					onSuccess: _.flow(
-						_.bind(self.strategyHolidaysExtractDatesFromCsvData, self, ordinals),
-						_.bind(self.strategyHolidaysListingRender, self, parent)
-					)
-				});
+				self.strategyHolidaysImportDatesFromCsvData(parent);
 			});
 
 			template.on('click', '.save-button', function(event) {
@@ -502,6 +410,102 @@ define(function(require) {
 
 				self.strategyHolidaysListingRender(parent);
 				popup.dialog('close').remove();
+			});
+		},
+
+		strategyHolidaysImportDatesFromCsvData: function(parent) {
+			var self = this,
+				i18n = self.i18n.active().strategy.holidays,
+				appFlags = self.appFlags.strategyHolidays,
+				filename = appFlags.csvExport.filename + '.csv',
+				data = appFlags.csvExport.sampleTemplate,
+				csv = Papa.unparse(data, {
+					quotes: true
+				}),
+				blob = new Blob([csv], {
+					type: 'text/csv;charset=utf-8;'
+				}),
+				dateTypes = appFlags.dateTypes,
+				ordinals = _.keys(i18n.ordinals),
+				sanitizeString = _.flow(
+					_.toString,
+					_.toLower,
+					_.trim
+				),
+				validateDate = function(date) {
+					var formattedDate = Sugar.Date.create(date),
+						isValid = formattedDate instanceof Date && !isNaN(formattedDate.getTime());
+
+					return isValid;
+				},
+				validateAdvancedDate = function(date) {
+					var dateArray = _.split(date, ' '),
+						ordinalInput = '',
+						isOrdinalValid = _.some(dateArray, function(value) {
+							ordinalInput = value;
+							return _.includes(ordinals, value);
+						}),
+						setDateToValidate = _.isEmpty(ordinalInput)
+							? date
+							: _.replace(date, ordinalInput, 'first'),
+						formattedDate = Sugar.Date.create(setDateToValidate),
+						isValid = formattedDate instanceof Date && !isNaN(formattedDate.getTime());
+
+					return _.every([
+						isOrdinalValid,
+						isValid
+					]);
+				};
+
+			monster.pub('common.csvUploader.renderPopup', {
+				title: i18n.importOfficeHolidays.title,
+				file: blob,
+				dataLabel: i18n.importOfficeHolidays.dataLabel,
+				filename: filename,
+				header: ['type', 'name', 'start_date', 'end_date', 'year', 'recurring'],
+				row: {
+					sanitizer: function(row) {
+						return {
+							type: sanitizeString(row.type),
+							name: _.trim(_.toString(row.name)),
+							start_date: sanitizeString(row.start_date),
+							end_date: sanitizeString(row.end_date),
+							year: _.toInteger(row.year),
+							recurring: sanitizeString(row.recurring) === 'yes'
+						};
+					},
+					validator: function(row) {
+						var type = row.type,
+							start_date = row.start_date,
+							end_date = row.end_date,
+							isTypeValid = _.includes(dateTypes, type),
+							datesValidator = _.get({
+								advanced: {
+									start: validateAdvancedDate,
+									end: _.stubTrue
+								},
+								range: {
+									start: validateDate,
+									end: validateDate
+								}
+							}, type, {
+								start: validateDate,
+								end: _.stubTrue
+							}),
+							isStartDateValid = datesValidator.start(start_date),
+							isEndDateValid = datesValidator.end(end_date);
+
+						return _.every([
+							isTypeValid,
+							isStartDateValid,
+							isEndDateValid
+						]);
+					}
+				},
+				onSuccess: _.flow(
+					_.bind(self.strategyHolidaysExtractDatesFromCsvData, self, ordinals),
+					_.bind(self.strategyHolidaysListingRender, self, parent)
+				)
 			});
 		},
 
