@@ -212,8 +212,7 @@ define(function(require) {
 			});
 
 			/*empty table before loading the rows for the year selected*/
-			table.rows.load([]);
-			table.rows.load(holidaysDataArray, true);
+			table.rows.load(holidaysDataArray);
 		},
 
 		strategyHolidaysDeleteDialogRender: function(parent, data) {
@@ -289,10 +288,7 @@ define(function(require) {
 						type: 'text/csv;charset=utf-8;'
 					}),
 					dateTypes = appFlags.dateTypes,
-					ordinals = _
-						.chain(i18n.ordinals)
-						.keys()
-						.value(),
+					ordinals = _.keys(i18n.ordinals),
 					sanitizeString = _.flow(
 						_.toString,
 						_.toLower,
@@ -319,7 +315,6 @@ define(function(require) {
 
 						return _.every([
 							isOrdinalValid,
-							setDateToValidate,
 							isValid
 						]);
 					};
@@ -342,15 +337,25 @@ define(function(require) {
 							};
 						},
 						validator: function(row) {
-							var start_date = row.start_date,
+							var type = row.type,
+								start_date = row.start_date,
 								end_date = row.end_date,
-								isTypeValid = _.includes(dateTypes, row.type),
-								isStartDateValid = row.type === 'advanced'
-									? validateAdvancedDate(row.start_date)
-									: validateDate(start_date),
-								isEndDateValid = row.type === 'range'
-									? validateDate(end_date)
-									: true;
+								isTypeValid = _.includes(dateTypes, type),
+								datesValidator = _.get({
+									advanced: {
+										start: validateAdvancedDate,
+										end: _.stubTrue
+									},
+									range: {
+										start: validateDate,
+										end: validateDate
+									}
+								}, type, {
+									start: validateDate,
+									end: _.stubTrue
+								}),
+								isStartDateValid = datesValidator.start(start_date),
+								isEndDateValid = datesValidator.end(end_date);
 
 							return _.every([
 								isTypeValid,
@@ -583,12 +588,9 @@ define(function(require) {
 				var type = row.type,
 					advancedDateDetails = function formattedAdvancedDate(date) {
 						var dateArray = _.split(row.start_date, ' '),
-							getOrdinal = _
-								.chain(dateArray)
-								.reject(function(value) {
-									return !_.includes(ordinals, value);
-								})
-								.value(),
+							getOrdinal = _.reject(dateArray, function(value) {
+								return !_.includes(ordinals, value);
+							}),
 							ordinal = _.get(getOrdinal, '[0]'),
 							updatedDate = _.replace(date, ordinal, 'first');
 
