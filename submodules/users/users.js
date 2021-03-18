@@ -2372,7 +2372,10 @@ define(function(require) {
 						});
 					},
 					function(callback) {
-						if (currentUser.vm_to_email_enabled === vmToEmailEnabled) {
+						if (
+							vmboxActive === enabled
+							&& currentUser.vm_to_email_enabled === vmToEmailEnabled
+						) {
 							callback(null);
 							return;
 						}
@@ -2381,7 +2384,7 @@ define(function(require) {
 							data: {
 								userId: userId,
 								data: {
-									vm_to_email_enabled: vmToEmailEnabled
+									vm_to_email_enabled: enabled ? vmToEmailEnabled : null
 								}
 							},
 							success: function() {
