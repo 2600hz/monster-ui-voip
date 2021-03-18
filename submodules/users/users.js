@@ -2267,16 +2267,14 @@ define(function(require) {
 			var self = this,
 				vmboxActive = currentUser.extra.mapFeatures.vmbox.active,
 				transcription = monster.util.getCapability('voicemail.transcription'),
-				announcement_only = _.get(vmbox, 'announcement_only', false),
 				vm_to_email_enabled = currentUser.vm_to_email_enabled,
 				transcribe = _.get(vmbox, 'transcribe', transcription.defaultValue),
 				featureTemplate = $(self.getTemplate({
 					name: 'feature-vmbox',
 					data: _.merge(currentUser, {
-						vm_to_email_enabled: announcement_only ? false : vm_to_email_enabled,
+						vm_to_email_enabled: vm_to_email_enabled,
 						vmbox: _.merge(vmbox, {
-							transcribe: announcement_only ? false : transcribe,
-							announcement_only: announcement_only,
+							transcribe: transcribe,
 							hasTranscribe: _.get(transcription, 'isEnabled', false),
 							include_message_on_notify: _.get(vmbox, 'include_message_on_notify', true)
 						})
@@ -2285,9 +2283,7 @@ define(function(require) {
 				})),
 				switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#vmbox_form'),
-				switchVmToEmail = featureForm.find('#vm_to_email_enabled'),
-				switchVmTranscribe = featureForm.find('#transcribe'),
-				switchVmAnnounceOnly = featureForm.find('#announcement_only');
+				switchVmToEmail = featureForm.find('#vm_to_email_enabled');
 
 			monster.ui.validate(featureForm);
 
@@ -2301,18 +2297,6 @@ define(function(require) {
 
 			switchVmToEmail.on('change', function() {
 				$(this).prop('checked') ? featureForm.find('.extra-content').slideDown() : featureForm.find('.extra-content').slideUp();
-			});
-
-			switchVmAnnounceOnly.on('change', function() {
-				var isEnabled = $(this).prop('checked');
-
-				switchVmTranscribe
-					.prop('checked', isEnabled ? false : transcribe)
-					.prop('disabled', isEnabled);
-
-				switchVmToEmail
-					.prop('checked', isEnabled ? false : vm_to_email_enabled)
-					.prop('disabled', isEnabled);
 			});
 
 			featureTemplate.find('.save').on('click', function() {
