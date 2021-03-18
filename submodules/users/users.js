@@ -2881,11 +2881,12 @@ define(function(require) {
 								};
 							});
 						})
-						.keyBy('direction')
+						.groupBy('direction')
 						.mapValues(_.flow(
 							_.partial(_.keyBy, _, 'network'),
 							_.partial(_.mapValues, _, 'config')
-						));
+						))
+						.value();
 				},
 				getConfigForSettings = function(settings, valueGetter) {
 					return _.merge({
