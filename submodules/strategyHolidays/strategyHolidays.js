@@ -2,7 +2,9 @@ define(function(require) {
 	var monster = require('monster'),
 		_ = require('lodash'),
 		$ = require('jquery'),
-		footable = require('footable');
+		footable = require('footable'),
+		Papa = require('papaparse'),
+		sugar = require('sugar-date');
 
 	return {
 		subscribe: {
@@ -35,7 +37,37 @@ define(function(require) {
 					'thursday',
 					'friday',
 					'saturday'
-				]
+				],
+				dateTypes: ['single', 'range', 'advanced'],
+				csvExport: {
+					filename: 'template-office-holidays',
+					sampleTemplate: [
+						{
+							type: 'single',
+							name: 'single_template',
+							start_date: 'February 14',
+							end_date: '',
+							year: '',
+							recurring: 'yes'
+						},
+						{
+							type: 'range',
+							name: 'range_template',
+							start_date: 'October 10',
+							end_date: 'October 12',
+							year: new Date().getFullYear(),
+							recurring: 'no'
+						},
+						{
+							type: 'advanced',
+							name: 'advanced_template',
+							start_date: 'Second Friday of March',
+							end_date: '',
+							year: '',
+							recurring: 'yes'
+						}
+					]
+				}
 			}
 		},
 
@@ -97,7 +129,7 @@ define(function(require) {
 				}
 			});
 
-			self.strategyHolidaysListingRender($container, holidaysData);
+			self.strategyHolidaysListingRender($container);
 			self.strategyHolidaysBindEvents($container, template, holidaysData, strategyData);
 
 			callback && callback();
@@ -105,10 +137,11 @@ define(function(require) {
 
 		strategyHolidaysListingRender: function($container, holidaysData) {
 			var self = this,
+				holidaysData = self.appFlags.strategyHolidays.allHolidays,
 				table = footable.get('#holidays_list_table'),
 				yearSelected = parseInt($container.find('#year').val()),
 				holidaysDataArray = [],
-				initTemplate = function initTemplate(data) {
+				initTemplate = function initTemplate(data, key) {
 					var dateToDisplay = function dateToDisplay($container, data) {
 							var getNumberWithOrdinal = function getNumberWithOrdinal(date) {
 									var ordinal = ['th', 'st', 'nd', 'rd'],
@@ -158,7 +191,8 @@ define(function(require) {
 							data: {
 								holidayType: data.holidayType,
 								holidayData: data.holidayData,
-								dateToDisplay: dateToDisplay($container, data)
+								dateToDisplay: dateToDisplay($container, data),
+								key: key
 							},
 							submodule: 'strategyHolidays'
 						}));
@@ -173,11 +207,12 @@ define(function(require) {
 					excludeYear = _.get(value, 'holidayData.excludeYear', []);
 
 				if (endYear === yearSelected && !_.includes(excludeYear, yearSelected)) {
-					holidaysDataArray.push(initTemplate(value));
+					holidaysDataArray.push(initTemplate(value, key));
 				}
 			});
 
-			table.rows.load(holidaysDataArray, true);
+			/*empty table before loading the rows for the year selected*/
+			table.rows.load(holidaysDataArray);
 		},
 
 		strategyHolidaysDeleteDialogRender: function(parent, data) {
@@ -196,7 +231,7 @@ define(function(require) {
 				},
 				popup = monster.ui.dialog(template, optionsPopup);
 
-			self.strategyHolidaysDeleteDialogBindsEvents(template, parent, popup, data.holidayId);
+			self.strategyHolidaysDeleteDialogBindsEvents(template, parent, popup, data);
 		},
 
 		strategyHolidaysBindEvents: function(parent, template, holidaysData, strategyData) {
@@ -217,12 +252,7 @@ define(function(require) {
 			});
 
 			parent.on('change', '#year', function() {
-				var table = footable.get('#holidays_list_table'),
-					allHolidays = self.appFlags.strategyHolidays.allHolidays;
-
-				/*empty table before loading the rows for the year selected*/
-				table.rows.load([]);
-				self.strategyHolidaysListingRender(parent, allHolidays);
+				self.strategyHolidaysListingRender(parent);
 			});
 
 			template.on('click', '.add-holiday', function(event) {
@@ -236,11 +266,17 @@ define(function(require) {
 							name: _.get(holiday, 'holidayData.name')
 						};
 					}),
+					isNew: true,
 					callback: function(err, data) {
 						self.appFlags.strategyHolidays.allHolidays.push(data);
-						self.strategyHolidaysListingRender(parent, [data]);
+						self.strategyHolidaysListingRender(parent);
 					}
 				});
+			});
+
+			template.on('click', '.import-csv', function(event) {
+				event.preventDefault();
+				self.strategyHolidaysImportDatesFromCsvData(parent);
 			});
 
 			template.on('click', '.save-button', function(event) {
@@ -264,11 +300,11 @@ define(function(require) {
 						_.forEach(allHolidays, function(holiday, key) {
 							var holidayId = _.get(holiday, 'holidayData.id');
 
-							if (!_.includes(holidayId, 'new-')) {
+							if (holidayId) {
 								self.appFlags.strategyHolidays.deletedHolidays.push(holidayId);
 							}
 						});
-						self.appFlags.strategyHolidays.allHolidays = {};
+						self.appFlags.strategyHolidays.allHolidays = [];
 						updateStrategyData(strategyData);
 					});
 				} else {
@@ -286,9 +322,11 @@ define(function(require) {
 				var $this = $(this),
 					holidayName = $this.parents('tr').find('td:first-child').html(),
 					id = $this.parents('tr').data('id'),
+					key = $this.parents('tr').data('key'),
 					data = {
 						holidayName: holidayName,
-						holidayId: id
+						holidayId: id,
+						holidayKey: key
 					};
 
 				self.strategyHolidaysDeleteDialogRender(parent, data);
@@ -298,14 +336,10 @@ define(function(require) {
 				event.preventDefault();
 
 				var $this = $(this),
-					id = $this.parents('tr').data('id'),
-					table = footable.get('#holidays_list_table'),
+					key = $this.parents('tr').data('key'),
 					yearSelected = parseInt(parent.find('#year').val()),
 					allHolidays = self.appFlags.strategyHolidays.allHolidays,
-					holidayRuleId = _.findKey(allHolidays, function(holiday) {
-						return _.get(holiday, 'holidayData.id') === id;
-					}),
-					holidayRule = allHolidays[holidayRuleId];
+					holidayRule = allHolidays[key];
 
 				monster.pub('voip.strategy.addEditOfficeHolidays', {
 					yearSelected: parseInt(parent.find('#year').val()),
@@ -316,6 +350,7 @@ define(function(require) {
 						};
 					}),
 					holidayRule: holidayRule,
+					isNew: false,
 					callback: function(err, data) {
 						/*Compare old date with new data if it's recurring*/
 						var isOldRecurring = _.get(holidayRule, 'holidayData.recurring', false);
@@ -327,23 +362,21 @@ define(function(require) {
 							}
 							holidayRule.holidayData.excludeYear.push(yearSelected);
 							holidayRule.modified = true;
-							self.appFlags.strategyHolidays.allHolidays[holidayRuleId] = holidayRule;
+							self.appFlags.strategyHolidays.allHolidays[key] = holidayRule;
 
 							/* add new rule */
 							self.appFlags.strategyHolidays.allHolidays.push(data);
 						} else {
-							self.appFlags.strategyHolidays.allHolidays[holidayRuleId] = data;
+							self.appFlags.strategyHolidays.allHolidays[key] = data;
 						}
 
-						/*empty table before re-loading all rows*/
-						table.rows.load([]);
-						self.strategyHolidaysListingRender(parent, allHolidays);
+						self.strategyHolidaysListingRender(parent);
 					}
 				});
 			});
 		},
 
-		strategyHolidaysDeleteDialogBindsEvents: function(template, parent, popup, holidayId) {
+		strategyHolidaysDeleteDialogBindsEvents: function(template, parent, popup, data) {
 			var self = this;
 
 			template.find('.cancel').on('click', function(event) {
@@ -353,21 +386,18 @@ define(function(require) {
 			template.find('.delete').on('click', function(event) {
 				event.preventDefault();
 
-				var table = footable.get('#holidays_list_table'),
-					yearSelected = parseInt(parent.find('#year').val()),
+				var yearSelected = parseInt(parent.find('#year').val()),
 					isChecked = template.find('.deleteAll').prop('checked'),
 					allHolidays = self.appFlags.strategyHolidays.allHolidays,
-					holidayRuleId = _.findKey(allHolidays, function(holiday) {
-						return _.get(holiday, 'holidayData.id') === holidayId;
-					}),
-					holidayRule = allHolidays[holidayRuleId],
-					isRecurring = _.get(holidayRule, 'holidayData.recurring', false);
+					holidayRule = allHolidays[data.holidayKey],
+					isRecurring = _.get(holidayRule, 'holidayData.recurring', false),
+					holidayKey = data.holidayKey;
 
 				if ((isRecurring && isChecked) || !isRecurring) {
-					if (!_.includes(holidayId, 'new-')) {
-						self.appFlags.strategyHolidays.deletedHolidays.push(holidayId);
+					if (data.holidayId) {
+						self.appFlags.strategyHolidays.deletedHolidays.push(data.holidayId);
 					}
-					delete allHolidays.splice(holidayRuleId, 1);
+					delete allHolidays.splice(holidayKey, 1);
 				} else {
 					if (_.isUndefined(holidayRule.holidayData.excludeYear)) {
 						holidayRule.holidayData.excludeYear = [];
@@ -375,14 +405,107 @@ define(function(require) {
 					holidayRule.modified = true;
 					holidayRule.holidayData.excludeYear.push(yearSelected);
 
-					self.appFlags.strategyHolidays.allHolidays[holidayRuleId] = holidayRule;
+					self.appFlags.strategyHolidays.allHolidays[holidayKey] = holidayRule;
 				}
 
-				/*empty table before re-loading all rows*/
-				table.rows.load([]);
-				self.strategyHolidaysListingRender(parent, allHolidays);
-
+				self.strategyHolidaysListingRender(parent);
 				popup.dialog('close').remove();
+			});
+		},
+
+		strategyHolidaysImportDatesFromCsvData: function(parent) {
+			var self = this,
+				i18n = self.i18n.active().strategy.holidays,
+				appFlags = self.appFlags.strategyHolidays,
+				filename = appFlags.csvExport.filename + '.csv',
+				data = appFlags.csvExport.sampleTemplate,
+				csv = Papa.unparse(data, {
+					quotes: true
+				}),
+				blob = new Blob([csv], {
+					type: 'text/csv;charset=utf-8;'
+				}),
+				dateTypes = appFlags.dateTypes,
+				ordinals = _.keys(i18n.ordinals),
+				sanitizeString = _.flow(
+					_.toString,
+					_.toLower,
+					_.trim
+				),
+				validateDate = function(date) {
+					var formattedDate = Sugar.Date.create(date),
+						isValid = formattedDate instanceof Date && !isNaN(formattedDate.getTime());
+
+					return isValid;
+				},
+				validateAdvancedDate = function(date) {
+					var dateArray = _.split(date, ' '),
+						ordinalInput = '',
+						isOrdinalValid = _.some(dateArray, function(value) {
+							ordinalInput = value;
+							return _.includes(ordinals, value);
+						}),
+						setDateToValidate = _.isEmpty(ordinalInput)
+							? date
+							: _.replace(date, ordinalInput, 'first'),
+						formattedDate = Sugar.Date.create(setDateToValidate),
+						isValid = formattedDate instanceof Date && !isNaN(formattedDate.getTime());
+
+					return _.every([
+						isOrdinalValid,
+						isValid
+					]);
+				};
+
+			monster.pub('common.csvUploader.renderPopup', {
+				title: i18n.importOfficeHolidays.title,
+				file: blob,
+				dataLabel: i18n.importOfficeHolidays.dataLabel,
+				filename: filename,
+				header: ['type', 'name', 'start_date', 'end_date', 'year', 'recurring'],
+				row: {
+					sanitizer: function(row) {
+						return {
+							type: sanitizeString(row.type),
+							name: _.trim(_.toString(row.name)),
+							start_date: sanitizeString(row.start_date),
+							end_date: sanitizeString(row.end_date),
+							year: _.toInteger(row.year),
+							recurring: sanitizeString(row.recurring) === 'yes'
+						};
+					},
+					validator: function(row) {
+						var type = row.type,
+							start_date = row.start_date,
+							end_date = row.end_date,
+							isTypeValid = _.includes(dateTypes, type),
+							datesValidator = _.get({
+								advanced: {
+									start: validateAdvancedDate,
+									end: _.stubTrue
+								},
+								range: {
+									start: validateDate,
+									end: validateDate
+								}
+							}, type, {
+								start: validateDate,
+								end: _.stubTrue
+							}),
+							isStartDateValid = datesValidator.start(start_date),
+							isEndDateValid = datesValidator.end(end_date);
+
+						return _.every([
+							isTypeValid,
+							isStartDateValid,
+							isEndDateValid
+						]);
+					}
+				},
+				onSuccess: _.flow(
+					_.bind(self.strategyHolidaysExtractDatesFromCsvData, self, ordinals),
+					_.bind(self.strategyHolidaysListingRender, self, parent)
+				)
 			});
 		},
 
@@ -457,6 +580,71 @@ define(function(require) {
 		},
 
 		/**
+		 * Returns an array of arrays containing intervals for each day of the week.
+		 * @param  {Array} csvData
+		 * @return {Array[]}
+		 */
+		strategyHolidaysExtractDatesFromCsvData: function(ordinals, csvData) {
+			var self = this,
+				wdays = self.appFlags.strategyHolidays.wdays;
+
+			return _.map(csvData, function(row) {
+				var type = row.type,
+					advancedDateDetails = function formattedAdvancedDate(date) {
+						var dateArray = _.split(row.start_date, ' '),
+							getOrdinal = _.reject(dateArray, function(value) {
+								return !_.includes(ordinals, value);
+							}),
+							ordinal = _.get(getOrdinal, '[0]'),
+							updatedDate = _.replace(date, ordinal, 'first');
+
+						return {
+							date: Sugar.Date.create(updatedDate),
+							ordinal: ordinal
+						};
+					},
+					advancedDetails = advancedDateDetails(row.start_date),
+					advancedStartDate = _.get(advancedDetails, 'date'),
+					startDate = type === 'advanced'
+						? advancedStartDate
+						: Sugar.Date.create(row.start_date),
+					endDate = type === 'range'
+						? Sugar.Date.create(row.end_date)
+						: null,
+					configsPerType = {
+						advanced: {
+							ordinal: _.get(advancedDetails, 'ordinal'),
+							wday: wdays[advancedStartDate.getDay()]
+						},
+						range: {
+							fromDay: startDate.getDate(),
+							toMonth: !_.isNull(endDate) ? endDate.getMonth() + 1 : '',
+							toDay: !_.isNull(endDate) ? endDate.getDate() : ''
+						},
+						single: {
+							fromDay: startDate.getDate()
+						}
+					},
+					typeConfig = _.get(configsPerType, row.type),
+					endYear = row.year !== 0 ? row.year : new Date().getFullYear(),
+					holidayRule = {
+						modified: true,
+						holidayType: row.type,
+						holidayData: _.merge({
+							fromMonth: startDate.getMonth() + 1,
+							name: row.name,
+							recurring: row.recurring
+						}, !row.recurring && {
+							endYear: endYear
+						}, typeConfig)
+					};
+
+				self.appFlags.strategyHolidays.allHolidays.push(holidayRule);
+				return holidayRule;
+			});
+		},
+
+		/**
 		 * Returns day of month based on oridnal and wday selection.
 		 * @param  {Object} holidayData
 		 * @param  {Integet} yearSelected
@@ -523,29 +711,36 @@ define(function(require) {
 				toMonth = holidayData.toMonth,
 				fromDay = holidayData.fromDay,
 				toDay = holidayData.toDay,
-				id = _.includes(holidayData.id, 'new-') ? null : holidayData.id,
+				id = holidayData.id,
 				endDate = holidayData.recurring
 					? null
 					: monster.util.dateToEndOfGregorianDay(self.strategyHolidaysGetEndDate(holidayData.endYear, holiday)),
+				holidayRuleConfig = _.merge({
+					oldType: holidayData.set ? 'set' : 'rule'
+				}, id && {
+					id: id
+				}, endDate && {
+					end_date: endDate
+				}),
 				holidayRule = {};
 
 			if (toMonth && month !== toMonth) {
-				holidayRule = {
+				holidayRule = _.merge({}, holidayRuleConfig, {
 					isRange: true,
 					name: name,
 					fromDay: fromDay,
 					fromMonth: month,
 					toDay: toDay,
 					toMonth: toMonth
-				};
+				});
 			} else {
-				holidayRule = {
+				holidayRule = _.merge({}, holidayRuleConfig, {
 					name: name,
 					cycle: 'yearly',
 					interval: 1,
 					month: month,
 					type: 'main_holidays'
-				};
+				});
 
 				if (fromDay) {
 					holidayRule.days = [fromDay];
@@ -566,18 +761,6 @@ define(function(require) {
 					holidayRule.exclude.push(excludeDate);
 				});
 			}
-
-			if (id) {
-				holidayRule.id = id;
-			}
-
-			if (id || endDate) {
-				holidayRule.end_date = endDate;
-			}
-
-			holidayRule.extra = {
-				oldType: holidayData.set ? 'set' : 'rule'
-			};
 
 			return holidayRule;
 		},

@@ -4047,6 +4047,7 @@ define(function(require) {
 			var self = this,
 				callback = args.callback,
 				holidayRule = args.holidayRule ? args.holidayRule : {},
+				isNew = args.isNew,
 				existingHolidays = args.existingHolidays,
 				isRecurring = _.get(holidayRule, 'holidayData.recurring', false),
 				getListOfYears = function getListOfYears() {
@@ -4088,7 +4089,8 @@ define(function(require) {
 					years: getListOfYears(),
 					dates: getListOfDates(),
 					toMonth: formatMonth(holidayRule, 'toMonth'),
-					fromMonth: formatMonth(holidayRule, 'fromMonth')
+					fromMonth: formatMonth(holidayRule, 'fromMonth'),
+					isNew: isNew
 				}),
 				$template = $(self.getTemplate({
 					name: 'addEditOfficeHolidays',
@@ -4177,17 +4179,18 @@ define(function(require) {
 
 				var formData = monster.ui.getFormData($template.get(0)),
 					$optionDiv = $template.find('.row-fluid.' + formData.type + ' select:not(.hide)'),
-					isHolidayRecurring = _.get(holidayRule, 'holidayData.recurring', false),
-					holidayId = _.get(holidayRule, 'holidayData.id', 'new-' + Date.now()),
-					holidayData = {
-						id: !_.includes(holidayId, 'new-') && isHolidayRecurring
-							? 'new-' + Date.now()
-							: holidayId
-					},
-					holidayRuleToSave = {},
+					holidayId = _.get(holidayRule, 'holidayData.id'),
 					nameLength = formData.name.length,
-					nameExists = _.find(existingHolidays, { name: formData.name }),
-					isSet = $template.find('.form-content').data('type') === 'set';
+					nameExistsData = _.find(existingHolidays, { name: formData.name }),
+					originalName = _.get(holidayRule, 'holidayData.name'),
+					isSet = $template.find('.form-content').data('type') === 'set',
+					holidayData = _.merge({
+					}, holidayId && {
+						id: holidayId
+					}, isSet && {
+						set: true
+					}),
+					holidayRuleToSave = {};
 
 				if (!monster.ui.valid($template)) {
 					return;
@@ -4202,7 +4205,7 @@ define(function(require) {
 				} else if (nameLength > 60) {
 					$template.find('.maximum-name-error').slideDown(200);
 					return;
-				} else if (nameExists && nameExists.name === formData.name && nameExists.id !== holidayData.id) {
+				} else if (nameExistsData && (originalName !== nameExistsData.name || isNew)) {
 					$template.find('.duplicate-name-error').slideDown(200);
 					return;
 				}
@@ -4223,10 +4226,6 @@ define(function(require) {
 					holidayData.endYear = args.yearSelected;
 				}
 
-				if (isSet) {
-					holidayData.set = true;
-				}
-
 				holidayRuleToSave = {
 					holidayType: formData.type,
 					holidayData: _.assign({}, holidayData, formData),
@@ -4240,7 +4239,7 @@ define(function(require) {
 
 			popup = monster.ui.dialog($template, {
 				autoScroll: false,
-				title: _.isEmpty(holidayRule)
+				title: isNew
 					? self.i18n.active().strategy.addEditOfficeHolidays.title.add
 					: self.i18n.active().strategy.addEditOfficeHolidays.title.edit,
 				dialogClass: 'monster-dialog holiday-add-edit-dialog'
