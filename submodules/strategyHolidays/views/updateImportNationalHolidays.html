@@ -1,0 +1,25 @@
+<div class="include-holidays-list">
+	<table id="include_holidays_table" class="monster-table footable">
+		<thead>
+			<tr class="footable-header">
+				<th data-sorted="true">
+					{{i18n.strategy.holidays.importOfficeHolidays.labels.holiday}}
+				</th>
+			</tr>
+		</thead>
+		<tbody class="footable-body">
+			{{#each holidays}}
+				<tr class="row"
+					data-name="{{name}}"
+					data-date="{{date}}"
+					data-type="{{type}}">
+					<td class="holiday-cell">
+						{{#monsterCheckbox name}}
+							<input class="add-holiday" type="checkbox"></input>
+						{{/monsterCheckbox}}
+					</td>
+				</tr>
+			{{/each}}
+		</tbody>
+	</table>
+</div>
