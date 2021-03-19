@@ -185,14 +185,21 @@ define(function(require) {
 									break;
 							}
 
-							return dateToText;
+							return {
+								text: dateToText,
+								timestamp: data.holidayType === 'advanced'
+									? Sugar.Date.create(dateToText).getTime()
+									: date.getTime()
+							};
 						},
+						getDate = dateToDisplay($container, data),
 						template = $(self.getTemplate({
 							name: 'listing',
 							data: {
 								holidayType: data.holidayType,
 								holidayData: data.holidayData,
-								dateToDisplay: dateToDisplay($container, data),
+								dateToDisplay: _.get(getDate, 'text'),
+								timestamp: _.get(getDate, 'timestamp'),
 								key: key
 							},
 							submodule: 'strategyHolidays'
