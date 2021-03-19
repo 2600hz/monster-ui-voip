@@ -4,7 +4,8 @@ define(function(require) {
 		$ = require('jquery'),
 		footable = require('footable'),
 		Papa = require('papaparse'),
-		sugar = require('sugar-date');
+		sugar = require('sugar-date'),
+		holidays = require('date-holidays');
 
 	return {
 		subscribe: {
@@ -234,6 +235,30 @@ define(function(require) {
 			self.strategyHolidaysDeleteDialogBindsEvents(template, parent, popup, data);
 		},
 
+		strategyHolidaysIncludeNationHolidaysRender: function(parent, data) {
+			var self = this,
+				$template = $(self.getTemplate({
+					name: 'includeNationalHolidays',
+					data: data,
+					submodule: 'strategyHolidays'
+				})),
+				popup = monster.ui.dialog($template, {
+					autoScroll: false,
+					title: self.i18n.active().strategy.holidays.importOfficeHolidays.title
+				});
+
+			monster.ui.footable($template.find('#include_holidays_table.footable'), {
+				filtering: {
+					enabled: false
+				},
+				paging: {
+					enabled: false
+				}
+			});
+
+			self.strategyHolidaysIncludeNationHolidaysBindsEvents($template, parent, popup, data);
+		},
+
 		strategyHolidaysBindEvents: function(parent, template, holidaysData, strategyData) {
 			var self = this;
 
@@ -277,6 +302,21 @@ define(function(require) {
 			template.on('click', '.import-csv', function(event) {
 				event.preventDefault();
 				self.strategyHolidaysImportDatesFromCsvData(parent);
+			});
+
+			template.on('click', '.include-national-holidays', function(event) {
+				event.preventDefault();
+
+				var holidayDates = new holidays(),
+					usHolidaysDate = new holidays('US'),
+					currentYear = new Date().getFullYear(),
+					data = {
+						allCountries: holidayDates.getCountries(),
+						countrySelected: 'US',
+						holidays: usHolidaysDate.getHolidays(currentYear)
+					}
+
+				self.strategyHolidaysIncludeNationHolidaysRender(parent, data);
 			});
 
 			template.on('click', '.save-button', function(event) {
@@ -409,6 +449,19 @@ define(function(require) {
 				}
 
 				self.strategyHolidaysListingRender(parent);
+				popup.dialog('close').remove();
+			});
+		},
+
+		strategyHolidaysIncludeNationHolidaysBindsEvents: function(template, parent, popup, date) {
+			var self = this;
+
+			template.find('.cancel').on('click', function(event) {
+				popup.dialog('close').remove();
+			});
+
+			template.on('submit', function(event) {
+				event.preventDefault();
 				popup.dialog('close').remove();
 			});
 		},
