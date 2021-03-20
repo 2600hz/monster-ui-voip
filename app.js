@@ -12,6 +12,7 @@ define(function(require) {
 		'numbers',
 		'strategy',
 		'strategyHours',
+		'strategyHolidays',
 		'users',
 		'vmboxes'
 	];
@@ -38,6 +39,13 @@ define(function(require) {
 		appFlags: {
 			common: {
 				hasProvisioner: false,
+				outboundPrivacy: [
+					'default',
+					'none',
+					'number',
+					'name',
+					'full'
+				],
 				callRecording: {
 					supportedAudioFormats: [
 						'mp3',

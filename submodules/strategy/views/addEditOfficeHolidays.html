@@ -1,0 +1,155 @@
+<form id="form_add_edit_office_holidays" class="form">
+	<div class="form-content" data-type="{{#if holidayData.set}}set{{else}}rule{{/if}}">
+		<div class="control-group">
+			<label class="control-label">
+				{{i18n.strategy.addEditOfficeHolidays.labels.name}}
+			</label>
+			<input id="name" name="name" type="text" placeholder="{{i18n.strategy.addEditOfficeHolidays.placeholders.name}}" value="{{holidayData.name}}" class="form-control">
+		</div>
+		{{#monsterPanelText i18n.strategy.addEditOfficeHolidays.errors.noName "danger" "fill-width no-name-error"}}
+		{{/monsterPanelText}}
+		{{#monsterPanelText i18n.strategy.addEditOfficeHolidays.errors.minimum "danger" "fill-width minimum-name-error"}}
+		{{/monsterPanelText}}
+		{{#monsterPanelText i18n.strategy.addEditOfficeHolidays.errors.maximum "danger" "fill-width maximum-name-error"}}
+		{{/monsterPanelText}}
+		{{#monsterPanelText i18n.strategy.addEditOfficeHolidays.errors.nameExists "danger" "fill-width duplicate-name-error"}}
+		{{/monsterPanelText}}
+		<div class="control-group">
+			{{#monsterCheckbox i18n.strategy.addEditOfficeHolidays.labels.recurringAnnually}}
+				<input type="checkbox" name="recurring" id="recurring" {{#if holidayData.recurring}} checked {{/if}}>
+			{{/monsterCheckbox}}
+		</div>
+		<div class="control-group">
+			<label class="control-label">
+				{{i18n.strategy.addEditOfficeHolidays.labels.dateType}}
+			</label>
+			<div class="controls">
+				<select name="type" id="date_type">
+					<option value="single">
+						{{i18n.strategy.addEditOfficeHolidays.dateType.singleDate}}
+					</option>
+					<option value="range">
+						{{i18n.strategy.addEditOfficeHolidays.dateType.dateRange}}
+					</option>
+					<option value="advanced">
+						{{i18n.strategy.addEditOfficeHolidays.dateType.advancedDate}}
+					</option>
+				</select>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">
+				{{i18n.strategy.addEditOfficeHolidays.labels.date}}
+			</label>
+			<div class="row-fluid single selected">
+				<select class="month from" data-name="fromMonth">
+				{{#select fromMonth}}
+					{{#each months as |label|}}
+						<option value="{{@key}}">
+							{{label}}
+						</option>
+					{{/each}}
+				{{/select}}
+				</select>
+				<select class="day from" data-name="fromDay">
+				{{#select holidayData.fromDay}}
+					{{#each dates as |label|}}
+						<option value="{{label}}">
+							{{label}}
+						</option>
+					{{/each}}
+				{{/select}}
+				</select>
+				<select class="year" data-name="endYear">
+				{{#select holidayData.endYear}}
+					{{#each years as |label|}}
+						<option value="{{label}}">
+							{{label}}
+						</option>
+					{{/each}}
+				{{/select}}
+				</select>
+			</div>
+			<div class="row-fluid advanced">
+				<select class="month from" data-name="fromMonth" >
+				{{#select fromMonth}}
+					{{#each months as |label|}}
+						<option value="{{@key}}">
+							{{label}}
+						</option>
+					{{/each}}
+				{{/select}}
+				</select>
+				<select class="ordinal" data-name="ordinal">
+				{{#select holidayData.ordinal}}
+					{{#each ordinals as |label|}}
+						<option value="{{@key}}">
+							{{label}}
+						</option>
+					{{/each}}
+				{{/select}}
+				</select>
+				<select class="wday" data-name="wday">
+				{{#select holidayData.wday}}
+					{{#each days as |label|}}
+						<option value="{{@key}}">
+							{{label}}
+					</option>
+					{{/each}}
+				{{/select}}
+				</select>
+			</div>
+			<div class="row-fluid range">
+				<select class="month from" data-name="fromMonth">
+				{{#select fromMonth}}
+					{{#each months as |label|}}
+						<option value="{{@key}}">
+							{{label}}
+						</option>
+					{{/each}}
+				{{/select}}
+				</select>
+				<select class="day from" data-name="fromDay">
+				{{#select holidayData.fromDay}}
+					{{#each dates as |label|}}
+						<option value="{{label}}">
+							{{label}}
+						</option>
+					{{/each}}
+				{{/select}}
+				</select>
+				<span class="separator">{{i18n.strategy.holidays.to}}</span>
+				<select class="month to" data-name="toMonth">
+				{{#select toMonth}}
+					{{#each months as |label|}}
+						<option value="{{@key}}">
+							{{label}}
+						</option>
+					{{/each}}
+				{{/select}}
+				</select>
+				<select class="day to" data-name="toDay">
+				{{#select holidayData.toDay}}
+					{{#each dates as |label|}}
+						<option value="{{label}}">
+							{{label}}
+						</option>
+					{{/each}}
+				{{/select}}
+				</select>
+			</div>
+		</div>
+	</div>
+	<div class="form-actions">
+		<button type="button" class="monster-button-ghost monster-button-fit cancel">
+			{{i18n.cancel}}
+		</button>
+		<button type="submit" class="monster-button-success monster-button-fit">
+			{{#if isNew}}
+				{{i18n.strategy.addEditOfficeHolidays.labels.addHoliday}}
+			{{else}}
+				{{i18n.strategy.addEditOfficeHolidays.labels.updateHoliday}}
+			{{/if}}
+		</button>
+	</div>
+</form>

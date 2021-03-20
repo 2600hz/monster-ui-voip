@@ -1100,13 +1100,29 @@ define(function(require) {
 						audio: [],
 						video: []
 					},
+					sip: {
+						realm: monster.apps.auth.currentAccount.realm
+					},
 					users: _.sortBy(data.users, function(user) {
 						return _
 							.chain(user)
 							.thru(monster.util.getUserFullName)
 							.toLower()
 							.value();
-					})
+					}),
+					faxOptions: {
+						selected: _.get(data.device, 'media.fax_option', 'auto'),
+						options: [{
+							labelKey: 'auto',
+							value: 'auto'
+						}, {
+							labelKey: 'force',
+							value: true
+						}, {
+							labelKey: 'disabled',
+							value: false
+						}]
+					}
 				}
 			}, deviceData);
 		},
@@ -1118,28 +1134,26 @@ define(function(require) {
 		 * @return {Object}
 		 */
 		devicesApplyDefaults: function(device) {
-			var self = this;
+			var self = this,
+				isNew = !_.has(device, 'id'),
+				type = _.get(device, 'device_type');
 
 			return _.mergeWith(
-				self.devicesGetDefaults(device),
+				isNew ? self.devicesGetDefaults(type) : {},
 				device,
 				overrideDestArray
 			);
 		},
 
 		/**
-		 * @param  {Object} device
-		 * @param  {String} device.device_type
-		 * @param  {String} [device.id]
+		 * @param  {String} type
 		 * @return {Object}
 		 */
-		devicesGetDefaults: function(device) {
-			var self = this,
-				isNew = !_.has(device, 'id'),
-				type = _.get(device, 'device_type');
+		devicesGetDefaults: function(type) {
+			var self = this;
 
 			return _.mergeWith(
-				isNew ? self.devicesGetBaseDefaults() : {},
+				self.devicesGetBaseDefaults(),
 				self.devicesGetDefaultsForType(type),
 				overrideDestArray
 			);
@@ -1178,7 +1192,6 @@ define(function(require) {
 				sipSettings = {
 					sip: {
 						password: monster.util.randomString(12),
-						realm: monster.apps.auth.currentAccount.realm,
 						username: 'user_' + monster.util.randomString(10)
 					}
 				},
@@ -1187,7 +1200,7 @@ define(function(require) {
 					cellphone: _.merge({}, callForwardSettings),
 					fax: _.merge({
 						media: {
-							fax_option: 'false'
+							fax_option: false
 						},
 						outbound_flags: [
 							'fax'

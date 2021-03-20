@@ -1,0 +1,167 @@
+.holidays-toggler {
+	padding: 32px 0 20px 20px;
+
+	span {
+		color: $woodsmoke;
+		font-weight: 600;
+	}
+}
+
+.monster-button {
+	color: $woodsmoke;
+	border-radius: 2px;
+}
+
+.save-button {
+	background: #2ed022;
+	border-color: #209218;
+	margin-left: 3px;
+}
+
+.holidays-div {
+	color: $woodsmoke;
+	padding: 20px;
+	display: none;
+
+	.title {
+		font-size: 18px;
+		margin-bottom: 1rem;
+	}
+
+	.help-div {
+		background-color: $french-pass;
+		display: flex;
+		padding: 16px;
+
+		.help-icon {
+			margin-right: 12px;
+			position: relative;
+			bottom: 2px;
+		}
+	}
+
+	.year-config {
+		margin: 16px 0;
+
+		select {
+			height: 36px;
+			width: 120px;
+		}
+	}
+
+	.actions-wrapper {
+		position: absolute;
+		z-index: 1;
+
+		button {
+			font-size: 14px;
+			padding: 8px 7px;
+			border: 1px solid $french-gray2;
+			background: linear-gradient(-180deg, $white 0%, $athens-gray 100%);
+			margin-right: 8px;
+			min-width: 96px;
+		}
+
+		.add-holiday {
+			background: $dodger-blue;
+			border: 1px solid #006bca;
+		}
+	}
+
+	#holidays_list_table {
+		.footable-filtering {
+			.input-group {
+				width: 256px;
+
+				.form-control {
+					width: 192px;
+				}
+
+				input[type="text"] {
+					height: 22px;
+				}
+
+				.input-group-btn {
+					.btn-primary {
+						background-color: $white !important;
+						color: $manatee;
+						border-left: unset;
+						height: 36px;
+
+						.fooicon {
+							font-size: 16px;
+						}
+					}
+				}
+			}
+		}
+
+		.footable-header {
+			background-color: #dbdbde;
+
+			th {
+				font-size: 12px;
+				color: $manatee;
+				font-weight: 600;
+			}
+		}
+
+		tbody {
+			color: $shark2;
+
+			tr {
+				height: 44px;
+
+				svg {
+					color: $midgray2;
+					padding: 0 10px;
+					cursor: pointer;
+				}
+
+				&.footable-empty {
+					display: none;
+				}
+			}
+		}
+	}
+
+	.custom-footable-empty {
+		color: $woodsmoke;
+		display: none;
+		border-radius: 2px;
+		border: 1px solid $mischka;
+		border-top: none;
+		text-align: center;
+
+		&.show {
+			display: block;
+		}
+
+		svg {
+			color: $manatee;
+			height: 1.5rem;
+			width: 1.5rem;
+			cursor: default;
+			margin-right: 12px;
+		}
+
+		.title-row {
+			padding: 44px 0;
+			display: inline-flex;
+			align-items: center;
+
+			span {
+				font-size: 16px;
+				font-weight: 600;
+			}
+		}
+
+		.description-row {
+			margin-bottom: 40px;
+
+			.description {
+				font-size: 14px;
+			}
+		}
+	}
+}

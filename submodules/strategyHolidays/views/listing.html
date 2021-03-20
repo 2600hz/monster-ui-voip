@@ -1,0 +1,12 @@
+<tr class="holiday-row" data-type="{{holidayType}}" data-id="{{holidayData.id}}" data-key="{{key}}">
+	<td class="name-cell">
+		{{holidayData.name}}
+	</td>
+	<td class="date-cell" data-sort-value="{{fromMonth}}" data-type="number">
+		{{dateToDisplay}}
+	</td>
+	<td class="action-cell">
+		<span class="edit-holiday">{{telicon "edit"}}</span>
+		<span class="delete-holiday">{{telicon "trash"}}</span>
+	</td>
+</tr>

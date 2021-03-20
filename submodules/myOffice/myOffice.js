@@ -892,8 +892,7 @@ define(function(require) {
 				monster.ui.validate(e911Form, {
 					rules: {
 						notification_contact_emails: {
-							normalizer: _.trim,
-							regex: /^(?:([\w+-.%]+@[\w-.]+\.[A-Za-z]{2,4})(?: ?))*$/
+							listOf: 'email'
 						}
 					},
 					messages: {
