@@ -506,26 +506,7 @@ define(function(require) {
 					holidayDates = new DateHolidays(country),
 					holidays = holidayDates.getHolidays(yearSelected);
 
-				template
-					.find('.observance')
-					.prop('checked', false);
-
 				self.strategyHolidaysUpdateNationHolidaysRender(parent, template, holidays);
-			});
-
-			template.on('change', '.observance', function(event) {
-				event.preventDefault();
-
-				var $rows = template.find('#include_holidays_table tbody tr');
-
-				_.forEach($rows, function(row) {
-					var $row = $(row),
-						type = $row.data('type');
-
-					if (type === 'observance') {
-						$row.toggleClass('hide');
-					}
-				});
 			});
 
 			template.on('submit', function(event) {
@@ -542,7 +523,7 @@ define(function(require) {
 
 					if (!_.includes(getImportedHolidaysForSelectedYear, name)) {
 						holiday = {
-							date: $row.data('date'),
+							date: $row.parents('tr').data('date'),
 							name: name
 						};
 
