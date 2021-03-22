@@ -254,12 +254,13 @@ define(function(require) {
 					title: self.i18n.active().strategy.holidays.importOfficeHolidays.title
 				});
 
-			self.strategyHolidaysUpdateNationHolidaysRender($template, data.holidays);
+			self.strategyHolidaysUpdateNationHolidaysRender(parent, $template, data.holidays);
 			self.strategyHolidaysIncludeNationHolidaysBindsEvents(parent, $template, popup);
 		},
 
-		strategyHolidaysUpdateNationHolidaysRender: function(parent, data) {
+		strategyHolidaysUpdateNationHolidaysRender: function(parent, parentTemplate, data) {
 			var self = this,
+				getImportedHolidaysForSelectedYear = self.strategyHolidaysGetHolidaysForCurrentYear(parent, true),
 				$template = $(self.getTemplate({
 					name: 'updateImportNationalHolidays',
 					data: {
@@ -268,7 +269,7 @@ define(function(require) {
 					submodule: 'strategyHolidays'
 				}));
 
-			parent
+			parentTemplate
 				.find('.include-holidays-list')
 				.replaceWith($template);
 
@@ -279,6 +280,19 @@ define(function(require) {
 				paging: {
 					enabled: false
 				}
+			});
+
+			_.forEach(getImportedHolidaysForSelectedYear, function(value) {
+				var $rows = $template.find('#include_holidays_table tbody tr');
+
+				_.forEach($rows, function(row) {
+					var $row = $(row),
+						name = $row.data('name');
+
+					if (name === value) {
+						$row.find('.add-holiday').prop('checked', true);
+					}
+				});
 			});
 		},
 
@@ -496,7 +510,7 @@ define(function(require) {
 					.find('.observance')
 					.prop('checked', false);
 
-				self.strategyHolidaysUpdateNationHolidaysRender(template, holidays);
+				self.strategyHolidaysUpdateNationHolidaysRender(parent, template, holidays);
 			});
 
 			template.on('change', '.observance', function(event) {
@@ -517,18 +531,19 @@ define(function(require) {
 			template.on('submit', function(event) {
 				event.preventDefault();
 
-				var $rows = template.find('#include_holidays_table tbody tr'),
+				var $rows = template.find('#include_holidays_table tbody tr .add-holiday:checked'),
+					getImportedHolidaysForSelectedYear = self.strategyHolidaysGetHolidaysForCurrentYear(parent, true),
 					holidaysData = [];
 
 				_.forEach($rows, function(row) {
 					var $row = $(row),
-						isChecked = $row.find('.add-holiday').prop('checked'),
+						name = $row.parents('tr').data('name'),
 						holiday = {};
 
-					if (isChecked) {
+					if (!_.includes(getImportedHolidaysForSelectedYear, name)) {
 						holiday = {
 							date: $row.data('date'),
-							name: $row.data('name')
+							name: name
 						};
 
 						holidaysData.push(holiday);
@@ -538,6 +553,26 @@ define(function(require) {
 				self.strategyHolidaysIncludeHolidaysForCountry(parent, holidaysData);
 				popup.dialog('close').remove();
 			});
+		},
+
+		strategyHolidaysGetHolidaysForCurrentYear: function(parent, isImported) {
+			var self = this,
+				holidaysData = self.appFlags.strategyHolidays.allHolidays,
+				yearSelected = parseInt(parent.find('#year').val()),
+				holidaysImportedList = [];
+
+			_.forEach(holidaysData, function(value, key) {
+				var endYear = _.get(value, 'holidayData.endYear', yearSelected),
+					excludeYear = _.get(value, 'holidayData.excludeYear', []),
+					isImported = _.get(value, 'holidayData.isImported', false),
+					name = _.get(value, 'holidayData.name');
+
+				if (endYear === yearSelected && !_.includes(excludeYear, yearSelected) && isImported) {
+					holidaysImportedList.push(name);
+				}
+			});
+
+			return holidaysImportedList;
 		},
 
 		strategyHolidaysImportHolidaysFromCsvData: function(parent) {
@@ -657,7 +692,8 @@ define(function(require) {
 							id: val.id,
 							name: val.name,
 							fromMonth: val.month,
-							recurring: true
+							recurring: true,
+							isImported: _.get(val, 'isImported', false)
 						};
 
 					if (val.hasOwnProperty('ordinal')) {
@@ -785,7 +821,8 @@ define(function(require) {
 							fromDay: date.getDate(),
 							fromMonth: date.getMonth() + 1,
 							name: data.name,
-							recurring: false
+							recurring: false,
+							isImported: true
 						}
 					};
 
@@ -867,11 +904,12 @@ define(function(require) {
 					? null
 					: monster.util.dateToEndOfGregorianDay(self.strategyHolidaysGetEndDate(holidayData.endYear, holiday)),
 				holidayRuleConfig = _.merge({
+					end_date: endDate,
 					oldType: holidayData.set ? 'set' : 'rule'
 				}, id && {
 					id: id
-				}, endDate && {
-					end_date: endDate
+				}, holidayData.isImported && {
+					isImported: holidayData.isImported
 				}),
 				holidayRule = {};
 
