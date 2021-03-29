@@ -5,7 +5,7 @@ define(function(require) {
 		footable = require('footable'),
 		Papa = require('papaparse'),
 		sugar = require('sugar-date'),
-		holidays = require('date-holidays');
+		DateHolidays = require('date-holidays');
 
 	return {
 		subscribe: {
@@ -136,7 +136,7 @@ define(function(require) {
 			callback && callback();
 		},
 
-		strategyHolidaysListingRender: function($container, holidaysData) {
+		strategyHolidaysListingRender: function($container) {
 			var self = this,
 				holidaysData = self.appFlags.strategyHolidays.allHolidays,
 				table = footable.get('#holidays_list_table'),
@@ -185,14 +185,21 @@ define(function(require) {
 									break;
 							}
 
-							return dateToText;
+							return {
+								text: dateToText,
+								timestamp: data.holidayType === 'advanced'
+									? Sugar.Date.create(dateToText).getTime()
+									: date.getTime()
+							};
 						},
+						getDate = dateToDisplay($container, data),
 						template = $(self.getTemplate({
 							name: 'listing',
 							data: {
 								holidayType: data.holidayType,
 								holidayData: data.holidayData,
-								dateToDisplay: dateToDisplay($container, data),
+								dateToDisplay: _.get(getDate, 'text'),
+								timestamp: _.get(getDate, 'timestamp'),
 								key: key
 							},
 							submodule: 'strategyHolidays'
@@ -203,7 +210,7 @@ define(function(require) {
 					return template;
 				};
 
-			_.each(holidaysData, function(value, key) {
+			_.forEach(holidaysData, function(value, key) {
 				var endYear = _.get(value, 'holidayData.endYear', yearSelected),
 					excludeYear = _.get(value, 'holidayData.excludeYear', []);
 
@@ -247,6 +254,25 @@ define(function(require) {
 					title: self.i18n.active().strategy.holidays.importOfficeHolidays.title
 				});
 
+			self.strategyHolidaysUpdateNationHolidaysRender(parent, $template, data.holidays);
+			self.strategyHolidaysIncludeNationHolidaysBindsEvents(parent, $template, popup);
+		},
+
+		strategyHolidaysUpdateNationHolidaysRender: function(parent, parentTemplate, data) {
+			var self = this,
+				getImportedHolidaysForSelectedYear = self.strategyHolidaysGetHolidaysForCurrentYear(parent, true),
+				$template = $(self.getTemplate({
+					name: 'updateImportNationalHolidays',
+					data: {
+						holidays: data
+					},
+					submodule: 'strategyHolidays'
+				}));
+
+			parentTemplate
+				.find('.include-holidays-list')
+				.replaceWith($template);
+
 			monster.ui.footable($template.find('#include_holidays_table.footable'), {
 				filtering: {
 					enabled: false
@@ -256,7 +282,18 @@ define(function(require) {
 				}
 			});
 
-			self.strategyHolidaysIncludeNationHolidaysBindsEvents($template, parent, popup, data);
+			_.forEach(getImportedHolidaysForSelectedYear, function(value) {
+				var $rows = $template.find('#include_holidays_table tbody tr');
+
+				_.forEach($rows, function(row) {
+					var $row = $(row),
+						name = $row.data('name');
+
+					if (name === value) {
+						$row.find('.add-holiday').prop('checked', true);
+					}
+				});
+			});
 		},
 
 		strategyHolidaysBindEvents: function(parent, template, holidaysData, strategyData) {
@@ -301,20 +338,20 @@ define(function(require) {
 
 			template.on('click', '.import-csv', function(event) {
 				event.preventDefault();
-				self.strategyHolidaysImportDatesFromCsvData(parent);
+				self.strategyHolidaysImportHolidaysFromCsvData(parent);
 			});
 
 			template.on('click', '.include-national-holidays', function(event) {
 				event.preventDefault();
 
-				var holidayDates = new holidays(),
-					usHolidaysDate = new holidays('US'),
-					currentYear = new Date().getFullYear(),
+				var holidayDates = new DateHolidays(),
+					usHolidaysDate = new DateHolidays('US'),
+					yearSelected = parent.find('#year').val(),
 					data = {
 						allCountries: holidayDates.getCountries(),
 						countrySelected: 'US',
-						holidays: usHolidaysDate.getHolidays(currentYear)
-					}
+						holidays: usHolidaysDate.getHolidays(yearSelected)
+					};
 
 				self.strategyHolidaysIncludeNationHolidaysRender(parent, data);
 			});
@@ -453,20 +490,73 @@ define(function(require) {
 			});
 		},
 
-		strategyHolidaysIncludeNationHolidaysBindsEvents: function(template, parent, popup, date) {
+		strategyHolidaysIncludeNationHolidaysBindsEvents: function(parent, template, popup) {
 			var self = this;
 
 			template.find('.cancel').on('click', function(event) {
 				popup.dialog('close').remove();
 			});
 
+			template.find('.countries').on('change', function(event) {
+				event.preventDefault();
+
+				var $this = $(this),
+					country = $this.val(),
+					yearSelected = parent.find('#year').val(),
+					holidayDates = new DateHolidays(country),
+					holidays = holidayDates.getHolidays(yearSelected);
+
+				self.strategyHolidaysUpdateNationHolidaysRender(parent, template, holidays);
+			});
+
 			template.on('submit', function(event) {
 				event.preventDefault();
+
+				var $rows = template.find('#include_holidays_table tbody tr .add-holiday:checked'),
+					getImportedHolidaysForSelectedYear = self.strategyHolidaysGetHolidaysForCurrentYear(parent, true),
+					holidaysData = [];
+
+				_.forEach($rows, function(row) {
+					var $row = $(row),
+						name = $row.parents('tr').data('name'),
+						holiday = {};
+
+					if (!_.includes(getImportedHolidaysForSelectedYear, name)) {
+						holiday = {
+							date: $row.parents('tr').data('date'),
+							name: name
+						};
+
+						holidaysData.push(holiday);
+					}
+				});
+
+				self.strategyHolidaysIncludeHolidaysForCountry(parent, holidaysData);
 				popup.dialog('close').remove();
 			});
 		},
 
-		strategyHolidaysImportDatesFromCsvData: function(parent) {
+		strategyHolidaysGetHolidaysForCurrentYear: function(parent, isImported) {
+			var self = this,
+				holidaysData = self.appFlags.strategyHolidays.allHolidays,
+				yearSelected = parseInt(parent.find('#year').val()),
+				holidaysImportedList = [];
+
+			_.forEach(holidaysData, function(value, key) {
+				var endYear = _.get(value, 'holidayData.endYear', yearSelected),
+					excludeYear = _.get(value, 'holidayData.excludeYear', []),
+					isImported = _.get(value, 'holidayData.isImported', false),
+					name = _.get(value, 'holidayData.name');
+
+				if (endYear === yearSelected && !_.includes(excludeYear, yearSelected) && isImported) {
+					holidaysImportedList.push(name);
+				}
+			});
+
+			return holidaysImportedList;
+		},
+
+		strategyHolidaysImportHolidaysFromCsvData: function(parent) {
 			var self = this,
 				i18n = self.i18n.active().strategy.holidays,
 				appFlags = self.appFlags.strategyHolidays,
@@ -556,7 +646,7 @@ define(function(require) {
 					}
 				},
 				onSuccess: _.flow(
-					_.bind(self.strategyHolidaysExtractDatesFromCsvData, self, ordinals),
+					_.bind(self.strategyHolidaysExtractHolidaysFromCsvData, self, ordinals),
 					_.bind(self.strategyHolidaysListingRender, self, parent)
 				)
 			});
@@ -572,7 +662,7 @@ define(function(require) {
 			var self = this,
 				holidaysData = [];
 
-			_.each(_.get(strategyData.temporalRules, 'holidays', {}), function(val, key) {
+			_.forEach(_.get(strategyData.temporalRules, 'holidays', {}), function(val, key) {
 				var endDate = val.hasOwnProperty('viewData')
 					? _.get(val, 'viewData.end_date')
 					: _.get(val, 'end_date');
@@ -583,7 +673,8 @@ define(function(require) {
 							id: val.id,
 							name: val.name,
 							fromMonth: val.month,
-							recurring: true
+							recurring: true,
+							isImported: _.get(val, 'isImported', false)
 						};
 
 					if (val.hasOwnProperty('ordinal')) {
@@ -628,6 +719,7 @@ define(function(require) {
 				}
 				self.appFlags.strategyHolidays.allHolidays = holidaysData;
 			});
+			self.appFlags.strategyHolidays.deletedHolidays = [];
 
 			return holidaysData;
 		},
@@ -637,7 +729,7 @@ define(function(require) {
 		 * @param  {Array} csvData
 		 * @return {Array[]}
 		 */
-		strategyHolidaysExtractDatesFromCsvData: function(ordinals, csvData) {
+		strategyHolidaysExtractHolidaysFromCsvData: function(ordinals, csvData) {
 			var self = this,
 				wdays = self.appFlags.strategyHolidays.wdays;
 
@@ -695,6 +787,30 @@ define(function(require) {
 				self.appFlags.strategyHolidays.allHolidays.push(holidayRule);
 				return holidayRule;
 			});
+		},
+
+		strategyHolidaysIncludeHolidaysForCountry: function(parent, holidaysData) {
+			var self = this;
+
+			_.forEach(holidaysData, function(data) {
+				var date = Sugar.Date.create(data.date),
+					holiday = {
+						holidayType: 'single',
+						modified: true,
+						holidayData: {
+							endYear: date.getFullYear(),
+							fromDay: date.getDate(),
+							fromMonth: date.getMonth() + 1,
+							name: data.name,
+							recurring: false,
+							isImported: true
+						}
+					};
+
+				self.appFlags.strategyHolidays.allHolidays.push(holiday);
+			});
+
+			self.strategyHolidaysListingRender(parent);
 		},
 
 		/**
@@ -769,11 +885,12 @@ define(function(require) {
 					? null
 					: monster.util.dateToEndOfGregorianDay(self.strategyHolidaysGetEndDate(holidayData.endYear, holiday)),
 				holidayRuleConfig = _.merge({
+					end_date: endDate,
 					oldType: holidayData.set ? 'set' : 'rule'
 				}, id && {
 					id: id
-				}, endDate && {
-					end_date: endDate
+				}, holidayData.isImported && {
+					isImported: holidayData.isImported
 				}),
 				holidayRule = {};
 
@@ -869,7 +986,7 @@ define(function(require) {
 				rulesToCreate.push(getMonthRule(junkName, fromMonth, fromDay, toDay));
 			}
 
-			_.each(rulesToCreate, function(rule) {
+			_.forEach(rulesToCreate, function(rule) {
 				parallelRequests[rule.name] = function(callback) {
 					self.strategyHolidaysUpdateHoliday(rule, function(data) {
 						callback && callback(null, data);
@@ -880,7 +997,7 @@ define(function(require) {
 			var createCleanSet = function() {
 				// Create All Rules, and then Create Rule Set.
 				monster.parallel(parallelRequests, function(err, results) {
-					_.each(rulesToCreate, function(rule) {
+					_.forEach(rulesToCreate, function(rule) {
 						ruleSet.temporal_rules.push(results[rule.name].id);
 					});
 
@@ -1104,7 +1221,7 @@ define(function(require) {
 			self.strategyGetRuleSet(id, function(data) {
 				var parallelRequests = {};
 
-				_.each(data.temporal_rules, function(id) {
+				_.forEach(data.temporal_rules, function(id) {
 					parallelRequests[id] = function(callback) {
 						self.strategyHolidaysDeleteHoliday(id, function() {
 							callback && callback(null, {});

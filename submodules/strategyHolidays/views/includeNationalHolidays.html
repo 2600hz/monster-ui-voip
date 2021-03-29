@@ -4,8 +4,8 @@
 			<label class="control-label">
 				{{i18n.strategy.holidays.importOfficeHolidays.labels.selectYourCountry}}
 			</label>
-			<div class="countries">
-				<select class=countries" name="countries">
+			<div class="countries-wrapper">
+				<select class="countries" name="countries">
 				{{#select countrySelected}}
 					{{#each allCountries as |label|}}
 						<option value="{{@key}}">
@@ -22,33 +22,7 @@
 			</label>
 		</div>
 		<div class="control-group">
-			{{#monsterCheckbox i18n.strategy.holidays.importOfficeHolidays.labels.includeObservedDates}}
-				<input type="checkbox" name="recurring" id="recurring">
-			{{/monsterCheckbox}}
-		</div>
-		<div class="control-group">
-			<div class="include-holidays-list">
-				<table id="include_holidays_table" class="monster-table footable">
-					<thead>
-						<tr class="footable-header">
-							<th data-sorted="true" data-direction="DESC">
-								{{i18n.strategy.holidays.importOfficeHolidays.labels.holiday}}
-							</th>
-						</tr>
-					</thead>
-					<tbody class="footable-body">
-						{{#each holidays}}
-							<tr class="row" data-id="" data-event="">
-								<td class="holiday-cell">
-									{{#monsterCheckbox name}}
-										<input class="edit-skill" type="checkbox"></input>
-									{{/monsterCheckbox}}
-								</td>
-							</tr>
-						{{/each}}
-					</tbody>
-				</table>
-			</div>
+			<div class="include-holidays-list"></div>
 		</div>
 	</div>
 	<div class="form-actions">
