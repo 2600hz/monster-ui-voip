@@ -3928,8 +3928,6 @@ define(function(require) {
 			});
 
 			$startTimepicker.on('change', function() {
-				$template.find('.overlapping-hours-error').slideUp(200);
-
 				var startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
 					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight'),
 					remainder = startSeconds % timepickerStep;
@@ -3944,8 +3942,6 @@ define(function(require) {
 			});
 
 			$endTimepicker.on('change', function() {
-				$template.find('.overlapping-hours-error').slideUp(200);
-
 				var startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
 					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight'),
 					remainder = endSeconds % timepickerStep;
@@ -3974,33 +3970,7 @@ define(function(require) {
 						type: formData.type
 					}, _.pick(formData, [
 						'days'
-					])),
-					overlapsExisting = _
-						.chain(formattedData.days)
-						.map(function(v, index) {
-							return {
-								selected: v,
-								overlaps: _
-									.chain((existing || [])[index])
-									.map(function(interval) {
-										var start = interval.start,
-											end = interval.end,
-											startsWithinExistingInterval = formattedData.start >= start && formattedData.start < end,
-											endsWithinExistingInterval = formattedData.end > start && formattedData.end <= end,
-											overlapsExistingInterval = formattedData.start <= start && formattedData.end >= end;
-
-										return startsWithinExistingInterval
-											|| endsWithinExistingInterval
-											|| overlapsExistingInterval;
-									})
-									.some()
-									.value()
-							};
-						})
-						.filter('selected')
-						.map('overlaps')
-						.some()
-						.value();
+					]));
 
 				if (!monster.ui.valid($template)) {
 					return;
@@ -4008,11 +3978,6 @@ define(function(require) {
 
 				if (!_.some(formattedData.days)) {
 					$template.find('.no-days-error').slideDown(200);
-					return;
-				}
-
-				if (overlapsExisting) {
-					$template.find('.overlapping-hours-error').slideDown(200);
 					return;
 				}
 
