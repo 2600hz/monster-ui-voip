@@ -821,8 +821,7 @@
 				"openHours": "Open Hours"
 			},
 			"errors": {
-				"noDaysSelected": "No days have been selected.",
-				"overlappingHours": "Selected hours overlap existing hours."
+				"noDaysSelected": "No days have been selected."
 			}
 		},
 		"noNumberHelp": "Note: Please add a Main Office Number to your account first. Once you add a main number, you will be able to set up Office Hours, Holidays and Incoming Call Handling (Call-Flow) for your office.",
