@@ -6,7 +6,7 @@
 			</label>
 			<div class="countries-wrapper">
 				<select class="countries" name="countries">
-				{{#select countrySelected}}
+				{{#select selectedCountry}}
 					{{#each allCountries as |label|}}
 						<option value="{{@key}}">
 							{{label}}
