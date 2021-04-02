@@ -100,20 +100,19 @@
 
 		.footable-header {
 			background-color: #dbdbde;
-			box-shadow: inset 0px -1px 0px 0px $french-gray2,
-				inset 0px 1px 0px 0px $french-gray2;
 
 			th {
 				font-size: 12px;
 				font-weight: 600;
 				color: $shark2;
+				border-color: $french-gray2;
 			}
 		}
 
 		tbody {
 			tr {
 				height: 44px;
-				box-shadow: inset 0px -1px 0px 0px $french-gray2;
+				border: 1px $french-gray2;
 
 				svg {
 					color: $midgray2;
