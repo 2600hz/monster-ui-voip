@@ -197,9 +197,13 @@ define(function(require) {
 				event.preventDefault();
 
 				monster.pub('voip.strategy.addOfficeHours', {
-					existing: self.strategyHoursGetDaysIntervalsFromTemplate(parent),
-					callback: function(err, existing) {
-						var normalizedIntervals = self.strategyHoursNormalizeDaysIntervals(existing);
+					callback: function(err, selected) {
+						var existing = self.strategyHoursGetDaysIntervalsFromTemplate(parent);
+							normalizedIntervals = _
+								.chain(existing)
+								.zipWith(selected, _.concat)
+								.thru(_.bind(self.strategyHoursNormalizeDaysIntervals, self))
+								.value();
 
 						self.strategyHoursListingRender(parent, normalizedIntervals);
 					}
