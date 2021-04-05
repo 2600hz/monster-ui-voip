@@ -178,14 +178,11 @@ define(function(require) {
 
 				monster.pub('voip.strategy.addOfficeHours', {
 					callback: function(err, selected) {
-						var existing = self.strategyHoursGetDaysIntervalsFromTemplate(parent);
-							normalizedIntervals = _
-								.chain(existing)
-								.zipWith(selected, _.concat)
-								.thru(_.bind(self.strategyHoursNormalizeDaysIntervals, self))
-								.value();
+						var existing = self.strategyHoursGetDaysIntervalsFromTemplate(parent),
+							merged = _.zipWith(existing, selected, _.concat),
+							normalized = self.strategyHoursNormalizeDaysIntervals(merged);
 
-						self.strategyHoursListingRender(parent, normalizedIntervals);
+						self.strategyHoursListingRender(parent, normalized);
 					}
 				});
 			});
