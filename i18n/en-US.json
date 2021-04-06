@@ -821,8 +821,7 @@
 				"openHours": "Open Hours"
 			},
 			"errors": {
-				"noDaysSelected": "No days have been selected.",
-				"overlappingHours": "Selected hours overlap existing hours."
+				"noDaysSelected": "No days have been selected."
 			}
 		},
 		"addEditOfficeHolidays": {
