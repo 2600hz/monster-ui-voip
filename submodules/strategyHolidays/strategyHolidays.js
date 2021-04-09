@@ -346,8 +346,12 @@ define(function(require) {
 
 				var dateHolidays = new DateHolidays(),
 					allCountries = dateHolidays.getCountries(),
-					countryCode = _.last(_.split(monster.config.whitelabel.language, '-')),
-					defaultCountryCode = _.last(_.split(monster.defaultLanguage, '-')),
+					parseCountryCode = _.flow(
+						_.partial(_.split, _, '-'),
+						_.last
+					),
+					countryCode = parseCountryCode(monster.config.whitelabel.language),
+					defaultCountryCode = parseCountryCode(monster.defaultLanguage),
 					selectedCountry = _.has(allCountries, countryCode) ? countryCode : defaultCountryCode,
 					holidaysList = new DateHolidays(selectedCountry),
 					yearSelected = parent.find('#year').val(),
@@ -553,14 +557,18 @@ define(function(require) {
 					.map(function(holiday) {
 						var holidayData = _.get(holiday, 'holidayData');
 
-						return {
-							name: _.get(holidayData, 'name'),
-							endYear: _.get(holidayData, 'endYear', yearSelected),
-							isImported: _.get(holidayData, 'isImported')
-						};
+						return _.merge({
+							endYear: yearSelected
+						}, _.pick(holidayData, [
+							'name',
+							'endYear',
+							'isImported'
+						]));
 					})
-					.filter(isCurrentYear)
-					.filter(isImported)
+					.filter(_.overEvery(
+						isCurrentYear,
+						isImported
+					))
 					.value();
 
 			return _.map(importedHolidaysList, 'name');
