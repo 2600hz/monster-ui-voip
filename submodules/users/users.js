@@ -2904,8 +2904,8 @@ define(function(require) {
 				userSettings = _
 					.chain(params.currentUser)
 					.get('call_recording', {})
-					.flatMap(_.unary(_.map))
-					.find('enabled')
+					.flatMap(_.values)
+					.find({ enabled: true })
 					.value(),
 				configGeneratorsPerType = {
 					defaults: _.partial(getConfigForSettings, defaultSettings, getDefaultValue),
@@ -2929,8 +2929,8 @@ define(function(require) {
 				user: params.currentUser,
 				canShowFields: _
 					.chain(config.extra)
-					.flatMap(_.unary(_.map))
-					.find('enabled')
+					.flatMap(_.values)
+					.find({ enabled: true })
 					.thru(_.negate(_.isUndefined))
 					.value()
 			}, _.pick(params, [
