@@ -215,7 +215,7 @@ define(function(require) {
 							iconColor: 'monster-blue',
 							title: self.i18n.active().users.caller_id.title
 						},
-						call_forward_failover: {
+						call_failover: {
 							icon: 'fa fa-share',
 							iconColor: 'monster-orange',
 							title: self.i18n.active().users.call_forward.failover_title,
