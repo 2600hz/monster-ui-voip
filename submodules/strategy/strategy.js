@@ -3842,7 +3842,6 @@ define(function(require) {
 					'timepicker'
 				]),
 				timepickerStep = meta.timepicker.step,
-				existing = args.existing,
 				callback = args.callback,
 				$template = $(self.getTemplate({
 					name: 'addOfficeHours',
@@ -3928,8 +3927,6 @@ define(function(require) {
 			});
 
 			$startTimepicker.on('change', function() {
-				$template.find('.overlapping-hours-error').slideUp(200);
-
 				var startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
 					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight'),
 					remainder = startSeconds % timepickerStep;
@@ -3944,8 +3941,6 @@ define(function(require) {
 			});
 
 			$endTimepicker.on('change', function() {
-				$template.find('.overlapping-hours-error').slideUp(200);
-
 				var startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
 					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight'),
 					remainder = endSeconds % timepickerStep;
@@ -3970,70 +3965,26 @@ define(function(require) {
 					endTime = $endTimepicker.timepicker('getSecondsFromMidnight'),
 					formattedData = _.merge({
 						start: $startTimepicker.timepicker('getSecondsFromMidnight'),
-						end: endTime === 0 ? meta.max : endTime,
-						type: formData.type
+						end: endTime === 0 ? meta.max : endTime
 					}, _.pick(formData, [
-						'days'
-					])),
-					overlapsExisting = _
-						.chain(formattedData.days)
-						.map(function(v, index) {
-							return {
-								selected: v,
-								overlaps: _
-									.chain((existing || [])[index])
-									.map(function(interval) {
-										var start = interval.start,
-											end = interval.end,
-											startsWithinExistingInterval = formattedData.start >= start && formattedData.start < end,
-											endsWithinExistingInterval = formattedData.end > start && formattedData.end <= end,
-											overlapsExistingInterval = formattedData.start <= start && formattedData.end >= end;
-
-										return startsWithinExistingInterval
-											|| endsWithinExistingInterval
-											|| overlapsExistingInterval;
-									})
-									.some()
-									.value()
-							};
-						})
-						.filter('selected')
-						.map('overlaps')
-						.some()
-						.value();
+						'type'
+					]));
 
 				if (!monster.ui.valid($template)) {
 					return;
 				}
 
-				if (!_.some(formattedData.days)) {
+				if (!_.some(formData.days)) {
 					$template.find('.no-days-error').slideDown(200);
-					return;
-				}
-
-				if (overlapsExisting) {
-					$template.find('.overlapping-hours-error').slideDown(200);
 					return;
 				}
 
 				popup.dialog('close');
 
 				callback(null, _
-					.chain(existing)
-					.map(function(intervals, index) {
-						var isDaySelected = formattedData.days[index];
-
-						return _
-							.chain(intervals)
-							.concat(isDaySelected ? [_.pick(formattedData, [
-								'start',
-								'end',
-								'type'
-							])] : [])
-							.sortBy('start')
-							.value();
+					.map(self.weekdays, function(weekday, index) {
+						return formData.days[index] ? [formattedData] : [];
 					})
-					.value()
 				);
 			});
 

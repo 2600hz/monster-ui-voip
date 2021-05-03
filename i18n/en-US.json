@@ -718,7 +718,6 @@
 			"label": "Voicemail to e-mail:",
 			"title": "Voicemail Box",
 			"vmToEmailHelp": "An e-mail will be sent to {{variable}} for every new voicemail. If you want to change where email notifications go to, please edit the user's email address in the User Administration section.",
-			"announceOnly": "Announce Only",
 			"transcribe": "Transcribe",
 			"attachVoicemail": "Attach voicemail message to email."
 		},
@@ -821,8 +820,7 @@
 				"openHours": "Open Hours"
 			},
 			"errors": {
-				"noDaysSelected": "No days have been selected.",
-				"overlappingHours": "Selected hours overlap existing hours."
+				"noDaysSelected": "No days have been selected."
 			}
 		},
 		"addEditOfficeHolidays": {
