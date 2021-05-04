@@ -971,8 +971,14 @@
 				"description": "Please use the Add holiday or Import Holidays buttons to enter holidays."
 			},
 			"importOfficeHolidays": {
-				"title": "Import Office Holidays",
-				"dataLabel": "holidays"
+				"title": "Select National Holidays",
+				"labels": {
+					"selectYourCountry": "Select Your Country",
+					"description": "Select holidays when your office will be closed",
+					"includeObservedDates": "Include Observed Dates",
+					"selectHolidays": "Select Holidays",
+					"holiday": "holiday"
+				}
 			},
 			"dialogs": {
 				"delete": {
