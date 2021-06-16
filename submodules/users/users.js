@@ -4606,19 +4606,15 @@ define(function(require) {
 		},
 
 		usersGetConferenceFeature: function(userId, globalCallback) {
-			var self = this,
-				dataResponse = {
-					conference: {},
-					listConfNumbers: []
-				};
+			var self = this;
 
 			monster.parallel({
-				confNumbers: function(callback) {
+				listConfNumbers: function(callback) {
 					self.usersListConfNumbers(function(numbers) {
 						callback && callback(null, numbers);
 					});
 				},
-				listConferences: function(callback) {
+				conference: function(callback) {
 					self.usersListConferences(userId, function(conferences) {
 						if (conferences.length > 0) {
 							self.usersGetConference(conferences[0].id, function(conference) {
@@ -4630,10 +4626,7 @@ define(function(require) {
 					});
 				}
 			}, function(err, results) {
-				dataResponse.conference = results.listConferences;
-				dataResponse.listConfNumbers = results.confNumbers;
-
-				globalCallback && globalCallback(dataResponse);
+				globalCallback && globalCallback(results);
 			});
 		},
 
