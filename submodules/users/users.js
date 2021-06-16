@@ -4606,7 +4606,8 @@ define(function(require) {
 		},
 
 		usersGetConferenceFeature: function(userId, globalCallback) {
-			var self = this;
+			var self = this,
+				isUserSmartConference = _.partial(_.includes, _, self.appFlags.users.smartPBXConferenceString);
 
 			monster.parallel({
 				listConfNumbers: function(callback) {
@@ -4620,15 +4621,18 @@ define(function(require) {
 							self.usersListConferences(userId, _.partial(next, null));
 						},
 						function(conferences, next) {
-							if (_.isEmpty(conferences)) {
-								return next(null, {});
-							}
 							var conferenceId = _
 								.chain(conferences)
-								.head()
+								.find(_.flow(
+									_.partial(_.get, _, 'name'),
+									isUserSmartConference
+								))
 								.get('id')
 								.value();
 
+							if (!_.isString(conferenceId)) {
+								return next(null, {});
+							}
 							self.usersGetConference(conferenceId, _.partial(next, null));
 						}
 					], callback);
