@@ -5302,11 +5302,14 @@ define(function(require) {
 
 			monster.parallel({
 				conferences: function(callback) {
-					self.usersListConferences(userId, function(conferences) {
-						self.usersRemoveBulkConferences(conferences, true, function(results) {
-							callback && callback(null, results);
-						});
-					});
+					monster.waterfall([
+						function(next) {
+							self.usersListConferences(userId, _.partial(next, null));
+						},
+						function(conferences, next) {
+							self.usersRemoveBulkConferences(conferences, true, _.partial(next, null));
+						}
+					], callback);
 				},
 				user: function(callback) {
 					self.usersGetUser(userId, function(user) {
