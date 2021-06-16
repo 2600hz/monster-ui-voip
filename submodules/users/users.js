@@ -4605,9 +4605,14 @@ define(function(require) {
 			});
 		},
 
+		usersIsSmartConference: function(name) {
+			var self = this;
+
+			return _.includes(name, self.appFlags.users.smartPBXConferenceString);
+		},
+
 		usersGetConferenceFeature: function(userId, globalCallback) {
-			var self = this,
-				isUserSmartConference = _.partial(_.includes, _, self.appFlags.users.smartPBXConferenceString);
+			var self = this;
 
 			monster.parallel({
 				listConfNumbers: function(callback) {
@@ -4625,7 +4630,7 @@ define(function(require) {
 								.chain(conferences)
 								.find(_.flow(
 									_.partial(_.get, _, 'name'),
-									isUserSmartConference
+									_.bind(self.usersIsSmartConference, self)
 								))
 								.get('id')
 								.value();
@@ -5307,7 +5312,10 @@ define(function(require) {
 							self.usersListConferences(userId, _.partial(next, null));
 						},
 						function(conferences, next) {
-							self.usersRemoveBulkConferences(conferences, true, _.partial(next, null));
+							self.usersRemoveBulkConferences(_.filter(conferences, _.flow(
+								_.partial(_.get, _, 'name'),
+								_.bind(self.usersIsSmartConference, self)
+							)), true, _.partial(next, null));
 						}
 					], callback);
 				},
