@@ -4615,15 +4615,23 @@ define(function(require) {
 					});
 				},
 				conference: function(callback) {
-					self.usersListConferences(userId, function(conferences) {
-						if (conferences.length > 0) {
-							self.usersGetConference(conferences[0].id, function(conference) {
-								callback && callback(null, conference);
-							});
-						} else {
-							callback && callback(null, {});
+					monster.waterfall([
+						function(next) {
+							self.usersListConferences(userId, _.partial(next, null));
+						},
+						function(conferences, next) {
+							if (_.isEmpty(conferences)) {
+								return next(null, {});
+							}
+							var conferenceId = _
+								.chain(conferences)
+								.head()
+								.get('id')
+								.value();
+
+							self.usersGetConference(conferenceId, _.partial(next, null));
 						}
-					});
+					], callback);
 				}
 			}, function(err, results) {
 				globalCallback && globalCallback(results);
