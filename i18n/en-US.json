@@ -834,7 +834,10 @@
 				"name": "Holiday Name",
 				"dateType": "Date Type",
 				"date": "Date",
-				"recurringAnnually": "Recurring Annually"
+				"recurringAnnually": "Recurring Annually",
+				"allDay": "All Day",
+				"year": "Year",
+				"time": "Time"
 			},
 			"dateType": {
 				"singleDate": "Single Date",
