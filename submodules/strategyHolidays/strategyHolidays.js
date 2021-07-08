@@ -908,15 +908,17 @@ define(function(require) {
 					? null
 					: monster.util.dateToEndOfGregorianDay(self.strategyHolidaysGetEndDate(holidayData.endYear, holiday)),
 				holidayRuleConfig = _.merge({
-					end_date: endDate,
 					oldType: holidayData.set ? 'set' : 'rule'
 				}, id && {
-					id: id
+					id: id,
+					end_date: endDate // if it's an existing holiday then always want to set the end_date
 				}, holidayData.isImported && {
 					isImported: holidayData.isImported
 				}, holidayData.type === 'single' && {
 					time_window_start: _.get(holidayData, 'time_window_start', null),
 					time_window_stop: _.get(holidayData, 'time_window_stop', null)
+				}, endDate && {
+					end_date: endDate
 				}),
 				holidayRule = {};
 
