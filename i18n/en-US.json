@@ -971,6 +971,9 @@
 				"description": "Please use the Add holiday or Import Holidays buttons to enter holidays."
 			},
 			"importOfficeHolidays": {
+				"title": "Import Holidays"
+			},
+			"importNationalOfficeHolidays": {
 				"title": "Select National Holidays",
 				"labels": {
 					"selectYourCountry": "Select Your Country",
