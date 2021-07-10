@@ -2282,7 +2282,7 @@ define(function(require) {
 							},
 							deleteAfterNotify: currentUser.extra.deleteAfterNotify,
 							includeMessageOnNotify: _.get(vmbox, 'include_message_on_notify', true),
-							vmToEmailEnabled: currentUser.vm_to_email_enabled
+							vmToEmailEnabled: vmboxActive ? currentUser.vm_to_email_enabled : true
 						}
 					}, _.pick(currentUser, [
 						'email'
