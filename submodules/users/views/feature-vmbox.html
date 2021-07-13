@@ -2,7 +2,7 @@
 	<div class="feature-popup-title">
 		<div class="popup-title">
 			<div class="feature-fa-wrapper">
-				<i class="{{extra.mapFeatures.vmbox.icon}}"></i>
+				<i class="{{feature.icon}}"></i>
 			</div>
 			<div class="feature-title">
 				{{ i18n.users.vmbox.headline }}
@@ -10,25 +10,25 @@
 		</div>
 		<div class="switch popup-action">
 		{{#monsterSwitch}}
-			<input class="switch-state" type="checkbox" id="checkbox_vmbox" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if extra.mapFeatures.vmbox.active}} checked="checked"{{/if}}></input>
+			<input class="switch-state" type="checkbox" id="checkbox_vmbox" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if feature.active}} checked="checked"{{/if}}></input>
 		{{/monsterSwitch}}
 		</div>
 	</div>
 
-	<div class="content{{#unless extra.mapFeatures.vmbox.active}} disabled{{/unless}}">
+	<div class="content{{#unless feature.active}} disabled{{/unless}}">
 		<form id="vmbox_form">
 
 			<div class="main-line">
 				{{i18n.users.vmbox.text}}
 			</div>
 
-			{{#if vmbox.hasTranscribe}}
+			{{#if vmbox.transcription.isEnabled}}
 			<div class="control-group main">
 				<label class="title">
 					{{i18n.users.vmbox.transcribe}}
 				</label>
 				{{#monsterSwitch}}
-					<input type="checkbox" name="transcribe" id="transcribe" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if vmbox.transcribe}} checked="checked"{{/if}}></input>
+					<input type="checkbox" name="transcribe" id="transcribe" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if vmbox.transcription.value}} checked="checked"{{/if}}></input>
 				{{/monsterSwitch}}
 			</div>
 			{{/if}}
@@ -38,15 +38,15 @@
 					{{i18n.users.vmbox.label}}
 				</label>
 				{{#monsterSwitch}}
-					<input type="checkbox" name="vm_to_email_enabled" id="vm_to_email_enabled" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if vm_to_email_enabled}} checked="checked"{{/if}}></input>
+					<input type="checkbox" name="vm_to_email_enabled" id="vm_to_email_enabled" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if vmbox.vmToEmailEnabled}} checked="checked"{{/if}}></input>
 				{{/monsterSwitch}}
 			</div>
 
-			<div class="extra-content{{#unless vm_to_email_enabled}} disabled{{/unless}}">
+			<div class="extra-content{{#unless vmbox.vmToEmailEnabled}} disabled{{/unless}}">
 				<div class="control-group">
 					<label class="fix-left">
 						{{#monsterCheckbox i18n.users.vmbox.deleteAfterNotify}}
-							<input type="checkbox" name="delete_after_notify"{{#if extra.deleteAfterNotify}} checked{{/if}}></input>
+							<input type="checkbox" name="delete_after_notify"{{#if vmbox.deleteAfterNotify}} checked{{/if}}></input>
 						{{/monsterCheckbox}}
 					</label>
 				</div>
@@ -54,7 +54,7 @@
 				<div class="control-group extra">
 					<label class="fix-left">
 						{{#monsterCheckbox i18n.users.vmbox.attachVoicemail}}
-							<input type="checkbox" name="include_message_on_notify" {{#if vmbox.include_message_on_notify}} checked{{/if}}></input>
+							<input type="checkbox" name="include_message_on_notify" {{#if vmbox.includeMessageOnNotify}} checked{{/if}}></input>
 						{{/monsterCheckbox}}
 					</label>
 				</div>

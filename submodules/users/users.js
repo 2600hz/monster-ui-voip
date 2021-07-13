@@ -2265,20 +2265,28 @@ define(function(require) {
 
 		usersRenderVMBox: function(currentUser, vmbox) {
 			var self = this,
-				vmboxActive = currentUser.extra.mapFeatures.vmbox.active,
+				featureData = currentUser.extra.mapFeatures.vmbox,
+				vmboxActive = featureData.active,
 				transcription = monster.util.getCapability('voicemail.transcription'),
-				vm_to_email_enabled = currentUser.vm_to_email_enabled,
-				transcribe = _.get(vmbox, 'transcribe', transcription.defaultValue),
 				featureTemplate = $(self.getTemplate({
 					name: 'feature-vmbox',
-					data: _.merge(currentUser, {
-						vm_to_email_enabled: vm_to_email_enabled,
-						vmbox: _.merge(vmbox, {
-							transcribe: transcribe,
-							hasTranscribe: _.get(transcription, 'isEnabled', false),
-							include_message_on_notify: _.get(vmbox, 'include_message_on_notify', true)
-						})
-					}),
+					data: _.merge({
+						feature: _.pick(featureData, [
+							'active',
+							'icon'
+						]),
+						vmbox: {
+							transcription: {
+								isEnabled: _.get(transcription, 'isEnabled', false),
+								value: _.get(vmbox, 'transcribe', transcription.defaultValue)
+							},
+							deleteAfterNotify: currentUser.extra.deleteAfterNotify,
+							includeMessageOnNotify: _.get(vmbox, 'include_message_on_notify', true),
+							vmToEmailEnabled: vmboxActive ? currentUser.vm_to_email_enabled : true
+						}
+					}, _.pick(currentUser, [
+						'email'
+					])),
 					submodule: 'users'
 				})),
 				switchFeature = featureTemplate.find('.switch-state'),
@@ -2411,7 +2419,7 @@ define(function(require) {
 			});
 
 			var popup = monster.ui.dialog(featureTemplate, {
-				title: currentUser.extra.mapFeatures.vmbox.title,
+				title: featureData.title,
 				position: ['center', 20]
 			});
 		},
