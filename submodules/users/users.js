@@ -4565,35 +4565,45 @@ define(function(require) {
 			});
 		},
 
+		usersIsSmartConference: function(name) {
+			var self = this;
+
+			return _.includes(name, self.appFlags.users.smartPBXConferenceString);
+		},
+
 		usersGetConferenceFeature: function(userId, globalCallback) {
-			var self = this,
-				dataResponse = {
-					conference: {},
-					listConfNumbers: []
-				};
+			var self = this;
 
 			monster.parallel({
-				confNumbers: function(callback) {
+				listConfNumbers: function(callback) {
 					self.usersListConfNumbers(function(numbers) {
 						callback && callback(null, numbers);
 					});
 				},
-				listConferences: function(callback) {
-					self.usersListConferences(userId, function(conferences) {
-						if (conferences.length > 0) {
-							self.usersGetConference(conferences[0].id, function(conference) {
-								callback && callback(null, conference);
-							});
-						} else {
-							callback && callback(null, {});
+				conference: function(callback) {
+					monster.waterfall([
+						function(next) {
+							self.usersListConferences(userId, _.partial(next, null));
+						},
+						function(conferences, next) {
+							var conferenceId = _
+								.chain(conferences)
+								.find(_.flow(
+									_.partial(_.get, _, 'name'),
+									_.bind(self.usersIsSmartConference, self)
+								))
+								.get('id')
+								.value();
+
+							if (!_.isString(conferenceId)) {
+								return next(null, {});
+							}
+							self.usersGetConference(conferenceId, _.partial(next, null));
 						}
-					});
+					], callback);
 				}
 			}, function(err, results) {
-				dataResponse.conference = results.listConferences;
-				dataResponse.listConfNumbers = results.confNumbers;
-
-				globalCallback && globalCallback(dataResponse);
+				globalCallback && globalCallback(results);
 			});
 		},
 
@@ -5257,11 +5267,17 @@ define(function(require) {
 
 			monster.parallel({
 				conferences: function(callback) {
-					self.usersListConferences(userId, function(conferences) {
-						self.usersRemoveBulkConferences(conferences, true, function(results) {
-							callback && callback(null, results);
-						});
-					});
+					monster.waterfall([
+						function(next) {
+							self.usersListConferences(userId, _.partial(next, null));
+						},
+						function(conferences, next) {
+							self.usersRemoveBulkConferences(_.filter(conferences, _.flow(
+								_.partial(_.get, _, 'name'),
+								_.bind(self.usersIsSmartConference, self)
+							)), true, _.partial(next, null));
+						}
+					], callback);
 				},
 				user: function(callback) {
 					self.usersGetUser(userId, function(user) {
