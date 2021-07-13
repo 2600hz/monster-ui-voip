@@ -564,6 +564,15 @@ define(function(require) {
 					}, function(error, results) {
 						self.usersRenderFindMeFollowMe($.extend(true, results, { currentUser: currentUser, saveCallback: featureCallback }));
 					});
+				},
+				isExtension = function(input) {
+					return _
+						.chain(input)
+						.toString()
+						.thru(function(string) {
+							return /\d/.test(string);
+						})
+						.value();
 				};
 
 			setTimeout(function() { template.find('.search-query').focus(); });
@@ -1521,7 +1530,17 @@ define(function(require) {
 							vmboxModule = self.usersExtractDataFromCallflow({
 								callflow: data.callflow,
 								module: 'voicemail'
-							});
+							}),
+							isMissingExtension = _
+								.chain(data)
+								.get('callflow.numbers')
+								.find(isExtension)
+								.isUndefined()
+								.value();
+
+						if (isMissingExtension) {
+							return monster.ui.alert('warning', self.i18n.active().users.vmbox.missingExtension);
+						}
 
 						// Update in-memory vmbox status
 						currentUser.extra.mapFeatures.vmbox.active = !(_.isUndefined(vmboxModule) || _.get(vmboxModule, 'data.skip_module', false));
