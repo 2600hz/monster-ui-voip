@@ -60,15 +60,14 @@
 					{{/each}}
 				{{/select}}
 				</select>
-				<select class="year" data-name="endYear">
-				{{#select holidayData.endYear}}
-					{{#each years as |label|}}
-						<option value="{{label}}">
-							{{label}}
-						</option>
-					{{/each}}
-				{{/select}}
-				</select>
+				<span class="separator">
+					{{i18n.strategy.addEditOfficeHolidays.labels.allDay}}
+				</span>
+				<div class="all-day">
+					{{#monsterSwitch}}
+						<input id="all_day" type="checkbox"></input>
+					{{/monsterSwitch}}
+				</div>
 			</div>
 			<div class="row-fluid advanced">
 				<select class="month from" data-name="fromMonth" >
@@ -131,6 +130,36 @@
 				<select class="day to" data-name="toDay">
 				{{#select holidayData.toDay}}
 					{{#each dates as |label|}}
+						<option value="{{label}}">
+							{{label}}
+						</option>
+					{{/each}}
+				{{/select}}
+				</select>
+			</div>
+		</div>
+		<div class="control-group optional-time show">
+			<label class="control-label">
+				{{i18n.strategy.addEditOfficeHolidays.labels.time}}
+			</label>
+			<div class="row-fluid">
+				<div class="controls">
+					<input type="text" class="start-time">
+				</div>
+				<span class="separator">{{i18n.strategy.holidays.to}}</span>
+				<div class="controls">
+					<input type="text" class="end-time">
+				</div>
+			</div>
+		</div>
+		<div class="control-group optional-year show">
+			<label class="control-label">
+				{{i18n.strategy.addEditOfficeHolidays.labels.year}}
+			</label>
+			<div class="row-fluid">
+				<select class="select-year">
+				{{#select holidayData.endYear}}
+					{{#each years as |label|}}
 						<option value="{{label}}">
 							{{label}}
 						</option>
