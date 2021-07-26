@@ -2284,20 +2284,28 @@ define(function(require) {
 
 		usersRenderVMBox: function(currentUser, vmbox) {
 			var self = this,
-				vmboxActive = currentUser.extra.mapFeatures.vmbox.active,
+				featureData = currentUser.extra.mapFeatures.vmbox,
+				vmboxActive = featureData.active,
 				transcription = monster.util.getCapability('voicemail.transcription'),
-				vm_to_email_enabled = currentUser.vm_to_email_enabled,
-				transcribe = _.get(vmbox, 'transcribe', transcription.defaultValue),
 				featureTemplate = $(self.getTemplate({
 					name: 'feature-vmbox',
-					data: _.merge(currentUser, {
-						vm_to_email_enabled: vm_to_email_enabled,
-						vmbox: _.merge(vmbox, {
-							transcribe: transcribe,
-							hasTranscribe: _.get(transcription, 'isEnabled', false),
-							include_message_on_notify: _.get(vmbox, 'include_message_on_notify', true)
-						})
-					}),
+					data: _.merge({
+						feature: _.pick(featureData, [
+							'active',
+							'icon'
+						]),
+						vmbox: {
+							transcription: {
+								isEnabled: _.get(transcription, 'isEnabled', false),
+								value: _.get(vmbox, 'transcribe', transcription.defaultValue)
+							},
+							deleteAfterNotify: currentUser.extra.deleteAfterNotify,
+							includeMessageOnNotify: _.get(vmbox, 'include_message_on_notify', true),
+							vmToEmailEnabled: vmboxActive ? currentUser.vm_to_email_enabled : true
+						}
+					}, _.pick(currentUser, [
+						'email'
+					])),
 					submodule: 'users'
 				})),
 				switchFeature = featureTemplate.find('.switch-state'),
@@ -2430,7 +2438,7 @@ define(function(require) {
 			});
 
 			var popup = monster.ui.dialog(featureTemplate, {
-				title: currentUser.extra.mapFeatures.vmbox.title,
+				title: featureData.title,
 				position: ['center', 20]
 			});
 		},
@@ -4584,35 +4592,45 @@ define(function(require) {
 			});
 		},
 
+		usersIsSmartConference: function(name) {
+			var self = this;
+
+			return _.includes(name, self.appFlags.users.smartPBXConferenceString);
+		},
+
 		usersGetConferenceFeature: function(userId, globalCallback) {
-			var self = this,
-				dataResponse = {
-					conference: {},
-					listConfNumbers: []
-				};
+			var self = this;
 
 			monster.parallel({
-				confNumbers: function(callback) {
+				listConfNumbers: function(callback) {
 					self.usersListConfNumbers(function(numbers) {
 						callback && callback(null, numbers);
 					});
 				},
-				listConferences: function(callback) {
-					self.usersListConferences(userId, function(conferences) {
-						if (conferences.length > 0) {
-							self.usersGetConference(conferences[0].id, function(conference) {
-								callback && callback(null, conference);
-							});
-						} else {
-							callback && callback(null, {});
+				conference: function(callback) {
+					monster.waterfall([
+						function(next) {
+							self.usersListConferences(userId, _.partial(next, null));
+						},
+						function(conferences, next) {
+							var conferenceId = _
+								.chain(conferences)
+								.find(_.flow(
+									_.partial(_.get, _, 'name'),
+									_.bind(self.usersIsSmartConference, self)
+								))
+								.get('id')
+								.value();
+
+							if (!_.isString(conferenceId)) {
+								return next(null, {});
+							}
+							self.usersGetConference(conferenceId, _.partial(next, null));
 						}
-					});
+					], callback);
 				}
 			}, function(err, results) {
-				dataResponse.conference = results.listConferences;
-				dataResponse.listConfNumbers = results.confNumbers;
-
-				globalCallback && globalCallback(dataResponse);
+				globalCallback && globalCallback(results);
 			});
 		},
 
@@ -5276,11 +5294,17 @@ define(function(require) {
 
 			monster.parallel({
 				conferences: function(callback) {
-					self.usersListConferences(userId, function(conferences) {
-						self.usersRemoveBulkConferences(conferences, true, function(results) {
-							callback && callback(null, results);
-						});
-					});
+					monster.waterfall([
+						function(next) {
+							self.usersListConferences(userId, _.partial(next, null));
+						},
+						function(conferences, next) {
+							self.usersRemoveBulkConferences(_.filter(conferences, _.flow(
+								_.partial(_.get, _, 'name'),
+								_.bind(self.usersIsSmartConference, self)
+							)), true, _.partial(next, null));
+						}
+					], callback);
 				},
 				user: function(callback) {
 					self.usersGetUser(userId, function(user) {
