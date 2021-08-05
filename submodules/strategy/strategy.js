@@ -4171,13 +4171,8 @@ define(function(require) {
 					isChecked = $this.prop('checked'),
 					$singleDateTimeElement = $template.find('.optional-time');
 
-				if (isChecked) {
-					$singleDateTimeElement
-						.removeClass('show');
-				} else {
-					$singleDateTimeElement
-						.addClass('show');
-				}
+				$singleDateTimeElement
+					.toggle('isChecked');
 			});
 
 			$startTimepicker.on('change', function() {
@@ -4189,7 +4184,7 @@ define(function(require) {
 					startSeconds - remainder + timepickerStep
 				);
 
-				if (!_.isNull(endSeconds)) {
+				if (endSeconds) {
 					$endTimepicker.timepicker('setTime', endSeconds);
 				}
 			});
@@ -4213,7 +4208,7 @@ define(function(require) {
 
 				var formData = monster.ui.getFormData('form_add_edit_office_holidays'),
 					$optionDiv = $template.find('.row-fluid.' + formData.type + ' select:not(.hide)'),
-					getSingleEndYear = $template.find('.optional-year.show .select-year').val(),
+					endYear = $template.find('.optional-year.show .select-year').val(),
 					getSingleStartTime = $template.find('.optional-time.show .start-time').val(),
 					holidayId = _.get(holidayRule, 'holidayData.id'),
 					nameLength = formData.name.length,
@@ -4225,8 +4220,8 @@ define(function(require) {
 						id: holidayId
 					}, isSet && {
 						set: true
-					}, getSingleEndYear && {
-						endYear: parseInt(getSingleEndYear)
+					}, endYear && {
+						endYear: parseInt(endYear)
 					}, getSingleStartTime && {
 						time_window_start: $startTimepicker.timepicker('getSecondsFromMidnight'),
 						time_window_stop: $endTimepicker.timepicker('getSecondsFromMidnight')
