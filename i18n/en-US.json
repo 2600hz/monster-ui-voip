@@ -712,6 +712,7 @@
 			}
 		},
 		"vmbox": {
+			"missingExtension": "You need to add an extension in order to enable the Voicemail Box",
 			"deleteAfterNotify": "Delete messages from database after sending the notification.",
 			"headline": "User Voicemail Box",
 			"text": "A voicemail box will be available for this user.",
@@ -974,6 +975,9 @@
 				"description": "Please use the Add holiday or Import Holidays buttons to enter holidays."
 			},
 			"importOfficeHolidays": {
+				"title": "Import Holidays"
+			},
+			"importNationalOfficeHolidays": {
 				"title": "Select National Holidays",
 				"labels": {
 					"selectYourCountry": "Select Your Country",

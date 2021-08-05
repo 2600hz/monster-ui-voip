@@ -251,7 +251,7 @@ define(function(require) {
 				})),
 				popup = monster.ui.dialog($template, {
 					autoScroll: false,
-					title: self.i18n.active().strategy.holidays.importOfficeHolidays.title
+					title: self.i18n.active().strategy.holidays.importNationalOfficeHolidays.title
 				});
 
 			self.strategyHolidaysUpdateNationHolidaysRender(parent, $template, data.holidays);
