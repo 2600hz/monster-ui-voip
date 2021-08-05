@@ -87,6 +87,7 @@
 
 				.separator {
 					margin-right: 1rem;
+					flex-shrink: 0;
 				}
 
 				&.date-range .date {
@@ -96,6 +97,39 @@
 				&.selected {
 					display: flex;
 				}
+
+				.select-year {
+					width: 50%;
+				}
+
+				.day.from {
+					margin-right: 2rem;
+				}
+
+				.controls {
+					width: 30%;
+					margin: 0 12px 0 0;
+					height: 36px;
+
+					input {
+						width: 90%;
+						margin: unset;
+						height: 25px;
+					}
+				}
+			}
+
+		}
+
+		.optional-time, .optional-year {
+			display: none;
+
+			&.show {
+				display: block;
+			}
+
+			.row-fluid {
+				display: flex;
 			}
 		}
 

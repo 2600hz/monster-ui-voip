@@ -682,18 +682,22 @@ define(function(require) {
 
 			_.forEach(_.get(strategyData.temporalRules, 'holidays', {}), function(val, key) {
 				var endDate = val.hasOwnProperty('viewData')
-					? _.get(val, 'viewData.end_date')
-					: _.get(val, 'end_date');
+						? _.get(val, 'viewData.end_date')
+						: _.get(val, 'end_date'),
+					startTime = _.get(val, 'time_window_start');
 
 				if (val.id in strategyData.callflows.MainCallflow.flow.children) {
 					var holidayType,
-						holidayData = {
+						holidayData = _.merge({
 							id: val.id,
 							name: val.name,
 							fromMonth: val.month,
 							recurring: true,
 							isImported: _.get(val, 'isImported', false)
-						};
+						}, startTime && {
+							time_window_start: startTime,
+							time_window_stop: _.get(val, 'time_window_stop')
+						});
 
 					if (val.hasOwnProperty('ordinal')) {
 						holidayType = 'advanced';
@@ -903,12 +907,17 @@ define(function(require) {
 					? null
 					: monster.util.dateToEndOfGregorianDay(self.strategyHolidaysGetEndDate(holidayData.endYear, holiday)),
 				holidayRuleConfig = _.merge({
-					end_date: endDate,
 					oldType: holidayData.set ? 'set' : 'rule'
 				}, id && {
-					id: id
+					id: id,
+					end_date: endDate // if it's an existing holiday then always want to set the end_date
 				}, holidayData.isImported && {
 					isImported: holidayData.isImported
+				}, holidayData.type === 'single' && _.pick(holidayData, [
+					'time_window_start',
+					'time_window_stop'
+				]), endDate && {
+					end_date: endDate
 				}),
 				holidayRule = {};
 
