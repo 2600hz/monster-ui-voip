@@ -542,6 +542,45 @@ define(function(require) {
 			});
 		},
 
+		strategySetupEmergencyCID: function(number) {
+			var self = this;
+
+			monster.waterfall([
+				function(cb) {
+					self.strategyGetNumber(number, function(numberData) {
+						cb(null, numberData);
+					});
+				},
+				function(numberData, cb) {
+					var isE911Enabled = _.chain(numberData).get('features').includes('e911').value();
+
+					if (isE911Enabled) {
+						self.strategyChangeCallerId({
+							callerIdType: 'emergency',
+							number: number,
+							success: function() {
+								monster.ui.toast({
+									type: 'success',
+									message: self.getTemplate({
+										name: '!' + self.i18n.active().strategy.updateCallerIdDialog.success.emergency,
+										data: {
+											number: monster.util.formatPhoneNumber(number)
+										}
+									})
+								});
+
+								cb(null);
+							}
+						});
+
+						return;
+					}
+
+					cb(null);
+				}
+			]);
+		},
+
 		/**
 		 * Check if it is necessary to update the emergency caller ID for the account
 		 * @param  {Object}   args
@@ -1058,6 +1097,7 @@ define(function(require) {
 		strategyNumbersBindEvents: function(container, strategyData) {
 			var self = this,
 				addNumbersToMainCallflow = function(numbers) {
+					var newNumberId = _.head(numbers);
 					if (_.isEmpty(numbers)) {
 						return;
 					}
@@ -1072,14 +1112,21 @@ define(function(require) {
 					mainCallflow.numbers = mainCallflow.numbers.concat(numbers);
 
 					self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
+						var callFlowNumbers = self.strategyExtractMainNumbers({
+								mainCallflow: updatedCallflow
+							}),
+							hasEmergencyCID = _.chain(monster.apps.auth.currentAccount).get('caller_id.emergency.number').isEmpty().value();
+
 						strategyData.callflows.MainCallflow = updatedCallflow;
 						refreshNumbersTemplate();
 
 						self.strategyCheckIfSetExternalCallerID({
-							numbers: self.strategyExtractMainNumbers({
-								mainCallflow: updatedCallflow
-							})
+							numbers: callFlowNumbers
 						});
+
+						if (hasEmergencyCID) {
+							self.strategySetupEmergencyCID(newNumberId);
+						}
 					});
 				},
 				refreshNumbersTemplate = function() {
