@@ -1115,7 +1115,8 @@ define(function(require) {
 						var callFlowNumbers = self.strategyExtractMainNumbers({
 								mainCallflow: updatedCallflow
 							}),
-							hasEmergencyCID = _.chain(monster.apps.auth.currentAccount).get('caller_id.emergency.number').isEmpty().value();
+							hasEmergencyCID = _.chain(monster.apps.auth.currentAccount).get('caller_id.emergency.number').isEmpty().value(),
+							hasExternalCID = _.chain(monster.apps.auth.currentAccount).get('caller_id.external.number').isEmpty().value();
 
 						strategyData.callflows.MainCallflow = updatedCallflow;
 						refreshNumbersTemplate();
@@ -1124,7 +1125,7 @@ define(function(require) {
 							numbers: callFlowNumbers
 						});
 
-						if (hasEmergencyCID) {
+						if (hasEmergencyCID && hasExternalCID) {
 							self.strategySetupEmergencyCID(newNumberId);
 						}
 					});
