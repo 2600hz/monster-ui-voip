@@ -1,6 +1,7 @@
 ---
 name: monster-ui-application-voip
 base_branch: 'origin/5.0'
+exposure: private
 metapackage:
   - name: meta-monster-ui
     branch: '5.0'
