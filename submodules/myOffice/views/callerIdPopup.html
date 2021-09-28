@@ -1,20 +1,17 @@
 <div id="my_office_caller_id_popup" class="monster-feature-popup-container">
 	<div class="content-wrapper">
-		<div class="content">
-			<div>
-				{{ i18n.myOffice.callerId.numberLabel }}
-				<select class="caller-id-select">
-					<option{{#compare selectedMainNumber "===" "none"}} selected{{/compare}} value="">None</option>
-					{{#each mainNumbers}}
-						<option{{#compare ../selectedMainNumber "===" this.number}} selected{{/compare}} value="{{this.number}}">{{formatPhoneNumber this.number}}</option>
-					{{/each}}
-				</select>
+		<form class="content form-horizontal">
+			<div class="control-group">
+				<label class="control-label">
+					{{ i18n.myOffice.callerId.numberLabel }}
+				</label>
+				<div class="controls caller-id-select-target"></div>
 			</div>
 
 			{{#monsterText}}
 				{{ i18n.myOffice.callerId.numberHelp }}
 			{{/monsterText}}
-		</div>
+		</form>
 
 		<div class="content number-feature" data-feature="cnam">
 			<div>
