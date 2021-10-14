@@ -870,9 +870,10 @@ define(function(require) {
 			var self = this,
 				parent = args.parent,
 				myOfficeData = args.myOfficeData,
-				selectedMainNumber = 'caller_id' in myOfficeData.account && 'external' in myOfficeData.account.caller_id ? myOfficeData.account.caller_id.external.number || 'none' : 'none',
 				templateData = {
-					isE911Enabled: monster.util.isNumberFeatureEnabled('e911')
+					isE911Enabled: monster.util.isNumberFeatureEnabled('e911'),
+					mainNumbers: myOfficeData.mainNumbers,
+					selectedMainNumber: 'caller_id' in myOfficeData.account && 'external' in myOfficeData.account.caller_id ? myOfficeData.account.caller_id.external.number || 'none' : 'none'
 				},
 				popupTemplate = $(self.getTemplate({
 					name: 'callerIdPopup',
@@ -885,64 +886,42 @@ define(function(require) {
 					position: ['center', 20]
 				});
 
-			monster.waterfall([
-				function(next) {
-					self.callApi({
-						resource: 'externalNumbers.list',
-						data: {
-							accountId: self.accountId
-						},
-						success: _.flow(
-							_.partial(_.get, _, 'data'),
-							_.partial(next, null)
-						),
-						error: _.partial(_.ary(next, 2), null, [])
-					});
-				}
-			], function(err, cidNumbers) {
-				if (monster.util.isNumberFeatureEnabled('e911')) {
-					var e911Form = popupTemplate.find('#emergency_form');
+			if (monster.util.isNumberFeatureEnabled('e911')) {
+				var e911Form = popupTemplate.find('#emergency_form');
 
-					monster.ui.validate(e911Form, {
-						rules: {
-							notification_contact_emails: {
-								listOf: 'email'
-							}
-						},
-						messages: {
-							'postal_code': {
-								required: '*'
-							},
-							'street_address': {
-								required: '*'
-							},
-							'locality': {
-								required: '*'
-							},
-							'region': {
-								required: '*'
-							},
-							notification_contact_emails: {
-								regex: self.i18n.active().myOffice.callerId.emergencyEmailError
-							}
+				monster.ui.validate(e911Form, {
+					rules: {
+						notification_contact_emails: {
+							listOf: 'email'
 						}
-					});
-
-					monster.ui.valid(e911Form);
-				}
-
-				monster.ui.cidNumberSelector(popupTemplate.find('.caller-id-select-target'), {
-					selected: selectedMainNumber,
-					cidNumbers: cidNumbers,
-					phoneNumbers: myOfficeData.mainNumbers
+					},
+					messages: {
+						'postal_code': {
+							required: '*'
+						},
+						'street_address': {
+							required: '*'
+						},
+						'locality': {
+							required: '*'
+						},
+						'region': {
+							required: '*'
+						},
+						notification_contact_emails: {
+							regex: self.i18n.active().myOffice.callerId.emergencyEmailError
+						}
+					}
 				});
 
-				self.myOfficeCallerIdPopupBindEvents({
-					parent: parent,
-					popupTemplate: popupTemplate,
-					popup: popup,
-					account: myOfficeData.account
-				});
+				monster.ui.valid(e911Form);
+			}
+
+			self.myOfficeCallerIdPopupBindEvents({
+				parent: parent,
+				popupTemplate: popupTemplate,
+				popup: popup,
+				account: myOfficeData.account
 			});
 		},
 
@@ -952,7 +931,7 @@ define(function(require) {
 				popupTemplate = args.popupTemplate,
 				popup = args.popup,
 				account = args.account,
-				callerIdNumberSelect = popupTemplate.find('.caller-id-select-target select'),
+				callerIdNumberSelect = popupTemplate.find('.caller-id-select'),
 				callerIdNameInput = popupTemplate.find('.caller-id-name'),
 				emergencyZipcodeInput = popupTemplate.find('.caller-id-emergency-zipcode'),
 				emergencyAddress1Input = popupTemplate.find('.caller-id-emergency-address1'),
@@ -970,8 +949,6 @@ define(function(require) {
 
 							self.myOfficeGetNumber(number, function(numberData) {
 								waterfallCallback(null, numberData);
-							}, function() {
-								waterfallCallback(null, {});
 							});
 						},
 						function getAllowedFeatures(numberData, waterfallCallback) {
@@ -1124,8 +1101,6 @@ define(function(require) {
 							self.myOfficeUpdateNumber(numberData, function(data) {
 								updateAccount();
 							});
-						}, function() {
-							updateAccount();
 						});
 					},
 					e911Form;
@@ -1227,7 +1202,6 @@ define(function(require) {
 			self.callApi({
 				resource: 'numbers.get',
 				data: {
-					generateError: false,
 					accountId: self.accountId,
 					phoneNumber: number
 				},
