@@ -385,7 +385,11 @@ define(function(require) {
 						hangupI18n = self.i18n.active().hangupCauses,
 						isOutboundCall = 'authorizing_id' in cdr && cdr.authorizing_id.length > 0,
 						fromNumber = cdr.caller_id_number || cdr.from.replace(/@.*/, ''),
-						toNumber = cdr.callee_id_number || ('request' in cdr) ? cdr.request.replace(/@.*/, '') : cdr.to.replace(/@.*/, ''),
+						toNumber = cdr.callee_id_number || _
+							.chain(cdr)
+							.get('request', cdr.to)
+							.replace(/@.*/, '')
+							.value(),
 						device = _.get(self.appFlags.callLogs.devices, _.get(cdr, 'custom_channel_vars.authorizing_id'));
 
 					return _.merge({
