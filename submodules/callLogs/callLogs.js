@@ -384,11 +384,12 @@ define(function(require) {
 						durationSec = (cdr.duration_seconds % 60 < 10 ? '0' : '') + (cdr.duration_seconds % 60),
 						hangupI18n = self.i18n.active().hangupCauses,
 						isOutboundCall = 'authorizing_id' in cdr && cdr.authorizing_id.length > 0,
-						fromNumber = cdr.caller_id_number || cdr.from.replace(/@.*/, ''),
+						extractSipDestination = _.partial(_.replace, _, /@.*/, ''),
+						fromNumber = cdr.caller_id_number || extractSipDestination(cdr.from),
 						toNumber = cdr.callee_id_number || _
 							.chain(cdr)
 							.get('request', cdr.to)
-							.replace(/@.*/, '')
+							.thru(extractSipDestination)
 							.value(),
 						device = _.get(self.appFlags.callLogs.devices, _.get(cdr, 'custom_channel_vars.authorizing_id'));
 
