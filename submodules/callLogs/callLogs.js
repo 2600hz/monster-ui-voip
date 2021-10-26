@@ -384,6 +384,8 @@ define(function(require) {
 						durationSec = (cdr.duration_seconds % 60 < 10 ? '0' : '') + (cdr.duration_seconds % 60),
 						hangupI18n = self.i18n.active().hangupCauses,
 						isOutboundCall = 'authorizing_id' in cdr && cdr.authorizing_id.length > 0,
+						fromNumber = cdr.caller_id_number || cdr.from.replace(/@.*/, ''),
+						toNumber = cdr.callee_id_number || ('request' in cdr) ? cdr.request.replace(/@.*/, '') : cdr.to.replace(/@.*/, ''),
 						device = _.get(self.appFlags.callLogs.devices, _.get(cdr, 'custom_channel_vars.authorizing_id'));
 
 					return _.merge({
@@ -393,9 +395,9 @@ define(function(require) {
 						date: shortDate,
 						time: time,
 						fromName: cdr.caller_id_name,
-						fromNumber: cdr.caller_id_number || cdr.from.replace(/@.*/, ''),
+						fromNumber: fromNumber,
 						toName: cdr.callee_id_name,
-						toNumber: cdr.callee_id_number || ('request' in cdr) ? cdr.request.replace(/@.*/, '') : cdr.to.replace(/@.*/, ''),
+						toNumber: toNumber,
 						duration: durationMin + ':' + durationSec,
 						hangupCause: _
 							.chain(hangupI18n)
@@ -411,9 +413,9 @@ define(function(require) {
 								+ '%0D%0A____________________________________________________________%0D%0A'
 								+ '%0D%0AAccount ID: ' + self.accountId
 								+ '%0D%0AFrom (Name): ' + (cdr.caller_id_name || '')
-								+ '%0D%0AFrom (Number): ' + (cdr.caller_id_number || cdr.from.replace(/@.*/, ''))
+								+ '%0D%0AFrom (Number): ' + fromNumber
 								+ '%0D%0ATo (Name): ' + (cdr.callee_id_name || '')
-								+ '%0D%0ATo (Number): ' + (cdr.callee_id_number || ('request' in cdr) ? cdr.request.replace(/@.*/, '') : cdr.to.replace(/@.*/, ''))
+								+ '%0D%0ATo (Number): ' + toNumber
 								+ '%0D%0ADate: ' + shortDate
 								+ '%0D%0ADuration: ' + durationMin + ':' + durationSec
 								+ '%0D%0AHangup Cause: ' + (cdr.hangup_cause || '')
