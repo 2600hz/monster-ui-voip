@@ -2144,7 +2144,6 @@ define(function(require) {
 			monster.pub('common.numberSelector.render', {
 				container: featureTemplate.find('.number-select'),
 				inputName: 'caller_id',
-				noCallerId: false,
 				number: data.hasOwnProperty('faxbox') ? data.faxbox.caller_id : undefined
 			});
 
