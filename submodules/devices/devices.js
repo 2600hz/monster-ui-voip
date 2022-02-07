@@ -41,7 +41,8 @@ define(function(require) {
 					sip_device: 'icon-telicon-voip-phone',
 					sip_uri: 'icon-telicon-voip-phone',
 					smartphone: 'icon-telicon-mobile-phone',
-					softphone: 'icon-telicon-soft-phone'
+					softphone: 'icon-telicon-soft-phone',
+					ms_teams: 'icon-telicon-soft-phone'
 				},
 				/**
 				 * Lists device types allowed to be added by devicesRenderAdd.
@@ -53,6 +54,7 @@ define(function(require) {
 					'cellphone',
 					'smartphone',
 					'softphone',
+					'ms_teams',
 					'landline',
 					'fax',
 					'ata',
@@ -71,7 +73,8 @@ define(function(require) {
 					'sip_device',
 					'sip_uri',
 					'smartphone',
-					'softphone'
+					'softphone',
+					'ms_teams'
 				],
 				provisionerConfigFlags: monster.config.whitelabel.provisioner
 			}
@@ -533,11 +536,11 @@ define(function(require) {
 				ignore: '' // Do not ignore hidden fields
 			});
 
-			if ($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone', 'sip_uri', 'fax', 'ata']) > -1) {
+			if ($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone', 'ms_teams', 'sip_uri', 'fax', 'ata']) > -1) {
 				var audioCodecs = monster.ui.codecSelector('audio', templateDevice.find('#audio_codec_selector'), data.media.audio.codecs);
 			}
 
-			if ($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone', 'sip_uri']) > -1) {
+			if ($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone', 'ms_teams', 'sip_uri']) > -1) {
 				var videoCodecs = monster.ui.codecSelector('video', templateDevice.find('#video_codec_selector'), data.media.video.codecs);
 			}
 
@@ -769,9 +772,9 @@ define(function(require) {
 
 		devicesMergeData: function(originalData, template, audioCodecs, videoCodecs) {
 			var self = this,
-				hasCodecs = $.inArray(originalData.device_type, ['sip_device', 'landline', 'fax', 'ata', 'softphone', 'smartphone', 'mobile', 'sip_uri']) > -1,
+				hasCodecs = $.inArray(originalData.device_type, ['sip_device', 'landline', 'fax', 'ata', 'softphone', 'ms_teams', 'smartphone', 'mobile', 'sip_uri']) > -1,
 				hasCallForward = $.inArray(originalData.device_type, ['landline', 'cellphone', 'smartphone']) > -1,
-				hasRTP = $.inArray(originalData.device_type, ['sip_device', 'mobile', 'softphone']) > -1,
+				hasRTP = $.inArray(originalData.device_type, ['sip_device', 'mobile', 'softphone', 'ms_teams']) > -1,
 				formData = monster.ui.getFormData('form_device'),
 				isValuePropertyEmpty = function(data, property) {
 					return _
@@ -1218,7 +1221,8 @@ define(function(require) {
 						]))
 					},
 					smartphone: _.merge({}, sipSettings, callForwardSettings),
-					softphone: _.merge({}, sipSettings)
+					softphone: _.merge({}, sipSettings),
+					ms_teams: _.merge({}, sipSettings)
 				};
 
 			return _.get(defaultsPerType, type, {});

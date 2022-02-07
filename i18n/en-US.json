@@ -432,6 +432,12 @@
 			"new": "New Softphone",
 			"deviceName": "Device Name"
 		},
+		"ms_teams": {
+			"addTitle": "Adding an MS Teams",
+			"editTitle": "Editing MS Teams: {{name}}",
+			"new": "New MS Teams",
+			"deviceName": "Device Name"
+		},
 		"ata": {
 			"addTitle": "Adding an ATA",
 			"editTitle": "Editing ATA: {{name}}",
@@ -459,6 +465,7 @@
 			"smartphone": "Smartphone",
 			"mobile": "Business Mobile",
 			"softphone": "Soft Phone",
+			"ms_teams": "MS Teams",
 			"landline": "Landline",
 			"fax": "Fax",
 			"ata": "ATA",
