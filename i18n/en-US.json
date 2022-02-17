@@ -1256,7 +1256,7 @@
 			"title": "Company Caller ID",
 			"headline": "Select a Caller ID Number for the Account",
 			"numberLabel": "Company Caller ID number",
-			"numberHelp": "This number will appear as your Caller ID when you make outbound calls.",
+			"numberHelp": "This number will appear as your Caller ID when you make outbound calls. Needs to be shorter than 15 characters (including spaces).",
 			"nameLabel": "Company Caller ID name",
 			"nameHelp": "This name will appear as your Caller ID when you make outbound calls.",
 			"emergencyLabel": "Company Emergency (E911) Information",
