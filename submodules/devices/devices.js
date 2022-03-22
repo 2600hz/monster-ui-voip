@@ -7,6 +7,10 @@ define(function(require) {
 		return _.every([dest, src], _.isArray) ? src : undefined;
 	};
 
+	var showTeammateDevice = monster.config.hasOwnProperty('extraDevices')
+		&& monster.config.extraDevices.length
+		&& $.inArray('teammate', monster.config.extraDevices) > -1;
+
 	var app = {
 
 		requests: {
@@ -58,7 +62,7 @@ define(function(require) {
 					'fax',
 					'ata',
 					'sip_uri',
-					'teammate'
+					showTeammateDevice ? 'teammate' : undefined
 				],
 				/**
 				 * Lists device types allowed to be edited by devicesRenderEdit.
@@ -74,7 +78,7 @@ define(function(require) {
 					'sip_uri',
 					'smartphone',
 					'softphone',
-					'teammate'
+					showTeammateDevice ? 'teammate' : undefined
 				],
 				provisionerConfigFlags: monster.config.whitelabel.provisioner
 			}
