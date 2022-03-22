@@ -32,16 +32,17 @@ define(function(require) {
 		appFlags: {
 			devices: {
 				iconClassesByDeviceTypes: {
-					application: 'icon-telicon-apps',
-					ata: 'icon-telicon-ata',
-					cellphone: 'fa fa-phone',
-					fax: 'icon-telicon-fax',
-					landline: 'icon-telicon-home',
-					mobile: 'icon-telicon-sprint-phone',
-					sip_device: 'icon-telicon-voip-phone',
-					sip_uri: 'icon-telicon-voip-phone',
-					smartphone: 'icon-telicon-mobile-phone',
-					softphone: 'icon-telicon-soft-phone'
+					application: 'apps',
+					ata: 'device-ata',
+					cellphone: 'phone',
+					fax: 'device-fax',
+					landline: 'home',
+					mobile: 'device-sprint-phone',
+					sip_device: 'device-voip-phone',
+					sip_uri: 'device-voip-phone',
+					smartphone: 'device-mobile',
+					softphone: 'device-soft-phone',
+					teammate: 'device-mst'
 				},
 				/**
 				 * Lists device types allowed to be added by devicesRenderAdd.
@@ -56,7 +57,8 @@ define(function(require) {
 					'landline',
 					'fax',
 					'ata',
-					'sip_uri'
+					'sip_uri',
+					'teammate'
 				],
 				/**
 				 * Lists device types allowed to be edited by devicesRenderEdit.
@@ -71,7 +73,8 @@ define(function(require) {
 					'sip_device',
 					'sip_uri',
 					'smartphone',
-					'softphone'
+					'softphone',
+					'teammate'
 				],
 				provisionerConfigFlags: monster.config.whitelabel.provisioner
 			}
@@ -1218,7 +1221,19 @@ define(function(require) {
 						]))
 					},
 					smartphone: _.merge({}, sipSettings, callForwardSettings),
-					softphone: _.merge({}, sipSettings)
+					softphone: _.merge({}, sipSettings),
+					teammate: _.merge({
+						media: {
+							encryption: {
+								enforce_security: true,
+								webrtc: false,
+								methods: ['srtp']
+							},
+							audio: {
+								codecs: ['PCMU', 'PCMA']
+							}
+						}
+					}, sipSettings)
 				};
 
 			return _.get(defaultsPerType, type, {});

@@ -433,7 +433,8 @@ define(function(require) {
 					'landline',
 					'fax',
 					'ata',
-					'application'
+					'application',
+					'teammate'
 				],
 				userCountByServicePlanRole = _
 					.chain(data.users)
