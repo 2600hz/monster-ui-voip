@@ -4,6 +4,12 @@ define(function(require) {
 		monster = require('monster'),
 		timezone = require('monster-timezone');
 
+	var showTeammateDevice = _
+		.chain(monster.config)
+		.get('allowedExtraDeviceTypes', [])
+		.includes('teammate')
+		.value();
+
 	var app = {
 
 		requests: {
@@ -28,16 +34,17 @@ define(function(require) {
 		},
 
 		deviceIcons: {
-			'cellphone': 'fa fa-phone',
-			'smartphone': 'icon-telicon-mobile-phone',
-			'landline': 'icon-telicon-home',
-			'mobile': 'icon-telicon-sprint-phone',
-			'softphone': 'icon-telicon-soft-phone',
-			'sip_device': 'icon-telicon-voip-phone',
-			'sip_uri': 'icon-telicon-voip-phone',
-			'fax': 'icon-telicon-fax',
-			'ata': 'icon-telicon-ata',
-			'application': 'icon-telicon-apps'
+			'cellphone': 'phone',
+			'smartphone': 'device-mobile',
+			'landline': 'home',
+			'mobile': 'device-sprint-phone',
+			'softphone': 'device-soft-phone',
+			'sip_device': 'device-voip-phone',
+			'sip_uri': 'device-voip-phone',
+			'fax': 'device-fax',
+			'ata': 'device-ata',
+			'application': 'apps',
+			'teammate': 'device-mst'
 		},
 
 		/* Users */
@@ -3692,7 +3699,9 @@ define(function(require) {
 
 				template = $(self.getTemplate({
 					name: 'devices',
-					data: formattedResults,
+					data: _.merge({
+						showTeammateDevice: showTeammateDevice
+					}, formattedResults),
 					submodule: 'users'
 				}));
 
