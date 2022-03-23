@@ -4,9 +4,11 @@ define(function(require) {
 		monster = require('monster'),
 		timezone = require('monster-timezone');
 
-	var showTeammateDevice = monster.config.hasOwnProperty('extraDevices')
-		&& monster.config.extraDevices.length
-		&& $.inArray('teammate', monster.config.extraDevices) > -1;
+	var showTeammateDevice = _
+		.chain(monster.config)
+		.get('allowedExtraDeviceTypes', [])
+		.includes('teammate')
+		.value();
 
 	var app = {
 
@@ -3697,7 +3699,9 @@ define(function(require) {
 
 				template = $(self.getTemplate({
 					name: 'devices',
-					data: formattedResults,
+					data: _.merge({
+						showTeammateDevice: showTeammateDevice
+					}, formattedResults),
 					submodule: 'users'
 				}));
 
@@ -3767,8 +3771,7 @@ define(function(require) {
 				emptyAssigned: _.isEmpty(assigned),
 				emptySpare: _.isEmpty(unassigned),
 				assignedDevices: _.keyBy(assigned, 'id'),
-				unassignedDevices: _.keyBy(unassigned, 'id'),
-				showTeammateDevice: showTeammateDevice
+				unassignedDevices: _.keyBy(unassigned, 'id')
 			};
 		},
 

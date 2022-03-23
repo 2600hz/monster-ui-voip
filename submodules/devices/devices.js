@@ -7,9 +7,11 @@ define(function(require) {
 		return _.every([dest, src], _.isArray) ? src : undefined;
 	};
 
-	var showTeammateDevice = monster.config.hasOwnProperty('extraDevices')
-		&& monster.config.extraDevices.length
-		&& $.inArray('teammate', monster.config.extraDevices) > -1;
+	var showTeammateDevice = _
+		.chain(monster.config)
+		.get('allowedExtraDeviceTypes', [])
+		.includes('teammate')
+		.value();
 
 	var app = {
 
@@ -53,7 +55,7 @@ define(function(require) {
 				 * The order is important and controls the list rendered in DOM.
 				 * @type {Array}
 				 */
-				addableDeviceTypes: [
+				addableDeviceTypes: _.flatten([[
 					'sip_device',
 					'cellphone',
 					'smartphone',
@@ -61,14 +63,15 @@ define(function(require) {
 					'landline',
 					'fax',
 					'ata',
-					'sip_uri',
-					showTeammateDevice ? 'teammate' : undefined
-				],
+					'sip_uri'
+				], showTeammateDevice ? [
+					'teammate'
+				] : []]),
 				/**
 				 * Lists device types allowed to be edited by devicesRenderEdit.
 				 * @type {Array}
 				 */
-				editableDeviceTypes: [
+				editableDeviceTypes: _.flatten([[
 					'ata',
 					'cellphone',
 					'fax',
@@ -77,9 +80,11 @@ define(function(require) {
 					'sip_device',
 					'sip_uri',
 					'smartphone',
-					'softphone',
-					showTeammateDevice ? 'teammate' : undefined
+					'softphone'
 				],
+				showTeammateDevice ? [
+					'teammate'
+				] : []]),
 				provisionerConfigFlags: monster.config.whitelabel.provisioner
 			}
 		},
