@@ -14,7 +14,9 @@
 			{{#each deviceTypesToAdd}}
 				<li>
 					<a class="create-device" data-type="{{type}}">
-						<i class="{{icon}}"></i>
+						<i>
+							{{telicon icon}}
+						</i>
 						{{tryI18n @root.i18n.devices.types type}}
 					</a>
 				</li>
