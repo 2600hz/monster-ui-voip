@@ -16,3 +16,9 @@ package:
     group: Productivity/Telephony
     url: http://www.2600hz.org/
     vendor: 2600Hz
+app_exchange:
+  type: monster-ui-application
+  core_app:
+    name: monsterui_core
+  name: monsterui_voip
+  dependencies: []
