@@ -1234,10 +1234,16 @@ define(function(require) {
 					smartphone: _.merge({}, sipSettings, callForwardSettings),
 					softphone: _.merge({}, sipSettings),
 					teammate: _.merge({
+						caller_id_options: {
+							outbound_privacy: "none"
+						},
+						sip: _.merge({
+							ignore_completed_elsewhere: false,
+						}, _.pick(sipSettings.sip, ['password', 'username'])),
 						media: {
+							webrtc: false,
 							encryption: {
 								enforce_security: true,
-								webrtc: false,
 								methods: ['srtp']
 							},
 							audio: {
