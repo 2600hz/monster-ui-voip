@@ -432,6 +432,12 @@
 			"new": "New Softphone",
 			"deviceName": "Device Name"
 		},
+		"teammate": {
+			"addTitle": "Adding a TeamMate Device",
+			"editTitle": "Editing TeamMate Device: {{name}}",
+			"new": "New TeamMate Device",
+			"deviceName": "Device Name"
+		},
 		"ata": {
 			"addTitle": "Adding an ATA",
 			"editTitle": "Editing ATA: {{name}}",
@@ -459,6 +465,7 @@
 			"smartphone": "Smartphone",
 			"mobile": "Business Mobile",
 			"softphone": "Soft Phone",
+			"teammate": "TeamMate",
 			"landline": "Landline",
 			"fax": "Fax",
 			"ata": "ATA",
@@ -712,6 +719,7 @@
 			}
 		},
 		"vmbox": {
+			"missingExtension": "You need to add an extension in order to enable the Voicemail Box",
 			"deleteAfterNotify": "Delete messages from database after sending the notification.",
 			"headline": "User Voicemail Box",
 			"text": "A voicemail box will be available for this user.",
@@ -834,7 +842,10 @@
 				"name": "Holiday Name",
 				"dateType": "Date Type",
 				"date": "Date",
-				"recurringAnnually": "Recurring Annually"
+				"recurringAnnually": "Recurring Annually",
+				"allDay": "All Day",
+				"year": "Year",
+				"time": "Time"
 			},
 			"dateType": {
 				"singleDate": "Single Date",
@@ -971,8 +982,17 @@
 				"description": "Please use the Add holiday or Import Holidays buttons to enter holidays."
 			},
 			"importOfficeHolidays": {
-				"title": "Import Office Holidays",
-				"dataLabel": "holidays"
+				"title": "Import Holidays"
+			},
+			"importNationalOfficeHolidays": {
+				"title": "Select National Holidays",
+				"labels": {
+					"selectYourCountry": "Select Your Country",
+					"description": "Select holidays when your office will be closed",
+					"includeObservedDates": "Include Observed Dates",
+					"selectHolidays": "Select Holidays",
+					"holiday": "holiday"
+				}
 			},
 			"dialogs": {
 				"delete": {

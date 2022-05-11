@@ -831,8 +831,13 @@
 	&[data-feature="caller_id"] {
 		width: 525px;
 
-		.caller-id-select {
-			margin-top: 5px;
+		.control-wrapper {
+			display: flex;
+			align-items: center;
+
+			.caller-id-select-target {
+				margin-left: 10px;
+			}
 		}
 	}
 

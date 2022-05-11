@@ -46,18 +46,15 @@
 	}
 }
 
-#form_add_edit_office_holidays {
+#form_add_edit_office_holidays, #form_national_holidays {
 	display: flex;
 	flex-direction: column;
 	margin: 0;
 	max-height: inherit;
 	width: 398px;
 
-	#date_type, .form-control {
-		width: 100%;
-	}
-
 	select, .form-control {
+		width: 100%;
 		height: 36px;
 		border-radius: 2px;
 		box-sizing: border-box;
@@ -90,6 +87,7 @@
 
 				.separator {
 					margin-right: 1rem;
+					flex-shrink: 0;
 				}
 
 				&.date-range .date {
@@ -99,6 +97,39 @@
 				&.selected {
 					display: flex;
 				}
+
+				.select-year {
+					width: 50%;
+				}
+
+				.day.from {
+					margin-right: 2rem;
+				}
+
+				.controls {
+					width: 30%;
+					margin: 0 12px 0 0;
+					height: 36px;
+
+					input {
+						width: 90%;
+						margin: unset;
+						height: 25px;
+					}
+				}
+			}
+
+		}
+
+		.optional-time, .optional-year {
+			display: none;
+
+			&.show {
+				display: block;
+			}
+
+			.row-fluid {
+				display: flex;
 			}
 		}
 
@@ -131,4 +162,52 @@
 		}
 	}
 
+	.include-holidays-list {
+		max-height: 350px;
+		overflow-y: scroll;
+	}
+
+	#include_holidays_table {
+		display: block;
+
+		thead {
+			display: block;
+
+			tr {
+				background-color: #dbdbde;
+
+				th {
+					height: 40px;
+					font-size: 12px;
+					color: $shark2;
+					font-weight: 600;
+					border-color: $french-gray2;
+				}
+			}
+		}
+
+		tbody {
+			tr {
+				height: 44px;
+				border: 1px $french-gray2;
+
+				td span {
+					margin-left: 1rem;
+				}
+			}
+
+			tr:nth-child(even) {
+				background: rgba($athens-gray, 0.48);
+			}
+		}
+
+		td, th {
+			border-left: 1px solid $french-gray2;
+			border-right: 1px solid $french-gray2;
+			padding-left: 16px;
+			text-align: left;
+			width: 300px;
+			max-width: 300px;
+		}
+	}
 }

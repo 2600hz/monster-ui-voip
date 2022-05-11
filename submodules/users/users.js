@@ -4,6 +4,12 @@ define(function(require) {
 		monster = require('monster'),
 		timezone = require('monster-timezone');
 
+	var showTeammateDevice = _
+		.chain(monster.config)
+		.get('allowedExtraDeviceTypes', [])
+		.includes('teammate')
+		.value();
+
 	var app = {
 
 		requests: {
@@ -28,16 +34,17 @@ define(function(require) {
 		},
 
 		deviceIcons: {
-			'cellphone': 'fa fa-phone',
-			'smartphone': 'icon-telicon-mobile-phone',
-			'landline': 'icon-telicon-home',
-			'mobile': 'icon-telicon-sprint-phone',
-			'softphone': 'icon-telicon-soft-phone',
-			'sip_device': 'icon-telicon-voip-phone',
-			'sip_uri': 'icon-telicon-voip-phone',
-			'fax': 'icon-telicon-fax',
-			'ata': 'icon-telicon-ata',
-			'application': 'icon-telicon-apps'
+			'cellphone': 'phone',
+			'smartphone': 'device-mobile',
+			'landline': 'home',
+			'mobile': 'device-sprint-phone',
+			'softphone': 'device-soft-phone',
+			'sip_device': 'device-voip-phone',
+			'sip_uri': 'device-voip-phone',
+			'fax': 'device-fax',
+			'ata': 'device-ata',
+			'application': 'apps',
+			'teammate': 'device-mst'
 		},
 
 		/* Users */
@@ -564,6 +571,15 @@ define(function(require) {
 					}, function(error, results) {
 						self.usersRenderFindMeFollowMe($.extend(true, results, { currentUser: currentUser, saveCallback: featureCallback }));
 					});
+				},
+				isExtension = function(input) {
+					return _
+						.chain(input)
+						.toString()
+						.thru(function(string) {
+							return /\d/.test(string);
+						})
+						.value();
 				};
 
 			setTimeout(function() { template.find('.search-query').focus(); });
@@ -1521,7 +1537,17 @@ define(function(require) {
 							vmboxModule = self.usersExtractDataFromCallflow({
 								callflow: data.callflow,
 								module: 'voicemail'
-							});
+							}),
+							isMissingExtension = _
+								.chain(data)
+								.get('callflow.numbers')
+								.find(isExtension)
+								.isUndefined()
+								.value();
+
+						if (isMissingExtension) {
+							return monster.ui.alert('warning', self.i18n.active().users.vmbox.missingExtension);
+						}
 
 						// Update in-memory vmbox status
 						currentUser.extra.mapFeatures.vmbox.active = !(_.isUndefined(vmboxModule) || _.get(vmboxModule, 'data.skip_module', false));
@@ -2265,20 +2291,28 @@ define(function(require) {
 
 		usersRenderVMBox: function(currentUser, vmbox) {
 			var self = this,
-				vmboxActive = currentUser.extra.mapFeatures.vmbox.active,
+				featureData = currentUser.extra.mapFeatures.vmbox,
+				vmboxActive = featureData.active,
 				transcription = monster.util.getCapability('voicemail.transcription'),
-				vm_to_email_enabled = currentUser.vm_to_email_enabled,
-				transcribe = _.get(vmbox, 'transcribe', transcription.defaultValue),
 				featureTemplate = $(self.getTemplate({
 					name: 'feature-vmbox',
-					data: _.merge(currentUser, {
-						vm_to_email_enabled: vm_to_email_enabled,
-						vmbox: _.merge(vmbox, {
-							transcribe: transcribe,
-							hasTranscribe: _.get(transcription, 'isEnabled', false),
-							include_message_on_notify: _.get(vmbox, 'include_message_on_notify', true)
-						})
-					}),
+					data: _.merge({
+						feature: _.pick(featureData, [
+							'active',
+							'icon'
+						]),
+						vmbox: {
+							transcription: {
+								isEnabled: _.get(transcription, 'isEnabled', false),
+								value: _.get(vmbox, 'transcribe', transcription.defaultValue)
+							},
+							deleteAfterNotify: currentUser.extra.deleteAfterNotify,
+							includeMessageOnNotify: _.get(vmbox, 'include_message_on_notify', true),
+							vmToEmailEnabled: vmboxActive ? currentUser.vm_to_email_enabled : true
+						}
+					}, _.pick(currentUser, [
+						'email'
+					])),
 					submodule: 'users'
 				})),
 				switchFeature = featureTemplate.find('.switch-state'),
@@ -2411,7 +2445,7 @@ define(function(require) {
 			});
 
 			var popup = monster.ui.dialog(featureTemplate, {
-				title: currentUser.extra.mapFeatures.vmbox.title,
+				title: featureData.title,
 				position: ['center', 20]
 			});
 		},
@@ -2419,66 +2453,106 @@ define(function(require) {
 		usersRenderCallerId: function(currentUser, numberChoices) {
 			var self = this,
 				allowAnyOwnedNumberAsCallerID = monster.config.whitelabel && monster.config.whitelabel.allowAnyOwnedNumberAsCallerID ? true : false,
-				templateUser = $.extend(true, { allowAnyOwnedNumberAsCallerID: allowAnyOwnedNumberAsCallerID }, currentUser),
-				featureTemplate,
-				switchFeature;
+				selectableNumbers = numberChoices && _.get(monster.config.whitelabel, 'allowAnyOwnedNumberAsCallerID')
+					? _.keys(numberChoices)
+					: _.get(currentUser, 'extra.listNumbers', []),
+				initTemplate = function(cidNumbers) {
+					var $template = $(self.getTemplate({
+						name: 'feature-caller_id',
+						data: _.merge({
+							allowAnyOwnedNumberAsCallerID: allowAnyOwnedNumberAsCallerID
+						}, _.pick(currentUser, [
+							'caller_id',
+							'extra'
+						])),
+						submodule: 'users'
+					}));
 
-			if (numberChoices && monster.config.whitelabel && monster.config.whitelabel.allowAnyOwnedNumberAsCallerID) {
-				templateUser.caller_id.numberChoices = numberChoices;
+					monster.ui.cidNumberSelector($template.find('.caller-id-select-target'), {
+						allowNone: false,
+						selected: _.get(currentUser, 'caller_id.external.number'),
+						cidNumbers: cidNumbers,
+						phoneNumbers: _.map(selectableNumbers, function(number) {
+							return {
+								number: number
+							};
+						})
+					});
+
+					bindEvents($template);
+
+					return $template;
+				},
+				bindEvents = function($template) {
+					var $switchFeature = $template.find('.switch-state'),
+						getPopup = function($node) {
+							return $node.parents('.ui-dialog-content');
+						};
+
+					$template.find('.cancel-link').on('click', function() {
+						getPopup($(this)).dialog('close').remove();
+					});
+
+					$switchFeature.on('change', function() {
+						$(this).prop('checked') ? $template.find('.content').slideDown() : $template.find('.content').slideUp();
+					});
+
+					$template.find('.save').on('click', function() {
+						var switchCallerId = $template.find('.switch-state'),
+							userToSave = $.extend(true, {}, {
+								caller_id: {
+									external: {}
+								}
+							}, currentUser),
+							args = {
+								openedTab: 'features',
+								callback: function() {
+									getPopup(switchCallerId).dialog('close').remove();
+								}
+							};
+
+						if (switchCallerId.prop('checked')) {
+							var callerIdValue = $template.find('.caller-id-select-target select').val();
+
+							userToSave.caller_id.external.number = callerIdValue;
+						} else if (userToSave.caller_id.hasOwnProperty('external')) {
+							delete userToSave.caller_id.external.number;
+						}
+
+						self.usersUpdateUser(userToSave, function(data) {
+							args.userId = data.data.id;
+
+							self.usersRender(args);
+						});
+					});
+				};
+
+			if (
+				_.isEmpty(currentUser.extra.listCallerId)
+				&& !_.get(monster.config.whitelabel, 'allowAnyOwnedNumberAsCallerID', false)
+			) {
+				return monster.ui.alert('error', self.i18n.active().users.errorCallerId);
 			}
-
-			featureTemplate = $(self.getTemplate({
-				name: 'feature-caller_id',
-				data: templateUser,
-				submodule: 'users'
-			}));
-			switchFeature = featureTemplate.find('.switch-state');
-
-			featureTemplate.find('.cancel-link').on('click', function() {
-				popup.dialog('close').remove();
-			});
-
-			switchFeature.on('change', function() {
-				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
-			});
-
-			featureTemplate.find('.save').on('click', function() {
-				var switchCallerId = featureTemplate.find('.switch-state'),
-					userToSave = $.extend(true, {}, {
-						caller_id: {
-							external: {}
-						}
-					}, currentUser),
-					args = {
-						openedTab: 'features',
-						callback: function() {
-							popup.dialog('close').remove();
-						}
-					};
-
-				if (switchCallerId.prop('checked')) {
-					var callerIdValue = featureTemplate.find('.caller-id-select').val();
-
-					userToSave.caller_id.external.number = callerIdValue;
-				} else if (userToSave.caller_id.hasOwnProperty('external')) {
-					delete userToSave.caller_id.external.number;
+			monster.waterfall([
+				function(next) {
+					self.callApi({
+						resource: 'externalNumbers.list',
+						data: {
+							accountId: self.accountId
+						},
+						success: _.flow(
+							_.partial(_.get, _, 'data'),
+							_.partial(next, null)
+						),
+						error: _.partial(_.ary(next, 2), null, [])
+					});
 				}
-
-				self.usersUpdateUser(userToSave, function(data) {
-					args.userId = data.data.id;
-
-					self.usersRender(args);
-				});
-			});
-
-			if (currentUser.extra.listCallerId.length > 0 || (monster.config.whitelabel && monster.config.whitelabel.allowAnyOwnedNumberAsCallerID)) {
-				var popup = monster.ui.dialog(featureTemplate, {
+			], function(err, cidNumbers) {
+				monster.ui.dialog(initTemplate(cidNumbers), {
 					title: currentUser.extra.mapFeatures.caller_id.title,
 					position: ['center', 20]
 				});
-			} else {
-				monster.ui.alert('error', self.i18n.active().users.errorCallerId);
-			}
+			});
 		},
 
 		usersFormatCallForwardData: function(user) {
@@ -3625,7 +3699,9 @@ define(function(require) {
 
 				template = $(self.getTemplate({
 					name: 'devices',
-					data: formattedResults,
+					data: _.merge({
+						showTeammateDevice: showTeammateDevice
+					}, formattedResults),
 					submodule: 'users'
 				}));
 
@@ -4565,35 +4641,45 @@ define(function(require) {
 			});
 		},
 
+		usersIsSmartConference: function(name) {
+			var self = this;
+
+			return _.includes(name, self.appFlags.users.smartPBXConferenceString);
+		},
+
 		usersGetConferenceFeature: function(userId, globalCallback) {
-			var self = this,
-				dataResponse = {
-					conference: {},
-					listConfNumbers: []
-				};
+			var self = this;
 
 			monster.parallel({
-				confNumbers: function(callback) {
+				listConfNumbers: function(callback) {
 					self.usersListConfNumbers(function(numbers) {
 						callback && callback(null, numbers);
 					});
 				},
-				listConferences: function(callback) {
-					self.usersListConferences(userId, function(conferences) {
-						if (conferences.length > 0) {
-							self.usersGetConference(conferences[0].id, function(conference) {
-								callback && callback(null, conference);
-							});
-						} else {
-							callback && callback(null, {});
+				conference: function(callback) {
+					monster.waterfall([
+						function(next) {
+							self.usersListConferences(userId, _.partial(next, null));
+						},
+						function(conferences, next) {
+							var conferenceId = _
+								.chain(conferences)
+								.find(_.flow(
+									_.partial(_.get, _, 'name'),
+									_.bind(self.usersIsSmartConference, self)
+								))
+								.get('id')
+								.value();
+
+							if (!_.isString(conferenceId)) {
+								return next(null, {});
+							}
+							self.usersGetConference(conferenceId, _.partial(next, null));
 						}
-					});
+					], callback);
 				}
 			}, function(err, results) {
-				dataResponse.conference = results.listConferences;
-				dataResponse.listConfNumbers = results.confNumbers;
-
-				globalCallback && globalCallback(dataResponse);
+				globalCallback && globalCallback(results);
 			});
 		},
 
@@ -5257,11 +5343,17 @@ define(function(require) {
 
 			monster.parallel({
 				conferences: function(callback) {
-					self.usersListConferences(userId, function(conferences) {
-						self.usersRemoveBulkConferences(conferences, true, function(results) {
-							callback && callback(null, results);
-						});
-					});
+					monster.waterfall([
+						function(next) {
+							self.usersListConferences(userId, _.partial(next, null));
+						},
+						function(conferences, next) {
+							self.usersRemoveBulkConferences(_.filter(conferences, _.flow(
+								_.partial(_.get, _, 'name'),
+								_.bind(self.usersIsSmartConference, self)
+							)), true, _.partial(next, null));
+						}
+					], callback);
 				},
 				user: function(callback) {
 					self.usersGetUser(userId, function(user) {

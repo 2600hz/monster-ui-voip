@@ -542,6 +542,47 @@ define(function(require) {
 			});
 		},
 
+		strategySetupEmergencyCID: function(number) {
+			var self = this;
+
+			monster.waterfall([
+				function(cb) {
+					self.strategyGetNumber(number, function(numberData) {
+						cb(null, numberData);
+					});
+				},
+				function(numberData, cb) {
+					var isE911Enabled = _
+						.chain(numberData)
+						.get('features')
+						.includes('e911')
+						.value();
+
+					if (!isE911Enabled) {
+						return cb(null);
+					}
+
+					self.strategyChangeCallerId({
+						callerIdType: 'emergency',
+						number: number,
+						success: function() {
+							monster.ui.toast({
+								type: 'success',
+								message: self.getTemplate({
+									name: '!' + self.i18n.active().strategy.updateCallerIdDialog.success.emergency,
+									data: {
+										number: monster.util.formatPhoneNumber(number)
+									}
+								})
+							});
+
+							cb(null);
+						}
+					});
+				}
+			]);
+		},
+
 		/**
 		 * Check if it is necessary to update the emergency caller ID for the account
 		 * @param  {Object}   args
@@ -1058,6 +1099,7 @@ define(function(require) {
 		strategyNumbersBindEvents: function(container, strategyData) {
 			var self = this,
 				addNumbersToMainCallflow = function(numbers) {
+					var newNumberId = _.head(numbers);
 					if (_.isEmpty(numbers)) {
 						return;
 					}
@@ -1072,14 +1114,30 @@ define(function(require) {
 					mainCallflow.numbers = mainCallflow.numbers.concat(numbers);
 
 					self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
+						var callFlowNumbers = self.strategyExtractMainNumbers({
+								mainCallflow: updatedCallflow
+							}),
+							shouldSetupEmergencyCid = _
+								.chain([
+									'external',
+									'emergency'
+								])
+								.map(function(cid) {
+									return _.get(monster.apps.auth.currentAccount, ['caller_id', cid, 'number'], '');
+								})
+								.every(_.isEmpty)
+								.value();
+
 						strategyData.callflows.MainCallflow = updatedCallflow;
 						refreshNumbersTemplate();
 
 						self.strategyCheckIfSetExternalCallerID({
-							numbers: self.strategyExtractMainNumbers({
-								mainCallflow: updatedCallflow
-							})
+							numbers: callFlowNumbers
 						});
+
+						if (shouldSetupEmergencyCid) {
+							self.strategySetupEmergencyCID(newNumberId);
+						}
 					});
 				},
 				refreshNumbersTemplate = function() {
@@ -4001,6 +4059,7 @@ define(function(require) {
 				isNew = args.isNew,
 				existingHolidays = args.existingHolidays,
 				isRecurring = _.get(holidayRule, 'holidayData.recurring', false),
+				isTimeSet = _.get(holidayRule, 'holidayData.time_window_start', false),
 				getListOfYears = function getListOfYears() {
 					var date = new Date(),
 						year = parseInt(date.getFullYear()),
@@ -4043,12 +4102,42 @@ define(function(require) {
 					fromMonth: formatMonth(holidayRule, 'fromMonth'),
 					isNew: isNew
 				}),
+				meta = _.pick(self.appFlags.strategyHours.intervals, [
+					'max',
+					'min',
+					'unit',
+					'step',
+					'timepicker'
+				]),
+				timepickerStep = meta.timepicker.step,
 				$template = $(self.getTemplate({
 					name: 'addEditOfficeHolidays',
 					data: dataToTemplate,
 					submodule: 'strategy'
 				})),
+				$startTimepicker = $template.find('.start-time'),
+				$endTimepicker = $template.find('.end-time'),
+				endTime = _.get(holidayRule, 'holidayData.time_window_stop', 3600 * 17),
+				endRemainder = endTime % timepickerStep,
+				startPickerMaxTime = endTime - endRemainder - (endRemainder > 0 ? 0 : timepickerStep),
+				startTime = _.get(holidayRule, 'holidayData.time_window_start', 3600 * 9),
+				startRemainder = startTime % timepickerStep,
+				endPickerMinTime = startTime - startRemainder + timepickerStep,
 				popup;
+
+			monster.ui.timepicker($startTimepicker, {
+				listWidth: 1,
+				minTime: meta.min,
+				maxTime: startPickerMaxTime
+			});
+			$startTimepicker.timepicker('setTime', startTime);
+
+			monster.ui.timepicker($endTimepicker, {
+				listWidth: 1,
+				minTime: endPickerMinTime,
+				maxTime: meta.max - timepickerStep
+			});
+			$endTimepicker.timepicker('setTime', endTime);
 
 			if (!_.isEmpty(holidayRule)) {
 				var selectedType = holidayRule.holidayType;
@@ -4067,8 +4156,18 @@ define(function(require) {
 
 				if (selectedType === 'single' && isRecurring) {
 					$template
-						.find('.single .year')
-						.addClass('hide');
+						.find('.optional-year')
+						.removeClass('show');
+				}
+
+				if (selectedType === 'single' && !isTimeSet) {
+					$template
+						.find('.optional-time')
+						.removeClass('show');
+
+					$template
+						.find('#all_day')
+						.prop('checked', true);
 				}
 			}
 
@@ -4089,14 +4188,14 @@ define(function(require) {
 				var $this = $(this),
 					isChecked = $this.prop('checked'),
 					dateType = $template.find('#date_type').val(),
-					$singleDateYearElement = $template.find('.single .year');
+					$singleDateYearElement = $template.find('.optional-year');
 
 				if (dateType === 'single' && isChecked) {
 					$singleDateYearElement
-						.addClass('hide');
+						.removeClass('show');
 				} else {
 					$singleDateYearElement
-						.removeClass('hide');
+						.addClass('show');
 				}
 			});
 
@@ -4106,7 +4205,7 @@ define(function(require) {
 				var $this = $(this),
 					className = $this.val(),
 					isRecurringChecked = $template.find('#recurring').prop('checked'),
-					$singleDateYearElement = $template.find('.single .year');
+					$singleDateYearElement = $template.find('.optional-year');
 
 				$template
 					.find('.row-fluid')
@@ -4118,18 +4217,57 @@ define(function(require) {
 
 				if (className === 'single' && isRecurringChecked) {
 					$singleDateYearElement
-						.addClass('hide');
+						.addClass('show');
 				} else {
 					$singleDateYearElement
-						.removeClass('hide');
+						.removeClass('show');
+				}
+			});
+
+			$template.on('click', '#all_day', function() {
+				var $this = $(this),
+					isChecked = $this.prop('checked'),
+					$singleDateTimeElement = $template.find('.optional-time');
+
+				$singleDateTimeElement
+					.toggle('isChecked');
+			});
+
+			$startTimepicker.on('change', function() {
+				var startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
+					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight'),
+					remainder = startSeconds % timepickerStep;
+
+				$endTimepicker.timepicker('option', 'minTime',
+					startSeconds - remainder + timepickerStep
+				);
+
+				if (endSeconds) {
+					$endTimepicker.timepicker('setTime', endSeconds);
+				}
+			});
+
+			$endTimepicker.on('change', function() {
+				var startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
+					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight'),
+					remainder = endSeconds % timepickerStep;
+
+				$startTimepicker.timepicker('option', 'maxTime',
+					endSeconds - remainder - (remainder > 0 ? 0 : timepickerStep)
+				);
+
+				if (!_.isNull(endSeconds)) {
+					$startTimepicker.timepicker('setTime', startSeconds);
 				}
 			});
 
 			$template.on('submit', function(event) {
 				event.preventDefault();
 
-				var formData = monster.ui.getFormData($template.get(0)),
+				var formData = monster.ui.getFormData('form_add_edit_office_holidays'),
 					$optionDiv = $template.find('.row-fluid.' + formData.type + ' select:not(.hide)'),
+					endYear = $template.find('.optional-year.show .select-year').val(),
+					getSingleStartTime = $template.find('.optional-time.show .start-time').val(),
 					holidayId = _.get(holidayRule, 'holidayData.id'),
 					nameLength = formData.name.length,
 					nameExistsData = _.find(existingHolidays, { name: formData.name }),
@@ -4140,6 +4278,11 @@ define(function(require) {
 						id: holidayId
 					}, isSet && {
 						set: true
+					}, endYear && {
+						endYear: parseInt(endYear)
+					}, getSingleStartTime && {
+						time_window_start: $startTimepicker.timepicker('getSecondsFromMidnight'),
+						time_window_stop: $endTimepicker.timepicker('getSecondsFromMidnight')
 					}),
 					holidayRuleToSave = {};
 

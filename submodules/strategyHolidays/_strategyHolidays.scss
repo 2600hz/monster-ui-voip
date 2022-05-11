@@ -69,6 +69,8 @@
 	}
 
 	#holidays_list_table {
+		color: $shark2;
+
 		.footable-filtering {
 			.input-group {
 				width: 256px;
@@ -101,16 +103,16 @@
 
 			th {
 				font-size: 12px;
-				color: $manatee;
 				font-weight: 600;
+				color: $shark2;
+				border-color: $french-gray2;
 			}
 		}
 
 		tbody {
-			color: $shark2;
-
 			tr {
 				height: 44px;
+				border: 1px $french-gray2;
 
 				svg {
 					color: $midgray2;
@@ -122,6 +124,18 @@
 					display: none;
 				}
 			}
+
+			tr:nth-child(even) {
+				background: rgba($athens-gray, 0.48);
+			}
+		}
+
+		td:first-child, .footable-header th:first-child {
+			border-left: 1px solid $french-gray2;
+		}
+
+		td:last-child, .footable-header th:last-child {
+			border-right: 1px solid $french-gray2;
 		}
 	}
 
