@@ -37,13 +37,22 @@
 	<div class="holidays-list">
 		<div class="actions-wrapper">
 			<button type="button" class="monster-button add-holiday">
-				{{i18n.strategy.holidays.buttons.addHoliday}}
+				{{telicon "plus"}}
+				<span>
+					{{i18n.strategy.holidays.buttons.addHoliday}}
+				</span>
 			</button>
 			<button type="button" class="monster-button import-csv">
-				{{i18n.strategy.holidays.buttons.importHolidays}}
+				{{telicon "file"}}
+				<span>
+					{{i18n.strategy.holidays.buttons.importHolidays}}
+				</span>
 			</button>
 			<button type="button" class="monster-button include-national-holidays">
-				{{i18n.strategy.holidays.buttons.includeNationalHolidays}}
+				{{telicon "check--circle"}}
+				<span>
+					{{i18n.strategy.holidays.buttons.includeNationalHolidays}}
+				</span>
 			</button>
 		</div>
 		<table id="holidays_list_table" class="monster-table footable">
