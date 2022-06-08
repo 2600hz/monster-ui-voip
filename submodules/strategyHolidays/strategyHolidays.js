@@ -533,7 +533,7 @@ define(function(require) {
 							var $tr = $(row).parents('tr');
 
 							return _.pick($tr.data(), [
-								'data',
+								'date',
 								'name'
 							]);
 						})
