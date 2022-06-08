@@ -60,11 +60,23 @@
 			background: linear-gradient(-180deg, $white 0%, $athens-gray 100%);
 			margin-right: 8px;
 			min-width: 96px;
+
+			span {
+				margin-left: .5rem
+			}
+
+			.svg-icon {
+				color: $midgray2;
+			}
 		}
 
 		.add-holiday {
 			background: $dodger-blue;
 			border: 1px solid #006bca;
+
+			.svg-icon {
+				color: $woodsmoke;
+			}
 		}
 	}
 
