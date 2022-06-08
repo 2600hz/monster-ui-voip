@@ -329,6 +329,11 @@ define(function(require) {
 						};
 					}),
 					isNew: true,
+					holidayRule: {
+						holidayData: {
+							recurring: true
+						}
+					},
 					callback: function(err, data) {
 						self.appFlags.strategyHolidays.allHolidays.push(data);
 						self.strategyHolidaysListingRender(parent);

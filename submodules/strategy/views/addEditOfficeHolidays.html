@@ -16,7 +16,7 @@
 		{{/monsterPanelText}}
 		<div class="control-group">
 			{{#monsterCheckbox i18n.strategy.addEditOfficeHolidays.labels.recurringAnnually}}
-				<input type="checkbox" name="recurring" id="recurring" {{#if holidayData.recurring}} checked {{/if}}>
+				<input type="checkbox" name="recurring" id="recurring" {{#if holidayData.recurring}}checked{{/if}}>
 			{{/monsterCheckbox}}
 		</div>
 		<div class="control-group">
@@ -152,7 +152,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="control-group optional-year show">
+		<div class="control-group optional-year {{#unless holidayData.recurring}}show{{/unless}}">
 			<label class="control-label">
 				{{i18n.strategy.addEditOfficeHolidays.labels.year}}
 			</label>
