@@ -87,8 +87,6 @@ define(function(require) {
 		initApp: function(callback) {
 			var self = this;
 
-			self.appFlags.common.hasProvisioner = _.isString(monster.config.api.provisioner);
-
 			monster.pub('auth.initApp', {
 				app: self,
 				callback: callback
@@ -101,6 +99,8 @@ define(function(require) {
 				template = $(self.getTemplate({
 					name: 'app'
 				}));
+
+			self.appFlags.common.hasProvisioner = _.isString(monster.config.api.provisioner);
 
 			self.loadGlobalData(function() {
 				/* On first Load, load my office */
