@@ -165,15 +165,35 @@ define(function(require) {
 		strategyHoursBindEvents: function(parent, template, strategyData) {
 			var self = this,
 				meta = self.appFlags.strategyHours.intervals,
+				minutesInHour = self.appFlags.strategyHours.minutesInHour,
+				secondsInMinute = self.appFlags.strategyHours.secondsInMinute,
+				hoursToSeconds = _.partial(_.reduce, [
+					minutesInHour,
+					secondsInMinute
+				], _.multiply),
+				minutesToSeconds = _.partial(_.multiply, secondsInMinute),
 				sanitizeString = _.flow(
 					_.toString,
 					_.toLower
 				),
 				parseTime = function(time) {
-					return time <= 24 ? time * meta.unit : time;
+					var modifiers = [
+						hoursToSeconds,
+						minutesToSeconds
+					];
+
+					return _
+						.chain(time)
+						.split(':')
+						.map(_.toNumber)
+						.slice(0, 2)
+						.map(function(value, index) {
+							return modifiers[index](value);
+						})
+						.sum()
+						.value();
 				},
 				sanitizeTime = _.flow(
-					_.toNumber,
 					parseTime,
 					_.floor
 				),
