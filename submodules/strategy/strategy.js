@@ -4059,7 +4059,7 @@ define(function(require) {
 				isNew = args.isNew,
 				existingHolidays = args.existingHolidays,
 				isRecurring = _.get(holidayRule, 'holidayData.recurring', false),
-				isTimeSet = _.get(holidayRule, 'holidayData.time_window_start', false),
+				isTimeSet = !_.isUndefined(_.get(holidayRule, 'holidayData.time_window_start')),
 				getListOfYears = function getListOfYears() {
 					var date = new Date(),
 						year = parseInt(date.getFullYear()),
@@ -4140,7 +4140,8 @@ define(function(require) {
 			$endTimepicker.timepicker('setTime', endTime);
 
 			if (!_.isEmpty(holidayRule)) {
-				var selectedType = holidayRule.holidayType;
+				var selectedType = holidayRule.holidayType || 'single',
+					$recurringElement = $template.find('#recurring');
 
 				$template
 					.find('#date_type')
@@ -4154,6 +4155,10 @@ define(function(require) {
 					.find('.row-fluid.' + selectedType)
 					.addClass('selected');
 
+				$template
+					.find('#all_day')
+					.prop('checked', !isTimeSet);
+
 				if (selectedType === 'single' && isRecurring) {
 					$template
 						.find('.optional-year')
@@ -4165,9 +4170,14 @@ define(function(require) {
 						.find('.optional-time')
 						.removeClass('show');
 
-					$template
-						.find('#all_day')
+				}
+
+				if (selectedType === 'advanced') {
+					$recurringElement
 						.prop('checked', true);
+
+					$recurringElement
+						.attr('disabled', 'disabled');
 				}
 			}
 
@@ -4188,13 +4198,13 @@ define(function(require) {
 				var $this = $(this),
 					isChecked = $this.prop('checked'),
 					dateType = $template.find('#date_type').val(),
-					$singleDateYearElement = $template.find('.optional-year');
+					$dateYearElement = $template.find('.optional-year');
 
-				if (dateType === 'single' && isChecked) {
-					$singleDateYearElement
+				if (isChecked) {
+					$dateYearElement
 						.removeClass('show');
 				} else {
-					$singleDateYearElement
+					$dateYearElement
 						.addClass('show');
 				}
 			});
@@ -4205,7 +4215,8 @@ define(function(require) {
 				var $this = $(this),
 					className = $this.val(),
 					isRecurringChecked = $template.find('#recurring').prop('checked'),
-					$singleDateYearElement = $template.find('.optional-year');
+					$singleDateYearElement = $template.find('.optional-year'),
+					$recurringElement = $template.find('#recurring');
 
 				$template
 					.find('.row-fluid')
@@ -4215,12 +4226,23 @@ define(function(require) {
 					.find('.row-fluid.' + className)
 					.addClass('selected');
 
-				if (className === 'single' && isRecurringChecked) {
-					$singleDateYearElement
-						.addClass('show');
-				} else {
+				if ((className === 'single' && isRecurringChecked) || className !== 'single') {
 					$singleDateYearElement
 						.removeClass('show');
+				} else if (className === 'single' && !isRecurringChecked) {
+					$singleDateYearElement
+						.addClass('show');
+				}
+
+				if (className === 'advanced') {
+					$recurringElement
+						.prop('checked', true);
+
+					$recurringElement
+						.attr('disabled', 'disabled');
+				} else {
+					$recurringElement
+						.removeAttr('disabled');
 				}
 			});
 
@@ -4230,7 +4252,7 @@ define(function(require) {
 					$singleDateTimeElement = $template.find('.optional-time');
 
 				$singleDateTimeElement
-					.toggle('isChecked');
+					.toggle('show');
 			});
 
 			$startTimepicker.on('change', function() {
@@ -4264,10 +4286,10 @@ define(function(require) {
 			$template.on('submit', function(event) {
 				event.preventDefault();
 
+				console.log(holidayRule);
 				var formData = monster.ui.getFormData('form_add_edit_office_holidays'),
 					$optionDiv = $template.find('.row-fluid.' + formData.type + ' select:not(.hide)'),
 					endYear = $template.find('.optional-year.show .select-year').val(),
-					getSingleStartTime = $template.find('.optional-time.show .start-time').val(),
 					holidayId = _.get(holidayRule, 'holidayData.id'),
 					nameLength = formData.name.length,
 					nameExistsData = _.find(existingHolidays, { name: formData.name }),
@@ -4280,9 +4302,12 @@ define(function(require) {
 						set: true
 					}, endYear && {
 						endYear: parseInt(endYear)
-					}, getSingleStartTime && {
+					}, !formData.allDay && {
 						time_window_start: $startTimepicker.timepicker('getSecondsFromMidnight'),
 						time_window_stop: $endTimepicker.timepicker('getSecondsFromMidnight')
+					}, isTimeSet && formData.allDay && {
+						time_window_start: null,
+						time_window_stop: null
 					}),
 					holidayRuleToSave = {};
 
@@ -4316,13 +4341,16 @@ define(function(require) {
 						: value;
 				});
 
-				if (!formData.recurring && formData.type !== 'single') {
+				if (!formData.recurring) {
 					holidayData.endYear = args.yearSelected;
 				}
 
+				holidayData.name = formData.name;
+				holidayData.recurring = formData.recurring;
+
 				holidayRuleToSave = {
 					holidayType: formData.type,
-					holidayData: _.assign({}, holidayData, formData),
+					holidayData: holidayData,
 					modified: true
 				};
 
