@@ -76,31 +76,14 @@ define(function(require) {
 
 		subModules: appSubmodules,
 
-		load: function(callback) {
-			var self = this;
-
-			self.initApp(function() {
-				callback && callback(self);
-			});
-		},
-
-		initApp: function(callback) {
-			var self = this;
-
-			self.appFlags.common.hasProvisioner = _.isString(monster.config.api.provisioner);
-
-			monster.pub('auth.initApp', {
-				app: self,
-				callback: callback
-			});
-		},
-
 		render: function(container) {
 			var self = this,
 				parent = container || $('#monster_content'),
 				template = $(self.getTemplate({
 					name: 'app'
 				}));
+
+			self.appFlags.common.hasProvisioner = _.isString(monster.config.api.provisioner);
 
 			self.loadGlobalData(function() {
 				/* On first Load, load my office */
