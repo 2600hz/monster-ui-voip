@@ -2,6 +2,7 @@ define(function(require) {
 	var monster = require('monster'),
 		_ = require('lodash'),
 		$ = require('jquery'),
+		moment = require('moment'),
 		Papa = require('papaparse'),
 		timezone = require('monster-timezone');
 
@@ -165,33 +166,12 @@ define(function(require) {
 		strategyHoursBindEvents: function(parent, template, strategyData) {
 			var self = this,
 				meta = self.appFlags.strategyHours.intervals,
-				minutesInHour = self.appFlags.strategyHours.minutesInHour,
-				secondsInMinute = self.appFlags.strategyHours.secondsInMinute,
-				hoursToSeconds = _.partial(_.reduce, [
-					minutesInHour,
-					secondsInMinute
-				], _.multiply),
-				minutesToSeconds = _.partial(_.multiply, secondsInMinute),
 				sanitizeString = _.flow(
 					_.toString,
 					_.toLower
 				),
 				parseTime = function(time) {
-					var modifiers = [
-						hoursToSeconds,
-						minutesToSeconds
-					];
-
-					return _
-						.chain(time)
-						.split(':')
-						.map(_.toNumber)
-						.slice(0, 2)
-						.map(function(value, index) {
-							return modifiers[index](value);
-						})
-						.sum()
-						.value();
+					return moment.duration(time).asSeconds();
 				},
 				sanitizeTime = _.flow(
 					parseTime,
