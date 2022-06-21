@@ -41,7 +41,7 @@
 			<label class="control-label">
 				{{i18n.strategy.addEditOfficeHolidays.labels.date}}
 			</label>
-			<div class="row-fluid single selected">
+			<div class="row-fluid single">
 				<select class="month from" data-name="fromMonth">
 				{{#select fromMonth}}
 					{{#each months as |label|}}
@@ -65,7 +65,7 @@
 				</span>
 				<div class="all-day">
 					{{#monsterSwitch}}
-						<input id="all_day" type="checkbox"></input>
+						<input id="all_day" name="allDay" type="checkbox"></input>
 					{{/monsterSwitch}}
 				</div>
 			</div>
@@ -144,11 +144,11 @@
 			</label>
 			<div class="row-fluid">
 				<div class="controls">
-					<input type="text" class="start-time">
+					<input type="text" name="startTime" class="start-time">
 				</div>
 				<span class="separator">{{i18n.strategy.holidays.to}}</span>
 				<div class="controls">
-					<input type="text" class="end-time">
+					<input type="text" name="endTime" class="end-time">
 				</div>
 			</div>
 		</div>

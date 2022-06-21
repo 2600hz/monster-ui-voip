@@ -442,10 +442,11 @@ define(function(require) {
 					holidayRule: holidayRule,
 					isNew: false,
 					callback: function(err, data) {
-						/*Compare old date with new data if it's recurring*/
-						var isOldRecurring = _.get(holidayRule, 'holidayData.recurring', false);
+						/*Compare old holidayData with new holidayData if it's recurring*/
+						var isOldRecurring = _.get(holidayRule, 'holidayData.recurring', false),
+							isNewRecurring = _.get(holidayRule, 'data.recurring', false);
 
-						if (isOldRecurring) {
+						if (isOldRecurring && (isOldRecurring !== isNewRecurring)) {
 							/* update existing rule */
 							if (_.isUndefined(holidayRule.holidayData.excludeYear)) {
 								holidayRule.holidayData.excludeYear = [];
@@ -455,6 +456,7 @@ define(function(require) {
 							self.appFlags.strategyHolidays.allHolidays[key] = holidayRule;
 
 							/* add new rule */
+							delete data.holidayData.id;
 							self.appFlags.strategyHolidays.allHolidays.push(data);
 						} else {
 							self.appFlags.strategyHolidays.allHolidays[key] = data;
@@ -918,7 +920,7 @@ define(function(require) {
 					end_date: endDate // if it's an existing holiday then always want to set the end_date
 				}, holidayData.isImported && {
 					isImported: holidayData.isImported
-				}, holidayData.type === 'single' && _.pick(holidayData, [
+				}, holiday.holidayType === 'single' && _.pick(holidayData, [
 					'time_window_start',
 					'time_window_stop'
 				]), endDate && {

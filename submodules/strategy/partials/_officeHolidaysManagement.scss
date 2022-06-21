@@ -77,6 +77,10 @@
 				margin-bottom: 0;
 			}
 
+			#recurring:disabled + i {
+				cursor: not-allowed;
+			}
+
 			.row-fluid {
 				align-items: center;
 				display: none;
