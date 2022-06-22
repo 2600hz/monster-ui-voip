@@ -806,7 +806,9 @@ define(function(require) {
 				}, formData.call_forward);
 
 				if (originalData.device_type === 'smartphone') {
-					formData.call_forward.failover = true;
+					formData.call_failover = $.extend(true, {
+						enabled: true
+					}, formData.call_failover);
 				}
 
 				if (formData.hasOwnProperty('extra') && formData.extra.allowVMCellphone) {

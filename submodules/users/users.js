@@ -2559,11 +2559,11 @@ define(function(require) {
 			var self = this,
 				isCallForwardConfigured = _.has(user, 'call_forward.enabled'),
 				isCallForwardEnabled = _.get(user, 'call_forward.enabled', false),
-				isFailoverEnabled = _.get(user, 'call_forward.failover', false);
+				isFailoverEnabled = _.get(user, 'call_failover.enabled', false);
 
 			//cfmode is on if call_forward.enabled = true
-			//cfmode is failover if call_forward.enabled = false & call_forward.failover = true
-			//cfmode is off if call_forward.enabled = false & call_forward.failover = false
+			//cfmode is failover if call_failover.enabled = true
+			//cfmode is off if call_forward.enabled = false & call_failover.enabled = false
 			return _.merge({}, user, _.merge({
 				extra: {
 					callForwardMode: !isCallForwardConfigured ? 'off'
@@ -2633,23 +2633,24 @@ define(function(require) {
 
 				if (monster.ui.valid(featureForm) && isValidPhoneNumber) {
 					formData.require_keypress = !formData.require_keypress;
+					formData.number = phoneNumber;
+					delete formData.phoneType;
 
 					var selectedType = featureTemplate.find('.feature-select-mode button.selected').data('value');
 					if (selectedType === 'off') {
 						formData.enabled = false;
-						formData.failover = false;
-					} else if (selectedType === 'failover') {
-						formData.enabled = false;
-						formData.failover = true;
-					} else {
-						formData.enabled = true;
-						formData.failover = false;
 					}
 
-					formData.number = phoneNumber;
-					delete formData.phoneType;
+					var payload = { call_forward: $.extend(true, {}, formData), call_failover: $.extend(true, {}, formData) };
+					if (selectedType === 'failover') {
+						payload.call_failover.enabled = true;
+						payload.call_forward.enabled = false;
+					} else if (selectedType === 'on') {
+						payload.call_forward.enabled = true;
+						payload.call_failover.enabled = false;
+					}
 
-					var userToSave = $.extend(true, {}, currentUser, { call_forward: formData });
+					var userToSave = $.extend(true, {}, currentUser, payload);
 
 					if (timeoutWarningBox.is(':visible')) {
 						args.openedTab = 'name';
