@@ -2561,9 +2561,9 @@ define(function(require) {
 				isCallForwardEnabled = _.get(user, 'call_forward.enabled', false),
 				isFailoverEnabled = _.get(user, 'call_failover.enabled', false);
 
-			//cfmode is on if call_forward.enabled = true
-			//failover is on if call_forward.enabled = false && failover if call_failover.enabled = true
-			//cfmode is off if call_forward.enabled = false && call_failover.enabled = false
+			// cfmode is off if call_forward.enabled = false && call_failover.enabled = false
+			// cfmode is failover if call_failover.enabled = true
+			// cfmode is on if call_failover.enabled = false && call_forward.enabled = true
 			var callForwardMode = 'off';
 			if (!isFailoverEnabled) {
 				callForwardMode = 'failover';
