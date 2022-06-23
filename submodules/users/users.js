@@ -2559,11 +2559,11 @@ define(function(require) {
 			var self = this,
 				isCallForwardConfigured = _.has(user, 'call_forward.enabled'),
 				isCallForwardEnabled = _.get(user, 'call_forward.enabled', false),
-				isFailoverEnabled = _.get(user, 'call_failover.enabled', false);
+				isFailoverEnabled = !isCallForwardEnabled && _.get(user, 'call_failover.enabled', false);
 
 			//cfmode is on if call_forward.enabled = true
-			//cfmode is failover if call_failover.enabled = true
-			//cfmode is off if call_forward.enabled = false & call_failover.enabled = false
+			//failover is on if call_forward.enabled = false && failover if call_failover.enabled = true
+			//cfmode is off if call_forward.enabled = false && call_failover.enabled = false
 			return _.merge({}, user, _.merge({
 				extra: {
 					callForwardMode: !isCallForwardConfigured ? 'off'
@@ -2575,7 +2575,8 @@ define(function(require) {
 				call_forward: _.merge({}, _.has(user, 'call_forward.number') && {
 					number: monster.util.unformatPhoneNumber(user.call_forward.number)
 				})
-			}));
+			}
+			));
 		},
 
 		usersRenderCallForward: function(currentUser) {
@@ -2641,13 +2642,13 @@ define(function(require) {
 						formData.enabled = false;
 					}
 
-					var payload = { call_forward: $.extend(true, {}, formData), call_failover: $.extend(true, {}, formData) };
+					var payload = { call_forward: _.merge({}, formData), call_failover: _.merge({}, formData) };
 					if (selectedType === 'failover') {
 						payload.call_failover.enabled = true;
 						payload.call_forward.enabled = false;
 					} else if (selectedType === 'on') {
-						payload.call_forward.enabled = true;
 						payload.call_failover.enabled = false;
+						payload.call_forward.enabled = true;
 					}
 
 					var userToSave = $.extend(true, {}, currentUser, payload);
