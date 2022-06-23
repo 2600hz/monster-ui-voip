@@ -2559,17 +2559,21 @@ define(function(require) {
 			var self = this,
 				isCallForwardConfigured = _.has(user, 'call_forward.enabled'),
 				isCallForwardEnabled = _.get(user, 'call_forward.enabled', false),
-				isFailoverEnabled = !isCallForwardEnabled && _.get(user, 'call_failover.enabled', false);
+				isFailoverEnabled = _.get(user, 'call_failover.enabled', false);
 
 			//cfmode is on if call_forward.enabled = true
 			//failover is on if call_forward.enabled = false && failover if call_failover.enabled = true
 			//cfmode is off if call_forward.enabled = false && call_failover.enabled = false
+			var callForwardMode = 'off';
+			if (!isFailoverEnabled) {
+				callForwardMode = 'failover';
+			} else if (isCallForwardEnabled) {
+				callForwardMode = 'on';
+			}
+
 			return _.merge({}, user, _.merge({
 				extra: {
-					callForwardMode: !isCallForwardConfigured ? 'off'
-					: isCallForwardEnabled ? 'on'
-					: isFailoverEnabled ? 'failover'
-					: 'off'
+					callForwardMode: callForwardMode
 				}
 			}, isCallForwardConfigured && {
 				call_forward: _.merge({}, _.has(user, 'call_forward.number') && {
