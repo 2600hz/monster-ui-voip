@@ -799,14 +799,16 @@ define(function(require) {
 			}
 
 			if (hasCallForward) {
-				formData.call_forward = $.extend(true, {
+				formData.call_forward = _.merge({
 					enabled: true,
 					require_keypress: true,
 					keep_caller_id: true
 				}, formData.call_forward);
 
 				if (originalData.device_type === 'smartphone') {
-					formData.call_forward.failover = true;
+					formData.call_failover = _.merge({
+						enabled: true
+					}, formData.call_failover);
 				}
 
 				if (formData.hasOwnProperty('extra') && formData.extra.allowVMCellphone) {
