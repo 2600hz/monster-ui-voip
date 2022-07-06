@@ -3,7 +3,9 @@
 		<thead>
 			<tr class="footable-header">
 				<th data-sorted="true">
-					{{i18n.strategy.holidays.importNationalOfficeHolidays.labels.holiday}}
+					{{#monsterCheckbox i18n.strategy.holidays.importNationalOfficeHolidays.labels.holiday}}
+						<input class="check-all" type="checkbox"></input>
+					{{/monsterCheckbox}}
 				</th>
 			</tr>
 		</thead>
