@@ -4169,7 +4169,6 @@ define(function(require) {
 					$template
 						.find('.optional-time')
 						.removeClass('show');
-
 				}
 
 				if (selectedType === 'advanced') {
@@ -4197,7 +4196,6 @@ define(function(require) {
 			$template.find('#recurring').on('change', function(event) {
 				var $this = $(this),
 					isChecked = $this.prop('checked'),
-					dateType = $template.find('#date_type').val(),
 					$dateYearElement = $template.find('.optional-year');
 
 				if (isChecked) {
@@ -4247,9 +4245,7 @@ define(function(require) {
 			});
 
 			$template.on('click', '#all_day', function() {
-				var $this = $(this),
-					isChecked = $this.prop('checked'),
-					$singleDateTimeElement = $template.find('.optional-time');
+				var $singleDateTimeElement = $template.find('.optional-time');
 
 				$singleDateTimeElement
 					.toggle('show');
