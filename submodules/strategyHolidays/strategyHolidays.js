@@ -573,16 +573,8 @@ define(function(require) {
 			template.find('.add-holiday').on('click', function(event) {
 				var $this = $(this),
 					totalRows = data.length,
-					$rows = $this.parents('#include_holidays_table').find('tbody tr'),
-					itemsChecked = 0;
-
-				_.forEach($rows, function(row) {
-					var $row = $(row);
-
-					if ($row.find('.add-holiday').prop('checked')) {
-						itemsChecked++;
-					}
-				});
+					$rows = $this.parents('#include_holidays_table').find('tbody tr .add-holiday:checked'),
+					itemsChecked = $rows.length;
 
 				$this.parents('table').find('.check-all').prop('checked', itemsChecked === totalRows);
 			});
