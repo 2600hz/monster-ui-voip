@@ -550,7 +550,6 @@ define(function(require) {
 						))
 						.value();
 
-				console.log(holidaysData);
 				self.strategyHolidaysIncludeHolidaysForCountry(parent, holidaysData);
 				popup.dialog('close').remove();
 			});
