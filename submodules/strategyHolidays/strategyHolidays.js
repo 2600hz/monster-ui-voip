@@ -239,10 +239,10 @@ define(function(require) {
 				},
 				popup = monster.ui.dialog(template, optionsPopup);
 
-			self.strategyHolidaysDeleteDialogBindsEvents(template, parent, popup, data);
+			self.strategyHolidaysDeleteDialogBindEvents(template, parent, popup, data);
 		},
 
-		strategyHolidaysIncludeNationHolidaysRender: function(parent, data) {
+		strategyHolidaysIncludeNationalHolidaysRender: function(parent, data) {
 			var self = this,
 				$template = $(self.getTemplate({
 					name: 'includeNationalHolidays',
@@ -254,15 +254,15 @@ define(function(require) {
 					title: self.i18n.active().strategy.holidays.importNationalOfficeHolidays.title
 				});
 
-			self.strategyHolidaysUpdateNationHolidaysRender(parent, $template, data.holidays);
-			self.strategyHolidaysIncludeNationHolidaysBindsEvents(parent, $template, popup);
+			self.strategyHolidaysUpdateNationalHolidaysRender(parent, $template, data.holidays);
+			self.strategyHolidaysIncludeNationalHolidaysBindEvents(parent, $template, popup);
 		},
 
-		strategyHolidaysUpdateNationHolidaysRender: function(parent, parentTemplate, data) {
+		strategyHolidaysUpdateNationalHolidaysRender: function(parent, parentTemplate, data) {
 			var self = this,
 				holidaysListForSelectedYear = self.strategyHolidaysGetHolidaysForCurrentYear(parent, true),
 				$template = $(self.getTemplate({
-					name: 'updateImportNationalHolidays',
+					name: 'importNationalHolidaysList',
 					data: {
 						holidays: data
 					},
@@ -282,18 +282,23 @@ define(function(require) {
 				}
 			});
 
-			_.forEach(holidaysListForSelectedYear, function(value) {
-				var $rows = $template.find('#include_holidays_table tbody tr');
+			var $rows = $template.find('#include_holidays_table tbody tr'),
+				totalRows = $rows.length,
+				itemsChecked = 0;
 
-				_.forEach($rows, function(row) {
-					var $row = $(row),
-						name = $row.data('name');
+			_.forEach($rows, function(row) {
+				var $row = $(row),
+					name = $row.data('name');
 
-					if (name === value) {
-						$row.find('.add-holiday').prop('checked', true);
-					}
-				});
+				if (holidaysListForSelectedYear.indexOf(name) > -1) {
+					itemsChecked++;
+					$row.find('.add-holiday').prop('checked', true);
+				}
 			});
+
+			$template.find('.check-all').prop('checked', itemsChecked === totalRows);
+
+			self.strategyHolidaysUpdateNationalHolidaysBindEvents($template, data);
 		},
 
 		strategyHolidaysBindEvents: function(parent, template, holidaysData, strategyData) {
@@ -366,7 +371,7 @@ define(function(require) {
 						holidays: holidaysList.getHolidays(yearSelected)
 					};
 
-				self.strategyHolidaysIncludeNationHolidaysRender(parent, data);
+				self.strategyHolidaysIncludeNationalHolidaysRender(parent, data);
 			});
 
 			template.on('click', '.save-button', function(event) {
@@ -468,7 +473,7 @@ define(function(require) {
 			});
 		},
 
-		strategyHolidaysDeleteDialogBindsEvents: function(template, parent, popup, data) {
+		strategyHolidaysDeleteDialogBindEvents: function(template, parent, popup, data) {
 			var self = this;
 
 			template.find('.cancel').on('click', function(event) {
@@ -505,7 +510,7 @@ define(function(require) {
 			});
 		},
 
-		strategyHolidaysIncludeNationHolidaysBindsEvents: function(parent, template, popup) {
+		strategyHolidaysIncludeNationalHolidaysBindEvents: function(parent, template, popup) {
 			var self = this;
 
 			template.find('.cancel').on('click', function(event) {
@@ -521,7 +526,7 @@ define(function(require) {
 					holidayDates = new DateHolidays(country),
 					holidays = holidayDates.getHolidays(yearSelected);
 
-				self.strategyHolidaysUpdateNationHolidaysRender(parent, template, holidays);
+				self.strategyHolidaysUpdateNationalHolidaysRender(parent, template, holidays);
 			});
 
 			template.on('submit', function(event) {
@@ -545,8 +550,42 @@ define(function(require) {
 						))
 						.value();
 
+				console.log(holidaysData);
 				self.strategyHolidaysIncludeHolidaysForCountry(parent, holidaysData);
 				popup.dialog('close').remove();
+			});
+		},
+
+		strategyHolidaysUpdateNationalHolidaysBindEvents: function(template, data) {
+			var self = this;
+
+			template.find('.check-all').on('click', function(event) {
+				var $this = $(this),
+					isChecked = $this.prop('checked'),
+					$rows = $this.parents('#include_holidays_table').find('tbody tr');
+
+				_.forEach($rows, function(row) {
+					var $row = $(row);
+
+					$row.find('.add-holiday').prop('checked', isChecked);
+				});
+			});
+
+			template.find('.add-holiday').on('click', function(event) {
+				var $this = $(this),
+					totalRows = data.length,
+					$rows = $this.parents('#include_holidays_table').find('tbody tr'),
+					itemsChecked = 0;
+
+				_.forEach($rows, function(row) {
+					var $row = $(row);
+
+					if ($row.find('.add-holiday').prop('checked')) {
+						itemsChecked++;
+					}
+				});
+
+				$this.parents('table').find('.check-all').prop('checked', itemsChecked === totalRows);
 			});
 		},
 
