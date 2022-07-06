@@ -2639,7 +2639,6 @@ define(function(require) {
 				if (monster.ui.valid(featureForm) && isValidPhoneNumber) {
 					formData.require_keypress = !formData.require_keypress;
 					formData.number = phoneNumber;
-					delete formData.phoneType;
 
 					var selectedType = featureTemplate.find('.feature-select-mode button.selected').data('value');
 					if (selectedType === 'off') {
@@ -2668,12 +2667,6 @@ define(function(require) {
 					});
 				}
 			});
-
-			if (currentUser.hasOwnProperty('call_forward') && currentUser.call_forward.number && /^(\+1)/.test(currentUser.call_forward.number)) {
-				featureTemplate.find('#phoneType').val('mobile');
-			} else {
-				featureTemplate.find('#phoneType').val('deskphone');
-			}
 
 			var popup = monster.ui.dialog(featureTemplate, {
 				title: currentUser.extra.mapFeatures.call_forward.title,
