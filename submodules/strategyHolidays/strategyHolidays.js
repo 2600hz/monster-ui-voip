@@ -260,7 +260,8 @@ define(function(require) {
 
 		strategyHolidaysUpdateNationalHolidaysRender: function(parent, parentTemplate, data) {
 			var self = this,
-				holidaysListForSelectedYear = self.strategyHolidaysGetHolidaysForCurrentYear(parent, true),
+				holidaysListForSelectedYear = self.strategyHolidaysGetHolidaysForCurrentYear(parent),
+				importedHolidaysNames = _.map(holidaysListForSelectedYear, 'name'),
 				$template = $(self.getTemplate({
 					name: 'importNationalHolidaysList',
 					data: {
@@ -290,7 +291,7 @@ define(function(require) {
 				var $row = $(row),
 					name = $row.data('name');
 
-				if (holidaysListForSelectedYear.indexOf(name) > -1) {
+				if (importedHolidaysNames.indexOf(name) > -1) {
 					itemsChecked++;
 					$row.find('.add-holiday').prop('checked', true);
 				}
@@ -532,10 +533,13 @@ define(function(require) {
 			template.on('submit', function(event) {
 				event.preventDefault();
 
-				var $rows = template.find('#include_holidays_table tbody tr .add-holiday:checked'),
-					holidaysListForSelectedYear = self.strategyHolidaysGetHolidaysForCurrentYear(parent, true),
+				var $rowsChecked = template.find('#include_holidays_table tbody tr .add-holiday:checked'),
+					$rowsUnchecked = template.find('#include_holidays_table tbody tr .add-holiday:not(:checked)'),
+					holidaysListForSelectedYear = self.strategyHolidaysGetHolidaysForCurrentYear(parent),
+					importedHolidaysNames = _.map(holidaysListForSelectedYear, 'name'),
+					allHolidays = self.appFlags.strategyHolidays.allHolidays,
 					holidaysData = _
-						.chain($rows)
+						.chain($rowsChecked)
 						.map(function(row) {
 							var $tr = $(row).parents('tr');
 
@@ -546,9 +550,30 @@ define(function(require) {
 						})
 						.reject(_.flow(
 							_.partial(_.get, _, 'name'),
-							_.partial(_.includes, holidaysListForSelectedYear)
+							_.partial(_.includes, importedHolidaysNames)
 						))
-						.value();
+						.value(),
+					keysToDelete = [];
+
+				_.forEach($rowsUnchecked, function(row) {
+					var $row = $(row),
+						name = $row.parents('tr').data('name'),
+						holidayExists = _.find(holidaysListForSelectedYear, { 'name': name }),
+						holidayId = _.get(holidayExists, 'id'),
+						holidayKey = _.get(holidayExists, 'key');
+
+					if (holidayExists) {
+						keysToDelete.push(holidayKey);
+
+						if (holidayId) {
+							self.appFlags.strategyHolidays.deletedHolidays.push(holidayId);
+						}
+					}
+				});
+
+				_.forEach(keysToDelete.sort((a, b) => b - a), function(key) {
+					delete allHolidays.splice(key, 1);
+				});
 
 				self.strategyHolidaysIncludeHolidaysForCountry(parent, holidaysData);
 				popup.dialog('close').remove();
@@ -580,7 +605,7 @@ define(function(require) {
 			});
 		},
 
-		strategyHolidaysGetHolidaysForCurrentYear: function(parent, isImported) {
+		strategyHolidaysGetHolidaysForCurrentYear: function(parent) {
 			var self = this,
 				holidaysData = self.appFlags.strategyHolidays.allHolidays,
 				yearSelected = parseInt(parent.find('#year').val()),
@@ -591,12 +616,13 @@ define(function(require) {
 				isImported = _.partial(_.get, _, 'isImported'),
 				importedHolidaysList = _
 					.chain(holidaysData)
-					.map(function(holiday) {
+					.map(function(holiday, key) {
 						var holidayData = _.get(holiday, 'holidayData');
 
 						return _.merge({
-							endYear: yearSelected
+							key: key
 						}, _.pick(holidayData, [
+							'id',
 							'name',
 							'endYear',
 							'isImported'
@@ -608,7 +634,7 @@ define(function(require) {
 					))
 					.value();
 
-			return _.map(importedHolidaysList, 'name');
+			return importedHolidaysList;
 		},
 
 		strategyHolidaysImportHolidaysFromCsvData: function(parent) {
