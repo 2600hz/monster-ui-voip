@@ -2565,7 +2565,7 @@ define(function(require) {
 			// cfmode is failover if call_failover.enabled = true
 			// cfmode is on if call_failover.enabled = false && call_forward.enabled = true
 			var callForwardMode = 'off';
-			if (!isFailoverEnabled) {
+			if (isFailoverEnabled) {
 				callForwardMode = 'failover';
 			} else if (isCallForwardEnabled) {
 				callForwardMode = 'on';
