@@ -607,7 +607,7 @@ define(function(require) {
 
 		strategyHolidaysGetHolidaysForCurrentYear: function(parent) {
 			var self = this,
-				holidaysData = self.appFlags.strategyHolidays.allHolidays,
+				allHolidays = self.appFlags.strategyHolidays.allHolidays,
 				yearSelected = parseInt(parent.find('#year').val()),
 				isCurrentYear = _.flow(
 					_.partial(_.get, _, 'endYear'),
@@ -615,7 +615,7 @@ define(function(require) {
 				),
 				isImported = _.partial(_.get, _, 'isImported'),
 				importedHolidaysList = _
-					.chain(holidaysData)
+					.chain(allHolidays)
 					.map(function(holiday, key) {
 						var holidayData = _.get(holiday, 'holidayData');
 
@@ -679,7 +679,8 @@ define(function(require) {
 						isOrdinalValid,
 						isValid
 					]);
-				};
+				},
+				allHolidays = self.appFlags.strategyHolidays.allHolidays;
 
 			monster.pub('common.csvUploader.renderPopup', {
 				title: i18n.importOfficeHolidays.title,
@@ -717,12 +718,36 @@ define(function(require) {
 								end: _.stubTrue
 							}),
 							isStartDateValid = datesValidator.start(start_date),
-							isEndDateValid = datesValidator.end(end_date);
+							isEndDateValid = datesValidator.end(end_date),
+							isSameName = _.flow(
+								_.partial(_.get, _, 'name'),
+								_.partial(_.isEqual, _, row.name)
+							),
+							isSameYear = _.partial(_.get, _, 'isSameYear'),
+							isNameValid = _
+								.chain(allHolidays)
+								.map(function(holiday, key) {
+									var data = _.get(holiday, 'holidayData');
+
+									return _.merge({
+										isSameYear: _.get(data, 'recurring')
+											? true
+											: row.year === data.endYear
+									}, _.pick(data, [
+										'name'
+									]));
+								})
+								.filter(_.overEvery(
+									isSameYear,
+									isSameName
+								))
+								.value();
 
 						return _.every([
 							isTypeValid,
 							isStartDateValid,
-							isEndDateValid
+							isEndDateValid,
+							_.isEmpty(isNameValid)
 						]);
 					}
 				},
