@@ -450,7 +450,7 @@ define(function(require) {
 					callback: function(err, data) {
 						/*Compare old holidayData with new holidayData if it's recurring*/
 						var isOldRecurring = _.get(holidayRule, 'holidayData.recurring', false),
-							isNewRecurring = _.get(holidayRule, 'data.recurring', false);
+							isNewRecurring = _.get(data, 'holidayData.recurring', false);
 
 						if (isOldRecurring && (isOldRecurring !== isNewRecurring)) {
 							/* update existing rule */
