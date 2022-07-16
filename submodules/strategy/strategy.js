@@ -4282,7 +4282,6 @@ define(function(require) {
 			$template.on('submit', function(event) {
 				event.preventDefault();
 
-				console.log(holidayRule);
 				var formData = monster.ui.getFormData('form_add_edit_office_holidays'),
 					$optionDiv = $template.find('.row-fluid.' + formData.type + ' select:not(.hide)'),
 					endYear = $template.find('.optional-year.show .select-year').val(),
