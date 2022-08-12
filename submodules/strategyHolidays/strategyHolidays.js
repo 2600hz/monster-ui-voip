@@ -1256,14 +1256,14 @@ define(function(require) {
 			var self = this,
 				reconcileTemporalRules = _.bind(self.strategyHolidaysReconcileTemporalRules, self, strategyData),
 				rebuildTemporalRulesInPlace = function(actionsByType, strategyData) {
-					var mainCallflowId = strategyData.callflows.MainCallflow.id;
+					var holidayCallflowId = _.get(strategyData.callflows, 'MainHolidays.id');
 
 					_.forEach(actionsByType.toAdd, function(rule) {
 						_.set(strategyData.temporalRules, ['holidays', rule.hasOwnProperty('temporal_rules') ? rule.name : rule.id], rule);
 						strategyData.callflows.MainCallflow.flow.children[rule.id] = {
 							children: {},
 							data: {
-								id: mainCallflowId
+								id: holidayCallflowId
 							},
 							module: 'callflow'
 						};
@@ -1277,17 +1277,6 @@ define(function(require) {
 						_.unset(strategyData.temporalRules, ['holidays', rule.hasOwnProperty('temporal_rules') ? rule.name : rule.id]);
 						_.unset(strategyData.callflows.MainCallflow.flow.children, rule.id);
 					});
-				},
-				updateMainCallflowCatchAllInPlace = function(strategyData) {
-					var holidayCallflowId = _.get(strategyData.callflows, 'MainHolidays.id');
-
-					strategyData.callflows.MainCallflow.flow.children._ = {
-						children: {},
-						data: {
-							id: holidayCallflowId
-						},
-						module: 'callflow'
-					};
 				},
 				rebuildMainCallflowRulesInPlace = _.bind(self.strategyRebuildMainCallflowRuleArray, self),
 				shouldUpdateMainCallflow = function(current, strategyData) {
@@ -1308,7 +1297,6 @@ define(function(require) {
 					};
 
 					rebuildTemporalRulesInPlace(actionsPerType, strategyData);
-					updateMainCallflowCatchAllInPlace(strategyData);
 					rebuildMainCallflowRulesInPlace(strategyData);
 
 					monster.waterfall([
