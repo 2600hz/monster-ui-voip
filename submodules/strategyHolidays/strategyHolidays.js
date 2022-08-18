@@ -939,9 +939,7 @@ define(function(require) {
 				ordinalId = _.indexOf(ordinals, holidayData.ordinal),
 				datesArray = [];
 
-			//find first selected wday of the month
-			date.setDate(wdayId);
-
+			//find first selected wday of the month date.getDay()
 			while (date.getDay() !== wdayId) {
 				date.setDate(date.getDate() + 1);
 			}
@@ -983,7 +981,6 @@ define(function(require) {
 		 * @return {Object[]}
 		 */
 		strategyHolidaysBuildHolidayRule: function(holiday) {
-			console.log(holiday);
 			var self = this,
 				holidayData = _.get(holiday, 'holidayData', {}),
 				name = holidayData.name,
