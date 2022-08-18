@@ -939,9 +939,7 @@ define(function(require) {
 				ordinalId = _.indexOf(ordinals, holidayData.ordinal),
 				datesArray = [];
 
-			//find first selected wday of the month
-			date.setDate(wdayId);
-
+			//find first selected wday of the month date.getDay()
 			while (date.getDay() !== wdayId) {
 				date.setDate(date.getDate() + 1);
 			}
@@ -1124,7 +1122,7 @@ define(function(require) {
 			};
 
 			if (data.hasOwnProperty('id')) {
-				if (data.extra.oldType === 'rule') {
+				if (data.oldType === 'rule') {
 					self.strategyHolidaysDeleteHoliday(data.id, function() {
 						createCleanSet();
 					});

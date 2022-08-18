@@ -4059,7 +4059,9 @@ define(function(require) {
 				isNew = args.isNew,
 				existingHolidays = args.existingHolidays,
 				isRecurring = _.get(holidayRule, 'holidayData.recurring', false),
-				isTimeSet = !_.isUndefined(_.get(holidayRule, 'holidayData.time_window_start')),
+				holidayStartTime = _.get(holidayRule, 'holidayData.time_window_start'),
+				holidayEndTime = _.get(holidayRule, 'holidayData.time_window_stop'),
+				isTimeSet = !_.isUndefined(holidayStartTime) && !_.isNull(holidayStartTime),
 				getListOfYears = function getListOfYears() {
 					var date = new Date(),
 						year = parseInt(date.getFullYear()),
@@ -4117,10 +4119,14 @@ define(function(require) {
 				})),
 				$startTimepicker = $template.find('.start-time'),
 				$endTimepicker = $template.find('.end-time'),
-				endTime = _.get(holidayRule, 'holidayData.time_window_stop', 3600 * 17),
+				endTime = !_.isUndefined(holidayEndTime) && !_.isNull(holidayEndTime)
+					? _.get(holidayRule, 'holidayData.time_window_stop', 3600 * 17)
+					: 3600 * 17,
 				endRemainder = endTime % timepickerStep,
 				startPickerMaxTime = endTime - endRemainder - (endRemainder > 0 ? 0 : timepickerStep),
-				startTime = _.get(holidayRule, 'holidayData.time_window_start', 3600 * 9),
+				startTime = isTimeSet
+					? _.get(holidayRule, 'holidayData.time_window_start', 3600 * 9)
+					: 3600 * 9,
 				startRemainder = startTime % timepickerStep,
 				endPickerMinTime = startTime - startRemainder + timepickerStep,
 				popup;
@@ -4165,7 +4171,7 @@ define(function(require) {
 						.removeClass('show');
 				}
 
-				if (selectedType === 'single' && !isTimeSet) {
+				if (['advanced', 'range'].includes(selectedType) || (selectedType === 'single' && !isTimeSet)) {
 					$template
 						.find('.optional-time')
 						.removeClass('show');
@@ -4242,6 +4248,13 @@ define(function(require) {
 					$recurringElement
 						.removeAttr('disabled');
 				}
+
+				if (['advanced', 'range'].includes(className)) {
+					$template
+						.find('.optional-time')
+						.removeClass('show');
+				}
+
 			});
 
 			$template.on('click', '#all_day', function() {
@@ -4290,6 +4303,9 @@ define(function(require) {
 					nameExistsData = _.find(existingHolidays, { name: formData.name }),
 					originalName = _.get(holidayRule, 'holidayData.name'),
 					isSet = $template.find('.form-content').data('type') === 'set',
+					isSingleDate = formData.type === 'single',
+					isNotSingleDate = ['advanced', 'range'].includes(formData.type),
+					isHolidayStartDate = !_.isUndefined(holidayStartTime),
 					holidayData = _.merge({
 					}, holidayId && {
 						id: holidayId
@@ -4297,10 +4313,10 @@ define(function(require) {
 						set: true
 					}, endYear && {
 						endYear: parseInt(endYear)
-					}, !formData.allDay && {
+					}, !formData.allDay && isSingleDate && {
 						time_window_start: $startTimepicker.timepicker('getSecondsFromMidnight'),
 						time_window_stop: $endTimepicker.timepicker('getSecondsFromMidnight')
-					}, isTimeSet && formData.allDay && {
+					}, ((isHolidayStartDate && formData.allDay && isSingleDate) || (isHolidayStartDate && isNotSingleDate)) && {
 						time_window_start: null,
 						time_window_stop: null
 					}),
