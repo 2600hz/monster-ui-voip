@@ -983,6 +983,7 @@ define(function(require) {
 		 * @return {Object[]}
 		 */
 		strategyHolidaysBuildHolidayRule: function(holiday) {
+			console.log(holiday);
 			var self = this,
 				holidayData = _.get(holiday, 'holidayData', {}),
 				name = holidayData.name,
@@ -1124,7 +1125,7 @@ define(function(require) {
 			};
 
 			if (data.hasOwnProperty('id')) {
-				if (data.extra.oldType === 'rule') {
+				if (data.oldType === 'rule') {
 					self.strategyHolidaysDeleteHoliday(data.id, function() {
 						createCleanSet();
 					});
