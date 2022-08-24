@@ -6,10 +6,12 @@
 				<span class="count-users">{{countUsers}}</span>
 			</div>
 
+		{{#isFeatureAvailable "smartpbx.users.add"}}
 			<a class="monster-link add-user">
 				<i class="icon-telicon-add-user"></i>
 				{{ i18n.users.add }}
 			</a>
+		{{/isFeatureAvailable}}
 		</div>
 
 		<span class="search-box pull-right">
