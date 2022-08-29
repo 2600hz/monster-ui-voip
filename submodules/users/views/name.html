@@ -4,7 +4,7 @@
 
 			<div class="row-fields">
 				<div class="fa fa-wrapper" data-original-title="{{i18n.users.editionForm.nameHelp}}" data-placement="top" data-toggle="tooltip"><i class="fa fa-user"></i></div>
-				<input required type="text" class="input-small" name="first_name" value="{{first_name}}" placeholder="{{i18n.users.editionForm.firstName}}"></input><input required class="input-small fix-left" type="text" name="last_name" value="{{last_name}}" placeholder="{{i18n.users.editionForm.lastName}}"></input>
+				<input {{#isFeatureAvailable "smartpbx.users.settings.fullName.edit"}}{{else}}disabled{{/isFeatureAvailable}} required type="text" class="input-small" name="first_name" value="{{first_name}}" placeholder="{{i18n.users.editionForm.firstName}}"></input><input {{#isFeatureAvailable "smartpbx.users.settings.fullName.edit"}}{{else}}disabled{{/isFeatureAvailable}} required class="input-small fix-left" type="text" name="last_name" value="{{last_name}}" placeholder="{{i18n.users.editionForm.lastName}}"></input>
 			</div>
 
 			<div class="row-fields">
