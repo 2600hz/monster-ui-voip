@@ -109,6 +109,7 @@
 				{{/if}}
 			</div>
 
+		{{#isFeatureAvailable "smartpbx.users.settings.mainExtensionNumber.manage"}}
 			<div class="row-fields">
 				<div class="fa fa-wrapper" data-toggle="tooltip" title="{{i18n.users.editionForm.mainExtensionHelp}}" data-placement="top">
 					<i class="icon-telicon-extensions"></i>
@@ -128,6 +129,7 @@
 					</select>
 				</div>
 			</div>
+		{{/isFeatureAvailable}}
 
 			<div class="row-fields">
 				<div class="fa fa-wrapper" data-toggle="tooltip" title="{{i18n.commonMisc.outboundPrivacy.tooltip}}" data-placement="top">
