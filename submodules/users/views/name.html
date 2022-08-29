@@ -157,10 +157,12 @@
 		</div>-->
 	</form>
 	<div class="actions">
+	{{#isFeatureAvailable "smartpbx.users.settings.delete"}}
 		<!-- We forbid users to delete their own user -->
 		{{#compare id "!==" extra.adminId}}
 			<a id="delete_user" class="monster-link" href="javascript:void(0);"><i class="fa fa-trash-o monster-red"></i>{{ i18n.users.delete }}</a>
 		{{/compare}}
+	{{/isFeatureAvailable}}
 
 		{{#if extra.canImpersonate}}
 			<a id="impersonate_user" class="monster-link" href="javascript:void(0);"><i class="fa fa-user monster-blue"></i>{{ i18n.users.impersonate }}</a>
