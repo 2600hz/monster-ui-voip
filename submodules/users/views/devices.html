@@ -7,7 +7,9 @@
 			{{#each assignedDevices}}
 				<div class="item-row assigned" data-id="{{this.id}}">
 					<div class="device">
+					{{#isFeatureAvailable "smartpbx.users.devices.edit"}}
 						<button type="button" class="monster-button monster-button-danger remove-device">{{ @root.i18n.unassign }}</button>
+					{{/isFeatureAvailable}}
 						<a href="javascript:void(0);" class="edit-device-link monster-link">{{ this.name }}</a>
 					</div>
 				</div>
