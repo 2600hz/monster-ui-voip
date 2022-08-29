@@ -49,12 +49,14 @@
 		</div>
 
 		<div class="category-group">
+		{{#isFeatureAvailable "smartpbx.devices.manage"}}
 			<div id="devices" class="category">
 				<div class="title">
 					<i class="icon-telicon-voip-phone larger-margin"></i>
 					<span class="title-text visible-desktop">{{ i18n.menuTitles.devices }}</span>
 				</div>
 			</div>
+		{{/isFeatureAvailable}}
 
 			<div id="vmboxes" class="category">
 				<div class="title">
