@@ -6,10 +6,12 @@
 				<span class="count-vmboxes">{{countVMBoxes}}</span>
 			</div>
 
+		{{#isFeatureAvailable "smartpbx.vmboxes.add"}}
 			<a class="monster-link add-vmbox">
 				<i class="fa fa-plus-circle"></i>
 				{{i18n.vmboxes.add }}
 			</a>
+		{{/isFeatureAvailable}}
 		</div>
 
 		<span class="search-box pull-right">
