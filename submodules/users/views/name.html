@@ -52,7 +52,8 @@
 		<div class="basic-fields span6">
 			<div class="row-fields">
 				<div class="fa fa-wrapper" data-original-title="{{i18n.users.editionForm.roleHelp}}" data-placement="top" data-toggle="tooltip"><i class="icon-telicon-moderator"></i></div>
-				<select id="priv_level" name="priv_level">
+				<select id="priv_level" name="priv_level"{{#isFeatureAvailable "smartpbx.users.settings.allowUserPrivLevel"}}{{else}} disabled{{/isFeatureAvailable}}>
+				{{#isFeatureAvailable "smartpbx.users.settings.allowUserPrivLevel"}}
 					{{#compare priv_level '===' 'admin'}}
 						<option value="admin" selected>{{ i18n.users.admin }}</option>
 						<option value="user">{{ i18n.users.user }}</option>
@@ -60,6 +61,9 @@
 						<option value="admin">{{ i18n.users.admin }}</option>
 						<option value="user" selected>{{ i18n.users.user }}</option>
 					{{/compare}}
+				{{else}}
+					<option value="admin" selected>{{ i18n.users.admin }}</option>
+				{{/isFeatureAvailable}}
 				</select>
 			</div>
 
