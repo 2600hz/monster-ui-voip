@@ -88,7 +88,8 @@
 				<div class="control-group">
 					<label class="control-label" for="name">{{ i18n.devices.sip_device.deviceName }}</label>
 					<div class="controls">
-						<input type="text" id="name" name="name" value="{{name}}">
+						<input {{#isFeatureAvailable "smartpbx.devices.settings.name.edit" }}{{else}}disabled{{/isFeatureAvailable}} type="text"
+							id="name" name="name" value="{{name}}">
 					</div>
 				</div>
 				{{#if provision}}
