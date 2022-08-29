@@ -8,12 +8,14 @@
 		</div>
 
 		<div class="category-group">
+		{{#isFeatureAvailable "smartpbx.numbers.manage"}}
 			<div id="numbers" class="category">
 				<div class="title">
 					<i class="icon-telicon-apps"></i>
 					<span class="title-text visible-desktop">{{ i18n.menuTitles.numbers }}</span>
 				</div>
 			</div>
+		{{/isFeatureAvailable}}
 
 			<div id="users" class="category">
 				<div class="title">
