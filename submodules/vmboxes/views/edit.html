@@ -247,9 +247,11 @@
 	</div>
 
 	<div class="actions clearfix">
+	{{#isFeatureAvailable "smartpbx.vmboxes.settings.delete"}}
 		{{#if id}}
 			<a id="delete_vmbox" class="monster-link"><i class="fa fa-trash-o monster-red"></i>{{ i18n.vmboxes.deleteVmbox }}</a>
 		{{/if}}
+	{{/isFeatureAvailable}}
 
 		<div class="pull-right">
 			<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
