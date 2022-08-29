@@ -30,6 +30,7 @@
 							{{ i18n.devices.popupSettings.options.menuTitle }}
 						</a>
 					</li>
+				{{#isFeatureAvailable "smartpbx.devices.settings.codecs.manage"}}
 					<li>
 						<a class="tabs-selector change-section" data-section="audio" href="javascript:void(0)">
 							<i class="fa fa-music"></i>
@@ -42,6 +43,7 @@
 							{{ i18n.devices.popupSettings.video.menuTitle }}
 						</a>
 					</li>
+				{{/isFeatureAvailable}}
 					<li>
 						<a class="tabs-selector change-section" data-section="restrictions" href="javascript:void(0)">
 							<i class="fa fa-ban"></i>
