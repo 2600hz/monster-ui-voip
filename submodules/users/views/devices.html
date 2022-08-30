@@ -7,7 +7,9 @@
 			{{#each assignedDevices}}
 				<div class="item-row assigned" data-id="{{this.id}}">
 					<div class="device">
+					{{#isFeatureAvailable "smartpbx.users.devices.edit"}}
 						<button type="button" class="monster-button monster-button-danger remove-device">{{ @root.i18n.unassign }}</button>
+					{{/isFeatureAvailable}}
 						<a href="javascript:void(0);" class="edit-device-link monster-link">{{ this.name }}</a>
 					</div>
 				</div>
@@ -17,6 +19,7 @@
 		</div>
 	</div>
 
+{{#isFeatureAvailable "smartpbx.users.devices.edit"}}
 	<div class="actions">
 		<a class="spare-devices monster-link pull-left" href="javascript:void(0);"><i class="fa fa-list monster-green"></i>{{ i18n.users.devices.spareDevice }}</a>
 		<div class="dropdown pull-left">
@@ -41,4 +44,5 @@
 			<button type="button" class="monster-button monster-button-success save-devices">{{ i18n.saveChanges }}</button>
 		</div>
 	</div>
+{{/isFeatureAvailable}}
 </div>
