@@ -224,7 +224,7 @@ define(function(require) {
 					listNumbers: [],
 					phoneNumber: '',
 					differentEmail: dataUser.email !== dataUser.username,
-					mapFeatures: {
+					mapFeatures: _.pickBy({
 						caller_id: {
 							icon: 'fa fa-user',
 							iconColor: 'monster-blue',
@@ -281,7 +281,11 @@ define(function(require) {
 							iconColor: 'monster-red',
 							title: self.i18n.active().users.do_not_disturb.title
 						}
-					},
+					}, function(object, feature) {
+						return monster.util.isFeatureAvailable(
+							['smartpbx', 'users', 'features', _.camelCase(feature), 'edit']
+						);
+					}),
 					outboundPrivacy: _.map(self.appFlags.common.outboundPrivacy, function(item) {
 						return {
 							key: item,
