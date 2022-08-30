@@ -18,7 +18,9 @@
 					</div>
 
 					<div class="number-container">
+					{{#isFeatureAvailable "smartpbx.users.phoneNumbers.edit"}}
 						<button type="button" class="monster-button monster-button-danger remove-number{{#compare this.used_by "===" "mobile"}} disabled" disabled{{else}}"{{/compare}}>{{ @root.i18n.unassign }}</button>
+					{{/isFeatureAvailable}}
 						<span class="number">
 							{{ formatPhoneNumber this.phoneNumber }}
 						</span>
@@ -30,6 +32,7 @@
 		</div>
 	</div>
 
+{{#isFeatureAvailable "smartpbx.users.phoneNumbers.edit"}}
 	<div class="actions">
 		<a href="#" class="spare-link monster-link pull-left{{#if emptySpare}} disabled{{/if}}">
 			<i class="fa fa-list monster-green"></i>{{ i18n.users.addFromSpare }}
@@ -52,4 +55,5 @@
 			<button type="button" class="monster-button monster-button-success save-numbers">{{ i18n.saveChanges }}</button>
 		</div>
 	</div>
+{{/isFeatureAvailable}}
 </div>
