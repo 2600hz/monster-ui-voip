@@ -9,10 +9,24 @@
 	display: inline-block;
 }
 
+#users_container .users-header .left {
+	&>* {
+		display: inline-block;
+
+		&:first-child {
+			border-top-left-radius: 2px;
+			border-bottom-left-radius: 2px;
+		}
+
+		&:last-child {
+			border-top-right-radius: 2px;
+			border-bottom-right-radius: 2px;
+		}
+	}
+}
 #users_container .users-header .title {
 	padding: 15px;
 	border: 1px solid #dcdcdc;
-	border-radius: 2px 0 0 2px;
 }
 
 #users_container .users-header .count-users {
@@ -29,7 +43,6 @@
 	padding: 9px 13px;
 	border: 1px solid #dcdcdc;
 	border-left: 0;
-	border-radius: 0 2px 2px 0;
 	background-image: -webkit-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
 	background-image:    -moz-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
 	background-image:     -ms-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
