@@ -24,6 +24,7 @@
 					<b class="caret"></b>
 				</a>
 				<ul class="dropdown-menu pull-right">
+				{{#isFeatureAvailable "smartpbx.devices.settings.codecs.manage"}}
 				{{#compare device_type "!==" "mobile"}}
 					<li>
 						<a class="tabs-selector change-section" data-section="audio" href="javascript:void(0)">
@@ -38,6 +39,7 @@
 						</a>
 					</li>
 				{{/compare}}
+				{{/isFeatureAvailable}}
 					<li>
 						<a class="tabs-selector change-section" data-section="restrictions" href="javascript:void(0)">
 							<i class="fa fa-ban"></i>
@@ -71,7 +73,8 @@
 				<div class="control-group">
 					<label class="control-label" for="name">{{ i18n.devices.mobile.deviceName }}</label>
 					<div class="controls">
-						<div class="text">{{name}}</div>
+						<div {{#isFeatureAvailable "smartpbx.devices.settings.name.edit" }}{{else}}disabled{{/isFeatureAvailable}} class="text">
+							{{name}}</div>
 					</div>
 				</div>
 
@@ -82,6 +85,7 @@
 					</div>
 				</div>
 
+			{{#isFeatureAvailable "smartpbx.devices.settings.sip.manage"}}
 				<div class="control-group">
 					<label class="control-label" for="sip_username">{{ i18n.devices.sip.username }}</label>
 					<div class="controls">
@@ -102,6 +106,7 @@
 						<span class="displayed-realm">{{ extra.sip.realm }}</span>
 					</div>
 				</div>
+			{{/isFeatureAvailable}}
 			</div>
 
 			<div class="tabs-section clearfix" data-section="audio">

@@ -504,7 +504,9 @@
 			"noConfNumbers": "Vous devez ajouter un Numéro principal de Conférence (Voir \"Numéro principal\" dans le menu de gauche) avant de pouvoir configurer les Conférences personnelles des utilisateurs"
 		},
 		"faxing": {
-			"title": "Faxbox",
+			"titles": {
+				"faxbox": "Faxbox"
+			},
 			"headline": "Faxbox",
 			"defaultSettings": {
 				"nameExtension": "'s Faxbox",
