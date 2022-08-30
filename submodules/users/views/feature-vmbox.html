@@ -28,7 +28,7 @@
 					{{i18n.users.vmbox.transcribe}}
 				</label>
 				{{#monsterSwitch}}
-					<input type="checkbox" name="transcribe" id="transcribe" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if vmbox.transcription.value}} checked="checked"{{/if}}></input>
+					<input {{#isFeatureAvailable "smartpbx.users.features.vmbox.transcription"}}{{else}}disabled{{/isFeatureAvailable}} type="checkbox" name="transcribe" id="transcribe" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if vmbox.transcription.value}} checked="checked"{{/if}}></input>
 				{{/monsterSwitch}}
 			</div>
 			{{/if}}
