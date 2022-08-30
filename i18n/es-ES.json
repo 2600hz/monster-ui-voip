@@ -528,7 +528,9 @@
 			"noConfNumbers": "Usted necesita agregar un número de conferencia principal (en la sección número principal a la izquierda de la SmartPBX) para permitir que los puentes de conferencia Personnals "
 		},
 		"faxing": {
-			"title": "Faxbox",
+			"titles": {
+				"faxbox": "Faxbox"
+			},
 			"headline": "Faxbox",
 			"defaultSettings": {
 				"nameExtension": "'s Faxbox",

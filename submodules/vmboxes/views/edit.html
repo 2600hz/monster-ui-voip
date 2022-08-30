@@ -57,12 +57,14 @@
 					</div>
 				</div>
 
+			{{#isFeatureAvailable "smartpbx.vmboxes.settings.voicemailNumber.manage"}}
 				<div class="control-group">
 					<label class="control-label" for="name">{{ i18n.vmboxes.popupSettings.basic.number.label }}</label>
 					<div class="controls">
 						<input type="text" id="mailbox" name="mailbox" value="{{ mailbox }}">
 					</div>
 				</div>
+			{{/isFeatureAvailable}}
 
 				<div class="control-group">
 					<label class="control-label" for="name">{{ i18n.vmboxes.popupSettings.basic.pinNumber.label }}</label>
@@ -247,9 +249,11 @@
 	</div>
 
 	<div class="actions clearfix">
+	{{#isFeatureAvailable "smartpbx.vmboxes.settings.delete"}}
 		{{#if id}}
 			<a id="delete_vmbox" class="monster-link"><i class="fa fa-trash-o monster-red"></i>{{ i18n.vmboxes.deleteVmbox }}</a>
 		{{/if}}
+	{{/isFeatureAvailable}}
 
 		<div class="pull-right">
 			<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>

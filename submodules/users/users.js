@@ -196,6 +196,14 @@ define(function(require) {
 		 */
 		usersFormatUserData: function(data) {
 			var self = this,
+				getFeatureTitle = function(featureId, defaultKey) {
+					var i18n = self.i18n.active().users[featureId].titles,
+						key = monster.util.getFeatureConfig(
+							['smartpbx', 'users', 'features', featureId, 'i18nLabelPath'],
+							defaultKey
+						);
+					return i18n[key];
+				},
 				dataUser = data.user,
 				_mainDirectory = data.mainDirectory,
 				_mainCallflow = data.userMainCallflow,
@@ -216,7 +224,7 @@ define(function(require) {
 					listNumbers: [],
 					phoneNumber: '',
 					differentEmail: dataUser.email !== dataUser.username,
-					mapFeatures: {
+					mapFeatures: _.pickBy({
 						caller_id: {
 							icon: 'fa fa-user',
 							iconColor: 'monster-blue',
@@ -241,12 +249,12 @@ define(function(require) {
 						vmbox: {
 							icon: 'icon-telicon-voicemail',
 							iconColor: 'monster-green',
-							title: self.i18n.active().users.vmbox.title
+							title: getFeatureTitle('vmbox', 'voicemailBox')
 						},
 						faxing: {
 							icon: 'icon-telicon-fax',
 							iconColor: 'monster-red',
-							title: self.i18n.active().users.faxing.title
+							title: getFeatureTitle('faxing', 'faxbox')
 						},
 						conferencing: {
 							icon: 'fa fa-comments',
@@ -273,7 +281,11 @@ define(function(require) {
 							iconColor: 'monster-red',
 							title: self.i18n.active().users.do_not_disturb.title
 						}
-					},
+					}, function(object, feature) {
+						return monster.util.isFeatureAvailable(
+							['smartpbx', 'users', 'features', _.camelCase(feature), 'edit']
+						);
+					}),
 					outboundPrivacy: _.map(self.appFlags.common.outboundPrivacy, function(item) {
 						return {
 							key: item,
@@ -2317,7 +2329,12 @@ define(function(require) {
 				})),
 				switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#vmbox_form'),
+				switchTranscription = featureForm.find('#transcribe').parent(),
 				switchVmToEmail = featureForm.find('#vm_to_email_enabled');
+			
+			if (!monster.util.isFeatureAvailable('smartpbx.users.features.vmbox.transcription')) {
+				switchTranscription.addClass('disabled');
+			}
 
 			monster.ui.validate(featureForm);
 

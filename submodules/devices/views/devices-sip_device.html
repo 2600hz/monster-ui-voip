@@ -30,13 +30,16 @@
 				</a>
 				<ul class="dropdown-menu pull-right">
 				{{#if provision}}
+					{{#isFeatureAvailable "smartpbx.devices.settings.sip.manage"}}
 					<li>
 						<a class="tabs-selector change-section" data-section="sip" href="javascript:void(0)">
 							<i class="fa fa-user"></i>
 							{{ i18n.devices.popupSettings.sip.menuTitle }}
 						</a>
 					</li>
+					{{/isFeatureAvailable}}
 				{{/if}}
+				{{#isFeatureAvailable "smartpbx.devices.settings.codecs.manage"}}
 					<li>
 						<a class="tabs-selector change-section" data-section="audio" href="javascript:void(0)">
 							<i class="fa fa-music"></i>
@@ -49,6 +52,7 @@
 							{{ i18n.devices.popupSettings.video.menuTitle }}
 						</a>
 					</li>
+				{{/isFeatureAvailable}}
 					<li>
 						<a class="tabs-selector change-section" data-section="restrictions" href="javascript:void(0)">
 							<i class="fa fa-ban"></i>
@@ -88,7 +92,8 @@
 				<div class="control-group">
 					<label class="control-label" for="name">{{ i18n.devices.sip_device.deviceName }}</label>
 					<div class="controls">
-						<input type="text" id="name" name="name" value="{{name}}">
+						<input {{#isFeatureAvailable "smartpbx.devices.settings.name.edit" }}{{else}}disabled{{/isFeatureAvailable}} type="text"
+							id="name" name="name" value="{{name}}">
 					</div>
 				</div>
 				{{#if provision}}
@@ -99,6 +104,7 @@
 					</div>
 				</div>
 				{{else}}
+			{{#isFeatureAvailable "smartpbx.devices.settings.sip.manage"}}
 				<div class="control-group">
 					<label class="control-label" for="sip_username">{{ i18n.devices.sip.username }}</label>
 					<div class="controls">
@@ -119,6 +125,8 @@
 						<span class="displayed-realm">{{ extra.sip.realm }}</span>
 					</div>
 				</div>
+			{{/isFeatureAvailable}}
+
 				{{/if}}
 			</div>
 
