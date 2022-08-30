@@ -676,7 +676,10 @@
 		},
 		"faxing": {
 			"trialError": "You're currently using a trial version of the UI. Please upgrade your account to have access to the Faxing feature!",
-			"title": "Faxbox",
+			"titles": {
+				"faxbox": "Faxbox",
+				"fax": "Fax"
+			},
 			"headline": "Faxbox",
 			"defaultSettings": {
 				"nameExtension": "'s Faxbox",
@@ -721,7 +724,10 @@
 			"headline": "User Voicemail Box",
 			"text": "A voicemail box will be available for this user.",
 			"label": "Voicemail to e-mail:",
-			"title": "Voicemail Box",
+			"titles": {
+				"voicemailBox": "Voicemail Box",
+				"voicemail": "Voicemail"
+			},
 			"vmToEmailHelp": "An e-mail will be sent to {{variable}} for every new voicemail. If you want to change where email notifications go to, please edit the user's email address in the User Administration section.",
 			"transcribe": "Transcribe",
 			"attachVoicemail": "Attach voicemail message to email."

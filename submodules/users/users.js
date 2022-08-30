@@ -196,6 +196,14 @@ define(function(require) {
 		 */
 		usersFormatUserData: function(data) {
 			var self = this,
+				getFeatureTitle = function(featureId, defaultKey) {
+					var i18n = self.i18n.active().users[featureId].titles,
+						key = monster.util.getFeatureConfig(
+							['smartpbx', 'users', 'features', featureId, 'i18nLabelPath'],
+							defaultKey
+						);
+					return i18n[key];
+				},
 				dataUser = data.user,
 				_mainDirectory = data.mainDirectory,
 				_mainCallflow = data.userMainCallflow,
@@ -241,12 +249,12 @@ define(function(require) {
 						vmbox: {
 							icon: 'icon-telicon-voicemail',
 							iconColor: 'monster-green',
-							title: self.i18n.active().users.vmbox.title
+							title: getFeatureTitle('vmbox', 'voicemailBox')
 						},
 						faxing: {
 							icon: 'icon-telicon-fax',
 							iconColor: 'monster-red',
-							title: self.i18n.active().users.faxing.title
+							title: getFeatureTitle('faxing', 'faxbox')
 						},
 						conferencing: {
 							icon: 'fa fa-comments',
