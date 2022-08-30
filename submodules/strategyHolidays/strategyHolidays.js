@@ -448,24 +448,36 @@ define(function(require) {
 					holidayRule: holidayRule,
 					isNew: false,
 					callback: function(err, data) {
-						/*Compare old holidayData with new holidayData if it's recurring*/
-						var isOldRecurring = _.get(holidayRule, 'holidayData.recurring', false),
-							isNewRecurring = _.get(data, 'holidayData.recurring', false);
+						var holidayId = _.get(data, 'holidayData.id');
 
-						if (isOldRecurring && (isOldRecurring !== isNewRecurring)) {
-							/* update existing rule */
-							if (_.isUndefined(holidayRule.holidayData.excludeYear)) {
-								holidayRule.holidayData.excludeYear = [];
+						if (holidayRule.holidayType === 'range' && data.holidayType !== 'range') {
+							if (holidayId) {
+								self.appFlags.strategyHolidays.deletedHolidays.push(holidayId);
 							}
-							holidayRule.holidayData.excludeYear.push(yearSelected);
-							holidayRule.modified = true;
-							self.appFlags.strategyHolidays.allHolidays[key] = holidayRule;
-
-							/* add new rule */
-							delete data.holidayData.id;
-							self.appFlags.strategyHolidays.allHolidays.push(data);
+							delete allHolidays.splice(key, 1);
+							self.appFlags.strategyHolidays.allHolidays.push(
+								_.omit(data, ['holidayData.id', 'holidayData.set'])
+							);
 						} else {
-							self.appFlags.strategyHolidays.allHolidays[key] = data;
+							/*Compare old holidayData with new holidayData if it's recurring*/
+							var isOldRecurring = _.get(holidayRule, 'holidayData.recurring', false),
+								isNewRecurring = _.get(data, 'holidayData.recurring', false);
+
+							if (isOldRecurring && (isOldRecurring !== isNewRecurring)) {
+								/* update existing rule */
+								if (_.isUndefined(holidayRule.holidayData.excludeYear)) {
+									holidayRule.holidayData.excludeYear = [];
+								}
+								holidayRule.holidayData.excludeYear.push(yearSelected);
+								holidayRule.modified = true;
+								self.appFlags.strategyHolidays.allHolidays[key] = holidayRule;
+
+								/* add new rule */
+								delete data.holidayData.id;
+								self.appFlags.strategyHolidays.allHolidays.push(data);
+							} else {
+								self.appFlags.strategyHolidays.allHolidays[key] = data;
+							}
 						}
 
 						self.strategyHolidaysListingRender(parent);
