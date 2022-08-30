@@ -473,8 +473,9 @@ define(function(require) {
 								self.appFlags.strategyHolidays.allHolidays[key] = holidayRule;
 
 								/* add new rule */
-								delete data.holidayData.id;
-								self.appFlags.strategyHolidays.allHolidays.push(data);
+								self.appFlags.strategyHolidays.allHolidays.push(
+									_.omit(data, ['holidayData.id'])
+								);
 							} else {
 								self.appFlags.strategyHolidays.allHolidays[key] = data;
 							}
