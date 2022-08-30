@@ -2329,7 +2329,12 @@ define(function(require) {
 				})),
 				switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#vmbox_form'),
+				switchTranscription = featureForm.find('#transcribe').parent(),
 				switchVmToEmail = featureForm.find('#vm_to_email_enabled');
+			
+			if (!monster.util.isFeatureAvailable('smartpbx.users.features.vmbox.transcription')) {
+				switchTranscription.addClass('disabled');
+			}
 
 			monster.ui.validate(featureForm);
 
