@@ -30,6 +30,7 @@
 							{{ i18n.devices.popupSettings.options.menuTitle }}
 						</a>
 					</li>
+				{{#isFeatureAvailable "smartpbx.devices.settings.codecs.manage"}}
 					<li>
 						<a class="tabs-selector change-section" data-section="audio" href="javascript:void(0)">
 							<i class="fa fa-music"></i>
@@ -42,6 +43,7 @@
 							{{ i18n.devices.popupSettings.video.menuTitle }}
 						</a>
 					</li>
+				{{/isFeatureAvailable}}
 					<li>
 						<a class="tabs-selector change-section" data-section="restrictions" href="javascript:void(0)">
 							<i class="fa fa-ban"></i>
@@ -67,7 +69,8 @@
 				<div class="control-group">
 					<label class="control-label" for="name">{{ i18n.devices.smartphone.deviceName }}</label>
 					<div class="controls">
-						<input type="text" id="name" name="name" value="{{name}}">
+						<input {{#isFeatureAvailable "smartpbx.devices.settings.name.edit" }}{{else}}disabled{{/isFeatureAvailable}} type="text"
+							id="name" name="name" value="{{name}}">
 					</div>
 				</div>
 				<div class="control-group">
@@ -76,6 +79,7 @@
 						<input type="text" name="call_forward.number" placeholder="{{ i18n.devices.cellphone.numberPlaceholder }}" value="{{call_forward.number}}">
 					</div>
 				</div>
+			{{#isFeatureAvailable "smartpbx.devices.settings.sip.manage"}}
 				<div class="control-group">
 					<label class="control-label" for="sip_username">{{ i18n.devices.sip.username }}</label>
 					<div class="controls">
@@ -96,6 +100,7 @@
 						<span class="displayed-realm">{{ extra.sip.realm }}</span>
 					</div>
 				</div>
+			{{/isFeatureAvailable}}
 			</div>
 
 			<div class="tabs-section" data-section="options">
