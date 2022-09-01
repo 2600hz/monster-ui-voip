@@ -4316,7 +4316,7 @@ define(function(require) {
 					}, !formData.allDay && isSingleDate && {
 						time_window_start: $startTimepicker.timepicker('getSecondsFromMidnight'),
 						time_window_stop: $endTimepicker.timepicker('getSecondsFromMidnight')
-					}, ((isHolidayStartDate && formData.allDay && isSingleDate) || (isHolidayStartDate && isNotSingleDate)) && {
+					}, holidayId && ((isHolidayStartDate && formData.allDay && isSingleDate) || (isHolidayStartDate && isNotSingleDate)) && {
 						time_window_start: null,
 						time_window_stop: null
 					}),

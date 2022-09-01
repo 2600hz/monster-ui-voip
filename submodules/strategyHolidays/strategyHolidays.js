@@ -468,6 +468,7 @@ define(function(require) {
 								if (_.isUndefined(holidayRule.holidayData.excludeYear)) {
 									holidayRule.holidayData.excludeYear = [];
 								}
+
 								holidayRule.holidayData.excludeYear.push(yearSelected);
 								holidayRule.modified = true;
 								self.appFlags.strategyHolidays.allHolidays[key] = holidayRule;
@@ -477,6 +478,9 @@ define(function(require) {
 									_.omit(data, ['holidayData.id'])
 								);
 							} else {
+								if (holidayRule.holidayType === 'advanced' && data.holidayType !== 'advanced') {
+									data.holidayData.ordinal = null;
+								}
 								self.appFlags.strategyHolidays.allHolidays[key] = data;
 							}
 						}
@@ -1044,8 +1048,11 @@ define(function(require) {
 						holidayRule.days = _.range(fromDay, toDay + 1);
 					}
 				} else {
-					holidayRule.ordinal = holidayData.ordinal;
 					holidayRule.wdays = [holidayData.wday];
+				}
+
+				if (holidayData.hasOwnProperty('ordinal')) {
+					holidayRule.ordinal = holidayData.ordinal;
 				}
 			}
 
