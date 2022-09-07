@@ -41,6 +41,33 @@ define(function(require) {
 			});
 		},
 
+		copyCallData: function(target, otherLegs) {
+			const self = this;
+			const $this = $(target);
+			const call = $this.data('diag-data');
+			call.other_legs = otherLegs;
+
+			var callData = 'Account ID: ' + (call.account_id || '')
+				+ '\nFrom (Name): ' + (call.from_name || '')
+				+ '\nFrom (Number): ' + (call.from_number || '')
+				+ '\nTo (Name): ' + (call.to_name || '')
+				+ '\nTo (Number): ' + (call.to_number || '')
+				+ '\nDate: ' + (call.date || '')
+				+ '\nDuration: ' + (call.duration || '')
+				+ '\nHangup Cause: ' + (call.hangup_cause || '')
+				+ '\nCall ID: ' + (call.call_id || '')
+				+ '\nOther Legs: \n  ' + (otherLegs || []).join('\n  ')
+				+ '\nHandling Server: ' + (call.handling_server || '')
+				+ '\nTimestamp: ' + (call.timestamp || '')
+				+ '\nBase64 Encoded: ' + btoa(JSON.stringify(call));
+
+			navigator.clipboard.writeText(callData);
+			monster.ui.toast({
+				type: 'success',
+				message: self.i18n.active().callLogs.copyCallDiagInfo
+			});
+		},
+
 		callLogsRenderContent: function(parent, fromDate, toDate, type, callback) {
 			var self = this,
 				template,
@@ -201,11 +228,18 @@ define(function(require) {
 				var $this = $(this),
 					rowGroup = $this.parents('.grid-row-group'),
 					callId = $this.data('id'),
-					extraLegs = rowGroup.find('.extra-legs');
+					extraLegs = rowGroup.find('.extra-legs'),
+					target = e.target;
 
 				if (rowGroup.hasClass('open')) {
 					rowGroup.removeClass('open');
 					extraLegs.slideUp();
+
+					// Handle copy diagnostic data button
+					if (target.classList.contains('copy-diag-data')) {
+						const otherLegs = $this.data('otherLegs');
+						self.copyCallData(target, otherLegs);
+					}
 				} else {
 					// Reset all slidedDown legs
 					template.find('.grid-row-group').removeClass('open');
@@ -219,6 +253,14 @@ define(function(require) {
 						self.callLogsGetLegs(callId, function(cdrs) {
 							var formattedCdrs = self.callLogsFormatCdrs(cdrs);
 
+							// Make other legs available when querying but not copying
+							const otherLegs = cdrs.map((call) => call.id);
+							$this.data('otherLegs', otherLegs);
+							// Handle copy diagnostic data button
+							if (target.classList.contains('copy-diag-data')) {
+								self.copyCallData(target, otherLegs);
+							}
+
 							rowGroup.find('.extra-legs')
 									.empty()
 									.addClass('data-loaded')
@@ -230,6 +272,12 @@ define(function(require) {
 										submodule: 'callLogs'
 									})));
 						});
+					} else {
+						// Handle copy diagnostic data button
+						if (target.classList.contains('copy-diag-data')) {
+							const otherLegs = $this.data('otherLegs');
+							self.copyCallData(target, otherLegs);
+						}
 					}
 				}
 			});
@@ -393,6 +441,21 @@ define(function(require) {
 							.value(),
 						device = _.get(self.appFlags.callLogs.devices, _.get(cdr, 'custom_channel_vars.authorizing_id'));
 
+					const base64DiagData = JSON.stringify({
+						account_id: self.accountId,
+						from_name: (cdr.caller_id_name || ''),
+						from_number: fromNumber,
+						to_name: (cdr.callee_id_name || ''),
+						to_number: toNumber,
+						date: shortDate,
+						duration: durationMin + ':' + durationSec,
+						hangup_cause: (cdr.hangup_cause || ''),
+						call_id: cdr.call_id,
+						other_legs: [(cdr.other_leg_call_id || '')],
+						handling_server: (cdr.media_server || ''),
+						timestamp: (cdr.timestamp || '')
+					});
+
 					return _.merge({
 						id: cdr.id,
 						callId: cdr.call_id,
@@ -412,22 +475,8 @@ define(function(require) {
 						// Only display help if it's in the i18n.
 						hangupHelp: _.get(hangupI18n, [cdr.hangup_cause, isOutboundCall ? 'outbound' : 'inbound'], ''),
 						isOutboundCall: isOutboundCall,
-						mailtoLink: 'mailto:' + monster.config.whitelabel.callReportEmail
-								+ '?subject=Call Report: ' + cdr.call_id
-								+ '&body=Please describe the details of the issue:%0D%0A%0D%0A'
-								+ '%0D%0A____________________________________________________________%0D%0A'
-								+ '%0D%0AAccount ID: ' + self.accountId
-								+ '%0D%0AFrom (Name): ' + (cdr.caller_id_name || '')
-								+ '%0D%0AFrom (Number): ' + fromNumber
-								+ '%0D%0ATo (Name): ' + (cdr.callee_id_name || '')
-								+ '%0D%0ATo (Number): ' + toNumber
-								+ '%0D%0ADate: ' + shortDate
-								+ '%0D%0ADuration: ' + durationMin + ':' + durationSec
-								+ '%0D%0AHangup Cause: ' + (cdr.hangup_cause || '')
-								+ '%0D%0ACall ID: ' + cdr.call_id
-								+ '%0D%0AOther Leg Call ID: ' + (cdr.other_leg_call_id || '')
-								+ '%0D%0AHandling Server: ' + (cdr.media_server || '')
-								+ '%0D%0ATimestamp: ' + (cdr.timestamp || '')
+						reportMail: monster.config.whitelabel.callReportEmail,
+						diagData: base64DiagData
 					}, _.has(cdr, 'channel_created_time') && {
 						channelCreatedTime: cdr.channel_created_time
 					}, !_.isUndefined(device) && {

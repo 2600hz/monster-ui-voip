@@ -1240,6 +1240,7 @@
 			"report": "Report Call",
 			"details": "Technical Details"
 		},
+		"copyCallDiagInfo": "Diagnostic data copied to clipboard, please email this to your support representative for assistance",
 		"downloadTooltip": "In \"Custom\" Mode, you'll need to click on \"Filter\" before clicking on download."
 	},
 
