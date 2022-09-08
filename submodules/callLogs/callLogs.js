@@ -42,36 +42,44 @@ define(function(require) {
 		},
 
 		copyCallData: function(target, otherLegs) {
-			if (!target.classList.contains('copy-diag-data')) {
-				return;
-			}
 			const self = this;
-			const $this = $(target);
-			const call = $this.data('diag-data');
-			const otherLegCallId = call.other_leg_call_id;
-			call.other_leg_call_id = undefined;
-			call.other_legs = otherLegs;
 
-			var callData = 'Account ID: ' + (call.account_id || '')
-				+ '\nFrom (Name): ' + (call.from_name || '')
-				+ '\nFrom (Number): ' + (call.from_number || '')
-				+ '\nTo (Name): ' + (call.to_name || '')
-				+ '\nTo (Number): ' + (call.to_number || '')
-				+ '\nDate: ' + (call.date || '')
-				+ '\nDuration: ' + (call.duration || '')
-				+ '\nHangup Cause: ' + (call.hangup_cause || '')
-				+ '\nCall ID: ' + (call.call_id || '')
-				+ '\nOther Leg Call ID: ' + (otherLegCallId || '')
-				+ '\nOther Legs: \n  ' + (otherLegs || []).join('\n  ')
-				+ '\nHandling Server: ' + (call.handling_server || '')
-				+ '\nTimestamp: ' + (call.timestamp || '')
-				+ '\nBase64 Encoded: ' + btoa(JSON.stringify(call));
+			try {
+				if (!target.classList.contains('copy-diag-data')) {
+					return;
+				}
+				const $this = $(target);
+				const call = $this.data('diag-data');
+				const otherLegCallId = call.other_leg_call_id;
+				call.other_leg_call_id = undefined;
+				call.other_legs = otherLegs;
 
-			navigator.clipboard.writeText(callData);
-			monster.ui.toast({
-				type: 'success',
-				message: self.i18n.active().callLogs.copyCallDiagInfo
-			});
+				var callData = 'Account ID: ' + (call.account_id || '')
+					+ '\nFrom (Name): ' + (call.from_name || '')
+					+ '\nFrom (Number): ' + (call.from_number || '')
+					+ '\nTo (Name): ' + (call.to_name || '')
+					+ '\nTo (Number): ' + (call.to_number || '')
+					+ '\nDate: ' + (call.date || '')
+					+ '\nDuration: ' + (call.duration || '')
+					+ '\nHangup Cause: ' + (call.hangup_cause || '')
+					+ '\nCall ID: ' + (call.call_id || '')
+					+ '\nOther Leg Call ID: ' + (otherLegCallId || '')
+					+ '\nOther Legs: \n  ' + (otherLegs || []).join('\n  ')
+					+ '\nHandling Server: ' + (call.handling_server || '')
+					+ '\nTimestamp: ' + (call.timestamp || '')
+					+ '\nBase64 Encoded: ' + btoa(JSON.stringify(call));
+
+				navigator.clipboard.writeText(callData);
+				monster.ui.toast({
+					type: 'success',
+					message: self.i18n.active().callLogs.copyCallDiagInfo
+				});
+			} catch (e) {
+				monster.ui.toast({
+					type: 'error',
+					message: self.i18n.active().callLogs.copyCallDiagError
+				});
+			}
 		},
 
 		callLogsRenderContent: function(parent, fromDate, toDate, type, callback) {
