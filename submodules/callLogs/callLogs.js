@@ -42,9 +42,14 @@ define(function(require) {
 		},
 
 		copyCallData: function(target, otherLegs) {
+			if (!target.classList.contains('copy-diag-data')) {
+				return;
+			}
 			const self = this;
 			const $this = $(target);
 			const call = $this.data('diag-data');
+			const otherLegCallId = call.other_leg_call_id;
+			call.other_leg_call_id = undefined;
 			call.other_legs = otherLegs;
 
 			var callData = 'Account ID: ' + (call.account_id || '')
@@ -56,6 +61,7 @@ define(function(require) {
 				+ '\nDuration: ' + (call.duration || '')
 				+ '\nHangup Cause: ' + (call.hangup_cause || '')
 				+ '\nCall ID: ' + (call.call_id || '')
+				+ '\nOther Leg Call ID: ' + (otherLegCallId || '')
 				+ '\nOther Legs: \n  ' + (otherLegs || []).join('\n  ')
 				+ '\nHandling Server: ' + (call.handling_server || '')
 				+ '\nTimestamp: ' + (call.timestamp || '')
@@ -236,10 +242,8 @@ define(function(require) {
 					extraLegs.slideUp();
 
 					// Handle copy diagnostic data button
-					if (target.classList.contains('copy-diag-data')) {
-						const otherLegs = $this.data('otherLegs');
-						self.copyCallData(target, otherLegs);
-					}
+					const otherLegs = $this.data('otherLegs');
+					self.copyCallData(target, otherLegs);
 				} else {
 					// Reset all slidedDown legs
 					template.find('.grid-row-group').removeClass('open');
@@ -255,11 +259,10 @@ define(function(require) {
 
 							// Make other legs available when querying but not copying
 							const otherLegs = cdrs.map((call) => call.id);
-							$this.data('otherLegs', otherLegs);
+
 							// Handle copy diagnostic data button
-							if (target.classList.contains('copy-diag-data')) {
-								self.copyCallData(target, otherLegs);
-							}
+							$this.data('otherLegs', otherLegs);
+							self.copyCallData(target, otherLegs);
 
 							rowGroup.find('.extra-legs')
 									.empty()
@@ -274,10 +277,8 @@ define(function(require) {
 						});
 					} else {
 						// Handle copy diagnostic data button
-						if (target.classList.contains('copy-diag-data')) {
-							const otherLegs = $this.data('otherLegs');
-							self.copyCallData(target, otherLegs);
-						}
+						const otherLegs = $this.data('otherLegs');
+						self.copyCallData(target, otherLegs);
 					}
 				}
 			});
@@ -451,7 +452,7 @@ define(function(require) {
 						duration: durationMin + ':' + durationSec,
 						hangup_cause: (cdr.hangup_cause || ''),
 						call_id: cdr.call_id,
-						other_legs: [(cdr.other_leg_call_id || '')],
+						other_leg_call_id: (cdr.other_leg_call_id || ''),
 						handling_server: (cdr.media_server || ''),
 						timestamp: (cdr.timestamp || '')
 					});

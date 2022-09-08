@@ -1237,7 +1237,7 @@
 		"__version": "v4.0",
 		"loading": "Loading additional information...",
 		"actions": {
-			"report": "Report Call",
+			"report": "Copy details",
 			"details": "Technical Details"
 		},
 		"copyCallDiagInfo": "Diagnostic data copied to clipboard, please email this to your support representative for assistance",
