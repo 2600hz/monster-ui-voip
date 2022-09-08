@@ -54,20 +54,23 @@ define(function(require) {
 				call.other_leg_call_id = undefined;
 				call.other_legs = otherLegs;
 
-				var callData = 'Account ID: ' + (call.account_id || '')
-					+ '\nFrom (Name): ' + (call.from_name || '')
-					+ '\nFrom (Number): ' + (call.from_number || '')
-					+ '\nTo (Name): ' + (call.to_name || '')
-					+ '\nTo (Number): ' + (call.to_number || '')
-					+ '\nDate: ' + (call.date || '')
-					+ '\nDuration: ' + (call.duration || '')
-					+ '\nHangup Cause: ' + (call.hangup_cause || '')
-					+ '\nCall ID: ' + (call.call_id || '')
-					+ '\nOther Leg Call ID: ' + (otherLegCallId || '')
-					+ '\nOther Legs: \n  ' + (otherLegs || []).join('\n  ')
-					+ '\nHandling Server: ' + (call.handling_server || '')
-					+ '\nTimestamp: ' + (call.timestamp || '')
-					+ '\nBase64 Encoded: ' + btoa(JSON.stringify(call));
+				const callLogsI18n = self.i18n.active().callLogs;
+				const callDataI18n = callLogsI18n.diagnosticCallData;
+
+				var callData = `${callDataI18n.accountId} ${(call.account_id || '')}`
+					+ `\n${callDataI18n.fromName} ${(call.from_name || '')}`
+					+ `\n${callDataI18n.fromNumber} ${(call.from_number || '')}`
+					+ `\n${callDataI18n.toName} ${(call.to_name || '')}`
+					+ `\n${callDataI18n.toNumber} ${(call.to_number || '')}`
+					+ `\n${callDataI18n.date} ${(call.date || '')}`
+					+ `\n${callDataI18n.duration} ${(call.duration || '')}`
+					+ `\n${callDataI18n.hangUpCause} ${(call.hangup_cause || '')}`
+					+ `\n${callDataI18n.callId} ${(call.call_id || '')}`
+					+ `\n${callDataI18n.otherLegCallId} ${(otherLegCallId || '')}`
+					+ `\n${callDataI18n.otherLegs}\n  ${(otherLegs || []).join('\n  ')}`
+					+ `\n${callDataI18n.handlingServer} ${(call.handling_server || '')}`
+					+ `\n${callDataI18n.timestamp} ${(call.timestamp || '')}`
+					+ `\n${callDataI18n.base64Encoded} ${btoa(JSON.stringify(call))}`;
 
 				navigator.clipboard.writeText(callData);
 				monster.ui.toast({

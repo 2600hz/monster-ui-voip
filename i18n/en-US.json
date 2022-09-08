@@ -1240,6 +1240,22 @@
 			"report": "Copy details",
 			"details": "Technical Details"
 		},
+		"diagnosticCallData": {
+			"accountId": "Account ID:",
+			"fromName": "From (Name):",
+			"fromNumber": "From (Number):",
+			"toName": "To (Name):",
+			"toNumber": "To (Number):",
+			"date": "Date:",
+			"duration": "Duration:",
+			"hangUpCause": "Hangup Cause:",
+			"callId": "Call ID:",
+			"otherLegCallId": "Other Leg Call ID:",
+			"otherLegs": "Other Legs:",
+			"handlingServer": "Handling Server:",
+			"timestamp": "Timestamp:",
+			"base64Encoded": "Base64 Encoded:"
+		},
 		"copyCallDiagInfo": "Diagnostic data copied to clipboard, please email this to your support representative for assistance",
 		"copyCallDiagError": "An error occurred while copying diagnostic data to clipboard",
 		"downloadTooltip": "In \"Custom\" Mode, you'll need to click on \"Filter\" before clicking on download."
