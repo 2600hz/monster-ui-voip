@@ -41,48 +41,65 @@ define(function(require) {
 			});
 		},
 
-		copyCallData: function(target, otherLegs) {
-			const self = this;
+		callLogsGenerateCallData: function(target, otherLegs) {
+			var self = this;
 
 			try {
-				if (!target.classList.contains('copy-diag-data')) {
-					return;
-				}
-				const $this = $(target);
-				const call = $this.data('diag-data');
-				const otherLegCallId = call.other_leg_call_id;
+				var $this = $(target);
+				var call = $this.data('diag-data');
+				var otherLegCallId = call.other_leg_call_id;
 				call.other_leg_call_id = undefined;
 				call.other_legs = otherLegs;
 
-				const callLogsI18n = self.i18n.active().callLogs;
-				const callDataI18n = callLogsI18n.diagnosticCallData;
-
-				var callData = `${callDataI18n.accountId} ${(call.account_id || '')}`
-					+ `\n${callDataI18n.fromName} ${(call.from_name || '')}`
-					+ `\n${callDataI18n.fromNumber} ${(call.from_number || '')}`
-					+ `\n${callDataI18n.toName} ${(call.to_name || '')}`
-					+ `\n${callDataI18n.toNumber} ${(call.to_number || '')}`
-					+ `\n${callDataI18n.date} ${(call.date || '')}`
-					+ `\n${callDataI18n.duration} ${(call.duration || '')}`
-					+ `\n${callDataI18n.hangUpCause} ${(call.hangup_cause || '')}`
-					+ `\n${callDataI18n.callId} ${(call.call_id || '')}`
-					+ `\n${callDataI18n.otherLegCallId} ${(otherLegCallId || '')}`
-					+ `\n${callDataI18n.otherLegs}\n  ${(otherLegs || []).join('\n  ')}`
-					+ `\n${callDataI18n.handlingServer} ${(call.handling_server || '')}`
-					+ `\n${callDataI18n.timestamp} ${(call.timestamp || '')}`
-					+ `\n${callDataI18n.base64Encoded} ${btoa(JSON.stringify(call))}`;
-
-				navigator.clipboard.writeText(callData);
-				monster.ui.toast({
-					type: 'success',
-					message: self.i18n.active().callLogs.copyCallDiagInfo
-				});
+				return _.chain([
+					{ i18nKey: 'accountId', prop: 'account_id' },
+					{ i18nKey: 'fromName', prop: 'from_name' },
+					{ i18nKey: 'fromNumber', prop: 'from_number' },
+					{ i18nKey: 'toName', prop: 'to_name' },
+					{ i18nKey: 'toNumber', prop: 'to_number' },
+					{ i18nKey: 'date', prop: 'date' },
+					{ i18nKey: 'duration', prop: 'duration' },
+					{ i18nKey: 'hangUpCause', prop: 'hangup_cause' },
+					{ i18nKey: 'callId', prop: 'call_id' },
+					{ i18nKey: 'otherLegCallId', value: otherLegCallId },
+					{ i18nKey: 'otherLegs', value: '\n  ' + _.join(otherLegs, '\n  ') },
+					{ i18nKey: 'handlingServer', prop: 'handling_server' },
+					{ i18nKey: 'timestamp', prop: 'timestamp' },
+					{ i18nKey: 'base64Encoded', value: btoa(JSON.stringify(call)) },
+					])
+					.map(function(data) {
+						var template = self.getTemplate({
+							name: '!' + monster.util.tryI18n(self.i18n.active().callLogs.diagnosticCallData, data.i18nKey),
+							data: {
+								variable: _.find([
+								data.value,
+								_.get(call, data.prop),
+								''
+								], _.isString)
+							},
+							ignoreSpaces: true
+						});
+						return template;
+					}).join('\n').value();
 			} catch (e) {
 				monster.ui.toast({
 					type: 'error',
 					message: self.i18n.active().callLogs.copyCallDiagError
 				});
 			}
+		},
+
+		callLogsTriggerCopy: function (target, otherLegs) {
+			var self = this;
+
+			if (!target.classList.contains('copy-diag-data')) {
+				return;
+			}
+
+			var callData = self.callLogsGenerateCallData(target, otherLegs);
+			var clipboardTarget = $('.copy-diag-data-target');
+			clipboardTarget.data('callData', callData);
+			clipboardTarget.trigger('click');
 		},
 
 		callLogsRenderContent: function(parent, fromDate, toDate, type, callback) {
@@ -253,8 +270,8 @@ define(function(require) {
 					extraLegs.slideUp();
 
 					// Handle copy diagnostic data button
-					const otherLegs = $this.data('otherLegs');
-					self.copyCallData(target, otherLegs);
+					var otherLegs = $this.data('otherLegs');
+					self.callLogsTriggerCopy(target, otherLegs);
 				} else {
 					// Reset all slidedDown legs
 					template.find('.grid-row-group').removeClass('open');
@@ -269,11 +286,11 @@ define(function(require) {
 							var formattedCdrs = self.callLogsFormatCdrs(cdrs);
 
 							// Make other legs available when querying but not copying
-							const otherLegs = cdrs.map((call) => call.id);
+							var otherLegs = cdrs.map(function (call) { return call.id } );
 
 							// Handle copy diagnostic data button
 							$this.data('otherLegs', otherLegs);
-							self.copyCallData(target, otherLegs);
+							self.callLogsTriggerCopy(target, otherLegs);
 
 							rowGroup.find('.extra-legs')
 									.empty()
@@ -288,8 +305,8 @@ define(function(require) {
 						});
 					} else {
 						// Handle copy diagnostic data button
-						const otherLegs = $this.data('otherLegs');
-						self.copyCallData(target, otherLegs);
+						var otherLegs = $this.data('otherLegs');
+						self.callLogsTriggerCopy(target, otherLegs);
 					}
 				}
 			});
@@ -353,6 +370,10 @@ define(function(require) {
 			template.find('.call-logs-loader:not(.loading) .loader-message').on('click', function(e) {
 				loadMoreCdrs();
 			});
+
+			monster.ui.clipboard(template.find('.copy-diag-data-target'), function (trigger) {
+				return $(trigger).data('callData');
+			}, self.i18n.active().callLogs.copyCallDiagInfo);
 		},
 
 		// Function built to return JS Dates for the fixed ranges.
@@ -453,7 +474,7 @@ define(function(require) {
 							.value(),
 						device = _.get(self.appFlags.callLogs.devices, _.get(cdr, 'custom_channel_vars.authorizing_id'));
 
-					const base64DiagData = JSON.stringify({
+					var base64DiagData = JSON.stringify({
 						account_id: self.accountId,
 						from_name: (cdr.caller_id_name || ''),
 						from_number: fromNumber,
