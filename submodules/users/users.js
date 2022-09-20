@@ -204,6 +204,17 @@ define(function(require) {
 						);
 					return i18n[key];
 				},
+				isFeatureAvailable = function(data, id) {
+					var isFeatureAvailable = monster.util.isFeatureAvailable(
+							['smartpbx', 'users', 'features', _.camelCase(id), 'edit']
+						),
+						availabilityChecker = _.get(data, 'availabilityChecker', _.stubTrue);
+
+					return _.every([
+						isFeatureAvailable,
+						availabilityChecker()
+					]);
+				},
 				dataUser = data.user,
 				_mainDirectory = data.mainDirectory,
 				_mainCallflow = data.userMainCallflow,
@@ -226,6 +237,18 @@ define(function(require) {
 					differentEmail: dataUser.email !== dataUser.username,
 					mapFeatures: _.pickBy({
 						caller_id: {
+							availabilityChecker: function() {
+								var isEditableWhenSetOnAccount = monster.util.isFeatureAvailable(
+										'smartpbx.users.features.callerId.editWhenSetOnAccount'
+									),
+									isNotSetOnAccount = _
+										.chain(monster.apps.auth.currentAccount)
+										.get('caller_id.external.number')
+										.isUndefined()
+										.value();
+
+								return isEditableWhenSetOnAccount || isNotSetOnAccount;
+							},
 							icon: 'fa fa-user',
 							iconColor: 'monster-blue',
 							title: self.i18n.active().users.caller_id.title
@@ -281,11 +304,7 @@ define(function(require) {
 							iconColor: 'monster-red',
 							title: self.i18n.active().users.do_not_disturb.title
 						}
-					}, function(object, feature) {
-						return monster.util.isFeatureAvailable(
-							['smartpbx', 'users', 'features', _.camelCase(feature), 'edit']
-						);
-					}),
+					}, isFeatureAvailable),
 					outboundPrivacy: _.map(self.appFlags.common.outboundPrivacy, function(item) {
 						return {
 							key: item,
@@ -2331,7 +2350,7 @@ define(function(require) {
 				featureForm = featureTemplate.find('#vmbox_form'),
 				switchTranscription = featureForm.find('#transcribe').parent(),
 				switchVmToEmail = featureForm.find('#vm_to_email_enabled');
-			
+
 			if (!monster.util.isFeatureAvailable('smartpbx.users.features.vmbox.transcription')) {
 				switchTranscription.addClass('disabled');
 			}

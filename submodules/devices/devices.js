@@ -335,6 +335,21 @@ define(function(require) {
 		 */
 		devicesRenderDevice: function(args) {
 			var self = this,
+				isCallerIdConfigurable = function() {
+					if (!monster.util.isNumberFeatureEnabled('e911')) {
+						return false;
+					}
+					var isEditableWhenSetOnAccount = monster.util.isFeatureAvailable(
+							'smartpbx.devices.settings.callerId.editWhenSetOnAccount'
+						),
+						isNotSetOnAccount = _
+							.chain(monster.apps.auth.currentAccount)
+							.get('caller_id.external.number')
+							.isUndefined()
+							.value();
+
+					return isEditableWhenSetOnAccount || isNotSetOnAccount;
+				},
 				data = _.get(args, 'data'),
 				isAssignAllowed = !!_.get(args, 'allowAssign', true),
 				callbackSave = _.get(args, 'callbackSave'),
@@ -353,7 +368,7 @@ define(function(require) {
 					name: 'devices-' + type,
 					data: $.extend(true, {}, data, {
 						isProvisionerConfigured: monster.config.api.hasOwnProperty('provisioner'),
-						showEmergencyCallerId: monster.util.isNumberFeatureEnabled('e911')
+						showEmergencyCallerId: isCallerIdConfigurable()
 					}),
 					submodule: 'devices'
 				})),
