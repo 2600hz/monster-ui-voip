@@ -80,36 +80,36 @@ define(function(require) {
 						{ i18nKey: 'otherLegs', value: '\n  ' + _.join(otherLegs, '\n  ') },
 						{ i18nKey: 'handlingServer', prop: 'handling_server' },
 						{ i18nKey: 'timestamp', prop: 'timestamp' },
-						{ i18nKey: 'base64Encoded', value: base64EncodedCall },
-						])
-						.map(function(data) {
-							var template = self.getTemplate({
-								name: '!' + monster.util.tryI18n(self.i18n.active().callLogs.diagnosticCallData, data.i18nKey),
-								data: {
-									variable: _.find([
+						{ i18nKey: 'base64Encoded', value: base64EncodedCall }
+					])
+					.map(function(data) {
+						var template = self.getTemplate({
+							name: '!' + monster.util.tryI18n(self.i18n.active().callLogs.diagnosticCallData, data.i18nKey),
+							data: {
+								variable: _.find([
 									data.value,
 									_.get(call, data.prop),
 									''
-									], _.isString)
-								},
-								ignoreSpaces: true
-							});
-							return template;
-						}).join('\n').value();
+								], _.isString)
+							},
+							ignoreSpaces: true
+						});
+						return template;
+					}).join('\n').value();
 
 					next(null, diagnosticData);
 				}
-				], callback);
+			], callback);
 		},
 
-		callLogsTriggerCopy: function (target, otherLegs) {
+		callLogsTriggerCopy: function(target, otherLegs) {
 			var self = this;
 
 			if (!target.classList.contains('copy-diag-data')) {
 				return;
 			}
 
-			self.callLogsGenerateCallData(target, otherLegs, function (err, callData) {
+			self.callLogsGenerateCallData(target, otherLegs, function(err, callData) {
 				if (err) {
 					return monster.ui.toast({
 						type: 'error',
@@ -117,9 +117,9 @@ define(function(require) {
 					});
 				}
 
-				var clipboardTarget = $('.copy-diag-data-target');
+				var clipboardTarget = $('#call_logs_container .copy-diag-data-target');
 				clipboardTarget.data('callData', callData);
-				clipboardTarget.trigger('click');	
+				clipboardTarget.trigger('click');
 			});
 		},
 
@@ -307,7 +307,7 @@ define(function(require) {
 							var formattedCdrs = self.callLogsFormatCdrs(cdrs);
 
 							// Make other legs available when querying but not copying
-							var otherLegs = cdrs.map(function (call) { return call.id } );
+							var otherLegs = cdrs.map(function(call) { return call.id; });
 
 							// Handle copy diagnostic data button
 							$this.data('otherLegs', otherLegs);
@@ -392,7 +392,7 @@ define(function(require) {
 				loadMoreCdrs();
 			});
 
-			monster.ui.clipboard(template.find('.copy-diag-data-target'), function (trigger) {
+			monster.ui.clipboard(template.find('.copy-diag-data-target'), function(trigger) {
 				return $(trigger).data('callData');
 			}, self.i18n.active().callLogs.copyCallDiagInfo);
 		},
@@ -494,20 +494,20 @@ define(function(require) {
 							.thru(extractSipDestination)
 							.value(),
 						device = _.get(self.appFlags.callLogs.devices, _.get(cdr, 'custom_channel_vars.authorizing_id')),
-					    base64DiagData = JSON.stringify({
-						account_id: self.accountId,
-						from_name: (cdr.caller_id_name || ''),
-						from_number: fromNumber,
-						to_name: (cdr.callee_id_name || ''),
-						to_number: toNumber,
-						date: shortDate,
-						duration: durationMin + ':' + durationSec,
-						hangup_cause: (cdr.hangup_cause || ''),
-						call_id: cdr.call_id,
-						other_leg_call_id: (cdr.other_leg_call_id || ''),
-						handling_server: (cdr.media_server || ''),
-						timestamp: (cdr.timestamp || '')
-					});
+						base64DiagData = JSON.stringify({
+							account_id: self.accountId,
+							from_name: (cdr.caller_id_name || ''),
+							from_number: fromNumber,
+							to_name: (cdr.callee_id_name || ''),
+							to_number: toNumber,
+							date: shortDate,
+							duration: durationMin + ':' + durationSec,
+							hangup_cause: (cdr.hangup_cause || ''),
+							call_id: cdr.call_id,
+							other_leg_call_id: (cdr.other_leg_call_id || ''),
+							handling_server: (cdr.media_server || ''),
+							timestamp: (cdr.timestamp || '')
+						});
 
 					return _.merge({
 						id: cdr.id,
