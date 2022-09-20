@@ -41,52 +41,65 @@ define(function(require) {
 			});
 		},
 
-		callLogsGenerateCallData: function(target, otherLegs) {
+		callLogsGenerateCallData: function(target, otherLegs, callback) {
 			var self = this;
 
-			try {
-				var $this = $(target);
-				var call = $this.data('diag-data');
-				var otherLegCallId = call.other_leg_call_id;
-				call.other_leg_call_id = undefined;
-				call.other_legs = otherLegs;
+			monster.waterfall([
+				function addOtherLegsToCall(next) {
+					try {
+						var $this = $(target),
+							call = $this.data('diag-data');
+						call.other_legs = otherLegs;
 
-				return _.chain([
-					{ i18nKey: 'accountId', prop: 'account_id' },
-					{ i18nKey: 'fromName', prop: 'from_name' },
-					{ i18nKey: 'fromNumber', prop: 'from_number' },
-					{ i18nKey: 'toName', prop: 'to_name' },
-					{ i18nKey: 'toNumber', prop: 'to_number' },
-					{ i18nKey: 'date', prop: 'date' },
-					{ i18nKey: 'duration', prop: 'duration' },
-					{ i18nKey: 'hangUpCause', prop: 'hangup_cause' },
-					{ i18nKey: 'callId', prop: 'call_id' },
-					{ i18nKey: 'otherLegCallId', value: otherLegCallId },
-					{ i18nKey: 'otherLegs', value: '\n  ' + _.join(otherLegs, '\n  ') },
-					{ i18nKey: 'handlingServer', prop: 'handling_server' },
-					{ i18nKey: 'timestamp', prop: 'timestamp' },
-					{ i18nKey: 'base64Encoded', value: btoa(JSON.stringify(call)) },
-					])
-					.map(function(data) {
-						var template = self.getTemplate({
-							name: '!' + monster.util.tryI18n(self.i18n.active().callLogs.diagnosticCallData, data.i18nKey),
-							data: {
-								variable: _.find([
-								data.value,
-								_.get(call, data.prop),
-								''
-								], _.isString)
-							},
-							ignoreSpaces: true
-						});
-						return template;
-					}).join('\n').value();
-			} catch (e) {
-				monster.ui.toast({
-					type: 'error',
-					message: self.i18n.active().callLogs.copyCallDiagError
-				});
-			}
+						next(null, call);
+					} catch (e) {
+						next(e);
+					}
+				},
+				function encodeCallToBase64(call, next) {
+					try {
+						var base64EncodedCall = btoa(JSON.stringify(call));
+
+						next(null, call, base64EncodedCall);
+					} catch (e) {
+						next(e);
+					}
+				},
+				function formatCallData(call, base64EncodedCall, next) {
+					var diagnosticData = _.chain([
+						{ i18nKey: 'accountId', prop: 'account_id' },
+						{ i18nKey: 'fromName', prop: 'from_name' },
+						{ i18nKey: 'fromNumber', prop: 'from_number' },
+						{ i18nKey: 'toName', prop: 'to_name' },
+						{ i18nKey: 'toNumber', prop: 'to_number' },
+						{ i18nKey: 'date', prop: 'date' },
+						{ i18nKey: 'duration', prop: 'duration' },
+						{ i18nKey: 'hangUpCause', prop: 'hangup_cause' },
+						{ i18nKey: 'callId', prop: 'call_id' },
+						{ i18nKey: 'otherLegCallId', value: call.other_leg_call_id },
+						{ i18nKey: 'otherLegs', value: '\n  ' + _.join(otherLegs, '\n  ') },
+						{ i18nKey: 'handlingServer', prop: 'handling_server' },
+						{ i18nKey: 'timestamp', prop: 'timestamp' },
+						{ i18nKey: 'base64Encoded', value: base64EncodedCall },
+						])
+						.map(function(data) {
+							var template = self.getTemplate({
+								name: '!' + monster.util.tryI18n(self.i18n.active().callLogs.diagnosticCallData, data.i18nKey),
+								data: {
+									variable: _.find([
+									data.value,
+									_.get(call, data.prop),
+									''
+									], _.isString)
+								},
+								ignoreSpaces: true
+							});
+							return template;
+						}).join('\n').value();
+
+					next(null, diagnosticData);
+				}
+				], callback);
 		},
 
 		callLogsTriggerCopy: function (target, otherLegs) {
@@ -96,10 +109,18 @@ define(function(require) {
 				return;
 			}
 
-			var callData = self.callLogsGenerateCallData(target, otherLegs);
-			var clipboardTarget = $('.copy-diag-data-target');
-			clipboardTarget.data('callData', callData);
-			clipboardTarget.trigger('click');
+			self.callLogsGenerateCallData(target, otherLegs, function (err, callData) {
+				if (err) {
+					return monster.ui.toast({
+						type: 'error',
+						message: self.i18n.active().callLogs.copyCallDiagError
+					});
+				}
+
+				var clipboardTarget = $('.copy-diag-data-target');
+				clipboardTarget.data('callData', callData);
+				clipboardTarget.trigger('click');	
+			});
 		},
 
 		callLogsRenderContent: function(parent, fromDate, toDate, type, callback) {
@@ -472,9 +493,8 @@ define(function(require) {
 							.get('request', cdr.to)
 							.thru(extractSipDestination)
 							.value(),
-						device = _.get(self.appFlags.callLogs.devices, _.get(cdr, 'custom_channel_vars.authorizing_id'));
-
-					var base64DiagData = JSON.stringify({
+						device = _.get(self.appFlags.callLogs.devices, _.get(cdr, 'custom_channel_vars.authorizing_id')),
+					    base64DiagData = JSON.stringify({
 						account_id: self.accountId,
 						from_name: (cdr.caller_id_name || ''),
 						from_number: fromNumber,
@@ -508,7 +528,6 @@ define(function(require) {
 						// Only display help if it's in the i18n.
 						hangupHelp: _.get(hangupI18n, [cdr.hangup_cause, isOutboundCall ? 'outbound' : 'inbound'], ''),
 						isOutboundCall: isOutboundCall,
-						reportMail: monster.config.whitelabel.callReportEmail,
 						diagData: base64DiagData
 					}, _.has(cdr, 'channel_created_time') && {
 						channelCreatedTime: cdr.channel_created_time
