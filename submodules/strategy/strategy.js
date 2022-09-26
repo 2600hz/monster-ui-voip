@@ -961,84 +961,12 @@ define(function(require) {
 							submodule: 'strategy'
 						}));
 
-					$.each($template.find('.callflow-tab'), renderTabContent);
+					$.each($template.find('.callflow-tab'), function(idx, element) {
+						self.strategyRenderTabContent(strategyData, $(element));
+					});
 
 					return $template;
-				},
-				renderTabContent = _.partial(function(strategyData) {
-					var $tabContentWrapper = $(this),
-						callflowName = $tabContentWrapper.data('callflow'),
-						menuName = callflowName + 'Menu',
-						initTemplate = function() {
-							var $template = $(self.getTemplate({
-									name: 'callsTab',
-									data: getTabData(),
-									submodule: 'strategy'
-								})),
-								$voicemailSelects = $template.find('.voicemail-select select'),
-								$advCallflowsSelects = $template.find('.advancedCallflows-select select'),
-								$entitiesSelects = $template.find('.user-select select');
-
-							$.each($entitiesSelects, function() {
-								var $select = $(this),
-									selectedOptionGroupLabel = $select.find('option:selected').closest('optgroup').prop('label');
-
-								$select.siblings('.title').text(selectedOptionGroupLabel);
-							});
-
-							_.forEach([
-								$voicemailSelects,
-								$advCallflowsSelects,
-								$entitiesSelects
-							], function($select) {
-								monster.ui.chosen($select, {
-									width: '160'
-								});
-							});
-
-							return $template;
-						},
-						getTabData = _.partial(function(strategyData, callflowName, menuName) {
-							var tabData = {
-								callOption: {
-									type: 'default'
-								},
-								hideAdvancedCallflows: _.isEmpty(strategyData.callEntities.advancedCallflows),
-								callflow: callflowName,
-								callEntities: self.strategyGetCallEntitiesDropdownData(strategyData.callEntities, true, true),
-								voicemails: strategyData.voicemails,
-								tabMessage: self.i18n.active().strategy.calls.callTabsMessages[callflowName]
-							};
-
-							if (strategyData.callflows[callflowName].flow.hasOwnProperty('is_main_number_cf')) {
-								tabData.callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
-								tabData.callOption.type = 'advanced-callflow';
-							} else if (strategyData.callflows[callflowName].flow.module === 'voicemail') {
-								tabData.callOption.callEntityId = 'none';
-								tabData.callOption.voicemailId = strategyData.callflows[callflowName].flow.data.id;
-								tabData.callOption.type = 'user-voicemail';
-							} else if (!_.isEmpty(strategyData.callflows[callflowName].flow.children)) {
-								tabData.callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
-								if ('_' in strategyData.callflows[callflowName].flow.children
-								&& strategyData.callflows[callflowName].flow.children._.module === 'voicemail') {
-									tabData.callOption.type = 'user-voicemail';
-									tabData.callOption.voicemailId = strategyData.callflows[callflowName].flow.children._.data.id;
-								} else {
-									tabData.callOption.type = 'user-menu';
-								}
-							}
-
-							if (menuName in strategyData.callflows) {
-								tabData.menu = menuName;
-							}
-
-							return tabData;
-						}, strategyData, callflowName, menuName);
-
-					$tabContentWrapper
-						.empty()
-							.append(initTemplate());
-				}, strategyData);
+				};
 
 			$container
 				.find('.element-content')
@@ -1046,6 +974,81 @@ define(function(require) {
 					.append(initTemplate());
 
 			callback && callback();
+		},
+
+		strategyRenderTabContent: function(strategyData, $tabContentWrapper) {
+			var self = this,
+				callflowName = $tabContentWrapper.data('callflow'),
+				menuName = callflowName + 'Menu',
+				initTemplate = function() {
+					var $template = $(self.getTemplate({
+							name: 'callsTab',
+							data: formatDataToTemplate(),
+							submodule: 'strategy'
+						})),
+						$voicemailSelects = $template.find('.voicemail-select select'),
+						$advCallflowsSelects = $template.find('.advancedCallflows-select select'),
+						$entitiesSelects = $template.find('.user-select select');
+
+					$.each($entitiesSelects, function() {
+						var $select = $(this),
+							selectedOptionGroupLabel = $select.find('option:selected').closest('optgroup').prop('label');
+
+						$select.siblings('.title').text(selectedOptionGroupLabel);
+					});
+
+					_.forEach([
+						$voicemailSelects,
+						$advCallflowsSelects,
+						$entitiesSelects
+					], function($select) {
+						monster.ui.chosen($select, {
+							width: '160'
+						});
+					});
+
+					return $template;
+				},
+				formatDataToTemplate = _.partial(function(strategyData, callflowName, menuName) {
+					var tabData = {
+						callOption: {
+							type: 'default'
+						},
+						hideAdvancedCallflows: _.isEmpty(strategyData.callEntities.advancedCallflows),
+						callflow: callflowName,
+						callEntities: self.strategyGetCallEntitiesDropdownData(strategyData.callEntities, true, true),
+						voicemails: strategyData.voicemails,
+						tabMessage: self.i18n.active().strategy.calls.callTabsMessages[callflowName]
+					};
+
+					if (strategyData.callflows[callflowName].flow.hasOwnProperty('is_main_number_cf')) {
+						tabData.callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
+						tabData.callOption.type = 'advanced-callflow';
+					} else if (strategyData.callflows[callflowName].flow.module === 'voicemail') {
+						tabData.callOption.callEntityId = 'none';
+						tabData.callOption.voicemailId = strategyData.callflows[callflowName].flow.data.id;
+						tabData.callOption.type = 'user-voicemail';
+					} else if (!_.isEmpty(strategyData.callflows[callflowName].flow.children)) {
+						tabData.callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
+						if ('_' in strategyData.callflows[callflowName].flow.children
+						&& strategyData.callflows[callflowName].flow.children._.module === 'voicemail') {
+							tabData.callOption.type = 'user-voicemail';
+							tabData.callOption.voicemailId = strategyData.callflows[callflowName].flow.children._.data.id;
+						} else {
+							tabData.callOption.type = 'user-menu';
+						}
+					}
+
+					if (menuName in strategyData.callflows) {
+						tabData.menu = menuName;
+					}
+
+					return tabData;
+				}, strategyData, callflowName, menuName);
+
+			$tabContentWrapper
+				.empty()
+					.append(initTemplate());
 		},
 
 		/**
