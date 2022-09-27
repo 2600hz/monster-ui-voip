@@ -1010,17 +1010,19 @@ define(function(require) {
 					return $template;
 				},
 				formatDataToTemplate = _.partial(function(strategyData, callflowName, menuName) {
-					var strategies = _.reject([{
+					var isVirtualExceptionistEnabled = monster.util.isFeatureAvailable('smartpbx.mainNumber.incomingCallHandling.virtualReceptionist'),
+						hasAdvancedCallflows = !_.isEmpty(strategyData.callEntities.advancedCallflows),
+						strategies = _.reject([{
 							type: 'menu',
-							options: [
+							options: isVirtualExceptionistEnabled ? [
 								'menu'
-							]
+							] : []
 						}, {
 							type: 'user-menu',
-							options: [
+							options: isVirtualExceptionistEnabled ? [
 								'entity',
 								'menu'
-							]
+							] : []
 						}, {
 							type: 'user-voicemail',
 							options: [
@@ -1030,11 +1032,13 @@ define(function(require) {
 							allowNone: true
 						}, {
 							type: 'advanced-callflow',
-							options: [
+							options: hasAdvancedCallflows ? [
 								'callflow'
-							],
-							isDisabled: _.isEmpty(strategyData.callEntities.advancedCallflows)
-						}], 'isDisabled'),
+							] : []
+						}], _.flow(
+							_.partial(_.get, _, 'options'),
+							_.isEmpty
+						)),
 						callOption = {
 							type: _
 								.chain(strategies)
