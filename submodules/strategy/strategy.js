@@ -961,84 +961,12 @@ define(function(require) {
 							submodule: 'strategy'
 						}));
 
-					$.each($template.find('.callflow-tab'), renderTabContent);
+					$.each($template.find('.callflow-tab'), function(idx, element) {
+						self.strategyRenderTabContent(strategyData, $(element));
+					});
 
 					return $template;
-				},
-				renderTabContent = _.partial(function(strategyData) {
-					var $tabContentWrapper = $(this),
-						callflowName = $tabContentWrapper.data('callflow'),
-						menuName = callflowName + 'Menu',
-						initTemplate = function() {
-							var $template = $(self.getTemplate({
-									name: 'callsTab',
-									data: getTabData(),
-									submodule: 'strategy'
-								})),
-								$voicemailSelects = $template.find('.voicemail-select select'),
-								$advCallflowsSelects = $template.find('.advancedCallflows-select select'),
-								$entitiesSelects = $template.find('.user-select select');
-
-							$.each($entitiesSelects, function() {
-								var $select = $(this),
-									selectedOptionGroupLabel = $select.find('option:selected').closest('optgroup').prop('label');
-
-								$select.siblings('.title').text(selectedOptionGroupLabel);
-							});
-
-							_.forEach([
-								$voicemailSelects,
-								$advCallflowsSelects,
-								$entitiesSelects
-							], function($select) {
-								monster.ui.chosen($select, {
-									width: '160'
-								});
-							});
-
-							return $template;
-						},
-						getTabData = _.partial(function(strategyData, callflowName, menuName) {
-							var tabData = {
-								callOption: {
-									type: 'default'
-								},
-								hideAdvancedCallflows: _.isEmpty(strategyData.callEntities.advancedCallflows),
-								callflow: callflowName,
-								callEntities: self.strategyGetCallEntitiesDropdownData(strategyData.callEntities, true, true),
-								voicemails: strategyData.voicemails,
-								tabMessage: self.i18n.active().strategy.calls.callTabsMessages[callflowName]
-							};
-
-							if (strategyData.callflows[callflowName].flow.hasOwnProperty('is_main_number_cf')) {
-								tabData.callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
-								tabData.callOption.type = 'advanced-callflow';
-							} else if (strategyData.callflows[callflowName].flow.module === 'voicemail') {
-								tabData.callOption.callEntityId = 'none';
-								tabData.callOption.voicemailId = strategyData.callflows[callflowName].flow.data.id;
-								tabData.callOption.type = 'user-voicemail';
-							} else if (!_.isEmpty(strategyData.callflows[callflowName].flow.children)) {
-								tabData.callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
-								if ('_' in strategyData.callflows[callflowName].flow.children
-								&& strategyData.callflows[callflowName].flow.children._.module === 'voicemail') {
-									tabData.callOption.type = 'user-voicemail';
-									tabData.callOption.voicemailId = strategyData.callflows[callflowName].flow.children._.data.id;
-								} else {
-									tabData.callOption.type = 'user-menu';
-								}
-							}
-
-							if (menuName in strategyData.callflows) {
-								tabData.menu = menuName;
-							}
-
-							return tabData;
-						}, strategyData, callflowName, menuName);
-
-					$tabContentWrapper
-						.empty()
-							.append(initTemplate());
-				}, strategyData);
+				};
 
 			$container
 				.find('.element-content')
@@ -1046,6 +974,112 @@ define(function(require) {
 					.append(initTemplate());
 
 			callback && callback();
+		},
+
+		strategyRenderTabContent: function(strategyData, $tabContentWrapper) {
+			var self = this,
+				callflowName = $tabContentWrapper.data('callflow'),
+				menuName = callflowName + 'Menu',
+				initTemplate = function() {
+					var $template = $(self.getTemplate({
+							name: 'callsTab',
+							data: formatDataToTemplate(),
+							submodule: 'strategy'
+						})),
+						$voicemailSelects = $template.find('.voicemail-select select'),
+						$advCallflowsSelects = $template.find('.advancedCallflows-select select'),
+						$entitiesSelects = $template.find('.user-select select');
+
+					$.each($entitiesSelects, function() {
+						var $select = $(this),
+							selectedOptionGroupLabel = $select.find('option:selected').closest('optgroup').prop('label');
+
+						$select.siblings('.title').text(selectedOptionGroupLabel);
+					});
+
+					_.forEach([
+						$voicemailSelects,
+						$advCallflowsSelects,
+						$entitiesSelects
+					], function($select) {
+						monster.ui.chosen($select, {
+							width: '160'
+						});
+					});
+
+					return $template;
+				},
+				formatDataToTemplate = _.partial(function(strategyData, callflowName, menuName) {
+					var isVirtualExceptionistEnabled = monster.util.isFeatureAvailable('smartpbx.mainNumber.incomingCallHandling.virtualReceptionist'),
+						hasAdvancedCallflows = !_.isEmpty(strategyData.callEntities.advancedCallflows),
+						strategies = _.reject([{
+							type: 'menu',
+							options: isVirtualExceptionistEnabled ? [
+								'menu'
+							] : []
+						}, {
+							type: 'user-menu',
+							options: isVirtualExceptionistEnabled ? [
+								'entity',
+								'menu'
+							] : []
+						}, {
+							type: 'user-voicemail',
+							options: [
+								'entity',
+								'voicemail'
+							],
+							allowNone: true
+						}, {
+							type: 'advanced-callflow',
+							options: hasAdvancedCallflows ? [
+								'callflow'
+							] : []
+						}], _.flow(
+							_.partial(_.get, _, 'options'),
+							_.isEmpty
+						)),
+						callOption = {
+							type: _
+								.chain(strategies)
+								.head()
+								.get('type')
+								.value()
+						};
+
+					if (_.has(strategyData.callflows, [callflowName, 'flow', 'is_main_number_cf'])) {
+						callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
+						callOption.type = 'advanced-callflow';
+					} else if (strategyData.callflows[callflowName].flow.module === 'voicemail') {
+						callOption.callEntityId = 'none';
+						callOption.voicemailId = strategyData.callflows[callflowName].flow.data.id;
+						callOption.type = 'user-voicemail';
+					} else if (!_.isEmpty(strategyData.callflows[callflowName].flow.children)) {
+						callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
+						if (_.get(strategyData.callflows, [callflowName, 'flow', 'children', '_', 'module']) === 'voicemail') {
+							callOption.type = 'user-voicemail';
+							callOption.voicemailId = strategyData.callflows[callflowName].flow.children._.data.id;
+						} else {
+							callOption.type = 'user-menu';
+						}
+					}
+
+					return _.merge({
+						strategies: strategies,
+						callOption: callOption,
+						callflow: callflowName,
+						callEntities: self.strategyGetCallEntitiesDropdownData(strategyData.callEntities, true, true),
+						tabMessage: self.i18n.active().strategy.calls.callTabsMessages[callflowName]
+					}, _.pick(strategyData, [
+						'voicemails'
+					]), _.has(strategyData.callflows, menuName) && {
+						menu: menuName
+					});
+				}, strategyData, callflowName, menuName);
+
+			$tabContentWrapper
+				.empty()
+					.append(initTemplate());
 		},
 
 		/**
@@ -2822,6 +2856,53 @@ define(function(require) {
 								}
 							});
 						});
+					});
+				},
+				function maybeDisableVirtualReceptionist(callflows, callback) {
+					if (monster.util.isFeatureAvailable('smartpbx.mainNumber.incomingCallHandling.virtualReceptionist')) {
+						return callback(null, callflows);
+					}
+					var updateCallflowModuleToVmBoxFactory = function(voicemailBoxId, subCallflowLabel) {
+							return function(next) {
+								self.strategyUpdateCallflow(_.assign({}, callflows[subCallflowLabel], {
+									flow: {
+										children: {},
+										data: {
+											id: voicemailBoxId
+										},
+										module: 'voicemail'
+									}
+								}), _.partial(next, null));
+							};
+						},
+						hasVirtualReceptionistNode = function(label) {
+							var menuLabel = label + 'Menu',
+								virtualReceptionistNode = monster.util.findCallflowNode(
+									_.get(callflows, label),
+									'callflow',
+									{
+										id: _.get(callflows, [menuLabel, 'id'])
+									}
+								);
+							return _.isObject(virtualReceptionistNode);
+						};
+					monster.waterfall([
+						_.bind(self.getOrCreateMainVMBox, self),
+						function(mainVoicemailBox, next) {
+							var requestsPerCallflowLabel = _
+								.chain(self.subCallflowsLabel)
+								.filter(hasVirtualReceptionistNode)
+								.keyBy()
+								.mapValues(_.partial(updateCallflowModuleToVmBoxFactory, mainVoicemailBox.id))
+								.value();
+
+							monster.parallel(requestsPerCallflowLabel, next);
+						}
+					], function(err, updatedCallflows) {
+						if (err) {
+							return callback(err);
+						}
+						callback(null, $.extend(true, callflows, updatedCallflows));
 					});
 				}
 			], function(err, result) {
