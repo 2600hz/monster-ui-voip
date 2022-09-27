@@ -2857,6 +2857,53 @@ define(function(require) {
 							});
 						});
 					});
+				},
+				function maybeDisableVirtualReceptionist(callflows, callback) {
+					if (monster.util.isFeatureAvailable('smartpbx.mainNumber.incomingCallHandling.virtualReceptionist')) {
+						return callback(null, callflows);
+					}
+					var updateCallflowModuleToVmBoxFactory = function(voicemailBoxId, subCallflowLabel) {
+							return function(next) {
+								self.strategyUpdateCallflow(_.assign({}, callflows[subCallflowLabel], {
+									flow: {
+										children: {},
+										data: {
+											id: voicemailBoxId
+										},
+										module: 'voicemail'
+									}
+								}), _.partial(next, null));
+							};
+						},
+						hasVirtualReceptionistNode = function(label) {
+							var menuLabel = label + 'Menu',
+								virtualReceptionistNode = monster.util.findCallflowNode(
+									_.get(callflows, label),
+									'callflow',
+									{
+										id: _.get(callflows, [menuLabel, 'id'])
+									}
+								);
+							return _.isObject(virtualReceptionistNode);
+						};
+					monster.waterfall([
+						_.bind(self.getOrCreateMainVMBox, self),
+						function(mainVoicemailBox, next) {
+							var requestsPerCallflowLabel = _
+								.chain(self.subCallflowsLabel)
+								.filter(hasVirtualReceptionistNode)
+								.keyBy()
+								.mapValues(_.partial(updateCallflowModuleToVmBoxFactory, mainVoicemailBox.id))
+								.value();
+
+							monster.parallel(requestsPerCallflowLabel, next);
+						}
+					], function(err, updatedCallflows) {
+						if (err) {
+							return callback(err);
+						}
+						callback(null, $.extend(true, callflows, updatedCallflows));
+					});
 				}
 			], function(err, result) {
 				if (err) {
