@@ -324,6 +324,78 @@ define(function(require) {
 				_.partial(getCallflowIds, userId, userMainCallflowId, device.mobile.mdn),
 				_.partial(updateMobileCallflowAssignment, userId, device.id)
 			], mainCallback);
+		},
+
+		getOrCreateMainVMBox: function(callback) {
+			var self = this,
+				findMainVMBoxId = function(next) {
+					self.callApi({
+						resource: 'voicemail.list',
+						data: {
+							accountId: self.accountId,
+							filters: {
+								filter_type: 'mainVMBox'
+							}
+						},
+						success: _.flow(
+							_.partial(_.get, _, 'data'),
+							_.head,
+							_.partial(_.get, _, 'id'),
+							_.partial(next, null)
+						),
+						error: next
+					});
+				},
+				maybeRetrieveVMBoxFromId = function(vmBoxId, next) {
+					if (_.isUndefined(vmBoxId)) {
+						return next(null, undefined);
+					}
+					self.callApi({
+						resource: 'voicemail.get',
+						data: {
+							accountId: self.accountId,
+							voicemailId: vmBoxId
+						},
+						success: _.flow(
+							_.partial(_.get, _, 'data'),
+							_.partial(next, null)
+						),
+						error: next
+					});
+				},
+				maybeGetMainVMBox = function(next) {
+					monster.waterfall([
+						findMainVMBoxId,
+						maybeRetrieveVMBoxFromId
+					], next);
+				},
+				maybeCreateMainVMBox = function(mainVMBox, next) {
+					if (_.isObject(mainVMBox)) {
+						return next(null, mainVMBox);
+					}
+					self.callApi({
+						resource: 'voicemail.create',
+						data: {
+							accountId: self.accountId,
+							data: {
+								type: 'mainVMBox',
+								mailbox: '0',
+								name: self.i18n.active().myOffice.mainVMBoxName,
+								delete_after_notify: true
+							}
+						},
+						success: _.flow(
+							_.partial(_.get, _, 'data'),
+							_.partial(next, null)
+						),
+						error: next
+					});
+				};
+
+			monster.waterfall([
+				maybeGetMainVMBox,
+				maybeCreateMainVMBox
+			], callback);
 		}
 	};
 
