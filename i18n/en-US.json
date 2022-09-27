@@ -1237,9 +1237,27 @@
 		"__version": "v4.0",
 		"loading": "Loading additional information...",
 		"actions": {
-			"report": "Report Call",
+			"report": "Copy details",
 			"details": "Technical Details"
 		},
+		"diagnosticCallData": {
+			"accountId": "Account ID: {{variable}}",
+			"fromName": "From (Name): {{variable}}",
+			"fromNumber": "From (Number): {{variable}}",
+			"toName": "To (Name): {{variable}}",
+			"toNumber": "To (Number): {{variable}}",
+			"date": "Date: {{variable}}",
+			"duration": "Duration: {{variable}}",
+			"hangUpCause": "Hangup Cause: {{variable}}",
+			"callId": "Call ID: {{variable}}",
+			"otherLegCallId": "Other Leg Call ID: {{variable}}",
+			"otherLegs": "Other Legs: {{variable}}",
+			"handlingServer": "Handling Server: {{variable}}",
+			"timestamp": "Timestamp: {{variable}}",
+			"base64Encoded": "Base64 Encoded: {{variable}}"
+		},
+		"copyCallDiagInfo": "Diagnostic data copied to clipboard, please email this to your support representative for assistance",
+		"copyCallDiagError": "An error occurred while copying diagnostic data to clipboard",
 		"downloadTooltip": "In \"Custom\" Mode, you'll need to click on \"Filter\" before clicking on download."
 	},
 
