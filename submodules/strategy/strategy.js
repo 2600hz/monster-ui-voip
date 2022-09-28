@@ -2648,7 +2648,14 @@ define(function(require) {
 
 		strategyGetMainCallflows: function(mainCallback) {
 			var self = this,
-				smartTypes = ['main', 'conference', 'faxing'],
+				identifierGetterPerSmartType = {
+					main: function(callflow) {
+						return callflow.name || _.head(callflow.numbers);
+					},
+					conference: _.constant('MainConference'),
+					faxing: _.constant('MainFaxing')
+				},
+				smartTypes = _.keys(identifierGetterPerSmartType),
 				listSmartCallflows = function(next) {
 					self.strategyListCallflows({
 						filters: {
@@ -2673,14 +2680,10 @@ define(function(require) {
 						menuRequests = {};
 
 					_.each(data, function(val, key) {
-						var name = val.name || val.numbers[0];
-						if (val.type === 'conference') {
-							name = 'MainConference';
-						} else if (val.type === 'faxing') {
-							name = 'MainFaxing';
-						}
+						var getIdentifier = _.get(identifierGetterPerSmartType, val.type),
+							identifier = getIdentifier(val);
 
-						parallelRequests[name] = function(callback) {
+						parallelRequests[identifier] = function(callback) {
 							self.strategyGetCallflow({
 								data: {
 									id: val.id
