@@ -2648,13 +2648,20 @@ define(function(require) {
 
 		strategyGetMainCallflows: function(mainCallback) {
 			var self = this,
+				smartTypes = ['main', 'conference', 'faxing'],
 				listSmartCallflows = function(next) {
 					self.strategyListCallflows({
 						filters: {
 							has_value: 'type',
 							key_missing: ['owner_id', 'group_id']
 						},
-						success: _.partial(next, null),
+						success: _.flow(
+							_.partial(_.filter, _, _.flow(
+								_.partial(_.get, _, 'type'),
+								_.partial(_.includes, smartTypes)
+							)),
+							_.partial(next, null),
+						),
 						error: next
 					});
 				};
@@ -2666,10 +2673,6 @@ define(function(require) {
 						menuRequests = {};
 
 					_.each(data, function(val, key) {
-						if (!_.includes(['main', 'conference', 'faxing'], val.type)) {
-							return;
-						}
-
 						var name = val.name || val.numbers[0];
 						if (val.type === 'conference') {
 							name = 'MainConference';
