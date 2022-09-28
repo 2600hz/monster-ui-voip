@@ -2786,29 +2786,30 @@ define(function(require) {
 						};
 					});
 
-					monster.parallel(menuRequests, function(err, mainCallflows) {
-						_.each(self.subCallflowsLabel, function(val) {
-							if (parallelRequests[val]) {
-								return;
-							}
+					monster.parallel(menuRequests, _.partial(waterfallCallback, _, parallelRequests));
+				},
+				function maybeCreateMenuCallflows(parallelRequests, mainCallflows, waterfallCallback) {
+					_.each(self.subCallflowsLabel, function(val) {
+						if (parallelRequests[val]) {
+							return;
+						}
 
-							parallelRequests[val] = function(callback) {
-								self.strategyCreateCallflow({
-									data: {
-										data: self.strategyGetDefaultMainSubCallflow({
-											label: val,
-											subMenuCallflowId: mainCallflows[val + 'Menu'].id
-										})
-									},
-									success: function(data) {
-										callback(null, data);
-									}
-								});
-							};
-						});
-
-						monster.parallel(parallelRequests, _.partial(waterfallCallback, _, parallelRequests, mainCallflows));
+						parallelRequests[val] = function(callback) {
+							self.strategyCreateCallflow({
+								data: {
+									data: self.strategyGetDefaultMainSubCallflow({
+										label: val,
+										subMenuCallflowId: mainCallflows[val + 'Menu'].id
+									})
+								},
+								success: function(data) {
+									callback(null, data);
+								}
+							});
+						};
 					});
+
+					monster.parallel(parallelRequests, _.partial(waterfallCallback, _, parallelRequests, mainCallflows));
 				},
 				function maybeCreateOrUpdateMainCallflow(parallelRequests, mainCallflows, results, waterfallCallback) {
 					if (parallelRequests.MainCallflow) {
