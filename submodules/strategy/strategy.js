@@ -2647,22 +2647,20 @@ define(function(require) {
 		},
 
 		strategyGetMainCallflows: function(mainCallback) {
-			var self = this;
-			monster.waterfall([
-				function(waterfallCallback) {
+			var self = this,
+				listSmartCallflows = function(next) {
 					self.strategyListCallflows({
 						filters: {
-							'has_value': 'type',
-							'key_missing': ['owner_id', 'group_id']
+							has_value: 'type',
+							key_missing: ['owner_id', 'group_id']
 						},
-						success: function(data) {
-							waterfallCallback(null, data);
-						},
-						error: function() {
-							waterfallCallback(true);
-						}
+						success: _.partial(next, null),
+						error: next
 					});
-				},
+				};
+
+			monster.waterfall([
+				listSmartCallflows,
 				function(data, waterfallCallback) {
 					var parallelRequests = {},
 						menuRequests = {};
