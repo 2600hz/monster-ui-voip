@@ -10,7 +10,9 @@
 			<div class="row-fields">
 				<div class="fa fa-wrapper" data-original-title="{{i18n.users.editionForm.loginHelp}}" data-placement="top" data-toggle="tooltip"><i class="fa fa-key"></i></div>
 				<span id="username">{{username}}</span>
-				<a href="javascript:void(0);" id="change_username" class="monster-link blue">{{i18n.users.editionForm.changeUsername}}</a>
+				{{#isFeatureAvailable "smartpbx.users.settings.credentials.edit"}}
+					<a href="javascript:void(0);" id="change_username" class="monster-link blue">{{i18n.users.editionForm.changeUsername}}</a>
+				{{/isFeatureAvailable}}
 			</div>
 
 			{{#if extra.vmbox.id}}
