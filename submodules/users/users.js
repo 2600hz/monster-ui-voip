@@ -669,7 +669,9 @@ define(function(require) {
 						if (type === 'name') {
 							currentUser = data;
 
-							monster.ui.chosen(template.find('#user_timezone'));
+							if (monster.util.isFeatureAvailable('smartpbx.users.timezone.edit')) {
+								monster.ui.chosen(template.find('#user_timezone'));
+							}
 
 							data.extra.differentEmail ? template.find('.email-group').show() : template.find('.email-group').hide();
 						} else if (type === 'numbers') {

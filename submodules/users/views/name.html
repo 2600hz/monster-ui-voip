@@ -71,7 +71,7 @@
 
 			<div class="row-fields">
 				<div class="fa fa-wrapper" data-original-title="{{i18n.users.editionForm.timezoneHelp}}" data-placement="top" data-toggle="tooltip"><i class="fa fa-clock-o"></i></div>
-				<select id="user_timezone" name="timezone" data-original_value="{{timezone}}"></select>
+				<select id="user_timezone" name="timezone" data-original_value="{{timezone}}"{{#isFeatureAvailable "smartpbx.users.timezone.edit"}}{{else}} disabled{{/isFeatureAvailable}}></select>
 			</div>
 
 			<div class="row-fields">
