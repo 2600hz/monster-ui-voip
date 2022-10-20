@@ -614,20 +614,15 @@
 		},
 		"uploadPicture": "Upload a Picture",
 		"user": "User",
-		"call_forward": {
+		"call_failover": {
 			"failoverMode": "Failover Mode",
-			"directCallsOnly": "Forward direct calls only",
-			"headline": "User Call Forwarding Settings",
+			"directCallsOnly": "Direct calls only",
+			"headline": "User Call Failover Settings",
 			"keepCallerId": "Keep Original Caller-ID",
-			"label": "Forward all calls to" ,
+			"label": "Forward all calls to",
 			"placeholder": "+14157283992",
-			"requireKeyPress": "Leave voicemails on forwarded numbers",
-			"title": "Call Forwarding",
-			"timeoutWarning": "In order to leave voicemails on forwarded numbers, your ringing timeout needs to be set to at least 30sec. By saving now, you will automatically be redirected to the user edition where you can update the ringing timeout.",
-			"__comment": ": Now add a mode for failover for call forward",
-			"__version": "4.0",
-			"failoverWarning": "In \"Failover Mode\", the call-forward settings will only apply when none of this user's devices are registered.",
-			"failover_title": "Call-Forwarding (Failover Mode)"
+			"requireKeyPress": "Require pressing 1 to accept the call",
+			"title": "Failover Mode"
 		},
 		"callRecording": {
 			"title": "Customized Call Recording",
