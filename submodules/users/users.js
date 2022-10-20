@@ -1520,24 +1520,8 @@ define(function(require) {
 				self.usersRenderDoNotDisturb(currentUser);
 			});
 
-			template.on('click', '.feature[data-feature="call_forward"]', function() {
-				if (currentUser.extra.features.indexOf('find_me_follow_me') < 0) {
-					var featureUser = $.extend(true, {}, currentUser);
-					self.usersGetMainCallflow(featureUser.id, function(mainCallflow) {
-						if (mainCallflow && 'flow' in mainCallflow) {
-							var flow = mainCallflow.flow;
-							while (flow.module !== 'user' && '_' in flow.children) {
-								flow = flow.children._;
-							}
-							if (flow.data.timeout < 30) {
-								featureUser.extra.timeoutTooShort = true;
-							}
-						}
-						self.usersRenderCallForward(featureUser);
-					});
-				} else {
-					self.usersRenderCallForward(currentUser);
-				}
+			template.on('click', '.feature[data-feature="call_failover"]', function() {
+				self.usersRenderCallFailover(currentUser);
 			});
 
 			template.on('click', '.feature[data-feature="hotdesk"]', function() {
@@ -2605,7 +2589,7 @@ define(function(require) {
 			));
 		},
 
-		usersRenderCallForward: function(currentUser) {
+		usersRenderCallFailover: function(currentUser) {
 			var self = this,
 				formattedCallForwardData = self.usersFormatCallForwardData(currentUser),
 				featureTemplate = $(self.getTemplate({
