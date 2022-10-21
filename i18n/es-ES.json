@@ -500,16 +500,6 @@
 		},
 		"uploadPicture": "Cargar una imagen",
 		"user": "Usuario",
-		"call_forward": {
-			"directCallsOnly": "Desvia llamadas directas sólamente",
-			"headline": "Configuración de Desvío de llamadas del usuario",
-			"keepCallerId": "Mantener su identificador de llamadas",
-			"label": "Desenvíar todas las llamadas a",
-			"placeholder": "+14157283992",
-			"requireKeyPress": "Deja mensajes de voz en números desvíados ",
-			"title": "Desvío de llamadas",
-			"timeoutWarning": "Para dejar mensajes de voz en números desvíados, su tiempo de espera de llamada debe ser ajustado a menos de 30 seg. Salvando ahora, será automáticamente desviado a la edición del usuario donde puede actualizar el intervalo de espera que suena."
-		},
 		"callRecording": {
 			"title": "Grabación de llamadas entrantes",
 			"headline": "Configuración de grabación de llamada de usuario",

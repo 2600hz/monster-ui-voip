@@ -609,21 +609,6 @@
 		},
 		"uploadPicture": "Ein Bild hochladen",
 		"user": "Benutzer",
-		"call_forward": {
-			"failoverMode": "Im Fehlerfall",
-			"directCallsOnly": "Nur Direktanrufe weiterleiten",
-			"headline": "Einstellungen zur Weiterleitung von Benutzeranrufen",
-			"keepCallerId": "Ursprüngliche Anrufer-ID speichern",
-			"label": "Alle Anrufe weiterleiten an" ,
-			"placeholder": "+49 123 4567890",
-			"requireKeyPress": "Sprachnachricht für weitergeleitete Rufnummern hinterlassen",
-			"title": "Anrufweiterleitung",
-			"timeoutWarning": "Um Sprachnachrichten für weitergeleitete Rufnummern zu hinterlassen, muss Ihre Rufzeichen-Zeitüberschreitung mindestens 30 Sekunden betragen. Wenn Sie jetzt speichern, werden Sie automatisch in die Benutzereinstellungen weitergeleitet, wo Sie die Rufzeichen-Zeitüberschreitung aktualisieren können.",
-			"__comment": ": Modus für Failover bei Anrufweiterleitung hinzugefügt",
-			"__version": "4.0",
-			"failoverWarning": "Im „Failover-Modus“ haben die Anrufweiterleitungseinstellungen nur dann Geltung, wenn keines der Geräte dieses Benutzers registriert ist.",
-			"failover_title": "Anrufweiterleitung (Failover-Modus)"
-		},
 		"callRecording": {
 			"title": "Angepasste Anrufaufzeichnung",
 			"headline": "Anpassungen für Anrufaufzeichnung des Benutzers",

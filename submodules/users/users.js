@@ -3339,12 +3339,6 @@ define(function(require) {
 				}
 			}
 
-			if (userData.hasOwnProperty('call_forward')) {
-				if (userData.call_forward.number === '') {
-					delete userData.call_forward.number;
-				}
-			}
-
 			// if presence_id doesn't have a proper value, delete it and remove the internal callerId
 			if (!userData.hasOwnProperty('presence_id') || userData.presence_id === 'unset' || !userData.presence_id) {
 				delete userData.presence_id;
