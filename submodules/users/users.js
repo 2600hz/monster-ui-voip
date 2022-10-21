@@ -2573,20 +2573,16 @@ define(function(require) {
 
 			monster.ui.mask(featureTemplate.find('#number'), 'phoneNumber');
 
-			monster.ui.validate(featureForm);
+			monster.ui.validate(featureForm, {
+				rules: {
+					number: {
+						phoneNumber: true
+					}
+				}
+			});
 
 			featureTemplate.find('.cancel-link').on('click', function() {
 				popup.dialog('close').remove();
-			});
-
-			featureTemplate.find('.feature-select-mode button').on('click', function() {
-				var $this = $(this);
-
-				featureTemplate.find('.feature-select-mode button').removeClass('selected monster-button-primary');
-				$(this).addClass('selected monster-button-primary');
-
-				$this.data('value') === 'off' ? featureTemplate.find('.content').slideUp() : featureTemplate.find('.content').slideDown();
-				$this.data('value') === 'failover' ? featureTemplate.find('.failover-info').slideDown() : featureTemplate.find('.failover-info').slideUp();
 			});
 
 			switchFeature.on('change', function() {
@@ -2594,40 +2590,27 @@ define(function(require) {
 			});
 
 			featureTemplate.find('.save').on('click', function() {
-				var formData = monster.ui.getFormData('call_forward_form'),
-					phoneNumber = monster.util.unformatPhoneNumber(formData.number),
-					isValidPhoneNumber = !_.isUndefined(phoneNumber);
-
-				if (monster.ui.valid(featureForm) && isValidPhoneNumber) {
-					formData.require_keypress = !formData.require_keypress;
-					formData.number = phoneNumber;
-
-					var selectedType = featureTemplate.find('.feature-select-mode button.selected').data('value');
-					if (selectedType === 'off') {
-						formData.enabled = false;
-					}
-
-					var payload = { call_forward: _.merge({}, formData), call_failover: _.merge({}, formData) };
-					if (selectedType === 'failover') {
-						payload.call_failover.enabled = true;
-						payload.call_forward.enabled = false;
-					} else if (selectedType === 'on') {
-						payload.call_failover.enabled = false;
-						payload.call_forward.enabled = true;
-					}
-
-					var userToSave = $.extend(true, {}, currentUser, payload);
-
-					self.usersUpdateUser(userToSave, function(data) {
-						args.userId = data.data.id;
-
-						self.usersRender(args);
-					});
+				if (!monster.ui.valid(featureForm)) {
+					return;
 				}
+				var formData = monster.ui.getFormData('call_failover_form'),
+					phoneNumber = monster.util.unformatPhoneNumber(formData.number),
+					formattedFormData = _.merge({}, formData, {
+						enabled: switchFeature.prop('checked'),
+						number: phoneNumber
+					}),
+					payload = { call_failover: formattedFormData },
+					userToSave = $.extend(true, {}, currentUser, payload);
+
+				self.usersUpdateUser(userToSave, function(data) {
+					args.userId = data.data.id;
+
+					self.usersRender(args);
+				});
 			});
 
 			var popup = monster.ui.dialog(featureTemplate, {
-				title: currentUser.extra.mapFeatures.call_forward.title,
+				title: currentUser.extra.mapFeatures.call_failover.title,
 				position: ['center', 20]
 			});
 
