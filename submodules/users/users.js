@@ -448,14 +448,16 @@ define(function(require) {
 					var extensions = _
 							.chain(numbers)
 							.filter(function(number) {
-								return _.size(number) < 7;
+								if (_.size(number) < 7) {
+									return self.filterNumbersToDisplay(number);
+								}
+								return false;
 							})
 							.concat(extra.listExtensions)
 							.value(),
 						phoneNumbers = _.filter(numbers, function(number) {
 							return _.size(number) >= 7;
 						});
-
 					return {
 						listExtensions: extensions,
 						listCallerId: phoneNumbers,
@@ -3872,7 +3874,9 @@ define(function(require) {
 
 						response.assignedNumbers.push(numberElement);
 					} else {
-						response.extensions.push(number);
+						if (self.filterNumbersToDisplay(number)) {
+							response.extensions.push(number);
+						}
 					}
 				});
 			}
