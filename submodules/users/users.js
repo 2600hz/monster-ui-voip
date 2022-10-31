@@ -449,7 +449,7 @@ define(function(require) {
 							.chain(numbers)
 							.filter(function(number) {
 								if (_.size(number) < 7) {
-									return self.filterNumbersToDisplay(number);
+									return self.isExtensionDisplayable(number);
 								}
 								return false;
 							})
@@ -3874,7 +3874,7 @@ define(function(require) {
 
 						response.assignedNumbers.push(numberElement);
 					} else {
-						if (self.filterNumbersToDisplay(number)) {
+						if (self.isExtensionDisplayable(number)) {
 							response.extensions.push(number);
 						}
 					}

@@ -102,14 +102,13 @@ define(function(require) {
 			var self = this;
 		},
 
-		filterNumbersToDisplay: function(number) {
+		isExtensionDisplayable: function(number) {
 			var isAlphanumericExtensionsEnabled = monster.util.isFeatureAvailable('smartpbx.users.settings.utfExtensions.show');
 			if (isAlphanumericExtensionsEnabled) {
 				return true;
 			}
 			var regex = /\D/;
-			var isValidPhoneNumber = monster.util.getFormatPhoneNumber(number).isValid;
-			var isAlphanumericExtension = !isValidPhoneNumber && regex.test(number);
+			var isAlphanumericExtension = regex.test(number);
 			return !isAlphanumericExtension;
 		},
 
