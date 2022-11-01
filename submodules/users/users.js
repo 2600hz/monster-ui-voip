@@ -445,10 +445,11 @@ define(function(require) {
 					});
 				}, mainUserCallflowsPerUserId),
 				getNumbersExtra = function(numbers, extra) {
-					var extensions = _
+					var EXTENSION_MAX_LENGTH = 7,
+						extensions = _
 							.chain(numbers)
 							.filter(function(number) {
-								if (_.size(number) < 7) {
+								if (_.size(number) < EXTENSION_MAX_LENGTH) {
 									return self.isExtensionDisplayable(number);
 								}
 								return false;
@@ -456,7 +457,7 @@ define(function(require) {
 							.concat(extra.listExtensions)
 							.value(),
 						phoneNumbers = _.filter(numbers, function(number) {
-							return _.size(number) >= 7;
+							return _.size(number) >= EXTENSION_MAX_LENGTH;
 						});
 					return {
 						listExtensions: extensions,
@@ -3873,10 +3874,8 @@ define(function(require) {
 						numberElement.isLocal = numberElement.features.indexOf('local') > -1;
 
 						response.assignedNumbers.push(numberElement);
-					} else {
-						if (self.isExtensionDisplayable(number)) {
-							response.extensions.push(number);
-						}
+					} else if (self.isExtensionDisplayable(number)) {
+						response.extensions.push(number);
 					}
 				});
 			}
