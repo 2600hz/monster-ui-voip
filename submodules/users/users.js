@@ -445,19 +445,16 @@ define(function(require) {
 					});
 				}, mainUserCallflowsPerUserId),
 				getNumbersExtra = function(numbers, extra) {
-					var EXTENSION_MAX_LENGTH = 7,
+					var extensionMaxLength = 7,
 						extensions = _
 							.chain(numbers)
 							.filter(function(number) {
-								if (_.size(number) < EXTENSION_MAX_LENGTH) {
-									return self.isExtensionDisplayable(number);
-								}
-								return false;
+								return _.size(number) < extensionMaxLength && self.isExtensionDisplayable(number);
 							})
 							.concat(extra.listExtensions)
 							.value(),
 						phoneNumbers = _.filter(numbers, function(number) {
-							return _.size(number) >= EXTENSION_MAX_LENGTH;
+							return _.size(number) >= extensionMaxLength;
 						});
 					return {
 						listExtensions: extensions,

@@ -107,11 +107,7 @@ define(function(require) {
 				regex = /\D/,
 				isAlphanumericExtension = regex.test(number);
 
-			if (isAlphanumericExtensionsEnabled) {
-				return true;
-			}
-
-			return !isAlphanumericExtension;
+			return isAlphanumericExtensionsEnabled || !isAlphanumericExtension;
 		},
 
 		loadGlobalData: function(callback) {
