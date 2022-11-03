@@ -139,7 +139,10 @@ define(function(require) {
 			var self = this,
 				container = parent.find('.right-content');
 
-			parent.find('.left-menu').on('click', '.category:not(.loading)', function() {
+			monster.util.isFeatureAvailable('smartpbx.other.eventRouting') ? window.addEventListener('message', (event) => {
+				let args = { parent: container };
+				monster.pub('voip.' + event.data + '.render', args);
+			}) : parent.find('.left-menu').on('click', '.category:not(.loading)', function() {
 				// Get the ID of the submodule to render
 				var $this = $(this),
 					args = {
