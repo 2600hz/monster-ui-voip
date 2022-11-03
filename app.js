@@ -140,7 +140,7 @@ define(function(require) {
 				container = parent.find('.right-content');
 
 			monster.util.isFeatureAvailable('smartpbx.other.eventRouting') ? window.addEventListener('message', function(event) {
-				let args = { parent: container };
+				var args = { parent: container };
 				monster.pub('voip.' + event.data + '.render', args);
 			}) : parent.find('.left-menu').on('click', '.category:not(.loading)', function() {
 				// Get the ID of the submodule to render
