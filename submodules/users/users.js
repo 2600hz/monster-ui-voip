@@ -445,17 +445,17 @@ define(function(require) {
 					});
 				}, mainUserCallflowsPerUserId),
 				getNumbersExtra = function(numbers, extra) {
-					var extensions = _
+					var extensionMaxLength = 7,
+						extensions = _
 							.chain(numbers)
 							.filter(function(number) {
-								return _.size(number) < 7;
+								return _.size(number) < extensionMaxLength && self.isExtensionDisplayable(number);
 							})
 							.concat(extra.listExtensions)
 							.value(),
 						phoneNumbers = _.filter(numbers, function(number) {
-							return _.size(number) >= 7;
+							return _.size(number) >= extensionMaxLength;
 						});
-
 					return {
 						listExtensions: extensions,
 						listCallerId: phoneNumbers,
@@ -3871,7 +3871,7 @@ define(function(require) {
 						numberElement.isLocal = numberElement.features.indexOf('local') > -1;
 
 						response.assignedNumbers.push(numberElement);
-					} else {
+					} else if (self.isExtensionDisplayable(number)) {
 						response.extensions.push(number);
 					}
 				});

@@ -102,6 +102,14 @@ define(function(require) {
 			var self = this;
 		},
 
+		isExtensionDisplayable: function(number) {
+			var isAlphanumericExtensionsEnabled = monster.util.isFeatureAvailable('smartpbx.users.settings.utfExtensions.show'),
+				regex = /\D/,
+				isAlphanumericExtension = regex.test(number);
+
+			return isAlphanumericExtensionsEnabled || !isAlphanumericExtension;
+		},
+
 		loadGlobalData: function(callback) {
 			var self = this;
 
