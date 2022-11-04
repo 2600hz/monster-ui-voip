@@ -69,19 +69,19 @@ define(function(require) {
 							}
 						}
 					}
-				}
+				},
+				navigationMenus: [
+					'myOffice',
+					'numbers',
+					'users',
+					'groups',
+					'strategy',
+					'callLogs',
+					'devices',
+					'vmboxes',
+					'featureCodes'
+				]
 			},
-			navigationMenus: [
-				'myOffice',
-				'numbers',
-				'users',
-				'groups',
-				'strategy',
-				'callLogs',
-				'devices',
-				'vmboxes',
-				'featureCodes'
-			],
 			global: {}
 		},
 
@@ -192,7 +192,9 @@ define(function(require) {
 					});
 				};
 
-			monster.util.isFeatureAvailable('smartpbx.other.eventRouting') ? bindEventNavigation() : bindDefaultNavigation();
+			monster.util.getFeatureConfig('smartpbx.other.eventRouting', false)
+				? bindEventNavigation()
+				: bindDefaultNavigation();
 		},
 
 		overlayInsert: function() {
