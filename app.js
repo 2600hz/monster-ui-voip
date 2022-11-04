@@ -71,6 +71,17 @@ define(function(require) {
 					}
 				}
 			},
+			navigationMenus: [
+				'myOffice',
+				'numbers',
+				'users',
+				'groups',
+				'strategy',
+				'callLogs',
+				'devices',
+				'vmboxes',
+				'featureCodes'
+			],
 			global: {}
 		},
 
@@ -145,34 +156,43 @@ define(function(require) {
 
 		bindEvents: function(parent) {
 			var self = this,
-				container = parent.find('.right-content');
+				container = parent.find('.right-content'),
+				bindDefaultNavigation = function defaultNavigation() {
+					parent.find('.left-menu').on('click', '.category:not(.loading)', function() {
+						// Get the ID of the submodule to render
+						var $this = $(this),
+							args = {
+								parent: container,
+								callback: function() {
+									parent.find('.category').removeClass('loading');
+								}
+							},
+							id = $this.attr('id');
 
-			monster.util.isFeatureAvailable('smartpbx.other.eventRouting')
-				? window.addEventListener('message', function(event) {
-					var args = { parent: container };
-					monster.pub('voip.' + event.data + '.render', args);
-				}) : parent.find('.left-menu').on('click', '.category:not(.loading)', function() {
-				// Get the ID of the submodule to render
-					var $this = $(this),
-						args = {
-							parent: container,
-							callback: function() {
-								parent.find('.category').removeClass('loading');
-							}
-						},
-						id = $this.attr('id');
+						// Display the category we clicked as active
+						parent
+							.find('.category')
+							.removeClass('active')
+							.addClass('loading');
+						$this.toggleClass('active');
 
-					// Display the category we clicked as active
-					parent
-					.find('.category')
-					.removeClass('active')
-					.addClass('loading');
-					$this.toggleClass('active');
+						// Empty the main container and then render the submodule content
+						container.empty();
+						monster.pub('voip.' + id + '.render', args);
+					});
+				},
+				bindEventNavigation = function bindEventNavigation() {
+					window.addEventListener('message', function(event) {
+						var args = { parent: container };
 
-					// Empty the main container and then render the submodule content
-					container.empty();
-					monster.pub('voip.' + id + '.render', args);
-				});
+						if (event.data.type === 'smartpbx.routing' && self.appFlags.common.navigationMenus.includes(event.data.data)) {
+							container.empty();
+							monster.pub('voip.' + event.data.data + '.render', args);
+						}
+					});
+				};
+
+			monster.util.isFeatureAvailable('smartpbx.other.eventRouting') ? bindEventNavigation() : bindDefaultNavigation();
 		},
 
 		overlayInsert: function() {
