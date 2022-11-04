@@ -139,31 +139,32 @@ define(function(require) {
 			var self = this,
 				container = parent.find('.right-content');
 
-			monster.util.isFeatureAvailable('smartpbx.other.eventRouting') ? window.addEventListener('message', function(event) {
-				var args = { parent: container };
-				monster.pub('voip.' + event.data + '.render', args);
-			}) : parent.find('.left-menu').on('click', '.category:not(.loading)', function() {
+			monster.util.isFeatureAvailable('smartpbx.other.eventRouting')
+				? window.addEventListener('message', function(event) {
+					var args = { parent: container };
+					monster.pub('voip.' + event.data + '.render', args);
+				}) : parent.find('.left-menu').on('click', '.category:not(.loading)', function() {
 				// Get the ID of the submodule to render
-				var $this = $(this),
-					args = {
-						parent: container,
-						callback: function() {
-							parent.find('.category').removeClass('loading');
-						}
-					},
-					id = $this.attr('id');
+					var $this = $(this),
+						args = {
+							parent: container,
+							callback: function() {
+								parent.find('.category').removeClass('loading');
+							}
+						},
+						id = $this.attr('id');
 
-				// Display the category we clicked as active
-				parent
+					// Display the category we clicked as active
+					parent
 					.find('.category')
 					.removeClass('active')
 					.addClass('loading');
-				$this.toggleClass('active');
+					$this.toggleClass('active');
 
-				// Empty the main container and then render the submodule content
-				container.empty();
-				monster.pub('voip.' + id + '.render', args);
-			});
+					// Empty the main container and then render the submodule content
+					container.empty();
+					monster.pub('voip.' + id + '.render', args);
+				});
 		},
 
 		overlayInsert: function() {
