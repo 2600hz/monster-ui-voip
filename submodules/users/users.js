@@ -5209,19 +5209,8 @@ define(function(require) {
 
 					baseConference = $.extend(true, {}, baseConference, data.conference);
 
-					self.usersListConferences(data.user.id, function(conferences) {
-						var conferenceToSave = baseConference;
-						if (conferences.length > 0) {
-							conferenceToSave = $.extend(true, {}, conferences[0], baseConference);
-
-							self.usersUpdateConference(conferenceToSave, function(conference) {
-								callback && callback(null, conference);
-							});
-						} else {
-							self.usersCreateConference(conferenceToSave, function(conference) {
-								callback && callback(null, conference);
-							});
-						}
+					self.usersCreateConference(baseConference, function(conference) {
+						callback && callback(null, conference);
 					});
 				},
 				user: function(callback) {
