@@ -2111,22 +2111,6 @@ define(function(require) {
 				};
 
 				if (monster.ui.valid(featureForm)) {
-					data.conference = monster.ui.getFormData('conferencing_form');
-
-					if (data.conference.video) {
-						data.conference = _.merge(data.conference, {
-							video: true,
-							profile_name: 'video',
-							caller_controls: 'video-participant',
-							moderator_controls: 'video-moderator'
-						});
-					} else {
-						delete data.conference.video;
-						delete data.conference.profile_name;
-						delete data.conference.caller_controls;
-						delete data.conference.moderator_controls;
-					}
-
 					if (switchFeature.prop('checked')) {
 						self.usersUpdateConferencing(data, function(data) {
 							args.userId = data.user.id;
@@ -5165,33 +5149,47 @@ define(function(require) {
 			monster.parallel({
 				conference: function(callback) {
 					var baseConference = {
-						name: monster.util.getUserFullName(data.user) + self.appFlags.users.smartPBXConferenceString,
-						owner_id: data.user.id,
-						play_name_on_join: true,
-						member: {
-							join_muted: false
+							name: monster.util.getUserFullName(data.user) + self.appFlags.users.smartPBXConferenceString,
+							owner_id: data.user.id,
+							play_name_on_join: true,
+							member: {
+								join_muted: false
+							},
+							conference_numbers: []
 						},
-						conference_numbers: []
-					};
+						formData = monster.ui.getFormData('conferencing_form');
 
 					monster.util.dataFlags.add({ source: 'smartpbx' }, baseConference);
 
-					baseConference = $.extend(true, {}, baseConference, data.conference);
+					if (formData.video) {
+						formData = _.merge(formData, {
+							video: true,
+							profile_name: 'video',
+							caller_controls: 'video-participant',
+							moderator_controls: 'video-moderator'
+						});
+					}
 
-					self.usersListConferences(data.user.id, function(conferences) {
-						var conferenceToSave = baseConference;
-						if (conferences.length > 0) {
-							conferenceToSave = $.extend(true, {}, conferences[0], baseConference);
+					baseConference = $.extend(true, {}, baseConference, formData);
 
-							self.usersUpdateConference(conferenceToSave, function(conference) {
-								callback && callback(null, conference);
-							});
-						} else {
-							self.usersCreateConference(conferenceToSave, function(conference) {
-								callback && callback(null, conference);
-							});
+					if (_.isEmpty(data.conference)) {
+						self.usersCreateConference(baseConference, function(conference) {
+							callback && callback(null, conference);
+						});
+					} else {
+						baseConference = $.extend(true, {}, data.conference, baseConference);
+
+						if (!formData.video) {
+							delete baseConference.video;
+							delete baseConference.profile_name;
+							delete baseConference.caller_controls;
+							delete baseConference.moderator_controls;
 						}
-					});
+
+						self.usersUpdateConference(baseConference, function(conference) {
+							callback && callback(null, conference);
+						});
+					}
 				},
 				user: function(callback) {
 					if (data.user.smartpbx && data.user.smartpbx.conferencing && data.user.smartpbx.conferencing.enabled === true) {
