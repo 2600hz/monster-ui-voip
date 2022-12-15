@@ -36,7 +36,17 @@ define(function(require) {
 		},
 
 		requests: {},
-		subscribe: {},
+		subscribe: {
+			'voip.tab.myOffice': 'myOfficeRender',
+			'voip.tab.numbers': 'numbersRender',
+			'voip.tab.users': 'usersRender',
+			'voip.tab.groups': 'groupsRender',
+			'voip.tab.strategy': 'strategyRender',
+			'voip.tab.callLogs': 'callLogsRender',
+			'voip.tab.devices': 'devicesRender',
+			'voip.tab.vmboxes': 'vmboxesRender',
+			'voip.tab.featureCodes': 'featureCodesRender'
+		},
 		appFlags: {
 			common: {
 				hasProvisioner: false,
@@ -70,18 +80,7 @@ define(function(require) {
 							}
 						}
 					}
-				},
-				navigationMenus: [
-					'myOffice',
-					'numbers',
-					'users',
-					'groups',
-					'strategy',
-					'callLogs',
-					'devices',
-					'vmboxes',
-					'featureCodes'
-				]
+				}
 			},
 			global: {},
 			disableFirstUseWalkthrough: monster.config.whitelabel.disableFirstUseWalkthrough
@@ -158,45 +157,30 @@ define(function(require) {
 
 		bindEvents: function(parent) {
 			var self = this,
-				container = parent.find('.right-content'),
-				bindDefaultNavigation = function defaultNavigation() {
-					parent.find('.left-menu').on('click', '.category:not(.loading)', function() {
-						// Get the ID of the submodule to render
-						var $this = $(this),
-							args = {
-								parent: container,
-								callback: function() {
-									parent.find('.category').removeClass('loading');
-								}
-							},
-							id = $this.attr('id');
+				container = parent.find('.right-content');
 
-						// Display the category we clicked as active
-						parent
-							.find('.category')
-							.removeClass('active')
-							.addClass('loading');
-						$this.toggleClass('active');
-
-						// Empty the main container and then render the submodule content
-						container.empty();
-						monster.pub('voip.' + id + '.render', args);
-					});
-				},
-				bindEventNavigation = function bindEventNavigation() {
-					window.addEventListener('message', function(event) {
-						var args = { parent: container };
-
-						if (event.data.type === 'smartpbx.routing' && self.appFlags.common.navigationMenus.includes(event.data.data)) {
-							container.empty();
-							monster.pub('voip.' + event.data.data + '.render', args);
+			parent.find('.left-menu').on('click', '.category:not(.loading)', function() {
+				// Get the ID of the submodule to render
+				var $this = $(this),
+					args = {
+						parent: container,
+						callback: function() {
+							parent.find('.category').removeClass('loading');
 						}
-					});
-				};
+					},
+					id = $this.attr('id');
 
-			monster.util.getFeatureConfig('smartpbx.other.eventRouting', false)
-				? bindEventNavigation()
-				: bindDefaultNavigation();
+				// Display the category we clicked as active
+				parent
+					.find('.category')
+					.removeClass('active')
+					.addClass('loading');
+				$this.toggleClass('active');
+
+				// Empty the main container and then render the submodule content
+				container.empty();
+				monster.pub('voip.' + id + '.render', args);
+			});
 		},
 
 		overlayInsert: function() {
