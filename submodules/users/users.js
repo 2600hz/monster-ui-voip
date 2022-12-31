@@ -236,6 +236,11 @@ define(function(require) {
 					phoneNumber: '',
 					differentEmail: dataUser.email !== dataUser.username,
 					mapFeatures: _.pickBy({
+						call_forwarding: {
+							icon: '',
+							iconColor: '',
+							title: self.i18n.active().users.callFailover.totle
+						},
 						caller_id: {
 							availabilityChecker: function() {
 								var isEditableWhenSetOnAccount = monster.util.isFeatureAvailable(
