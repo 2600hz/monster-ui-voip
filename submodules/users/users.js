@@ -237,9 +237,9 @@ define(function(require) {
 					differentEmail: dataUser.email !== dataUser.username,
 					mapFeatures: _.pickBy({
 						call_forwarding: {
-							icon: '',
-							iconColor: '',
-							title: self.i18n.active().users.callFailover.totle
+							icon: 'icon-telicon-forward',
+							iconColor: 'monster-orange',
+							title: self.i18n.active().users.callForwarding.title
 						},
 						caller_id: {
 							availabilityChecker: function() {
@@ -1521,6 +1521,10 @@ define(function(require) {
 
 			template.on('click', '.feature[data-feature="call_failover"]', function() {
 				self.usersRenderCallFailover(currentUser);
+			});
+
+			template.on('click', '.feature[data-feature="call_forwarding"]', function() {
+				self.usersCallForwardingRender(currentUser);
 			});
 
 			template.on('click', '.feature[data-feature="hotdesk"]', function() {

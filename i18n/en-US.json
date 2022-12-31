@@ -615,7 +615,12 @@
 		"uploadPicture": "Upload a Picture",
 		"user": "User",
 		"callForwarding": {
-			"title": "Call Forwarding"
+			"title": "Call Forwarding",
+			"toast": {
+				"error": {
+					"save": "Ooops, there was an issue while applying your changes"
+				}
+			}
 		},
 		"call_failover": {
 			"failoverMode": "Failover Mode",
