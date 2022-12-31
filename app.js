@@ -14,6 +14,7 @@ define(function(require) {
 		'strategyHours',
 		'strategyHolidays',
 		'users',
+		'usersCallForwarding',
 		'vmboxes'
 	];
 
