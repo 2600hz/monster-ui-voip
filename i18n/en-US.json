@@ -614,6 +614,9 @@
 		},
 		"uploadPicture": "Upload a Picture",
 		"user": "User",
+		"callForwarding": {
+			"title": "Call Forwarding"
+		},
 		"call_failover": {
 			"failoverMode": "Failover Mode",
 			"directCallsOnly": "Direct calls only",
