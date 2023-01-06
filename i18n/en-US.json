@@ -433,9 +433,9 @@
 			"deviceName": "Device Name"
 		},
 		"teammate": {
-			"addTitle": "Adding a TeamMate Device",
-			"editTitle": "Editing TeamMate Device: {{name}}",
-			"new": "New TeamMate Device",
+			"addTitle": "Adding a MS Teams Device",
+			"editTitle": "Editing MS Teams Device: {{name}}",
+			"new": "New MS Teams Device",
 			"deviceName": "Device Name"
 		},
 		"ata": {
@@ -465,7 +465,7 @@
 			"smartphone": "Smartphone",
 			"mobile": "Business Mobile",
 			"softphone": "Soft Phone",
-			"teammate": "TeamMate",
+			"teammate": "MS Teams",
 			"landline": "Landline",
 			"fax": "Fax",
 			"ata": "ATA",
