@@ -82,7 +82,8 @@ define(function(require) {
 					'featureCodes'
 				]
 			},
-			global: {}
+			global: {},
+			disableShowfirstUseWalkthrough: monster.config.whitelabel.disableShowfirstUseWalkthrough
 		},
 
 		subModules: appSubmodules,

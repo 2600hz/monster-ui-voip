@@ -1843,11 +1843,13 @@ define(function(require) {
 		groupsCheckWalkthrough: function() {
 			var self = this;
 
-			self.groupsHasWalkthrough(function() {
-				self.groupsShowWalkthrough(function() {
-					self.groupsUpdateWalkthroughFlagUser();
+			if (!self.appFlags.disableShowfirstUseWalkthrough) {
+				self.groupsHasWalkthrough(function() {
+					self.groupsShowWalkthrough(function() {
+						self.groupsUpdateWalkthroughFlagUser();
+					});
 				});
-			});
+			}
 		},
 
 		groupsHasWalkthrough: function(callback) {

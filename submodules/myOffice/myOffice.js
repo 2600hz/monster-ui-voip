@@ -175,7 +175,7 @@ define(function(require) {
 		myOfficeCheckWalkthrough: function() {
 			var self = this;
 
-			if (!monster.apps.auth.currentAccount.hasOwnProperty('trial_time_left')) {
+			if (!monster.apps.auth.currentAccount.hasOwnProperty('trial_time_left') && !self.appFlags.disableShowfirstUseWalkthrough) {
 				monster.pub('myaccount.hasToShowWalkthrough', function(response) {
 					if (response === false) {
 						self.myOfficeWalkthroughRender();
@@ -1077,11 +1077,13 @@ define(function(require) {
 			if (self.isActive()) {
 				// First we check if the user hasn't seen the walkthrough already
 				// if he hasn't we show the walkthrough, and once they're done with it, we update their user doc so they won't see the walkthrough again
-				self.myOfficeHasWalkthrough(function() {
-					self.myOfficeShowWalkthrough(function() {
-						self.myOfficeUpdateWalkthroughFlagUser();
+				if (!self.appFlags.disableShowfirstUseWalkthrough) {
+					self.myOfficeHasWalkthrough(function() {
+						self.myOfficeShowWalkthrough(function() {
+							self.myOfficeUpdateWalkthroughFlagUser();
+						});
 					});
-				});
+				}
 			}
 		},
 

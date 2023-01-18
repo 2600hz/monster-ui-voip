@@ -295,11 +295,13 @@ define(function(require) {
 			var self = this,
 				flagName = 'showStrategyFirstWalkthrough';
 
-			self.strategyHasWalkthrough(flagName, function() {
-				self.strategyShowFirstWalkthrough(function() {
-					self.strategyUpdateWalkthroughFlagUser(flagName);
+			if (!self.appFlags.disableShowfirstUseWalkthrough) {
+				self.strategyHasWalkthrough(flagName, function() {
+					self.strategyShowFirstWalkthrough(function() {
+						self.strategyUpdateWalkthroughFlagUser(flagName);
+					});
 				});
-			});
+			}
 		},
 
 		strategyCheckSecondWalkthrough: function() {
