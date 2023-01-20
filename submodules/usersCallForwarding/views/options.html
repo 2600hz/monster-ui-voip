@@ -1,0 +1,24 @@
+<div>
+    <div class="title">
+        {{@root.i18n.users.callForwarding.strategies.common.options.title}} 
+    </div>
+    <div class="options-wrapper">
+        {{#each options as |option|}}
+            <div class="option-pill{{#if option.isEnabled}} enabled{{/if}}">
+                <div class="option-header">
+                    <div class="option-title">
+                        {{option.title}}
+                    </div>
+                    <div class="option-toggle">
+                        {{#monsterCheckbox "large-checkbox"}}
+                            <input type="checkbox" name="{{../strategy}}.{{option.type}}"{{#if option.isEnabled}} checked{{/if}} />
+                        {{/monsterCheckbox}}
+                    </div>
+                </div>
+                <div class="option-content">
+                    {{option.text}}
+                </div>
+            </div>
+        {{/each}}
+    </div>
+</div>

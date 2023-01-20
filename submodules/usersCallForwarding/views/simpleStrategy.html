@@ -1,0 +1,67 @@
+<div class="strategy{{#if isEnabled}} enalbed{{/if}}" data-strategy="{{strategy}}">
+    <div class="wrapper">
+        <div class="header">
+            <div class="header-icon">
+                <i class="icon-telicon-{{icon}}"></i>
+            </div>
+            <div class="header-content">
+                <div class="header-title">
+                    {{title}}
+                </div>
+                <div class="header-help-text">
+                    {{helpText}}
+                </div>
+            </div>
+            <div class="header-toggle">
+                {{#monsterCheckbox "large-checkbox"}}
+					<input type="checkbox" name="{{strategy}}.isEnabled"{{#if isEnabled}} checked{{/if}} />
+				{{/monsterCheckbox}}
+            </div>
+        </div>
+        <div class="content">
+            <div class="voicemail-wrapper">
+                <div>
+                    {{#monsterRadio @root.i18n.users.callForwarding.strategies.common.voicemail.label }}
+                        <input type="radio" name="{{strategy}}.type" value="voicemail"{{#if type '===' 'voicemail'}} checked{{/if}} />
+                    {{/monsterRadio}}
+                </div>
+                <div>
+                    <div class="control-group">
+                        <label class="control-label" for="{{strategy}}.voicemail.value">
+                            {{@root.i18n.users.callForwarding.strategies.common.voicemail.selectLabel}}
+                        </label>
+                        <div class="controls">
+                            <select id="{{strategy}}_voicemail_select" name="{{strategy}}.voicemail.value">
+                            {{#select selectedVoicemailId}}
+                                {{#each voicemails as |voicemail|}}
+                                    <option value="{{voicemail.id}}">
+                                        {{voicemail.name}}
+                                    </option>
+                                {{/each}}
+                            {{/select}}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="phoneNumber-wrapper">
+                <div>
+                    {{#monsterRadio @root.i18n.users.callForwarding.strategies.common.phoneNumber.label }}
+                        <input type="radio" name="{{strategy}}.type" value="phoneNumber"{{#if type '===' 'phoneNumber'}} checked{{/if}} />
+                    {{/monsterRadio}}
+                </div>
+                <div>
+                    <div class="control-group">
+                        <label for="{{strategy}}.phoneNumber.value" class="control-label">
+                            {{@root.i18n.users.callForwarding.strategies.common.phoneNumber.selectLabel}}
+                        </label>
+                        <div class="controls">
+                            <input type="phoneNumber" value="{{selectedPhoneNumber}}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="options-target"></div>
+        </div>
+    </div>
+</div>

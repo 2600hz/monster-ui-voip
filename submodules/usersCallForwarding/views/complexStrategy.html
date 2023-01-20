@@ -1,0 +1,23 @@
+<div class="strategy{{#if isEnabled}} enalbed{{/if}}" data-strategy="{{strategy}}">
+    <div class="wrapper">
+        <div class="header">
+            <div class="header-icon">
+                <i class="icon-telicon-{{icon}}"></i>
+            </div>
+            <div class="header-content">
+                <div class="header-title">
+                    {{title}}
+                </div>
+                <div class="header-help-text">
+                    {{helpText}}
+                </div>
+            </div>
+            <div class="header-toggle">
+                {{#monsterCheckbox "large-checkbox"}}
+					<input type="checkbox" name="{{strategy}}.isEnabled"{{#if isEnabled}} checked{{/if}} />
+				{{/monsterCheckbox}}
+            </div>
+        </div>
+        <div class="content"></div>
+    </div>
+</div>
