@@ -119,13 +119,15 @@ define(function(require) {
 		usersCheckWalkthrough: function() {
 			var self = this;
 
-			if (!self.appFlags.disableShowfirstUseWalkthrough) {
-				self.usersHasWalkthrough(function() {
-					self.usersShowWalkthrough(function() {
-						self.usersUpdateWalkthroughFlagUser();
-					});
-				});
+			if (self.appFlags.disableFirstUseWalkthrough) {
+				return;
 			}
+
+			self.usersHasWalkthrough(function() {
+				self.usersShowWalkthrough(function() {
+					self.usersUpdateWalkthroughFlagUser();
+				});
+			});
 		},
 
 		usersHasWalkthrough: function(callback) {

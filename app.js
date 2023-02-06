@@ -83,7 +83,7 @@ define(function(require) {
 				]
 			},
 			global: {},
-			disableShowfirstUseWalkthrough: monster.config.whitelabel.disableShowfirstUseWalkthrough
+			disableFirstUseWalkthrough: monster.config.whitelabel.disableFirstUseWalkthrough
 		},
 
 		subModules: appSubmodules,

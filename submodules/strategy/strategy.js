@@ -295,13 +295,15 @@ define(function(require) {
 			var self = this,
 				flagName = 'showStrategyFirstWalkthrough';
 
-			if (!self.appFlags.disableShowfirstUseWalkthrough) {
-				self.strategyHasWalkthrough(flagName, function() {
-					self.strategyShowFirstWalkthrough(function() {
-						self.strategyUpdateWalkthroughFlagUser(flagName);
-					});
-				});
+			if (self.appFlags.disableFirstUseWalkthrough) {
+				return;
 			}
+
+			self.strategyHasWalkthrough(flagName, function() {
+				self.strategyShowFirstWalkthrough(function() {
+					self.strategyUpdateWalkthroughFlagUser(flagName);
+				});
+			});
 		},
 
 		strategyCheckSecondWalkthrough: function() {
