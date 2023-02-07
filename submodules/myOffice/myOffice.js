@@ -1089,7 +1089,7 @@ define(function(require) {
 			var self = this,
 				flag = self.uiFlags.user.get('showDashboardWalkthrough');
 
-			if (flag !== false) {
+			if (flag !== false && self.appFlags.disableFirstUseWalkthrough !== true) {
 				callback && callback();
 			}
 		},
