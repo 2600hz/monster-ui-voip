@@ -1077,10 +1077,6 @@ define(function(require) {
 			if (self.isActive()) {
 				// First we check if the user hasn't seen the walkthrough already
 				// if he hasn't we show the walkthrough, and once they're done with it, we update their user doc so they won't see the walkthrough again
-				if (self.appFlags.disableFirstUseWalkthrough) {
-					return;
-				}
-
 				self.myOfficeHasWalkthrough(function() {
 					self.myOfficeShowWalkthrough(function() {
 						self.myOfficeUpdateWalkthroughFlagUser();
@@ -1093,7 +1089,7 @@ define(function(require) {
 			var self = this,
 				flag = self.uiFlags.user.get('showDashboardWalkthrough');
 
-			if (flag !== false) {
+			if (flag !== false && self.appFlags.disableFirstUseWalkthrough !== true) {
 				callback && callback();
 			}
 		},

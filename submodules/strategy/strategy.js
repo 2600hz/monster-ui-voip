@@ -295,10 +295,6 @@ define(function(require) {
 			var self = this,
 				flagName = 'showStrategyFirstWalkthrough';
 
-			if (self.appFlags.disableFirstUseWalkthrough) {
-				return;
-			}
-
 			self.strategyHasWalkthrough(flagName, function() {
 				self.strategyShowFirstWalkthrough(function() {
 					self.strategyUpdateWalkthroughFlagUser(flagName);
@@ -321,7 +317,7 @@ define(function(require) {
 			var self = this,
 				flag = self.uiFlags.user.get(name);
 
-			if (flag !== false) {
+			if (flag !== false && self.appFlags.disableFirstUseWalkthrough !== true) {
 				callback && callback();
 			}
 		},
