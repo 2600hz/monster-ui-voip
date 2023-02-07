@@ -175,7 +175,7 @@ define(function(require) {
 		myOfficeCheckWalkthrough: function() {
 			var self = this;
 
-			if (!monster.apps.auth.currentAccount.hasOwnProperty('trial_time_left') && !self.appFlags.disableFirstUseWalkthrough) {
+			if (!monster.apps.auth.currentAccount.hasOwnProperty('trial_time_left')) {
 				monster.pub('myaccount.hasToShowWalkthrough', function(response) {
 					if (response === false) {
 						self.myOfficeWalkthroughRender();
