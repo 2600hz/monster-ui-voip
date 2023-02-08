@@ -3454,6 +3454,7 @@ define(function(require) {
 			delete userData.features;
 			delete userData.extra;
 			delete userData[''];
+			delete userData.confirm_password;
 
 			return userData;
 		},
