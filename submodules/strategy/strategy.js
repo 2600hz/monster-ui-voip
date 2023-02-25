@@ -2834,6 +2834,19 @@ define(function(require) {
 
 		strategyHandleFeatureCodes: function() {
 			var self = this,
+				deleteFeatureCodeFactory = function deleteFeatureCodeFactory(callflow) {
+					return function(callback) {
+						self.strategyDeleteCallflow({
+							bypassProgressIndicator: true,
+							data: {
+								callflowId: callflow.id,
+								data: {}
+							},
+							success: _.partial(callback, null),
+							error: _.partial(callback, null)
+						});
+					};
+				},
 				createFeatureCodeFactory = function createFeatureCodeFactory(featureCode) {
 					return function(callback) {
 						self.strategyCreateCallflow({
@@ -2867,15 +2880,43 @@ define(function(require) {
 
 			monster.waterfall([
 				function fetchExistingFeatureCodes(callback) {
-					self.strategyGetFeatureCodes(_.partial(callback, null));
+					monster.parallel({
+						createdByApp: function fetchFeatureCodesCreatedByApp(createdByAppCallback) {
+							self.strategyGetFeatureCodes(true, _.partial(createdByAppCallback, null));
+						},
+						createdOutsideApp: function fetchFeatureCodesCreatedOutsideApp(createdOutsideAppCallback) {
+							self.strategyGetFeatureCodes(false, _.partial(createdOutsideAppCallback, null));
+						}
+					}, callback);
+				},
+				function maybeDeleteWrongFeatureCodes(existing, callback) {
+					monster.parallel(_
+						.chain(existing.createdOutsideApp)
+						.filter(function(callflow) {
+							return _.some(self.featureCodeConfigs, _.flow([
+								_.unary(_.partial(_.get, _, 'name')),
+								_.partial(_.isEqual, _.get(callflow, 'featurecode.name'))
+							]));
+						})
+						.tap(function(callflows) {
+							console.log('monster-ui-voip:strategy:strategyHandleFeatureCodes:maybeDeleteWrongFeatureCodes', callflows);
+						})
+						.map(deleteFeatureCodeFactory)
+						.value()
+					, function() {
+						callback(null, existing.createdByApp);
+					});
 				},
 				function maybeCreateMissingFeatureCodes(existing, callback) {
 					monster.parallel(_
 						.chain(self.featureCodeConfigs)
 						.reject(_.flow([
-							_.partial(_.get, _, 'name'),
+							_.unary(_.partial(_.get, _, 'name')),
 							_.partial(_.includes, _.map(existing, 'featurecode.name'))
 						]))
+						.tap(function(configs) {
+							console.log('monster-ui-voip:strategy:strategyHandleFeatureCodes:maybeCreateMissingFeatureCodes', configs);
+						})
 						.map(createFeatureCodeFactory)
 						.value()
 					, callback);
@@ -2883,15 +2924,19 @@ define(function(require) {
 			]);
 		},
 
-		strategyGetFeatureCodes: function(callback) {
+		strategyGetFeatureCodes: function(createdByApp, callback) {
 			var self = this;
 
 			self.strategyListCallflows({
 				bypassProgressIndicator: true,
-				filters: {
+				filters: _.merge({
 					paginate: 'false',
 					has_key: 'featurecode'
-				},
+				}, createdByApp ? {
+					'filter_ui_metadata.origin': 'voip'
+				} : {
+					'filter_not_ui_metadata.origin': 'voip'
+				}),
 				success: function(listFeatureCodes) {
 					callback && callback(listFeatureCodes);
 				}
