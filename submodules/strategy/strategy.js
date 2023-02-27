@@ -2979,9 +2979,6 @@ define(function(require) {
 								_.partial(_.isEqual, _.get(callflow, 'featurecode.name'))
 							]));
 						})
-						.tap(function(callflows) {
-							console.log('monster-ui-voip:strategy:strategyHandleFeatureCodes:maybeDeleteWrongFeatureCodes', callflows);
-						})
 						.map(deleteFeatureCodeFactory)
 						.value()
 					, function() {
@@ -2995,9 +2992,6 @@ define(function(require) {
 							_.unary(_.partial(_.get, _, 'name')),
 							_.partial(_.includes, _.map(existing, 'featurecode.name'))
 						]))
-						.tap(function(configs) {
-							console.log('monster-ui-voip:strategy:strategyHandleFeatureCodes:maybeCreateMissingFeatureCodes', configs);
-						})
 						.map(createFeatureCodeFactory)
 						.value()
 					, callback);
