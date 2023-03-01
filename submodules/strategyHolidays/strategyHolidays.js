@@ -82,7 +82,7 @@ define(function(require) {
 					var currentYear = self.strategyHolidaysGetCurrentYear(),
 						totalYears = 3,
 						yearsArray = _.chain(currentYear)
-							.range(currentYear + totalYears)
+							.range(currentYear + totalYears + 1)
 							.map(function(year) {
 								return {
 									label: _.toString(year),
