@@ -4293,7 +4293,6 @@ define(function(require) {
 						.find('.optional-time')
 						.removeClass('show');
 				}
-
 			});
 
 			$template.on('click', '#all_day', function() {
@@ -4390,10 +4389,6 @@ define(function(require) {
 						? value + 1
 						: value;
 				});
-
-				if (!formData.recurring) {
-					holidayData.endYear = args.yearSelected;
-				}
 
 				holidayData.name = formData.name;
 				holidayData.recurring = formData.recurring;

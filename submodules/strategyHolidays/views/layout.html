@@ -25,9 +25,9 @@
 
 		<div class="controls">
 			<select class="years-list" name="year" id="year">
-				{{#each years as |label|}}
-				<option value="{{label}}">
-					{{label}}
+				{{#each years as |option|}}
+				<option value="{{option.value}}"{{#compare @index "===" 1}} selected{{/compare}}>
+					{{option.label}}
 				</option>
 				{{/each}}
 			</select>
