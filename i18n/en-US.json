@@ -946,7 +946,8 @@
 					"date": "Date",
 					"actions": "Actions"
 				},
-				"search": "Search..."
+				"search": "Search...",
+				"dateWithYear": "{{dateText}}, {{year}}"
 			},
 			"days": {
 				"monday": "Mon",
@@ -1008,7 +1009,8 @@
 					}
 				}
 			},
-			"helpHolidays": "Do not forget to set the call routing for when your office is closed for the holidays! To set it up, go in the \"Incoming Call Handling\" section of this page, and select the \"Holidays\" tab."
+			"helpHolidays": "Do not forget to set the call routing for when your office is closed for the holidays! To set it up, go in the \"Incoming Call Handling\" section of this page, and select the \"Holidays\" tab.",
+			"expiredHolidays": "Expired holidays"
 		},
 		"calls": {
 			"openHoursTitle": "Open Hours",
