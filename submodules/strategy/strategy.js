@@ -4256,9 +4256,9 @@ define(function(require) {
 				event.preventDefault();
 
 				var $this = $(this),
-					className = $this.val(),
+					selectedDateType = $this.val(),
 					isRecurringChecked = $template.find('#recurring').prop('checked'),
-					$singleDateYearElement = $template.find('.optional-year'),
+					$optionalYearElement = $template.find('.optional-year'),
 					$recurringElement = $template.find('#recurring');
 
 				$template
@@ -4266,18 +4266,18 @@ define(function(require) {
 					.removeClass('selected');
 
 				$template
-					.find('.row-fluid.' + className)
+					.find('.row-fluid.' + selectedDateType)
 					.addClass('selected');
 
-				if ((className === 'single' && isRecurringChecked) || className !== 'single') {
-					$singleDateYearElement
+				if (selectedDateType === 'advanced' || isRecurringChecked) {
+					$optionalYearElement
 						.removeClass('show');
-				} else if (className === 'single' && !isRecurringChecked) {
-					$singleDateYearElement
+				} else {
+					$optionalYearElement
 						.addClass('show');
 				}
 
-				if (className === 'advanced') {
+				if (selectedDateType === 'advanced') {
 					$recurringElement
 						.prop('checked', true);
 
@@ -4288,7 +4288,7 @@ define(function(require) {
 						.removeAttr('disabled');
 				}
 
-				if (['advanced', 'range'].includes(className)) {
+				if (['advanced', 'range'].includes(selectedDateType)) {
 					$template
 						.find('.optional-time')
 						.removeClass('show');
