@@ -6,7 +6,9 @@
 		{{dateToDisplay}}
 	</td>
 	<td class="action-cell">
+	{{#if isEditable}}
 		<span class="edit-holiday">{{telicon "edit"}}</span>
+	{{/if}}
 		<span class="delete-holiday">{{telicon "trash"}}</span>
 	</td>
 </tr>
