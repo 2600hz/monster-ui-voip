@@ -4,7 +4,7 @@ base_branch: 'origin/5.2'
 exposure: private
 metapackage:
   - name: meta-monster-ui
-    branch: master
+    branch: '5.2'
     package: monster-ui-application-voip
     type: required
 base_core: monster-ui
