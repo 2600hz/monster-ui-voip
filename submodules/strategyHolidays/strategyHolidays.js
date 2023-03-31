@@ -5,7 +5,7 @@ define(function(require) {
 		footable = require('footable'),
 		Papa = require('papaparse'),
 		sugar = require('sugar-date'),
-		DateHolidays = require('date-holidays');
+		DateHolidays = require('date-holidays').default;
 
 	return {
 		subscribe: {
