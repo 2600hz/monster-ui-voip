@@ -1,8 +1,8 @@
 define(function(require) {
 	var $ = require('jquery'),
 		_ = require('lodash'),
-		jstz = require('jstz'),
-		monster = require('monster');
+		monster = require('monster'),
+		moment = require('moment');
 
 	var app = {
 		requests: {},
@@ -135,14 +135,15 @@ define(function(require) {
 				toDate = dates.to;
 			}
 
-			var dataTemplate = {
-				timezone: 'GMT' + jstz.determine_timezone().offset(),
-				type: type || 'today',
-				fromDate: fromDate,
-				toDate: toDate,
-				showFilteredDates: ['thisMonth', 'thisWeek'].indexOf(type) >= 0,
-				showReport: monster.config.whitelabel.callReportEmail ? true : false
-			};
+			var tz = monster.util.getCurrentTimeZone(),
+				dataTemplate = {
+					timezone: 'GMT' + moment().tz(tz).format('Z'),
+					type: type || 'today',
+					fromDate: fromDate,
+					toDate: toDate,
+					showFilteredDates: ['thisMonth', 'thisWeek'].indexOf(type) >= 0,
+					showReport: monster.config.whitelabel.callReportEmail ? true : false
+				};
 
 			self.callLogsGetCdrs(fromDate, toDate, function(cdrs, nextStartKey) {
 				cdrs = self.callLogsFormatCdrs(cdrs);

@@ -5,7 +5,7 @@ define(function(require) {
 		footable = require('footable'),
 		Papa = require('papaparse'),
 		sugar = require('sugar-date'),
-		DateHolidays = require('date-holidays');
+		DateHolidays = require('date-holidays').default;
 
 	return {
 		subscribe: {
@@ -78,25 +78,33 @@ define(function(require) {
 				strategyData = args.strategyData,
 				holidaysData = self.strategyHolidaysExtractHolidaysFromStrategyData(strategyData),
 				callback = args.callback,
-				getListOfYears = function getListOfYears() {
-					var date = new Date(),
-						year = parseInt(date.getFullYear()),
+				getYearOptions = function getListOfYears() {
+					var currentYear = self.strategyHolidaysGetCurrentYear(),
 						totalYears = 3,
-						yearsArray = [];
+						yearsArray = _.chain(currentYear)
+							.range(currentYear + totalYears + 1)
+							.map(function(year) {
+								return {
+									label: _.toString(year),
+									value: year
+								};
+							})
+							.value(),
+						optionsArray = _.concat(
+							[{
+								label: self.i18n.active().strategy.holidays.expiredHolidays,
+								value: 'expired'
+							}],
+							yearsArray
+						);
 
-					while (totalYears >= 0) {
-						yearsArray.push(year);
-						year++;
-						totalYears--;
-					}
-
-					return yearsArray;
+					return optionsArray;
 				},
 				template = $(self.getTemplate({
 					name: 'layout',
 					data: {
 						enabled: !_.isEmpty(strategyData.temporalRules.holidays),
-						years: getListOfYears()
+						years: getYearOptions()
 					},
 					submodule: 'strategyHolidays'
 				}));
@@ -140,8 +148,9 @@ define(function(require) {
 			var self = this,
 				holidaysData = self.appFlags.strategyHolidays.allHolidays,
 				table = footable.get('#holidays_list_table'),
-				yearSelected = parseInt($container.find('#year').val()),
-				holidaysDataArray = [],
+				yearSelectedValue = $container.find('#year').val(),
+				yearSelected = parseInt(yearSelectedValue),
+				isExpiredYearsSelected = yearSelectedValue === 'expired',
 				initTemplate = function initTemplate(data, key) {
 					var getDateToDisplay = function getDateToDisplay($container, data) {
 							var getNumberWithOrdinal = function getNumberWithOrdinal(date) {
@@ -154,12 +163,14 @@ define(function(require) {
 								fromMonth = months[holidayData.fromMonth - 1],
 								fromDay = getNumberWithOrdinal(holidayData.fromDay),
 								wdays = self.appFlags.strategyHolidays.wdays,
-								date = new Date(yearSelected, holidayData.fromMonth - 1, holidayData.fromDay),
+								// yearSelected = NaN when expired option is selected, so holidayYear defaults to data.holidayData.endYear
+								holidayYear = yearSelected || _.get(data, 'holidayData.endYear'),
+								date = new Date(holidayYear, holidayData.fromMonth - 1, holidayData.fromDay),
 								dateToText = '';
 
 							switch (data.holidayType) {
 								case 'advanced':
-									var selectedDay = self.strategyHolidaysGetOrdinalWday(holidayData, yearSelected),
+									var selectedDay = self.strategyHolidaysGetOrdinalWday(holidayData, holidayYear),
 										day = _.upperCase(holidayData.wday.charAt(0)) + holidayData.wday.substr(1, 2);
 
 									dateToText = day + ' ' + fromMonth + ' ' + getNumberWithOrdinal(selectedDay);
@@ -175,7 +186,7 @@ define(function(require) {
 								case 'range':
 									var startFullDay = wdays[date.getDay()],
 										startDay = _.upperCase(startFullDay.charAt(0)) + startFullDay.substr(1, 2),
-										endDate = new Date(yearSelected, holidayData.toMonth - 1, holidayData.toDay),
+										endDate = new Date(holidayYear, holidayData.toMonth - 1, holidayData.toDay),
 										endFullDay = wdays[endDate.getDay()],
 										endDay = _.upperCase(endFullDay.charAt(0)) + endFullDay.substr(1, 2),
 										toMonth = months[holidayData.toMonth - 1],
@@ -186,7 +197,15 @@ define(function(require) {
 							}
 
 							return {
-								text: dateToText,
+								text: isExpiredYearsSelected
+									? self.getTemplate({
+										name: '!' + self.i18n.active().strategy.holidays.listing.dateWithYear,
+										data: {
+											dateText: dateToText,
+											year: holidayYear
+										}
+									})
+									: dateToText,
 								timestamp: data.holidayType === 'advanced'
 									? Sugar.Date.create(dateToText).getTime()
 									: date.getTime()
@@ -200,7 +219,8 @@ define(function(require) {
 								holidayData: data.holidayData,
 								dateToDisplay: _.get(dateToDisplay, 'text'),
 								timestamp: _.get(dateToDisplay, 'timestamp'),
-								key: key
+								key: key,
+								isEditable: !isExpiredYearsSelected
 							},
 							submodule: 'strategyHolidays'
 						}));
@@ -208,16 +228,18 @@ define(function(require) {
 					self.strategyHolidaysListingBindEvents($container, template);
 
 					return template;
-				};
+				},
+				holidaysDataArray = _.reduce(holidaysData, function(accum, value, key) {
+					var endYear = _.get(value, 'holidayData.endYear', _.isNumber(yearSelected) ? yearSelected : Infinity),
+						excludeYear = _.get(value, 'holidayData.excludeYear', []),
+						currentYear = self.strategyHolidaysGetCurrentYear(),
+						isExpiredYearHoliday = isExpiredYearsSelected && endYear < currentYear,
+						isSelectedYearHoliday = endYear === yearSelected && !_.includes(excludeYear, yearSelected);
 
-			_.forEach(holidaysData, function(value, key) {
-				var endYear = _.get(value, 'holidayData.endYear', yearSelected),
-					excludeYear = _.get(value, 'holidayData.excludeYear', []);
-
-				if (endYear === yearSelected && !_.includes(excludeYear, yearSelected)) {
-					holidaysDataArray.push(initTemplate(value, key));
-				}
-			});
+					return isExpiredYearHoliday || isSelectedYearHoliday
+						? _.concat(accum, [initTemplate(value, key)])
+						: accum;
+				}, []);
 
 			/*empty table before loading the rows for the year selected*/
 			table.rows.load(holidaysDataArray);
@@ -320,6 +342,7 @@ define(function(require) {
 			});
 
 			parent.on('change', '#year', function() {
+				self.strategyHolidaysEnableButtons(parent);
 				self.strategyHolidaysListingRender(parent);
 			});
 
@@ -327,7 +350,6 @@ define(function(require) {
 				event.preventDefault();
 
 				monster.pub('voip.strategy.addEditOfficeHolidays', {
-					yearSelected: parseInt(parent.find('#year').val()),
 					existingHolidays: _.map(self.appFlags.strategyHolidays.allHolidays, function(holiday) {
 						return {
 							id: _.get(holiday, 'holidayData.id'),
@@ -1442,6 +1464,19 @@ define(function(require) {
 					callback(data.data);
 				}
 			});
+		},
+
+		strategyHolidaysGetCurrentYear: function() {
+			var date = new Date();
+
+			return parseInt(date.getFullYear());
+		},
+
+		strategyHolidaysEnableButtons: function($container) {
+			var yearSelectedValue = $container.find('#year').val(),
+				isExpiredYearsSelected = yearSelectedValue === 'expired';
+
+			$container.find('.include-national-holidays').prop('disabled', isExpiredYearsSelected);
 		}
 	};
 });

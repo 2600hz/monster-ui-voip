@@ -130,7 +130,7 @@ define(function(require) {
 			var self = this,
 				flag = self.uiFlags.user.get('showUsersWalkthrough');
 
-			if (flag !== false) {
+			if (flag !== false && self.appFlags.disableFirstUseWalkthrough !== true) {
 				callback && callback();
 			}
 		},
@@ -3376,6 +3376,7 @@ define(function(require) {
 			delete userData.features;
 			delete userData.extra;
 			delete userData[''];
+			delete userData.confirm_password;
 
 			return userData;
 		},
