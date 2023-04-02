@@ -635,7 +635,9 @@
 				},
 				"selective": {
 					"title": "Selective",
-					"helpText": "Calls will be forwarded based on predefined criteria, including specific phone numbers and schedules."
+					"helpText": "Calls will be forwarded based on predefined criteria, including specific phone numbers and schedules.",
+					"all": "All numbers",
+					"specific": "Specific numbers (10 max)" 
 				},
 				"common": {
 					"voicemail": {
@@ -645,6 +647,10 @@
 					"phoneNumber": {
 						"label": "Phone number",
 						"inputLabel": "Forward calls to"
+					},
+					"length": {
+						"always": "Always",
+						"custom": "Custom"
 					},
 					"options": {
 						"title": "Additional Options",
@@ -1543,7 +1549,8 @@
 			},
 			"call_recording": {
 				"label": "Call Recording",
-				"tooltip": ""
+				"tooltip": "",
+				"icon": "icon-telicon-mobile-phone"
 			},
 			"move": {
 				"label": "Move",
