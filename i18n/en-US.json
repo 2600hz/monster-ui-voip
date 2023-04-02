@@ -1549,8 +1549,7 @@
 			},
 			"call_recording": {
 				"label": "Call Recording",
-				"tooltip": "",
-				"icon": "icon-telicon-mobile-phone"
+				"tooltip": ""
 			},
 			"move": {
 				"label": "Move",
