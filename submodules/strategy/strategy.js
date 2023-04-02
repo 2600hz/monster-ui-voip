@@ -317,7 +317,7 @@ define(function(require) {
 			var self = this,
 				flag = self.uiFlags.user.get(name);
 
-			if (flag !== false) {
+			if (flag !== false && self.appFlags.disableFirstUseWalkthrough !== true) {
 				callback && callback();
 			}
 		},
@@ -2915,6 +2915,19 @@ define(function(require) {
 
 		strategyHandleFeatureCodes: function() {
 			var self = this,
+				deleteFeatureCodeFactory = function deleteFeatureCodeFactory(callflow) {
+					return function(callback) {
+						self.strategyDeleteCallflow({
+							bypassProgressIndicator: true,
+							data: {
+								callflowId: callflow.id,
+								data: {}
+							},
+							success: _.partial(callback, null),
+							error: _.partial(callback, null)
+						});
+					};
+				},
 				createFeatureCodeFactory = function createFeatureCodeFactory(featureCode) {
 					return function(callback) {
 						self.strategyCreateCallflow({
@@ -2948,13 +2961,35 @@ define(function(require) {
 
 			monster.waterfall([
 				function fetchExistingFeatureCodes(callback) {
-					self.strategyGetFeatureCodes(_.partial(callback, null));
+					monster.parallel({
+						createdByApp: function fetchFeatureCodesCreatedByApp(createdByAppCallback) {
+							self.strategyGetFeatureCodes(true, _.partial(createdByAppCallback, null));
+						},
+						createdOutsideApp: function fetchFeatureCodesCreatedOutsideApp(createdOutsideAppCallback) {
+							self.strategyGetFeatureCodes(false, _.partial(createdOutsideAppCallback, null));
+						}
+					}, callback);
+				},
+				function maybeDeleteWrongFeatureCodes(existing, callback) {
+					monster.parallel(_
+						.chain(existing.createdOutsideApp)
+						.filter(function(callflow) {
+							return _.some(self.featureCodeConfigs, _.flow([
+								_.unary(_.partial(_.get, _, 'name')),
+								_.partial(_.isEqual, _.get(callflow, 'featurecode.name'))
+							]));
+						})
+						.map(deleteFeatureCodeFactory)
+						.value()
+					, function() {
+						callback(null, existing.createdByApp);
+					});
 				},
 				function maybeCreateMissingFeatureCodes(existing, callback) {
 					monster.parallel(_
 						.chain(self.featureCodeConfigs)
 						.reject(_.flow([
-							_.partial(_.get, _, 'name'),
+							_.unary(_.partial(_.get, _, 'name')),
 							_.partial(_.includes, _.map(existing, 'featurecode.name'))
 						]))
 						.map(createFeatureCodeFactory)
@@ -2964,15 +2999,19 @@ define(function(require) {
 			]);
 		},
 
-		strategyGetFeatureCodes: function(callback) {
+		strategyGetFeatureCodes: function(createdByApp, callback) {
 			var self = this;
 
 			self.strategyListCallflows({
 				bypassProgressIndicator: true,
-				filters: {
+				filters: _.merge({
 					paginate: 'false',
 					has_key: 'featurecode'
-				},
+				}, createdByApp ? {
+					'filter_ui_metadata.origin': 'voip'
+				} : {
+					'filter_not_ui_metadata.origin': 'voip'
+				}),
 				success: function(listFeatureCodes) {
 					callback && callback(listFeatureCodes);
 				}
@@ -4298,9 +4337,9 @@ define(function(require) {
 				event.preventDefault();
 
 				var $this = $(this),
-					className = $this.val(),
+					selectedDateType = $this.val(),
 					isRecurringChecked = $template.find('#recurring').prop('checked'),
-					$singleDateYearElement = $template.find('.optional-year'),
+					$optionalYearElement = $template.find('.optional-year'),
 					$recurringElement = $template.find('#recurring');
 
 				$template
@@ -4308,18 +4347,18 @@ define(function(require) {
 					.removeClass('selected');
 
 				$template
-					.find('.row-fluid.' + className)
+					.find('.row-fluid.' + selectedDateType)
 					.addClass('selected');
 
-				if ((className === 'single' && isRecurringChecked) || className !== 'single') {
-					$singleDateYearElement
+				if (selectedDateType === 'advanced' || isRecurringChecked) {
+					$optionalYearElement
 						.removeClass('show');
-				} else if (className === 'single' && !isRecurringChecked) {
-					$singleDateYearElement
+				} else {
+					$optionalYearElement
 						.addClass('show');
 				}
 
-				if (className === 'advanced') {
+				if (selectedDateType === 'advanced') {
 					$recurringElement
 						.prop('checked', true);
 
@@ -4330,12 +4369,11 @@ define(function(require) {
 						.removeAttr('disabled');
 				}
 
-				if (['advanced', 'range'].includes(className)) {
+				if (['advanced', 'range'].includes(selectedDateType)) {
 					$template
 						.find('.optional-time')
 						.removeClass('show');
 				}
-
 			});
 
 			$template.on('click', '#all_day', function() {
@@ -4432,10 +4470,6 @@ define(function(require) {
 						? value + 1
 						: value;
 				});
-
-				if (!formData.recurring) {
-					holidayData.endYear = args.yearSelected;
-				}
 
 				holidayData.name = formData.name;
 				holidayData.recurring = formData.recurring;
