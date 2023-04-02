@@ -1,0 +1,36 @@
+<div>
+    <table> 
+        <thead class="table-header ">
+            <tr>
+                <th>
+                    Day
+                </th>
+                <th>
+                    Start Time
+                </th>
+                <th>
+                    End Time
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each intervals}}
+                <tr>
+                    <td>
+                        {{#monsterCheckbox (tryI18n @root.i18n.strategy.hours.days weekday)}}
+                        <input type="checkbox" name="{{@root.strategy}}.intervals[{{@index}}].active" {{#if active}} checked="checked" {{/if}} />
+                        {{/monsterCheckbox}}
+
+                        <input type="hidden" name="{{@root.strategy}}.intervals[{{@index}}].weekday" value="{{weekday}}">
+                    </td>
+                    <td>
+                        <input class="start table-cell" name="{{@root.strategy}}.intervals[{{@index}}].start"></input>
+                    </td>
+                    <td>
+                        <input class="end table-cell" name="{{@root.strategy}}.intervals[{{@index}}].end"></input>
+                    </td>
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
