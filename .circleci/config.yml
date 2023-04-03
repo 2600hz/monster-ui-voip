@@ -5,7 +5,7 @@ workflows:
   build_branch:
     jobs:
       - build_centos7
-          
+
   build_release:
     jobs:
        - build_centos7:
@@ -14,11 +14,11 @@ workflows:
                only: /^\d+\.\d+\.\d+$/
              branches:
                ignore: /.*/
-            
+
 jobs:
   build_centos7:
     docker:
-      - image: offical2600hz/monster-ui-packager:1.0-centos-7
+      - image: 2600hz/node-packager:14.17.4-centos-7
         user: circleci
     shell: /bin/bash --login
     working_directory: /home/circleci/2600hz/the_app
@@ -33,7 +33,7 @@ jobs:
       APP_DIR: "/home/circleci/2600hz/the_app"
     steps:
       - checkout
-      - run: 
+      - run:
           name: Setting up core repository
           command: |
             BAZE="$(cat "${HOME}/2600hz/the_app/.base_branch")"
@@ -43,7 +43,7 @@ jobs:
               echo "add base branch name of main Monster-UI repo (like origin/master) to '.base_branch' in your application root directory"
               exit 1
             fi
-      - run: 
+      - run:
           name: Generating build environment variables
           command: |
             APP=${CIRCLE_PROJECT_REPONAME#monster-ui-}
@@ -52,7 +52,7 @@ jobs:
             echo -e "export MONSTER_ROOT=${HOME}/2600hz/monster-ui" >> $BASH_ENV
             echo -e "export APP_PATH=src/apps/${APP}\n\n" >> $BASH_ENV
       - run:
-          name: Displaying environment information 
+          name: Displaying environment information
           command: |
             echo ":: behold, running ci tests for application: $MONSTER_APP"
             echo "MONSTER_ROOT: $MONSTER_ROOT"
@@ -64,7 +64,7 @@ jobs:
             if [ ! -d ${MONSTER_ROOT} ]; then
               git clone https://github.com/2600hz/monster-ui $MONSTER_ROOT
             fi
-      - run: 
+      - run:
           name: Running core setup script
           command: ${MONSTER_ROOT}/scripts/circleci.bash
       - restore_cache:
@@ -80,7 +80,7 @@ jobs:
           name: Building release
           command: |
             cd $MONSTER_ROOT
-            gulp build-app --app=${APP}            
+            gulp build-app --app=${APP}
       - run:
           name: Generating version info
           command: |
@@ -101,7 +101,7 @@ jobs:
             ./package_docs
       - run:
           name: Preparing source for packaging
-          command: |           
+          command: |
             cd $BUILD_SOURCES
             echo " - copy build into artifacts"
             cp -R ${MONSTER_ROOT}/dist/apps/${MONSTER_APP} ${BUILD_SOURCES}/
@@ -128,4 +128,4 @@ jobs:
           key: dependency-cache-centos-{{ checksum "/home/circleci/2600hz/monster-ui/package-lock.json" }}
           paths:
             - /home/circle/2600hz/monster-ui/node_modules
-     
+
