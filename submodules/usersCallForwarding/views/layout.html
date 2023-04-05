@@ -1,10 +1,10 @@
 <div class="monster-feature-popup-container call-forwarding-popup" data-feature="call_forwarding">
 	<form id="call_forward_form" class="content">
-		
+
 		<div class="feature-popup-title" data-template="off">
 			<div class="popup-title">
 				<div class="feature-fa-wrapper">
-					<i class="{{group.extra.mapFeatures.call_recording.icon}}"></i>
+					{{telicon "telicon2--cancel"}}
 				</div>
 				<div>
 					<div class="call-forwarding-titles">
@@ -17,7 +17,9 @@
 			</div>
 			<div class="switch popup-action">
 				{{#monsterSwitch}}
-					<input class="switch-state" type="radio" value="off" name="call_forwarding_strategy" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if this.call_forward.enabled }} checked="unchecked" {{else}} checked="checked" {{/if}}></input>
+				<input class="switch-state" type="radio" value="off" name="call_forwarding_strategy"
+					data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}" {{#if this.call_forward.enabled }}
+					checked="unchecked" {{else}} checked="checked" {{/if}}></input>
 				{{/monsterSwitch}}
 			</div>
 		</div>
@@ -26,21 +28,23 @@
 			<div class="simple-strategy-row">
 				<div class="popup-title">
 					<div class="feature-fa-wrapper">
-						<i class="{{group.extra.mapFeatures.call_recording.icon}}"></i>
+						{{telicon "telicon2--lightning-bolt"}}
 					</div>
 					<div>
-						<div>
+						<div class="call-forwarding-titles">
 							{{ i18n.users.callForwarding.strategies.alwaysOn.title }}
 						</div>
-						<div>
+						<div class="call-forwarding-descriptions">
 							{{ i18n.users.callForwarding.strategies.alwaysOn.helpText }}
 						</div>
 					</div>
 				</div>
 				<div class="switch popup-action">
-				{{#monsterSwitch}}
-					<input class="switch-state" type="radio" value="unconditional" name="call_forwarding_strategy" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if this.call_forward.unconditional.enabled }} checked="checked"{{/if}}></input>
-				{{/monsterSwitch}}
+					{{#monsterSwitch}}
+					<input class="switch-state" type="radio" value="unconditional" name="call_forwarding_strategy"
+						data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}" {{#if
+						this.call_forward.unconditional.enabled }} checked="checked" {{/if}}></input>
+					{{/monsterSwitch}}
 				</div>
 			</div>
 
@@ -51,20 +55,22 @@
 			<div class="simple-strategy-row">
 				<div class="popup-title">
 					<div class="feature-fa-wrapper">
-						<i class="{{group.extra.mapFeatures.call_recording.icon}}"></i>
+						{{telicon "telicon2--clock"}}
 					</div>
 					<div>
-						<div>
+						<div class="call-forwarding-titles">
 							{{ i18n.users.callForwarding.strategies.busy.title }}
 						</div>
-						<div>
+						<div class="call-forwarding-descriptions">
 							{{ i18n.users.callForwarding.strategies.busy.helpText }}
 						</div>
 					</div>
 				</div>
 				<div class="switch popup-action">
 					{{#monsterSwitch}}
-						<input class="switch-state" type="radio" value="busy" name="call_forwarding_strategy" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if this.call_forward.busy.enabled }} checked="checked"{{/if}}></input>
+					<input class="switch-state" type="radio" value="busy" name="call_forwarding_strategy"
+						data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}" {{#if this.call_forward.busy.enabled }}
+						checked="checked" {{/if}}></input>
 					{{/monsterSwitch}}
 				</div>
 			</div>
@@ -76,22 +82,23 @@
 			<div class="simple-strategy-row">
 				<div class="popup-title">
 					<div class="feature-fa-wrapper">
-						<i class="{{group.extra.mapFeatures.call_recording.icon}}"></i>
+						{{telicon "telicon2--phone-missed"}}
 					</div>
 					<div>
-						<div>
+						<div class="call-forwarding-titles">
 							{{ i18n.users.callForwarding.strategies.noAnswer.title }}
 						</div>
-						<div>
+						<div class="call-forwarding-descriptions">
 							{{ i18n.users.callForwarding.strategies.noAnswer.helpText }}
 						</div>
 					</div>
 				</div>
 				<div class="switch popup-action">
-				{{#monsterSwitch}}
-					<input class="switch-state" type="radio"  value="no_answer" name="call_forwarding_strategy" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"
-					{{#if this.call_forward.no_answer.enabled }} checked="checked"{{/if}}></input>
-				{{/monsterSwitch}}
+					{{#monsterSwitch}}
+					<input class="switch-state" type="radio" value="no_answer" name="call_forwarding_strategy"
+						data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}" {{#if
+						this.call_forward.no_answer.enabled }} checked="checked" {{/if}}></input>
+					{{/monsterSwitch}}
 				</div>
 			</div>
 
@@ -102,21 +109,23 @@
 			<div class="simple-strategy-row">
 				<div class="popup-title">
 					<div class="feature-fa-wrapper">
-						<i class="{{group.extra.mapFeatures.call_recording.icon}}"></i>
+						{{telicon "telicon2--list-prioritize"}}
 					</div>
 					<div>
-						<div>
+						<div class="call-forwarding-titles">
 							{{ i18n.users.callForwarding.strategies.selective.title }}
 						</div>
-						<div>
+						<div class="call-forwarding-descriptions">
 							{{ i18n.users.callForwarding.strategies.selective.helpText }}
 						</div>
 					</div>
 				</div>
 				<div class="switch popup-action">
-				{{#monsterSwitch}}
-					<input class="switch-state" type="radio" value="selective" name="call_forwarding_strategy" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if this.call_forward.selective.enabled }} checked="checked"{{/if}}></input>
-				{{/monsterSwitch}}
+					{{#monsterSwitch}}
+					<input class="switch-state" type="radio" value="selective" name="call_forwarding_strategy"
+						data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}" {{#if
+						this.call_forward.selective.enabled }} checked="checked" {{/if}}></input>
+					{{/monsterSwitch}}
 				</div>
 			</div>
 

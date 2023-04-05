@@ -637,7 +637,21 @@
 					"title": "Selective",
 					"helpText": "Calls will be forwarded based on predefined criteria, including specific phone numbers and schedules.",
 					"all": "All numbers",
-					"specific": "Specific numbers (10 max)" 
+					"specific": "Specific numbers (10 max)",
+					"buttons": {
+						"addRule": "New rule"
+					},
+					"rules": {
+						"from": "Forward Calls From",
+						"to": "Forward To",
+						"duration": "Active Duration",
+						"remove": "Remove Rule",
+						"customDuration": {
+							"day": "Day",
+							"start": "Start Time",
+							"end": "End Time"
+						}
+					}
 				},
 				"common": {
 					"voicemail": {
@@ -660,7 +674,7 @@
 						},
 						"acknowledge": {
 							"title": "Acknowledge Call",
-							"helpText": "Receive a prompt to accept forwarded calls. This prevents voicemails from being associated with the 'Forward To' number."
+							"helpText": "Receive a prompt to accept forwarded calls. This prevents voicemails from being associated with the \"Forward To\" number."
 						},
 						"keep": {
 							"title": "Keep initial Caller ID",
