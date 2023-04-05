@@ -1,3 +1,5 @@
+@import '../../../../css/partials/base';
+
 .call-forwarding-popup {
     width: 976px;
 }
@@ -13,7 +15,7 @@
 }
 
 .call-forwarding-titles {
-    color: rgb(14, 14, 15);
+    color: $woodsmoke;
     font-size: 16px;
     font-weight: normal;
     height: 24px;
@@ -21,12 +23,12 @@
 }
 
 .call-forwarding-descriptions {
-    color: rgb(14, 14, 15);
+    color: $woodsmoke;
     font-size: 14px;
     font-weight: normal;
     height: 20px;
     line-height: 20px;
-
+    margin-top: 10px;
 }
 
 .popup-container .feature-popup-title {
@@ -51,9 +53,9 @@
 }
 
 .controlls-width {
-    background: rgb(255, 255, 255);
+    background: $white;
     border-radius: 8px;
-    border: 1px solid rgb(184, 184, 190);
+    border: 1px solid $french-gray;
     height: 36px;
     width: 100%;
 }
@@ -67,13 +69,26 @@
     margin-left: 10px;
 }
 
+.additional-options-title {
+    font-weight: bold;
+}
+
 .option {
     width: calc(50% - 15px);
     height: 100px;
     margin: 5px;
-    background: rgb(255, 255, 255);
+    background: $athens-gray;
     border-radius: 8px;
-    border: 1px solid rgb(184, 184, 190);
+    border: 1px solid $french-gray;
+}
+
+.option-checked {
+    width: calc(50% - 15px);
+    height: 100px;
+    margin: 5px;
+    background: $french-pass;
+    border-radius: 8px;
+    border: 1px solid $dodger-blue;
 }
 
 .options-description {
@@ -120,6 +135,10 @@
     margin-bottom: 10px;
 }
 
+.control-label {
+    margin-top: 10px;
+}
+
 .forward-from {
     width: 200px;
 }
@@ -134,6 +153,7 @@
 
 .remove-rule {
     width: 100px;
+
     .complex-rule {
         float: right;
         margin-right: 25px;
@@ -146,7 +166,7 @@
     margin-left: 10px;
     display: inline-flex;
     padding: 13px;
-    border: 1px solid #dcdcdc;
+    border: 1px solid $french-gray;
     border-radius: 4px;
     background-image: -webkit-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
     background-image: -moz-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
@@ -160,10 +180,10 @@
 }
 
 .remove-button {
-    width: 7px;
+    width: 14px;
     display: inline-flex;
     padding: 8px;
-    border: 1px solid #dcdcdc;
+    border: 1px solid $french-gray;
     border-radius: 4px;
     background-image: -webkit-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
     background-image: -moz-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
@@ -182,7 +202,7 @@
 
 .table-header {
     border-radius: 0px;
-    box-shadow: inset 0px -1px 0px 0px rgb(184, 184, 190), inset 0px 1px 0px 0px rgb(184, 184, 190);
+    box-shadow: inset 0px -1px 0px 0px $french-gray, inset 0px 1px 0px 0px $french-gray;
 }
 
 .office-hours-wrapper {

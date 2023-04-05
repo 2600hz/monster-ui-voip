@@ -1,35 +1,36 @@
 <div>
-    <table> 
+    <table>
         <thead class="table-header ">
             <tr>
                 <th>
-                    Day
+                    {{ i18n.users.callForwarding.strategies.selective.rules.customDuration.day }}
                 </th>
                 <th>
-                    Start Time
+                    {{ i18n.users.callForwarding.strategies.selective.rules.customDuration.start }}
                 </th>
                 <th>
-                    End Time
+                    {{ i18n.users.callForwarding.strategies.selective.rules.customDuration.end }}
                 </th>
             </tr>
         </thead>
         <tbody>
             {{#each intervals}}
-                <tr>
-                    <td>
-                        {{#monsterCheckbox (tryI18n @root.i18n.strategy.hours.days weekday)}}
-                        <input type="checkbox" name="{{@root.strategy}}.intervals[{{@index}}].active" {{#if active}} checked="checked" {{/if}} />
-                        {{/monsterCheckbox}}
+            <tr>
+                <td>
+                    {{#monsterCheckbox (tryI18n i18n.strategy.hours.days weekday)}}
+                    <input type="checkbox" name="{{@root.strategy}}.intervals[{{@index}}].active" {{#if active}}
+                        checked="checked" {{/if}} />
+                    {{/monsterCheckbox}}
 
-                        <input type="hidden" name="{{@root.strategy}}.intervals[{{@index}}].weekday" value="{{weekday}}">
-                    </td>
-                    <td>
-                        <input class="start table-cell" name="{{@root.strategy}}.intervals[{{@index}}].start"></input>
-                    </td>
-                    <td>
-                        <input class="end table-cell" name="{{@root.strategy}}.intervals[{{@index}}].end"></input>
-                    </td>
-                </tr>
+                    <input type="hidden" name="{{@root.strategy}}.intervals[{{@index}}].weekday" value="{{weekday}}">
+                </td>
+                <td>
+                    <input class="start table-cell" name="{{@root.strategy}}.intervals[{{@index}}].start"></input>
+                </td>
+                <td>
+                    <input class="end table-cell" name="{{@root.strategy}}.intervals[{{@index}}].end"></input>
+                </td>
+            </tr>
             {{/each}}
         </tbody>
     </table>

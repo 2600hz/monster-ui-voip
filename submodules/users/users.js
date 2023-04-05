@@ -236,11 +236,6 @@ define(function(require) {
 					phoneNumber: '',
 					differentEmail: dataUser.email !== dataUser.username,
 					mapFeatures: _.pickBy({
-						call_forwarding: {
-							icon: 'icon-telicon-forward',
-							iconColor: 'monster-orange',
-							title: self.i18n.active().users.callForwarding.title
-						},
 						caller_id: {
 							availabilityChecker: function() {
 								var isEditableWhenSetOnAccount = monster.util.isFeatureAvailable(
@@ -257,6 +252,11 @@ define(function(require) {
 							icon: 'fa fa-user',
 							iconColor: 'monster-blue',
 							title: self.i18n.active().users.caller_id.title
+						},
+						call_forwarding: {
+							icon: 'icon-telicon-forward',
+							iconColor: 'monster-orange',
+							title: self.i18n.active().users.callForwarding.title
 						},
 						hotdesk: {
 							icon: 'fa fa-fire',
