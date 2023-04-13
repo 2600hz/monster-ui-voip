@@ -639,7 +639,8 @@
 					"all": "All numbers",
 					"specific": "Specific numbers (10 max)",
 					"buttons": {
-						"addRule": "New rule"
+						"addRule": "New rule",
+						"addNumber": "Number"
 					},
 					"rules": {
 						"from": "Forward Calls From",
