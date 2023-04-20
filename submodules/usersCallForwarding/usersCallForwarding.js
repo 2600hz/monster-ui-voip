@@ -415,151 +415,71 @@ define(function(require) {
 			});
 		},
 
-        usersListVMBoxes: function(args) {
+		getCallflowList: function(userId, callback) {
 			var self = this;
 
 			self.callApi({
-                resource: 'voicemail.list',
-                data: _.merge({
-					accountId: self.accountId,
-					filters: {
-                        paginate: 'false'
-					}
-                }, args.data),
-                success: function(data) {
-                    args.hasOwnProperty('success') && args.success(data.data);
-				},
-                error: function(parsedError) {
-                    args.hasOwnProperty('error') && args.error(parsedError);
-				}
-			});
-		},
-
-        usersUpdateVMBoxStatusInCallflow: function(data) {
-            var self = this,
-                userId = data.id,
-                enabled = data.enableVmbox,
-                callback = data.callback;
-
-            monster.waterfall([
-                function(waterfallCallback) {
-                    self.usersGetMainCallflow(userId, function(callflow) {
-                        waterfallCallback(null, callflow);
-                    });
-                },
-                function(callflow, waterfallCallback) {
-                    var flow = self.usersExtractDataFromCallflow({
-                        callflow: callflow,
-                        module: 'voicemail'
-                    });
-
-                    if (flow) {
-                        // Module already exists in callflow
-                        flow.data.skip_module = enabled;
-
-                        self.usersUpdateCallflow(callflow, function() {
-                            waterfallCallback(null);
-                        });
-                    } else {
-                        // Module does not exist in callflow, but should, so err
-                        waterfallCallback(true);
-                    }
-                }
-            ], callback);
-        },
-
-        usersGetMainCallflow: function(userId, callback) {
-			var self = this;
-
-            self.usersListCallflowsUser(userId, function(listCallflows) {
-                var indexMain = -1;
-
-                _.each(listCallflows, function(callflow, index) {
-                    if (callflow.type === 'mainUserCallflow' || !('type' in callflow)) {
-                        indexMain = index;
-                        return false;
-                    }
-                });
-
-                if (indexMain === -1) {
-                    // monster.ui.toast({
-                    // 	type: 'error',
-                    // 	message: self.i18n.active().users.noUserCallflow
-                    // });
-                    callback(null);
-                } else {
-			self.callApi({
-                        resource: 'callflow.get',
+				resource: 'callflow.list',
 				data: {
 					accountId: self.accountId,
-                            callflowId: listCallflows[indexMain].id
-                        },
-                        success: function(data) {
-                            callback(data.data);
-                        },
-                        error: function() {
-                            callback(listCallflows[indexMain]);
-							}
-                    });
-						}
-            });
-        },
-
-        usersListCallflowsUser: function(userId, callback) {
-            var self = this;
-
-            self.callApi({
-                resource: 'callflow.list',
-                data: {
-                    accountId: self.accountId,
-                    filters: {
-                        filter_owner_id: userId,
-                        paginate: 'false'
+					filters: {
+						filter_owner_id: userId
 					}
 				},
-                success: function(data) {
-                    callback(data.data);
+				success: function(callflowData) {
+					callback && callback(callflowData.data);
 				}
 			});
 		},
 
-        usersExtractDataFromCallflow: function(args) {
-			var self = this,
-                flow = _.get(args, 'callflow.flow'),
-                cfModule = args.module;
+		skipToVoicemail: function(callflowId, enabled, callback) {
+			var self = this;
 
-            if (_.isNil(flow)) {
-                return undefined;
-            }
-
-            while (flow.module !== cfModule && _.has(flow.children, '_')) {
-                flow = flow.children._;
-            }
-
-            if (flow.module !== cfModule) {
-                return undefined;
-            } else if (_.has(args, 'dataPath')) {
-                return _.get(flow, args.dataPath);
-					} else {
-                return flow;
+			self.callApi({
+				resource: 'callflow.patch',
+				data: {
+					accountId: self.accountId,
+					callflowId: callflowId,
+					data: {
+						flow: {
+							data: {
+								skip_module: enabled
+							}
+						}
 					}
-        },
-
-        usersUpdateCallflow: function(callflow, callback) {
-            var self = this;
-
-            self.callApi({
-                resource: 'callflow.update',
-                data: {
-                    accountId: self.accountId,
-                    callflowId: callflow.id,
-                    data: callflow
-                },
-                success: function(callflowData) {
-                    callback && callback(callflowData.data);
+				},
+				success: function(callflowData) {
+					callback && callback(callflowData.data);
 				}
-            });
-		}
+			});
+		},
 
+		userUpdateCallflow: function(data, enabled) {
+			var self = this,
+				userId = data.id,
+				callback = data.callback;
+
+			monster.waterfall([
+				function(waterfallCallback) {
+					self.getCallflowList(userId, function(callflow) {
+						console.log('callflow');
+						console.log(callflow);
+						waterfallCallback(null, callflow[0].id);
+					});
+				},
+				function(callflowId, waterfallCallback) {
+					console.log('callflowId');
+					console.log(callflowId);
+
+					if (callflowId) {
+						// Skip to voicemail if voicemail is selected
+						self.skipToVoicemail(callflowId, enabled);
+					} else {
+						// Module does not exist in callflow, but should, so err
+						waterfallCallback(true);
+					}
+				}
+			], callback);
+		}
 	};
 });
