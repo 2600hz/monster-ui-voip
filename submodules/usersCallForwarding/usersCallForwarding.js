@@ -192,7 +192,6 @@ define(function(require) {
 				var $button = $(this),
 					updateData = self.usersCallForwardingGetFormData(data);
 
-				console.log(updateData);
 				self.usersCallForwardingSaveData({
 					data: updateData,
 					userId: data.user.id
@@ -314,7 +313,6 @@ define(function(require) {
 			});
 
 			$template.on('click', '.remove-rule-button', function() {
-				console.log('removing rule');
 				var count = $template.find('.complex-strategy-header').length;
 
 				if (count > 1) {
@@ -324,8 +322,6 @@ define(function(require) {
 		},
 
 		usersCallForwardingGetFormData: function(data) {
-			console.log('user');
-			console.log(data.user);
 			var self = this,
 				user = data.user,
 				formData = monster.ui.getFormData('call_forward_form'),
@@ -356,9 +352,6 @@ define(function(require) {
 						}
 					}
 				};
-
-			console.log('self');
-			console.log(self);
 
 			if (callForwardStrategy === 'selective') {
 				_.merge(payload, {
@@ -393,13 +386,7 @@ define(function(require) {
 				}
 			});
 
-			console.log('callForwardData');
-			console.log(callForwardData);
-			console.log('payload');
-			console.log(payload);
-
 			// formattedCallForwardData = self.usersCallForwardingFormatData(data);
-			console.log(isVmboxEnabled);
 			self.userUpdateCallflow(user, isVmboxEnabled);
 
 			return payload;
@@ -496,14 +483,10 @@ define(function(require) {
 			monster.waterfall([
 				function(waterfallCallback) {
 					self.getCallflowList(userId, function(callflow) {
-						console.log('callflow');
-						console.log(callflow);
 						waterfallCallback(null, callflow[0].id);
 					});
 				},
 				function(callflowId, waterfallCallback) {
-					console.log('callflowId');
-					console.log(callflowId);
 
 					if (callflowId) {
 						// Skip to voicemail if voicemail is selected
