@@ -65,16 +65,22 @@ define(function(require) {
 					}));
 
 					layoutTemplate.find('.feature-popup-title').each(function() {
-                        var strategy = $(this).data('template');
+						var strategy = $(this).data('template'),
+							hasVmBox = _.has(user, 'call_forward_vm', false),
+							isVmBoxEnabled = _.get(user, ['call_forward_vm', strategy, 'enabled'], false);
 
 						if (strategy !== 'off' || strategy !== 'selective') {
 							var simpleStrategyTemplate = $(self.getTemplate({
 								name: 'simpleStrategy',
 								data: {
 									strategy: strategy,
-                                    enabled: _.get(user, 'call_forward.enabled', false),
-                                    number: _.get(user, 'call_forward.number', ''),
-                                    type: _.get(user, ['call_forward', strategy, 'type'], 'voicemail'),
+									enabled: _.get(user, ['call_forward', strategy, 'enabled'], false),
+									number: _.get(user, ['call_forward', strategy, 'number'], ''),
+									keep_caller_id: _.get(user, ['call_forward', strategy, 'keep_caller_id'], false),
+									direct_calls_only: _.get(user, ['call_forward', strategy, 'direct_calls_only'], false),
+									require_keypress: _.get(user, ['call_forward', strategy, 'require_keypress'], false),
+									ignore_early_media: _.get(user, ['call_forward', strategy, 'ignore_early_media'], false),
+									type: !hasVmBox ? 'voicemail' : isVmBoxEnabled ? 'voicemail' : 'phoneNumber',
 									voicemails: data.voicemails,
 									user: user
 								},
@@ -88,9 +94,13 @@ define(function(require) {
 									name: 'complexStrategy',
 									data: {
 										strategy: strategy,
-                                    enabled: _.get(user, 'call_forward.enabled', false),
-                                    number: _.get(user, 'call_forward.number', ''),
-                                    type: _.get(user, ['call_forward', strategy, 'type'], 'voicemail'),
+										enabled: _.get(user, ['call_forward', strategy, 'enabled'], false),
+										number: _.get(user, ['call_forward', strategy, 'number'], ''),
+										keep_caller_id: _.get(user, ['call_forward', strategy, 'keep_caller_id'], false),
+										direct_calls_only: _.get(user, ['call_forward', strategy, 'direct_calls_only'], false),
+										require_keypress: _.get(user, ['call_forward', strategy, 'require_keypress'], false),
+										ignore_early_media: _.get(user, ['call_forward', strategy, 'ignore_early_media'], false),
+										type: !hasVmBox ? 'voicemail' : isVmBoxEnabled ? 'voicemail' : 'phoneNumber',
 										voicemails: data.voicemails,
 										user: user
 									},
@@ -241,7 +251,7 @@ define(function(require) {
 						if (div.children[0].innerText !== 'Forward direct calls only') {
 							$template.find('.simple-control-group.voicemail').removeClass('disabled').find('input').prop('checked', true);
 							$template.find('.simple-control-group.phone-number').addClass('disabled').find('input').prop('checked', false);
-                            $template.find(div).addClass('disabled').find('input').prop('checked', false);
+							$template.find(div).addClass('disabled').find('input');
 						}
 					});
 
@@ -278,7 +288,7 @@ define(function(require) {
 			});
 
 			$template.find('.add-phone-number').on('click', function() {
-                var count = $(self).closest('.selective-control-group').find('.controls').length,
+				var count = $template.find('.selective-control-group.specific').find('.controls').length,
 					containerToAppend = $template.find('.specific-phone-number-wrapper'),
 					numberContainer = $template.find('.specific-phone-number-wrapper')[0].children[1].outerHTML;
 				if (count < 10) {
@@ -286,15 +296,36 @@ define(function(require) {
 				}
 			});
 
-            $template.on('click', '.remove-button', function() {
+			$template.on('click', '.remove-number-button', function() {
 				var count = $(this).closest('.specific-phone-number-wrapper').find('.controls.specific-controls').length;
 				if (count > 1) {
 					$(this).closest('.controls.specific-controls').remove();
 				}
 			});
+
+			$template.on('click', '.add-rule', function() {
+				var count = $template.find('.complex-strategy-header').length,
+					ruleContainer = $template.find('.complex-strategy-header')[0].outerHTML,
+					containerToAppend = $template.find('.test-append');
+
+				if (count < 3) {
+					$(containerToAppend[0]).append(ruleContainer);
+				}
+			});
+
+			$template.on('click', '.remove-rule-button', function() {
+				console.log('removing rule');
+				var count = $template.find('.complex-strategy-header').length;
+
+				if (count > 1) {
+					$(this).closest('.complex-strategy-header').remove();
+				}
+			});
 		},
 
 		usersCallForwardingGetFormData: function(data) {
+			console.log('user');
+			console.log(data.user);
 			var self = this,
 				user = data.user,
 				formData = monster.ui.getFormData('call_forward_form'),
@@ -325,6 +356,9 @@ define(function(require) {
 						}
 					}
 				};
+
+			console.log('self');
+			console.log(self);
 
 			if (callForwardStrategy === 'selective') {
 				_.merge(payload, {
@@ -359,10 +393,10 @@ define(function(require) {
 				}
 			});
 
-            console.log('callForwardData')
-            console.log(callForwardData)
-            console.log('payload')
-            console.log(payload)
+			console.log('callForwardData');
+			console.log(callForwardData);
+			console.log('payload');
+			console.log(payload);
 
 			// formattedCallForwardData = self.usersCallForwardingFormatData(data);
 			console.log(isVmboxEnabled);
