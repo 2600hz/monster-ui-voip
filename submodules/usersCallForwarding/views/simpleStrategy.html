@@ -62,7 +62,7 @@
 
                     {{#monsterCheckbox "large-checkbox"}}
                     <input type="checkbox" class="checkbox" value="forward" name="{{strategy}}.isEnabled[]" {{#if
-                        user.call_forward.direct_calls_only}} checked="checked" {{/if}} />
+                        direct_calls_only}} checked="checked" {{/if}} />
                     {{/monsterCheckbox}}
                 </div>
 
@@ -77,7 +77,7 @@
 
                     {{#monsterCheckbox "large-checkbox"}}
                     <input type="checkbox" class="checkbox" value="acknowledge" name="{{strategy}}.isEnabled[]" {{#if
-                        user.call_forward.require_keypress}} checked="checked" {{/if}} />
+                        require_keypress}} checked="checked" {{/if}} />
                     {{/monsterCheckbox}}
                 </div>
 
@@ -92,7 +92,7 @@
 
                     {{#monsterCheckbox "large-checkbox"}}
                     <input type="checkbox" class="checkbox" value="keep" name="{{strategy}}.isEnabled[]" {{#if
-                        user.call_forward.keep_caller_id}} checked="checked" {{/if}} />
+                        keep_caller_id}} checked="checked" {{/if}} />
                     {{/monsterCheckbox}}
                 </div>
 
@@ -107,7 +107,7 @@
 
                     {{#monsterCheckbox "large-checkbox"}}
                     <input type="checkbox" class="checkbox" value="ring" name="{{strategy}}.isEnabled[]" {{#if
-                        user.call_forward.ignore_early_media}} checked="checked" {{/if}} />
+                        ignore_early_media}} checked="checked" {{/if}} />
                     {{/monsterCheckbox}}
                 </div>
 
