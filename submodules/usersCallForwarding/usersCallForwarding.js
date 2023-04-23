@@ -411,7 +411,9 @@ define(function(require) {
 			});
 
 			// formattedCallForwardData = self.usersCallForwardingFormatData(data);
-			self.userUpdateCallflow(user, isVmboxEnabled);
+			if (callForwardStrategy !== 'off') {
+				self.userUpdateCallflow(user, callForwardData.type);
+			}
 
 			return payload;
 		},
@@ -499,22 +501,45 @@ define(function(require) {
 			});
 		},
 
-		userUpdateCallflow: function(data, enabled) {
+		getCallflow: function(callflowId, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'callflow.get',
+				data: {
+					accountId: self.accountId,
+					callflowId: callflowId
+				},
+				success: function(callflowData) {
+					callback && callback(callflowData.data);
+				}
+			});
+		},
+
+		userUpdateCallflow: function(data, selectedType) {
 			var self = this,
 				userId = data.id,
 				callback = data.callback;
 
 			monster.waterfall([
 				function(waterfallCallback) {
-					self.getCallflowList(userId, function(callflow) {
-						waterfallCallback(null, callflow[0].id);
+					self.getCallflowList(userId, function(callflowList) {
+						waterfallCallback(null, callflowList[0].id);
 					});
 				},
 				function(callflowId, waterfallCallback) {
+					self.getCallflow(callflowId, function(callflow) {
+						waterfallCallback(null, callflow);
+					});
+				},
+				function(callflow, waterfallCallback) {
+					var id = callflow.id,
+						flow = callflow.flow.data.skip_module,
+						enabled = selectedType === 'voicemail';
 
-					if (callflowId) {
+					if (enabled !== flow) {
 						// Skip to voicemail if voicemail is selected
-						self.skipToVoicemail(callflowId, enabled);
+						self.skipToVoicemail(id, enabled);
 					} else {
 						// Module does not exist in callflow, but should, so err
 						waterfallCallback(true);
