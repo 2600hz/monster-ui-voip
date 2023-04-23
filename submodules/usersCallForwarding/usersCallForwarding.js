@@ -5,7 +5,6 @@ define(function(require) {
 	return {
 		usersCallForwardingRender: function(user) {
 			var self = this,
-				days = self.weekdays,
 				meta = self.appFlags.strategyHours.intervals,
 				timepickerStep = meta.timepicker.step,
 				intervalLowerBound = meta.min,
@@ -58,30 +57,49 @@ define(function(require) {
 				formatData = _.bind(self.usersCallForwardingFormatData, self),
 				bindEvents = _.bind(self.usersCallForwardingBindingEvents, self),
 				initTemplate = function(data) {
-					var layoutTemplate = $(self.getTemplate({
-						name: 'layout',
-						data: formatData(data),
-						submodule: 'usersCallForwarding'
-					}));
+					var isCallForwardVmEnabled = _.get(user, 'call_forward_vm.unconditional.enabled', false)
+												|| _.get(user, 'call_forward_vm.busy.enabled', false)
+												|| _.get(user, 'call_forward_vm.no_answer.enabled', false)
+												|| _.get(user, 'call_forward_vm.selective.enabled', false),
+						isCallForwardEnabled = _.get(user, 'call_forward.unconditional.enabled', false)
+												|| _.get(user, 'call_forward.busy.enabled', false)
+												|| _.get(user, 'call_forward.no_answer.enabled', false)
+												|| _.get(user, 'call_forward.selective.enabled', false),
+						layoutTemplate = $(self.getTemplate({
+							name: 'layout',
+							data: {
+								data: formatData(data),
+								enabled: isCallForwardEnabled || isCallForwardVmEnabled,
+								isUnconditionalEnabled: _.get(user, 'call_forward.unconditional.enabled', false) || _.get(user, 'call_forward_vm.unconditional.enabled', false),
+								isBusyEnabled: _.get(user, 'call_forward.busy.enabled', false) || _.get(user, 'call_forward_vm.busy.enabled', false),
+								isNoAnswerEnabled: _.get(user, 'call_forward.no_answer.enabled', false) || _.get(user, 'call_forward_vm.no_answer.enabled', false),
+								isSelectiveEnabled: _.get(user, 'call_forward.selective.enabled', false) || _.get(user, 'call_forward_vm.selective.enabled', false)
+							},
+							submodule: 'usersCallForwarding'
+						}));
 
 					layoutTemplate.find('.feature-popup-title').each(function() {
 						var strategy = $(this).data('template'),
-							hasVmBox = _.has(user, 'call_forward_vm', false),
-							isVmBoxEnabled = _.get(user, ['call_forward_vm', strategy, 'enabled'], false);
+							hasVmBox = _.has(user, 'call_forward_vm'),
+							isKeepCallerIdEnabled = _.get(user, ['call_forward', strategy, 'keep_caller_id'], false),
+							isDirectCallsOnlyEnabled = _.get(user, ['call_forward', strategy, 'direct_calls_only'], false) || _.get(user, ['call_forward_vm', strategy, 'direct_calls_only'], false),
+							isRequireKeypressEnabled = _.get(user, ['call_forward', strategy, 'require_keypress'], false),
+							isIgnoreEarlyMediaEnabled = _.get(user, ['call_forward', strategy, 'ignore_early_media'], false);
 
 						if (strategy !== 'off' || strategy !== 'selective') {
 							var simpleStrategyTemplate = $(self.getTemplate({
 								name: 'simpleStrategy',
 								data: {
 									strategy: strategy,
-									enabled: _.get(user, ['call_forward', strategy, 'enabled'], false),
+									enabled: isCallForwardVmEnabled || isCallForwardEnabled,
 									number: _.get(user, ['call_forward', strategy, 'number'], ''),
-									keep_caller_id: _.get(user, ['call_forward', strategy, 'keep_caller_id'], false),
-									direct_calls_only: _.get(user, ['call_forward', strategy, 'direct_calls_only'], false),
-									require_keypress: _.get(user, ['call_forward', strategy, 'require_keypress'], false),
-									ignore_early_media: _.get(user, ['call_forward', strategy, 'ignore_early_media'], false),
-									type: !hasVmBox ? 'voicemail' : isVmBoxEnabled ? 'voicemail' : 'phoneNumber',
+									keep_caller_id: isKeepCallerIdEnabled,
+									direct_calls_only: isDirectCallsOnlyEnabled,
+									require_keypress: isRequireKeypressEnabled,
+									ignore_early_media: isIgnoreEarlyMediaEnabled,
+									type: hasVmBox ? 'voicemail' : 'phoneNumber',
 									voicemails: data.voicemails,
+									selectedVoicemailId: _.get(user, ['call_forward_vm', strategy, 'voicemail'], data.voicemails[0]),
 									user: user
 								},
 								submodule: 'usersCallForwarding'
@@ -94,14 +112,15 @@ define(function(require) {
 									name: 'complexStrategy',
 									data: {
 										strategy: strategy,
-										enabled: _.get(user, ['call_forward', strategy, 'enabled'], false),
+										enabled: isCallForwardVmEnabled || isCallForwardEnabled,
 										number: _.get(user, ['call_forward', strategy, 'number'], ''),
-										keep_caller_id: _.get(user, ['call_forward', strategy, 'keep_caller_id'], false),
-										direct_calls_only: _.get(user, ['call_forward', strategy, 'direct_calls_only'], false),
-										require_keypress: _.get(user, ['call_forward', strategy, 'require_keypress'], false),
-										ignore_early_media: _.get(user, ['call_forward', strategy, 'ignore_early_media'], false),
-										type: !hasVmBox ? 'voicemail' : isVmBoxEnabled ? 'voicemail' : 'phoneNumber',
+										keep_caller_id: isKeepCallerIdEnabled,
+										direct_calls_only: isDirectCallsOnlyEnabled,
+										require_keypress: isRequireKeypressEnabled,
+										ignore_early_media: isIgnoreEarlyMediaEnabled,
+										type: hasVmBox ? 'voicemail' : 'phoneNumber',
 										voicemails: data.voicemails,
+										selectedVoicemailId: _.get(user, ['call_forward_vm', strategy, 'voicemail'], data.voicemails[0]),
 										user: user
 									},
 									submodule: 'usersCallForwarding'
