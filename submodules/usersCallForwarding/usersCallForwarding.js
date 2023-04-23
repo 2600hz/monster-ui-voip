@@ -348,10 +348,13 @@ define(function(require) {
 				callForwardData = formData[callForwardStrategy],
 				isVmboxEnabled = callForwardStrategy !== 'off' && callForwardData.type === 'voicemail',
 				strategies = ['unconditional', 'busy', 'no_answer', 'selective'],
-				payload = {
-					call_forward: callForwardStrategy === 'off' ? {
+				payload = callForwardStrategy === 'off' ? {
+					call_forward: {
 						enabled: false
-					} : {
+					},
+					call_forward_vm: null
+				} : callForwardData.type === 'phoneNumber' ? {
+					call_forward: {
 						enabled: true,
 						[callForwardStrategy]: {
 							enabled: true,
@@ -360,23 +363,25 @@ define(function(require) {
 							require_keypress: _.includes(callForwardData.isEnabled, 'acknowledge'),
 							ignore_early_media: _.includes(callForwardData.isEnabled, 'ring'),
 							substitute: false,
-							number: _.get(callForwardData, callForwardData.phoneNumber, '123')
+							number: _.get(callForwardData, 'phoneNumber', '')
 						}
 					},
+					call_forward_vm: null
+				} : {
 					call_forward_vm: {
 						[callForwardStrategy]: {
 							enabled: callForwardStrategy !== 'off' && callForwardData.type === 'voicemail',
 							voicemail: _.get(callForwardData, 'voicemail.value', ''),
-							direct_calls_only: false
+							direct_calls_only: true
 						}
-					}
+					},
+					call_forward: null
 				};
 
-			if (callForwardStrategy === 'selective') {
+			if (callForwardStrategy === 'selective' && callForwardData.type === 'phoneNumber') {
 				_.merge(payload, {
 					call_forward: {
 						selective: {
-							substitute: null,
 							enabled: true,
 							number: callForwardData.phoneNumber,
 							rules: [
