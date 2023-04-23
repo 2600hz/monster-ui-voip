@@ -18,7 +18,7 @@
 			<div class="switch popup-action">
 				{{#monsterSwitch}}
 				<input class="switch-state" type="radio" value="off" name="call_forwarding_strategy"
-					data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}" {{#if this.call_forward.enabled }}
+					data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}" {{#if enabled }}
 					checked="unchecked" {{else}} checked="checked" {{/if}}></input>
 				{{/monsterSwitch}}
 			</div>
@@ -43,12 +43,12 @@
 					{{#monsterSwitch}}
 					<input class="switch-state" type="radio" value="unconditional" name="call_forwarding_strategy"
 						data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}" {{#if
-						this.call_forward.unconditional.enabled }} checked="checked" {{/if}}></input>
+						isUnconditionalEnabled }} checked="checked" {{/if}}></input>
 					{{/monsterSwitch}}
 				</div>
 			</div>
 
-			<div class="simple-strategy {{#unless this.call_forward.unconditional.enabled}} disabled{{/unless}}"></div>
+			<div class="simple-strategy {{#unless isUnconditionalEnabled}} disabled{{/unless}}"></div>
 		</div>
 
 		<div class="feature-popup-title feature-popup-flex" data-template="busy">
@@ -69,13 +69,13 @@
 				<div class="switch popup-action">
 					{{#monsterSwitch}}
 					<input class="switch-state" type="radio" value="busy" name="call_forwarding_strategy"
-						data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}" {{#if this.call_forward.busy.enabled }}
+						data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}" {{#if isBusyEnabled }}
 						checked="checked" {{/if}}></input>
 					{{/monsterSwitch}}
 				</div>
 			</div>
 
-			<div class="simple-strategy {{#unless this.call_forward.busy.enabled}} disabled{{/unless}}"></div>
+			<div class="simple-strategy {{#unless isBusyEnabled}} disabled{{/unless}}"></div>
 		</div>
 
 		<div class="feature-popup-title feature-popup-flex" data-template="no_answer">
@@ -97,12 +97,12 @@
 					{{#monsterSwitch}}
 					<input class="switch-state" type="radio" value="no_answer" name="call_forwarding_strategy"
 						data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}" {{#if
-						this.call_forward.no_answer.enabled }} checked="checked" {{/if}}></input>
+						isNoAnswerEnabled }} checked="checked" {{/if}}></input>
 					{{/monsterSwitch}}
 				</div>
 			</div>
 
-			<div class="simple-strategy {{#unless this.call_forward.no_answer.enabled}} disabled{{/unless}}"></div>
+			<div class="simple-strategy {{#unless isNoAnswerEnabled}} disabled{{/unless}}"></div>
 		</div>
 
 		<div class="feature-popup-title feature-popup-flex" data-template="selective">
@@ -124,12 +124,12 @@
 					{{#monsterSwitch}}
 					<input class="switch-state" type="radio" value="selective" name="call_forwarding_strategy"
 						data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}" {{#if
-						this.call_forward.selective.enabled }} checked="checked" {{/if}}></input>
+						isSelectiveEnabled }} checked="checked" {{/if}}></input>
 					{{/monsterSwitch}}
 				</div>
 			</div>
 
-			<div class="complex-strategy {{#unless this.call_forward.selective.enabled}} disabled{{/unless}}"></div>
+			<div class="complex-strategy {{#unless isSelectiveEnabled}} disabled{{/unless}}"></div>
 		</div>
 	</form>
 

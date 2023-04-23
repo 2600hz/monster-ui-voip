@@ -9,7 +9,7 @@
         </div>
 
         <div>
-            <div class="simple-control-group voicemail">
+            <div class="simple-control-group voicemail {{#compare type '===' 'phoneNumber' }} disabled{{/compare}}">
                 <label class="control-label" for="{{strategy}}.voicemail.value">
                     {{i18n.users.callForwarding.strategies.common.voicemail.selectLabel}}
                 </label>
@@ -38,7 +38,7 @@
         </div>
 
         <div>
-            <div class="simple-control-group phone-number disabled">
+            <div class="simple-control-group phone-number {{#compare type '===' 'voicemail' }} disabled{{/compare}}">
                 <label for="{{strategy}}.phoneNumber.value" class="control-label">
                     {{i18n.users.callForwarding.strategies.common.phoneNumber.inputLabel}}
                 </label>
