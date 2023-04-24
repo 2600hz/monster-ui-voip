@@ -378,20 +378,23 @@ define(function(require) {
 					call_forward: null
 				};
 
+			console.log('self');
+			console.log(self);
+
 			if (callForwardStrategy === 'selective' && callForwardData.type === 'phoneNumber') {
 				_.merge(payload, {
 					call_forward: {
 						selective: {
 							enabled: true,
 							number: callForwardData.phoneNumber,
+							direct_calls_only: _.includes(callForwardData.isEnabled, 'forward'),
+							ignore_early_media: _.includes(callForwardData.isEnabled, 'ring'),
+							keep_caller_id: _.includes(callForwardData.isEnabled, 'keep'),
+							require_keypress: _.includes(callForwardData.isEnabled, 'acknowledge'),
 							rules: [
 								{
 									enabled: true,
 									match_list_id: '',
-									direct_calls_only: _.includes(callForwardData.isEnabled, 'forward'),
-									ignore_early_media: _.includes(callForwardData.isEnabled, 'ring'),
-									keep_caller_id: _.includes(callForwardData.isEnabled, 'keep'),
-									require_keypress: _.includes(callForwardData.isEnabled, 'acknowledge')
 								}
 							]
 						}
