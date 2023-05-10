@@ -195,47 +195,49 @@ define(function(require) {
 				});
 			});
 
-			$template.find('.radio-state').on('change', function() {
+			$template.on('change', '.radio-state', function() {
 				var self = this,
 					strategy = self.name.split('.')[0],
 					options = $template.find('.option[strategy=' + strategy + ']');
 
 				if (self.checked && self.defaultValue === 'phoneNumber') {
+					$(this).closest('.phone-number-wrapper').siblings().find('.simple-control-group.voicemail').addClass('disabled').find('input').prop('checked', false);
+					$(this).closest('.phone-number-wrapper').find('.simple-control-group.phone-number').removeClass('disabled').find('input').prop('checked', true);
+
 					_.each(options, function(div) {
-						$template.find('.simple-control-group.phone-number').removeClass('disabled').find('input').prop('checked', true);
-						$template.find('.simple-control-group.voicemail').addClass('disabled').find('input').prop('checked', false);
 						$template.find(div).removeClass('disabled').find('input');
 					});
+
 					if (strategy === 'selective') {
-						$template.find('.selective-control-group.phone-number').removeClass('disabled');
-						$template.find('.selective-control-group.voicemail').addClass('disabled');
+						$(this).closest('.phone-number-wrapper').find('.selective-control-group.phone-number').removeClass('disabled');
+						$(this).closest('.phone-number-wrapper').siblings().find('.selective-control-group.voicemail').addClass('disabled');
 					}
 				}
 
 				if (self.checked && self.defaultValue === 'voicemail') {
+					$(this).closest('.voicemail-wrapper').find('.simple-control-group.voicemail').removeClass('disabled').find('input').prop('checked', true);
+					$(this).closest('.voicemail-wrapper').siblings().find('.simple-control-group.phone-number').addClass('disabled').find('input').prop('checked', false);
 					_.each(options, function(div) {
 						if (div.children[0].innerText !== 'Forward direct calls only') {
-							$template.find('.simple-control-group.voicemail').removeClass('disabled').find('input').prop('checked', true);
-							$template.find('.simple-control-group.phone-number').addClass('disabled').find('input').prop('checked', false);
 							$template.find(div).addClass('disabled').find('input');
 						}
 					});
 
 					if (strategy === 'selective') {
-						$template.find('.selective-control-group.phone-number').addClass('disabled');
-						$template.find('.selective-control-group.voicemail').removeClass('disabled');
+						$(this).closest('.voicemail-wrapper').find('.selective-control-group.voicemail').removeClass('disabled');
+						$(this).closest('.voicemail-wrapper').siblings().find('.selective-control-group.phone-number').addClass('disabled');
 					}
 				}
 
 				if (self.checked && self.defaultValue === 'custom') {
-					$template.find('.office-hours-wrapper').removeClass('disabled');
+					$(this).closest('.monster-radio').siblings('.office-hours-wrapper').removeClass('disabled');
 				} else if (self.checked && self.defaultValue === 'always') {
-					$template.find('.office-hours-wrapper').addClass('disabled');
+					$(this).closest('.monster-radio').siblings('.office-hours-wrapper').addClass('disabled');
 				}
 
 				if (self.checked) {
-					self.defaultValue === 'allNumbers' && $template.find('.selective-control-group.specific').addClass('disabled').find('input').prop('checked', false);
-					self.defaultValue === 'specific' && $template.find('.selective-control-group.specific').removeClass('disabled').find('input').prop('checked', true);
+					self.defaultValue === 'allNumbers' && $(this).parent('.monster-radio').siblings().find('.selective-control-group.specific').addClass('disabled').closest('input').prop('checked', false);
+					self.defaultValue === 'specific' && $(this).parent('.monster-radio').siblings('.selective-control-group.specific').removeClass('disabled').closest('input').prop('checked', true);
 				}
 			});
 
@@ -253,10 +255,10 @@ define(function(require) {
 				});
 			});
 
-			$template.find('.add-phone-number').on('click', function() {
-				var count = $template.find('.selective-control-group.specific').find('.controls').length,
-					containerToAppend = $template.find('.specific-phone-number-wrapper'),
-					numberContainer = $template.find('.specific-phone-number-wrapper')[0].children[1].outerHTML;
+			$template.on('click', '.add-phone-number', function() {
+				var count = $(this).closest('.selective-control-group.specific').find('.controls').length,
+					containerToAppend = $(this).closest('.selective-control-group.specific').find('.specific-phone-number-wrapper'),
+					numberContainer = $(this).closest('.selective-control-group.specific').find('.specific-phone-number-wrapper')[0].children[1].outerHTML;
 				if (count < 10) {
 					$(containerToAppend[0]).append(numberContainer);
 				}
