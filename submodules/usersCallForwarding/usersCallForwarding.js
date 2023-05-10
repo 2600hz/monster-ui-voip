@@ -5,54 +5,6 @@ define(function(require) {
 	return {
 		usersCallForwardingRender: function(user) {
 			var self = this,
-				meta = self.appFlags.strategyHours.intervals,
-				timepickerStep = meta.timepicker.step,
-				intervalLowerBound = meta.min,
-				intervalUpperBound = meta.max,
-				intervals = [
-					{
-						weekday: 'monday',
-						start: 0,
-						end: 84600,
-						active: true
-					},
-					{
-						weekday: 'tuesday',
-						start: 0,
-						end: 84600,
-						active: true
-					},
-					{
-						weekday: 'wednesday',
-						start: 0,
-						end: 84600,
-						active: true
-					},
-					{
-						weekday: 'thursday',
-						start: 0,
-						end: 84600,
-						active: true
-					},
-					{
-						weekday: 'friday',
-						start: 0,
-						end: 84600,
-						active: true
-					},
-					{
-						weekday: 'saturday',
-						start: 0,
-						end: 84600,
-						active: true
-					},
-					{
-						weekday: 'sunday',
-						start: 0,
-						end: 84600,
-						active: true
-					}
-				],
 				getData = _.bind(self.usersCallForwardingGetData, self),
 				formatData = _.bind(self.usersCallForwardingFormatData, self),
 				bindEvents = _.bind(self.usersCallForwardingBindingEvents, self),
@@ -118,49 +70,21 @@ define(function(require) {
 										direct_calls_only: isDirectCallsOnlyEnabled,
 										require_keypress: isRequireKeypressEnabled,
 										ignore_early_media: isIgnoreEarlyMediaEnabled,
-										type: hasVmBox ? 'voicemail' : 'phoneNumber',
+										type: hasVmBox ? 'voicemail' : hasPhoneNumber ? 'phoneNumber' : 'voicemail',
 										voicemails: data.voicemails,
-										selectedVoicemailId: _.get(user, ['call_forward_vm', strategy, 'voicemail'], data.voicemails[0]),
+										selectedVoicemailId: _.get(user, 'ui_help.voicemail_id', data.voicemails[0]),
+										rules: _.get(data, 'match_list_cf.rules'),
 										user: user
 									},
 									submodule: 'usersCallForwarding'
 								})),
-								listingTemplate = $(self.getTemplate({
-									name: 'listing',
-									data: {
-										strategy: strategy,
-										intervals: intervals
-									},
-									submodule: 'usersCallForwarding'
-								}));
-
-							_.forEach(intervals, function(interval, index) {
-								var $startPicker = listingTemplate.find('input[name="' + strategy + '.intervals[' + index + '].start"]'),
-									$endPicker = listingTemplate.find('input[name="' + strategy + '.intervals[' + index + '].end"]'),
-									endTime = interval.end,
-									endRemainder = endTime % timepickerStep,
-									startPickerMaxTime = endTime - endRemainder - (endRemainder > 0 ? 0 : timepickerStep),
-									startTime = interval.start,
-									startRemainder = startTime % timepickerStep,
-									endPickerMinTime = startTime - startRemainder + timepickerStep;
-
-								monster.ui.timepicker($startPicker, {
-									listWidth: 1,
-									minTime: intervalLowerBound,
-									maxTime: startPickerMaxTime
-								});
-								$startPicker.timepicker('setTime', startTime);
-
-								monster.ui.timepicker($endPicker, {
-									listWidth: 1,
-									minTime: endPickerMinTime,
-									maxTime: intervalUpperBound - timepickerStep
-								});
-								$endPicker.timepicker('setTime', endTime);
-							});
+								matchListRules = data.match_list_cf.rules;
 
 							$(this).find('.complex-strategy').append(complexStrategyTemplate);
-							$(this).find('.office-hours-wrapper').append(listingTemplate);
+
+							_.forEach(matchListRules, function(value, index) {
+								self.renderRulesListingTemplate(self, complexStrategyTemplate, index);
+							});
 						}
 					});
 
@@ -322,12 +246,26 @@ define(function(require) {
 			});
 
 			$template.on('click', '.add-rule', function() {
-				var count = $template.find('.complex-strategy-header').length,
-					ruleContainer = $template.find('.complex-strategy-header')[0].outerHTML,
-					containerToAppend = $template.find('.test-append');
+				var user = data.user,
+					hasVmBox = _.has(user, 'call_forward_vm'),
+					hasPhoneNumber = _.has(user, 'call_forward'),
+					count = $template.find('.complex-strategy-header').length;
 
 				if (count < 3) {
-					$(containerToAppend[0]).append(ruleContainer);
+					var ruleTemplate = $(self.getTemplate({
+						name: 'rule',
+						data: {
+							number: _.get(user, 'call_forward.selective.number', ''),
+							type: hasVmBox ? 'voicemail' : hasPhoneNumber ? 'phoneNumber' : 'voicemail',
+							voicemails: data.voicemails,
+							selectedVoicemailId: _.get(user, 'ui_help.voicemail_id', data.voicemails[0]),
+							index: count
+						},
+						submodule: 'usersCallForwarding'
+					}));
+
+					$template.find('.test-append').append(ruleTemplate);
+					self.renderRulesListingTemplate(self, ruleTemplate, count);
 				}
 			});
 
@@ -348,6 +286,7 @@ define(function(require) {
 				callForwardData = formData[callForwardStrategy],
 				isVmboxEnabled = callForwardStrategy !== 'off' && callForwardData.type === 'voicemail',
 				strategies = ['unconditional', 'busy', 'no_answer', 'selective'],
+				hasMatchList = _.has(user, 'call_forward.selective.rules'),
 				payload = callForwardStrategy === 'off' ? {
 					call_forward: {
 						enabled: false
@@ -391,12 +330,8 @@ define(function(require) {
 							ignore_early_media: _.includes(callForwardData.isEnabled, 'ring'),
 							keep_caller_id: _.includes(callForwardData.isEnabled, 'keep'),
 							require_keypress: _.includes(callForwardData.isEnabled, 'acknowledge'),
-							rules: [
-								{
-									enabled: true,
-									match_list_id: '',
-								}
-							]
+							substitute: null,
+							rules: hasMatchList ? _.get(user, 'call_forward.selective.rules') : []
 						}
 					}
 				});
@@ -413,9 +348,29 @@ define(function(require) {
 				}
 			});
 
+			if (callForwardData.type === 'voicemail') {
+				_.merge(payload, {
+					ui_help: {
+						voicemail_id: _.get(callForwardData, 'voicemail.value')
+					}
+				});
+			}
+
+			_.merge(payload, {
+				ui_help: {
+					match_list_id: _.get(data, 'match_list_cf.id')
+				}
+			});
+
 			// formattedCallForwardData = self.usersCallForwardingFormatData(data);
 			if (callForwardStrategy !== 'off') {
 				self.userUpdateCallflow(user, callForwardData.type);
+			}
+
+			if (callForwardStrategy === 'selective' && callForwardData.type === 'phoneNumber') {
+				if (payload.call_forward.selective.rules.length <= 0) {
+
+				}
 			}
 
 			return payload;
@@ -549,6 +504,221 @@ define(function(require) {
 					}
 				}
 			], callback);
+		},
+
+		listUserMatchLists: function(callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'matchList.list',
+				data: {
+					accountId: self.accountId
+				},
+				success: function(matchListData) {
+					callback && callback(matchListData.data);
+				}
+			});
+		},
+
+		getUserMatchList: function(matchListId, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'matchList.get',
+				data: {
+					accountId: self.accountId,
+					matchListId: matchListId
+				},
+				success: function(matchListData) {
+					callback && callback(matchListData.data);
+				}
+			});
+		},
+
+		createUserDefaultMatchList: function(callback) {
+			var self = this,
+				matchListName = 'Default Match List',
+				ruleName = 'Default Rule',
+				type = 'regex';
+
+			self.callApi({
+				resource: 'matchList.create',
+				data: {
+					accountId: self.accountId,
+					data: {
+						name: matchListName,
+						rules: [
+							{
+								name: ruleName,
+								type: type
+							}
+						]
+					}
+				},
+				success: function(matchListData) {
+					callback && callback(matchListData.data);
+				}
+			});
+		},
+
+		patchUserMatchList: function(temporalRuleId, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'matchList.patch',
+				data: {
+					accountId: self.accountId,
+					data: {
+						name: 'Match List for Selective',
+						rules: [
+							{
+								name: 'Rule Name',
+								regex: '^313$',
+								target: '+13132961231',
+								temporal_route_id: temporalRuleId,
+								type: 'regex'
+							}
+						]
+					}
+				},
+				success: function(matchListData) {
+					callback && callback(matchListData.data);
+				}
+			});
+		},
+
+		deleteUserMatchList: function(matchListId, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'matchList.delete',
+				data: {
+					accountId: self.accountId,
+					matchListId: matchListId
+				},
+				success: function(matchListData) {
+					callback && callback(matchListData.data);
+				}
+			});
+		},
+
+		createUserTemporalRule: function(accountId, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'temporalRules.create',
+				data: {
+					accountId: accountId,
+					data: data
+				},
+				success: function(temporalRuleData) {
+					callback && callback(temporalRuleData.data);
+				}
+			});
+		},
+
+		usersMatchListGetData: function(callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'voicemail.list',
+				data: {
+					accountId: self.accountId
+				},
+				success: _.flow(
+					_.partial(_.get, _, 'data'),
+					_.partial(callback, null)
+				),
+				error: _.partial(callback, _, [])
+			});
+		},
+
+		renderRulesListingTemplate: function(data, template, ruleIndex) {
+			var self = data,
+				meta = self.appFlags.strategyHours.intervals,
+				timepickerStep = meta.timepicker.step,
+				intervalLowerBound = meta.min,
+				intervalUpperBound = meta.max,
+				intervals = [
+					{
+						weekday: 'monday',
+						start: 0,
+						end: 84600,
+						active: true
+					},
+					{
+						weekday: 'tuesday',
+						start: 0,
+						end: 84600,
+						active: true
+					},
+					{
+						weekday: 'wednesday',
+						start: 0,
+						end: 84600,
+						active: true
+					},
+					{
+						weekday: 'thursday',
+						start: 0,
+						end: 84600,
+						active: true
+					},
+					{
+						weekday: 'friday',
+						start: 0,
+						end: 84600,
+						active: true
+					},
+					{
+						weekday: 'saturday',
+						start: 0,
+						end: 84600,
+						active: true
+					},
+					{
+						weekday: 'sunday',
+						start: 0,
+						end: 84600,
+						active: true
+					}
+				],
+				listingTemplate = $(self.getTemplate({
+					name: 'listing',
+					data: {
+						strategy: 'selective',
+						intervals: intervals,
+						ruleIndex: ruleIndex
+					},
+					submodule: 'usersCallForwarding'
+				}));
+
+			_.forEach(intervals, function(interval, index) {
+				var $startPicker = listingTemplate.find('input[name="selective.rule[' + ruleIndex + '].intervals[' + index + '].start"]'),
+					$endPicker = listingTemplate.find('input[name="selective.rule[' + ruleIndex + '].intervals[' + index + '].end"]'),
+					endTime = interval.end,
+					endRemainder = endTime % timepickerStep,
+					startPickerMaxTime = endTime - endRemainder - (endRemainder > 0 ? 0 : timepickerStep),
+					startTime = interval.start,
+					startRemainder = startTime % timepickerStep,
+					endPickerMinTime = startTime - startRemainder + timepickerStep;
+
+				monster.ui.timepicker($startPicker, {
+					listWidth: 1,
+					minTime: intervalLowerBound,
+					maxTime: startPickerMaxTime
+				});
+				$startPicker.timepicker('setTime', startTime);
+
+				monster.ui.timepicker($endPicker, {
+					listWidth: 1,
+					minTime: endPickerMinTime,
+					maxTime: intervalUpperBound - timepickerStep
+				});
+				$endPicker.timepicker('setTime', endTime);
+			});
+
+			$(template).find('.office-hours-wrapper').append(listingTemplate);
 		}
 	};
 });
