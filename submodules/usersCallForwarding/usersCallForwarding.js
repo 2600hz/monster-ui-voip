@@ -33,6 +33,7 @@ define(function(require) {
 					layoutTemplate.find('.feature-popup-title').each(function() {
 						var strategy = $(this).data('template'),
 							hasVmBox = _.has(user, 'call_forward_vm'),
+							hasPhoneNumber = _.has(user, 'call_forward'),
 							isKeepCallerIdEnabled = _.get(user, ['call_forward', strategy, 'keep_caller_id'], false),
 							isDirectCallsOnlyEnabled = _.get(user, ['call_forward', strategy, 'direct_calls_only'], false) || _.get(user, ['call_forward_vm', strategy, 'direct_calls_only'], false),
 							isRequireKeypressEnabled = _.get(user, ['call_forward', strategy, 'require_keypress'], false),
@@ -49,16 +50,15 @@ define(function(require) {
 									direct_calls_only: isDirectCallsOnlyEnabled,
 									require_keypress: isRequireKeypressEnabled,
 									ignore_early_media: isIgnoreEarlyMediaEnabled,
-									type: hasVmBox ? 'voicemail' : 'phoneNumber',
+									type: hasVmBox ? 'voicemail' : hasPhoneNumber ? 'phoneNumber' : 'voicemail',
 									voicemails: data.voicemails,
-									selectedVoicemailId: _.get(user, ['call_forward_vm', strategy, 'voicemail'], data.voicemails[0]),
+									selectedVoicemailId: _.get(user, 'ui_help.voicemail_id', data.voicemails[0]),
 									user: user
 								},
 								submodule: 'usersCallForwarding'
 							}));
 							$(this).find('.simple-strategy').append(simpleStrategyTemplate);
 						}
-
 						if (strategy === 'selective') {
 							var complexStrategyTemplate = $(self.getTemplate({
 									name: 'complexStrategy',
@@ -98,14 +98,33 @@ define(function(require) {
 						voicemails: voicemails,
 						user: user
 					},
-					$template = initTemplate(data);
+					callback = data.user.callback;
+				monster.waterfall([
+					function(waterfallCallback) {
+						if (_.has(data, 'user.ui_help.match_list_id')) {
+							self.getUserMatchList(data.user.ui_help.match_list_id, function(matchList) {
+								waterfallCallback(null, matchList);
+							});
+						} else {
+							self.createUserDefaultMatchList(function(createdMatchlist) {
+								waterfallCallback(null, createdMatchlist);
+							});
+						}
+					},
+					function(matchList, waterfallCallback) {
+						var newData = _.merge(data, {
+								match_list_cf: matchList
+							}),
+							$template = initTemplate(newData);
 
-				bindEvents($template, data);
+						bindEvents($template, newData);
 
-				monster.ui.dialog($template, {
-					title: user.extra.mapFeatures.call_forwarding.title,
-					position: ['center', 20]
-				});
+						monster.ui.dialog($template, {
+							title: user.extra.mapFeatures.call_forwarding.title,
+							position: ['center', 20]
+						});
+					}
+				], callback);
 			});
 		},
 
@@ -321,9 +340,6 @@ define(function(require) {
 					},
 					call_forward: null
 				};
-
-			console.log('self');
-			console.log(self);
 
 			if (callForwardStrategy === 'selective' && callForwardData.type === 'phoneNumber') {
 				_.merge(payload, {
