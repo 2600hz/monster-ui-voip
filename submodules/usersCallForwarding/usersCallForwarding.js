@@ -371,7 +371,7 @@ define(function(require) {
 				}
 			});
 
-			if (callForwardData.type === 'voicemail') {
+			if (callForwardData && callForwardData.type === 'voicemail') {
 				_.merge(payload, {
 					ui_help: {
 						voicemail_id: _.get(callForwardData, 'voicemail.value')
