@@ -1,133 +1,135 @@
 <div class="complex-strategy-content" data-strategy="{{strategy}}">
     <div class="test-append">
-        <div class="complex-strategy-header">
-            <div class="forward-from">
-                <label>
-                    {{ i18n.users.callForwarding.strategies.selective.rules.from }}
-                </label>
+        {{#each rules}}
+            <div class="complex-strategy-header">
+                <div class="forward-from">
+                    <label>
+                        {{ @root.i18n.users.callForwarding.strategies.selective.rules.from }}
+                    </label>
 
-                <div class="complex-rule">
-                    {{#monsterRadio i18n.users.callForwarding.strategies.selective.all }}
-                    <input type="radio" class="radio-state" name="{{strategy}}.from" value="allNumbers"
-                        checked="checked" {{#compare type '===' 'allNumbers' }} checked{{/compare}} />
-                    {{/monsterRadio}}
-
-                    <div>
-                        {{#monsterRadio i18n.users.callForwarding.strategies.selective.specific }}
-                        <input type="radio" class="radio-state" name="{{strategy}}.from" value="specific" {{#compare
-                            type '===' 'specific' }} checked{{/compare}} />
+                    <div class="complex-rule">
+                        {{#monsterRadio @root.i18n.users.callForwarding.strategies.selective.all }}
+                        <input type="radio" class="radio-state" name="{{@root.strategy}}.rule[{{@index}}].from" value="allNumbers"
+                            checked="checked" {{#compare @root.type '===' 'allNumbers' }} checked{{/compare}} />
                         {{/monsterRadio}}
 
-                        <div class="selective-control-group specific disabled">
-                            <div class="specific-phone-number-wrapper">
-                                <label for="{{strategy}}.phoneNumber.value" class="control-label">
-                                    {{i18n.users.callForwarding.strategies.common.phoneNumber.inputLabel}}
-                                </label>
-                                <div class="controls specific-controls">
-                                    <input class="controlls-width margins" name="{{strategy}}.phoneNumbers[]"
-                                        type="phoneNumber" value="{{selective.number}}">
-                                    <a class="remove-number-button">
-                                        {{telicon "telicon2--trash-x"}}
-                                    </a>
-                                </div>
-                            </div>
-                            <a class="add-phone-number">
-                                {{telicon "plus"}}
-                                <span>
-                                    {{i18n.users.callForwarding.strategies.selective.buttons.addNumber}}
-                                </span>
-                            </a>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-            <div class="forward-to">
-                <label>
-                    {{ i18n.users.callForwarding.strategies.selective.rules.to }}
-                </label>
-
-                <div class="complex-rule">
-                    <div class="voicemail-wrapper">
                         <div>
-                            {{#monsterRadio i18n.users.callForwarding.strategies.common.voicemail.label }}
-                            <input type="radio" class="radio-state" name="{{strategy}}.type" value="voicemail"
-                                {{#compare type '===' 'voicemail' }} checked{{/compare}} />
+                            {{#monsterRadio @root.i18n.users.callForwarding.strategies.selective.specific }}
+                            <input type="radio" class="radio-state" name="{{@root.strategy}}.rule[{{@index}}].from" value="specific" {{#compare
+                                type '===' 'specific' }} checked{{/compare}} />
                             {{/monsterRadio}}
+
+                            <div class="selective-control-group specific disabled">
+                                <div class="specific-phone-number-wrapper">
+                                    <label for="{{@root.strategy}}.rule[{{@index}}].phoneNumber.value" class="control-label">
+                                        {{@root.i18n.users.callForwarding.strategies.common.phoneNumber.inputLabel}}
+                                    </label>
+                                    <div class="controls specific-controls">
+                                        <input class="controlls-width margins" name="{{@root.strategy}}.rule[{{@index}}].phoneNumbers[]"
+                                            type="phoneNumber" value="{{selective.number}}">
+                                        <a class="remove-number-button">
+                                            {{telicon "telicon2--trash-x"}}
+                                        </a>
+                                    </div>
+                                </div>
+                                <a class="add-phone-number">
+                                    {{telicon "plus"}}
+                                    <span>
+                                        {{@root.i18n.users.callForwarding.strategies.selective.buttons.addNumber}}
+                                    </span>
+                                </a>
+                            </div>
+
                         </div>
-                        <div>
-                            <div class="selective-control-group voicemail">
-                                <label class="control-label" for="{{strategy}}.voicemail.value">
-                                    {{i18n.users.callForwarding.strategies.common.voicemail.selectLabel}}
+                    </div>
+                </div>
+
+                <div class="forward-to">
+                    <label>
+                        {{ @root.i18n.users.callForwarding.strategies.selective.rules.to }}
+                    </label>
+
+                    <div class="complex-rule">
+                        <div class="voicemail-wrapper">
+                            <div>
+                                {{#monsterRadio @root.i18n.users.callForwarding.strategies.common.voicemail.label }}
+                                <input type="radio" class="radio-state" name="{{@root.strategy}}.rule[{{@index}}].type" value="voicemail"
+                                    {{#compare @root.type '===' 'voicemail' }} checked{{/compare}} />
+                                {{/monsterRadio}}
+                            </div>
+                            <div>
+                                <div class="selective-control-group voicemail {{#compare @root.type '===' 'phoneNumber' }} disabled{{/compare}}">
+                                    <label class="control-label" for="{{@root.strategy}}.rule[{{@index}}].voicemail.value">
+                                        {{@root.i18n.users.callForwarding.strategies.common.voicemail.selectLabel}}
+                                    </label>
+                                    <div class="controls specific-controls">
+                                        <select class="controlls-width" id="{{@root.strategy}}.rule[{{@index}}]_voicemail_select"
+                                            name="{{@root.strategy}}.rule[{{@index}}].voicemail.value">
+                                            {{#select @root.selectedVoicemailId}}
+                                            {{#each @root.voicemails as |voicemail|}}
+                                            <option value="{{voicemail.id}}">
+                                                {{voicemail.name}}
+                                            </option>
+                                            {{/each}}
+                                            {{/select}}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="phone-number-wrapper">
+                            {{#monsterRadio @root.i18n.users.callForwarding.strategies.common.phoneNumber.label }}
+                            <input type="radio" class="radio-state" name="{{@root.strategy}}.rule[{{@index}}].type" value="phoneNumber" {{#compare
+                                type '===' 'phoneNumber' }} checked{{/compare}} />
+                            {{/monsterRadio}}
+
+                            <div class="selective-control-group phone-number {{#compare @root.type '===' 'voicemail' }} disabled{{/compare}}">
+                                <label for="{{@root.strategy}}.rule[{{@index}}].phoneNumber.value" class="control-label">
+                                    {{@root.i18n.users.callForwarding.strategies.common.phoneNumber.inputLabel}}
                                 </label>
                                 <div class="controls specific-controls">
-                                    <select class="controlls-width" id="{{strategy}}_voicemail_select"
-                                        name="{{strategy}}.voicemail.value">
-                                        {{#select selectedVoicemailId}}
-                                        {{#each voicemails as |voicemail|}}
-                                        <option value="{{voicemail.id}}">
-                                            {{voicemail.name}}
-                                        </option>
-                                        {{/each}}
-                                        {{/select}}
-                                    </select>
+                                    <input class="controlls-width" name="{{@root.strategy}}.rule[{{@index}}].phoneNumber" type="phoneNumber"
+                                        value="{{number}}">
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div>
-                        {{#monsterRadio i18n.users.callForwarding.strategies.common.phoneNumber.label }}
-                        <input type="radio" class="radio-state" name="{{strategy}}.type" value="phoneNumber" {{#compare
-                            type '===' 'phoneNumber' }} checked{{/compare}} />
+                <div class="active-duration">
+                    <label>
+                        {{ @root.i18n.users.callForwarding.strategies.selective.rules.duration }}
+                    </label>
+
+                    <div class="complex-rule">
+                        {{#monsterRadio @root.i18n.users.callForwarding.strategies.common.length.always }}
+                        <input type="radio" class="radio-state" name="{{@root.strategy}}.rule[{{@index}}].length" value="always" checked="checked"
+                            {{#compare @root.type '===' 'always' }} checked{{/compare}} />
                         {{/monsterRadio}}
 
-                        <div class="selective-control-group phone-number disabled">
-                            <label for="{{strategy}}.phoneNumber.value" class="control-label">
-                                {{i18n.users.callForwarding.strategies.common.phoneNumber.inputLabel}}
-                            </label>
-                            <div class="controls specific-controls">
-                                <input class="controlls-width" name="{{strategy}}.phoneNumber" type="phoneNumber"
-                                    value="{{number}}">
-                            </div>
-                        </div>
+                        {{#monsterRadio @root.i18n.users.callForwarding.strategies.common.length.custom }}
+                        <input type="radio" class="radio-state" name="{{@root.strategy}}.rule[{{@index}}].length" value="custom" {{#compare
+                            type '===' 'custom' }} checked{{/compare}} />
+                        {{/monsterRadio}}
+
+                        <div class="office-hours-wrapper disabled"></div>
+                    </div>
+                </div>
+
+                <div class="remove-rule">
+                    <label>
+                        {{ @root.i18n.users.callForwarding.strategies.selective.rules.remove }}
+                    </label>
+
+                    <div class="complex-rule">
+                        <a class="remove-rule-button">
+                            {{telicon "telicon2--trash-x"}}
+                        </a>
                     </div>
                 </div>
             </div>
-
-            <div class="active-duration">
-                <label>
-                    {{ i18n.users.callForwarding.strategies.selective.rules.duration }}
-                </label>
-
-                <div class="complex-rule">
-                    {{#monsterRadio i18n.users.callForwarding.strategies.common.length.always }}
-                    <input type="radio" class="radio-state" name="{{strategy}}.length" value="always" checked="checked"
-                        {{#compare type '===' 'always' }} checked{{/compare}} />
-                    {{/monsterRadio}}
-
-                    {{#monsterRadio i18n.users.callForwarding.strategies.common.length.custom }}
-                    <input type="radio" class="radio-state" name="{{strategy}}.length" value="custom" {{#compare
-                        type '===' 'custom' }} checked{{/compare}} />
-                    {{/monsterRadio}}
-
-                    <div class="office-hours-wrapper disabled"></div>
-                </div>
-            </div>
-
-            <div class="remove-rule">
-                <label>
-                    {{ i18n.users.callForwarding.strategies.selective.rules.remove }}
-                </label>
-
-                <div class="complex-rule">
-                    <a class="remove-rule-button">
-                        {{telicon "telicon2--trash-x"}}
-                    </a>
-                </div>
-            </div>
-        </div>
+        {{/each}}
     </div>
 
     <div>
@@ -160,7 +162,7 @@
                 </div>
             </div>
 
-            <div class="option disabled" strategy="{{strategy}}">
+            <div class="option {{#compare type '===' 'voicemail' }} disabled{{/compare}}" strategy="{{strategy}}">
                 <div class="options-title">
                     {{i18n.users.callForwarding.strategies.common.options.acknowledge.title}}
 
@@ -175,7 +177,7 @@
                 </div>
             </div>
             <br>
-            <div class="option disabled" strategy="{{strategy}}">
+            <div class="option {{#compare type '===' 'voicemail' }} disabled{{/compare}}" strategy="{{strategy}}">
                 <div class="options-title">
                     {{i18n.users.callForwarding.strategies.common.options.keep.title}}
 
@@ -190,7 +192,7 @@
                 </div>
             </div>
 
-            <div class="option disabled" strategy="{{strategy}}">
+            <div class="option {{#compare type '===' 'voicemail' }} disabled{{/compare}}" strategy="{{strategy}}">
                 <div class="options-title">
                     {{i18n.users.callForwarding.strategies.common.options.ring.title}}
 
