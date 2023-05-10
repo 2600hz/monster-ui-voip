@@ -146,6 +146,11 @@ define(function(require) {
 						});
 					}
 					getPopup($button).dialog('close');
+
+					self.usersRender({
+						userId: data.user.id,
+						openedTab: 'features'
+					});
 				});
 			});
 
