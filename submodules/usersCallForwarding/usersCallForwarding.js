@@ -101,15 +101,21 @@ define(function(require) {
 					callback = data.user.callback;
 				monster.waterfall([
 					function(waterfallCallback) {
-						if (_.has(data, 'user.ui_help.match_list_id')) {
-							self.getUserMatchList(data.user.ui_help.match_list_id, function(matchList) {
-								waterfallCallback(null, matchList);
+						self.getMatchList(function(matchList) {
+							var userMatchList = _.find(matchList, function(list) {
+								return list.owner_id === data.user.id;
 							});
-						} else {
-							self.createUserDefaultMatchList(function(createdMatchlist) {
-								waterfallCallback(null, createdMatchlist);
-							});
-						}
+
+							if (!userMatchList) {
+								self.createUserDefaultMatchList(data.user.id, function(createdMatchlist) {
+									waterfallCallback(null, createdMatchlist);
+								});
+							} else {
+								self.getUserMatchList(userMatchList.id, function(userMatchList) {
+									waterfallCallback(null, userMatchList);
+								});
+							}
+						});
 					},
 					function(matchList, waterfallCallback) {
 						var newData = _.merge(data, {
@@ -543,6 +549,20 @@ define(function(require) {
 			});
 		},
 
+		getMatchList: function(callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'matchList.list',
+				data: {
+					accountId: self.accountId
+				},
+				success: function(matchListData) {
+					callback && callback(matchListData.data);
+				}
+			});
+		},
+
 		getUserMatchList: function(matchListId, callback) {
 			var self = this;
 
@@ -558,7 +578,7 @@ define(function(require) {
 			});
 		},
 
-		createUserDefaultMatchList: function(callback) {
+		createUserDefaultMatchList: function(userId, callback) {
 			var self = this,
 				matchListName = 'Default Match List',
 				ruleName = 'Default Rule',
@@ -570,6 +590,34 @@ define(function(require) {
 					accountId: self.accountId,
 					data: {
 						name: matchListName,
+						owner_id: userId,
+						rules: [
+							{
+								name: ruleName,
+								type: type
+							}
+						]
+					}
+				},
+				success: function(matchListData) {
+					callback && callback(matchListData.data);
+				}
+			});
+		},
+
+		createUserMatchList: function(userId, callback) {
+			var self = this,
+				matchListName = 'Default Match List',
+				ruleName = 'Default Rule',
+				type = 'regex';
+
+			self.callApi({
+				resource: 'matchList.create',
+				data: {
+					accountId: self.accountId,
+					data: {
+						name: matchListName,
+						owner_id: userId,
 						rules: [
 							{
 								name: ruleName,
