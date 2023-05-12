@@ -140,7 +140,10 @@ define(function(require) {
 			self.callApi({
 				resource: 'voicemail.list',
 				data: {
-					accountId: self.accountId
+					accountId: self.accountId,
+					filters: {
+						paginate: 'false'
+					}
 				},
 				success: _.flow(
 					_.partial(_.get, _, 'data'),
