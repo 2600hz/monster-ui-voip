@@ -388,15 +388,9 @@ define(function(require) {
 				});
 			}
 
-			_.merge(payload, {
-				ui_help: {
-					match_list_id: _.get(data, 'match_list_cf.id')
-				}
-			});
-
 			// formattedCallForwardData = self.usersCallForwardingFormatData(data);
 			if (callForwardStrategy !== 'off') {
-				self.userUpdateCallflow(user, callForwardData.type);
+				self.userUpdateCallflow(user, callForwardData, callForwardData.type);
 			}
 
 			if (callForwardStrategy === 'selective' && callForwardData.type === 'phoneNumber') {
@@ -469,18 +463,44 @@ define(function(require) {
 			});
 		},
 
-		skipToVoicemail: function(callflowId, enabled, callback) {
+		skipToVoicemail: function(callflow, enabled, callback) {
 			var self = this;
 
 			self.callApi({
 				resource: 'callflow.patch',
 				data: {
 					accountId: self.accountId,
-					callflowId: callflowId,
+					callflowId: callflow.id,
 					data: {
 						flow: {
 							data: {
 								skip_module: enabled
+							}
+						}
+					}
+				},
+				success: function(callflowData) {
+					callback && callback(callflowData.data);
+				}
+			});
+		},
+
+		updateVoicemail: function(callflow, voicemailId, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'callflow.patch',
+				data: {
+					accountId: self.accountId,
+					callflowId: callflow.id,
+					data: {
+						flow: {
+							children: {
+								_: {
+									data: {
+										id: voicemailId
+									}
+								}
 							}
 						}
 					}
@@ -506,10 +526,11 @@ define(function(require) {
 			});
 		},
 
-		userUpdateCallflow: function(data, selectedType) {
+		userUpdateCallflow: function(user, data, selectedType) {
 			var self = this,
-				userId = data.id,
-				callback = data.callback;
+				userId = user.id,
+				callback = user.callback,
+				voicemailId = data.voicemail.value;
 
 			monster.waterfall([
 				function(waterfallCallback) {
@@ -523,13 +544,17 @@ define(function(require) {
 					});
 				},
 				function(callflow, waterfallCallback) {
-					var id = callflow.id,
-						flow = callflow.flow.data.skip_module,
-						enabled = selectedType === 'voicemail';
+					var flow = callflow.flow.data.skip_module,
+						enabled = selectedType === 'voicemail',
+						currentUserVoicemail = callflow.flow.children._.data.id;
 
 					if (enabled !== flow) {
 						// Skip to voicemail if voicemail is selected
-						self.skipToVoicemail(id, enabled);
+						self.skipToVoicemail(callflow, enabled);
+					}
+					if (enabled && voicemailId !== currentUserVoicemail) {
+						// Modify current voicemailId
+						self.updateVoicemail(callflow, voicemailId);
 					} else {
 						// Module does not exist in callflow, but should, so err
 						waterfallCallback(true);
