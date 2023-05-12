@@ -50,7 +50,7 @@ define(function(require) {
 									direct_calls_only: isDirectCallsOnlyEnabled,
 									require_keypress: isRequireKeypressEnabled,
 									ignore_early_media: isIgnoreEarlyMediaEnabled,
-									type: hasVmBox ? 'voicemail' : hasPhoneNumber ? 'phoneNumber' : 'voicemail',
+									type: hasVmBox ? 'voicemail' : hasPhoneNumber && isCallForwardEnabled ? 'phoneNumber' : 'voicemail',
 									voicemails: data.voicemails,
 									selectedVoicemailId: _.get(user, 'ui_help.voicemail_id', data.voicemails[0]),
 									user: user
@@ -70,7 +70,7 @@ define(function(require) {
 										direct_calls_only: isDirectCallsOnlyEnabled,
 										require_keypress: isRequireKeypressEnabled,
 										ignore_early_media: isIgnoreEarlyMediaEnabled,
-										type: hasVmBox ? 'voicemail' : hasPhoneNumber ? 'phoneNumber' : 'voicemail',
+										type: hasVmBox ? 'voicemail' : hasPhoneNumber && isCallForwardEnabled ? 'phoneNumber' : 'voicemail',
 										voicemails: data.voicemails,
 										selectedVoicemailId: _.get(user, 'ui_help.voicemail_id', data.voicemails[0]),
 										rules: _.get(data, 'match_list_cf.rules'),
