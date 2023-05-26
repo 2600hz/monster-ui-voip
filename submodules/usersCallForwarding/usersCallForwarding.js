@@ -94,8 +94,9 @@ define(function(require) {
 			monster.waterfall([
 				getData
 			], function(err, voicemails) {
-				var data = {
-						voicemails: voicemails,
+				var userVoicemails = _.filter(voicemails, function(vmbox) { return vmbox.owner_id === user.id}),
+					data = {
+						voicemails: userVoicemails,
 						user: user
 					},
 					callback = data.user.callback;
