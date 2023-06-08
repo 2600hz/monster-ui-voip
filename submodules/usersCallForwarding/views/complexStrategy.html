@@ -141,7 +141,7 @@
         </a>
     </div>
 
-    <div class="options">
+    <div class="options{{#compare type '===' 'voicemail' }} disabled{{/compare}}">
         <div>
             {{i18n.users.callForwarding.strategies.common.options.title}}
         </div>
@@ -162,7 +162,7 @@
                 </div>
             </div>
 
-            <div class="option {{#compare type '===' 'voicemail' }} disabled{{/compare}}" strategy="{{strategy}}">
+            <div class="option" strategy="{{strategy}}">
                 <div class="options-title">
                     {{i18n.users.callForwarding.strategies.common.options.acknowledge.title}}
 
@@ -177,7 +177,7 @@
                 </div>
             </div>
             <br>
-            <div class="option {{#compare type '===' 'voicemail' }} disabled{{/compare}}" strategy="{{strategy}}">
+            <div class="option" strategy="{{strategy}}">
                 <div class="options-title">
                     {{i18n.users.callForwarding.strategies.common.options.keep.title}}
 
@@ -192,7 +192,7 @@
                 </div>
             </div>
 
-            <div class="option {{#compare type '===' 'voicemail' }} disabled{{/compare}}" strategy="{{strategy}}">
+            <div class="option" strategy="{{strategy}}">
                 <div class="options-title">
                     {{i18n.users.callForwarding.strategies.common.options.ring.title}}
 
