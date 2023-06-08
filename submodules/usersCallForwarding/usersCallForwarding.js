@@ -320,127 +320,68 @@ define(function(require) {
 				formData = monster.ui.getFormData('call_forward_form'),
 				callForwardStrategy = formData.call_forwarding_strategy,
 				callForwardData = formData[callForwardStrategy],
-				isVmboxEnabled = callForwardStrategy !== 'off' && callForwardData.type === 'voicemail',
-				strategies = ['unconditional', 'busy', 'no_answer', 'selective'],
-				hasMatchList = _.has(user, 'call_forward.selective.rules'),
-				payload = callForwardStrategy === 'off' ? {
-					call_forward: {
-						enabled: false
-					},
-					call_forward_vm: null
-				} : callForwardData.type === 'phoneNumber' ? {
-					call_forward: {
+				hasMatchList = _.has(user, 'call_forward.selective.rules');
+
+			if (callForwardStrategy === 'off') {
+				_.set(user, 'call_forward', {
+					enabled: false
+				});
+			};
+
+			if (callForwardData && callForwardData.type === 'phoneNumber') {
+				_.set(user, 'call_forward', {
+					[callForwardStrategy]: {
 						enabled: true,
-						[callForwardStrategy]: {
-							enabled: true,
-							keep_caller_id: _.includes(callForwardData.isEnabled, 'keep'),
-							direct_calls_only: _.includes(callForwardData.isEnabled, 'forward'),
-							require_keypress: _.includes(callForwardData.isEnabled, 'acknowledge'),
-							ignore_early_media: _.includes(callForwardData.isEnabled, 'ring'),
-							substitute: false,
-							number: _.get(callForwardData, 'phoneNumber', '')
-						}
+						number: _.get(callForwardData, 'phoneNumber', ''),
+						keep_caller_id: _.includes(callForwardData.isEnabled, 'keep'),
+						direct_calls_only: _.includes(callForwardData.isEnabled, 'forward'),
+						require_keypress: _.includes(callForwardData.isEnabled, 'acknowledge'),
+						ignore_early_media: _.includes(callForwardData.isEnabled, 'ring'),
+						substitute: false
+					}
+				});
+
+				_.set(user, 'smartpbx.call_forwarding', {
+					enabled: true
+				});
+			} else {
+				_.set(user, 'smartpbx.call_forwarding', {
+					enabled: callForwardStrategy !== 'off',
+					[callForwardStrategy]: {
+						voicemail: _.get(callForwardData, 'voicemail.value', data.voicemails[0].id)
 					},
-					call_forward_vm: null
-				} : {
-					call_forward_vm: {
-						[callForwardStrategy]: {
-							enabled: callForwardStrategy !== 'off' && callForwardData.type === 'voicemail',
-							voicemail: _.get(callForwardData, 'voicemail.value', ''),
-							direct_calls_only: true
-						}
-					},
-					call_forward: null
-				};
+					default: data.voicemails[0].id
+				});
+
+				_.set(user, 'ui_help', {
+					voicemail_id: _.get(callForwardData, 'voicemail.value', data.voicemails[0].id)
+				});
+
+				delete user.call_forward;
+			};
 
 			if (callForwardStrategy === 'selective' && callForwardData.type === 'phoneNumber') {
-				_.merge(payload, {
-					call_forward: {
-						selective: {
-							enabled: true,
-							number: callForwardData.phoneNumber,
-							direct_calls_only: _.includes(callForwardData.isEnabled, 'forward'),
-							ignore_early_media: _.includes(callForwardData.isEnabled, 'ring'),
-							keep_caller_id: _.includes(callForwardData.isEnabled, 'keep'),
-							require_keypress: _.includes(callForwardData.isEnabled, 'acknowledge'),
-							substitute: null,
-							rules: hasMatchList ? _.get(user, 'call_forward.selective.rules') : []
-						}
-					}
+				_.set(user, 'call_forward.selective', {
+					rules: hasMatchList ? _.get(user, 'call_forward.selective.rules') : []
 				});
-			}
+			};
 
-			_.each(strategies, function(strategy) {
-				if (strategy !== callForwardStrategy) {
-					_.assign(payload.call_forward, {
-						[strategy]: null
-					});
-					_.assign(payload.call_forward_vm, {
-						[strategy]: null
-					});
-				}
-			});
-
-			if (callForwardData && callForwardData.type === 'voicemail') {
-				_.merge(payload, {
-					ui_help: {
-						voicemail_id: _.get(callForwardData, 'voicemail.value')
-					}
-				});
-			}
-
-			// formattedCallForwardData = self.usersCallForwardingFormatData(data);
-			if (callForwardStrategy !== 'off') {
+			if (callForwardStrategy !== 'off' && callForwardStrategy !== 'selective') {
 				self.userUpdateCallflow(user, callForwardData, callForwardData.type);
 			}
 
-			if (callForwardStrategy === 'selective' && callForwardData.type === 'phoneNumber') {
-				if (payload.call_forward.selective.rules.length <= 0) {
-
-				}
-			}
-
-			return payload;
+			return user;
 		},
 
-		usersCallForwardingFormatData: function(data) {
-			var self = this,
-				user = data.user,
-				isCallForwardConfigured = _.has(user, 'call_forward.enabled'),
-				isCallForwardEnabled = _.get(user, 'call_forward.enabled', false),
-				isFailoverEnabled = _.get(user, 'call_failover.enabled', false);
-
-			// cfmode is off if call_forward.enabled = false && call_failover.enabled = false
-			// cfmode is failover if call_failover.enabled = true
-			// cfmode is on if call_failover.enabled = false && call_forward.enabled = true
-			var callForwardMode = 'off';
-			if (isFailoverEnabled) {
-				callForwardMode = 'failover';
-			} else if (isCallForwardEnabled) {
-				callForwardMode = 'on';
-			}
-
-			return _.merge({}, user, _.merge({
-				extra: {
-					callForwardMode: callForwardMode
-				}
-			}, isCallForwardConfigured && {
-				call_forward: _.merge({}, _.has(user, 'call_forward.number') && {
-					number: monster.util.unformatPhoneNumber(user.call_forward.number)
-				})
-			}
-			));
-		},
-
-		usersCallForwardingSaveData: function(data, callback) {
+		usersCallForwardingSaveData: function(userData, callback) {
 			var self = this;
 
 			self.callApi({
-				resource: 'user.patch',
+				resource: 'user.update',
 				data: {
 					accountId: self.accountId,
-					userId: data.userId,
-					data: data.data
+					userId: userData.id,
+					data: userData
 				},
 				success: _.partial(callback, null),
 				error: _.partial(callback, _)
