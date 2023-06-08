@@ -156,12 +156,10 @@ define(function(require) {
 
 			$template.find('.save').on('click', function() {
 				var $button = $(this),
-					updateData = self.usersCallForwardingGetFormData(data);
+					updateData = self.usersCallForwardingGetFormData(data),
+					cleanedData = self.usersCleanUserData(updateData);
 
-				self.usersCallForwardingSaveData({
-					data: updateData,
-					userId: data.user.id
-				}, function(err) {
+				self.usersCallForwardingSaveData(cleanedData, function(err) {
 					if (err) {
 						return monster.ui.toast({
 							type: 'warning',
@@ -749,6 +747,103 @@ define(function(require) {
 			});
 
 			$(template).find('.office-hours-wrapper').append(listingTemplate);
+		},
+
+		usersCleanUserData: function(userData) {
+			var self = this,
+				userData = $.extend(true, {}, userData),
+				fullName = monster.util.getUserFullName(userData),
+				defaultCallerIdName = fullName.substring(0, 15),
+				newCallerIDs = {
+					caller_id: {
+						internal: {
+							name: defaultCallerIdName
+						}
+					}
+				};
+
+			userData = $.extend(true, userData, newCallerIDs);
+			/* If the user has been removed from the directory */
+			if (userData.extra) {
+				if (userData.extra.includeInDirectory === false) {
+					if ('directories' in userData && userData.extra.mainDirectoryId && userData.extra.mainDirectoryId in userData.directories) {
+						delete userData.directories[userData.extra.mainDirectoryId];
+					}
+				} else {
+					userData.directories = userData.directories || {};
+
+					if (userData.extra.mainCallflowId) {
+						userData.directories[userData.extra.mainDirectoryId] = userData.extra.mainCallflowId;
+					}
+				}
+
+				if ('differentEmail' in userData.extra && userData.extra.differentEmail) {
+					if ('email' in userData.extra) {
+						userData.email = userData.extra.email;
+					}
+				} else {
+					userData.email = userData.username;
+				}
+
+				if ('language' in userData.extra) {
+					if (userData.extra.language !== 'auto') {
+						userData.language = userData.extra.language;
+					} else {
+						delete userData.language;
+					}
+				}
+
+				/**
+				 * When updating the user type, override existing one with new
+				 * user type selected.
+				 * Once set the `service` prop should not be removed by the UI.
+				 *
+				 */
+				if (userData.extra.hasOwnProperty('licensedRole')) {
+					userData.service = {
+						plans: {}
+					};
+					userData.service.plans[userData.extra.licensedRole] = {
+						account_id: monster.config.resellerId,
+						overrides: {}
+					};
+				}
+			}
+
+			// if presence_id doesn't have a proper value, delete it and remove the internal callerId
+			if (!userData.hasOwnProperty('presence_id') || userData.presence_id === 'unset' || !userData.presence_id) {
+				delete userData.presence_id;
+
+				if (userData.caller_id.hasOwnProperty('internal')) {
+					delete userData.caller_id.internal.number;
+				}
+			} else {
+				// Always set the Internal Caller-ID Number to the Main Extension/Presence ID
+				userData.caller_id.internal.number = userData.presence_id + '';
+			}
+
+			if (userData.hasOwnProperty('caller_id_options') && userData.caller_id_options.hasOwnProperty('outbound_privacy') && userData.caller_id_options.outbound_privacy === 'default') {
+				delete userData.caller_id_options.outbound_privacy;
+
+				if (_.isEmpty(userData.caller_id_options)) {
+					delete userData.caller_id_options;
+				}
+			}
+
+			if (userData.timezone === 'inherit') {
+				delete userData.timezone;
+			}
+
+			_.set(userData, 'myaccount.showfirstUseWalkthrough', false);
+			_.set(userData, 'voip.showDashboardWalkthrough', false);
+
+			delete userData.include_directory;
+			delete userData.features;
+			delete userData.extra;
+			delete userData[''];
+			delete userData.confirm_password;
+
+			return userData;
 		}
 	};
 });
