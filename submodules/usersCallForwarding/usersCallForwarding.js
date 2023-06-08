@@ -189,7 +189,13 @@ define(function(require) {
 				simpleStrategyContainers.push(complexStrategyContainer[0]);
 
 				_.forEach(simpleStrategyContainers, function(div) {
-					if (div.outerHTML.includes(dataStrategyString)) {
+					if (div.outerHTML.includes(dataStrategyString) && !_.has(data.user, ['call_forward', strategy])) {
+						$template.find(div).removeClass('disabled');
+						$(div).find('.radio-state[value="voicemail"]').prop('checked', true);
+						$(div).find('.options').addClass('disabled');
+						$(div).find('.simple-control-group.phone-number').addClass('disabled');
+						$(div).find('.simple-control-group.voicemail').removeClass('disabled');
+					} else if (div.outerHTML.includes(dataStrategyString) && _.has(data.user, ['call_forward', strategy])) {
 						$template.find(div).removeClass('disabled');
 					} else {
 						$template.find(div).addClass('disabled');
@@ -199,35 +205,30 @@ define(function(require) {
 
 			$template.on('change', '.radio-state', function() {
 				var self = this,
-					strategy = self.name.split('.')[0],
-					options = $template.find('.option[strategy=' + strategy + ']');
+					strategy = self.name.split('.')[0];
 
 				if (self.checked && self.defaultValue === 'phoneNumber') {
 					$(this).closest('.phone-number-wrapper').siblings().find('.simple-control-group.voicemail').addClass('disabled').find('input').prop('checked', false);
 					$(this).closest('.phone-number-wrapper').find('.simple-control-group.phone-number').removeClass('disabled').find('input').prop('checked', true);
 
-					_.each(options, function(div) {
-						$template.find(div).removeClass('disabled').find('input');
-					});
+					$(this).closest('.phone-number-wrapper').siblings('.options').removeClass('disabled');
 
 					if (strategy === 'selective') {
 						$(this).closest('.phone-number-wrapper').find('.selective-control-group.phone-number').removeClass('disabled');
 						$(this).closest('.phone-number-wrapper').siblings().find('.selective-control-group.voicemail').addClass('disabled');
+						$(this).closest('.test-append').siblings('.options').removeClass('disabled');
 					}
 				}
 
 				if (self.checked && self.defaultValue === 'voicemail') {
 					$(this).closest('.voicemail-wrapper').find('.simple-control-group.voicemail').removeClass('disabled').find('input').prop('checked', true);
 					$(this).closest('.voicemail-wrapper').siblings().find('.simple-control-group.phone-number').addClass('disabled').find('input').prop('checked', false);
-					_.each(options, function(div) {
-						if (div.children[0].innerText !== 'Forward direct calls only') {
-							$template.find(div).addClass('disabled').find('input');
-						}
-					});
+					$(this).closest('.voicemail-wrapper').siblings('.options').addClass('disabled');
 
 					if (strategy === 'selective') {
 						$(this).closest('.voicemail-wrapper').find('.selective-control-group.voicemail').removeClass('disabled');
 						$(this).closest('.voicemail-wrapper').siblings().find('.selective-control-group.phone-number').addClass('disabled');
+						$(this).closest('.test-append').siblings('.options').addClass('disabled');
 					}
 				}
 
