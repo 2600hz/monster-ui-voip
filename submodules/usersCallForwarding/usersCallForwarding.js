@@ -835,8 +835,9 @@ define(function(require) {
 				delete userData.timezone;
 			}
 
-			_.set(userData, 'myaccount.showfirstUseWalkthrough', false);
-			_.set(userData, 'voip.showDashboardWalkthrough', false);
+			_.set(userData, 'ui_help.myaccount.showfirstUseWalkthrough', false);
+			_.set(userData, 'ui_help.voip.showDashboardWalkthrough', false);
+			_.set(userData, 'ui_help.voip.showUsersWalkthrough', false);
 
 			delete userData.include_directory;
 			delete userData.features;
