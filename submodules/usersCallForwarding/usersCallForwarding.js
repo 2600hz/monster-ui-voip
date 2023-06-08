@@ -6,34 +6,30 @@ define(function(require) {
 		usersCallForwardingRender: function(user) {
 			var self = this,
 				getData = _.bind(self.usersCallForwardingGetData, self),
-				formatData = _.bind(self.usersCallForwardingFormatData, self),
 				bindEvents = _.bind(self.usersCallForwardingBindingEvents, self),
 				initTemplate = function(data) {
-					var isCallForwardVmEnabled = _.get(user, 'call_forward_vm.unconditional.enabled', false)
-												|| _.get(user, 'call_forward_vm.busy.enabled', false)
-												|| _.get(user, 'call_forward_vm.no_answer.enabled', false)
-												|| _.get(user, 'call_forward_vm.selective.enabled', false),
-						isCallForwardEnabled = _.get(user, 'call_forward.unconditional.enabled', false)
-												|| _.get(user, 'call_forward.busy.enabled', false)
-												|| _.get(user, 'call_forward.no_answer.enabled', false)
-												|| _.get(user, 'call_forward.selective.enabled', false),
+					var isCallForwardVmEnabled = _.get(user, 'smartpbx.call_forwarding.enabled', false),
+						isCallForwardEnabled = _.has(user, 'call_forward'),
+						isUnconditionalVmEnabled = !isCallForwardEnabled && _.has(user, 'smartpbx.call_forwarding.unconditional') && isCallForwardVmEnabled,
+						isBusyVmEnabled = !isCallForwardEnabled && _.has(user, 'smartpbx.call_forwarding.busy') && isCallForwardVmEnabled,
+						isNoAnswerVmEnabled = !isCallForwardEnabled && _.has(user, 'smartpbx.call_forwarding.no_answer') && isCallForwardVmEnabled,
+						isSelectiveVmEnabled = !isCallForwardEnabled && _.has(user, 'smartpbx.call_forwarding.selective') && isCallForwardVmEnabled,
 						layoutTemplate = $(self.getTemplate({
 							name: 'layout',
 							data: {
-								data: formatData(data),
+								data: data,
 								enabled: isCallForwardEnabled || isCallForwardVmEnabled,
-								isUnconditionalEnabled: _.get(user, 'call_forward.unconditional.enabled', false) || _.get(user, 'call_forward_vm.unconditional.enabled', false),
-								isBusyEnabled: _.get(user, 'call_forward.busy.enabled', false) || _.get(user, 'call_forward_vm.busy.enabled', false),
-								isNoAnswerEnabled: _.get(user, 'call_forward.no_answer.enabled', false) || _.get(user, 'call_forward_vm.no_answer.enabled', false),
-								isSelectiveEnabled: _.get(user, 'call_forward.selective.enabled', false) || _.get(user, 'call_forward_vm.selective.enabled', false)
+								isUnconditionalEnabled: _.get(user, 'call_forward.unconditional.enabled', false) || isUnconditionalVmEnabled,
+								isBusyEnabled: _.get(user, 'call_forward.busy.enabled', false) || isBusyVmEnabled,
+								isNoAnswerEnabled: _.get(user, 'call_forward.no_answer.enabled', false) || isNoAnswerVmEnabled,
+								isSelectiveEnabled: _.get(user, 'call_forward.selective.enabled', false) || isSelectiveVmEnabled
 							},
 							submodule: 'usersCallForwarding'
 						}));
 
 					layoutTemplate.find('.feature-popup-title').each(function() {
 						var strategy = $(this).data('template'),
-							hasVmBox = _.has(user, 'call_forward_vm'),
-							hasPhoneNumber = _.has(user, 'call_forward'),
+							hasVmBox = _.get(user, 'smartpbx.call_forwarding.enabled') && !_.has(user, 'call_forward'),
 							isKeepCallerIdEnabled = _.get(user, ['call_forward', strategy, 'keep_caller_id'], false),
 							isDirectCallsOnlyEnabled = _.get(user, ['call_forward', strategy, 'direct_calls_only'], false) || _.get(user, ['call_forward_vm', strategy, 'direct_calls_only'], false),
 							isRequireKeypressEnabled = _.get(user, ['call_forward', strategy, 'require_keypress'], false),
@@ -50,7 +46,7 @@ define(function(require) {
 									direct_calls_only: isDirectCallsOnlyEnabled,
 									require_keypress: isRequireKeypressEnabled,
 									ignore_early_media: isIgnoreEarlyMediaEnabled,
-									type: hasVmBox ? 'voicemail' : hasPhoneNumber && isCallForwardEnabled ? 'phoneNumber' : 'voicemail',
+									type: hasVmBox ? 'voicemail' : isCallForwardEnabled ? 'phoneNumber' : 'voicemail',
 									voicemails: data.voicemails,
 									selectedVoicemailId: _.get(user, 'ui_help.voicemail_id', data.voicemails[0]),
 									user: user
@@ -70,7 +66,7 @@ define(function(require) {
 										direct_calls_only: isDirectCallsOnlyEnabled,
 										require_keypress: isRequireKeypressEnabled,
 										ignore_early_media: isIgnoreEarlyMediaEnabled,
-										type: hasVmBox ? 'voicemail' : hasPhoneNumber && isCallForwardEnabled ? 'phoneNumber' : 'voicemail',
+										type: hasVmBox ? 'voicemail' : isCallForwardEnabled ? 'phoneNumber' : 'voicemail',
 										voicemails: data.voicemails,
 										selectedVoicemailId: _.get(user, 'ui_help.voicemail_id', data.voicemails[0]),
 										rules: _.get(data, 'match_list_cf.rules'),
@@ -94,7 +90,7 @@ define(function(require) {
 			monster.waterfall([
 				getData
 			], function(err, voicemails) {
-				var userVoicemails = _.filter(voicemails, function(vmbox) { return vmbox.owner_id === user.id}),
+				var userVoicemails = _.filter(voicemails, function(vmbox) { return vmbox.owner_id === user.id }),
 					data = {
 						voicemails: userVoicemails,
 						user: user
@@ -119,9 +115,7 @@ define(function(require) {
 						});
 					},
 					function(matchList, waterfallCallback) {
-						var newData = _.merge(data, {
-								match_list_cf: matchList
-							}),
+						var newData = _.set(data, 'match_list_cf', matchList),
 							$template = initTemplate(newData);
 
 						bindEvents($template, newData);
@@ -283,16 +277,12 @@ define(function(require) {
 
 			$template.on('click', '.add-rule', function() {
 				var user = data.user,
-					hasVmBox = _.has(user, 'call_forward_vm'),
-					hasPhoneNumber = _.has(user, 'call_forward'),
-					count = $template.find('.complex-strategy-header').length;
-
-				if (count < 3) {
-					var ruleTemplate = $(self.getTemplate({
+					count = $template.find('.complex-strategy-header').length,
+					ruleTemplate = $(self.getTemplate({
 						name: 'rule',
 						data: {
 							number: _.get(user, 'call_forward.selective.number', ''),
-							type: hasVmBox ? 'voicemail' : hasPhoneNumber ? 'phoneNumber' : 'voicemail',
+							type: 'voicemail',
 							voicemails: data.voicemails,
 							selectedVoicemailId: _.get(user, 'ui_help.voicemail_id', data.voicemails[0]),
 							index: count
@@ -300,9 +290,8 @@ define(function(require) {
 						submodule: 'usersCallForwarding'
 					}));
 
-					$template.find('.test-append').append(ruleTemplate);
-					self.renderRulesListingTemplate(self, ruleTemplate, count);
-				}
+				$template.find('.test-append').append(ruleTemplate);
+				self.renderRulesListingTemplate(self, ruleTemplate, count);
 			});
 
 			$template.on('click', '.remove-rule-button', function() {
