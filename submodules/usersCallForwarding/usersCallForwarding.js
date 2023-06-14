@@ -48,7 +48,7 @@ define(function(require) {
 									ignore_early_media: isIgnoreEarlyMediaEnabled,
 									type: hasVmBox ? 'voicemail' : isCallForwardEnabled ? 'phoneNumber' : 'voicemail',
 									voicemails: data.voicemails,
-									selectedVoicemailId: _.get(user, 'ui_help.voicemail_id', data.voicemails[0]),
+									selectedVoicemailId: _.get(user, ['smartpbx', 'call_forwarding', strategy, 'voicemail'], data.voicemails[0]),
 									user: user
 								},
 								submodule: 'usersCallForwarding'
@@ -68,7 +68,7 @@ define(function(require) {
 										ignore_early_media: isIgnoreEarlyMediaEnabled,
 										type: hasVmBox ? 'voicemail' : isCallForwardEnabled ? 'phoneNumber' : 'voicemail',
 										voicemails: data.voicemails,
-										selectedVoicemailId: _.get(user, 'ui_help.voicemail_id', data.voicemails[0]),
+										selectedVoicemailId: _.get(user, ['smartpbx', 'call_forwarding', strategy, 'voicemail'], data.voicemails[0]),
 										rules: _.get(data, 'match_list_cf.rules'),
 										user: user
 									},
@@ -276,14 +276,16 @@ define(function(require) {
 
 			$template.on('click', '.add-rule', function() {
 				var user = data.user,
+					hasVmBox = _.get(user, 'smartpbx.call_forwarding.enabled', false),
+					hasPhoneNumber = _.has(user, 'call_forward'),
 					count = $template.find('.complex-strategy-header').length,
 					ruleTemplate = $(self.getTemplate({
 						name: 'rule',
 						data: {
 							number: _.get(user, 'call_forward.selective.number', ''),
-							type: 'voicemail',
+							type: hasVmBox ? 'voicemail' : hasPhoneNumber ? 'phoneNumber' : 'voicemail',
 							voicemails: data.voicemails,
-							selectedVoicemailId: _.get(user, 'ui_help.voicemail_id', data.voicemails[0]),
+							selectedVoicemailId: _.get(user, 'smartpbx.call_forward.selective.voicemail', data.voicemails[0]),
 							index: count
 						},
 						submodule: 'usersCallForwarding'
@@ -308,15 +310,16 @@ define(function(require) {
 				formData = monster.ui.getFormData('call_forward_form'),
 				callForwardStrategy = formData.call_forwarding_strategy,
 				callForwardData = formData[callForwardStrategy],
-				hasMatchList = _.has(user, 'call_forward.selective.rules');
-
-			if (callForwardStrategy === 'off') {
-				_.set(user, 'call_forward', {
-					enabled: false
-				});
-			};
+				hasMatchList = _.has(user, 'call_forward.selective.rules'),
+				defaultVoicemail = _.get(user, ['smartpbx', 'call_forwarding', 'default'], data.voicemails[0].id),
+				voicemail = callForwardStrategy === 'off' ? defaultVoicemail : _.get(callForwardData, 'voicemail.value', defaultVoicemail),
+				isSkipToVoicemailEnabled = callForwardStrategy === 'off' || callForwardData.type === 'phoneNumber'? false : true;
 
 			if (callForwardData && callForwardData.type === 'phoneNumber') {
+				if (callForwardStrategy !== 'selective') {
+					self.userUpdateCallflow(user, defaultVoicemail, isSkipToVoicemailEnabled);
+				}
+				
 				_.set(user, 'call_forward', {
 					[callForwardStrategy]: {
 						enabled: true,
@@ -336,27 +339,20 @@ define(function(require) {
 				_.set(user, 'smartpbx.call_forwarding', {
 					enabled: callForwardStrategy !== 'off',
 					[callForwardStrategy]: {
-						voicemail: _.get(callForwardData, 'voicemail.value', data.voicemails[0].id)
+						voicemail: voicemail
 					},
 					default: data.voicemails[0].id
 				});
 
-				_.set(user, 'ui_help', {
-					voicemail_id: _.get(callForwardData, 'voicemail.value', data.voicemails[0].id)
-				});
+				if (callForwardStrategy === 'off') {
+					_.set(user, 'call_forward', {
+						enabled: false
+					});
+				}
+				self.userUpdateCallflow(user, voicemail, isSkipToVoicemailEnabled);
 
 				delete user.call_forward;
 			};
-
-			if (callForwardStrategy === 'selective' && callForwardData.type === 'phoneNumber') {
-				_.set(user, 'call_forward.selective', {
-					rules: hasMatchList ? _.get(user, 'call_forward.selective.rules') : []
-				});
-			};
-
-			if (callForwardStrategy !== 'off' && callForwardStrategy !== 'selective') {
-				self.userUpdateCallflow(user, callForwardData, callForwardData.type);
-			}
 
 			return user;
 		},
@@ -393,29 +389,7 @@ define(function(require) {
 			});
 		},
 
-		skipToVoicemail: function(callflow, enabled, callback) {
-			var self = this;
-
-			self.callApi({
-				resource: 'callflow.patch',
-				data: {
-					accountId: self.accountId,
-					callflowId: callflow.id,
-					data: {
-						flow: {
-							data: {
-								skip_module: enabled
-							}
-						}
-					}
-				},
-				success: function(callflowData) {
-					callback && callback(callflowData.data);
-				}
-			});
-		},
-
-		updateVoicemail: function(callflow, voicemailId, callback) {
+		updateVoicemail: function(callflow, voicemailId, enabled, callback) {
 			var self = this;
 
 			self.callApi({
@@ -431,6 +405,9 @@ define(function(require) {
 										id: voicemailId
 									}
 								}
+							},
+							data: {
+								skip_module: enabled
 							}
 						}
 					}
@@ -456,11 +433,10 @@ define(function(require) {
 			});
 		},
 
-		userUpdateCallflow: function(user, data, selectedType) {
+		userUpdateCallflow: function(user, voicemailId, enabled) {
 			var self = this,
 				userId = user.id,
-				callback = user.callback,
-				voicemailId = data.voicemail.value;
+				callback = user.callback;
 
 			monster.waterfall([
 				function(waterfallCallback) {
@@ -474,21 +450,8 @@ define(function(require) {
 					});
 				},
 				function(callflow, waterfallCallback) {
-					var flow = callflow.flow.data.skip_module,
-						enabled = selectedType === 'voicemail',
-						currentUserVoicemail = callflow.flow.children._.data.id;
-
-					if (enabled !== flow) {
-						// Skip to voicemail if voicemail is selected
-						self.skipToVoicemail(callflow, enabled);
-					}
-					if (enabled && voicemailId !== currentUserVoicemail) {
-						// Modify current voicemailId
-						self.updateVoicemail(callflow, voicemailId);
-					} else {
-						// Module does not exist in callflow, but should, so err
-						waterfallCallback(true);
-					}
+					self.updateVoicemail(callflow, voicemailId, enabled);
+					waterfallCallback(true);
 				}
 			], callback);
 		},
@@ -631,13 +594,13 @@ define(function(require) {
 			});
 		},
 
-		createUserTemporalRule: function(accountId, callback) {
+		createUserTemporalRule: function(data, callback) {
 			var self = this;
 
 			self.callApi({
 				resource: 'temporalRules.create',
 				data: {
-					accountId: accountId,
+					accountId: self.accountId,
 					data: data
 				},
 				success: function(temporalRuleData) {
