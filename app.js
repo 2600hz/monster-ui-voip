@@ -36,17 +36,7 @@ define(function(require) {
 		},
 
 		requests: {},
-		subscribe: {
-			'voip.tab.myOffice': 'myOfficeRender',
-			'voip.tab.numbers': 'numbersRender',
-			'voip.tab.users': 'usersRender',
-			'voip.tab.groups': 'groupsRender',
-			'voip.tab.strategy': 'strategyRender',
-			'voip.tab.callLogs': 'callLogsRender',
-			'voip.tab.devices': 'devicesRender',
-			'voip.tab.vmboxes': 'vmboxesRender',
-			'voip.tab.featureCodes': 'featureCodesRender'
-		},
+		subscribe: {},
 		appFlags: {
 			common: {
 				hasProvisioner: false,
@@ -180,6 +170,12 @@ define(function(require) {
 				// Empty the main container and then render the submodule content
 				container.empty();
 				monster.pub('voip.' + id + '.render', args);
+			});
+
+			monster.sub('core.crossSiteMessage', function(topic) {
+				var crossSiteMessageTopic = topic.replace('.tab', '') + '.render';
+
+				monster.pub(crossSiteMessageTopic);
 			});
 		},
 
