@@ -1288,6 +1288,21 @@ define(function(require) {
 
 			regexArr.push(')$');
 			return regexArr.join('');
+		},
+
+		regexToArray: function(regexString) {
+			var result = [];
+			if (regexString && regexString !== '^()$' && regexString !== '^+1d{10}$') {
+				var groups = regexString.match(/\(([^)]+)\)/g);
+				for (var i = 0; i < groups.length; i++) {
+					var group = groups[i];
+					var numbers = group.slice(1, -1).split('|');
+
+					result = result.concat(numbers);
+				}
+			}
+
+			return result;
 		}
 	};
 });
