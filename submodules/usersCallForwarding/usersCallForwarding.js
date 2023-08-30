@@ -1303,6 +1303,27 @@ define(function(require) {
 			}
 
 			return result;
+		},
+
+		formatRulesData: function(rules) { //here
+			var self = this,
+				rulesArray = [];
+
+			_.forEach(rules, function(rule, index) {
+				if (rule.type !== 'voicemail') {
+					var data = {
+						from: 'rule-' + rule.length + rule.phoneNumber,
+						type: rule.length === 'always' ? 'regex' : 'temporal_route',
+						target: rule.phoneNumber,
+						regex: rule.from === 'specific ' && self.regexToArray(rule.phoneNumbers),
+						intervals: self.transformIntervals(rule.intervals)
+					};
+
+					rulesArray.push(data);
+				}
+			});
+
+			return rulesArray;
 		}
 	};
 });
