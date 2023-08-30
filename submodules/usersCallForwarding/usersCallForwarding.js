@@ -1384,6 +1384,101 @@ define(function(require) {
 			}
 
 			return result;
+		},
+
+		transforFlowIntoRules: function(data, callback) {
+			var self = this;
+
+			self.getUserCallflow(data.user.id, function(flow) {
+				var voicemailRules = [];
+				if (_.get(flow.flow, 'module') === 'check_cid') {
+					if (_.get(flow.flow, 'children.match.module') === 'temporal_route') {
+						voicemailRules.push({
+							from: 'specific',
+							type: 'voicemail',
+							duration: 'custom',
+							voicemails: data.voicemails,
+							selectedVoicemailId: _.get(data.user, ['smartpbx', 'call_forwarding', 'selective', 'voicemail'], data.voicemails[0]),
+							number: _.get(data.user, ['call_forward', 'selective', 'number'], ''),
+							regex: _.get(flow.flow, 'data.regex'),
+							temporal_route_id: _.remove(_.keys(flow.flow.children.match.children), function(key) { return key !== '_'; })
+						});
+
+						if (_.get(flow.flow, 'children.nomatch.module') === 'check_cid') {
+							voicemailRules.push({
+								from: 'specific',
+								type: 'voicemail',
+								duration: 'always',
+								voicemails: data.voicemails,
+								selectedVoicemailId: _.get(data.user, ['smartpbx', 'call_forwarding', 'selective', 'voicemail'], data.voicemails[0]),
+								number: _.get(data.user, ['call_forward', 'selective', 'number'], ''),
+								regex: _.get(flow.flow, 'children.nomatch.data.regex')
+							});
+
+							if (_.get(flow.flow, 'children.nomatch.children.nomatch.module') === 'temporal_route') {
+								voicemailRules.push({
+									from: 'allNumbers',
+									type: 'voicemail',
+									duration: 'custom',
+									voicemails: data.voicemails,
+									selectedVoicemailId: _.get(data.user, ['smartpbx', 'call_forwarding', 'selective', 'voicemail'], data.voicemails[0]),
+									number: _.get(data.user, ['call_forward', 'selective', 'number'], ''),
+									regex: '^+1d{10}$',
+									temporal_route_id: _.remove(_.keys(flow.flow.children.nomatch.children.nomatch.children), function(key) { return key !== '_'; })
+								});
+							}
+						} else if (_.get(flow.flow, 'children.nomatch.module') === 'temporal_route') {
+							voicemailRules.push({
+								from: 'allNumbers',
+								type: 'voicemail',
+								duration: 'custom',
+								voicemails: data.voicemails,
+								selectedVoicemailId: _.get(data.user, ['smartpbx', 'call_forwarding', 'selective', 'voicemail'], data.voicemails[0]),
+								number: _.get(data.user, ['call_forward', 'selective', 'number'], ''),
+								regex: '^+1d{10}$',
+								temporal_route_id: _.remove(_.keys(flow.flow.children.nomatch.children), function(key) { return key !== '_'; })
+							});
+						}
+					} else if (_.get(flow.flow, 'children.match.module') === 'voicemail') {
+						voicemailRules.push({
+							from: 'specific',
+							type: 'voicemail',
+							duration: 'always',
+							voicemails: data.voicemails,
+							selectedVoicemailId: _.get(data.user, ['smartpbx', 'call_forwarding', 'selective', 'voicemail'], data.voicemails[0]),
+							number: _.get(data.user, ['call_forward', 'selective', 'number'], ''),
+							regex: _.get(flow.flow, 'data.regex'),
+							temporal_route_id: _.remove(_.keys(flow.flow.children.match.children), function(key) { return key !== '_'; })
+						});
+
+						if (_.get(flow.flow, 'children.nomatch.module') === 'temporal_route') {
+							voicemailRules.push({
+								from: 'allNumbers',
+								type: 'voicemail',
+								duration: 'custom',
+								voicemails: data.voicemails,
+								selectedVoicemailId: _.get(data.user, ['smartpbx', 'call_forwarding', 'selective', 'voicemail'], data.voicemails[0]),
+								number: _.get(data.user, ['call_forward', 'selective', 'number'], ''),
+								regex: '^+1d{10}$',
+								temporal_route_id: _.remove(_.keys(flow.flow.children.nomatch.children), function(key) { return key !== '_'; })
+							});
+						}
+					}
+				} else if (_.get(flow.flow, 'module') === 'temporal_route') {
+					voicemailRules.push({
+						from: 'allNumbers',
+						type: 'voicemail',
+						duration: 'custom',
+						voicemails: data.voicemails,
+						selectedVoicemailId: _.get(data.user, ['smartpbx', 'call_forwarding', 'selective', 'voicemail'], data.voicemails[0]),
+						number: _.get(data.user, ['call_forward', 'selective', 'number'], ''),
+						regex: '^+1d{10}$',
+						temporal_route_id: _.remove(_.keys(flow.flow.children), function(key) { return key !== '_'; })
+					});
+				}
+
+				callback(voicemailRules);
+			});
 		}
 	};
 });
