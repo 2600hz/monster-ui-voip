@@ -455,31 +455,289 @@ define(function(require) {
 						keep_caller_id: _.includes(callForwardData.isEnabled, 'keep'),
 						direct_calls_only: _.includes(callForwardData.isEnabled, 'forward'),
 						require_keypress: _.includes(callForwardData.isEnabled, 'acknowledge'),
-						ignore_early_media: _.includes(callForwardData.isEnabled, 'ring'),
-						substitute: false
+						ignore_early_media: _.includes(callForwardData.isEnabled, 'ring')
 					}
 				});
 
 				_.set(user, 'smartpbx.call_forwarding', {
 					enabled: true
 				});
-			} else {
+			}
+
+			if ((callForwardData && callForwardData.type === 'voicemail') || callForwardStrategy === 'off') {
 				_.set(user, 'smartpbx.call_forwarding', {
 					enabled: callForwardStrategy !== 'off',
 					[callForwardStrategy]: {
 						voicemail: voicemail
 					},
-					default: data.voicemails[0].id
+					'default': data.voicemails[0].id
 				});
 
 				if (callForwardStrategy === 'off') {
 					_.set(user, 'call_forward', {
 						enabled: false
 					});
-				}
-				self.userUpdateCallflow(user, voicemail, isSkipToVoicemailEnabled);
+				};
 
 				delete user.call_forward;
+			}
+
+			// Logic for selective strategy
+			if (callForwardStrategy === 'selective') {
+				var filterAlwaysRules = _.remove(callForwardData.rule, function(rule) {
+						if (rule.from === 'allNumbers' && rule.type === 'voicemail' && rule.length === 'always') {
+							return rule;
+						}
+					}),
+					voicemailRules = _.filter(callForwardData.rule, function(rule) {
+						if (rule.type === 'voicemail') {
+							return rule;
+						}
+					}),
+					phoneNumberRules = _.filter(callForwardData.rule, function(rule) {
+						if (rule.type === 'phoneNumber') {
+							return rule;
+						}
+					}),
+					standardFlow = self.buildStandardFlow(user, voicemail),
+					temporalRouteFlow = self.buildTemporalRoutesFlow(),
+					specificFlow = self.buildSpecificFlow(voicemail),
+					specificCustomFlow = self.buildSpecificCustomFlow(),
+					newFlow = {};
+
+				_.set(user, 'call_forward', {
+					selective: {
+						enabled: true,
+						number: _.get(phoneNumberRules[0], 'phoneNumber', ''),
+						keep_caller_id: _.includes(callForwardData.isEnabled, 'keep'),
+						direct_calls_only: _.includes(callForwardData.isEnabled, 'forward'),
+						require_keypress: _.includes(callForwardData.isEnabled, 'acknowledge'),
+						ignore_early_media: _.includes(callForwardData.isEnabled, 'ring'),
+						rules: []
+					}
+				});
+
+				_.set(user, 'smartpbx.call_forwarding', {
+					enabled: true,
+					selective: {
+						voicemail: _.get(voicemailRules[0], 'voicemail.value', defaultVoicemail)
+					},
+					'default': data.voicemails[0].id
+				});
+
+				if (filterAlwaysRules.length <= 0) {
+					_.set(standardFlow.data.skip_module, false);
+				};
+
+				if (_.isEmpty(voicemailRules)) {
+					_.set(standardFlow.data.skip_module, false);
+					self.resetUserCallFlow(user, standardFlow);
+				};
+
+				if (_.isEmpty(phoneNumberRules)) {
+					monster.waterfall([
+						function(waterfallCallback) {
+							self.getMatchList(function(matchList) {
+								var userMatchList = _.filter(matchList, function(list) {
+									return list.owner_id === user.id;
+								});
+
+								waterfallCallback(null, userMatchList);
+							});
+						},
+						function(userMatchList, waterfallCallback) {
+							self.deleteOldMatchLists(userMatchList);
+							waterfallCallback(null, null);
+						},
+						function(empty, waterfallCallback) {
+							self.createUserDefaultMatchList(user.id);
+							waterfallCallback(true);
+						}
+					]);
+				};
+
+				//Phonenumber Rules Logic
+				if (phoneNumberRules.length > 0) {
+					var standardPhoneNumberRules = _.filter(phoneNumberRules, function(rule) {
+							if (rule.from === 'allNumbers' && rule.length === 'always') {
+								return rule;
+							}
+						}),
+						customPhoneNumberRules = _.filter(phoneNumberRules, function(rule) {
+							if (rule.from === 'allNumbers' && rule.length === 'custom') {
+								return rule;
+							}
+						}),
+						specificPhoneNumberRules = _.filter(phoneNumberRules, function(rule) {
+							if (rule.from === 'specific' && rule.length === 'always') {
+								return rule;
+							}
+						}),
+						specificCustomPhoneNumberRules = _.filter(phoneNumberRules, function(rule) {
+							if (rule.from === 'specific' && rule.length === 'custom') {
+								return rule;
+							}
+						}),
+						customPhoneNumberRulesIntervals,
+						specificCustomPhoneNumberRulesIntervals,
+						standardMatchlist = {},
+						customPhoneNumberMatchList = {},
+						specificPhoneNumberMatchList = {},
+						specificCustomPhoneNumberMatchList = {};
+
+					monster.waterfall([
+						function(waterfallCallback) {
+							self.getMatchList(function(matchList) {
+								var userMatchList = _.filter(matchList, function(list) {
+									return list.owner_id === user.id;
+								});
+
+								waterfallCallback(null, userMatchList);
+							});
+						},
+						function(userMatchList, waterfallCallback) {
+							self.deleteOldMatchLists(userMatchList);
+							waterfallCallback(null, null);
+						},
+						function(userMatchList, waterfallCallback) {
+							if (standardPhoneNumberRules.length > 0) {
+								standardMatchlist = self.buildMatchList(user, 'allNumbers', standardPhoneNumberRules, 'standard match list');
+								self.createUserMatchList(standardMatchlist);
+							};
+							waterfallCallback(null, null);
+						},
+						function(userMatchList, waterfallCallback) {
+							if (customPhoneNumberRules.length > 0) {
+								customPhoneNumberMatchList = self.buildMatchList(user, 'allNumbers', customPhoneNumberRules, 'custom match list');
+								customPhoneNumberRulesIntervals = self.transformIntervalsToRoutes(customPhoneNumberRules);
+								self.generateTemporalRoutesForPhoneNumbers(user, customPhoneNumberRulesIntervals, customPhoneNumberMatchList, [], customPhoneNumberRules[0].phoneNumber, 'custom match list');
+							};
+							waterfallCallback(null, null);
+						},
+						function(userMatchList, waterfallCallback) {
+							if (specificPhoneNumberRules.length > 0) {
+								specificPhoneNumberMatchList = self.buildMatchList(user, 'specific', specificPhoneNumberRules, 'specific match list');
+								self.createUserMatchList(specificPhoneNumberMatchList);
+							};
+							waterfallCallback(null, null);
+						},
+						function(userMatchList, waterfallCallback) {
+							if (specificCustomPhoneNumberRules.length > 0) {
+								specificCustomPhoneNumberMatchList = self.buildMatchList(user, 'specific', specificCustomPhoneNumberRules, 'specific-custom match list');
+								specificCustomPhoneNumberRulesIntervals = self.transformIntervalsToRoutes(specificCustomPhoneNumberRules);
+								self.generateTemporalRoutesForPhoneNumbers(user, specificCustomPhoneNumberRulesIntervals, specificCustomPhoneNumberMatchList, [], specificCustomPhoneNumberRules[0].phoneNumber, 'specific-custom match list');
+							};
+							waterfallCallback(true);
+						}
+					], callback);
+				};
+
+				// Voicemail Flows Logic
+				if (voicemailRules.length > 0) {
+					var customRules = _.filter(voicemailRules, function(rule) {
+							if (rule.from === 'allNumbers' && rule.length === 'custom') {
+								return rule;
+							}
+						}),
+						specificRules = _.filter(voicemailRules, function(rule) {
+							if (rule.from === 'specific' && rule.length === 'always') {
+								return rule;
+							}
+						}),
+						specificCustomRules = _.filter(voicemailRules, function(rule) {
+							if (rule.from === 'specific' && rule.length === 'custom') {
+								return rule;
+							}
+						}),
+						specificCustomIntervals,
+						customRulesIntervals,
+						specificCustomNumbers,
+						specificRulesNumbers;
+
+					if (specificCustomRules.length > 0) {
+						specificCustomIntervals = self.transformIntervalsToRoutes(specificCustomRules);
+						specificCustomNumbers = self.transformPhonenumbersToRegex(specificCustomRules);
+
+						_.set(specificCustomFlow, 'data.regex', _.cloneDeep(specificCustomNumbers));
+						_.merge(newFlow, specificCustomFlow);
+						_.set(newFlow, 'children.match', _.cloneDeep(temporalRouteFlow));
+						_.set(newFlow, 'children.match.children._', _.cloneDeep(standardFlow));
+
+						if (specificRules.length > 0) {
+							specificRulesNumbers = self.transformPhonenumbersToRegex(specificRules);
+
+							_.set(specificFlow, 'data.regex', _.cloneDeep(specificRulesNumbers));
+							_.set(newFlow, 'children.nomatch', _.cloneDeep(specificFlow));
+
+							if (customRules.length > 0) {
+								customRulesIntervals = self.transformIntervalsToRoutes(customRules);
+
+								_.set(newFlow, 'children.nomatch.children.nomatch', _.cloneDeep(temporalRouteFlow));
+								_.set(newFlow, 'children.nomatch.children.nomatch.children._', _.cloneDeep(standardFlow));
+							} else {
+								_.set(newFlow, 'children.nomatch.children.nomatch', _.cloneDeep(standardFlow));
+							}
+						} else if (customRules.length > 0) {
+							customRulesIntervals = self.transformIntervalsToRoutes(customRules);
+
+							_.set(newFlow, 'children.nomatch', _.cloneDeep(temporalRouteFlow));
+							_.set(newFlow, 'children.nomatch.children._', _.cloneDeep(standardFlow));
+						} else {
+							_.set(newFlow, 'children.nomatch', _.cloneDeep(standardFlow));
+						}
+					} else if (specificRules.length > 0 && _.isEmpty(newFlow)) {
+						specificRulesNumbers = self.transformPhonenumbersToRegex(specificRules);
+
+						_.set(specificFlow, 'data.regex', _.cloneDeep(specificRulesNumbers));
+						_.merge(newFlow, specificFlow);
+
+						if (customRules.length > 0) {
+							customRulesIntervals = self.transformIntervalsToRoutes(customRules);
+
+							_.set(newFlow, 'children.nomatch', _.cloneDeep(temporalRouteFlow));
+							_.set(newFlow, 'children.nomatch.children._', _.cloneDeep(standardFlow));
+						} else {
+							_.set(newFlow, 'children.nomatch', _.cloneDeep(standardFlow));
+						}
+					} else if (customRules.length > 0 && _.isEmpty(newFlow)) {
+						customRulesIntervals = self.transformIntervalsToRoutes(customRules);
+
+						_.merge(newFlow, _.cloneDeep(temporalRouteFlow));
+						_.set(newFlow, 'children._', _.cloneDeep(standardFlow));
+					}
+
+					if (!_.isEmpty(specificCustomIntervals)) {
+						if (!_.isEmpty(specificRules)) {
+							if (!_.isEmpty(customRules)) {
+								self.generateTemporalRoutesForVoicemail(newFlow, user, specificCustomIntervals, [], 'children.match.children', voicemail, function(data) {
+									self.generateTemporalRoutesForVoicemail(data.flow, user, customRulesIntervals, [], 'children.nomatch.children.nomatch.children', voicemail, function(data) {
+									});
+								});
+							} else {
+								self.generateTemporalRoutesForVoicemail(newFlow, user, specificCustomIntervals, [], 'children.match.children', voicemail, function(data) {
+								});
+							}
+						} else if (!_.isEmpty(customRules)) {
+							self.generateTemporalRoutesForVoicemail(newFlow, user, specificCustomIntervals, [], 'children.match.children', voicemail, function(data) {
+								self.generateTemporalRoutesForVoicemail(data.flow, user, customRulesIntervals, [], 'children.nomatch.children', voicemail, function(data) {
+								});
+							});
+						} else {
+							self.generateTemporalRoutesForVoicemail(newFlow, user, specificCustomIntervals, [], 'children.match.children', voicemail, function(data) {
+							});
+						}
+					} else if (!_.isEmpty(specificRules)) {
+						if (!_.isEmpty(customRules)) {
+							self.generateTemporalRoutesForVoicemail(newFlow, user, customRulesIntervals, [], 'children.nomatch.children', voicemail, function(data) {
+							});
+						} else {
+							self.updateFlow(user, newFlow);
+						};
+					} else if (!_.isEmpty(customRules)) {
+						self.generateTemporalRoutesForVoicemail(newFlow, user, customRulesIntervals, [], 'children', voicemail, function(data) {
+						});
+					};
+				};
 			};
 
 			return user;
