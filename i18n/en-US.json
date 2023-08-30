@@ -661,7 +661,8 @@
 					},
 					"phoneNumber": {
 						"label": "Phone number",
-						"inputLabel": "Forward calls to"
+						"inputLabelTo": "Forward calls to",
+						"inputLabelFrom": "Forward calls from"
 					},
 					"length": {
 						"always": "Always",
