@@ -290,15 +290,18 @@ define(function(require) {
 				_.forEach(simpleStrategyContainers, function(div) {
 					if (div.outerHTML.includes(dataStrategyString) && !_.has(data.user, ['call_forward', strategy])) {
 						$template.find(div).removeClass('disabled');
-						$(div).find('.radio-state[value="voicemail"]').prop('checked', true);
 						$(div).find('.options').addClass('disabled');
 						$(div).find('.simple-control-group.phone-number').addClass('disabled');
 						$(div).find('.simple-control-group.voicemail').removeClass('disabled');
+						$(div).closest('.simple-strategy').find('input[value="voicemail"]').prop('checked', true);
+						if (strategy === 'selective') {
+							$(div).closest('.complex-strategy').find('input[value="voicemail"]').prop('checked', true);
+						};
 					} else if (div.outerHTML.includes(dataStrategyString) && _.has(data.user, ['call_forward', strategy])) {
 						$template.find(div).removeClass('disabled');
 					} else {
 						$template.find(div).addClass('disabled');
-					}
+					};
 				});
 			});
 
@@ -307,7 +310,7 @@ define(function(require) {
 					strategy = self.name.split('.')[0];
 
 				if (self.checked && self.defaultValue === 'phoneNumber') {
-					$(this).closest('.phone-number-wrapper').siblings().find('.simple-control-group.voicemail').addClass('disabled').find('input').prop('checked', false);
+					$(this).closest('.phone-number-wrapper').siblings().find('.simple-control-group.voicemail').addClass('disabled').find('input').prop('checked', true);
 					$(this).closest('.phone-number-wrapper').find('.simple-control-group.phone-number').removeClass('disabled').find('input').prop('checked', true);
 
 					$(this).closest('.phone-number-wrapper').siblings('.options').removeClass('disabled');
@@ -315,7 +318,7 @@ define(function(require) {
 					if (strategy === 'selective') {
 						$(this).closest('.phone-number-wrapper').find('.selective-control-group.phone-number').removeClass('disabled');
 						$(this).closest('.phone-number-wrapper').siblings().find('.selective-control-group.voicemail').addClass('disabled');
-						$(this).closest('.test-append').siblings('.options').removeClass('disabled');
+						$(this).closest('.append-phone-number').siblings('.options').removeClass('disabled');
 					}
 				}
 
@@ -327,7 +330,7 @@ define(function(require) {
 					if (strategy === 'selective') {
 						$(this).closest('.voicemail-wrapper').find('.selective-control-group.voicemail').removeClass('disabled');
 						$(this).closest('.voicemail-wrapper').siblings().find('.selective-control-group.phone-number').addClass('disabled');
-						$(this).closest('.test-append').siblings('.options').addClass('disabled');
+						$(this).closest('.append-phone-number').siblings('.options').addClass('disabled');
 					}
 				}
 
@@ -375,22 +378,22 @@ define(function(require) {
 
 			$template.on('click', '.add-rule', function() {
 				var user = data.user,
-					hasVmBox = _.get(user, 'smartpbx.call_forwarding.enabled', false),
-					hasPhoneNumber = _.has(user, 'call_forward'),
 					count = $template.find('.complex-strategy-header').length,
 					ruleTemplate = $(self.getTemplate({
 						name: 'rule',
 						data: {
-							number: _.get(user, 'call_forward.selective.number', ''),
-							type: hasVmBox ? 'voicemail' : hasPhoneNumber ? 'phoneNumber' : 'voicemail',
+							from: 'allNumbers',
+							type: 'voicemail',
+							duration: 'always',
 							voicemails: data.voicemails,
 							selectedVoicemailId: _.get(user, 'smartpbx.call_forward.selective.voicemail', data.voicemails[0]),
+							number: _.get(user, 'call_forward.selective.number', ''),
 							index: count
 						},
 						submodule: 'usersCallForwarding'
 					}));
 
-				$template.find('.test-append').append(ruleTemplate);
+				$template.find('.append-phone-number').append(ruleTemplate);
 				self.renderRulesListingTemplate(self, ruleTemplate, count);
 			});
 
