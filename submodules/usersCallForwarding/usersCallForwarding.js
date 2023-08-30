@@ -1099,7 +1099,15 @@ define(function(require) {
 				$endPicker.timepicker('setTime', endTime);
 			});
 
-			$(template).find('.office-hours-wrapper').append(listingTemplate);
+			_.each($(template).find('.office-hours-wrapper'), function(elem, index) {
+				if (ruleIndex === index) {
+					$(elem).append(listingTemplate);
+				}
+
+				if ($(elem).hasClass('disabled')) {
+					$(elem).append(listingTemplate);
+				}
+			});
 		},
 
 		usersCleanUserData: function(userData) {
