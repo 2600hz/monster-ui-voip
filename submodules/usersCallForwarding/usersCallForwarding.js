@@ -1241,6 +1241,39 @@ define(function(require) {
 			}
 
 			return filledIntervals;
+		},
+
+		updateFlow: function(user, flow, callback) {
+			var self = this,
+				userId = user.id,
+				callback = user.callback;
+
+			monster.waterfall([
+				function(waterfallCallback) {
+					self.getCallflowList(userId, function(callflowList) {
+						waterfallCallback(null, callflowList[0].id);
+					});
+				},
+				function(callflowId, waterfallCallback) {
+					self.getCallflow(callflowId, function(callflow) {
+						waterfallCallback(null, callflow);
+					});
+				},
+				function(callflow, waterfallCallback) {
+					_.set(callflow, 'flow', flow);
+					self.callApi({
+						resource: 'callflow.update',
+						data: {
+							accountId: self.accountId,
+							callflowId: callflow.id,
+							data: callflow
+						},
+						success: function(callflowData) {
+							callback && callback(callflowData.data);
+						}
+					});
+				}
+			], callback);
 		}
 	};
 });
