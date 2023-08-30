@@ -676,26 +676,14 @@ define(function(require) {
 			});
 		},
 
-		createUserMatchList: function(userId, callback) {
-			var self = this,
-				matchListName = 'Default Match List',
-				ruleName = 'Default Rule',
-				type = 'regex';
+		createUserMatchList: function(data, callback) {
+			var self = this;
 
 			self.callApi({
 				resource: 'matchList.create',
 				data: {
 					accountId: self.accountId,
-					data: {
-						name: matchListName,
-						owner_id: userId,
-						rules: [
-							{
-								name: ruleName,
-								type: type
-							}
-						]
-					}
+					data: data
 				},
 				success: function(matchListData) {
 					callback && callback(matchListData.data);
