@@ -226,24 +226,52 @@ define(function(require) {
 				};
 
 			$template.find('.save').on('click', function() {
-				var $button = $(this),
-					updateData = self.usersCallForwardingGetFormData(data),
-					cleanedData = self.usersCleanUserData(updateData);
+				var $button = $(this);
 
-				self.usersCallForwardingSaveData(cleanedData, function(err) {
-					if (err) {
-						return monster.ui.toast({
-							type: 'warning',
-							message: self.i18n.active().users.callForwarding.toast.error.save
+				monster.waterfall([
+					function(waterfallCallback) {
+						var updateData = self.usersCallForwardingGetFormData(data),
+							cleanedData = self.usersCleanUserData(updateData);
+
+						waterfallCallback(null, cleanedData);
+					},
+					function(cleanedData, waterfallCallback) {
+						if (_.has(cleanedData, 'call_forward.selective')) {
+							self.getMatchList(function(matchList) {
+								var userMatchList = _.filter(matchList, function(list) {
+									return list.owner_id === cleanedData.id;
+								});
+								_.each(userMatchList, function(matchList) {
+									cleanedData.call_forward.selective.rules.push({
+										match_list_id: matchList.id,
+										enabled: true
+									});
+								});
+
+								waterfallCallback(null, cleanedData);
+							});
+						} else {
+							waterfallCallback(null, cleanedData);
+						};
+					},
+					function(cleanedData, waterfallCallback) {
+						self.usersCallForwardingSaveData(cleanedData, function(err) {
+							if (err) {
+								return monster.ui.toast({
+									type: 'warning',
+									message: self.i18n.active().users.callForwarding.toast.error.save
+								});
+							}
+							getPopup($button).dialog('close');
+
+							self.usersRender({
+								userId: data.user.id,
+								openedTab: 'features'
+							});
 						});
+						waterfallCallback(true);
 					}
-					getPopup($button).dialog('close');
-
-					self.usersRender({
-						userId: data.user.id,
-						openedTab: 'features'
-					});
-				});
+				]);
 			});
 
 			$template.find('.cancel-link').on('click', function() {
