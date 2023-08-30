@@ -1,0 +1,953 @@
+{
+	"callerId": "Caller-ID",
+	"e911": "Adresse d'urgence (E911)",
+	"failover": "Numéro de rechange",
+
+	"menuTitles": {
+		"myOffice": "Tableau de bord",
+		"users": "Utilisateurs",
+		"groups": "Groupes",
+		"numbers": "Numéros",
+		"devices": "Téléphones",
+		"mainNumber": "Numéro principal",
+		"callLogs": "Journal d'appels",
+		"quickLinks": "Aide",
+		"__comment": "UI-1220: Added VMBox module",
+		"__version": "3.19",
+		"vmboxes": "Répondeurs"
+	},
+
+	"groups": {
+		"addFromSpare": "Ajouter depuis numéros disponibles",
+		"add": "Ajouter un groupe",
+		"addExtension": "Ajouter une extension",
+		"addNewExtension": "Numéro d'extension: ",
+		"buy": "Acheter des numéros",
+		"confirmDeleteGroup": "Ce groupe sera complètement supprimé. Continuer quand même?",
+		"delete": "Supprimer groupe",
+		"dialogCreationGroup": {
+			"availableUsers": "Utilisateurs disponibles",
+			"createGroup": "Créer groupe",
+			"extension": "Extension",
+			"name": "Nom du groupe",
+			"selectedUsers": "Utilisateurs sélectionnés",
+			"title": "Création d'un groupe",
+			"missingDataAlert": "Vous devez choisir un nom ainsi qu'une extension pour ce groupe"
+		},
+		"groupDeleted": "Le groupe {{name}} a été supprimé avec succès!",
+		"name": "Nom du groupe",
+		"noAssignedExtensions": "Aucune extension attribuée à ce groupe.",
+		"noExtension": "Aucune",
+		"noFeatures": "Aucune",
+		"noMatchingGroup": "Aucun groupe correspondant à votre recherche",
+		"noGroupsConfigured": "Veuillez ajouter un groupe d'utilisateurs pour commencer",
+		"noNumber": "Aucun",
+		"noAssignedNumbers": "Il n'y a aucun numéro attribué à ce groupe.",
+		"noUnassignedNumbers": "Aucun numéro n'est disponible afin d'être attribué à ce groupe.",
+		"noAssignedNumbers": "Aucun numéro n'est assigné à ce groupe.",
+		"noMoreSpareNumbers": "Aucun numéro disponible restant, vous pouvez en acheter de nouveaux en cliquant sur le lien ci-dessous",
+		"noMatchingNumbers": "Aucun numéro correspondant à votre recherche",
+		"port": "Porter Numéros",
+		"ringThisMemberFor": "Faire sonner ce membre pendant:",
+		"ringGroupMissing": "Aucun groupe d'appels n'a été défini pour ce groupe d'utilisatuers (group_id missing from callflow)",
+		"userDeleted": "Utilisateur supprimé",
+		"removeMember": "Supprimer ce membre",
+		"distribute": "Répartir",
+		"maxDurationTooltip": "Cliquez sur le label ci-contre pour changer la durée maximale de ce groupe d'appel. Vous devez saisir un nombre crompris entre 30 et 999.",
+		"title": "Groupes",
+		"titleGrid": {
+			"groups": "Nom du groupe",
+			"members": "Membres",
+			"extensions": "Extension",
+			"phoneNumbers": "Numéro direct",
+			"features": "Fonctionnalités du groupe"
+		},
+		"toastrMessages": {
+			"numbersUpdated": "Les numéros de {{name}} ont été mis à jour avec succès",
+			"extensionsUpdated": "Les extensions de {{name}} ont été mises à jour avec succès"
+		},
+		"callRecording": {
+			"title": "Enregistrement d'appel",
+			"headline": "Options de l'enregistrement d'appel du groupe",
+			"formatLabel": "Format:",
+			"urlLabel": "URL:",
+			"urlPlaceholder": "http://votre.serveur.com/endroit/ou/sauvegarder/enregistrements",
+			"timeLimitLabel": "Limite de temps (s):"
+		},
+		"ringback": {
+			"title": "Tonalité d'appel",
+			"headline": "Options de la tonalité d'appel du groupe",
+			"dropdownLabel": "Tonalité d'appel:",
+			"silence": "Silence",
+			"defaultRingback": "Tonalité par défaut",
+			"emptyUploadAlert": "Veuillez sélectionner un fichier à uploader",
+			"fileTooBigAlert": "Vous ne pouvez pas uploader un fichier de taille excédant 5MB"
+		},
+		"nextAction": {
+			"title": "Action Finale",
+			"headline": "Sélectionner l'Action Finale",
+			"label": "Si personne ne répond, transférer l'appel vers :",
+			"menu": "Menu",
+			"mainMenu": "Menu principal",
+			"voicemails": "Répondeurs",
+			"users": "Utilisateurs"
+		},
+		"__comment": "UI-819, v3.19_s1: Showing an error popup when group data is outdated.",
+		"outdatedGroupsError": "Les données de vos Groupes sont obsolètes et ne peuvent être affichées. Veuillez contacter votre administrateur afin de mettre à jour vos données.",
+
+		"__comment": "UI-1352: Adding an option to enable/disable call forwarding on ring group",
+		"__version": "3.20",
+		"forward": {
+			"title": "Redirection d'appel",
+			"headline": "Autoriser la Redirection d'Appels",
+			"description": "Si cette option est activée, les utilisateurs de ce group pourront presser le bouton \"Redirection\" de leur téléphone afin de rediriger un appel de ce groupe. Si cette option est desactivée, ce groupe ignorera les commandes de redirections."
+		},
+
+		"__comment": "UI-1604: Adding Walkthrough for new users",
+		"__version": "3.21",
+		"walkthrough": {
+			"steps": {
+				"1": "Ajouter un group en cliquant sur ce bouton. Vous pourrez dès lors sélectionner ses membres ainsi que lui assigner un nom et un numéro.",
+				"2": "Une fois créé, chaque groupe et ses options apparaîtront ici, et vous pourrez changer ces réglages en cliquant sur les cases associées.",
+				"3": "Cliquez sur cette case pour acheter, assigner ou porter des numéros. Une fois fait, ces numéros seront automatiquement liés à ce groupe.",
+				"4": "Enfin, cliquez sur cette case pour activer ou désactiver les fonctionnalités de ce groupe d'utilisateurs."
+			}
+		}
+	},
+
+	"devices": {
+		"add": "Ajouter téléphone",
+		"assigned": "Assignés",
+		"createDevice": "Créer téléphone",
+		"confirmDeleteDevice": "Ce téléphone sera supprimé de façon permanente. Continuer quand même?",
+		"deleteDevice": "Supprimer téléphone",
+		"deletedDevice": "Le téléphone \"{{deviceName}}\" a été supprimé avec succès.",
+		"popupSettings": {
+			"advancedTitle": "Avancés",
+			"basicTitle": "Réglages",
+			"basicSectionTitle": "Réglages basiques",
+			"dragAndDrop": "Pour sélectionner un codec, glisser-déposer depuis la boite des codecs disponibles jusqu'à celle des codecs sélectionnés",
+			"options": {
+				"menuTitle": "Réglages"
+			},
+			"sip": {
+				"menuTitle": "SIP",
+				"sectionTitle": "SIP Info"
+			},
+			"audio": {
+				"menuTitle": "Audio",
+				"sectionTitle": "Réglages audio",
+				"selectedCodecs": "Codecs sélectionnés",
+				"unselectedCodecs": "Codecs disponibles"
+			},
+			"callerId": {
+				"menuTitle": "Caller-ID d'urgence",
+				"sectionTitle": "Caller-ID d'urgence",
+				"emergency": "Numéro",
+				"notSet": "- Valeur du compte par défaut -",
+				"noE911Numbers": "L'E911 n'a été configuré sur aucun numéro, veuillez utiliser l'application de gestion des numéros pour le configurer sur un de vos numéros avant de définir votre Caller-ID d'urgence.",
+				"address": "Adresse",
+				"__comment": "UI-1386: Updating devices to use the numberSelector common control",
+				"__version": "v3.20_s4",
+				"selectNumber": "Sélectionnez un numéro E911",
+				"useDefault": "Utiliser la valeur du compte par défaut"
+			},
+			"miscellaneous": {
+				"menuTitle": "Divers",
+				"sectionTitle": "Divers",
+				"rtp": {
+					"enable": "Stratégie d'encryption audio",
+					"srtp": "SRTP",
+					"zrtp": "ZRTP"
+				},
+				"__comment": "UI-1119: Adding ignore_complete_elsewhere",
+				"__version": "3.19",
+				"ignoreCompletedElsewhere": {
+					"label": "Afficher les appels manqués des groupes d'Appels",
+					"help": "Si cette case est cochée, les téléphones ayant accès à cette fonctionnalité afficheront les appels manqués même s'ils viennent d'un Groupe d'Appel et que l'appel a été pris par un collègue"
+				},
+				"__comment": "UI-377: Adding Restart device feature",
+				"__version": "3.21",
+				"restart": {
+					"label": "Envoyer une requête de redémarrage",
+					"button": "Redémarrer",
+					"help": "Ce bouton envoie une requête de redémarrage. Cette action n'est disponible que pour les appareils qui sont actuellement connectés à la plateforme.",
+					"success": "Vous avez envoyé une requête de redémarrage avec succès!"
+				},
+
+				"unlock": {
+					"label": "Autoriser la mise à jour",
+					"button": "Déverrouiller",
+					"success": "Ce téléphone est déverrouillé pour les prochaines 24 heures"
+				}
+			},
+			"restrictions": {
+				"menuTitle": "Restrictions",
+				"sectionTitle": "Réglages des Restrictions",
+				"inherit": "Hériter",
+				"deny": "Refuser",
+				"matcher": {
+					"help": "Saisissez un numéro et cliquez sur \"Tester\" pour savoir s'il sera autorisé.",
+					"placeholder": "+18554443333",
+					"button": "Tester",
+					"label": "Le numéro ci-dessus appartient à cette catégorie.",
+					"allowMessage": "Ce téléphone sera autorisé à appeler le numéro {{phoneNumber}}",
+					"denyMessage": "Ce téléphone ne sera pas autorisé à appeler le numéro {{phoneNumber}}."
+				},
+				"__comment": "UI-727, v3.19_s2: Updating the way call restrictions are displayed on devices.",
+				"allow": "Autoriser",
+				"disabledRestrictionsInfo": "Certains types d'appels on été bloqués pour votre compte et ne peuvent pas être activés sur vos téléphones."
+			},
+			"video": {
+				"menuTitle": "Vidéo",
+				"sectionTitle": "Réglages vidéo",
+				"selectedCodecs": "Codecs sélectionnés",
+				"unselectedCodecs": "Codecs disponibles"
+			},
+			"featureKeys": {
+				"menuTitle": "Feature Keys",
+				"description": "Feature key",
+				"labels": {
+					"parkingSpot": "Place",
+					"user": "Utilisateur",
+					"value": "Valeur"
+				},
+				"info": {
+					"link": {
+						"showInfo": "Show Info",
+						"hideInfo": "Hide Info"
+					},
+					"types": {
+						"presence": "Indique lorsqu'un utilisateur à un appel entrant ou est en train d'appeler. L'indicateur peut être utilisé pour répondre à un appel ou appeler l'utilisateur.",
+						"parking": "Indique lorsqu'un appel est placé sur une place de parking accessible par l'intégralité de l'entreprise. L'indicateur peut être utilisé pour transférer un appel vers la place de parking ou récupérer un appel en attente.",
+						"personal_parking": "Indique lorsqu'un appel est placé sur une place de parking dédié à l'utilisateur sélectionné. L'indicateur peut être utilisé pour transférer un appel vers la place de parking ou récupérer un appel en attente.",
+						"speed_dial": "N'indique pas l'état d'un appel mais peut être utilisé pour appeller rapidement le numéro configuré."
+					},
+					"typeTitle": "{{variable}}: "
+				},
+				"types": {
+					"none": "Aucun",
+					"presence": "Présence",
+					"parking": "Parking",
+					"personal_parking": "Personal Parking",
+					"speed_dial": "Speed Dial"
+				}
+			}
+		},
+		"buy": "Acheter téléphone",
+		"classifiers": {
+			"unknown": {
+			    "name": "Autre que les options précédentes",
+			    "help": "Veuillez sélectionner cette option lorsque vous souhaitez que ce compte fasse un appel vers un format de numéro non-spécifié ci-dessus."
+			}
+		},
+		"noMatchingDevices": "Aucun téléphone correspondant à votre recherche",
+		"noDevicesConfigured": "Aucun téléphone configuré",
+		"provisionerPopup": {
+			"brandHeadline": "Sélectionner la marque du téléphone:",
+			"deviceHeadline": "Sélectionner le modèle du téléphone:",
+			"deviceSelected": "Vous avez sélectionner le {{brand}} {{model}}",
+			"missingBrand": "La marque de mon téléphone ne figure pas dans cette liste",
+			"missingDevice": "Le modèle de mon téléphone n'est pas listé",
+			"title": "Sélection du téléphone"
+		},
+		"sip_device": {
+			"addTitle": "Ajouter un téléphone SIP",
+			"editTitle": "Modification d'un téléphone SIP: {{name}}",
+			"macAddress": "Adresse MAC",
+			"macAddressPlaceholder": "19:33:1A:B2:12:58",
+			"new": "Nouveau téléphone SIP",
+			"deviceName": "Nom du téléphone"
+		},
+		"sip_uri": {
+			"addTitle": "Ajouter une URI SIP",
+			"deviceName": "Nom",
+			"editTitle": "Modification d'une URI SIP: {{name}}",
+			"new": "Nouvelle URI SIP",
+			"uri": "URI SIP",
+			"uriPlaceholder": "sip:device@my.company.com",
+			"hideContactList": "Cacher de la liste de Contacts"
+		},
+		"landline": {
+			"addTitle": "Ajout d'une ligne fixe",
+			"deviceName": "Nom",
+			"editTitle": "Modification d'une ligne fixe: {{name}}",
+			"new": "Nouvelle ligne fixe",
+			"number": "Numéro",
+			"numberPlaceholder": "+14152231121",
+			"requireKeypress": "Autoriser l'utilisation du répondeur de la ligne fixe",
+			"keepCallerId": "Conserver le Caller-ID original",
+			"hideContactList": "Cacher de la liste de Contacts"
+		},
+		"cellphone": {
+			"addTitle": "Ajout d'un Portable",
+			"deviceName": "Nom",
+			"editTitle": "Modification d'un Portable: {{name}}",
+			"new": "Nouveau Portable",
+			"number": "Numéro",
+			"numberPlaceholder": "+14152231121",
+			"requireKeypress": "Autoriser l'utilisation du répondeur du portable",
+			"keepCallerId": "Conserver le Caller-ID original",
+			"hideContactList": "Cacher de la liste de Contacts"
+		},
+		"mobile": {
+			"addTitle": "Ajout d'un Mobile",
+			"deviceName": "Nom",
+			"editTitle": "Modification d'un Mobile: {{name}}",
+			"mdn": "MDN",
+			"mdnPlaceholder": "Numéro de tél. US à 10 chiffres",
+			"new": "Nouveau Mobile"
+		},
+		"smartphone": {
+			"addTitle": "Ajout d'un Smartphone",
+			"deviceName": "Nom",
+			"editTitle": "Modification d'un Smartphone: {{name}}",
+			"new": "Nouveau Smartphone",
+			"requireKeypress": "Autoriser l'utilisation du répondeur du Smartphone",
+			"keepCallerId": "Conserver le Caller-ID original",
+			"hideContactList": "Cacher de la liste de Contacts"
+		},
+		"fax": {
+			"addTitle": "Ajout d'un Fax",
+			"editTitle": "Modification d'un Fax: {{name}}",
+			"macAddress": "Adresse MAC",
+			"macAddressPlaceholder": "19:33:1A:B2:12:58",
+			"new": "Nouveau Fax",
+			"deviceName": "Nom",
+			"t38": "T38",
+			"disabled": "Désactivé",
+			"auto": "Détection auto",
+			"force": "Toujours forcé"
+		},
+		"softphone": {
+			"addTitle": "Ajout d'un Softphone",
+			"editTitle": "Modification d'un Softphone: {{name}}",
+			"new": "Nouveau Softphone",
+			"deviceName": "Nom"
+		},
+		"ata": {
+			"addTitle": "Ajout d'un ATA",
+			"editTitle": "Modification d'un ATA: {{name}}",
+			"new": "Nouvel ATA",
+			"deviceName": "Nom"
+		},
+		"sip": {
+			"username": "Nom d'utilisateur SIP",
+			"password": "Mot de passe SIP",
+			"realm": "Royaume"
+		},
+		"spare": "Disponibles",
+		"title": " Nombre de Téléphones",
+		"titleGrid": {
+			"edit": "Modifier",
+			"enable": "Activer",
+			"user": "Utilisateur",
+			"modelMacAddress": "Nom / Adresse MAC",
+			"type": "Type"
+		},
+		"types": {
+			"cellphone": "Portable",
+			"sip_device": "Téléphone SIP",
+			"smartphone": "Smartphone",
+			"mobile": "Mobile",
+			"softphone": "Softphone",
+			"landline": "Ligne fixe",
+			"fax": "Fax",
+			"ata": "ATA",
+			"sip_uri": "URI SIP"
+		},
+		"unassignedDevice": "-"
+	},
+
+	"users": {
+		"admin": "Admin",
+		"add": "Ajouter utilisateur",
+		"addExtension": "Ajouter une extension à cet utilisateur",
+		"addNewExtension": "Numéro d'extension: ",
+		"addFromSpare": "Ajouter depuis les numéros disponibles",
+		"addFromSpareDevices": "Ajouter depuis les téléphones disponibles",
+		"buy": "Acheter numéros",
+		"confirmDeleteUser": "Supprimer un utilisateur supprimera également les numéros, téléphones et répondeurs associés à cet utilisateur. Continuer quand même?",
+		"confirmDeleteAdmin": "Vous êtes sur le point de supprimer un ADMINISTRATEUR! Ceci supprimera son utilisateur Kazoo, numéros, téléphones et répondeurs associés, et lui enlevera aussi la permission de gérer cette interface. Continuer quand même?",
+		"dialogChangePassword": {
+			"help": "Vous pouvez mettre à jour votre mot de passe en tapant votre Email et le nouveau mot de passe ci-dessus!",
+			"password": "Mot de passe",
+			"passwordPlaceholder": "(Min. 6 caractères)",
+			"title": "Mettre à jour Email / Mot de passe",
+			"username": "Email de l'utilisateur"
+		},
+		"dialogChangePin": {
+			"help": "Vous pouvez mettre à jour le PIN de messagerie d'utilisateur grâce à cette popup. Cela peut vous permettre de réinitialiser son PIN afin qu'il le re-configurer ensuite en appelant lui-même sa messagerie.",
+			"pin": "PIN",
+			"pinPlaceholder": "PIN (Min. 4 numéros)",
+			"title": "Mettre à jour le PIN de Messagerie"
+		},
+		"dialogCreationUser": {
+			"createUser": "Créer utilisateur",
+			"errorOnCreation": "Une erreur est survenue lors de la création de l'utilisateur:",
+			"extension": "Num. Extension",
+			"extensionAlreadyExist": "Cette extension est déjà prise, veuillez choisir un numéro différent.",
+			"firstName": "Prénom",
+			"lastName": "Nom",
+			"loginEmail": "Email/Login de l'utilisateur",
+			"notificationEmail": "Email pour notifications",
+			"password": "(Min. 6 caractères)",
+			"sendToDifferentEmail": "Envoyer les emails à une autre adresse",
+			"title": "Créer Utilisateur",
+			"vmboxAlreadyExist": "Le numéro de répondeur existe déjà, veuillez en choisir un autre.",
+			"vmboxNumber": "Numéro Répondeur",
+			"sendWelcomeEmail": "Envoyer les informations de connexion à cet utilisateur"
+		},
+		"editionForm": {
+			"changePIN": "Changer PIN",
+			"changeUsername": "Changer",
+			"firstName": "Prénom",
+			"lastName": "Nom",
+			"role": "Rôle",
+			"timezone": "Fuseau Horaire",
+			"vmboxNumber": "Num. Répondeur",
+			"timeout": "Durée de sonnerie",
+			"timeoutSec": "Sec",
+			"timeoutEdit": "Editer dans \"Find-Me-Follow-Me\"",
+			"timeoutEditHint": "La durée de sonnerie est redéfinie dans la fonctionnalité \"Find-Me-Follow-Me\". Cliquez sur le lien ci-dessous pour la modifier.",
+			"disabledTimeoutHint": "Au moins un numéro ou extension est requis avant de pouvoir définir la durée de sonnerie.",
+			"__comment": "UI-1109: Adding the Presence ID setting on the User document",
+			"__version": "3.19",
+			"presenceId": "Extension Principale",
+			"noPresenceID": "- Aucune -",
+			"__comment": "UI-1066: Adding Help text hover the icons of the user edition form",
+			"__version": "3.19",
+			"nameHelp": "Tapez le Prénom de l'Utilisateur dans le premier champ, et son Nom dans le deuxième",
+			"loginHelp": "Ce champ contient le Login de l'utilisateur, qu'il utilise pour se connecter à cette application",
+			"vmboxHelp": "Ce champ est le numéro de Répondeur de cet utilisateur. Clickez sur \"Changer PIN\" afin de modifier son PIN ou de le réinitialiser",
+			"roleHelp": "Un \"Admin\" pourra ajouter ou modifier les différentes applications utilisables sur le compte général, tandis qu'un \"Utilisateur\" aura seulement accès aux applications qui ont été installé pour lui.",
+			"languageHelp": "Ce champ permet de changer le langage affiché dans cette application",
+			"timezoneHelp": "Ceci changera le Fuseau Horaire utilisé pour les téléphones de cet Utilisateur ainsi que pour son Répondeur",
+			"ringingHelp": "Ceci défini la durée de sonnerie avant de rediriger l'appel entrant vers le répondeur. Par exemple, en rentrant la valeur \"20\" dans ce champ, un appel sera redirigé après 20 seconds sans réponse vers le Répondeur",
+			"mainExtensionHelp": "Ceci défini le Caller-ID de cet utilisateur pour les appels internes au système, ainsi que son Presence ID"
+		},
+		"delete": "Supprimer Utilisateur",
+		"errorCallerId": "Avant de configurer le Caller-ID de l'utilisateur, vous devez d'abord lui attribuer un numéro.",
+		"errorNumberFaxing": "Avant de configurer le numéro de Fax de cet utilisateur, vous devez avoir au moins un numéro disponible pour l'assigner ici. (Vous pouvez acheter des numéros depuis la section numéro sur la gauche)",
+		"featureOn": "ON",
+		"includeInDirectory": "Inclure l'utilisateur au répertoire de l'entreprise",
+		"noMatchingDevices": "Aucun télépone correspondant à votre recherche",
+		"noMatchingNumbers": "Aucun numéro correspondant à votre recherche",
+		"noMatchingUser": "Aucun utilisateur correspondant à votre recherche",
+		"noUsersConfigured": "Veuillez ajouer un utilisateur pour commencer",
+		"noMoreSpareDevices": "Aucun téléphone disponible, vous pouvez acheter de nouveaux téléphones depuis l'Inventaire",
+		"noMoreSpareNumbers": "Aucun numéro disponible, vous pouvez en achetant en cliquant sur le lien ci-dessous",
+		"noAssignedDevices": "Aucun téléphone assigné à cet utilisateur",
+		"noAssignedNumbers": "Aucun numéro attribué à cet utilisateur.",
+		"noAssignedExtensions": "Aucune extension assignée à cet utilisateur.",
+		"noNumber": "Aucun",
+		"noNumberCallflow": "Vous devez assigner au moins un numéro ou une extension à cet utilisateur avant de pouvoir le sauvegarder",
+		"needExtensionFirst": "Veuillez assigner une extension avant d'ajouter un numéro à cet utilisateur.",
+		"noExtension": "Aucune",
+		"noAssignedNumbers": "Aucun numéro assigné à cet utilisateur.",
+		"noUnassignedNumbers": "Aucun numéro disponible à assigner à cet utilisateur.",
+		"noUserDevices": "Aucun",
+		"noUserFeatures": "Aucun",
+		"noUserCallflow": "Une erreur est survenue. Aucun Callflow n'est assigné à cet utilisateur, il est donc impossible de l'ajouter au répertoire de l'entreprise.",
+		"port": "Porter Numéros",
+		"resetPassword": "Réinitialiser Mot de passe",
+		"resendInstructions": "Renvoyer les Instructions",
+		"title": "Nombre d'utilisateurs",
+		"titleGrid": {
+			"users": "Réglages Utilisateurs",
+			"extensions": "Extensions",
+			"phoneNumbers": "Numéros de téléphone",
+			"devices": "Téléphones",
+			"features": "Fonctionnalités utilisateurs"
+		},
+		"toastrMessages": {
+			"devicesUpdated": "Vous avez mis à jour les téléphones de {{ name }} avec succès.",
+			"instructionsSent": "Un email a été envoyé à {{ email }} avec toutes les instructions pour bien commencer à utiliser l'application!",
+			"numbersUpdated": "Vous avez mis à jour les numéros de {{ name }} avec succès.",
+			"passwordReseted": "Le mot de passe a été réinitialisé, un email a été envoyé à {{email}} avec les instructions pour créer un nouveau mot de passe.",
+			"userDelete": "Vous avez supprimé {{ name }} avec succès!",
+			"userUpdated": "Vous avez mis à jour {{ name }} avec succès!",
+			"pinUpdated": "Vous avez mis à jour le PIN de {{ name }} avec succès!",
+			"__comment": "UI-1033: Now properly remove the Caller-ID Feature if we remove a number that was set as that Caller-ID Number",
+			"__version": "3.20",
+			"callerIDDeleted": "Le Numéro de Caller-ID de cet utilisateur n'étant plus assigné, la fonctionnalité Caller-ID a été desactivée."
+		},
+		"uploadPicture": "Uploader une image",
+		"user": "Utilisateur",
+		"call_forward": {
+			"directCallsOnly": "Seulement transférer les appels direct",
+			"headline": "Réglages du transfert d'appel",
+			"keepCallerId": "Garder le Caller-ID",
+			"label": "Transférer tous les appels vers",
+			"placeholder": "+14157283992",
+			"requireKeyPress": "Laisser message sur le répondeur du numéro transferé",
+			"title": "Transfert d'appels",
+			"timeoutWarning": "Afin de pouvoir laisser un message sur le répondeur du numéro transferé, la durée de sonnerie de l'utilisateur doit être d'au moins 30sec. En cliquant sur le bouton \"Sauvegarder\", vous serez automatiquement redirigé vers l'édition d'utilisateur où vous pourrez modifier la durée de sonnerie."
+		},
+		"callRecording": {
+			"title": "Enregistrement d'appel entrant",
+			"headline": "Réglages de l'enregistrement d'appel",
+			"formatLabel": "Format:",
+			"urlLabel": "URL:",
+			"urlPlaceholder": "http://votre.serveur.com/vos/enregistrements",
+			"timeLimitLabel": "Durée maximale (Sec):"
+		},
+		"call_recording": {
+			"title": "Enregistrement d'appel"
+		},
+		"conferencing": {
+			"title": "Conférence de l'Utilisateur",
+			"headline": "Conférence de l'Utilisateur",
+			"number": "Numéro téléphonique de la conférence",
+			"pinLabel": "Salle de conférence",
+			"help": "Afin de joindre la conférence, transmettez le numéro téléphonique à appeler ainsi que le numéro de salle de conférence à tous les participants!",
+			"noConfNumbers": "Vous devez ajouter un Numéro principal de Conférence (Voir \"Numéro principal\" dans le menu de gauche) avant de pouvoir configurer les Conférences personnelles des utilisateurs"
+		},
+		"faxing": {
+			"titles": {
+				"faxbox": "Faxbox"
+			},
+			"headline": "Faxbox",
+			"defaultSettings": {
+				"nameExtension": "'s Faxbox",
+				"headerExtension": " Fax Printer"
+			},
+			"faxToEmail": {
+				"title": "Fax to Email",
+				"text1": "Les fax envoyés à",
+				"text2": "seront convertis en email et transférés à l'adresse"
+			},
+			"emailToFax": {
+				"title": "Email to Fax",
+				"text1": "Les emails envoyés depuis",
+				"text2": "à",
+				"text3": " avec un pdf seront faxés au numéro spécifié dans le champ 'destinataire' de l'email.",
+				"default": "{ numéro de destination }",
+				"help": {
+					"showHelp": "Montrer l'aide",
+					"hideHelp": "Cacher l'aider",
+					"question": "À quel numéro voulez-vous envoyer le fax ?",
+					"placeholder": "numéro de destination"
+				}
+			},
+
+			"googlePrinter": {
+				"title": "Google Imprimante",
+				"text1": "Cliquez ",
+				"text2": " pour activer l'imprimante Google Cloud. Récupérez l'intalleur de l'imprimante ",
+				"link": "ici"
+			},
+			"toastr": {
+				"error": {
+					"numberMissing": "Veuillez sélectionner un numéro"
+				}
+			}
+		},
+		"vmbox": {
+			"deleteAfterNotify": "Supprimer les messages vocaux de la base de données après l'envoi de la notification."
+		},
+		"find_me_follow_me": {
+			"title": "Ordre d'appel",
+			"headline": "Réglages de l'ordre d'appels",
+			"disableDevice": "Ne pas faire sonner",
+			"ringThisPhoneFor": "Faire sonner pour",
+			"noDevice": "Vous devez avoir au moins un téléphone configuré pour activer cette fonctionnalité.",
+			"noNumber": "Avant de configurer la fonctionnalité Find-Me Follow-Me pour cet utilisateur, vous devez d'abord lui attribuer un numéro ou une extension.",
+			"distribute": "Répartir"
+		},
+		"caller_id": {
+			"title": "Numéro de Caller-ID",
+			"dropdownLabel": "Numéro de Caller-Id:",
+			"headline": "Réglages du numéro de Caller-ID de l'utilisateur",
+			"help": "Si cette fonctionnalité n'est pas activé, le Caller-ID affiché par défaut sera celui configuré sur le numéro principal de l'entreprise."
+		},
+		"music_on_hold": {
+			"title": "Musique d'attente",
+			"headline": "Réglages de la musique d'attente",
+			"dropdownLabel": "Musique d'attente:",
+			"silence": "Silence",
+			"emptyUploadAlert": "Veuillez sélectionner un fichier à uploader",
+			"fileTooBigAlert": "Vous ne pouvez pas uploader un fichier de taille excédant 5MB"
+		},
+		"hotdesk": {
+			"label": "Cela requiert-il un PIN?",
+			"keep_logged_in_elsewhere": "Autoriser les login sur multiples téléphones",
+			"title": "Hot-Desking",
+			"headline": "Réglages du Hot-Desking",
+			"help": "Le Hot-Desking ID est automatiquement défini avec le numéro d'extension assigné."
+		},
+		"__comment": "UI-1129: Migration tool from Kazoo-UI to Monster-UI",
+		"__version": "3.19",
+		"migration": {
+			"confirmMigration": "Un des numéros que vous souhaitez rajouter existe déjà dans Kazoo-UI, nous pouvons migrer le callflow vers SmartPBX pour vous permettre de l'utiliser. Vous ne pourrez plus modifier ce callflow dans Kazoo-UI ou dans l'application Callflows de Monster-UI. Continuez quand même?",
+			"tooManyCallflows": "Vous essayez de rajouter des numéros existant déjà sur plusieurs callflows, nous ne pouvons continuer notre opération automatique de migration. Veuillez contacter votre support pour résoudre ce problème."
+		},
+		"__commment": "UI-1109: Adding popup for Presence ID change",
+		"__version": "3.19",
+		"presenceIDPopup": {
+			"title": "Sélectionnez votre Extension Principale",
+			"header": "Vous êtes en train de supprimer l'Extension Principale de cet utilisateur, veuillez en sélectionner une nouvelle dans les options ci-dessous:",
+			"none": "Je ne veux pas d'Extension Principale"
+		},
+		"__comment": "UI-1393: Updating user devices to use the monsterListing common control",
+		"__version": "v3.20_s4",
+		"devices": {
+			"newDevice": "Nouveau Téléphone",
+			"spareDevice": "Ajouter depuis les Téléphones Disponibles"
+		},
+
+		"__comment": "UI-1604: Adding Walkthrough for new users",
+		"__version": "3.21",
+		"walkthrough": {
+			"steps": {
+				"1": "Accèder à la création utilisateur via ce bouton. ",
+				"2": "Une fois compléter, chaque utilisateur et ses réglages seront affichés ici. Cliquez sur cette case pour changer ses informations.",
+				"3": "Fournissez un numéro unique d'extension à chacun de vos utilisateur ici.",
+				"4": "Cliquez sur cette case pour acheter, porter ou sélectionner un numéro disponible. Ils seront automatiquement assignés à cet utilisateur.",
+				"5": "Ajouter des téléphones à vos utilisateurs via cette case.",
+				"6": "Gérez les différentes fonctionnalités disponibles pour vos utilisateurs via ce menu."
+			}
+		},
+
+		"confirmMobileUnAssignment": "Vous allez retirer un téléphone mobile. Le numéro lié à ce téléphone ({{variable}}) sera aussi retiré de cet utilisateur. Voulez-vous continuer ?"
+	},
+
+	"strategy": {
+		"noNumberHelp": "Note: Veuillez ajouter un numéro principal avant de passer à la suite. Une fois ce numéro rajouté, vous aurez la possibilité de configurer vos  Horaires d'Ouvertures, vos Vacances ainsi que la Gestion des Appels Entrants pour votre bureau.",
+		"sectionTitles": {
+			"numbers": "Numéro principal de l'entreprise",
+			"confnum": "Numéro principal de conférence",
+			"hours": "Horaires d'entreprise",
+			"holidays": "Jours fériés & Vacances",
+			"calls": "Gestion des appels entrants"
+		},
+		"noNumberTitle": "Ajouter numéro principal",
+		"noNumberMessage": "Veuillez ajouter un numéro principal pour continuer.",
+		"noConfNumMessage": "Veuillez ajouter un numéro de conférence",
+		"numberLinks": {
+			"spare": "Ajouter depuis les numéros disponibles",
+			"buy": {
+				"link": "Acheter numéros",
+				"regular": "Locaux",
+				"tollfree": "Numéro vert",
+				"vanity": "Personnalisés"
+			},
+			"port": "Porter numéros"
+		},
+		"hours": {
+			"alwaysOpenTitle": "Ouvert 24/24",
+			"alwaysOpenDescription": "Choisissez cette option si vous souhaitez gérer les appels entrants toujours de la même façon.",
+			"customHoursTitle": "Horaires personnalisés",
+			"customHoursDescription": "Choisissez cette option si vous souhaitez gérer vos appels entrants differemment lorsque votre bureau est fermé",
+			"listTitle": "Horaires",
+			"timezone": "Fuseau horaire:",
+			"to": "à",
+			"lunchbreakTitle": "Êtes-vous fermé pendant le déjeuner?",
+			"helpAfterHours": "N'oubliez pas de choisir votre route d'appel à utiliser quand votre bureau est fermé pour la nuit ! Pour la configurer, ouvrez la section \"Gestion des appels entrants\" de cette page, et sélectionnez l'onglet \"Fermé\".",
+			"helpLunchHours": "Si votre bureau ferme aux heures du déjeuner, vous devez aussi choisir votre route d'appel à utiliser pour ces heures là. Vous pouvez la configurer dans la section \"Gestion des appels entrants\" également, sous l'onglet \"Déjeuner\"."
+		},
+		"holidays": {
+			"enableTitle": "Êtes-vous fermé pendant les vacances?",
+			"addLink": "Ajouter vacances",
+			"singleLink": "Jour unique",
+			"rangeLink": "Période",
+			"advancedLink": "Avancé",
+			"helpHolidays": "N'oubliez pas de choisir votre route d'appel à utiliser quand votre bureau est fermé pour les vacances ! Pour la configurer, ouvrez la section \"Gestion des appels entrants\" de cette page, et sélectionnez l'onglet \"Vacances\" tab."
+		},
+		"calls": {
+			"openHoursTitle": "Ouvert",
+			"lunchHoursTitle": "Déjeuner",
+			"afterHoursTitle": "Fermé",
+			"holidaysTitle": "Vacances",
+			"incomingCall": "Appel entrant",
+			"virtualReceptionist": "Réceptionniste virtuel",
+			"voicemail": "Répondeur",
+			"groupOther": "Autre",
+			"optionNone": "Aller directement vers répondeur",
+			"callTabsMessages": {
+				"MainOpenHours":"Sélectionner la maniére dont les appels seront traités lorsque votre bureau est ouvert.",
+				"MainLunchHours":"Sélectionner la maniére dont les appels seront traités pendant les horaires de déjeuner.",
+				"MainAfterHours":"Sélectionner la maniére dont les appels seront traités lorsque le bureau est fermé.",
+				"MainHolidays":"Sélectionner la maniére dont les appels seront traités lorsque votre bureau est en vacances."
+			}
+		},
+		"popup": {
+			"title": "Réceptioniste virtuel",
+			"infoBlock": "Le Réceptionniste virtuel répondra automatiquement et redirigera les appels directement vers le bon groupe ou la bonne personne. Vous pouvez configurer le menu ci-dessous.",
+			"menuTitle": "Menu principal",
+			"greetingsTitle": "Message de bienvenue",
+			"addRouteLink": "Ajouter option",
+			"ttsGreetingTitle": "Text to Speech",
+			"ttsGreetingPlaceholder": "Veuillez entrer votre message de bienvenue ici.",
+			"uploadGreetingTitle": "Uploader votre propre fichier",
+			"recordGreetingTitle": "Enregistrer depuis un téléphone",
+			"recordGreetingInfo": "Enregistrer vous même le message en suivant ces 4 étapes:",
+			"recordGreetingLines": {
+				"line1": "Choisissez un téléphone enregistré sur ce ocmpte.",
+				"line2": "Appeler le numéro principal de l'entreprise.",
+				"line3": "Entrer ce PIN lorsque l'on vous le demandera:",
+				"line4": "Enregistrer votre messages! :)."
+			},
+			"pressKey": "Appuyer",
+			"for": "pour",
+			"fileUploadButton": "Choisir fichier",
+			"greetingsHelp": "Vous devez cliquer sur le bouton \"Mettre à jour\" pour sauvegarder les changements apportés au message d'accueil.",
+			"defaultAction": "Action par défaut"
+		},
+		"open": "Ouvert",
+		"closed": "Fermé",
+		"weekdays": {
+			"monday": "Lundi",
+			"tuesday": "Mardi",
+			"wednesday": "Mercredi",
+			"thursday": "Jeudi",
+			"friday": "Vendredi",
+			"saturday": "Samedi",
+			"sunday": "Dimanche"
+		},
+		"ordinals": {
+			"first": "Premier",
+			"second": "Deuxième",
+			"third": "Troisième",
+			"fourth": "Quatrième",
+			"fifth": "Cinquième",
+			"last": "Dernier"
+		},
+		"monthsShort": {
+			"january": "Jan",
+			"february": "Fév",
+			"march": "Mar",
+			"april": "Avr",
+			"may": "Mai",
+			"june": "Jun",
+			"july": "Jul",
+			"august": "Aôu",
+			"september": "Sep",
+			"october": "Oct",
+			"november": "Nov",
+			"december": "Déc"
+		},
+		"callEntities": {
+			"user": "Utilisateurs",
+			"device": "Téléphones",
+			"ring_group": "Groupes",
+			"voicemail": "Répondeurs",
+			"directory": "Annuaire"
+		},
+		"confirmMessages": {
+			"deleteHoliday": "Ces vacances seront supprimées. Continuer?",
+			"disableHolidays": "Toutes les vacances existantes seront supprimées. Continuer?"
+		},
+		"alertMessages": {
+			"uniqueHoliday": "Chaque vacances doit avoir un nom unique.",
+			"undefinedMenu": "Vous avez sélectionner un réceptionniste virtuel sans le configurer. Veuillez le configurer en cliquant sur le lien, ou choisissez une option différente.",
+			"emptyTtsGreeting": "Vous devez entrer un message afin d'activer le Text to Speech.",
+			"emptyUploadGreeting": "Veuillez sélectionner un fichier à uploader",
+			"fileTooBigAlert": "Vous ne pouvez pas uploader un fichier de taille excédant 5MB",
+			"uniqueMenuNumbers": "Les numéros doivent être uniques et non-vide.",
+			"lastE911Error": "E911 doit être configuré sur au moins un de vos Numéros principaux. Veuillez configurer e911 sur un autre numéro principal avant de supprimer celui-ci."
+		},
+		"toastrMessages": {
+			"updateHolidaySuccess": "Vacances mises à jour avec succès.",
+			"updateCallSuccess": "Gestion des appels mise à jour.",
+			"buyNumbersSuccess": "Les numéros ont été achetés avec succès.",
+			"buyNumbersError": "Une erreur est survenue lors de l'achat des numéros.",
+			"removeNumberSuccess": "Numéro retiré du callflow principal."
+		},
+		"popupRemoveFeatures": {
+			"title": "Fonctionnalités",
+			"questionPartOne": "Voulez-vous supprimer des fonctionnalités de",
+			"questionPartTwo": "?",
+			"featuresToRemove": "Sélectionner les fonctionnalité(s) à supprimer :",
+			"features": {
+				"cnam": "Caller-ID",
+				"e911": "Adresse d'urgence (e911)"
+			}
+		},
+		"__comment": "UI-1604: Walkthrough dashboard",
+		"__version": "3.21",
+		"walkthrough": {
+			"first": {
+				"steps": {
+					"1": "Configurer votre numéro principal d'entreprise ici. Ce numéro est différent de vos numéros assignés à vos utilisateurs car il représente votre entreprise dans son ensemble."
+				}
+			},
+			"second": {
+				"steps": {
+					"1": "Configurez les heures d'ouverture de votre bureau ici. Vous avez le choix de laisser votre ligne ouverte 24h/24h ou bien de créer des horaires personnalisés. Vous pourrez même sélectionner des horaires de repas.",
+					"2": "Votre bureau ferme t'il pendant les vacances? Gérez tout cela dans cette section.",
+					"3": "Le \"Virtual Receptionist\" disponible dans ce menu vous permet de répondre intelligemment à tous les appels entrants sur votre numéro d'entreprise.",
+					"4": "Sélectionnez un numéro de conférence pour votre entreprise ici.",
+					"5": "Sélectionnez un numéro de fax pour votre entreprise ici."
+				}
+			}
+		},
+		"faxing": {
+			"nameExtension": "'s Faxbox",
+			"headerExtension": " Fax Printer"
+		}
+	},
+
+	"callLogs": {
+		"title": "Historique d'appels",
+		"dateRangeTo": "à",
+		"noSearchMatch": "Votre critère de recherche ne correspond à aucun appel.",
+		"detailsPopupTitle": "Détail de l'appel",
+		"applyFilter": "Filtrer par date",
+		"resetFilter": "Remettre le filtre par défaut",
+		"gridHeaders": {
+			"inboundCall": "Entrant",
+			"outboundCall": "Sortant",
+			"dateTime1": "Date/Heure",
+			"from": "Depuis",
+			"to": "À",
+			"duration1": "Durée",
+			"duration2": "(Min)",
+			"hangup1": "Hangup",
+			"hangup2": "Raison",
+			"details1": "Appel",
+			"details2": "Détails",
+			"report1": "Soumettre",
+			"report2": "Reporter"
+		},
+		"reportCall": "Reporter Appel",
+		"loaderMessage": "Défilez vers le bas ou cliquez ici pour charger plus d'appels.",
+		"loadingMessage": "Chargement d'appels supplémentaires...",
+		"alertMessages": {
+			"getDetailsError": "Une erreur est survenue en essayant de récuperer les détails de l'appel."
+		},
+		"key": "Clé",
+		"value": "Valeur",
+
+		"__comment": "UI-1071: Adding new Range buttons to Call Logs",
+		"__version": "3.20",
+		"thisMonth": "Ce mois",
+		"thisWeek": "Cette semaine",
+		"thisDay": "Aujourd'hui",
+		"custom": "Personnalisé",
+		"callsFrom": "Liste les appels depuis",
+		"callsTo": "jusqu'à"
+	},
+
+	"myOffice": {
+		"topBarLinks": {
+			"callerID": "Caller ID",
+			"musicOnHold": "Musique d'attente",
+			"callRecording": "Enregistrement",
+			"hours": "Heures"
+		},
+		"musicOnHold": {
+			"title": "Musique d'attente",
+			"headline": "Régler la musique d'attente pour ce compte",
+			"dropdownLabel": "Musique d'attente:",
+			"silence": "Silence",
+			"default": "Musique par défaut",
+			"emptyUploadAlert": "Veuillez sélectionner un fichier à uploader",
+			"fileTooBigAlert": "Vous ne pouvez pas uploader un fichier de taille excédant 5MB"
+		},
+		"callerId": {
+			"title": "Caller ID d'entreprise",
+			"headline": "Sélectionner un numéro de Caller ID Number pour ce compte",
+			"numberLabel": "Numéro de Caller ID de l'entreprise",
+			"numberHelp": "Ce numéro sera affiché lors des appels sortants. 15 caractères maximum (espaces inclus).",
+			"nameLabel": "Nom du Caller-ID de l'entreprise",
+			"nameHelp": "Ce nom sera affiché si possible lors des appels sortants.",
+			"emergencyLabel": "Adresse d'urgence de l'entreprise",
+			"emergencyZipcode": "Code postal",
+			"emergencyAddress1": "Adresse Ligne 1",
+			"emergencyAddress2": "Adresse Ligne 2",
+			"emergencyCity": "Ville",
+			"emergencyState": "État",
+			"emergencyHelp1": "Cette adresse apparaitra lorsque vous appelerez un numéro d'urgence (911 aux Etats-Unis).",
+			"emergencyHelp2": "Note: Vous pouvez ajouter cette fonctionnalité sur chaque utilisateur si cette adresse ne leur correspond pas.",
+			"mandatoryE911Alert": "Vous devez spécifier les infos E911 pour le Caller-ID de ce numéro d'entreprise."
+		},
+		"missingMainNumberForCallerId": "Veuillez ajouter un Numéro principal à votre compte avant de configurer le Caller-ID de votre compte!",
+		"missingCnamE911Message": "Veuillez configurer le Caller-ID et l'E911 sur un de vos numéros principaux.",
+		"missingCnamMessage": "Veuillez configurer le Caller-ID sur un de vos numéros principaux.",
+		"missingE911Message": "Veuillez configurer l'E911 sur un de vos numéros principaux.",
+		"missingMainNumberMessage": "Veuillez ajouter un Numéro principal à votre compte.",
+		"totalUsers": "Utilisateurs",
+		"totalDevices": "Téléphones",
+		"totalConfs": "Conférences",
+		"mainNumberLabel": "Numéro principal",
+		"noMainNumber": "Ajouter numéro principal",
+		"confNumberLabel": "Numéro de conférence",
+		"faxNumberLabel": "Numéro de Fax",
+		"totalNumbers": "Total Numéros",
+		"unregisteredDevices": "Téléphones non-connectés",
+		"accountId": "ID Compte:",
+		"accountRealm": "Royaume du compte:",
+		"numberChartLegend": {
+			"assigned": "Numéros assignés",
+			"spare": "Numéros assignés",
+			"local": "Numéros locaux",
+			"tollfree": "Numéros verts",
+			"international": "Numéros internationaux",
+			"noNumber": "Aucun numéro disponible"
+		},
+		"__comment": "UI-1220: Adding a Main VMBox automatically when they first load the SmartPBX if they don't have one",
+		"__version": "3.19",
+		"mainVMBoxName": "Répondeur Principal",
+
+		"__comment": "UI-1604: Walkthrough dashboard",
+		"__version": "3.21",
+		"walkthrough": {
+			"steps": {
+				"1": "Observez les statistiques d'appels et plein d'autre informations en un coup d'oeil sur ce menu.",
+				"2": "Gérez les différents services de vos utilisateurs ici. Vous pourrez leur assigner des numéros, gérez leurs appareils téléphoniques et bien plus encore!",
+				"3": "Une fois les utilisateurs créés, dirigez-vous vers la section \"Groupes\". Ceci est très pratique pour les utilisateurs travaillant dans une même section (Marketing, Ventes...) afin de définir un répondeur global etc...",
+				"4": "Créer votre numéro d'entreprise dans cette section. Vous pourrez gérer les appels entrants et les router differemment en fonction de vos réglages d'horaires ou de vacances..."
+			}
+		},
+		"faxingNumberLabel": "Numéro de Fax"
+	},
+
+	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SmartPBX.",
+	"featureCodes": {
+		"title": "Codes d'appel disponibles",
+		"noFeatureCodeMessage": "Aucun code d'appel n'est actuellement disponible sur votre compte. Les codes d'appel sont crées automatiquement lorsque vous chargez la page \"Numéro principal\".",
+		"mainNumberLink": "Aller à \"Numéro principal\"",
+		"labels": {
+			"call_forward[action=activate]": "Activer le Transfert d'appel",
+			"call_forward[action=deactivate]": "Désactiver le Transfert d'appel",
+			"call_forward[action=toggle]": "Activer/Désactiver le Transfert d'appel",
+			"call_forward[action=update]": "Mettre à jour le Transfert d'appel",
+			"call_forward[action=on_busy_enable]": "Activer le Transfert d'appel quand occupé",
+			"call_forward[action=on_busy_disable]": "Désactiver le Transfert d'appel quand occupé",
+			"call_forward[action=no_answer_enable]": "Activer le Transfert d'appel quand l'appelé ne répond pas",
+			"call_forward[action=no_answer_disable]": "Désactiver le Transfert d'appel quand l'appelé ne répond pas",
+			"hotdesk[action=login]": "Activer le \"Hot-Desking\"",
+			"hotdesk[action=logout]": "Désactiver le \"Hot-Desking\"",
+			"hotdesk[action=toggle]": "Activer/Désactiver le \"Hot-Desking\"",
+			"voicemail[action=check]": "Consulter la boite vocale",
+			"voicemail[action=\"direct\"]": "Rediriger vers la boite vocale",
+			"intercom": "Interphone",
+			"privacy[mode=full]": "Privé",
+			"park_and_retrieve": "Stationner/Récuperer",
+			"valet": "Valet",
+			"retrieve": "Récuperer",
+			"donotdisturb[action=\"enable\"]": "Activer \"Ne pas déranger\"",
+			"donotdisturb[action=\"disable\"]": "Désactiver \"Ne pas déranger\"",
+			"donotdisturb[action=\"toggle\"]": "Activer/Désactiver \"Ne pas déranger\"",
+			"directory": "Répertoire",
+			"time": "Consulter l'horloge",
+			"call_waiting[action=enable]": "Activer le double-appel",
+			"call_waiting[action=disable]": "Désactiver le double-appel",
+			"sound_test_service": "Test Son",
+			"call_recording": "Enregistrement d'appel",
+			"__comment": "UI-1395: Added voicemail[single_mailbox_login] feature code",
+			"__version": "3.20",
+			"voicemail[single_mailbox_login]": "Consulter la boite vocale (identification automatique)"
+		},
+		"__comment": "UI-1028, v3.20_s0: Added categories for the feature codes.",
+		"categories": {
+			"call_forward": "Transfert d'appel",
+			"hotdesk": "\"Hot-Desking\"",
+			"parking": "Stationnement",
+			"do_not_disturb": "\"Ne pas déranger\"",
+			"misc": "Divers"
+		},
+		"portIconHelp": "Ce numéro est en cours de transfert et sera supprimé si celui-ci échoue. Il peut être configuré mais ne sera pas utilisable"
+	}
+}
