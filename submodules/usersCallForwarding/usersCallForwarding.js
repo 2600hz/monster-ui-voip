@@ -409,19 +409,45 @@ define(function(require) {
 		usersCallForwardingGetFormData: function(data) {
 			var self = this,
 				user = data.user,
+				callback = user.callback,
 				formData = monster.ui.getFormData('call_forward_form'),
 				callForwardStrategy = formData.call_forwarding_strategy,
 				callForwardData = formData[callForwardStrategy],
-				hasMatchList = _.has(user, 'call_forward.selective.rules'),
 				defaultVoicemail = _.get(user, ['smartpbx', 'call_forwarding', 'default'], data.voicemails[0].id),
 				voicemail = callForwardStrategy === 'off' ? defaultVoicemail : _.get(callForwardData, 'voicemail.value', defaultVoicemail),
-				isSkipToVoicemailEnabled = callForwardStrategy === 'off' || callForwardData.type === 'phoneNumber'? false : true;
+				isSkipToVoicemailEnabled = callForwardStrategy === 'off' || callForwardData.type === 'phoneNumber' ? false : true;
+
+			if (callForwardStrategy !== 'selective') {
+				monster.waterfall([
+					function(waterfallCallback) {
+						self.resetUserCallFlow(user, self.buildStandardFlow(user, voicemail));
+						waterfallCallback(null, null);
+					},
+					function(empty, waterfallCallback) {
+						self.userUpdateVoicemailCallflow(user, defaultVoicemail, isSkipToVoicemailEnabled);
+						waterfallCallback(true);
+					},
+					function(waterfallCallback) {
+						self.getMatchList(function(matchList) {
+							var userMatchList = _.filter(matchList, function(list) {
+								return list.owner_id === user.id;
+							});
+
+							waterfallCallback(null, userMatchList);
+						});
+					},
+					function(userMatchList, waterfallCallback) {
+						self.deleteOldMatchLists(userMatchList);
+						waterfallCallback(null, null);
+					},
+					function(empty, waterfallCallback) {
+						self.createUserDefaultMatchList(user.id);
+						waterfallCallback(true);
+					}
+				]);
+			}
 
 			if (callForwardData && callForwardData.type === 'phoneNumber') {
-				if (callForwardStrategy !== 'selective') {
-					self.userUpdateCallflow(user, defaultVoicemail, isSkipToVoicemailEnabled);
-				}
-				
 				_.set(user, 'call_forward', {
 					[callForwardStrategy]: {
 						enabled: true,
