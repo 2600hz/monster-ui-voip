@@ -66,20 +66,55 @@ define(function(require) {
 										direct_calls_only: isDirectCallsOnlyEnabled,
 										require_keypress: isRequireKeypressEnabled,
 										ignore_early_media: isIgnoreEarlyMediaEnabled,
-										type: hasVmBox ? 'voicemail' : isCallForwardEnabled ? 'phoneNumber' : 'voicemail',
+										type: 'voicemail',
 										voicemails: data.voicemails,
 										selectedVoicemailId: _.get(user, ['smartpbx', 'call_forwarding', strategy, 'voicemail'], data.voicemails[0]),
-										rules: _.get(data, 'match_list_cf.rules'),
+										rules: _.get(data, 'match_list_cf'),
 										user: user
 									},
 									submodule: 'usersCallForwarding'
 								})),
-								matchListRules = data.match_list_cf.rules;
+								matchListRules = data.match_list_cf;
 
 							$(this).find('.complex-strategy').append(complexStrategyTemplate);
 
+							_.each(matchListRules, function(matchList, index) {
+								var isMatchListSpecific = _.get(matchList, 'regex', '^+1d{10}$') !== '^+1d{10}$',
+									ruleTemplate = $(self.getTemplate({
+										name: 'rule',
+										data: {
+											from: isMatchListSpecific ? 'specific' : 'allNumbers',
+											type: matchList.name === 'Default Rule' || matchList.type === 'voicemail' ? 'voicemail' : 'phoneNumber',
+											duration: _.get(matchList, 'type') === 'regex' || _.get(matchList, 'duration') === 'always' ? 'always' : 'custom',
+											voicemails: data.voicemails,
+											selectedVoicemailId: _.get(user, ['smartpbx', 'call_forwarding', strategy, 'voicemail'], data.voicemails[0]),
+											number: _.get(user, ['call_forward', strategy, 'number'], ''),
+											index: index
+										},
+										submodule: 'usersCallForwarding'
+									}));
+
+								$(complexStrategyTemplate).find('.append-phone-number').append(ruleTemplate);
+								matchList.name !== 'Default Rule' && $(complexStrategyTemplate).find('.options-container').parent().removeClass('disabled');
+
+								var numbers = self.regexToArray(matchList.regex);
+
+								_.each(numbers, function(number, index) {
+									var containerToAppend = $(ruleTemplate).find('.specific-phone-number-wrapper'),
+										numberContainer = $(ruleTemplate).find('.specific-phone-number-wrapper').children().last()[0].outerHTML;
+
+									$(ruleTemplate).find('.specific-phone-number-wrapper').children().last().find('input').prop('value', number);
+									$(containerToAppend[0]).append(numberContainer);
+								});
+
+								if (!_.isEmpty(numbers)) {
+									$(ruleTemplate).find('.specific-phone-number-wrapper').children().last().detach();
+								}
+							});
+
 							_.forEach(matchListRules, function(value, index) {
-								self.renderRulesListingTemplate(self, complexStrategyTemplate, index);
+								var intervals = _.get(value, 'temporal_route_id[0].intervals', []);
+								self.renderRulesListingTemplate(self, complexStrategyTemplate, index, intervals);
 							});
 						}
 					});
