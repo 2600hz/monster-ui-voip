@@ -626,6 +626,9 @@ define(function(require) {
 			self.callApi({
 				resource: 'matchList.list',
 				data: {
+					filters: {
+						paginate: 'false'
+					},
 					accountId: self.accountId
 				},
 				success: function(matchListData) {
