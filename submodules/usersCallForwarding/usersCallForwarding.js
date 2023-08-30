@@ -709,29 +709,29 @@ define(function(require) {
 			});
 		},
 
-		deleteUserMatchList: function(matchListId, callback) {
-			var self = this;
-
-			self.callApi({
-				resource: 'matchList.delete',
-				data: {
-					accountId: self.accountId,
-					matchListId: matchListId
-				},
-				success: function(matchListData) {
-					callback && callback(matchListData.data);
-				}
-			});
-		},
-
 		createUserTemporalRule: function(data, callback) {
 			var self = this;
 
 			self.callApi({
-				resource: 'temporalRules.create',
+				resource: 'temporalRule.create',
 				data: {
 					accountId: self.accountId,
 					data: data
+				},
+				success: function(temporalRuleData) {
+					callback && callback(temporalRuleData.data);
+				}
+			});
+		},
+
+		getUserTemporalRule: function(ruleId, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'temporalRule.get',
+				data: {
+					accountId: self.accountId,
+					ruleId: ruleId
 				},
 				success: function(temporalRuleData) {
 					callback && callback(temporalRuleData.data);
