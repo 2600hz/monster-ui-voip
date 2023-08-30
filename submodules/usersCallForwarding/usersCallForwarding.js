@@ -1206,6 +1206,41 @@ define(function(require) {
 			delete userData.confirm_password;
 
 			return userData;
+		},
+
+		fillMissingDays: function(intervals) {
+			var daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
+				filledIntervals = [];
+
+			for (var i = 0; i < daysOfWeek.length; i++) {
+				var day = daysOfWeek[i],
+					existingInterval = null;
+
+				for (var j = 0; j < intervals.length; j++) {
+					if (intervals[j].weekday === day) {
+						existingInterval = intervals[j];
+						break;
+					}
+				}
+
+				if (existingInterval) {
+					filledIntervals.push({
+						weekday: day,
+						start: existingInterval.start,
+						end: existingInterval.end,
+						active: existingInterval.active
+					});
+				} else {
+					filledIntervals.push({
+						weekday: day,
+						start: 0,
+						end: 84600,
+						active: false
+					});
+				}
+			}
+
+			return filledIntervals;
 		}
 	};
 });
