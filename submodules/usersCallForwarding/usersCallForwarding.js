@@ -1274,6 +1274,20 @@ define(function(require) {
 					});
 				}
 			], callback);
+		},
+
+		regexFromArray: function(numbers) {
+			var regexArr = ['^('];
+
+			for (var i = 0; i < numbers.length; i++) {
+				regexArr.push(numbers[i].toString());
+				if (i < numbers.length - 1) {
+					regexArr.push('|');
+				}
+			};
+
+			regexArr.push(')$');
+			return regexArr.join('');
 		}
 	};
 });
