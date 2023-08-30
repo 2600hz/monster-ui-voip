@@ -1479,6 +1479,457 @@ define(function(require) {
 
 				callback(voicemailRules);
 			});
+		},
+
+		getIntervalsFromRules: function(array, callback) {
+			var self = this,
+				filteredArray = _.filter(array, function(elem) {
+					return _.has(elem, 'temporal_route_id') && _.get(elem, 'temporal_route_id') && !_.isEmpty(elem.temporal_route_id);
+				});
+
+			if (!_.isEmpty(filteredArray)) {
+				self.getIntervals(filteredArray, [], function(data) {
+					var transformedArray = self.transformArray(data);
+					callback(transformedArray);
+				});
+			} else {
+				callback(array);
+			}
+		},
+
+		replaceTemporalRouteIdWithObjects: function(a, b) {
+			var idToIntervalMap = _.keyBy(b, 'id'),
+				result = a.map(item => {
+					if (item.temporal_route_id) {
+						var mergedId = item.temporal_route_id.map(id => idToIntervalMap[id]),
+							mergedIntervals = mergedId.reduce((merged, id) => {
+								merged.id.push(id.id);
+								merged.intervals.push(...id.intervals);
+								return merged;
+							}, { id: [], intervals: [] });
+
+						item.temporal_route_id = [mergedIntervals];
+					}
+
+					if (item.selectedVoicemailId) {
+						item.voicemails = [/* Assuming you have the corresponding voicemail object here */];
+						delete item.selectedVoicemailId;
+					}
+
+					return item;
+				});
+
+			return result;
+		},
+
+		getIntervals: function(array, intervalData, callback) {
+			var self = this,
+				id = array[0].temporal_route_id;
+
+			if (_.size(id) > 1 && _.isArray(id)) {
+				id = array[0].temporal_route_id[0];
+				_.each(_.tail(array[0].temporal_route_id), function(value) {
+					array.push({
+						temporal_route_id: value
+					});
+				});
+			}
+
+			self.getUserTemporalRule(id, function(data) {
+				var newArray = _.tail(array);
+
+				intervalData.push({
+					id: data.id,
+					end: data.time_window_stop,
+					start: data.time_window_start,
+					wdays: data.wdays
+				});
+
+				if (!_.isEmpty(newArray)) {
+					self.getIntervals(newArray, intervalData, callback);
+				} else {
+					callback(intervalData);
+				}
+			});
+		},
+
+		transformArray: function(inputArray) {
+			return _.map(inputArray, item => {
+				var intervals = _.map(item.wdays, weekday => ({
+					weekday,
+					start: item.start,
+					end: item.end,
+					active: true
+				}));
+
+				return {
+					id: item.id,
+					intervals
+				};
+			});
+		},
+
+		mergeMatchLists: function(array) {
+			var groupedByName = _.groupBy(array, 'name'),
+				mergedArray = [];
+
+			_.forEach(groupedByName, (group) => {
+				var mergedObject = _.mergeWith({}, ...group, (objValue, srcValue, key) => {
+					if (key === 'temporal_route_id') {
+						return _.concat(objValue || [], srcValue);
+					}
+				});
+				mergedArray.push(mergedObject);
+			});
+
+			return mergedArray;
+		},
+
+		getUserCallflow: function(userId, callback) {
+			var self = this;
+
+			monster.waterfall([
+				function(waterfallCallback) {
+					self.getCallflowList(userId, function(callflowList) {
+						waterfallCallback(null, callflowList[0].id);
+					});
+				},
+				function(callflowId, waterfallCallback) {
+					self.getCallflow(callflowId, function(callflow) {
+						callback && callback(callflow);
+					});
+				}
+			], callback);
+		},
+
+		resetUserCallFlow: function(user, flow) {
+			var self = this,
+				userId = user.id,
+				callback = user.callback;
+
+			monster.waterfall([
+				function(waterfallCallback) {
+					self.getCallflowList(userId, function(callflowList) {
+						waterfallCallback(null, callflowList[0].id);
+					});
+				},
+				function(callflowId, waterfallCallback) {
+					self.getCallflow(callflowId, function(callflow) {
+						waterfallCallback(null, callflow);
+					});
+				},
+				function(callflow, waterfallCallback) {
+					_.set(callflow, 'flow', flow);
+					self.callApi({
+						resource: 'callflow.update',
+						data: {
+							accountId: self.accountId,
+							callflowId: callflow.id,
+							data: callflow
+						},
+						success: function(callflowData) {
+							callback && callback(callflowData.data);
+						}
+					});
+					waterfallCallback(true);
+				}
+			], callback);
+		},
+
+		getUserRulesByMatchListId: function(userMatchList, dataArray, callback) {
+			var self = this,
+				newArray = [];
+
+			newArray = _.tail(userMatchList);
+			if (!_.isEmpty(userMatchList)) {
+				self.getUserMatchList(userMatchList[0].id, function(data) {
+					dataArray.push(data);
+					self.getUserRulesByMatchListId(newArray, dataArray, callback);
+				});
+			} else {
+				callback(dataArray);
+			};
+		},
+
+		updateUserWithMatchList: function(user, callback) {
+			var self = this;
+
+			monster.waterfall([
+				function(waterfallCallback) {
+					self.getMatchList(function(matchList) {
+						var userMatchList = _.filter(matchList, function(list) {
+							return list.owner_id === user.id;
+						});
+
+						waterfallCallback(null, userMatchList);
+					});
+				},
+				function(matchList, waterfallCallback) {
+					_.set(user.call_forward.selective.rules, matchList);
+					callback(null, user);
+				}
+			], callback);
+		},
+
+		generateTemporalRoutesForPhoneNumbers: function(user, intervals, matchList, idsArray, phoneNumber, matchListType) {
+			var self = this;
+
+			self.createUserTemporalRule(intervals[0], function(routeData) {
+				var newIntervals = _.tail(intervals);
+				idsArray.push(routeData.id);
+				if (!_.isEmpty(newIntervals)) {
+					self.generateTemporalRoutesForPhoneNumbers(user, newIntervals, matchList, idsArray, phoneNumber, matchListType);
+				} else {
+					self.createCustomMatchList(user, matchList, idsArray, phoneNumber, matchListType);
+				}
+			});
+		},
+
+		deleteOldMatchLists: function(matchLists) {
+			var self = this;
+
+			self.deleteUserMatchList(matchLists[0].id, function(deletedData) {
+				var newMatchLists = _.tail(matchLists);
+				if (!_.isEmpty(newMatchLists)) {
+					self.deleteOldMatchLists(newMatchLists);
+				};
+			});
+		},
+
+		createCustomMatchList: function(user, matchList, idsArray, phoneNumber, matchListType, callback) {
+			var self = this;
+
+			_.each(idsArray, function(ruleId) {
+				matchList.rules.push({
+					name: matchListType + ' for: ' + phoneNumber,
+					type: 'temporal_route',
+					temporal_route_id: ruleId
+				});
+			});
+
+			self.callApi({
+				resource: 'matchList.create',
+				data: {
+					owner_id: user.id,
+					accountId: self.accountId,
+					data: matchList
+				},
+				success: function(matchListData) {
+					callback && callback(matchListData.data);
+				}
+			});
+		},
+
+		buildMatchList: function(user, type, phoneNumberRules, matchListType) {
+			var self = this,
+				matchList = {
+					name: matchListType + ' for: ' + phoneNumberRules[0].phoneNumber,
+					owner_id: user.id,
+					rules: [
+						{
+							name: matchListType + ' for: ' + phoneNumberRules[0].phoneNumber,
+							regex: type === 'allNumbers' ? '^+1d{10}$' : self.transformPhonenumbersToRegex(phoneNumberRules),
+							type: 'regex'
+						}
+						// Temporal Rules if applicable
+					]
+				};
+
+			return matchList;
+		},
+
+		buildStandardFlow: function(user, voicemailId) {
+			var flow = {
+				module: 'user',
+				data: {
+					id: user.id,
+					timeout: 20,
+					can_call_self: false,
+					delay: 0,
+					strategy: 'simultaneous',
+					skip_module: true
+				},
+				children: {
+					_: {
+						module: 'voicemail',
+						data: {
+							id: voicemailId,
+							action: 'compose',
+							callerid_match_login: false,
+							interdigit_timeout: 2000,
+							max_message_length: 500,
+							single_mailbox_login: false
+						},
+						children: {}
+					}
+				}
+			};
+
+			return flow;
+		},
+
+		buildSpecificFlow: function(voicemailId) {
+			var flow = {
+				module: 'check_cid',
+				data: {
+					use_absolute_mode: false,
+					regex: []
+				},
+				children: {
+					match: {
+						module: 'voicemail',
+						data: {
+							id: voicemailId,
+							action: 'compose',
+							callerid_match_login: false,
+							interdigit_timeout: 2000,
+							max_message_length: 500,
+							single_mailbox_login: false
+						},
+						children: {}
+					},
+					nomatch: {
+						// standard flow here
+					}
+				}
+			};
+
+			return flow;
+		},
+
+		buildSpecificCustomFlow: function() {
+			var flow = {
+				module: 'check_cid',
+				data: {
+					use_absolute_mode: false,
+					regex: []
+				},
+				children: {
+					match: {
+						// temporal route flow  here
+						// inside standard flow with routes ids
+					},
+					nomatch: {
+						//standard flow here
+					}
+				}
+			};
+
+			return flow;
+		},
+
+		buildTemporalRoutesFlow: function() {
+			var flow = {
+				module: 'temporal_route',
+				data: {},
+				children: {
+					_: {
+						//standard flow here
+					}
+					//ids here
+				}
+			};
+
+			return flow;
+		},
+
+		generateTemporalRoutesForVoicemail: function(flow, user, intervals, idsArray, path, voicemailId, callback) {
+			var self = this;
+
+			self.createUserTemporalRule(intervals[0], function(routeData) {
+				var newIntervals = _.tail(intervals);
+				idsArray.push(routeData.id);
+				if (!_.isEmpty(newIntervals)) {
+					self.generateTemporalRoutesForVoicemail(flow, user, newIntervals, idsArray, path, voicemailId, callback);
+				} else {
+					self.updateFlowWithIntervals(flow, user, idsArray, path, voicemailId, function(data) {
+						callback(data);
+					});
+				}
+			});
+		},
+
+		updateFlowWithIntervals: function(flow, user, idsArray, path, voicemailId, callback) {
+			var self = this,
+				userId = user.id,
+				data = {
+					data: {
+						id: voicemailId,
+						action: 'compose',
+						callerid_match_login: false,
+						interdigit_timeout: 2000,
+						max_message_length: 500,
+						single_mailbox_login: false
+					},
+					module: 'voicemail',
+					children: {}
+				},
+				nestedProperty = _.get(flow, path),
+				clonedProperty = _.cloneDeep(nestedProperty),
+				clonedFlow = _.cloneDeep(flow);
+
+			_.each(idsArray, function(id) {
+				_.set(clonedProperty, id, data);
+			});
+
+			_.set(clonedFlow, path, clonedProperty);
+
+			monster.waterfall([
+				function(waterfallCallback) {
+					self.getCallflowList(userId, function(callflowList) {
+						waterfallCallback(null, callflowList[0].id);
+					});
+				},
+				function(callflowId, waterfallCallback) {
+					self.getCallflow(callflowId, function(callflow) {
+						waterfallCallback(null, callflow);
+					});
+				},
+				function(callflow, waterfallCallback) {
+					// If para borrar los temporal rules si ya se tiene el module "temporal_route"
+					_.defaults({}, clonedFlow, callflow);
+					_.set(callflow, 'flow', clonedFlow);
+					self.callApi({
+						resource: 'callflow.update',
+						data: {
+							accountId: self.accountId,
+							callflowId: callflow.id,
+							data: callflow
+						},
+						success: function(callflowData) {
+							callback && callback(callflowData.data);
+						}
+					});
+				}
+			]);
+		},
+
+		transformIntervalsToRoutes: function(rules) {
+			var self = this,
+				arr = [];
+
+			_.each(rules, function(rule) {
+				arr.push(rule.intervals);
+			});
+
+			arr = _.flatten(arr);
+			arr = self.transformIntervals(arr);
+
+			return arr;
+		},
+
+		transformPhonenumbersToRegex: function(rules) {
+			var self = this,
+				arr = [];
+
+			_.each(rules, function(rule) {
+				arr.push(rule.phoneNumbers);
+			});
+
+			arr = _.flatten(arr);
+			arr = self.regexFromArray(arr);
+
+			return arr;
 		}
 	};
 });
