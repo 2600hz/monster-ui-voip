@@ -694,25 +694,14 @@ define(function(require) {
 			});
 		},
 
-		patchUserMatchList: function(temporalRuleId, callback) {
+		deleteUserMatchList: function(matchListId, callback) {
 			var self = this;
 
 			self.callApi({
-				resource: 'matchList.patch',
+				resource: 'matchList.delete',
 				data: {
 					accountId: self.accountId,
-					data: {
-						name: 'Match List for Selective',
-						rules: [
-							{
-								name: 'Rule Name',
-								regex: '^313$',
-								target: '+13132961231',
-								temporal_route_id: temporalRuleId,
-								type: 'regex'
-							}
-						]
-					}
+					matchListId: matchListId
 				},
 				success: function(matchListData) {
 					callback && callback(matchListData.data);
