@@ -583,7 +583,7 @@ define(function(require) {
 			});
 		},
 
-		userUpdateCallflow: function(user, voicemailId, enabled) {
+		userUpdateVoicemailCallflow: function(user, voicemailId, enabled) {
 			var self = this,
 				userId = user.id,
 				callback = user.callback;
