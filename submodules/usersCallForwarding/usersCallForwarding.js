@@ -755,12 +755,13 @@ define(function(require) {
 			});
 		},
 
-		renderRulesListingTemplate: function(data, template, ruleIndex) {
+		renderRulesListingTemplate: function(data, template, ruleIndex, customIntervals) {
 			var self = data,
 				meta = self.appFlags.strategyHours.intervals,
 				timepickerStep = meta.timepicker.step,
 				intervalLowerBound = meta.min,
 				intervalUpperBound = meta.max,
+				filledCustomIntervals = self.fillMissingDays(customIntervals),
 				intervals = [
 					{
 						weekday: 'monday',
@@ -809,13 +810,13 @@ define(function(require) {
 					name: 'listing',
 					data: {
 						strategy: 'selective',
-						intervals: intervals,
+						intervals: !_.isEmpty(customIntervals) ? filledCustomIntervals : intervals,
 						ruleIndex: ruleIndex
 					},
 					submodule: 'usersCallForwarding'
 				}));
 
-			_.forEach(intervals, function(interval, index) {
+			_.forEach(!_.isEmpty(customIntervals) ? filledCustomIntervals : intervals, function(interval, index) {
 				var $startPicker = listingTemplate.find('input[name="selective.rule[' + ruleIndex + '].intervals[' + index + '].start"]'),
 					$endPicker = listingTemplate.find('input[name="selective.rule[' + ruleIndex + '].intervals[' + index + '].end"]'),
 					endTime = interval.end,
