@@ -31,7 +31,8 @@ define(function(require) {
 			'en-US': { customCss: false },
 			'fr-FR': { customCss: false },
 			'ru-RU': { customCss: false },
-			'es-ES': { customCss: false }
+			'es-ES': { customCss: false },
+			'fr-CA': { customCss: false }
 		},
 
 		requests: {},
