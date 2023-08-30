@@ -1324,6 +1324,66 @@ define(function(require) {
 			});
 
 			return rulesArray;
+		},
+
+		transformIntervals: function(intervals) {
+			var daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+			var dayIntervals = {};
+			var result = [];
+
+			for (var i = 0; i < intervals.length; i++) {
+				var interval = intervals[i];
+
+				if (!interval.active) {
+					continue;
+				}
+
+				var dayIndex = daysOfWeek.indexOf(interval.weekday);
+				var start = interval.start.split(':');
+				var end = interval.end.split(':');
+				var startSeconds = parseInt(start[0]) * 3600 + parseInt(start[1]) * 60;
+				var endSeconds = parseInt(end[0]) * 3600 + parseInt(end[1]) * 60;
+
+				if (!dayIntervals[dayIndex]) {
+					dayIntervals[dayIndex] = {
+						start: startSeconds,
+						end: endSeconds
+					};
+				} else {
+					dayIntervals[dayIndex].start = Math.min(dayIntervals[dayIndex].start, startSeconds);
+					dayIntervals[dayIndex].end = Math.max(dayIntervals[dayIndex].end, endSeconds);
+				}
+			}
+
+			for (var i = 0; i < daysOfWeek.length; i++) {
+				var currentDay = [daysOfWeek[i]];
+				var currentInterval = dayIntervals[i];
+
+				if (currentInterval) {
+					var start = currentInterval.start;
+					var end = currentInterval.end;
+
+					for (var j = i + 1; j < daysOfWeek.length; j++) {
+						var nextDay = daysOfWeek[j];
+						var nextInterval = dayIntervals[j];
+
+						if (nextInterval && currentInterval.start === nextInterval.start && currentInterval.end === nextInterval.end) {
+							currentDay.push(nextDay);
+							delete dayIntervals[j];
+						}
+					}
+
+					result.push({
+						name: 'weekly temporal rule for selective',
+						wdays: currentDay,
+						time_window_start: start,
+						time_window_stop: end,
+						cycle: 'weekly'
+					});
+				}
+			}
+
+			return result;
 		}
 	};
 });
