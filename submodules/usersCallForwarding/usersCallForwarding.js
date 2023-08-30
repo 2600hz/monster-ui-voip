@@ -517,6 +517,28 @@ define(function(require) {
 			});
 		},
 
+		skipToVoicemail: function(callflow, enabled, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'callflow.patch',
+				data: {
+					accountId: self.accountId,
+					callflowId: callflow.id,
+					data: {
+						flow: {
+							data: {
+								skip_module: enabled
+							}
+						}
+					}
+				},
+				success: function(callflowData) {
+					callback && callback(callflowData.data);
+				}
+			});
+		},
+
 		updateVoicemail: function(callflow, voicemailId, enabled, callback) {
 			var self = this;
 
