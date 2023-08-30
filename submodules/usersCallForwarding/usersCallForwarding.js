@@ -125,32 +125,68 @@ define(function(require) {
 			monster.waterfall([
 				getData
 			], function(err, voicemails) {
-				var userVoicemails = _.filter(voicemails, function(vmbox) { return vmbox.owner_id === user.id }),
+				var userVoicemails = _.filter(voicemails, function(vmbox) {
+						return vmbox.owner_id === user.id;
+					}),
 					data = {
 						voicemails: userVoicemails,
 						user: user
 					},
 					callback = data.user.callback;
+
 				monster.waterfall([
 					function(waterfallCallback) {
 						self.getMatchList(function(matchList) {
-							var userMatchList = _.find(matchList, function(list) {
+							var userMatchLists = _.filter(matchList, function(list) {
 								return list.owner_id === data.user.id;
 							});
 
-							if (!userMatchList) {
+							if (_.isEmpty(userMatchLists)) {
 								self.createUserDefaultMatchList(data.user.id, function(createdMatchlist) {
 									waterfallCallback(null, createdMatchlist);
 								});
 							} else {
-								self.getUserMatchList(userMatchList.id, function(userMatchList) {
-									waterfallCallback(null, userMatchList);
-								});
+								waterfallCallback(null, userMatchLists);
 							}
 						});
 					},
-					function(matchList, waterfallCallback) {
-						var newData = _.set(data, 'match_list_cf', matchList),
+					function(userMatchLists, waterfallCallback) {
+						self.getUserRulesByMatchListId(userMatchLists, [], function(matchLists) {
+							var rules = [];
+							if (!_.isEmpty(matchLists)) {
+								_.each(matchLists, function(elem) {
+									rules.push(elem.rules);
+								});
+								rules = _.flatten(rules);
+							};
+							waterfallCallback(null, rules);
+						});
+					},
+					function(rules, waterfallCallback) {
+						self.transforFlowIntoRules(data, function(voicemailRules) {
+							if (_.isEmpty(voicemailRules)) {
+								waterfallCallback(null, rules);
+							} else {
+								var allRules = _.concat(rules, voicemailRules);
+								_.remove(allRules, function(rule) {
+									return rule.name === 'Default Rule';
+								});
+								waterfallCallback(null, allRules);
+							}
+						});
+					},
+					function(rules, waterfallCallback) {
+						var mergedRules = self.mergeMatchLists(rules);
+						waterfallCallback(null, mergedRules);
+					},
+					function(mergedRules, waterfallCallback) {
+						self.getIntervalsFromRules(mergedRules, function(data) {
+							var rulesWithIntervals = self.replaceTemporalRouteIdWithObjects(mergedRules, data);
+							waterfallCallback(null, rulesWithIntervals);
+						});
+					},
+					function(rulesWithIntervals, waterfallCallback) {
+						var newData = _.set(data, 'match_list_cf', rulesWithIntervals),
 							$template = initTemplate(newData);
 
 						bindEvents($template, newData);
