@@ -55,6 +55,7 @@ define(function(require) {
 							}));
 							$(this).find('.simple-strategy').append(simpleStrategyTemplate);
 						}
+
 						if (strategy === 'selective') {
 							var complexStrategyTemplate = $(self.getTemplate({
 									name: 'complexStrategy',
@@ -422,11 +423,9 @@ define(function(require) {
 			if (callForwardStrategy !== 'selective') {
 				monster.waterfall([
 					function(waterfallCallback) {
-						self.resetUserCallFlow(user, self.buildStandardFlow(user, voicemail));
-						waterfallCallback(null, null);
-					},
-					function(empty, waterfallCallback) {
-						self.userUpdateVoicemailCallflow(user, defaultVoicemail, isSkipToVoicemailEnabled);
+						var standardFlow = self.buildStandardFlow(user, voicemail);
+						_.set(standardFlow, 'data.skip_module', isSkipToVoicemailEnabled);
+						self.resetUserCallFlow(user, standardFlow);
 						waterfallCallback(true);
 					},
 					function(waterfallCallback) {
@@ -528,11 +527,11 @@ define(function(require) {
 				});
 
 				if (filterAlwaysRules.length <= 0) {
-					_.set(standardFlow.data.skip_module, false);
+					_.set(standardFlow, 'data.skip_module', false);
 				};
 
 				if (_.isEmpty(voicemailRules)) {
-					_.set(standardFlow.data.skip_module, false);
+					_.set(standardFlow, 'data.skip_module', false);
 					self.resetUserCallFlow(user, standardFlow);
 				};
 
@@ -1621,18 +1620,21 @@ define(function(require) {
 					});
 				},
 				function(callflow, waterfallCallback) {
-					_.set(callflow, 'flow', flow);
-					self.callApi({
-						resource: 'callflow.update',
-						data: {
-							accountId: self.accountId,
-							callflowId: callflow.id,
-							data: callflow
-						},
-						success: function(callflowData) {
-							callback && callback(callflowData.data);
-						}
-					});
+					var isFlowsEqual = _.isEqual(callflow.flow, flow);
+					if (!isFlowsEqual) {
+						_.set(callflow, 'flow', flow);
+						self.callApi({
+							resource: 'callflow.update',
+							data: {
+								accountId: self.accountId,
+								callflowId: callflow.id,
+								data: callflow
+							},
+							success: function(callflowData) {
+								callback && callback(callflowData.data);
+							}
+						});
+					}
 					waterfallCallback(true);
 				}
 			], callback);
@@ -1667,7 +1669,7 @@ define(function(require) {
 					});
 				},
 				function(matchList, waterfallCallback) {
-					_.set(user.call_forward.selective.rules, matchList);
+					_.set(user, 'call_forward.selective.rules', matchList);
 					callback(null, user);
 				}
 			], callback);
