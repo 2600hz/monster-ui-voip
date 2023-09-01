@@ -151,7 +151,9 @@ define(function(require) {
 						});
 					},
 					function(userMatchLists, waterfallCallback) {
-						self.getUserRulesByMatchListId(userMatchLists, [], function(matchLists) {
+						var array = !_.isArray(userMatchLists) ? _.wrap(userMatchLists, Array) : userMatchLists;
+
+						self.getUserRulesByMatchListId(array, [], function(matchLists) {
 							var rules = [];
 							if (!_.isEmpty(matchLists)) {
 								_.each(matchLists, function(elem) {
