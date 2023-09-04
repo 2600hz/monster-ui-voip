@@ -415,10 +415,13 @@ define(function(require) {
 				callback = user.callback,
 				formData = monster.ui.getFormData('call_forward_form'),
 				callForwardStrategy = formData.call_forwarding_strategy,
+				isStategyBusy = callForwardStrategy === 'busy',
+				isStrategyOff = callForwardStrategy === 'off',
+				isStategyNoAnswer = callForwardStrategy === 'no_answer',
 				callForwardData = formData[callForwardStrategy],
 				defaultVoicemail = _.get(user, ['smartpbx', 'call_forwarding', 'default'], data.voicemails[0].id),
-				voicemail = callForwardStrategy === 'off' ? defaultVoicemail : _.get(callForwardData, 'voicemail.value', defaultVoicemail),
-				isSkipToVoicemailEnabled = callForwardStrategy === 'off' || callForwardData.type === 'phoneNumber' ? false : true;
+				voicemail = isStrategyOff ? defaultVoicemail : _.get(callForwardData, 'voicemail.value', defaultVoicemail),
+				isSkipToVoicemailEnabled = isStrategyOff || isStategyBusy || isStategyNoAnswer || callForwardData.type === 'phoneNumber' ? false : true;
 
 			if (callForwardStrategy !== 'selective') {
 				monster.waterfall([
@@ -457,7 +460,8 @@ define(function(require) {
 						direct_calls_only: _.includes(callForwardData.isEnabled, 'forward'),
 						require_keypress: _.includes(callForwardData.isEnabled, 'acknowledge'),
 						ignore_early_media: _.includes(callForwardData.isEnabled, 'ring')
-					}
+					},
+					enabled: true
 				});
 
 				_.set(user, 'smartpbx.call_forwarding', {
@@ -465,7 +469,7 @@ define(function(require) {
 				});
 			}
 
-			if ((callForwardData && callForwardData.type === 'voicemail') || callForwardStrategy === 'off') {
+			if ((callForwardData && callForwardData.type === 'voicemail') || isStrategyOff) {
 				_.set(user, 'smartpbx.call_forwarding', {
 					enabled: callForwardStrategy !== 'off',
 					[callForwardStrategy]: {
@@ -474,7 +478,7 @@ define(function(require) {
 					'default': data.voicemails[0].id
 				});
 
-				if (callForwardStrategy === 'off') {
+				if (isStrategyOff) {
 					_.set(user, 'call_forward', {
 						enabled: false
 					});
