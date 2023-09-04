@@ -397,7 +397,7 @@ define(function(require) {
 					}));
 
 				$template.find('.append-phone-number').append(ruleTemplate);
-				self.renderRulesListingTemplate(self, ruleTemplate, count);
+				self.renderRulesListingTemplate(self, ruleTemplate, count, []);
 			});
 
 			$template.on('click', '.remove-rule-button', function() {
