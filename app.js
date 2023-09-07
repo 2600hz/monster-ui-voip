@@ -172,7 +172,7 @@ define(function(require) {
 				monster.pub('voip.' + id + '.render', args);
 			});
 
-			monster.sub('core.crossSiteMessage', function(topic) {
+			monster.sub('core.crossSiteMessage.' + app.name, function(topic) {
 				var crossSiteMessageTopic = topic.replace('.tab', '') + '.render';
 
 				monster.pub(crossSiteMessageTopic);
