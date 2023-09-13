@@ -773,6 +773,9 @@ define(function(require) {
 							};
 						}
 
+						if (_.isEmpty(selectedMedia)) {
+							delete ringGroupNode.data.ringback;
+						}
 						self.groupsUpdateCallflow(data.baseCallflow, function() {
 							self.groupsUpdate(data.group, function(updatedGroup) {
 								popup.dialog('close').remove();
