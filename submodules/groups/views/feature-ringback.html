@@ -19,6 +19,7 @@
 		<div>
 			<span>{{ i18n.groups.ringback.dropdownLabel }}</span>
 			<select name="format" class="media-dropdown">
+				<option value="" {{#compare media '===' ""}}selected{{/compare}}>{{ i18n.groups.ringback.default }}</option>
 				<option value="{{silenceMedia}}" {{#compare media '===' silenceMedia}}selected{{/compare}}>{{ i18n.groups.ringback.silence }}</option>
 				{{#each mediaList}}
 					<option value="{{this.id}}" {{#compare ../media '===' this.id}}selected{{/compare}}>{{this.name}}</option>
