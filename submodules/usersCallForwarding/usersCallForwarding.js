@@ -532,14 +532,11 @@ define(function(require) {
 					'default': data.voicemails[0].id
 				});
 
-				if (filterAlwaysRules.length <= 0) {
+				if (_.isEmpty(voicemailRules) && _.isEmpty(filterAlwaysRules)) {
 					_.set(standardFlow, 'data.skip_module', false);
 				};
 
-				if (_.isEmpty(voicemailRules)) {
-					_.set(standardFlow, 'data.skip_module', false);
-					self.resetUserCallFlow(user, standardFlow);
-				};
+				self.resetUserCallFlow(user, standardFlow);
 
 				if (_.isEmpty(phoneNumberRules)) {
 					monster.waterfall([
