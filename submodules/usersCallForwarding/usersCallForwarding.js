@@ -510,17 +510,19 @@ define(function(require) {
 					specificCustomFlow = self.buildSpecificCustomFlow(),
 					newFlow = {};
 
-				_.set(user, 'call_forward', {
-					selective: {
-						enabled: true,
-						number: _.get(phoneNumberRules[0], 'phoneNumber', ''),
-						keep_caller_id: _.includes(callForwardData.isEnabled, 'keep'),
-						direct_calls_only: _.includes(callForwardData.isEnabled, 'forward'),
-						require_keypress: _.includes(callForwardData.isEnabled, 'acknowledge'),
-						ignore_early_media: _.includes(callForwardData.isEnabled, 'ring'),
-						rules: []
-					}
-				});
+				if (!_.isEmpty(phoneNumberRules)) {
+					_.set(user, 'call_forward', {
+						selective: {
+							enabled: true,
+							number: _.get(phoneNumberRules[0], 'phoneNumber', ''),
+							keep_caller_id: _.includes(callForwardData.isEnabled, 'keep'),
+							direct_calls_only: _.includes(callForwardData.isEnabled, 'forward'),
+							require_keypress: _.includes(callForwardData.isEnabled, 'acknowledge'),
+							ignore_early_media: _.includes(callForwardData.isEnabled, 'ring'),
+							rules: []
+						}
+					});
+				}
 
 				_.set(user, 'smartpbx.call_forwarding', {
 					enabled: true,
