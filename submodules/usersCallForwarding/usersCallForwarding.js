@@ -550,11 +550,22 @@ define(function(require) {
 							});
 						},
 						function(userMatchList, waterfallCallback) {
-							self.deleteOldMatchLists(userMatchList);
-							waterfallCallback(null, null);
+							var isDefaultMatchList = userMatchList[0].name === 'Default Match List',
+								createDefaultMatchList = false;
+							console.log('isDefaultMatchList');
+							console.log(userMatchList);
+							if (!isDefaultMatchList) {
+								console.log('deleteOldMatchLists');
+								createDefaultMatchList = true;
+								self.deleteOldMatchLists(userMatchList);
+							}
+							waterfallCallback(null, createDefaultMatchList);
 						},
-						function(empty, waterfallCallback) {
-							self.createUserDefaultMatchList(user.id);
+						function(createDefaultMatchList, waterfallCallback) {
+							if (createDefaultMatchList) {
+								console.log('createDefaultMatchList');
+								self.createUserDefaultMatchList(user.id);
+							}
 							waterfallCallback(true);
 						}
 					]);
