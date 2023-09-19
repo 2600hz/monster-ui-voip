@@ -1389,7 +1389,7 @@ define(function(require) {
 					}
 
 					result.push({
-						name: 'weekly temporal rule for selective',
+						name: 'Weekly temporal rule for selective',
 						wdays: currentDay,
 						time_window_start: start,
 						time_window_stop: end,
