@@ -552,10 +552,8 @@ define(function(require) {
 						function(userMatchList, waterfallCallback) {
 							var isDefaultMatchList = userMatchList[0].name === 'Default Match List',
 								createDefaultMatchList = false;
-							console.log('isDefaultMatchList');
-							console.log(userMatchList);
+
 							if (!isDefaultMatchList) {
-								console.log('deleteOldMatchLists');
 								createDefaultMatchList = true;
 								self.deleteOldMatchLists(userMatchList);
 							}
@@ -563,7 +561,6 @@ define(function(require) {
 						},
 						function(createDefaultMatchList, waterfallCallback) {
 							if (createDefaultMatchList) {
-								console.log('createDefaultMatchList');
 								self.createUserDefaultMatchList(user.id);
 							}
 							waterfallCallback(true);
