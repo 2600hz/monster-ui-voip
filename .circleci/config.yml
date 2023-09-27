@@ -1,40 +1,56 @@
 version: 2
-
 workflows:
   version: 2
   build_branch:
     jobs:
       - build_centos7
-          
+      - build_rockylinux8
+      - build_rockylinux9
   build_release:
     jobs:
-       - build_centos7:
-           filters:
-             tags:
-               only: /^\d+\.\d+\.\d+$/
-             branches:
-               ignore: /.*/
-            
+      -
+        build_centos7:
+          filters:
+            tags:
+              only: '/^\d+\.\d+\.\d+(\.\d+)?$/'
+            branches:
+              ignore: '/.*/'
+      -
+        build_rockylinux8:
+          filters:
+            tags:
+              only: '/^\d+\.\d+\.\d+(\.\d+)?$/'
+            branches:
+              ignore: '/.*/'
+      -
+        build_rockylinux9:
+          filters:
+            tags:
+              only: '/^\d+\.\d+\.\d+(\.\d+)?$/'
+            branches:
+              ignore: '/.*/'
 jobs:
   build_centos7:
     docker:
-      - image: offical2600hz/monster-ui-packager:1.0-centos-7
+      -
+        image: '2600hz/node-packager:14-centos-7'
         user: circleci
-    shell: /bin/bash --login
+    shell: '/bin/bash --login'
     working_directory: /home/circleci/2600hz/the_app
     environment:
       CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
       CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
-      BASH_ENV: "/home/circleci/2600hz/.bashrc"
-      BUILD_ROOT: "/home/circleci/2600hz/packager"
-      CORE_ROOT: "/home/circleci/2600hz/monster-ui"
-      BUILD_SOURCES: "/home/circleci/2600hz/packager/SOURCES"
-      BUILD_RPMS: "/home/circleci/2600hz/packager/RPMS"
-      APP_DIR: "/home/circleci/2600hz/the_app"
+      BASH_ENV: /home/circleci/2600hz/.bashrc
+      BUILD_ROOT: /home/circleci/2600hz/packager
+      CORE_ROOT: /home/circleci/2600hz/monster-ui
+      BUILD_SOURCES: /home/circleci/2600hz/packager/SOURCES
+      BUILD_RPMS: /home/circleci/2600hz/packager/RPMS
+      APP_DIR: /home/circleci/2600hz/the_app
     steps:
       - checkout
-      - run: 
-          name: Setting up core repository
+      -
+        run:
+          name: 'Setting up core repository'
           command: |
             BAZE="$(cat "${HOME}/2600hz/the_app/.base_branch")"
             if [ -n "$BAZE" ]; then
@@ -43,46 +59,53 @@ jobs:
               echo "add base branch name of main Monster-UI repo (like origin/master) to '.base_branch' in your application root directory"
               exit 1
             fi
-      - run: 
-          name: Generating build environment variables
+      -
+        run:
+          name: 'Generating build environment variables'
           command: |
             APP=${CIRCLE_PROJECT_REPONAME#monster-ui-}
             echo -e "export MONSTER_APP=${APP}\n" >> $BASH_ENV
             echo -e "export APP=${APP}\n" >> $BASH_ENV
             echo -e "export MONSTER_ROOT=${HOME}/2600hz/monster-ui" >> $BASH_ENV
             echo -e "export APP_PATH=src/apps/${APP}\n\n" >> $BASH_ENV
-      - run:
-          name: Displaying environment information 
+      -
+        run:
+          name: 'Displaying environment information'
           command: |
             echo ":: behold, running ci tests for application: $MONSTER_APP"
             echo "MONSTER_ROOT: $MONSTER_ROOT"
             echo "APP_PATH: $APP_PATH"
             echo "BASE_BRANCH: $BASE_BRANCH"
-      - run:
-          name: Cloning core repository
+      -
+        run:
+          name: 'Cloning core repository'
           command: |
             if [ ! -d ${MONSTER_ROOT} ]; then
               git clone https://github.com/2600hz/monster-ui $MONSTER_ROOT
             fi
-      - run: 
-          name: Running core setup script
-          command: ${MONSTER_ROOT}/scripts/circleci.bash
-      - restore_cache:
-          key: dependency-cache-centos-{{ checksum "/home/circleci/2600hz/monster-ui/package-lock.json" }}
-          paths:
-            -/home/circle/2600hz/monster-ui/node_modules
-      - run:
-          name: Making dependencies
+      -
+        run:
+          name: 'Running core setup script'
+          command: '${MONSTER_ROOT}/scripts/circleci.bash'
+      -
+        restore_cache:
+          key: 'dependency-cache-centos-7-{{ checksum "/home/circleci/2600hz/monster-ui/package-lock.json" }}'
+          paths: '-/home/circle/2600hz/monster-ui/node_modules'
+      -
+        run:
+          name: 'Making dependencies'
           command: |
             cd $MONSTER_ROOT
             npm install
-      - run:
-          name: Building release
+      -
+        run:
+          name: 'Building release'
           command: |
             cd $MONSTER_ROOT
             gulp build-app --app=${APP}            
-      - run:
-          name: Generating version info
+      -
+        run:
+          name: 'Generating version info'
           command: |
             cd $BUILD_ROOT
             VERSION=$(./version)
@@ -94,14 +117,16 @@ jobs:
             PACKAGE_NAME=$(./package_name)
             echo "export PACKAGE_NAME=${PACKAGE_NAME}" >> $BASH_ENV
             echo "build version for ${PACKAGE_NAME} version: ${VERSION} release: ${RELEASE}"
-      - run:
-          name: Building CHANGELOG and VERSION files
+      -
+        run:
+          name: 'Building CHANGELOG and VERSION files'
           command: |
             cd $BUILD_ROOT
             ./package_docs
-      - run:
-          name: Preparing source for packaging
-          command: |           
+      -
+        run:
+          name: 'Preparing source for packaging'
+          command: |-
             cd $BUILD_SOURCES
             echo " - copy build into artifacts"
             cp -R ${MONSTER_ROOT}/dist/apps/${MONSTER_APP} ${BUILD_SOURCES}/
@@ -117,15 +142,269 @@ jobs:
             cp -r ${BUILD_SOURCES}/* ${ARTIFACTS_NAME}/.
             tar -cf ${ARTIFACTS_NAME}.tar ${ARTIFACTS_NAME}
             cp ${ARTIFACTS_NAME}.tar ${BUILD_SOURCES}/.
-      - run:
-          name: Building package
+      -
+        run:
+          name: 'Building package'
           command: |
             cd $BUILD_ROOT
             ./build
-      - store_artifacts:
+      -
+        store_artifacts:
           path: /home/circleci/2600hz/packager/RPMS
-      - save_cache:
-          key: dependency-cache-centos-{{ checksum "/home/circleci/2600hz/monster-ui/package-lock.json" }}
+      -
+        save_cache:
+          key: 'dependency-cache-centos-7-{{ checksum "/home/circleci/2600hz/monster-ui/package-lock.json" }}'
           paths:
             - /home/circle/2600hz/monster-ui/node_modules
-     
+  build_rockylinux8:
+    docker:
+      -
+        image: '2600hz/node-packager:14-rockylinux-8'
+        user: circleci
+    shell: '/bin/bash --login'
+    working_directory: /home/circleci/2600hz/the_app
+    environment:
+      CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
+      CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
+      BASH_ENV: /home/circleci/2600hz/.bashrc
+      BUILD_ROOT: /home/circleci/2600hz/packager
+      CORE_ROOT: /home/circleci/2600hz/monster-ui
+      BUILD_SOURCES: /home/circleci/2600hz/packager/SOURCES
+      BUILD_RPMS: /home/circleci/2600hz/packager/RPMS
+      APP_DIR: /home/circleci/2600hz/the_app
+    steps:
+      - checkout
+      -
+        run:
+          name: 'Setting up core repository'
+          command: |
+            BAZE="$(cat "${HOME}/2600hz/the_app/.base_branch")"
+            if [ -n "$BAZE" ]; then
+              echo -e "\n\nexport BASE_BRANCH=$BAZE" >> $BASH_ENV
+            else
+              echo "add base branch name of main Monster-UI repo (like origin/master) to '.base_branch' in your application root directory"
+              exit 1
+            fi
+      -
+        run:
+          name: 'Generating build environment variables'
+          command: |
+            APP=${CIRCLE_PROJECT_REPONAME#monster-ui-}
+            echo -e "export MONSTER_APP=${APP}\n" >> $BASH_ENV
+            echo -e "export APP=${APP}\n" >> $BASH_ENV
+            echo -e "export MONSTER_ROOT=${HOME}/2600hz/monster-ui" >> $BASH_ENV
+            echo -e "export APP_PATH=src/apps/${APP}\n\n" >> $BASH_ENV
+      -
+        run:
+          name: 'Displaying environment information'
+          command: |
+            echo ":: behold, running ci tests for application: $MONSTER_APP"
+            echo "MONSTER_ROOT: $MONSTER_ROOT"
+            echo "APP_PATH: $APP_PATH"
+            echo "BASE_BRANCH: $BASE_BRANCH"
+      -
+        run:
+          name: 'Cloning core repository'
+          command: |
+            if [ ! -d ${MONSTER_ROOT} ]; then
+              git clone https://github.com/2600hz/monster-ui $MONSTER_ROOT
+            fi
+      -
+        run:
+          name: 'Running core setup script'
+          command: '${MONSTER_ROOT}/scripts/circleci.bash'
+      -
+        restore_cache:
+          key: 'dependency-cache-rockylinux-8-{{ checksum "/home/circleci/2600hz/monster-ui/package-lock.json" }}'
+          paths: '-/home/circle/2600hz/monster-ui/node_modules'
+      -
+        run:
+          name: 'Making dependencies'
+          command: |
+            cd $MONSTER_ROOT
+            npm install
+      -
+        run:
+          name: 'Building release'
+          command: |
+            cd $MONSTER_ROOT
+            gulp build-app --app=${APP}            
+      -
+        run:
+          name: 'Generating version info'
+          command: |
+            cd $BUILD_ROOT
+            VERSION=$(./version)
+            RELEASE=$(./release)
+            PACKAGE_NAME=$(./package_name)
+            echo "export PACKAGE_NAME=${PACKAGE_NAME}" >> $BASH_ENV
+            echo "export VERSION=${VERSION}" >> $BASH_ENV
+            echo "export RELEASE=${RELEASE}" >> $BASH_ENV
+            PACKAGE_NAME=$(./package_name)
+            echo "export PACKAGE_NAME=${PACKAGE_NAME}" >> $BASH_ENV
+            echo "build version for ${PACKAGE_NAME} version: ${VERSION} release: ${RELEASE}"
+      -
+        run:
+          name: 'Building CHANGELOG and VERSION files'
+          command: |
+            cd $BUILD_ROOT
+            ./package_docs
+      -
+        run:
+          name: 'Preparing source for packaging'
+          command: |-
+            cd $BUILD_SOURCES
+            echo " - copy build into artifacts"
+            cp -R ${MONSTER_ROOT}/dist/apps/${MONSTER_APP} ${BUILD_SOURCES}/
+            cp VERSION ${MONSTER_APP}/
+            echo " - removing files that should not be packaged in the source tar"
+            rm -rf ${BUILD_SOURCES}/.??*
+            rm -rf ${BUILD_SOURCES}/doc*
+            rm -rf ${BUILD_SOURCES}/*.md
+            echo " - creating the source tar"
+            cd $BUILD_ROOT
+            ARTIFACTS_NAME=${PACKAGE_NAME}-${VERSION}
+            mkdir -p ${ARTIFACTS_NAME}
+            cp -r ${BUILD_SOURCES}/* ${ARTIFACTS_NAME}/.
+            tar -cf ${ARTIFACTS_NAME}.tar ${ARTIFACTS_NAME}
+            cp ${ARTIFACTS_NAME}.tar ${BUILD_SOURCES}/.
+      -
+        run:
+          name: 'Building package'
+          command: |
+            cd $BUILD_ROOT
+            ./build
+      -
+        store_artifacts:
+          path: /home/circleci/2600hz/packager/RPMS
+      -
+        save_cache:
+          key: 'dependency-cache-rockylinux-8-{{ checksum "/home/circleci/2600hz/monster-ui/package-lock.json" }}'
+          paths:
+            - /home/circle/2600hz/monster-ui/node_modules
+  build_rockylinux9:
+    docker:
+      -
+        image: '2600hz/node-packager:14-rockylinux-9'
+        user: circleci
+    shell: '/bin/bash --login'
+    working_directory: /home/circleci/2600hz/the_app
+    environment:
+      CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
+      CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
+      BASH_ENV: /home/circleci/2600hz/.bashrc
+      BUILD_ROOT: /home/circleci/2600hz/packager
+      CORE_ROOT: /home/circleci/2600hz/monster-ui
+      BUILD_SOURCES: /home/circleci/2600hz/packager/SOURCES
+      BUILD_RPMS: /home/circleci/2600hz/packager/RPMS
+      APP_DIR: /home/circleci/2600hz/the_app
+    steps:
+      - checkout
+      -
+        run:
+          name: 'Setting up core repository'
+          command: |
+            BAZE="$(cat "${HOME}/2600hz/the_app/.base_branch")"
+            if [ -n "$BAZE" ]; then
+              echo -e "\n\nexport BASE_BRANCH=$BAZE" >> $BASH_ENV
+            else
+              echo "add base branch name of main Monster-UI repo (like origin/master) to '.base_branch' in your application root directory"
+              exit 1
+            fi
+      -
+        run:
+          name: 'Generating build environment variables'
+          command: |
+            APP=${CIRCLE_PROJECT_REPONAME#monster-ui-}
+            echo -e "export MONSTER_APP=${APP}\n" >> $BASH_ENV
+            echo -e "export APP=${APP}\n" >> $BASH_ENV
+            echo -e "export MONSTER_ROOT=${HOME}/2600hz/monster-ui" >> $BASH_ENV
+            echo -e "export APP_PATH=src/apps/${APP}\n\n" >> $BASH_ENV
+      -
+        run:
+          name: 'Displaying environment information'
+          command: |
+            echo ":: behold, running ci tests for application: $MONSTER_APP"
+            echo "MONSTER_ROOT: $MONSTER_ROOT"
+            echo "APP_PATH: $APP_PATH"
+            echo "BASE_BRANCH: $BASE_BRANCH"
+      -
+        run:
+          name: 'Cloning core repository'
+          command: |
+            if [ ! -d ${MONSTER_ROOT} ]; then
+              git clone https://github.com/2600hz/monster-ui $MONSTER_ROOT
+            fi
+      -
+        run:
+          name: 'Running core setup script'
+          command: '${MONSTER_ROOT}/scripts/circleci.bash'
+      -
+        restore_cache:
+          key: 'dependency-cache-rockylinux-9-{{ checksum "/home/circleci/2600hz/monster-ui/package-lock.json" }}'
+          paths: '-/home/circle/2600hz/monster-ui/node_modules'
+      -
+        run:
+          name: 'Making dependencies'
+          command: |
+            cd $MONSTER_ROOT
+            npm install
+      -
+        run:
+          name: 'Building release'
+          command: |
+            cd $MONSTER_ROOT
+            gulp build-app --app=${APP}            
+      -
+        run:
+          name: 'Generating version info'
+          command: |
+            cd $BUILD_ROOT
+            VERSION=$(./version)
+            RELEASE=$(./release)
+            PACKAGE_NAME=$(./package_name)
+            echo "export PACKAGE_NAME=${PACKAGE_NAME}" >> $BASH_ENV
+            echo "export VERSION=${VERSION}" >> $BASH_ENV
+            echo "export RELEASE=${RELEASE}" >> $BASH_ENV
+            PACKAGE_NAME=$(./package_name)
+            echo "export PACKAGE_NAME=${PACKAGE_NAME}" >> $BASH_ENV
+            echo "build version for ${PACKAGE_NAME} version: ${VERSION} release: ${RELEASE}"
+      -
+        run:
+          name: 'Building CHANGELOG and VERSION files'
+          command: |
+            cd $BUILD_ROOT
+            ./package_docs
+      -
+        run:
+          name: 'Preparing source for packaging'
+          command: |-
+            cd $BUILD_SOURCES
+            echo " - copy build into artifacts"
+            cp -R ${MONSTER_ROOT}/dist/apps/${MONSTER_APP} ${BUILD_SOURCES}/
+            cp VERSION ${MONSTER_APP}/
+            echo " - removing files that should not be packaged in the source tar"
+            rm -rf ${BUILD_SOURCES}/.??*
+            rm -rf ${BUILD_SOURCES}/doc*
+            rm -rf ${BUILD_SOURCES}/*.md
+            echo " - creating the source tar"
+            cd $BUILD_ROOT
+            ARTIFACTS_NAME=${PACKAGE_NAME}-${VERSION}
+            mkdir -p ${ARTIFACTS_NAME}
+            cp -r ${BUILD_SOURCES}/* ${ARTIFACTS_NAME}/.
+            tar -cf ${ARTIFACTS_NAME}.tar ${ARTIFACTS_NAME}
+            cp ${ARTIFACTS_NAME}.tar ${BUILD_SOURCES}/.
+      -
+        run:
+          name: 'Building package'
+          command: |
+            cd $BUILD_ROOT
+            ./build
+      -
+        store_artifacts:
+          path: /home/circleci/2600hz/packager/RPMS
+      -
+        save_cache:
+          key: 'dependency-cache-rockylinux-9-{{ checksum "/home/circleci/2600hz/monster-ui/package-lock.json" }}'
+          paths:
+            - /home/circle/2600hz/monster-ui/node_modules
