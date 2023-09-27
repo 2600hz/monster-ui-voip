@@ -44,7 +44,8 @@ define(function(require) {
 			'fax': 'device-fax',
 			'ata': 'device-ata',
 			'application': 'apps',
-			'teammate': 'device-mst'
+			'teammate': 'device-mst',
+			'meta': 'apps'
 		},
 
 		/* Users */

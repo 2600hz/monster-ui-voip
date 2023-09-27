@@ -48,7 +48,8 @@ define(function(require) {
 					sip_uri: 'device-voip-phone',
 					smartphone: 'device-mobile',
 					softphone: 'device-soft-phone',
-					teammate: 'device-mst'
+					teammate: 'device-mst',
+					meta: 'apps'
 				},
 				/**
 				 * Lists device types allowed to be added by devicesRenderAdd.
