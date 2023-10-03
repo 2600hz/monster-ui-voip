@@ -470,6 +470,10 @@ define(function(require) {
 					};
 				},
 				isRegistered = function(device) {
+					// TODO: this validation should be removed once the backend returns the actual meta device status.
+					if (device.device_type === 'meta') {
+						return true;
+					}
 					return _.every([
 						device.enabled,
 						device.registrable ? device.registered : true
