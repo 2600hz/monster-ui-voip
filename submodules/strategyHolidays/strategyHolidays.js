@@ -1021,6 +1021,9 @@ define(function(require) {
 		 */
 		strategyHolidaysBuildHolidayRule: function(holiday) {
 			var self = this,
+				formatDateToExclude = function formatDateToExclude(date) {
+					return date.toISOString().split('T')[0].split('-').join('');
+				},
 				holidayData = _.get(holiday, 'holidayData', {}),
 				name = holidayData.name,
 				month = holidayData.fromMonth,
@@ -1082,8 +1085,16 @@ define(function(require) {
 				holidayRule.exclude = [];
 
 				_.forEach(holidayData.excludeYear, function(year) {
-					var excludeDate = self.strategyHolidaysGetEndDate(year, holiday).toISOString().split('T')[0].split('-').join('');
-					holidayRule.exclude.push(excludeDate);
+					if (holiday.holidayType === 'range') {
+						_.forEach(_.range(fromDay, toDay + 1), function(day) {
+							holidayRule.exclude.push(
+								formatDateToExclude(new Date(year, holidayData.toMonth - 1, day))
+							);
+						});
+					} else {
+						var excludeDate = formatDateToExclude(self.strategyHolidaysGetEndDate(year, holiday));
+						holidayRule.exclude.push(excludeDate);
+					}
 				});
 			}
 
