@@ -1145,7 +1145,7 @@ define(function(require) {
 						_.forEach(data.exclude, function(year) {
 							_.forEach(_.range(fromDay, toDay + 1), function(day) {
 								rule.exclude.push(
-									self.formatDate(new Date(year, month, day))
+									self.formatDate(new Date(year, month - 1, day))
 								);
 							});
 						});
