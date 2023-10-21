@@ -858,12 +858,17 @@ define(function(require) {
 					holidaysData.push({ holidayType: holidayType, holidayData: holidayData });
 
 					if (val.hasOwnProperty('exclude')) {
-						holidayData.excludeYear = [];
-
-						_.forEach(val.exclude, function(date) {
-							var year = parseInt(date.substring(0, 4));
-							holidayData.excludeYear.push(year);
-						});
+						if (val.hasOwnProperty('temporal_rules')) {
+							holidayData.excludeYear = val.exclude;
+						} else {
+							holidayData.excludeYear = [];
+							_.forEach(val.exclude, function(date) {
+								var year = parseInt(date.substring(0, 4));
+								if (!_.includes(holidayData.excludeYear, year)) {
+									holidayData.excludeYear.push(year);
+								}
+							});
+						}
 					}
 				}
 				self.appFlags.strategyHolidays.allHolidays = holidaysData;
@@ -1014,6 +1019,15 @@ define(function(require) {
 		},
 
 		/**
+		 * Returns Date in the format MMDDYYYY
+		 * @param  {string} endYear
+		 * @return {Date}
+		 */
+		formatDate: function formatDateToExclude(date) {
+			return date.toISOString().split('T')[0].split('-').join('');
+		},
+
+		/**
 		 * Returns an objects with formatted data for a holiday.
 		 * @param  {Object} holiday
 		 * @param  {Object} rules
@@ -1082,8 +1096,18 @@ define(function(require) {
 				holidayRule.exclude = [];
 
 				_.forEach(holidayData.excludeYear, function(year) {
-					var excludeDate = self.strategyHolidaysGetEndDate(year, holiday).toISOString().split('T')[0].split('-').join('');
-					holidayRule.exclude.push(excludeDate);
+					if (holiday.holidayType === 'range' && holidayData.set) {
+						holidayRule.exclude.push(year);
+					} else if (holiday.holidayType === 'range') {
+						_.forEach(_.range(fromDay, toDay + 1), function(day) {
+							holidayRule.exclude.push(
+								self.formatDate(new Date(year, holidayData.toMonth - 1, day))
+							);
+						});
+					} else {
+						var excludeDate = self.formatDate(self.strategyHolidaysGetEndDate(year, holiday));
+						holidayRule.exclude.push(excludeDate);
+					}
 				});
 			}
 
@@ -1107,15 +1131,27 @@ define(function(require) {
 					var month = parseInt(pMonth),
 						fromDay = pStartDay || 1,
 						toDay = pEndDay || 31,
-						days = _.range(fromDay, toDay + 1);
+						days = _.range(fromDay, toDay + 1),
+						rule = {
+							name: name + '_' + month,
+							cycle: 'yearly',
+							days: days,
+							interval: 1,
+							month: month
+						};
 
-					return {
-						name: name + '_' + month,
-						cycle: 'yearly',
-						days: days,
-						interval: 1,
-						month: month
-					};
+					if (data.exclude) {
+						rule.exclude = [];
+						_.forEach(data.exclude, function(year) {
+							_.forEach(_.range(fromDay, toDay + 1), function(day) {
+								rule.exclude.push(
+									self.formatDate(new Date(year, month - 1, day))
+								);
+							});
+						});
+					}
+
+					return rule;
 				},
 				rulesToCreate = [],
 				ruleSet = {
@@ -1125,6 +1161,10 @@ define(function(require) {
 				},
 				parallelRequests = {},
 				junkName = name + '_' + monster.util.randomString(6);
+
+			if (data.exclude) {
+				ruleSet.exclude = data.exclude;
+			}
 
 			if (fromMonth !== toMonth) {
 				rulesToCreate.push(getMonthRule(junkName, fromMonth, fromDay, 31));
