@@ -608,6 +608,88 @@
 			"successResetPassword": "Vorgang erfolgreich durchgeführt! {{ name }} wird in Kürze eine E-Mail erhalten, in der steht, wie er sein Kennwort zurücksetzen kann."
 		},
 		"uploadPicture": "Ein Bild hochladen",
+		"callForwarding": {
+			"title": "Anrufweiterleitung",
+			"strategies": {
+				"off": {
+					"title": "Aus",
+					"helpText": "Die Anrufweiterleitung ist deaktiviert und Anrufe werden nicht weitergeleitet."
+				},
+				"alwaysOn": {
+					"title": "Immer aktiv",
+					"helpText": "Anrufe werden zu einem ausgewählten Ziel weitergeleitet."
+				},
+				"busy": {
+					"title": "Besetzt",
+					"helpText": "Anrufe werden weitergeleitet, wenn alle Leitungsauftritte belegt sind."
+				},
+				"noAnswer": {
+					"title": "Keine Antwort",
+					"helpText": "Anrufe werden weitergeleitet, wenn der Anruf auf keinem zugewiesenen Gerät beantwortet wird."
+				},
+				"selective": {
+					"title": "Selektiv",
+					"helpText": "Anrufe werden anhand vordefinierter Kriterien weitergeleitet, einschließlich bestimmter Telefonnummern und Zeitpläne.",
+					"all": "Alle Nummern",
+					"specific": "Bestimmte Nummern (max. 10)",
+					"buttons": {
+						"addRule": "Neue Regel",
+						"addNumber": "Nummer"
+					},
+					"rules": {
+						"from": "Anrufe weiterleiten von",
+						"to": "Anrufe weiterleiten nach",
+						"duration": "Aktive Dauer",
+						"remove": "Regel entfernen",
+						"customDuration": {
+							"day": "Tag",
+							"start": "Startzeit",
+							"end": "Endzeit"
+						}
+					}
+				},
+				"common": {
+					"voicemail": {
+						"label": "Voicemail",
+						"selectLabel": "Ziel Voicemail-Box"
+					},
+					"phoneNumber": {
+						"label": "Telefonnummer",
+						"inputLabelTo": "Anrufe weiterleiten nach",
+						"inputLabelFrom": "Anrufe weiterleiten von"
+					},
+					"length": {
+						"always": "Immer",
+						"custom": "Benutzerdefiniert"
+					},
+					"options": {
+						"title": "Zusätzliche Optionen",
+						"forward": {
+							"title": "Nur direkte Anrufe weiterleiten",
+							"helpText": "Eingehende Anrufe, die auf Klingelgruppen, Warteschlangen usw. abzielen, werden nicht weitergeleitet."
+						},
+						"acknowledge": {
+							"title": "Anruf bestätigen",
+							"helpText": "Erhalten Sie eine Aufforderung zur Annahme weitergeleiteter Anrufe. Dadurch wird vermieden, dass Voicemails mit der Nummer \"Anrufe weiterleiten nach\" in Verbindung gebracht werden."
+						},
+						"keep": {
+							"title": "Ursprüngliche Anrufer-ID beibehalten",
+							"helpText": "Die ursprüngliche eingehende Anrufer-ID wird für den weitergeleiteten Anruf verwendet."
+						},
+						"ring": {
+							"title": "Meine anderen Geräte klingeln lassen",
+							"helpText": "Auch Ihre anderen Geräte klingeln, wenn ein weitergeleiteter Anruf eingeht."
+						}
+					}
+				}
+			},
+
+			"toast": {
+				"error": {
+					"save": "Hoppla, es gab ein Problem beim Anwenden Ihrer Änderungen"
+				}
+			}
+		},
 		"user": "Benutzer",
 		"callRecording": {
 			"title": "Angepasste Anrufaufzeichnung",

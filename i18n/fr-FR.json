@@ -474,6 +474,88 @@
 		},
 		"uploadPicture": "Uploader une image",
 		"user": "Utilisateur",
+		"callForwarding": {
+			"title": "Transfert d'appel",
+			"strategies": {
+				"off": {
+					"title": "Désactivé",
+					"helpText": "Le transfert d'appel est désactivé et les appels ne seront pas redirigés."
+				},
+				"alwaysOn": {
+					"title": "Toujours actif",
+					"helpText": "Les appels seront redirigés vers une destination de choix."
+				},
+				"busy": {
+					"title": "Occupé",
+					"helpText": "Les appels seront redirigés si toutes les apparences de ligne sont occupées."
+				},
+				"noAnswer": {
+					"title": "Pas de réponse",
+					"helpText": "Les appels seront redirigés si l'appel n'est pas répondu sur tous les appareils assignés."
+				},
+				"selective": {
+					"title": "Sélectif",
+					"helpText": "Les appels seront redirigés en fonction de critères prédéfinis, y compris des numéros de téléphone spécifiques et des horaires.",
+					"all": "Tous les numéros",
+					"specific": "Numéros spécifiques (10 max)",
+					"buttons": {
+						"addRule": "Nouvelle règle",
+						"addNumber": "Numéro"
+					},
+					"rules": {
+						"from": "Rediriger les appels depuis",
+						"to": "Rediriger vers",
+						"duration": "Durée active",
+						"remove": "Supprimer la règle",
+						"customDuration": {
+							"day": "Jour",
+							"start": "Heure de début",
+							"end": "Heure de fin"
+						}
+					}
+				},
+				"common": {
+					"voicemail": {
+						"label": "Messagerie vocale",
+						"selectLabel": "Boîte vocale cible"
+					},
+					"phoneNumber": {
+						"label": "Numéro de téléphone",
+						"inputLabelTo": "Rediriger les appels vers",
+						"inputLabelFrom": "Rediriger les appels depuis"
+					},
+					"length": {
+						"always": "Toujours",
+						"custom": "Personnalisé"
+					},
+					"options": {
+						"title": "Options supplémentaires",
+						"forward": {
+							"title": "Rediriger uniquement les appels directs",
+							"helpText": "Les appels entrants ciblant des groupes de sonnerie, des files d'attente, etc. ne seront pas redirigés."
+						},
+						"acknowledge": {
+							"title": "Reconnaître l'appel",
+							"helpText": "Recevez une invite pour accepter les appels redirigés. Cela évite que les messages vocaux soient associés au numéro de \"Rediriger vers\"."
+						},
+						"keep": {
+							"title": "Conserver l'identifiant de l'appelant initial",
+							"helpText": "L'identifiant d'appel entrant original sera utilisé pour l'appel redirigé."
+						},
+						"ring": {
+							"title": "Faire sonner mes autres appareils",
+							"helpText": "Vos autres appareils sonneront également lors de la réception d'un appel redirigé."
+						}
+					}
+				}
+			},
+
+			"toast": {
+				"error": {
+					"save": "Oups, il y a eu un problème lors de l'application de vos modifications"
+				}
+			}
+		},
 		"callRecording": {
 			"title": "Enregistrement d'appel entrant",
 			"headline": "Réglages de l'enregistrement d'appel",
