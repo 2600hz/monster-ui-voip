@@ -319,9 +319,20 @@ define(function(require) {
 					$(this).closest('.phone-number-wrapper').siblings('.options').removeClass('disabled');
 
 					if (strategy === 'selective') {
+						var radioCheckboxes = $(this).closest('.append-phone-number').find('.radio-state'),
+							isAnyPhoneNumberActive = _.some(radioCheckboxes, function(checkBox) {
+								return checkBox.value === 'phoneNumber' && checkBox.checked === true;
+							});
+
 						$(this).closest('.phone-number-wrapper').find('.selective-control-group.phone-number').removeClass('disabled');
 						$(this).closest('.phone-number-wrapper').siblings().find('.selective-control-group.voicemail').addClass('disabled');
 						$(this).closest('.append-phone-number').siblings('.options').removeClass('disabled');
+
+						if (isAnyPhoneNumberActive) {
+							$(this).closest('.append-phone-number').siblings('.options').removeClass('disabled');
+						} else {
+							$(this).closest('.append-phone-number').siblings('.options').addClass('disabled');
+						}
 					}
 				}
 
@@ -331,9 +342,19 @@ define(function(require) {
 					$(this).closest('.voicemail-wrapper').siblings('.options').addClass('disabled');
 
 					if (strategy === 'selective') {
+						var radioCheckboxes = $(this).closest('.append-phone-number').find('.radio-state'),
+							isAnyPhoneNumberActive = _.some(radioCheckboxes, function(checkBox) {
+								return checkBox.value === 'phoneNumber' && checkBox.checked === true;
+							});
+
 						$(this).closest('.voicemail-wrapper').find('.selective-control-group.voicemail').removeClass('disabled');
 						$(this).closest('.voicemail-wrapper').siblings().find('.selective-control-group.phone-number').addClass('disabled');
-						$(this).closest('.append-phone-number').siblings('.options').addClass('disabled');
+
+						if (isAnyPhoneNumberActive) {
+							$(this).closest('.append-phone-number').siblings('.options').removeClass('disabled');
+						} else {
+							$(this).closest('.append-phone-number').siblings('.options').addClass('disabled');
+						}
 					}
 				}
 
@@ -504,6 +525,21 @@ define(function(require) {
 							return rule;
 						}
 					}),
+					customRules = _.filter(voicemailRules, function(rule) {
+						if (rule.from === 'allNumbers' && rule.length === 'custom') {
+							return rule;
+						}
+					}),
+					specificRules = _.filter(voicemailRules, function(rule) {
+						if (rule.from === 'specific' && rule.length === 'always') {
+							return rule;
+						}
+					}),
+					specificCustomRules = _.filter(voicemailRules, function(rule) {
+						if (rule.from === 'specific' && rule.length === 'custom') {
+							return rule;
+						}
+					}),
 					standardFlow = self.buildStandardFlow(user, voicemail),
 					temporalRouteFlow = self.buildTemporalRoutesFlow(),
 					specificFlow = self.buildSpecificFlow(voicemail),
@@ -522,6 +558,18 @@ define(function(require) {
 							rules: []
 						}
 					});
+				} else {
+					_.set(user, 'call_forward', {
+						selective: {
+							enabled: true,
+							number: '',
+							keep_caller_id: false,
+							direct_calls_only: false,
+							require_keypress: false,
+							ignore_early_media: false,
+							rules: []
+						}
+					});
 				}
 
 				_.set(user, 'smartpbx.call_forwarding', {
@@ -532,11 +580,13 @@ define(function(require) {
 					'default': data.voicemails[0].id
 				});
 
-				if (_.isEmpty(voicemailRules) && _.isEmpty(filterAlwaysRules)) {
+				if (!_.isEmpty(voicemailRules) && _.isEmpty(filterAlwaysRules)) {
 					_.set(standardFlow, 'data.skip_module', false);
 				};
 
-				self.resetUserCallFlow(user, standardFlow);
+				if (_.isEmpty(specificRules)) {
+					self.resetUserCallFlow(user, standardFlow);
+				}
 
 				if (_.isEmpty(phoneNumberRules)) {
 					monster.waterfall([
@@ -646,22 +696,7 @@ define(function(require) {
 
 				// Voicemail Flows Logic
 				if (voicemailRules.length > 0) {
-					var customRules = _.filter(voicemailRules, function(rule) {
-							if (rule.from === 'allNumbers' && rule.length === 'custom') {
-								return rule;
-							}
-						}),
-						specificRules = _.filter(voicemailRules, function(rule) {
-							if (rule.from === 'specific' && rule.length === 'always') {
-								return rule;
-							}
-						}),
-						specificCustomRules = _.filter(voicemailRules, function(rule) {
-							if (rule.from === 'specific' && rule.length === 'custom') {
-								return rule;
-							}
-						}),
-						specificCustomIntervals,
+					var	specificCustomIntervals,
 						customRulesIntervals,
 						specificCustomNumbers,
 						specificRulesNumbers;
@@ -743,6 +778,7 @@ define(function(require) {
 							self.generateTemporalRoutesForVoicemail(newFlow, user, customRulesIntervals, [], 'children.nomatch.children', voicemail, function(data) {
 							});
 						} else {
+							_.set(newFlow, 'children.nomatch.data.skip_module', false);
 							self.updateFlow(user, newFlow);
 						};
 					} else if (!_.isEmpty(customRules)) {
@@ -1116,7 +1152,7 @@ define(function(require) {
 					$(elem).append(listingTemplate);
 				}
 
-				if ($(elem).hasClass('disabled')) {
+				if ($(template).find('.office-hours-wrapper').children().length === 0) {
 					$(elem).append(listingTemplate);
 				}
 			});
@@ -1317,7 +1353,7 @@ define(function(require) {
 			return result;
 		},
 
-		formatRulesData: function(rules) { //here
+		formatRulesData: function(rules) {
 			var self = this,
 				rulesArray = [];
 
