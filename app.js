@@ -176,9 +176,10 @@ define(function(require) {
 		},
 
 		crossSiteMessageHandler: function(topic) {
-			var crossSiteMessageTopic = topic.replace('.tab', '') + '.render';
+			var crossSiteMessageTopic = topic.replace('.tab', '') + '.render',
+				container = $('.right-content');
 
-			monster.pub(crossSiteMessageTopic);
+			monster.pub(crossSiteMessageTopic, { parent: container });
 		},
 
 		overlayInsert: function() {
