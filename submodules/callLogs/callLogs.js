@@ -127,6 +127,7 @@ define(function(require) {
 			var self = this,
 				template,
 				defaultDateRange = 1,
+				container = parent || $('.right-content'),
 				maxDateRange = 31;
 
 			if (!toDate && !fromDate) {
@@ -193,7 +194,7 @@ define(function(require) {
 
 				monster.ui.tooltips(template);
 
-				parent
+				container
 					.empty()
 					.append(template);
 
