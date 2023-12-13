@@ -372,10 +372,15 @@ define(function(require) {
 			}
 
 			dataUser.extra.countFeatures = 0;
-			_.each(dataUser.extra.features, function(v) {
-				if (v in dataUser.extra.mapFeatures) {
+			_.each(dataUser.extra.features, function(feature) {
+				var featureKey = feature;
+				if (feature === 'call_forward' && 'call_forwarding' in dataUser.extra.mapFeatures) {
+					featureKey = 'call_forwarding';
+				}
+
+				if (featureKey in dataUser.extra.mapFeatures) {
 					dataUser.extra.countFeatures++;
-					dataUser.extra.mapFeatures[v].active = true;
+					dataUser.extra.mapFeatures[featureKey].active = true;
 				}
 			});
 

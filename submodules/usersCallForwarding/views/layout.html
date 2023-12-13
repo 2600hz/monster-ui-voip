@@ -104,33 +104,6 @@
 
 			<div class="simple-strategy {{#unless isNoAnswerEnabled}} disabled{{/unless}}"></div>
 		</div>
-
-		<div class="feature-popup-title feature-popup-flex" data-template="selective">
-			<div class="simple-strategy-row">
-				<div class="popup-title">
-					<div class="feature-fa-wrapper">
-						{{telicon "telicon2--list-prioritize"}}
-					</div>
-					<div>
-						<div class="call-forwarding-titles">
-							{{ i18n.users.callForwarding.strategies.selective.title }}
-						</div>
-						<div class="call-forwarding-descriptions">
-							{{ i18n.users.callForwarding.strategies.selective.helpText }}
-						</div>
-					</div>
-				</div>
-				<div class="switch popup-action">
-					{{#monsterSwitch}}
-					<input class="switch-state" type="radio" value="selective" name="call_forwarding_strategy"
-						data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}" {{#if
-						isSelectiveEnabled }} checked="checked" {{/if}}></input>
-					{{/monsterSwitch}}
-				</div>
-			</div>
-
-			<div class="complex-strategy {{#unless isSelectiveEnabled}} disabled{{/unless}}"></div>
-		</div>
 	</form>
 
 	<div class="actions clearfix">

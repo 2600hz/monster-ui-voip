@@ -519,27 +519,6 @@
 					"title": "Sin Respuesta",
 					"helpText": "Las llamadas serán desviadas si la llamada no es contestada en ninguno de los dispositivos asignados."
 				},
-				"selective": {
-					"title": "Selectivo",
-					"helpText": "Las llamadas serán desviadas según criterios predefinidos, incluyendo números de teléfono específicos y horarios.",
-					"all": "Todos los números",
-					"specific": "Números específicos (máx. 10)",
-					"buttons": {
-						"addRule": "Nueva regla",
-						"addNumber": "Número"
-					},
-					"rules": {
-						"from": "Desviar llamadas desde",
-						"to": "Desviar a",
-						"duration": "Duración activa",
-						"remove": "Eliminar regla",
-						"customDuration": {
-							"day": "Día",
-							"start": "Hora de inicio",
-							"end": "Hora de fin"
-						}
-					}
-				},
 				"common": {
 					"voicemail": {
 						"label": "Correo de voz",
@@ -549,10 +528,6 @@
 						"label": "Número de teléfono",
 						"inputLabelTo": "Desviar llamadas a",
 						"inputLabelFrom": "Desviar llamadas desde"
-					},
-					"length": {
-						"always": "Siempre",
-						"custom": "Personalizado"
 					},
 					"options": {
 						"title": "Opciones adicionales",

@@ -493,27 +493,6 @@
 					"title": "Pas de réponse",
 					"helpText": "Les appels seront redirigés si l'appel n'est pas répondu sur tous les appareils assignés."
 				},
-				"selective": {
-					"title": "Sélectif",
-					"helpText": "Les appels seront redirigés en fonction de critères prédéfinis, y compris des numéros de téléphone spécifiques et des horaires.",
-					"all": "Tous les numéros",
-					"specific": "Numéros spécifiques (10 max)",
-					"buttons": {
-						"addRule": "Nouvelle règle",
-						"addNumber": "Numéro"
-					},
-					"rules": {
-						"from": "Rediriger les appels depuis",
-						"to": "Rediriger vers",
-						"duration": "Durée active",
-						"remove": "Supprimer la règle",
-						"customDuration": {
-							"day": "Jour",
-							"start": "Heure de début",
-							"end": "Heure de fin"
-						}
-					}
-				},
 				"common": {
 					"voicemail": {
 						"label": "Messagerie vocale",
@@ -523,10 +502,6 @@
 						"label": "Numéro de téléphone",
 						"inputLabelTo": "Rediriger les appels vers",
 						"inputLabelFrom": "Rediriger les appels depuis"
-					},
-					"length": {
-						"always": "Toujours",
-						"custom": "Personnalisé"
 					},
 					"options": {
 						"title": "Options supplémentaires",

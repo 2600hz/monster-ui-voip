@@ -627,27 +627,6 @@
 					"title": "Keine Antwort",
 					"helpText": "Anrufe werden weitergeleitet, wenn der Anruf auf keinem zugewiesenen Gerät beantwortet wird."
 				},
-				"selective": {
-					"title": "Selektiv",
-					"helpText": "Anrufe werden anhand vordefinierter Kriterien weitergeleitet, einschließlich bestimmter Telefonnummern und Zeitpläne.",
-					"all": "Alle Nummern",
-					"specific": "Bestimmte Nummern (max. 10)",
-					"buttons": {
-						"addRule": "Neue Regel",
-						"addNumber": "Nummer"
-					},
-					"rules": {
-						"from": "Anrufe weiterleiten von",
-						"to": "Anrufe weiterleiten nach",
-						"duration": "Aktive Dauer",
-						"remove": "Regel entfernen",
-						"customDuration": {
-							"day": "Tag",
-							"start": "Startzeit",
-							"end": "Endzeit"
-						}
-					}
-				},
 				"common": {
 					"voicemail": {
 						"label": "Voicemail",
@@ -657,10 +636,6 @@
 						"label": "Telefonnummer",
 						"inputLabelTo": "Anrufe weiterleiten nach",
 						"inputLabelFrom": "Anrufe weiterleiten von"
-					},
-					"length": {
-						"always": "Immer",
-						"custom": "Benutzerdefiniert"
 					},
 					"options": {
 						"title": "Zusätzliche Optionen",

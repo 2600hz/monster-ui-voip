@@ -633,27 +633,6 @@
 					"title": "No Answer",
 					"helpText": "Calls will be forwarded if the call is not answered on any assigned devices."
 				},
-				"selective": {
-					"title": "Selective",
-					"helpText": "Calls will be forwarded based on predefined criteria, including specific phone numbers and schedules.",
-					"all": "All numbers",
-					"specific": "Specific numbers (10 max)",
-					"buttons": {
-						"addRule": "New rule",
-						"addNumber": "Number"
-					},
-					"rules": {
-						"from": "Forward Calls From",
-						"to": "Forward To",
-						"duration": "Active Duration",
-						"remove": "Remove Rule",
-						"customDuration": {
-							"day": "Day",
-							"start": "Start Time",
-							"end": "End Time"
-						}
-					}
-				},
 				"common": {
 					"voicemail": {
 						"label": "Voicemail",
@@ -663,10 +642,6 @@
 						"label": "Phone number",
 						"inputLabelTo": "Forward calls to",
 						"inputLabelFrom": "Forward calls from"
-					},
-					"length": {
-						"always": "Always",
-						"custom": "Custom"
 					},
 					"options": {
 						"title": "Additional Options",
