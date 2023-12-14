@@ -97,6 +97,7 @@
 			"headline": "Group Ringback Settings",
 			"dropdownLabel": "Ringback media:",
 			"silence": "Silence",
+			"default": "Default",
 			"defaultRingback": "Default Ringback",
 			"emptyUploadAlert": "Please select a file to upload",
 			"fileTooBigAlert": "You can not upload a file with a size exceeding 5MB",

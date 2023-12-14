@@ -48,7 +48,8 @@ define(function(require) {
 					sip_uri: 'device-voip-phone',
 					smartphone: 'device-mobile',
 					softphone: 'device-soft-phone',
-					teammate: 'device-mst'
+					teammate: 'device-mst',
+					meta: 'apps'
 				},
 				/**
 				 * Lists device types allowed to be added by devicesRenderAdd.
@@ -739,12 +740,6 @@ define(function(require) {
 					keep_caller_id: true
 				}, formData.call_forward);
 
-				if (originalData.device_type === 'smartphone') {
-					formData.call_failover = _.merge({
-						enabled: true
-					}, formData.call_failover);
-				}
-
 				if (formData.hasOwnProperty('extra') && formData.extra.allowVMCellphone) {
 					formData.call_forward.require_keypress = !formData.extra.allowVMCellphone;
 				}
@@ -1213,7 +1208,9 @@ define(function(require) {
 					.map(function(device) {
 						var staticStatusClasses = ['unregistered', 'registered'],
 							deviceType = device.device_type,
-							isRegistered = device.registrable ? device.registered : true,
+							// TODO: this validation should be removed once the backend returns the actual meta device status.
+							isRegistered = device.device_type === 'meta' ? true :
+							  device.registrable ? device.registered : true,
 							isEnabled = _.get(device, 'enabled', false),
 							userName = _
 								.chain(usersById)

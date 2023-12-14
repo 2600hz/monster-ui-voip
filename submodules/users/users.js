@@ -44,7 +44,8 @@ define(function(require) {
 			'fax': 'device-fax',
 			'ata': 'device-ata',
 			'application': 'apps',
-			'teammate': 'device-mst'
+			'teammate': 'device-mst',
+			'meta': 'apps'
 		},
 
 		/* Users */
@@ -473,6 +474,10 @@ define(function(require) {
 					};
 				},
 				isRegistered = function(device) {
+					// TODO: this validation should be removed once the backend returns the actual meta device status.
+					if (device.device_type === 'meta') {
+						return true;
+					}
 					return _.every([
 						device.enabled,
 						device.registrable ? device.registered : true
