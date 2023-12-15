@@ -1,0 +1,115 @@
+<div class="monster-feature-popup-container call-forwarding-popup" data-feature="call_forwarding">
+	<form id="call_forward_form" class="content">
+
+		<div class="feature-popup-title" data-template="off">
+			<div class="popup-title">
+				<div class="feature-fa-wrapper">
+					{{telicon "telicon2--cancel"}}
+				</div>
+				<div>
+					<div class="call-forwarding-titles">
+						{{ i18n.users.callForwarding.strategies.off.title }}
+					</div>
+					<div class="call-forwarding-descriptions">
+						{{ i18n.users.callForwarding.strategies.off.helpText }}
+					</div>
+				</div>
+			</div>
+			<div class="switch popup-action">
+				{{#monsterSwitch}}
+				<input class="switch-state" type="radio" value="off" name="call_forwarding_strategy"
+					data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}" {{#if enabled }}
+					checked="unchecked" {{else}} checked="checked" {{/if}}></input>
+				{{/monsterSwitch}}
+			</div>
+		</div>
+
+		<div class="feature-popup-title feature-popup-flex" data-template="unconditional">
+			<div class="simple-strategy-row">
+				<div class="popup-title">
+					<div class="feature-fa-wrapper">
+						{{telicon "telicon2--lightning-bolt"}}
+					</div>
+					<div>
+						<div class="call-forwarding-titles">
+							{{ i18n.users.callForwarding.strategies.alwaysOn.title }}
+						</div>
+						<div class="call-forwarding-descriptions">
+							{{ i18n.users.callForwarding.strategies.alwaysOn.helpText }}
+						</div>
+					</div>
+				</div>
+				<div class="switch popup-action">
+					{{#monsterSwitch}}
+					<input class="switch-state" type="radio" value="unconditional" name="call_forwarding_strategy"
+						data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}" {{#if
+						isUnconditionalEnabled }} checked="checked" {{/if}}></input>
+					{{/monsterSwitch}}
+				</div>
+			</div>
+
+			<div class="simple-strategy {{#unless isUnconditionalEnabled}} disabled{{/unless}}"></div>
+		</div>
+
+		<div class="feature-popup-title feature-popup-flex" data-template="busy">
+			<div class="simple-strategy-row">
+				<div class="popup-title">
+					<div class="feature-fa-wrapper">
+						{{telicon "telicon2--clock"}}
+					</div>
+					<div>
+						<div class="call-forwarding-titles">
+							{{ i18n.users.callForwarding.strategies.busy.title }}
+						</div>
+						<div class="call-forwarding-descriptions">
+							{{ i18n.users.callForwarding.strategies.busy.helpText }}
+						</div>
+					</div>
+				</div>
+				<div class="switch popup-action">
+					{{#monsterSwitch}}
+					<input class="switch-state" type="radio" value="busy" name="call_forwarding_strategy"
+						data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}" {{#if isBusyEnabled }}
+						checked="checked" {{/if}}></input>
+					{{/monsterSwitch}}
+				</div>
+			</div>
+
+			<div class="simple-strategy {{#unless isBusyEnabled}} disabled{{/unless}}"></div>
+		</div>
+
+		<div class="feature-popup-title feature-popup-flex" data-template="no_answer">
+			<div class="simple-strategy-row">
+				<div class="popup-title">
+					<div class="feature-fa-wrapper">
+						{{telicon "telicon2--phone-missed"}}
+					</div>
+					<div>
+						<div class="call-forwarding-titles">
+							{{ i18n.users.callForwarding.strategies.noAnswer.title }}
+						</div>
+						<div class="call-forwarding-descriptions">
+							{{ i18n.users.callForwarding.strategies.noAnswer.helpText }}
+						</div>
+					</div>
+				</div>
+				<div class="switch popup-action">
+					{{#monsterSwitch}}
+					<input class="switch-state" type="radio" value="no_answer" name="call_forwarding_strategy"
+						data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}" {{#if
+						isNoAnswerEnabled }} checked="checked" {{/if}}></input>
+					{{/monsterSwitch}}
+				</div>
+			</div>
+
+			<div class="simple-strategy {{#unless isNoAnswerEnabled}} disabled{{/unless}}"></div>
+		</div>
+	</form>
+
+	<div class="actions clearfix">
+		<div class="pull-right">
+			<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
+			<button type="button" class="monster-button monster-button-success save">{{ i18n.saveChanges }}</button>
+		</div>
+	</div>
+</div>
