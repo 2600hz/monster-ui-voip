@@ -254,16 +254,10 @@ define(function(require) {
 							iconColor: 'monster-blue',
 							title: self.i18n.active().users.caller_id.title
 						},
-						call_failover: {
-							icon: 'fa fa-share',
+						call_forwarding: {
+							icon: 'icon-telicon-forward',
 							iconColor: 'monster-orange',
-							title: self.i18n.active().users.call_forward.failover_title,
-							hidden: true
-						},
-						call_forward: {
-							icon: 'fa fa-share',
-							iconColor: 'monster-yellow',
-							title: self.i18n.active().users.call_forward.title
+							title: self.i18n.active().users.callForwarding.title
 						},
 						hotdesk: {
 							icon: 'fa fa-fire',
@@ -304,6 +298,11 @@ define(function(require) {
 							icon: 'fa fa-ban',
 							iconColor: 'monster-red',
 							title: self.i18n.active().users.do_not_disturb.title
+						},
+						call_failover: {
+							telicon: 'failover',
+							iconColor: 'monster-orange',
+							title: self.i18n.active().users.call_failover.title
 						}
 					}, isFeatureAvailable),
 					outboundPrivacy: _.map(self.appFlags.common.outboundPrivacy, function(item) {
@@ -374,10 +373,15 @@ define(function(require) {
 			}
 
 			dataUser.extra.countFeatures = 0;
-			_.each(dataUser.extra.features, function(v) {
-				if (v in dataUser.extra.mapFeatures) {
+			_.each(dataUser.extra.features, function(feature) {
+				var featureKey = feature;
+				if (feature === 'call_forward' && 'call_forwarding' in dataUser.extra.mapFeatures) {
+					featureKey = 'call_forwarding';
+				}
+
+				if (featureKey in dataUser.extra.mapFeatures) {
 					dataUser.extra.countFeatures++;
-					dataUser.extra.mapFeatures[v].active = true;
+					dataUser.extra.mapFeatures[featureKey].active = true;
 				}
 			});
 
@@ -1525,24 +1529,12 @@ define(function(require) {
 				self.usersRenderDoNotDisturb(currentUser);
 			});
 
-			template.on('click', '.feature[data-feature="call_forward"]', function() {
-				if (currentUser.extra.features.indexOf('find_me_follow_me') < 0) {
-					var featureUser = $.extend(true, {}, currentUser);
-					self.usersGetMainCallflow(featureUser.id, function(mainCallflow) {
-						if (mainCallflow && 'flow' in mainCallflow) {
-							var flow = mainCallflow.flow;
-							while (flow.module !== 'user' && '_' in flow.children) {
-								flow = flow.children._;
-							}
-							if (flow.data.timeout < 30) {
-								featureUser.extra.timeoutTooShort = true;
-							}
-						}
-						self.usersRenderCallForward(featureUser);
-					});
-				} else {
-					self.usersRenderCallForward(currentUser);
-				}
+			template.on('click', '.feature[data-feature="call_failover"]', function() {
+				self.usersRenderCallFailover(currentUser);
+			});
+
+			template.on('click', '.feature[data-feature="call_forwarding"]', function() {
+				self.usersCallForwardingRender(currentUser);
 			});
 
 			template.on('click', '.feature[data-feature="hotdesk"]', function() {
@@ -2582,76 +2574,34 @@ define(function(require) {
 			});
 		},
 
-		usersFormatCallForwardData: function(user) {
+		usersRenderCallFailover: function(currentUser) {
 			var self = this,
-				isCallForwardConfigured = _.has(user, 'call_forward.enabled'),
-				isCallForwardEnabled = _.get(user, 'call_forward.enabled', false),
-				isFailoverEnabled = _.get(user, 'call_failover.enabled', false);
-
-			// cfmode is off if call_forward.enabled = false && call_failover.enabled = false
-			// cfmode is failover if call_failover.enabled = true
-			// cfmode is on if call_failover.enabled = false && call_forward.enabled = true
-			var callForwardMode = 'off';
-			if (isFailoverEnabled) {
-				callForwardMode = 'failover';
-			} else if (isCallForwardEnabled) {
-				callForwardMode = 'on';
-			}
-
-			return _.merge({}, user, _.merge({
-				extra: {
-					callForwardMode: callForwardMode
-				}
-			}, isCallForwardConfigured && {
-				call_forward: _.merge({}, _.has(user, 'call_forward.number') && {
-					number: monster.util.unformatPhoneNumber(user.call_forward.number)
-				})
-			}
-			));
-		},
-
-		usersRenderCallForward: function(currentUser) {
-			var self = this,
-				formattedCallForwardData = self.usersFormatCallForwardData(currentUser),
 				featureTemplate = $(self.getTemplate({
-					name: 'feature-call_forward',
-					data: formattedCallForwardData,
+					name: 'feature-call_failover',
+					data: currentUser,
 					submodule: 'users'
 				})),
 				switchFeature = featureTemplate.find('.switch-state'),
-				featureForm = featureTemplate.find('#call_forward_form'),
+				featureForm = featureTemplate.find('#call_failover_form'),
 				args = {
 					callback: function() {
 						popup.dialog('close').remove();
 					},
 					openedTab: 'features'
-				},
-				timeoutWarningBox = featureTemplate.find('.help-box.red-box');
+				};
 
 			monster.ui.mask(featureTemplate.find('#number'), 'phoneNumber');
 
-			if (currentUser.hasOwnProperty('call_forward') && currentUser.call_forward.require_keypress) {
-				timeoutWarningBox.hide();
-			}
-
-			monster.ui.validate(featureForm);
-
-			featureTemplate.find('input[name="require_keypress"]').on('change', function() {
-				timeoutWarningBox.toggle();
+			monster.ui.validate(featureForm, {
+				rules: {
+					number: {
+						phoneNumber: true
+					}
+				}
 			});
 
 			featureTemplate.find('.cancel-link').on('click', function() {
 				popup.dialog('close').remove();
-			});
-
-			featureTemplate.find('.feature-select-mode button').on('click', function() {
-				var $this = $(this);
-
-				featureTemplate.find('.feature-select-mode button').removeClass('selected monster-button-primary');
-				$(this).addClass('selected monster-button-primary');
-
-				$this.data('value') === 'off' ? featureTemplate.find('.content').slideUp() : featureTemplate.find('.content').slideDown();
-				$this.data('value') === 'failover' ? featureTemplate.find('.failover-info').slideDown() : featureTemplate.find('.failover-info').slideUp();
 			});
 
 			switchFeature.on('change', function() {
@@ -2659,44 +2609,27 @@ define(function(require) {
 			});
 
 			featureTemplate.find('.save').on('click', function() {
-				var formData = monster.ui.getFormData('call_forward_form'),
-					phoneNumber = monster.util.unformatPhoneNumber(formData.number),
-					isValidPhoneNumber = !_.isUndefined(phoneNumber);
-
-				if (monster.ui.valid(featureForm) && isValidPhoneNumber) {
-					formData.require_keypress = !formData.require_keypress;
-					formData.number = phoneNumber;
-
-					var selectedType = featureTemplate.find('.feature-select-mode button.selected').data('value');
-					if (selectedType === 'off') {
-						formData.enabled = false;
-					}
-
-					var payload = { call_forward: _.merge({}, formData), call_failover: _.merge({}, formData) };
-					if (selectedType === 'failover') {
-						payload.call_failover.enabled = true;
-						payload.call_forward.enabled = false;
-					} else if (selectedType === 'on') {
-						payload.call_failover.enabled = false;
-						payload.call_forward.enabled = true;
-					}
-
-					var userToSave = $.extend(true, {}, currentUser, payload);
-
-					if (timeoutWarningBox.is(':visible')) {
-						args.openedTab = 'name';
-					}
-
-					self.usersUpdateUser(userToSave, function(data) {
-						args.userId = data.data.id;
-
-						self.usersRender(args);
-					});
+				if (!monster.ui.valid(featureForm)) {
+					return;
 				}
+				var formData = monster.ui.getFormData('call_failover_form'),
+					phoneNumber = monster.util.unformatPhoneNumber(formData.number),
+					formattedFormData = _.merge({}, formData, {
+						enabled: switchFeature.prop('checked'),
+						number: phoneNumber
+					}),
+					payload = { call_failover: formattedFormData },
+					userToSave = $.extend(true, {}, currentUser, payload);
+
+				self.usersUpdateUser(userToSave, function(data) {
+					args.userId = data.data.id;
+
+					self.usersRender(args);
+				});
 			});
 
 			var popup = monster.ui.dialog(featureTemplate, {
-				title: currentUser.extra.mapFeatures.call_forward.title,
+				title: currentUser.extra.mapFeatures.call_failover.title,
 				position: ['center', 20]
 			});
 
@@ -3422,12 +3355,6 @@ define(function(require) {
 						account_id: monster.config.resellerId,
 						overrides: {}
 					};
-				}
-			}
-
-			if (userData.hasOwnProperty('call_forward')) {
-				if (userData.call_forward.number === '') {
-					delete userData.call_forward.number;
 				}
 			}
 

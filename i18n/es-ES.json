@@ -500,15 +500,62 @@
 		},
 		"uploadPicture": "Cargar una imagen",
 		"user": "Usuario",
-		"call_forward": {
-			"directCallsOnly": "Desvia llamadas directas sólamente",
-			"headline": "Configuración de Desvío de llamadas del usuario",
-			"keepCallerId": "Mantener su identificador de llamadas",
-			"label": "Desenvíar todas las llamadas a",
-			"placeholder": "+14157283992",
-			"requireKeyPress": "Deja mensajes de voz en números desvíados ",
-			"title": "Desvío de llamadas",
-			"timeoutWarning": "Para dejar mensajes de voz en números desvíados, su tiempo de espera de llamada debe ser ajustado a menos de 30 seg. Salvando ahora, será automáticamente desviado a la edición del usuario donde puede actualizar el intervalo de espera que suena."
+		"callForwarding": {
+			"title": "Desvío de Llamadas",
+			"strategies": {
+				"off": {
+					"title": "Apagar",
+					"helpText": "El desvío de llamadas está desactivado y las llamadas no serán desviadas."
+				},
+				"alwaysOn": {
+					"title": "Siempre Activo",
+					"helpText": "Las llamadas serán desviadas a un destino de elección."
+				},
+				"busy": {
+					"title": "Ocupado",
+					"helpText": "Las llamadas serán desviadas si todas las apariencias de línea están ocupadas."
+				},
+				"noAnswer": {
+					"title": "Sin Respuesta",
+					"helpText": "Las llamadas serán desviadas si la llamada no es contestada en ninguno de los dispositivos asignados."
+				},
+				"common": {
+					"voicemail": {
+						"label": "Correo de voz",
+						"selectLabel": "Seleccionar buzón de voz de destino"
+					},
+					"phoneNumber": {
+						"label": "Número de teléfono",
+						"inputLabelTo": "Desviar llamadas a",
+						"inputLabelFrom": "Desviar llamadas desde"
+					},
+					"options": {
+						"title": "Opciones adicionales",
+						"forward": {
+							"title": "Desviar solo llamadas directas",
+							"helpText": "Las llamadas entrantes dirigidas a grupos de timbre, colas, etc. no serán desviadas."
+						},
+						"acknowledge": {
+							"title": "Reconocer llamada",
+							"helpText": "Reciba un aviso para aceptar llamadas desviadas. Esto evita que los mensajes de voz se asocien con el número \"Desviar a\"."
+						},
+						"keep": {
+							"title": "Conservar identificación de llamada inicial",
+							"helpText": "Se utilizará la identificación de llamada entrante original para la llamada desviada."
+						},
+						"ring": {
+							"title": "Sonar en mis otros dispositivos",
+							"helpText": "Tus otros dispositivos también sonarán al recibir una llamada desviada."
+						}
+					}
+				}
+			},
+
+			"toast": {
+				"error": {
+					"save": "Ups, hubo un problema al aplicar tus cambios"
+				}
+			}
 		},
 		"callRecording": {
 			"title": "Grabación de llamadas entrantes",
@@ -556,7 +603,6 @@
 					"placeholder": "Número de destino "
 				}
 			},
-
 			"googlePrinter": {
 				"title": "Impresora de Google",
 				"text1": "seleccionar ",

@@ -608,22 +608,64 @@
 			"successResetPassword": "Vorgang erfolgreich durchgeführt! {{ name }} wird in Kürze eine E-Mail erhalten, in der steht, wie er sein Kennwort zurücksetzen kann."
 		},
 		"uploadPicture": "Ein Bild hochladen",
-		"user": "Benutzer",
-		"call_forward": {
-			"failoverMode": "Im Fehlerfall",
-			"directCallsOnly": "Nur Direktanrufe weiterleiten",
-			"headline": "Einstellungen zur Weiterleitung von Benutzeranrufen",
-			"keepCallerId": "Ursprüngliche Anrufer-ID speichern",
-			"label": "Alle Anrufe weiterleiten an" ,
-			"placeholder": "+49 123 4567890",
-			"requireKeyPress": "Sprachnachricht für weitergeleitete Rufnummern hinterlassen",
+		"callForwarding": {
 			"title": "Anrufweiterleitung",
-			"timeoutWarning": "Um Sprachnachrichten für weitergeleitete Rufnummern zu hinterlassen, muss Ihre Rufzeichen-Zeitüberschreitung mindestens 30 Sekunden betragen. Wenn Sie jetzt speichern, werden Sie automatisch in die Benutzereinstellungen weitergeleitet, wo Sie die Rufzeichen-Zeitüberschreitung aktualisieren können.",
-			"__comment": ": Modus für Failover bei Anrufweiterleitung hinzugefügt",
-			"__version": "4.0",
-			"failoverWarning": "Im „Failover-Modus“ haben die Anrufweiterleitungseinstellungen nur dann Geltung, wenn keines der Geräte dieses Benutzers registriert ist.",
-			"failover_title": "Anrufweiterleitung (Failover-Modus)"
+			"strategies": {
+				"off": {
+					"title": "Aus",
+					"helpText": "Die Anrufweiterleitung ist deaktiviert und Anrufe werden nicht weitergeleitet."
+				},
+				"alwaysOn": {
+					"title": "Immer aktiv",
+					"helpText": "Anrufe werden zu einem ausgewählten Ziel weitergeleitet."
+				},
+				"busy": {
+					"title": "Besetzt",
+					"helpText": "Anrufe werden weitergeleitet, wenn alle Leitungsauftritte belegt sind."
+				},
+				"noAnswer": {
+					"title": "Keine Antwort",
+					"helpText": "Anrufe werden weitergeleitet, wenn der Anruf auf keinem zugewiesenen Gerät beantwortet wird."
+				},
+				"common": {
+					"voicemail": {
+						"label": "Voicemail",
+						"selectLabel": "Ziel Voicemail-Box"
+					},
+					"phoneNumber": {
+						"label": "Telefonnummer",
+						"inputLabelTo": "Anrufe weiterleiten nach",
+						"inputLabelFrom": "Anrufe weiterleiten von"
+					},
+					"options": {
+						"title": "Zusätzliche Optionen",
+						"forward": {
+							"title": "Nur direkte Anrufe weiterleiten",
+							"helpText": "Eingehende Anrufe, die auf Klingelgruppen, Warteschlangen usw. abzielen, werden nicht weitergeleitet."
+						},
+						"acknowledge": {
+							"title": "Anruf bestätigen",
+							"helpText": "Erhalten Sie eine Aufforderung zur Annahme weitergeleiteter Anrufe. Dadurch wird vermieden, dass Voicemails mit der Nummer \"Anrufe weiterleiten nach\" in Verbindung gebracht werden."
+						},
+						"keep": {
+							"title": "Ursprüngliche Anrufer-ID beibehalten",
+							"helpText": "Die ursprüngliche eingehende Anrufer-ID wird für den weitergeleiteten Anruf verwendet."
+						},
+						"ring": {
+							"title": "Meine anderen Geräte klingeln lassen",
+							"helpText": "Auch Ihre anderen Geräte klingeln, wenn ein weitergeleiteter Anruf eingeht."
+						}
+					}
+				}
+			},
+
+			"toast": {
+				"error": {
+					"save": "Hoppla, es gab ein Problem beim Anwenden Ihrer Änderungen"
+				}
+			}
 		},
+		"user": "Benutzer",
 		"callRecording": {
 			"title": "Angepasste Anrufaufzeichnung",
 			"headline": "Anpassungen für Anrufaufzeichnung des Benutzers",

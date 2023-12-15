@@ -1,0 +1,247 @@
+@import '../../../../css/partials/base';
+
+.call-forwarding-popup {
+    width: 976px;
+}
+
+.feature-popup-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.feature-popup-flex {
+    flex-direction: column;
+}
+
+.call-forwarding-titles {
+    color: $woodsmoke;
+    font-size: 16px;
+    font-weight: normal;
+    height: 24px;
+    line-height: 24px;
+}
+
+.call-forwarding-descriptions {
+    color: $woodsmoke;
+    font-size: 14px;
+    font-weight: normal;
+    height: 20px;
+    line-height: 20px;
+    margin-top: 10px;
+}
+
+.popup-container .feature-popup-title {
+    display: flex;
+    align-items: center;
+}
+
+.simple-strategy-row {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.simple-strategy {
+    display: block;
+    width: 95%;
+}
+
+.disabled {
+    display: none;
+}
+
+.controlls-width {
+    background: $white;
+    border-radius: 8px;
+    border: 1px solid $french-gray;
+    height: 36px;
+    width: 100%;
+}
+
+.options-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    height: 150%;
+    margin-left: 10px;
+}
+
+.additional-options-title {
+    font-weight: bold;
+}
+
+.option {
+    width: calc(50% - 15px);
+    height: 100px;
+    margin: 5px;
+    background: $athens-gray;
+    border-radius: 8px;
+    border: 1px solid $french-gray;
+}
+
+.option-checked {
+    width: calc(50% - 15px);
+    height: 100px;
+    margin: 5px;
+    background: $french-pass;
+    border-radius: 8px;
+    border: 1px solid $dodger-blue;
+}
+
+.options-description {
+    margin: 10px;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.options-title {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px;
+}
+
+.complex-strategy {
+    width: 100%;
+}
+
+.complex-strategy-header {
+    display: flex;
+    justify-content: space-around;
+}
+
+.complex-strategy-rules {
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    margin-left: 10px;
+}
+
+.complex-rule {
+    display: flex;
+    flex-direction: column;
+}
+
+.specific-controls {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.selective-control-group {
+    margin-bottom: 10px;
+}
+
+.control-label {
+    margin-top: 10px;
+}
+
+.forward-from {
+    width: 200px;
+}
+
+.forward-to {
+    width: 250px;
+}
+
+.active-duration {
+    width: 150px;
+}
+
+.remove-rule {
+    height: 70px;
+    width: 100px;
+
+    .complex-rule {
+        float: right;
+        margin-right: 25px;
+    }
+}
+
+.add-phone-number {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 10px;
+    display: inline-flex;
+    padding: 13px;
+    border: 1px solid $french-gray;
+    border-radius: 4px;
+    background-image: -webkit-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+    background-image: -moz-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+    background-image: -ms-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+    background-image: -o-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+    background-image: linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+    vertical-align: top;
+    text-align: center;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.add-rule {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 10px;
+    display: inline-flex;
+    padding: 13px;
+    border: 1px solid $french-gray;
+    border-radius: 4px;
+    background-image: -webkit-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+    background-image: -moz-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+    background-image: -ms-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+    background-image: -o-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+    background-image: linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+    vertical-align: top;
+    text-align: center;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.remove-number-button {
+    width: 14px;
+    display: inline-flex;
+    padding: 8px;
+    border: 1px solid $french-gray;
+    border-radius: 4px;
+    background-image: -webkit-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+    background-image: -moz-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+    background-image: -ms-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+    background-image: -o-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+    background-image: linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+    vertical-align: top;
+    text-align: center;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.remove-rule-button {
+    width: 14px;
+    display: inline-flex;
+    padding: 8px;
+    border: 1px solid $french-gray;
+    border-radius: 4px;
+    background-image: -webkit-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+    background-image: -moz-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+    background-image: -ms-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+    background-image: -o-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+    background-image: linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 95%) 100%);
+    vertical-align: top;
+    text-align: center;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.table-cell {
+    width: 80px;
+}
+
+.table-header {
+    border-radius: 0px;
+    box-shadow: inset 0px -1px 0px 0px $french-gray, inset 0px 1px 0px 0px $french-gray;
+}
+
+.office-hours-wrapper {
+    margin-top: 10px;
+}
