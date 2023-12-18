@@ -4,7 +4,11 @@
 			{{#unless hidden}}
 				<div data-feature="{{@key}}" class="feature">
 					<div class="fa fa-wrapper{{#if active}} active{{/if}}">
+					{{#if icon}}
 						<i class="{{icon}}"></i>
+					{{else}}
+						{{telicon telicon}}
+					{{/if}}
 					</div>
 					<div class="feature-title">
 						{{title}}

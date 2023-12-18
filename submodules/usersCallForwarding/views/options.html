@@ -1,0 +1,24 @@
+<div data-strategy="{{strategy}}">
+    <div class="title">
+        {{i18n.users.callForwarding.strategies.common.options.title}}
+    </div>
+    <div class="options-container">
+        {{#each options as |option|}}
+
+        <div class="option" strategy="{{strategy}}">
+            <div class="options-title" value="{{option.title}}">
+                {{option.title}}
+
+                {{#monsterCheckbox "large-checkbox"}}
+                <input type="checkbox" name="{{strategy}}.isEnabled" {{#if isEnabled}} checked="unchecked" {{/if}} />
+                {{/monsterCheckbox}}
+            </div>
+
+            <div class="options-description">
+                {{option.helpText}}
+            </div>
+        </div>
+
+        {{/each}}
+    </div>
+</div>

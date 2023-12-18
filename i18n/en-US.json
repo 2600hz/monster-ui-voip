@@ -615,20 +615,72 @@
 		},
 		"uploadPicture": "Upload a Picture",
 		"user": "User",
-		"call_forward": {
-			"failoverMode": "Failover Mode",
-			"directCallsOnly": "Forward direct calls only",
-			"headline": "User Call Forwarding Settings",
-			"keepCallerId": "Keep Original Caller-ID",
-			"label": "Forward all calls to" ,
-			"placeholder": "+14157283992",
-			"requireKeyPress": "Leave voicemails on forwarded numbers",
+		"callForwarding": {
 			"title": "Call Forwarding",
-			"timeoutWarning": "In order to leave voicemails on forwarded numbers, your ringing timeout needs to be set to at least 30sec. By saving now, you will automatically be redirected to the user edition where you can update the ringing timeout.",
-			"__comment": ": Now add a mode for failover for call forward",
-			"__version": "4.0",
-			"failoverWarning": "In \"Failover Mode\", the call-forward settings will only apply when none of this user's devices are registered.",
-			"failover_title": "Call-Forwarding (Failover Mode)"
+			"strategies": {
+				"off": {
+					"title": "Off",
+					"helpText": "Call Forwarding is disabled and calls will not be forwarded."
+				},
+				"alwaysOn": {
+					"title": "Always On",
+					"helpText": "Calls will be forwarded to a destination of choice."
+				},
+				"busy": {
+					"title": "Busy",
+					"helpText": "Calls will be forwarded if all line appearances are busy."
+				},
+				"noAnswer": {
+					"title": "No Answer",
+					"helpText": "Calls will be forwarded if the call is not answered on any assigned devices."
+				},
+				"common": {
+					"voicemail": {
+						"label": "Voicemail",
+						"selectLabel": "Target voicemail box"
+					},
+					"phoneNumber": {
+						"label": "Phone number",
+						"inputLabelTo": "Forward calls to",
+						"inputLabelFrom": "Forward calls from"
+					},
+					"options": {
+						"title": "Additional Options",
+						"forward": {
+							"title": "Forward direct calls only",
+							"helpText": "Inbound calls targeting ring groups, queues, etc will not be forwarded."
+						},
+						"acknowledge": {
+							"title": "Acknowledge Call",
+							"helpText": "Receive a prompt to accept forwarded calls. This prevents voicemails from being associated with the \"Forward To\" number."
+						},
+						"keep": {
+							"title": "Keep initial Caller ID",
+							"helpText": "The original incoming Caller ID will be used for the forwarded call."
+						},
+						"ring": {
+							"title": "Ring my other devices",
+							"helpText": "Your other devices will also ring when receiving a forwarded call."
+						}
+					}
+				}
+			},
+
+			"toast": {
+				"error": {
+					"save": "Ooops, there was an issue while applying your changes"
+				}
+			}
+		},
+		"call_failover": {
+			"failoverMode": "Failover Mode",
+			"directCallsOnly": "Direct calls only",
+			"headline": "User Call Failover Settings",
+			"keepCallerId": "Keep Original Caller-ID",
+			"label": "Forward all calls to",
+			"placeholder": "+14157283992",
+			"requireKeyPress": "Require pressing 1 to accept the call",
+			"title": "Failover Mode"
 		},
 		"callRecording": {
 			"title": "Customized Call Recording",

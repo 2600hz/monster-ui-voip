@@ -48,7 +48,13 @@
 			{{#if extra.hasFeatures}}
 				{{#each extra.mapFeatures}}
 					{{#if this.active}}
-						<i class="{{this.icon}} {{this.iconColor}}" data-toggle="tooltip" data-placement="top" data-original-title="{{ this.title }}"></i>
+						{{#if this.icon}}
+							<i class="{{this.icon}} {{this.iconColor}}" data-toggle="tooltip" data-placement="top" data-original-title="{{ this.title }}"></i>
+						{{else}}
+							<i class="{{this.iconColor}}" data-toggle="tooltip" data-placement="top" data-original-title="{{ this.title }}">
+								{{telicon this.telicon}}
+							</i>
+						{{/if}}
 					{{/if}}
 				{{/each}}
 			{{else}}
