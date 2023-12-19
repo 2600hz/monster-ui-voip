@@ -3,25 +3,6 @@ define(function(require) {
 		_ = require('lodash'),
 		monster = require('monster');
 
-	var appSubmodules = [
-		'callLogs',
-		'devices',
-		'featureCodes',
-		'groups',
-		'myOffice',
-		'numbers',
-		'strategy',
-		'strategyHours',
-		'strategyHolidays',
-		'users',
-		'usersCallForwarding',
-		'vmboxes'
-	];
-
-	require(_.map(appSubmodules, function(name) {
-		return './submodules/' + name + '/' + name;
-	}));
-
 	var app = {
 		name: 'voip',
 
@@ -79,7 +60,20 @@ define(function(require) {
 			disableFirstUseWalkthrough: monster.config.whitelabel.disableFirstUseWalkthrough
 		},
 
-		subModules: appSubmodules,
+		subModules: [
+			'callLogs',
+			'devices',
+			'featureCodes',
+			'groups',
+			'myOffice',
+			'numbers',
+			'strategy',
+			'strategyHours',
+			'strategyHolidays',
+ 			'usersCallForwarding',
+			'users',
+			'vmboxes'
+		],
 
 		render: function(container) {
 			var self = this,
