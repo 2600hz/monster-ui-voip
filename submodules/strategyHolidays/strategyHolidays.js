@@ -999,6 +999,20 @@ define(function(require) {
 
 		/**
 		 * Returns Date
+		 * @param  {string} selectedYear
+		 * @param  {Object} holiday
+		 * @return {Date}
+		 */
+		strategyHolidaysGetStartDate: function(selectedYear, holiday) {
+			var self = this,
+				holidayData = holiday.holidayData,
+				startDate = new Date(selectedYear, holidayData.fromMonth - 1, holidayData.fromDay);
+
+			return monster.util.dateToBeginningOfGregorianDay(startDate, monster.util.getCurrentTimeZone());
+		},
+
+		/**
+		 * Returns Date
 		 * @param  {string} endYear
 		 * @param  {Object} holiday
 		 * @return {Date}
@@ -1056,6 +1070,7 @@ define(function(require) {
 					'time_window_start',
 					'time_window_stop'
 				]), endDate && {
+					start_date: self.strategyHolidaysGetStartDate(holidayData.endYear, holiday),
 					end_date: endDate
 				}),
 				holidayRule = {};
@@ -1072,7 +1087,7 @@ define(function(require) {
 			} else {
 				holidayRule = _.merge({}, holidayRuleConfig, {
 					name: name,
-					cycle: 'yearly',
+					cycle: holidayData.recurring ? 'yearly' : 'date',
 					interval: 1,
 					month: month,
 					type: 'main_holidays'
@@ -1134,10 +1149,11 @@ define(function(require) {
 						days = _.range(fromDay, toDay + 1),
 						rule = {
 							name: name + '_' + month,
-							cycle: 'yearly',
+							cycle: data.start_date ? 'date' : 'yearly',
 							days: days,
 							interval: 1,
-							month: month
+							month: month,
+							start_date: data.start_date
 						};
 
 					if (data.exclude) {
