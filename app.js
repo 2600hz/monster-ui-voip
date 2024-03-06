@@ -70,7 +70,6 @@ define(function(require) {
 			'strategy',
 			'strategyHours',
 			'strategyHolidays',
- 			'usersCallForwarding',
 			'users',
 			'vmboxes'
 		],

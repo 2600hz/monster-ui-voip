@@ -474,62 +474,15 @@
 		},
 		"uploadPicture": "Uploader une image",
 		"user": "Utilisateur",
-		"callForwarding": {
-			"title": "Transfert d'appel",
-			"strategies": {
-				"off": {
-					"title": "Désactivé",
-					"helpText": "Le transfert d'appel est désactivé et les appels ne seront pas redirigés."
-				},
-				"alwaysOn": {
-					"title": "Toujours actif",
-					"helpText": "Les appels seront redirigés vers une destination de choix."
-				},
-				"busy": {
-					"title": "Occupé",
-					"helpText": "Les appels seront redirigés si toutes les apparences de ligne sont occupées."
-				},
-				"noAnswer": {
-					"title": "Pas de réponse",
-					"helpText": "Les appels seront redirigés si l'appel n'est pas répondu sur tous les appareils assignés."
-				},
-				"common": {
-					"voicemail": {
-						"label": "Messagerie vocale",
-						"selectLabel": "Boîte vocale cible"
-					},
-					"phoneNumber": {
-						"label": "Numéro de téléphone",
-						"inputLabelTo": "Rediriger les appels vers",
-						"inputLabelFrom": "Rediriger les appels depuis"
-					},
-					"options": {
-						"title": "Options supplémentaires",
-						"forward": {
-							"title": "Rediriger uniquement les appels directs",
-							"helpText": "Les appels entrants ciblant des groupes de sonnerie, des files d'attente, etc. ne seront pas redirigés."
-						},
-						"acknowledge": {
-							"title": "Reconnaître l'appel",
-							"helpText": "Recevez une invite pour accepter les appels redirigés. Cela évite que les messages vocaux soient associés au numéro de \"Rediriger vers\"."
-						},
-						"keep": {
-							"title": "Conserver l'identifiant de l'appelant initial",
-							"helpText": "L'identifiant d'appel entrant original sera utilisé pour l'appel redirigé."
-						},
-						"ring": {
-							"title": "Faire sonner mes autres appareils",
-							"helpText": "Vos autres appareils sonneront également lors de la réception d'un appel redirigé."
-						}
-					}
-				}
-			},
-
-			"toast": {
-				"error": {
-					"save": "Oups, il y a eu un problème lors de l'application de vos modifications"
-				}
-			}
+		"call_forward": {
+			"directCallsOnly": "Seulement transférer les appels direct",
+			"headline": "Réglages du transfert d'appel",
+			"keepCallerId": "Garder le Caller-ID",
+			"label": "Transférer tous les appels vers",
+			"placeholder": "+14157283992",
+			"requireKeyPress": "Laisser message sur le répondeur du numéro transferé",
+			"title": "Transfert d'appels",
+			"timeoutWarning": "Afin de pouvoir laisser un message sur le répondeur du numéro transferé, la durée de sonnerie de l'utilisateur doit être d'au moins 30sec. En cliquant sur le bouton \"Sauvegarder\", vous serez automatiquement redirigé vers l'édition d'utilisateur où vous pourrez modifier la durée de sonnerie."
 		},
 		"callRecording": {
 			"title": "Enregistrement d'appel entrant",
