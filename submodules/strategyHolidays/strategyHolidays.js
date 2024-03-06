@@ -1058,7 +1058,7 @@ define(function(require) {
 				id = holidayData.id,
 				endDate = holidayData.recurring
 					? null
-					: monster.util.dateToEndOfGregorianDay(self.strategyHolidaysGetEndDate(holidayData.endYear, holiday)),
+					: monster.util.dateToEndOfGregorianDay(self.strategyHolidaysGetEndDate(holidayData.endYear, holiday), monster.util.getCurrentTimeZone()),
 				holidayRuleConfig = _.merge({
 					oldType: holidayData.set ? 'set' : 'rule'
 				}, id && {
