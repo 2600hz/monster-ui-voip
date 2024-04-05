@@ -1146,6 +1146,8 @@ define(function(require) {
 					phoneNumber: number
 				},
 				success: function(data, status) {
+					data.data['metadata'] = _.get(data, 'metadata', {});
+
 					success && success(data.data);
 				},
 				error: function(data, status) {
