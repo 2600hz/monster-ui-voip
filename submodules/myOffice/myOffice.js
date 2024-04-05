@@ -1148,7 +1148,6 @@ define(function(require) {
 				success: function(data, status) {
 					data.data['metadata'] = _.get(data, 'metadata', {});
 
-					console.log(data.data);
 					success && success(data.data);
 				},
 				error: function(data, status) {
