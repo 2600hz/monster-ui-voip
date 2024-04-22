@@ -1045,7 +1045,7 @@
 			"recordGreetingInfo": "Record the greeting message yourself over the phone, by following the steps below:",
 			"recordGreetingLines": {
 				"line1": "Pick up a phone registered in this account.",
-				"line2": "Dial your office main number.",
+				"line2": "Dial into the appropriate menu.",
 				"line3": "Enter this PIN when prompted:",
 				"line4": "Record your greetings / menu."
 			},
