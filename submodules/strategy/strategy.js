@@ -3353,6 +3353,7 @@ define(function(require) {
 		strategyUpdateNumber: function(phoneNumber, data, callback) {
 			var self = this;
 
+			delete data.metadata;
 			self.callApi({
 				resource: 'numbers.update',
 				data: {
