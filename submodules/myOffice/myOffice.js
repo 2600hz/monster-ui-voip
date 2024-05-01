@@ -1159,6 +1159,7 @@ define(function(require) {
 		myOfficeUpdateNumber: function(numberData, success, error) {
 			var self = this;
 
+			delete numberData.metadata;
 			self.callApi({
 				resource: 'numbers.update',
 				data: {
