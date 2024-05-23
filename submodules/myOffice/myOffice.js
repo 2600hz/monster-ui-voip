@@ -912,8 +912,10 @@ define(function(require) {
 
 							if (hasE911 && isE911Enabled) {
 								if (_.has(numberData, 'e911')) {
+									var street_address = _.get(numberData, 'e911.legacy_data.house_number', '') + ' ' + _.get(numberData, 'e911.street_address', '');
+
 									emergencyZipcodeInput.val(numberData.e911.postal_code);
-									emergencyAddress1Input.val(numberData.e911.street_address);
+									emergencyAddress1Input.val(street_address);
 									emergencyAddress2Input.val(numberData.e911.extended_address);
 									emergencyCityInput.val(numberData.e911.locality);
 									emergencyStateInput.val(numberData.e911.region);
@@ -994,7 +996,8 @@ define(function(require) {
 					setNumberData = function(e911Data) {
 						var callerIdName = callerIdNameInput.val(),
 							setCNAM = popupTemplate.find('.number-feature[data-feature="cnam"]').is(':visible'),
-							setE911 = popupTemplate.find('.number-feature[data-feature="e911"]').is(':visible');
+							setE911 = popupTemplate.find('.number-feature[data-feature="e911"]').is(':visible'),
+							splitAddress = e911Data.street_address.split(/\s/g);
 
 						account.caller_id = $.extend(true, {}, account.caller_id, {
 							external: {
@@ -1031,7 +1034,12 @@ define(function(require) {
 											.split(' ')
 											.reject(_.isEmpty)
 											.uniq()
-											.value()
+											.value(),
+										caller_name: monster.apps.auth.currentAccount.name,
+										legacy_data: {
+											house_number: _.head(splitAddress)
+										},
+										street_address: splitAddress.slice(1).join(' ')
 									})
 								});
 							} else {
