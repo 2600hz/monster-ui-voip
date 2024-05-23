@@ -908,11 +908,12 @@ define(function(require) {
 
 							var hasE911 = _.includes(allowedFeatures, 'e911'),
 								hasCNAM = _.includes(allowedFeatures, 'cnam'),
-								isE911Enabled = monster.util.isNumberFeatureEnabled('e911'),
-								street_address = _.get(numberData, 'e911.legacy_data.house_number') + ' ' + numberData.e911.street_address;
+								isE911Enabled = monster.util.isNumberFeatureEnabled('e911');
 
 							if (hasE911 && isE911Enabled) {
 								if (_.has(numberData, 'e911')) {
+									var street_address = _.get(numberData, 'e911.legacy_data.house_number', '') + ' ' + _.get(numberData, 'e911.street_address', '');
+
 									emergencyZipcodeInput.val(numberData.e911.postal_code);
 									emergencyAddress1Input.val(street_address);
 									emergencyAddress2Input.val(numberData.e911.extended_address);
