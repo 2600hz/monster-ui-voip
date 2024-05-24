@@ -2364,7 +2364,7 @@ define(function(require) {
 							accountId: self.accountId,
 							data: {
 								streamable: true,
-								name: callflowName + 'TTS',
+								name: callflowName + 'TTS' + '_' + new Date().getTime(),
 								media_source: 'tts',
 								description: '<Text to Speech>',
 								tts: {
@@ -3364,6 +3364,7 @@ define(function(require) {
 		strategyUpdateNumber: function(phoneNumber, data, callback) {
 			var self = this;
 
+			delete data.metadata;
 			self.callApi({
 				resource: 'numbers.update',
 				data: {
