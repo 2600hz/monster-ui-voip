@@ -2889,19 +2889,30 @@ define(function(require) {
 						}
 					}, callback);
 				},
-				function maybeDeleteWrongFeatureCodes(existing, callback) {
-					monster.parallel(_
+				/**
+				 * We need to validate if there are duplicated feature codes
+				 * if duplicated, the ones created outside of SmartPBX will be removed
+				 */
+				function validateDuplicatedFeatureCodes(existing, callback) {
+					existing.duplicated = _
 						.chain(existing.createdOutsideApp)
 						.filter(function(callflow) {
-							return _.some(self.featureCodeConfigs, _.flow([
-								_.unary(_.partial(_.get, _, 'name')),
+							return _.some(existing.createdByApp, _.flow([
+								_.unary(_.partial(_.get, _, 'featurecode.name')),
 								_.partial(_.isEqual, _.get(callflow, 'featurecode.name'))
 							]));
 						})
+						.value();
+
+					callback(null, existing);
+				},
+				function maybeDeleteWrongFeatureCodes(existing, callback) {
+					monster.parallel(_
+						.chain(existing.duplicated)
 						.map(deleteFeatureCodeFactory)
 						.value()
 					, function() {
-						callback(null, existing.createdByApp);
+						callback(null, _.concat(existing.createdByApp, existing.createdOutsideApp));
 					});
 				},
 				function maybeCreateMissingFeatureCodes(existing, callback) {
