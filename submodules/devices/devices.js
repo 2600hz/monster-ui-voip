@@ -1084,7 +1084,10 @@ define(function(require) {
 							value: false
 						}]
 					}
-				}
+				},
+				system_ignore_completed_elsewhere: _.get(data, 'configs.ignore_completed_elsewhere', true)
+					? self.i18n.active().on
+					: self.i18n.active().off
 			}, deviceData);
 		},
 
@@ -1435,7 +1438,18 @@ define(function(require) {
 									callback(null, users);
 								}
 							});
-						}
+						},
+						configs: function(callback) {
+							self.callApi({
+								resource: 'configs.get',
+								data: {
+									accountId: self.accountId
+								},
+								success: function(data, status) {
+									callback(null, data.data);
+								}
+							});
+						},
 					}, function(error, results) {
 						waterfallCb(null, results);
 					});
