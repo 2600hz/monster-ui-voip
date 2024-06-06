@@ -731,8 +731,6 @@ define(function(require) {
 				}
 			});
 
-			console.log('forms data', formData, template)
-
 			if ('mac_address' in formData) {
 				formData.mac_address = monster.util.formatMacAddress(formData.mac_address);
 			}
@@ -1174,7 +1172,7 @@ define(function(require) {
 							outbound_privacy: "none"
 						},
 						sip: _.merge({
-							ignore_completed_elsewhere: "true",
+							ignore_completed_elsewhere: 'true',
 						}, _.pick(sipSettings.sip, ['password', 'username'])),
 						media: {
 							webrtc: false,
@@ -1425,7 +1423,8 @@ define(function(require) {
 							self.callApi({
 								resource: 'configs.get',
 								data: {
-									accountId: self.accountId
+									accountId: self.accountId,
+									endpoint: 'kazoo_endpoint'
 								},
 								success: function(data, status) {
 									callback(null, data.data);
