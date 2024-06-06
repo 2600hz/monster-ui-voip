@@ -662,6 +662,13 @@ define(function(require) {
 				});
 			});
 
+			templateDevice.find('.btn-group-wrapper button.monster-button-ignore').on('click', function(e) {
+				e.preventDefault();
+				var $this = $(this);
+				$this.siblings().removeClass('selected monster-button-primary');
+				$this.addClass('selected monster-button-primary');
+			});
+
 			var popup = monster.ui.dialog(templateDevice, {
 				title: popupTitle,
 				dialogClass: 'voip-edit-device-popup'
@@ -712,6 +719,17 @@ define(function(require) {
 						.isEmpty()
 						.value();
 				};
+
+			template.find('.ignore-completed-elsewhere').each(function() {
+				var $this = $(this),
+					hasValue = $this.find('button.selected').length,
+					value = hasValue ? $this.find('button.selected').data('value') : 'default';
+
+				// If value is set to something else than account default then we set the enabled boolean
+				if (value && value !== 'default') {
+					formData.ignore_completed_elsewhere = value === 'on'
+				}
+			});
 
 			if ('mac_address' in formData) {
 				formData.mac_address = monster.util.formatMacAddress(formData.mac_address);
@@ -1048,7 +1066,10 @@ define(function(require) {
 							value: false
 						}]
 					}
-				}
+				},
+				system_ignore_completed_elsewhere: _.get(data, 'configs.ignore_completed_elsewhere', true)
+					? self.i18n.active().on
+					: self.i18n.active().off
 			}, deviceData);
 		},
 
@@ -1151,7 +1172,7 @@ define(function(require) {
 							outbound_privacy: "none"
 						},
 						sip: _.merge({
-							ignore_completed_elsewhere: false,
+							ignore_completed_elsewhere: 'true',
 						}, _.pick(sipSettings.sip, ['password', 'username'])),
 						media: {
 							webrtc: false,
@@ -1397,7 +1418,19 @@ define(function(require) {
 									callback(null, users);
 								}
 							});
-						}
+						},
+						configs: function(callback) {
+							self.callApi({
+								resource: 'configs.get',
+								data: {
+									accountId: self.accountId,
+									endpoint: 'kazoo_endpoint'
+								},
+								success: function(data, status) {
+									callback(null, data.data);
+								}
+							});
+						},
 					}, function(error, results) {
 						waterfallCb(null, results);
 					});
