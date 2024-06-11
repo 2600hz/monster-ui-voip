@@ -481,6 +481,7 @@
 		"add": "Add User",
 		"addExtension": "Add an extension to this user",
 		"addNewExtension": "Extension number: ",
+		"extensionAlreadyExist": "Already exists",
 		"addFromSpare": "Add from Spare Numbers",
 		"addFromSpareDevices": "Add from Spare Devices",
 		"buy": "Buy Numbers",
