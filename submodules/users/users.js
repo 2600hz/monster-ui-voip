@@ -833,6 +833,21 @@ define(function(require) {
 				listExtensions.append(newLineTemplate);
 
 				existingExtensions.push(nextExtension);
+
+				newLineTemplate.find('.extesion-already-exist').hide();
+
+				newLineTemplate.find('.input-extension ').on('keyup', function() {
+					var val = $(this).val();
+
+					if (existingExtensions.indexOf(val) >= 0) {
+						newLineTemplate.find('.extesion-already-exist').show();
+						template.find('.save-extensions').attr('disabled', true)
+						return;
+					}
+
+					newLineTemplate.find('.extesion-already-exist').hide();
+					template.find('.save-extensions').attr('disabled', false)
+				});
 			});
 
 			template.on('click', '.remove-extension', function() {
@@ -854,6 +869,7 @@ define(function(require) {
 
 				if (index > -1) {
 					existingExtensions.splice(index, 1);
+					template.find('.save-extensions').attr('disabled', false)
 				}
 
 				$(this).parents('.item-row').remove();
@@ -4896,7 +4912,7 @@ define(function(require) {
 					}, function(devices) {
 						callback(null, devices);
 					});
-				}
+				},
 			}, function(err, results) {
 				callback && callback(results);
 			});
