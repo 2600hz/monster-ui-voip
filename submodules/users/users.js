@@ -2396,6 +2396,8 @@ define(function(require) {
 							self.usersAddMainVMBoxToUser({
 								user: currentUser,
 								deleteAfterNotify: deleteAfterNotify,
+								transcribe: transcribe,
+								includeMessageOnNotify: include_message_on_notify,
 								callback: callback
 							});
 							return;
@@ -5593,7 +5595,14 @@ define(function(require) {
 
 					self.usersCreateVMBox({
 						data: {
-							data: self.usersNewMainVMBox(mailbox, userFullName, userId, args.deleteAfterNotify)
+							data: self.usersNewMainVMBox(
+								mailbox,
+								userFullName,
+								userId,
+								args.deleteAfterNotify,
+								args.transcribe,
+								args.includeMessageOnNotify
+							)
 						},
 						success: function(userVMBox) {
 							waterfallCallback(null, userData, userVMBox);
@@ -5813,14 +5822,16 @@ define(function(require) {
 		 * @param    {Boolean} [deleteAfterNotify]  Delete voicemail message after notify user
 		 * @returns  {Object}  Voicemail Box object
 		 */
-		usersNewMainVMBox: function(mailbox, userName, userId, deleteAfterNotify) {
+		usersNewMainVMBox: function(mailbox, userName, userId, deleteAfterNotify, transcribe, includeMessageOnNotify) {
 			var self = this;
 
 			return {
 				owner_id: userId,
 				mailbox: mailbox.toString(),	// Force to string
 				name: self.usersGetMainVMBoxName(userName),
-				delete_after_notify: deleteAfterNotify
+				delete_after_notify: deleteAfterNotify,
+				transcribe: transcribe,
+				include_message_on_notify: includeMessageOnNotify
 			};
 		},
 
