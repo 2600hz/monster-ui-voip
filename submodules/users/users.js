@@ -833,6 +833,21 @@ define(function(require) {
 				listExtensions.append(newLineTemplate);
 
 				existingExtensions.push(nextExtension);
+
+				newLineTemplate.find('.extesion-already-exist').hide();
+
+				newLineTemplate.find('.input-extension ').on('keyup', function() {
+					var val = $(this).val();
+
+					if (existingExtensions.indexOf(val) >= 0) {
+						newLineTemplate.find('.extesion-already-exist').show();
+						template.find('.save-extensions').attr('disabled', true)
+						return;
+					}
+
+					newLineTemplate.find('.extesion-already-exist').hide();
+					template.find('.save-extensions').attr('disabled', false)
+				});
 			});
 
 			template.on('click', '.remove-extension', function() {
@@ -854,6 +869,7 @@ define(function(require) {
 
 				if (index > -1) {
 					existingExtensions.splice(index, 1);
+					template.find('.save-extensions').attr('disabled', false)
 				}
 
 				$(this).parents('.item-row').remove();
@@ -2380,6 +2396,8 @@ define(function(require) {
 							self.usersAddMainVMBoxToUser({
 								user: currentUser,
 								deleteAfterNotify: deleteAfterNotify,
+								transcribe: transcribe,
+								includeMessageOnNotify: include_message_on_notify,
 								callback: callback
 							});
 							return;
@@ -4896,7 +4914,7 @@ define(function(require) {
 					}, function(devices) {
 						callback(null, devices);
 					});
-				}
+				},
 			}, function(err, results) {
 				callback && callback(results);
 			});
@@ -5577,7 +5595,14 @@ define(function(require) {
 
 					self.usersCreateVMBox({
 						data: {
-							data: self.usersNewMainVMBox(mailbox, userFullName, userId, args.deleteAfterNotify)
+							data: self.usersNewMainVMBox(
+								mailbox,
+								userFullName,
+								userId,
+								args.deleteAfterNotify,
+								args.transcribe,
+								args.includeMessageOnNotify
+							)
 						},
 						success: function(userVMBox) {
 							waterfallCallback(null, userData, userVMBox);
@@ -5797,14 +5822,16 @@ define(function(require) {
 		 * @param    {Boolean} [deleteAfterNotify]  Delete voicemail message after notify user
 		 * @returns  {Object}  Voicemail Box object
 		 */
-		usersNewMainVMBox: function(mailbox, userName, userId, deleteAfterNotify) {
+		usersNewMainVMBox: function(mailbox, userName, userId, deleteAfterNotify, transcribe, includeMessageOnNotify) {
 			var self = this;
 
 			return {
 				owner_id: userId,
 				mailbox: mailbox.toString(),	// Force to string
 				name: self.usersGetMainVMBoxName(userName),
-				delete_after_notify: deleteAfterNotify
+				delete_after_notify: deleteAfterNotify,
+				transcribe: transcribe,
+				include_message_on_notify: includeMessageOnNotify
 			};
 		},
 
