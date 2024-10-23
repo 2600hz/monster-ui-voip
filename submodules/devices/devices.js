@@ -1087,7 +1087,7 @@ define(function(require) {
 						}]
 					}
 				},
-				system_ignore_completed_elsewhere: _.get(data, 'configs.ignore_completed_elsewhere', false)
+				system_ignore_completed_elsewhere: _.get(data, 'configs.ignore_completed_elsewhere', true)
 					? self.i18n.active().on
 					: self.i18n.active().off
 			}, deviceData);
