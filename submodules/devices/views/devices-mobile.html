@@ -198,13 +198,16 @@
 					{{ i18n.devices.popupSettings.miscellaneous.sectionTitle }}
 				</div>
 
-				<div class="control-group">
-					<label class="control-label checkbox">
-						{{#monsterCheckbox i18n.devices.popupSettings.miscellaneous.ignoreCompletedElsewhere.label }}
-							<input type="checkbox" name="ignore_completed_elsewhere" id="ignore_completed_elsewhere" {{#if ignore_completed_elsewhere }}checked{{/if}} />
-						{{/monsterCheckbox}}
+				<div class="control-group ignore-completed-elsewhere-group">
+					<label class="control-label">{{ i18n.devices.popupSettings.miscellaneous.ignoreCompletedElsewhere.label }}</label>
+					<div class="btn-group-wrapper">
 						<i class="help-popover fa fa-question-circle fa-lg" data-original-title="{{i18n.devices.popupSettings.miscellaneous.ignoreCompletedElsewhere.help}}" data-placement="top" data-toggle="tooltip"></i>
-					</label>
+						<div class="btn-group btn-group-controls ignore-completed-elsewhere">
+							<button data-value="off" class="monster-button monster-button-ignore{{#compare ignore_completed_elsewhere "===" false}} monster-button-primary selected{{/compare}}">{{ i18n.off }}</button>
+							<button data-value="default" class="monster-button monster-button-ignore{{#compare ignore_completed_elsewhere "===" undefined}} monster-button-primary selected{{/compare}}">{{ i18n.devices.popupSettings.miscellaneous.ignoreCompletedElsewhere.systemDefault }} ({{ system_ignore_completed_elsewhere }})</button>
+							<button data-value="on" class="monster-button monster-button-ignore{{#compare ignore_completed_elsewhere "===" true}} monster-button-primary selected{{/compare}}">{{ i18n.on }}</button>
+						</div>
+					</div>
 				</div>
 
 				<div class="rtp-line">
