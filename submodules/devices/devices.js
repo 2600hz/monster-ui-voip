@@ -743,8 +743,12 @@ define(function(require) {
 
 				// If value is set to something else than account default then we set the enabled boolean
 				if (value && value !== 'default') {
-					formData.ignore_completed_elsewhere = value === 'on'
+					formData.ignore_completed_elsewhere = value === 'on';
+					return;
 				}
+
+				delete formData.ignore_completed_elsewhere;
+				delete originalData.ignore_completed_elsewhere;
 			});
 
 			if ('mac_address' in formData) {
@@ -1185,10 +1189,10 @@ define(function(require) {
 					softphone: _.merge({}, sipSettings),
 					teammate: _.merge({
 						caller_id_options: {
-							outbound_privacy: "none"
+							outbound_privacy: 'none'
 						},
 						sip: _.merge({
-							ignore_completed_elsewhere: 'true',
+							ignore_completed_elsewhere: false
 						}, _.pick(sipSettings.sip, ['password', 'username'])),
 						media: {
 							webrtc: false,
@@ -1511,6 +1515,8 @@ define(function(require) {
 					self.updateMobileCallflowAssignment(userId, userMainCallflowId, device, callback);
 				},
 				saveDevice = function saveDevice(device, callback) {
+					delete device.system_ignore_completed_elsewhere;
+
 					var method = _.has(device, 'id') ? 'devicesUpdateDevice' : 'devicesCreateDevice';
 
 					self[method](device, _.partial(callback, null), callback);
