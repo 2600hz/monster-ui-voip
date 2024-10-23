@@ -1515,6 +1515,8 @@ define(function(require) {
 					self.updateMobileCallflowAssignment(userId, userMainCallflowId, device, callback);
 				},
 				saveDevice = function saveDevice(device, callback) {
+					delete device.system_ignore_completed_elsewhere;
+
 					var method = _.has(device, 'id') ? 'devicesUpdateDevice' : 'devicesCreateDevice';
 
 					self[method](device, _.partial(callback, null), callback);
