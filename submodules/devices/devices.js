@@ -1087,7 +1087,7 @@ define(function(require) {
 						}]
 					}
 				},
-				system_ignore_completed_elsewhere: _.get(data, 'configs.ignore_completed_elsewhere', true)
+				system_ignore_completed_elsewhere: _.get(data, 'configs.ignore_completed_elsewhere', false)
 					? self.i18n.active().on
 					: self.i18n.active().off
 			}, deviceData);
@@ -1192,7 +1192,7 @@ define(function(require) {
 							outbound_privacy: 'none'
 						},
 						sip: _.merge({
-							ignore_completed_elsewhere: 'true'
+							ignore_completed_elsewhere: false
 						}, _.pick(sipSettings.sip, ['password', 'username'])),
 						media: {
 							webrtc: false,
