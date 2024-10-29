@@ -1087,7 +1087,11 @@ define(function(require) {
 			} else {
 				holidayRule = _.merge({}, holidayRuleConfig, {
 					name: name,
-					cycle: holidayData.recurring ? 'yearly' : 'date',
+					cycle: holidayData.recurring
+						? 'yearly'
+						: holidayData.toDay
+						? 'monthly'
+						: 'date',
 					interval: 1,
 					month: month,
 					type: 'main_holidays'
@@ -1149,7 +1153,7 @@ define(function(require) {
 						days = _.range(fromDay, toDay + 1),
 						rule = {
 							name: name + '_' + month,
-							cycle: data.start_date ? 'date' : 'yearly',
+							cycle: data.start_date ? 'monthly' : 'yearly',
 							days: days,
 							interval: 1,
 							month: month,
