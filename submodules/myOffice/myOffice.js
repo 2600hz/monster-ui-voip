@@ -996,8 +996,7 @@ define(function(require) {
 					setNumberData = function(e911Data) {
 						var callerIdName = callerIdNameInput.val(),
 							setCNAM = popupTemplate.find('.number-feature[data-feature="cnam"]').is(':visible'),
-							setE911 = popupTemplate.find('.number-feature[data-feature="e911"]').is(':visible'),
-							splitAddress = e911Data.street_address.split(/\s/g);
+							setE911 = popupTemplate.find('.number-feature[data-feature="e911"]').is(':visible');
 
 						account.caller_id = $.extend(true, {}, account.caller_id, {
 							external: {
