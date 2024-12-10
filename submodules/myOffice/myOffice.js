@@ -1024,6 +1024,8 @@ define(function(require) {
 							}
 
 							if (setE911) {
+								var splitAddress = e911Data.street_address.split(/\s/g);
+
 								_.assign(numberData, {
 									e911: _.assign({}, e911Data, {
 										notification_contact_emails: _
