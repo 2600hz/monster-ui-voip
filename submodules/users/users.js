@@ -1863,7 +1863,9 @@ define(function(require) {
 								checkList: originalData.listVMBoxes
 							},
 							'user.password': {
-								minlength: 6
+								minlength: 6,
+								// NOTE: This regex is used to prevent the user from entering a password with a square bracket
+								regex: /^[^[]+$/
 							},
 							'user.device.name': 'required',
 							'user.device.model': 'required',
@@ -1890,6 +1892,9 @@ define(function(require) {
 							},
 							'user.device.mac_address': {
 								required: self.i18n.active().validation.required
+							},
+							'user.password': {
+								regex: 'Hi'
 							}
 						}
 					};
