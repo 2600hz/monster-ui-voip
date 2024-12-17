@@ -1894,7 +1894,7 @@ define(function(require) {
 								required: self.i18n.active().validation.required
 							},
 							'user.password': {
-								regex: 'Hi'
+								regex: self.i18n.active().validation.defaultRules.passwordCharacter
 							}
 						}
 					};
