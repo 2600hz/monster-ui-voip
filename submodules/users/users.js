@@ -1098,11 +1098,18 @@ define(function(require) {
 						},
 						password: {
 							required: true,
-							minlength: 6
+							minlength: 6,
+							// NOTE: This regex is used to prevent the user from entering a password with a square bracket
+							regex: /^[^[]+$/
 						},
 						confirm_password: {
 							required: true,
 							equalTo: '#inputPassword'
+						}
+					},
+					messages: {
+						'password': {
+							regex: self.i18n.active().validation.defaultRules.passwordCharacter
 						}
 					}
 				});
