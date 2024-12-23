@@ -48,6 +48,13 @@ define(function(require) {
 			'meta': 'apps'
 		},
 
+		rules: {
+			password: {
+				// NOTE: This regex is used to prevent the user from entering a password with a square bracket
+				regex: /^[^[]+$/
+			}
+		},
+
 		/* Users */
 		/* args: parent and userId */
 		usersRender: function(args) {
@@ -1098,11 +1105,17 @@ define(function(require) {
 						},
 						password: {
 							required: true,
-							minlength: 6
+							minlength: 6,
+							regex: self.rules.password.regex
 						},
 						confirm_password: {
 							required: true,
 							equalTo: '#inputPassword'
+						}
+					},
+					messages: {
+						'password': {
+							regex: self.i18n.active().validation.defaultRules.passwordCharacter
 						}
 					}
 				});
@@ -1863,7 +1876,8 @@ define(function(require) {
 								checkList: originalData.listVMBoxes
 							},
 							'user.password': {
-								minlength: 6
+								minlength: 6,
+								regex: self.rules.password.regex
 							},
 							'user.device.name': 'required',
 							'user.device.model': 'required',
@@ -1890,6 +1904,9 @@ define(function(require) {
 							},
 							'user.device.mac_address': {
 								required: self.i18n.active().validation.required
+							},
+							'user.password': {
+								regex: self.i18n.active().validation.defaultRules.passwordCharacter
 							}
 						}
 					};
