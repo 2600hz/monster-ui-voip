@@ -48,6 +48,13 @@ define(function(require) {
 			'meta': 'apps'
 		},
 
+		rules: {
+			password: {
+				// NOTE: This regex is used to prevent the user from entering a password with a square bracket
+				regex: /^[^[]+$/
+			}
+		},
+
 		/* Users */
 		/* args: parent and userId */
 		usersRender: function(args) {
@@ -1099,8 +1106,7 @@ define(function(require) {
 						password: {
 							required: true,
 							minlength: 6,
-							// NOTE: This regex is used to prevent the user from entering a password with a square bracket
-							regex: /^[^[]+$/
+							regex: self.rules.password.regex
 						},
 						confirm_password: {
 							required: true,
@@ -1871,8 +1877,7 @@ define(function(require) {
 							},
 							'user.password': {
 								minlength: 6,
-								// NOTE: This regex is used to prevent the user from entering a password with a square bracket
-								regex: /^[^[]+$/
+								regex: self.rules.password.regex
 							},
 							'user.device.name': 'required',
 							'user.device.model': 'required',
