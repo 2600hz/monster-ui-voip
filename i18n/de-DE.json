@@ -473,7 +473,7 @@
 			"help": "Sie können ein neues Kennwort hinzufügen, indem Sie ein beliebiges Kennwort mit der E-Mail-Adresse eintippen!",
 			"password": "Kennwort",
 			"confirmPassword": "Kennwort wiederholen",
-			"passwordPlaceholder": "Kennwort (mind. 6 Zeichen)",
+			"passwordPlaceholder": "Kennwort",
 			"title": "Anmeldeinformationen aktualisieren",
 			"username": "E-Mail-Adresse des Benutzers",
 			"resetPassword": {

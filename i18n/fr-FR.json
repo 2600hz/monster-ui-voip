@@ -372,7 +372,7 @@
 		"dialogChangePassword": {
 			"help": "Vous pouvez mettre à jour votre mot de passe en tapant votre Email et le nouveau mot de passe ci-dessus!",
 			"password": "Mot de passe",
-			"passwordPlaceholder": "(Min. 6 caractères)",
+			"passwordPlaceholder": "Mot de passe",
 			"title": "Mettre à jour Email / Mot de passe",
 			"username": "Email de l'utilisateur"
 		},

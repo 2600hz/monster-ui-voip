@@ -1097,8 +1097,7 @@ define(function(require) {
 							required: true
 						},
 						password: {
-							required: true,
-							minlength: 6
+							required: true
 						},
 						confirm_password: {
 							required: true,
