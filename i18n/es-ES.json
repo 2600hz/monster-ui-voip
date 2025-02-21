@@ -396,7 +396,7 @@
 		"dialogChangePassword": {
 			"help": "Puede establecer una nueva contraseña, simplemente escribiendo cualquier contraseña que quieras, junto con la dirección de correo electrónico!",
 			"password": "Contraseña",
-			"passwordPlaceholder": "Contraseña (mínimo de seis caracteres)",
+			"passwordPlaceholder": "Contraseña",
 			"title": "Actualización de correo electrónico y contraseña",
 			"username": "Dirección de correo electrónico del usuario"
 		},
