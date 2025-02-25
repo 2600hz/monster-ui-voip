@@ -1097,8 +1097,7 @@ define(function(require) {
 							required: true
 						},
 						password: {
-							required: true,
-							minlength: 6
+							required: true
 						},
 						confirm_password: {
 							required: true,
@@ -1863,7 +1862,7 @@ define(function(require) {
 								checkList: originalData.listVMBoxes
 							},
 							'user.password': {
-								minlength: 6
+								required: true
 							},
 							'user.device.name': 'required',
 							'user.device.model': 'required',
