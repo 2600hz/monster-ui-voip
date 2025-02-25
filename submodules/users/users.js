@@ -1862,7 +1862,7 @@ define(function(require) {
 								checkList: originalData.listVMBoxes
 							},
 							'user.password': {
-								minlength: 6
+								required: true
 							},
 							'user.device.name': 'required',
 							'user.device.model': 'required',
