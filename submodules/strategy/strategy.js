@@ -2368,7 +2368,7 @@ define(function(require) {
 								media_source: 'tts',
 								description: '<Text to Speech>',
 								tts: {
-									voice: 'female/en-US',
+									voice: monster.config.whitelabel.ttsVoice || monster.defaultTTSVoice,
 									text: text
 								}
 							}
