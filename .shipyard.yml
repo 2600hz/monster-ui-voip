@@ -35,3 +35,4 @@ metapackage:
     package: monster-ui-application-voip
     type: required
 dependencies: null
+
