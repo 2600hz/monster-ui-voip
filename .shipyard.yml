@@ -1,7 +1,7 @@
 name: monster-ui-application-voip
 custom_files: null
 exposure: private
-base_branch: origin/master
+base_branch: origin/5.5
 base_core: monster-ui
 template: monster-ui-application.spec.tmpl
 package:
@@ -31,7 +31,7 @@ package:
 metapackage:
   -
     name: meta-monster-ui
-    branch: master
+    branch: '5.5'
     package: monster-ui-application-voip
     type: required
 dependencies: null
