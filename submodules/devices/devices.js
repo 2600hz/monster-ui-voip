@@ -1363,7 +1363,12 @@ define(function(require) {
 					accountId: self.accountId
 				},
 				success: function(data) {
-					callback(data.data);
+					var newClassifiers = {};
+
+					_.each(data.data, function(classifier) {
+						newClassifiers[classifier.name] = classifier;
+					});
+					callback(newClassifiers);
 				}
 			});
 		},
