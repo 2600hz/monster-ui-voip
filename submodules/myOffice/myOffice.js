@@ -289,7 +289,12 @@ define(function(require) {
 							accountId: self.accountId
 						},
 						success: function(data) {
-							parallelCallback && parallelCallback(null, data.data);
+							var classifiers = {};
+							_.each(data.data, function(classifier) {
+								classifiers[classifier.name] = classifier;
+							});
+
+							parallelCallback && parallelCallback(null, classifiers);
 						}
 					});
 				},
