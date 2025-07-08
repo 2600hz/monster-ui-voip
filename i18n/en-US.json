@@ -515,7 +515,7 @@
 			"loginEmail": "Email used for Login",
 			"notificationEmail": "Notification E-mail",
 			"password": "Password",
-			"passwordPlaceholder": "Password (Min. 6 characters)",
+			"passwordPlaceholder": "Password",
 			"sendToDifferentEmail": "Send emails to an alternate address",
 			"title": "Add User and Device",
 			"vmboxAlreadyExist": "VMBox Number is already taken, please choose a different Voicemail Box Number.",
