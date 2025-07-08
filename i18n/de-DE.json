@@ -499,7 +499,7 @@
 			"loginEmail": "Zur Anwendung verwendete E-Mail",
 			"notificationEmail": "Benachrichtigungs-E-Mail",
 			"password": "Kennwort",
-			"passwordPlaceholder": "Kennwort (mind. 6 Zeichen)",
+			"passwordPlaceholder": "Kennwort",
 			"sendToDifferentEmail": "E-Mails an andere Adresse senden",
 			"title": "Benutzer und Gerät hinzufügen",
 			"vmboxAlreadyExist": "VMBox-Nummer ist bereits vergeben. Bitte wählen Sie eine andere Anrufbeantworter-Nummer.",
