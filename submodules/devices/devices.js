@@ -468,7 +468,8 @@ define(function(require) {
 						number: true
 					},
 					'sip.username': {
-						required: true
+						required: true,
+						alphanumeric: true
 					},
 					'sip.password': {
 						required: true
