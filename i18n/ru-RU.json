@@ -1073,6 +1073,17 @@
 				"mediaExtension": {
 					"label": "Расширения файлов",
 					"default": "По-уполчанию для учетной записи"
+				},
+				"share": {
+					"label": "Share Voicemail Box",
+					"help": "Share the Voicemail Box among multiple users or groups. Voicemail boxes can be shared whether they are assigned to specific users or not assigned.",
+					"edit": "Edit"
+				},
+				"sharedMembersSelector": {
+					"title": "Shared Voicemail Box Members",
+					"available": "Available Users",
+					"selected": "Selected Members",
+					"okButton": "Confirm members"
 				}
 			},
 			"recipients": {

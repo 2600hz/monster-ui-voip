@@ -949,5 +949,129 @@
 			"misc": "Divers"
 		},
 		"portIconHelp": "Ce numéro est en cours de transfert et sera supprimé si celui-ci échoue. Il peut être configuré mais ne sera pas utilisable"
+	},
+
+	"vmboxes": {
+		"addTitle": "Adding a Voicemail Box",
+		"editTitle": "Editing a Voicemail Box: {{ name }}",
+		"title": "Total Voicemail Boxes",
+		"add": "Add Voicemail Box",
+		"new": "New Voicemail Box",
+		"createVmbox": "Create new Voicemail Box",
+		"deleteVmbox": "Delete Voicemail Box",
+		"deleteNotAllowed": "You can not delete this Voicemail Box because it belongs to a User",
+		"confirmDeleteVmbox": "This Voicemail Box will be permanently deleted. Continue?",
+		"deletedVmbox": "You successfully deleted the following Voicemail Box \"{{vmboxName}}\".",
+		"titleGrid": {
+			"name": "Name",
+			"number": "Number",
+			"owner": "User",
+			"edit": "Edit"
+		},
+		"noMatchingVMBoxes": "There were no Voicemail Boxes found matching your search",
+		"noVMBoxesConfigured": "There are no Voicemail Boxes configured",
+		"popupSettings": {
+			"advancedTitle": "Advanced",
+			"basicTitle": "Basic Settings",
+			"basicSectionTitle": "Basic Settings",
+			"basic": {
+				"name": {
+					"label": "Name"
+				},
+				"number": {
+					"label": "Voicemail Number"
+				},
+				"pinNumber": {
+					"label": "PIN Number"
+				}
+			},
+			"options": {
+				"menuTitle": "Options",
+				"sectionTitle": "Options",
+				"timezone": {
+					"label": "Timezone"
+				},
+				"unavailableMessage": {
+					"label": "Unavailable Message"
+				},
+				"alreadySetup": {
+					"label": "Already Setup?",
+					"help": "Is this voicemail box already considered initialized? If not, the first time the user logs in they will be forced to change their PIN and setup a greeting."
+				},
+				"requirePIN": {
+					"label": "Require PIN?",
+					"help": "Check if voicemail requires a PIN."
+				},
+				"autoLogin": {
+					"label": "Auto-Login Enabled?",
+					"help": "Check to enable auto-login for this voicemail box? (If the user call his own voicemail, it goes straight to his messages)"
+				},
+				"skipGreetings": {
+					"label": "Skip Greetings?",
+					"help": "Check to skip greetings by default"
+				},
+				"skipInstructions": {
+					"label": "Skip Instructions?",
+					"help": "Check to skip instructions by default"
+				},
+				"deleteAfterNotify": {
+					"label": "Delete after Notification?",
+					"help": "Delete the voicemail after the notification has been sent"
+				},
+				"configurable": {
+					"label": "Configurable via Menu?",
+					"help": " If unchecked, it will disallow the user to configure voicemail via the menu"
+				},
+				"transcription": {
+					"label": "Transcribe Messages",
+					"help": "If enabled a voicemail transcription will be sent to the email assigned to the account and can be viewed in the desktop application"
+				},
+				"announceOnly": {
+					"label": "Announce only-mode",
+					"help": "Set a voicemail box to announce-only mode"
+				},
+				"emailAsAttachment": {
+					"label": "Attach messages to e-mail",
+					"help": "E-mail not having the message as an attachment"
+				},
+				"mediaExtension": {
+					"label": "Media Extension",
+					"mp3": "mp3",
+					"mp4": "mp4",
+					"wav": "wav",
+					"default": "Account Default"
+				},
+				"share": {
+					"label": "Share Voicemail Box",
+					"help": "Share the Voicemail Box among multiple users or groups. Voicemail boxes can be shared whether they are assigned to specific users or not assigned.",
+					"edit": "Edit"
+				},
+				"sharedMembersSelector": {
+					"title": "Shared Voicemail Box Members",
+					"available": "Available Users",
+					"selected": "Selected Members",
+					"okButton": "Confirm members"
+				}
+			},
+			"recipients": {
+				"menuTitle": "Recipients",
+				"sectionTitle": "Recipients",
+				"header": "This panel lets you manage who will be notified when someone leaves a message in this voicemail box. Click on  \"Add New Recipient\" to add an e-mail address to the list",
+				"create": "Add New Recipient"
+			},
+			"greeting": {
+				"menuTitle": "Greeting Media",
+				"sectionTitle": "Greeting Media",
+				"dropdownLabel": "Media:",
+				"noGreeting": "- None -",
+				"audioUploadButton": "Browse...",
+				"fileTooBigAlert": "You can not upload a file with a size exceeding 5MB",
+				"emptyUploadAlert": "Please select a file to upload",
+
+				"temporary": {
+					"label": "Temporary:"
+				}
+			}
+		}
 	}
 }
