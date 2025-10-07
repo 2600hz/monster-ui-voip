@@ -167,6 +167,12 @@ define(function(require) {
 						})));
 			});
 
+			self.vmboxesRenderMembers({
+				template: templateVMBox,
+				members: data.members,
+				loadNames: true
+			});
+
 			monster.pub('common.mediaSelect.render', {
 				container: templateVMBox.find('.greeting-container'),
 				name: 'media.unavailable',
@@ -196,7 +202,50 @@ define(function(require) {
 
 		vmboxesEditBindEvents: function(templateVMBox, data, greetingControl, temporaryGreetingControl, callbacks) {
 			var self = this,
-				vmboxForm = templateVMBox.find('#form_vmbox');
+				vmboxForm = templateVMBox.find('#form_vmbox'),
+				shareCheckbox = vmboxForm.find('#shared_vmbox'),
+				vmboxEditMembers = vmboxForm.find('.edit-members'),
+				userMembers = _.chain(data)
+					.get('members', [])
+					.filter({ type: 'user' })
+					.value(),
+				showMemberSelector = function showMemberSelector(uncheckShareOnCancel) {
+					var selectedUserIds = _.map(userMembers, 'id');
+
+					monster.pub('common.userSelector.renderDialog', {
+						title: _.get(self.i18n.active().callflows, 'vmbox.sharedMembersSelector.title'),
+						selectedUserIds: selectedUserIds,
+						i18n: {
+							okButton: _.get(self.i18n.active().callflows, 'vmbox.sharedMembersSelector.okButton'),
+							columnsTitles: {
+								available: _.get(self.i18n.active().callflows, 'vmbox.sharedMembersSelector.available'),
+								selected: _.get(self.i18n.active().callflows, 'vmbox.sharedMembersSelector.selected')
+							}
+						},
+						okCallback: function(selectedUsers) {
+							userMembers = _.map(selectedUsers, function(user) {
+								return {
+									id: user.key,
+									type: 'user',
+									name: user.value
+								};
+							});
+
+							self.vmboxesRenderMembers({
+								template: vmboxForm,
+								members: userMembers,
+								loadNames: false
+							});
+
+							vmboxEditMembers.removeClass('hidden');
+						},
+						cancelCallback: function() {
+							if (uncheckShareOnCancel) {
+								shareCheckbox.prop('checked', false);
+							}
+						}
+					});
+				};
 
 			monster.ui.validate(vmboxForm, {
 				rules: {
@@ -215,7 +264,7 @@ define(function(require) {
 
 			templateVMBox.find('.actions .save').on('click', function() {
 				if (monster.ui.valid(vmboxForm)) {
-					var dataToSave = self.vmboxesMergeData(data, templateVMBox, greetingControl, temporaryGreetingControl),
+					var dataToSave = self.vmboxesMergeData(data, templateVMBox, greetingControl, temporaryGreetingControl, userMembers),
 						$skipInstructionsInput = templateVMBox.find('#skip_instructions_input').val();
 
 					if (dataToSave.announcement_only) {
@@ -342,9 +391,106 @@ define(function(require) {
 			templateVMBox.find('.saved-entities').on('click', '.delete-entity', function() {
 				$(this).parents('.entity-wrapper').remove();
 			});
+
+			// Shared vmbox members
+			$('#shared_vmbox', vmboxForm).on('change', function(ev) {
+				if (this.checked) {
+					showMemberSelector(true);
+					return;
+				}
+
+				userMembers = [];
+
+				vmboxEditMembers.addClass('hidden');
+
+				self.vmboxesRenderMembers({
+					template: vmboxForm,
+					members: userMembers,
+					loadNames: false
+				});
+			});
+
+			$('.edit-members', vmboxForm).on('click', function() {
+				showMemberSelector(false);
+			});
 		},
 
-		vmboxesMergeData: function(originalData, template, greetingControl, temporaryGreetingControl) {
+		/**
+		 * Renders the list of vmbox members.
+		 * @param  {Object}   args
+		 * @param  {jQuery}   args.template         Vmbox edit template.
+		 * @param  {Object[]} args.members          Vmbox member list.
+		 * @param  {String}   args.members[].id     Member's user ID.
+		 * @param  {'user'|'group'} args.members[].type Member's type
+		 * @param  {String}   [args.members[].name] Member's name.
+		 * @param  {Boolean}  args.loadNames        Whether to load or not the member names from the backend.
+		 */
+		vmboxesRenderMembers: function(args) {
+			var self = this,
+				$template = args.template,
+				$membersContainer = $template.find('.vmbox-members'),
+				members = args.members,
+				loadNames = !!args.loadNames;
+
+			// Empty the members container
+			$membersContainer.empty();
+
+			// If there are no members, do nothing
+			if (_.isEmpty(members)) {
+				return;
+			}
+
+			// Else, load the member names if necessary, and render the list
+			monster.waterfall([
+				function loadUsers(next) {
+					if (!loadNames) {
+						return next(null, null);
+					}
+
+					return self.vmboxesGetUserList(next);
+				},
+				function addUserNames(users, next) {
+					if (!loadNames) {
+						return next(null, members);
+					}
+
+					var usersById = _.keyBy(users, 'id'),
+						updatedMembers = _.chain(members)
+							.filter({ type: 'user' })
+							.map(function(member) {
+								var user = _.get(usersById, member.id),
+									name = user
+										? monster.util.getUserFullName(user)
+										: null;
+
+								return _.assign({
+									name: name
+								}, member);
+							})
+							.filter()
+							.value();
+
+					return next(null, updatedMembers);
+				}
+			], function(err, membersWithNames) {
+				if (err) {
+					return;
+				}
+
+				var $memberListTemplate = $(self.getTemplate({
+					name: 'members',
+					data: {
+						members: membersWithNames
+					},
+					submodule: 'vmboxes'
+				}));
+
+				$membersContainer
+					.append($memberListTemplate);
+			});
+		},
+
+		vmboxesMergeData: function(originalData, template, greetingControl, temporaryGreetingControl, userMembers) {
 			var self = this,
 				formData = monster.ui.getFormData('form_vmbox'),
 				mergedData = $.extend(true, {}, originalData, formData);
@@ -382,6 +528,14 @@ define(function(require) {
 
 			if (mergedData.media_extension && mergedData.media_extension === 'default') {
 				delete mergedData.media_extension;
+			}
+
+			if (mergedData.shared_vmbox) {
+				mergedData.members = _.map(userMembers, function(userMember) {
+					return _.pick(userMember, ['id', 'type']);
+				});
+			} else if (_.has(mergedData, 'members')) {
+				delete mergedData.members;
 			}
 
 			delete mergedData.extra;
@@ -523,24 +677,31 @@ define(function(require) {
 			});
 		},
 
+		vmboxesGetUserList: function(callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'user.list',
+				data: {
+					accountId: self.accountId,
+					filters: {
+						paginate: false
+					}
+				},
+				success: function(data) {
+					callback && callback(null, data.data);
+				},
+				error: function(parsedError) {
+					callback && callback(parsedError);
+				}
+			});
+		},
+
 		vmboxesGetData: function(callback) {
 			var self = this;
 
 			monster.parallel({
-				users: function(callback) {
-					self.callApi({
-						resource: 'user.list',
-						data: {
-							accountId: self.accountId,
-							filters: {
-								paginate: 'false'
-							}
-						},
-						success: function(dataUsers) {
-							callback && callback(null, dataUsers.data);
-						}
-					});
-				},
+				users: _.bind(self.vmboxesGetUserList, self),
 				vmboxes: function(callback) {
 					self.callApi({
 						resource: 'voicemail.list',
@@ -600,7 +761,7 @@ define(function(require) {
 				},
 				function(vmbox, userMainCallflow, callback) {
 					if (_.isUndefined(userMainCallflow)) {
-						callback(null);
+						callback(null, vmbox);
 						return;
 					}
 					self.vmboxesRemoveCallflowModule({

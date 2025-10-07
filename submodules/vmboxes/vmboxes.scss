@@ -182,119 +182,144 @@
 }
 
 /* Adding / Edition vmboxes Popups */
-.edit-vmbox .actions {
-	border-top: 1px solid #CCCCCC;
-	height: 30px;
-	line-height: 30px;
-	padding: 15px;
-}
+.edit-vmbox {
+	.actions {
+		border-top: 1px solid #CCCCCC;
+		height: 30px;
+		line-height: 30px;
+		padding: 15px;
+	}
 
-.edit-vmbox .actions button {
-	margin-left: 10px;
-}
+	.actions button {
+		margin-left: 10px;
+	}
 
-.edit-vmbox .title-bar {
-	border-bottom: 1px solid #ccc;
-	margin-bottom: 20px;
-	padding: 15px 0;
-}
+	.title-bar {
+		border-bottom: 1px solid #ccc;
+		margin-bottom: 20px;
+		padding: 15px 0;
+	}
 
-.edit-vmbox .title-bar .vmbox-title > div {
-	display: inline-block;
-	float: left;
-	font-size: 18px;
-	font-weight: bold;
-	height: 80px;
-	line-height: 80px;
-	margin-left: 40px;
-}
+	.title-bar .vmbox-title > div {
+		display: inline-block;
+		float: left;
+		font-size: 18px;
+		font-weight: bold;
+		height: 80px;
+		line-height: 80px;
+		margin-left: 40px;
+	}
 
-.edit-vmbox .title-bar .vmbox-title .vmbox-icon {
-	height: 75px;
-	line-height: 75px;
-}
+	.title-bar .vmbox-title .vmbox-icon {
+		height: 75px;
+		line-height: 75px;
+	}
 
-.edit-vmbox .title-bar .vmbox-title .vmbox-icon > i {
-	font-size: 48px;
-	vertical-align: middle;
-}
+	.title-bar .vmbox-title .vmbox-icon > i {
+		font-size: 48px;
+		vertical-align: middle;
+	}
 
-.edit-vmbox .title-bar .nav-pills {
-	margin-top: 24px;
-	margin-right: 15px;
-}
+	.title-bar .nav-pills {
+		margin-top: 24px;
+		margin-right: 15px;
+	}
 
-.edit-vmbox .content .tabs-section .title {
-	color: #22a5ff;
-	font-size: 24px;
-	margin-bottom: 30px;
-	margin-left: 40px;
-	text-shadow: 1px 0 1px #CCCCCC;
-}
+	.content .tabs-section .title {
+		color: #22a5ff;
+		font-size: 24px;
+		margin-bottom: 30px;
+		margin-left: 40px;
+		text-shadow: 1px 0 1px #CCCCCC;
+	}
 
-.edit-vmbox .control-input.checkbox {
-	margin-left: 160px;
-}
-.edit-vmbox .control-input.checkbox > div {
-	display: inline-block;
-}
-.edit-vmbox .control-input.checkbox.disabled {
-	color: #909099;
-}
-.edit-vmbox .control-input.checkbox.disabled input ~ i {
-	border: solid 1px #bcbcc2;
-	background: #909099;
-}
+	.control-input.checkbox {
+		margin-left: 160px;
+	}
+	.control-input.checkbox > div {
+		display: inline-block;
+	}
+	.control-input.checkbox.disabled {
+		color: #909099;
+	}
+	.control-input.checkbox.disabled input ~ i {
+		border: solid 1px #bcbcc2;
+		background: #909099;
+	}
 
-.edit-vmbox .helper {
-	margin: 0 30px;
-}
+	.helper {
+		margin: 0 30px;
+	}
 
-.edit-vmbox .helper i {
-	margin-right: 5px;
-}
+	.helper i {
+		margin-right: 5px;
+	}
 
-.edit-vmbox .list-entities.emails-list {
-	padding: 0 20px;
-}
+	.list-entities.emails-list {
+		padding: 0 20px;
+	}
 
-.edit-vmbox .tabs-section[data-section="greeting"] .greeting-container,
-.edit-vmbox .tabs-section[data-section="greeting"] .temporary-greeting-container {
-	padding: 0 90px 25px
-}
-.edit-vmbox .tabs-section[data-section="greeting"] .greeting-container .media-dropdown {
-	margin-bottom: 0px;
-	margin-left: 10px
-}
-.edit-vmbox .tabs-section[data-section="greeting"] .greeting-container .upload-toggle {
-	margin-left: 10px;
-	min-width: 117px;
-}
-.edit-vmbox .tabs-section[data-section="greeting"] .greeting-container .upload-div {
-	display: none;
-	margin-top: 20px;
-}
-.edit-vmbox .tabs-section[data-section="greeting"] .greeting-container .upload-div .upload-input {
-	margin: 0;
-	width: 330px;
-}
-.edit-vmbox .tabs-section[data-section="greeting"] .greeting-container .upload-div button.upload-action {
-	margin-left: 10px;
-	padding-left: 19px;
-	padding-right: 19px;
-}
+	.tabs-section[data-section="greeting"] .greeting-container,
+	.tabs-section[data-section="greeting"] .temporary-greeting-container {
+		padding: 0 90px 25px
+	}
+	.tabs-section[data-section="greeting"] .greeting-container .media-dropdown {
+		margin-bottom: 0px;
+		margin-left: 10px
+	}
+	.tabs-section[data-section="greeting"] .greeting-container .upload-toggle {
+		margin-left: 10px;
+		min-width: 117px;
+	}
+	.tabs-section[data-section="greeting"] .greeting-container .upload-div {
+		display: none;
+		margin-top: 20px;
+	}
+	.tabs-section[data-section="greeting"] .greeting-container .upload-div .upload-input {
+		margin: 0;
+		width: 330px;
+	}
+	.tabs-section[data-section="greeting"] .greeting-container .upload-div button.upload-action {
+		margin-left: 10px;
+		padding-left: 19px;
+		padding-right: 19px;
+	}
 
-.edit-vmbox .tabs-section[data-section="greeting"] .greeting-container .upload-div button > i {
-	margin-right: 0;
-	padding-right: 0;
-}
+	.tabs-section[data-section="greeting"] .greeting-container .upload-div button > i {
+		margin-right: 0;
+		padding-right: 0;
+	}
 
-.edit-vmbox .tabs-section[data-section="greeting"] .greeting-container .upload-div .file-upload {
-	margin: 0;
-	display: inline-block;
-}
-.edit-vmbox .tabs-section[data-section="greeting"] .greeting-container .upload-div .file-upload > input {
-	margin: 0;
-	padding: 6px;
-	width: 140px;
+	.tabs-section[data-section="greeting"] .greeting-container .upload-div .file-upload {
+		margin: 0;
+		display: inline-block;
+	}
+	.tabs-section[data-section="greeting"] .greeting-container .upload-div .file-upload > input {
+		margin: 0;
+		padding: 6px;
+		width: 140px;
+	}
+
+	.edit-members {
+		margin-left: 0.75rem;
+		text-decoration: underline;
+	}
+
+	.vmbox-members {
+		margin-top: 1rem;
+		margin-left: 10rem;
+		padding-left: 1.25rem;
+		line-height: 1.25rem;
+		font-size: 0.875rem;
+		font-weight: 600;
+
+		ul.vmbox-member-list {
+			list-style: none;
+			margin-left: 1.25rem;
+
+			li {
+				margin-bottom: 0.25rem;
+			}
+		}
+	}
 }

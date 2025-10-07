@@ -202,6 +202,20 @@
 						</div>
 					</label>
 				</div>
+
+				<div class="control-group">
+					<label class="control-input checkbox">
+						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.share.help }}">
+							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.share.label}}
+								<input type="checkbox" name="shared_vmbox" id="shared_vmbox" {{#if shared_vmbox }}checked{{/if}} />
+							{{/monsterCheckbox}}
+							<a class="edit-members monster-link blue{{#unless shared_vmbox}} hidden{{/unless}}" href="javascript:void(0);">
+								{{ i18n.vmboxes.popupSettings.options.share.edit }}
+							</a>
+						</div>
+					</label>
+					<div class="vmbox-members"></div>
+				</div>
 			</div>
 
 			<div class="tabs-section" data-section="recipients">
