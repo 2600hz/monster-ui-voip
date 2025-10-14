@@ -1271,7 +1271,7 @@
 			},
 			"voicemail[action=\"direct\"]": {
 				"label": "Zum Anrufbeantworter weiterleiten",
-				"tooltip": "(Drücken Sie auf „Weiterleiten“, dann ** und die Nebenstellennummer des Empfängers) Der Anruf wird direkt zur Voicemail durchgestellt."
+				"tooltip": "(Eingabe von ** und die Nebenstellennummer des Empfängers) Der Anruf wird direkt zur Voicemail durchgestellt."
 			},
 			"voicemail[single_mailbox_login]": {
 				"label": "Anrufbeantworter abhören (automatische Anmeldung)",
