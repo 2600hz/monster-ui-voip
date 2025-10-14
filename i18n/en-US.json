@@ -1338,7 +1338,7 @@
 			},
 			"voicemail[action=\"direct\"]": {
 				"label": "Direct to Voicemail",
-				"tooltip": "(Press transfer, then ** + extension number of recipient) Call will go straight to voicemail."
+				"tooltip": "(Dial ** + extension number of recipient) Call will go straight to voicemail."
 			},
 			"voicemail[single_mailbox_login]": {
 				"label": "Check Voicemail (auto login)",
