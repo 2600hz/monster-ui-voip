@@ -1054,6 +1054,7 @@ define(function(require) {
 							action: _.get(data.device, ['call_restriction', classifier, 'action'], 'inherit'),
 							disabled: isClassifierDisabledByAccount(classifier),
 							friendly_name: _.get(i18n, 'name', metadata.friendly_name),
+							name: _.get(metadata, 'name'),
 							help: _.get(i18n, 'help')
 						};
 					}),
@@ -1364,12 +1365,7 @@ define(function(require) {
 					accountId: self.accountId
 				},
 				success: function(data) {
-					var classifiers = {};
-
-					_.each(data.data, function(classifier) {
-						classifiers[classifier.name] = classifier;
-					});
-					callback(classifiers);
+					callback(data.data);
 				}
 			});
 		},
