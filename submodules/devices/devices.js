@@ -925,8 +925,8 @@ define(function(require) {
 					self.appFlags.devices.provisionerConfigFlags,
 					['brands', _.get(data.device, 'provision.endpoint_brand'), 'lineKeys']
 				),
-				isClassifierDisabledByAccount = function isClassifierDisabledByAccount(classifier) {
-					return _.get(data.accountLimits, ['call_restriction', classifier, 'action']) === 'deny';
+				isClassifierDisabledByAccount = function isClassifierDisabledByAccount(classifierName) {
+					return _.get(data.accountLimits, ['call_restriction', classifierName, 'action']) === 'deny';
 				},
 				templateDefaults = {
 					media: {
@@ -951,8 +951,8 @@ define(function(require) {
 						video: []
 					},
 					e911Numbers: data.e911Numbers,
-					hasDisabledRestrictions: _.some(data.listClassifiers, function(metadata, classifier) {
-						return isClassifierDisabledByAccount(classifier);
+					hasDisabledRestrictions: _.some(data.listClassifiers, function(classifier) {
+						return isClassifierDisabledByAccount(classifier.name);
 					}),
 					hasE911Numbers: !_.isEmpty(data.e911Numbers),
 					isRegistered: _.get(dataList, 'isRegistered', false),
@@ -1047,14 +1047,14 @@ define(function(require) {
 							.value(),
 						parkingSpots: _.range(1, 11)
 					},
-					restrictions: _.mapValues(data.listClassifiers, function(metadata, classifier) {
-						var i18n = _.get(self.i18n.active().devices.classifiers, classifier);
+					restrictions: _.mapValues(data.listClassifiers, function(classifier) {
+						var i18n = _.get(self.i18n.active().devices.classifiers, classifier.name);
 
 						return {
-							action: _.get(data.device, ['call_restriction', classifier, 'action'], 'inherit'),
-							disabled: isClassifierDisabledByAccount(classifier),
-							friendly_name: _.get(i18n, 'name', metadata.friendly_name),
-							name: _.get(metadata, 'name'),
+							action: _.get(data.device, ['call_restriction', classifier.name, 'action'], 'inherit'),
+							disabled: isClassifierDisabledByAccount(classifier.name),
+							friendly_name: _.get(i18n, 'name', classifier.friendly_name),
+							name: _.get(classifier, 'name'),
 							help: _.get(i18n, 'help')
 						};
 					}),
