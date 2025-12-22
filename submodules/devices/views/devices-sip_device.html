@@ -193,7 +193,7 @@
 					</div>
 					<div class="restriction-list">
 					{{#each extra.restrictions}}
-						<div class="control-group restriction-line{{#if this.disabled}} disabled{{/if}}" data-restriction="{{@key}}">
+						<div class="control-group restriction-line{{#if this.disabled}} disabled{{/if}}" data-restriction="{{this.name}}">
 							<label class="control-label">{{this.friendly_name}}
 								{{#if this.help}}
 									<i class="help-popover fa fa-question-circle" data-original-title="{{this.help}}" data-placement="top" data-toggle="tooltip"></i>
@@ -202,7 +202,7 @@
 							<div class="controls">
 								<div class="switch">
 								{{#monsterSwitch}}
-									<input class="restrictions-switch" type="checkbox" name="call_restriction.{{@key}}.action" data-on="{{@root.i18n.devices.popupSettings.restrictions.allow}}" data-off="{{@root.i18n.devices.popupSettings.restrictions.deny}}" {{#compare this.action '===' 'inherit'}}{{#unless this.disabled}} checked{{/unless}}{{/compare}}{{#if this.disabled}} disabled{{/if}}></input>
+									<input class="restrictions-switch" type="checkbox" name="call_restriction.{{this.name}}.action" data-on="{{@root.i18n.devices.popupSettings.restrictions.allow}}" data-off="{{@root.i18n.devices.popupSettings.restrictions.deny}}" {{#compare this.action '===' 'inherit'}}{{#unless this.disabled}} checked{{/unless}}{{/compare}}{{#if this.disabled}} disabled{{/if}}></input>
 								{{/monsterSwitch}}
 								</div>
 								<i class="restriction-matcher-sign fa-lg fa fa-check monster-green"></i>
