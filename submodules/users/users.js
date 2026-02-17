@@ -5830,7 +5830,10 @@ define(function(require) {
 				name: self.usersGetMainVMBoxName(userName),
 				delete_after_notify: deleteAfterNotify,
 				transcribe: transcribe,
-				include_message_on_notify: includeMessageOnNotify
+				include_message_on_notify: includeMessageOnNotify,
+				envelope_type: 'caller_and_time',
+				skip_envelope: false
+
 			};
 		},
 

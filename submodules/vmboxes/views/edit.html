@@ -205,6 +205,29 @@
 
 				<div class="control-group">
 					<label class="control-input checkbox">
+						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.skipEnvelope.help }}">
+							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.skipEnvelope.label}}
+					</div>
+								<input type="checkbox" name="skip_envelope" id="skip_envelope" {{#if skip_envelope }}checked{{/if}} />
+							{{/monsterCheckbox}}
+						</div>
+					</label>
+				</div>
+
+				<div class="control-group">
+					<label class="control-label" for="name">{{ i18n.vmboxes.popupSettings.basic.envelopeType.label }}</label>
+					<div class="controls">
+						<select name="envelope_type" id="envelope_type" {{#if skip_envelope }}disabled{{/if}}>
+							{{#select envelope_type}}
+								<option value="caller_and_time">{{ i18n.vmboxes.popupSettings.options.envelopeType.caller_and_time }}</option>
+								<option value="default">{{ i18n.vmboxes.popupSettings.options.envelopeType.default }}</option>
+							{{/select}}
+						</select>
+					</div>
+				</div>
+
+				<div class="control-group">
+					<label class="control-input checkbox">
 						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.share.help }}">
 							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.share.label}}
 								<input type="checkbox" name="shared_vmbox" id="shared_vmbox" {{#if shared_vmbox }}checked{{/if}} />
