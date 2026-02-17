@@ -1236,8 +1236,11 @@ define(function(require) {
 						var staticStatusClasses = ['unregistered', 'registered'],
 							deviceType = device.device_type,
 							// TODO: this validation should be removed once the backend returns the actual meta device status.
-							isRegistered = device.device_type === 'meta' ? true :
-							  device.registrable ? device.registered : true,
+							isRegistered = device.device_type === 'meta'
+								? true
+								: device.registrable
+									? device.registered
+									: true,
 							isEnabled = _.get(device, 'enabled', false),
 							userName = _
 								.chain(usersById)
@@ -1454,7 +1457,7 @@ define(function(require) {
 									callback(null, data.data);
 								}
 							});
-						},
+						}
 					}, function(error, results) {
 						waterfallCb(null, results);
 					});

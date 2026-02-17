@@ -1090,8 +1090,8 @@ define(function(require) {
 					cycle: holidayData.recurring
 						? 'yearly'
 						: holidayData.toDay
-						? 'monthly'
-						: 'date',
+							? 'monthly'
+							: 'date',
 					interval: 1,
 					month: month,
 					type: 'main_holidays'
