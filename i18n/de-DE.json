@@ -1450,6 +1450,15 @@
 					"available": "Available Users",
 					"selected": "Selected Members",
 					"okButton": "Confirm members"
+				},
+				"skipEnvelope": {
+					"label": "Skip Envelope",
+					"help": "Check to skip playing any envelope type"
+				},
+				"envelopeType": {
+					"label": "Envelope Type",
+					"caller_and_time": "Accounce Caller ID and Time",
+					"default": "Announce Time"
 				}
 			},
 			"recipients": {
