@@ -592,7 +592,7 @@ define(function(require) {
 				_.partial(_.groupBy, _, identify),
 				_.partial(_.map, _, _.partial(resolve, meta.typesOrderSignificance)),
 				_.partial(_.sortBy, _, 'start'),
-				_.partial(_.thru, _, _.partial(combine, meta.step)),
+				_.partial(_.thru, _, _.partial(combine, meta.step))
 			));
 		},
 
