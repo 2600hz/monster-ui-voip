@@ -1027,8 +1027,6 @@ define(function(require) {
 							}
 
 							if (setE911) {
-								var splitAddress = e911Data.street_address.split(/\s/g);
-
 								_.assign(numberData, {
 									e911: _.assign({}, e911Data, {
 										notification_contact_emails: _
@@ -1041,10 +1039,7 @@ define(function(require) {
 											.uniq()
 											.value(),
 										caller_name: monster.apps.auth.currentAccount.name,
-										legacy_data: {
-											house_number: _.head(splitAddress)
-										},
-										street_address: splitAddress.slice(1).join(' ')
+										street_address: _.trim(e911Data.street_address)
 									})
 								});
 							} else {
