@@ -912,7 +912,11 @@ define(function(require) {
 
 							if (hasE911 && isE911Enabled) {
 								if (_.has(numberData, 'e911')) {
-									var street_address = _.get(numberData, 'e911.legacy_data.house_number', '') + ' ' + _.get(numberData, 'e911.street_address', '');
+									var streetAddress = _.get(numberData, 'e911.street_address', ''),
+										houseNumber = _.get(numberData, 'e911.legacy_data.house_number', ''),
+										street_address = _.isEmpty(houseNumber) || _.startsWith(streetAddress, houseNumber)
+											? streetAddress
+											: _.trim([houseNumber, streetAddress].join(' '));
 
 									emergencyZipcodeInput.val(numberData.e911.postal_code);
 									emergencyAddress1Input.val(street_address);
@@ -1023,8 +1027,6 @@ define(function(require) {
 							}
 
 							if (setE911) {
-								var splitAddress = e911Data.street_address.split(/\s/g);
-
 								_.assign(numberData, {
 									e911: _.assign({}, e911Data, {
 										notification_contact_emails: _
@@ -1037,10 +1039,7 @@ define(function(require) {
 											.uniq()
 											.value(),
 										caller_name: monster.apps.auth.currentAccount.name,
-										legacy_data: {
-											house_number: _.head(splitAddress)
-										},
-										street_address: splitAddress.slice(1).join(' ')
+										street_address: _.trim(e911Data.street_address)
 									})
 								});
 							} else {
