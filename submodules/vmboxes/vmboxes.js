@@ -287,6 +287,14 @@ define(function(require) {
 				templateVMBox.find('#skip_instructions_input').val(isChecked);
 			});
 
+			templateVMBox.find('#skip_envelope').on('click', function() {
+				var $this = $(this),
+					isChecked = $this.prop('checked'),
+					$envelopeType = templateVMBox.find('#envelope_type');
+
+				$envelopeType.prop('disabled', isChecked);
+			});
+
 			templateVMBox.find('#announcement_only').on('click', function() {
 				var $this = $(this),
 					isChecked = $this.prop('checked'),
@@ -497,6 +505,8 @@ define(function(require) {
 
 			// Rebuild list of recipients from UI
 			mergedData.notify_email_addresses = [];
+			mergedData.envelope_type = formData.envelope_type || 'caller_and_time';
+			mergedData.skip_envelope = formData.skip_envelope || false;
 			template.find('.saved-entities .entity-wrapper').each(function() {
 				mergedData.notify_email_addresses.push($(this).data('name'));
 			});
