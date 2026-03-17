@@ -871,8 +871,8 @@ define(function(require) {
 						}
 					}
 				}
-				self.appFlags.strategyHolidays.allHolidays = holidaysData;
 			});
+			self.appFlags.strategyHolidays.allHolidays = holidaysData;
 			self.appFlags.strategyHolidays.deletedHolidays = [];
 
 			return holidaysData;
