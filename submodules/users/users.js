@@ -904,6 +904,49 @@ define(function(require) {
 				});
 			});
 
+			template.on('click', '#reset_mfa', function() {
+				var dataUser = $(this).parents('.grid-row').data(),
+					dialogTemplate = $(self.getTemplate({
+						name: 'resetMFADialog',
+						data: dataUser,
+						submodule: 'users'
+					})),
+					popup = monster.ui.dialog(dialogTemplate, {
+						title: '<i class="fa fa-question-circle monster-primary-color"></i>',
+						position: ['center', 20],
+						dialogClass: 'monster-alert'
+					});
+
+
+				dialogTemplate.find('#confirm_button').on('click', function() {
+					var dataResetMFA = {
+						data: {
+							user_id: dataUser.id,
+							account_id: self.accountId
+						}
+					};
+
+					self.usersResetMFA(dataResetMFA, function() {
+						popup.dialog('close').remove();
+
+						monster.ui.toast({
+							type: 'success',
+							message: self.getTemplate({
+								name: '!' + toastrMessages.successResetMFA,
+								data: {
+									name: dataUser.name
+								}
+							})
+						});
+					});
+				});
+
+
+				dialogTemplate.find('#cancel_button').on('click', function() {
+					popup.dialog('close').remove();
+				});
+			});
+
 			template.on('change', '#notification_email', function() {
 				if (template.find('.email-border').hasClass('open')) {
 					template.find('.email-border').removeClass('open', 400);
@@ -5543,6 +5586,18 @@ define(function(require) {
 				},
 				onChargesCancelled: function() {
 					args.hasOwnProperty('onChargesCancelled') && args.onChargesCancelled();
+				}
+			});
+		},
+
+		usersResetMFA: function(data, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'multifactor.resetQrcode',
+				data: data,
+				success: function(data, status) {
+					callback && callback(data.data);
 				}
 			});
 		},
