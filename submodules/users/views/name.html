@@ -168,6 +168,7 @@
 		{{#compare id "!==" extra.adminId}}
 			<a id="delete_user" class="monster-link" href="javascript:void(0);"><i class="fa fa-trash-o monster-red"></i>{{ i18n.users.delete }}</a>
 		{{/compare}}
+			<a id="reset_mfa" class="monster-link" href="javascript:void(0);"><i class="fa fa-repeat monster-red"></i>{{ i18n.users.resetMFA }}</a>
 	{{/isFeatureAvailable}}
 
 		{{#if extra.canImpersonate}}
