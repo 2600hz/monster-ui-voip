@@ -536,6 +536,11 @@
 				"title": "Add Device"
 			}
 		},
+		"resetMFADialog": {
+			"resetMFAUserName": "Reset MFA for \"{{variable}}\"",
+			"message": "Do you want to reset the Multi-Factor Authentication (MFA) configuration for this user?",
+			"proceed": "Proceed"
+		},
 		"editionForm": {
 			"changePIN": "Change PIN",
 			"changeUsername": "Change Credentials",
@@ -565,6 +570,7 @@
 			"mainExtensionHelp": "This will define the Caller-ID used for this User for calls inside the system, as well as setting his Presence ID to that number"
 		},
 		"delete": "Delete User",
+		"resetMFA": "Reset MFA",
 		"errorCallerId": "Before configuring the Caller-ID of this user, you need to assign them a number",
 		"errorNumberFaxing": "Before configuring the Faxing number of this user, you need to get some spare numbers on your account (You can buy new numbers in the Numbers section on the left menu).",
 		"featureOn": "ON",
@@ -613,7 +619,8 @@
 			"callerIDDeleted": "The Caller-ID Number of this user was set to a number that was no longer assigned to them, so we disabled the Caller-ID Feature.",
 			"__comment": ": Now offer admin the option to send an email to reset the password of a user",
 			"__version": "4.0",
-			"successResetPassword": "Success! {{ name }} will be receiving an e-mail with instructions on how to reset his password shortly."
+			"successResetPassword": "Success! {{ name }} will be receiving an e-mail with instructions on how to reset his password shortly.",
+			"successResetMFA": "Success! Multi-factor Authentication (MFA) has been reset for {{name}}"
 		},
 		"uploadPicture": "Upload a Picture",
 		"user": "User",
