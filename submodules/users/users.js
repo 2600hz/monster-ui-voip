@@ -30,7 +30,8 @@ define(function(require) {
 				smartPBXCallflowString: ' SmartPBX\'s Callflow',
 				smartPBXConferenceString: ' SmartPBX Conference',
 				smartPBXVMBoxString: '\'s VMBox'
-			}
+			},
+			isAccountPlatformMFA: false
 		},
 
 		deviceIcons: {
@@ -68,7 +69,13 @@ define(function(require) {
 						data: dataTemplate,
 						submodule: 'users'
 					})),
-					templateUser;
+					templateUser,
+					otpMFA = _.get(data, 'securitySettings.account.auth_modules.cb_user_auth.multi_factor'),
+					isMFAEnabled = _.get(otpMFA, 'enabled', false),
+					isAccountPlatformMFA =
+						_.get(data, 'getOptMFA.id') === _.get(otpMFA, 'configuration_id');
+
+				self.appFlags.isAccountPlatformMFA = isAccountPlatformMFA;
 
 				_.each(dataTemplate.users, function(user) {
 					templateUser = $(self.getTemplate({
@@ -384,6 +391,8 @@ define(function(require) {
 			dataUser.extra.hasFeatures = (dataUser.extra.countFeatures > 0);
 
 			dataUser.extra.adminId = self.userId;
+
+			dataUser.extra.canResetMFA =  self.appFlags.isAccountPlatformMFA && monster.util.isAdmin();
 
 			dataUser.extra.canImpersonate = monster.util.canImpersonate(self.accountId);
 
@@ -4924,7 +4933,16 @@ define(function(require) {
 		},
 
 		usersGetData: function(callback) {
-			var self = this;
+			var self = this,
+				getOtpMultiFactor = function(data) {
+					return _.chain(data)
+						.get('data.multi_factor_providers')
+						.find({
+							provider_name: 'otp',
+							enabled: true
+						})
+						.value();
+				};
 
 			monster.parallel({
 				users: function(callback) {
@@ -4955,6 +4973,30 @@ define(function(require) {
 						}
 					}, function(devices) {
 						callback(null, devices);
+					});
+				},
+				getOptMFA: function(callback) {
+					self.callApi({
+						resource: 'multifactor.list',
+						data: {
+							accountId: self.accountId
+						},
+						success: _.flow(
+							getOtpMultiFactor,
+							_.partial(callback, null)
+						)
+					});
+				},
+				securitySettings: function(callback) {
+					self.callApi({
+						resource: 'security.get',
+						data: {
+							accountId: self.accountId
+						},
+						success: _.flow(
+							_.partial(_.get, _, 'data'),
+							_.partial(callback, null)
+						)
 					});
 				}
 			}, function(err, results) {
