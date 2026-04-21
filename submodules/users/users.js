@@ -30,7 +30,8 @@ define(function(require) {
 				smartPBXCallflowString: ' SmartPBX\'s Callflow',
 				smartPBXConferenceString: ' SmartPBX Conference',
 				smartPBXVMBoxString: '\'s VMBox'
-			}
+			},
+			isAccountPlatformMFA: false
 		},
 
 		deviceIcons: {
@@ -68,7 +69,12 @@ define(function(require) {
 						data: dataTemplate,
 						submodule: 'users'
 					})),
-					templateUser;
+					templateUser,
+					otpMFA = _.get(data, 'securitySettings.account.auth_modules.cb_user_auth.multi_factor'),
+					isMFAEnabled = _.get(otpMFA, 'enabled', false),
+					isAccountPlatformMFA = _.get(data, 'getOptMFA.id') === _.get(otpMFA, 'configuration_id');
+
+				self.appFlags.isAccountPlatformMFA = isAccountPlatformMFA && isMFAEnabled;
 
 				_.each(dataTemplate.users, function(user) {
 					templateUser = $(self.getTemplate({
@@ -384,6 +390,8 @@ define(function(require) {
 			dataUser.extra.hasFeatures = (dataUser.extra.countFeatures > 0);
 
 			dataUser.extra.adminId = self.userId;
+
+			dataUser.extra.canResetMFA =  self.appFlags.isAccountPlatformMFA && monster.util.isAdmin();
 
 			dataUser.extra.canImpersonate = monster.util.canImpersonate(self.accountId);
 
@@ -901,6 +909,49 @@ define(function(require) {
 						});
 						self.usersRender();
 					}
+				});
+			});
+
+			template.on('click', '#reset_mfa', function() {
+				var dataUser = $(this).parents('.grid-row').data(),
+					dialogTemplate = $(self.getTemplate({
+						name: 'resetMFADialog',
+						data: dataUser,
+						submodule: 'users'
+					})),
+					popup = monster.ui.dialog(dialogTemplate, {
+						title: '<i class="fa fa-question-circle monster-primary-color"></i>',
+						position: ['center', 20],
+						dialogClass: 'monster-alert'
+					});
+
+
+				dialogTemplate.find('#confirm_button').on('click', function() {
+					var dataResetMFA = {
+						data: {
+							user_id: dataUser.id,
+							account_id: self.accountId
+						}
+					};
+
+					self.usersResetMFA(dataResetMFA, function() {
+						popup.dialog('close').remove();
+
+						monster.ui.toast({
+							type: 'success',
+							message: self.getTemplate({
+								name: '!' + toastrMessages.successResetMFA,
+								data: {
+									name: dataUser.name
+								}
+							})
+						});
+					});
+				});
+
+
+				dialogTemplate.find('#cancel_button').on('click', function() {
+					popup.dialog('close').remove();
 				});
 			});
 
@@ -4881,7 +4932,16 @@ define(function(require) {
 		},
 
 		usersGetData: function(callback) {
-			var self = this;
+			var self = this,
+				getOtpMultiFactor = function(data) {
+					return _.chain(data)
+						.get('data.multi_factor_providers')
+						.find({
+							provider_name: 'otp',
+							enabled: true
+						})
+						.value();
+				};
 
 			monster.parallel({
 				users: function(callback) {
@@ -4912,6 +4972,30 @@ define(function(require) {
 						}
 					}, function(devices) {
 						callback(null, devices);
+					});
+				},
+				getOptMFA: function(callback) {
+					self.callApi({
+						resource: 'multifactor.list',
+						data: {
+							accountId: self.accountId
+						},
+						success: _.flow(
+							getOtpMultiFactor,
+							_.partial(callback, null)
+						)
+					});
+				},
+				securitySettings: function(callback) {
+					self.callApi({
+						resource: 'security.get',
+						data: {
+							accountId: self.accountId
+						},
+						success: _.flow(
+							_.partial(_.get, _, 'data'),
+							_.partial(callback, null)
+						)
 					});
 				}
 			}, function(err, results) {
@@ -5543,6 +5627,18 @@ define(function(require) {
 				},
 				onChargesCancelled: function() {
 					args.hasOwnProperty('onChargesCancelled') && args.onChargesCancelled();
+				}
+			});
+		},
+
+		usersResetMFA: function(data, callback) {
+			var self = this;
+
+			self.callApi({
+				resource: 'multifactor.resetQrcode',
+				data: data,
+				success: function(data, status) {
+					callback && callback(data.data);
 				}
 			});
 		},
