@@ -72,10 +72,9 @@ define(function(require) {
 					templateUser,
 					otpMFA = _.get(data, 'securitySettings.account.auth_modules.cb_user_auth.multi_factor'),
 					isMFAEnabled = _.get(otpMFA, 'enabled', false),
-					isAccountPlatformMFA =
-						_.get(data, 'getOptMFA.id') === _.get(otpMFA, 'configuration_id');
+					isAccountPlatformMFA = _.get(data, 'getOptMFA.id') === _.get(otpMFA, 'configuration_id');
 
-				self.appFlags.isAccountPlatformMFA = isAccountPlatformMFA;
+				self.appFlags.isAccountPlatformMFA = isAccountPlatformMFA && isMFAEnabled;
 
 				_.each(dataTemplate.users, function(user) {
 					templateUser = $(self.getTemplate({
