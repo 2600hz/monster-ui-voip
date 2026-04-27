@@ -912,7 +912,11 @@ define(function(require) {
 
 							if (hasE911 && isE911Enabled) {
 								if (_.has(numberData, 'e911')) {
-									var street_address = _.get(numberData, 'e911.legacy_data.house_number', '') + ' ' + _.get(numberData, 'e911.street_address', '');
+									var streetAddress = _.get(numberData, 'e911.street_address', ''),
+										houseNumber = _.get(numberData, 'e911.legacy_data.house_number', ''),
+										street_address = _.isEmpty(houseNumber) || _.startsWith(streetAddress, houseNumber)
+											? streetAddress
+											: _.trim([houseNumber, streetAddress].join(' '));
 
 									emergencyZipcodeInput.val(numberData.e911.postal_code);
 									emergencyAddress1Input.val(street_address);
