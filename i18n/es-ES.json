@@ -424,6 +424,11 @@
 			"__version": "3.20_s3",
 			"sendWelcomeEmail": "Enviar las credenciales a este usuario"
 		},
+		"resetMFADialog": {
+			"resetMFAUserName": "Restablecer Autenticación multifactor para \"{{variable}}\"",
+			"message": "¿Desea restablecer la configuración de autenticación multifactor para este usuario?",
+			"proceed": "Proceder"
+		},
 		"editionForm": {
 			"changePIN": "Cambiar PIN",
 			"changeUsername": "Cambiar",
@@ -453,6 +458,7 @@
 			"mainExtensionHelp": "Esto definirá el identificador (Caller-ID) utilizado para este usuario para llamadas dentro del sistema, así como establecer la identificación de su presencia en ese número "
 		},
 		"delete": "Eliminar usuario ",
+		"resetMFA": "Reajustar Doble factor",
 		"errorCallerId": "Antes de configurar el identificador (Caller-ID) de usuario, se necesita asignarle un número ",
 		"errorNumberFaxing": "Antes de configurar el número que Manda por fax de este usuario, tiene que conseguir algunos números de repuesto en su cuenta (Usted puede comprar nuevos números en la sección de números en el menú de la izquierda).",
 		"featureOn": "Activar",
@@ -496,7 +502,9 @@
 			"pinUpdated": "Ha actualizado correctamente el PIN de {{ name }}.",
 			"__comment": "UI-1033: Now properly remove the Caller-ID Feature if we remove a number that was set as that Caller-ID Number",
 			"__version": "3.20",
-			"callerIDDeleted": "El número de identificador de llamadas de este usuario fue fijado en un número que no fue asignado a él, por lo que hemos deshabilitado la característica del identificador (Caller-ID)."
+			"callerIDDeleted": "El número de identificador de llamadas de este usuario fue fijado en un número que no fue asignado a él, por lo que hemos deshabilitado la característica del identificador (Caller-ID).",
+			"successResetPassword": "{{ name }} recibirá en breve un correo electrónico con instrucciones sobre cómo restablecer su contraseña.",
+			"successResetMFA": "La autenticación multifactor se ha restablecido para {{name}}"
 		},
 		"uploadPicture": "Cargar una imagen",
 		"user": "Usuario",

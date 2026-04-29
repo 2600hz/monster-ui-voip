@@ -398,6 +398,11 @@
 			"vmboxNumber": "Numéro Répondeur",
 			"sendWelcomeEmail": "Envoyer les informations de connexion à cet utilisateur"
 		},
+		"resetMFADialog": {
+			"resetMFAUserName": "Réinitialiser l'authentification multifacteur pour \"{{variable}}\"",
+			"message": "Souhaitez-vous réinitialiser la configuration de l'authentification multifacteur pour cet utilisateur?",
+			"proceed": "Continuer"
+		},
 		"editionForm": {
 			"changePIN": "Changer PIN",
 			"changeUsername": "Changer",
@@ -427,6 +432,7 @@
 			"mainExtensionHelp": "Ceci défini le Caller-ID de cet utilisateur pour les appels internes au système, ainsi que son Presence ID"
 		},
 		"delete": "Supprimer Utilisateur",
+		"resetMFA": "Reset Auth forte",
 		"errorCallerId": "Avant de configurer le Caller-ID de l'utilisateur, vous devez d'abord lui attribuer un numéro.",
 		"errorNumberFaxing": "Avant de configurer le numéro de Fax de cet utilisateur, vous devez avoir au moins un numéro disponible pour l'assigner ici. (Vous pouvez acheter des numéros depuis la section numéro sur la gauche)",
 		"featureOn": "ON",
@@ -470,7 +476,9 @@
 			"pinUpdated": "Vous avez mis à jour le PIN de {{ name }} avec succès!",
 			"__comment": "UI-1033: Now properly remove the Caller-ID Feature if we remove a number that was set as that Caller-ID Number",
 			"__version": "3.20",
-			"callerIDDeleted": "Le Numéro de Caller-ID de cet utilisateur n'étant plus assigné, la fonctionnalité Caller-ID a été desactivée."
+			"callerIDDeleted": "Le Numéro de Caller-ID de cet utilisateur n'étant plus assigné, la fonctionnalité Caller-ID a été desactivée.",
+			"successResetPassword": "Succès! {{ name }} recevra sous peu un e-mail contenant les instructions pour réinitialiser son mot de passe.",
+			"successResetMFA": "Succès! L'authentification multifacteur a été réinitialisée pour {{name}}."
 		},
 		"uploadPicture": "Uploader une image",
 		"user": "Utilisateur",
