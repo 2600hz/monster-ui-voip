@@ -520,6 +520,11 @@
 				"title": "Gerät hinzufügen"
 			}
 		},
+		"resetMFADialog": {
+			"resetMFAUserName": "MFA zurücksetzen für \"{{variable}}\"",
+			"message": "Möchten Sie die Konfiguration der Multi-Faktor-Authentifizierung (MFA) für diesen Benutzer zurücksetzen?",
+			"proceed": "Fortfahren"
+		},
 		"editionForm": {
 			"changePIN": "PIN ändern",
 			"changeUsername": "Anmeldeinformationen ändern",
@@ -557,6 +562,7 @@
 			}
 		},
 		"delete": "Benutzer löschen",
+		"resetMFA": "MFA zurücksetzen",
 		"errorCallerId": "Bevor Sie die Anrufer-ID dieses Benutzers konfigurieren, müssen Sie ihm eine Nummer zuweisen",
 		"errorNumberFaxing": "Bevor Sie die Faxnummer dieses Benutzers konfigurieren, benötigen Sie freie Rufnummern auf Ihrem Account (Sie können neue Rufnummern im Abschnitt „Rufnummern“ im linken Menü kaufen).",
 		"featureOn": "EIN",
@@ -605,7 +611,8 @@
 			"callerIDDeleted": "Die Anrufer-ID-Nummer dieses Benutzers war für eine Nummer festgelegt, die dem Benutzer nicht mehr zugewiesen ist. Daher haben wir die Anrufer-ID-Funktion deaktiviert.",
 			"__comment": ": Dem Admin wird jetzt die Möglichkeit gegeben, eine E-Mail zum Zurücksetzen des Kennworts eines Benutzers zu versenden",
 			"__version": "4.0",
-			"successResetPassword": "Vorgang erfolgreich durchgeführt! {{ name }} wird in Kürze eine E-Mail erhalten, in der steht, wie er sein Kennwort zurücksetzen kann."
+			"successResetPassword": "Vorgang erfolgreich durchgeführt! {{ name }} wird in Kürze eine E-Mail erhalten, in der steht, wie er sein Kennwort zurücksetzen kann.",
+			"successResetMFA": "Vorgang erfolgreich durchgeführt! Die Multi-Faktor-Authentifizierung (MFA) für {{name}} wurde zurückgesetzt."
 		},
 		"uploadPicture": "Ein Bild hochladen",
 		"user": "Benutzer",
