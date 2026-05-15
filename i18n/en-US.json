@@ -1321,18 +1321,14 @@
 					"option": "Canada"
 				}
 			},
-			"labels": {
+			"placeholders": {
 				"us": {
-					"postalCode": "Zip Code",
-					"region": "State",
-					"postalPlaceholder": "12345",
-					"regionPlaceholder": "CA"
+					"postalCode": "12345",
+					"region": "CA"
 				},
 				"ca": {
-					"postalCode": "Postal Code",
-					"region": "Province",
-					"postalPlaceholder": "A1A 1A1",
-					"regionPlaceholder": "ON"
+					"postalCode": "A1A 1A1",
+					"region": "ON"
 				}
 			}
 		},

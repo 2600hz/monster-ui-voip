@@ -1100,17 +1100,15 @@ define(function(require) {
 		myOfficeApplyCountryUi: function(form, country) {
 			var self = this,
 				key = (country || 'US').toLowerCase(),
-				i18nLabels = _.get(self.i18n.active(), 'myOffice.callerId.labels', {}),
-				labels = i18nLabels[key] || i18nLabels.us;
+				i18nPlaceholders = _.get(self.i18n.active(), 'myOffice.callerId.placeholders', {}),
+				hints = i18nPlaceholders[key] || i18nPlaceholders.us;
 
-			if (!labels) {
+			if (!hints) {
 				return;
 			}
 
-			form.find('input[name="postal_code"]').closest('label').find('.emergency-form-label').text(labels.postalCode);
-			form.find('input[name="postal_code"]').attr('placeholder', labels.postalPlaceholder);
-			form.find('input[name="region"]').closest('label').find('.emergency-form-label').text(labels.region);
-			form.find('input[name="region"]').attr('placeholder', labels.regionPlaceholder);
+			form.find('input[name="postal_code"]').attr('placeholder', hints.postalCode);
+			form.find('input[name="region"]').attr('placeholder', hints.region);
 		},
 
 		myOfficeWalkthroughRender: function() {
