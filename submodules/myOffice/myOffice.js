@@ -833,6 +833,11 @@ define(function(require) {
 					rules: {
 						notification_contact_emails: {
 							listOf: 'email'
+						},
+						region: {
+							minlength: 2,
+							maxlength: 2,
+							lettersonly: true
 						}
 					},
 					messages: {

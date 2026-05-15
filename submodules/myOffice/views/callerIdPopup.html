@@ -50,7 +50,9 @@
 				</label>
 				<label>
 					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyState }}</span>
-					<input required name="region" type="text" class="caller-id-emergency-state">
+					<div class="horizontal-error-container">
+						<input required name="region" type="text" class="caller-id-emergency-state">
+					</div>
 				</label>
 				<label>
 					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyEmail }}</span>
@@ -61,12 +63,14 @@
 				<label>
 					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyCountry }}</span>
 					<select class="country-list" name="country">
-						<option value="{{ i18n.myOffice.callerId.countries.us.value }}">
+						{{#select country}}
+						<option value="{{ i18n.myOffice.callerId.countries.canada.value }}">
+							{{ i18n.myOffice.callerId.countries.canada.option }}
+						</option>
+						<option value="{{ i18n.myOffice.callerId.countries.us.value }}" selected>
 							{{ i18n.myOffice.callerId.countries.us.option }}
 						</option>
-						<option value="{{ i18n.myOffice.callerId.countries.ca.value }}">
-							{{ i18n.myOffice.callerId.countries.ca.option }}
-						</option>
+						{{/select}}
 					</select>
 				</label>
 			</form>
