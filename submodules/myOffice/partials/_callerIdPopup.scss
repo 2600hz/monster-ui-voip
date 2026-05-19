@@ -33,6 +33,12 @@
 
 				.horizontal-error-container {
 					position: relative;
+					margin-bottom: 10px;
+
+					input,
+					textarea {
+						margin-bottom: 0;
+					}
 				}
 			}
 			textarea {
@@ -42,12 +48,14 @@
 				position: relative;
 				margin-left: 5px;
 				font-size: 30px;
-
-				&#notification_contact_emails-error {
-					position: absolute;
-					margin: -10px 0 0 10px;
-					font-size: 12px;
-				}
+			}
+			.horizontal-error-container > label.monster-invalid {
+				margin: 2px 0 0 10px;
+				font-size: 12px;
+				display: block;
+				max-width: 220px;
+				white-space: normal;
+				word-wrap: break-word;
 			}
 		}
 	}

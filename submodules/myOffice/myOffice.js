@@ -856,6 +856,30 @@ define(function(require) {
 						notification_contact_emails: {
 							regex: self.i18n.active().myOffice.callerId.emergencyEmailError
 						}
+					},
+					errorPlacement: function(error, element) {
+						var container = element.closest('.horizontal-error-container');
+						if (container.length && error.text() !== '*') {
+							container.append(error);
+						} else if (container.length) {
+							error.insertAfter(container);
+						} else {
+							error.insertAfter(element);
+						}
+					},
+					showErrors: function(errorMap, errorList) {
+						this.defaultShowErrors();
+						$.each(errorList, function(_, e) {
+							var $el = $(e.element);
+							var $lbl = $('#' + $el.attr('name') + '-error');
+							var $container = $el.closest('.horizontal-error-container');
+							if (!$container.length || !$lbl.length) return;
+							if ($lbl.text() === '*') {
+								$container.after($lbl);
+							} else {
+								$container.append($lbl);
+							}
+						});
 					}
 				});
 
