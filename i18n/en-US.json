@@ -1300,11 +1300,14 @@
 			"nameLabel": "Company Caller ID name",
 			"nameHelp": "This name will appear as your Caller ID when you make outbound calls.",
 			"emergencyLabel": "Company Emergency (E911) Information",
-			"emergencyZipcode": "Zip/Postal Code",
-			"emergencyAddress1": "Address Line 1",
+			"emergencyZipcode": "Zip Code",
+			"emergencyAddress1": "Address",
 			"emergencyAddress2": "Extended Address",
 			"emergencyCity": "City",
-			"emergencyState": "State/Province",
+			"emergencyState": {
+				"label": "State",
+				"placeholder": "2-letter code"
+			},
 			"emergencyEmail": "Email Address(es)",
 			"emergencyCountry": "Country",
 			"emergencyEmailError": "Invalid space separated address(es)",
@@ -1314,21 +1317,21 @@
 			"countries": {
 				"us": {
 					"value": "US",
-					"option": "United States"
-				},
-				"canada": {
-					"value": "CA",
-					"option": "Canada"
-				}
-			},
-			"placeholders": {
-				"us": {
-					"postalCode": "12345",
-					"region": "CA"
+					"option": "United States",
+					"postalCode": {
+						"label": "Zip Code",
+						"placeholder": "12345"
+					},
+					"region": "State"
 				},
 				"ca": {
-					"postalCode": "A1A 1A1",
-					"region": "ON"
+					"value": "CA",
+					"option": "Canada",
+					"postalCode": {
+						"label": "Postal Code",
+						"placeholder": "A1A 1A1"
+					},
+					"region": "Province"
 				}
 			}
 		},
