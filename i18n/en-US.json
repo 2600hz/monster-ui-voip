@@ -1306,7 +1306,7 @@
 			"emergencyCity": "City",
 			"emergencyState": {
 				"label": "State",
-				"placeholder": "2-letter code"
+				"placeholder": "2 Letter Code"
 			},
 			"emergencyEmail": "Email Address(es)",
 			"emergencyCountry": "Country",
