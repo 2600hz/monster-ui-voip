@@ -33,38 +33,45 @@
 
 			<form id="emergency_form">
 				<label>
-					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyZipcode }}</span>
-					<input required name="postal_code" type="text" class="caller-id-emergency-zipcode">
+					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyCountry }}</span>
+					<select class="country-list" name="country">
+						{{#select country}}
+						<option value="{{ i18n.myOffice.callerId.countries.us.value }}">
+							{{ i18n.myOffice.callerId.countries.us.option }}
+						</option>
+						<option value="{{ i18n.myOffice.callerId.countries.ca.value }}">
+							{{ i18n.myOffice.callerId.countries.ca.option }}
+						</option>
+						{{/select}}
+					</select>
 				</label>
 				<label>
 					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyAddress1 }}</span>
-					<input required name="street_address" type="text" class="caller-id-emergency-address1">
+					<input required name="street_address" type="text" class="caller-id-emergency-address1" placeholder="{{ i18n.myOffice.callerId.emergencyAddress1 }}">
 				</label>
 				<label>
 					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyAddress2 }}</span>
-					<input name="extended_address" type="text" class="caller-id-emergency-address2">
+					<input name="extended_address" type="text" class="caller-id-emergency-address2" placeholder="{{ i18n.myOffice.callerId.emergencyAddress2 }}">
 				</label>
 				<label>
 					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyCity }}</span>
-					<input required name="locality" type="text" class="caller-id-emergency-city">
+					<input required name="locality" type="text" class="caller-id-emergency-city" placeholder="{{ i18n.myOffice.callerId.emergencyCity }}">
 				</label>
 				<label>
-					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyState }}</span>
-					<input required name="region" type="text" class="caller-id-emergency-state">
+					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyState.label }}</span>
+					<div class="horizontal-error-container">
+						<input required name="region" type="text" maxlength="2" class="caller-id-emergency-state" placeholder="{{ i18n.myOffice.callerId.emergencyState.placeholder }}">
+					</div>
+				</label>
+				<label>
+					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyZipcode }}</span>
+					<input required name="postal_code" type="text" class="caller-id-emergency-zipcode" placeholder="{{ i18n.myOffice.callerId.countries.us.postalCode.placeholder }}">
 				</label>
 				<label>
 					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyEmail }}</span>
 					<div class="horizontal-error-container">
 						<textarea name="notification_contact_emails" class="caller-id-emergency-email"></textarea>
 					</div>
-				</label>
-				<label>
-					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyCountry }}</span>
-					<select class="country-list" name="country">
-						<option value="{{ i18n.myOffice.callerId.countries.us.value }}" selected>
-							{{ i18n.myOffice.callerId.countries.us.option }}
-						</option>
-					</select>
 				</label>
 			</form>
 
