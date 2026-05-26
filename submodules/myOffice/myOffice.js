@@ -833,6 +833,11 @@ define(function(require) {
 					rules: {
 						notification_contact_emails: {
 							listOf: 'email'
+						},
+						region: {
+							lettersonly: true,
+							minlength: 2,
+							maxlength: 2
 						}
 					},
 					messages: {
@@ -851,10 +856,40 @@ define(function(require) {
 						notification_contact_emails: {
 							regex: self.i18n.active().myOffice.callerId.emergencyEmailError
 						}
+					},
+					errorPlacement: function(error, element) {
+						var container = element.closest('.horizontal-error-container');
+						if (container.length && error.text() !== '*') {
+							container.append(error);
+						} else if (container.length) {
+							error.insertAfter(container);
+						} else {
+							error.insertAfter(element);
+						}
+					},
+					showErrors: function(errorMap, errorList) {
+						this.defaultShowErrors();
+						$.each(errorList, function(_, e) {
+							var $el = $(e.element);
+							var $lbl = $('#' + $el.attr('name') + '-error');
+							var $container = $el.closest('.horizontal-error-container');
+							if (!$container.length || !$lbl.length) return;
+							if ($lbl.text() === '*') {
+								$container.after($lbl);
+							} else {
+								$container.append($lbl);
+							}
+						});
 					}
 				});
 
 				monster.ui.valid(e911Form);
+
+				self.myOfficeApplyCountryUi(e911Form, 'US');
+
+				e911Form.find('select[name="country"]').on('change', function() {
+					self.myOfficeApplyCountryUi(e911Form, $(this).val());
+				});
 			}
 
 			self.myOfficeCallerIdPopupBindEvents({
@@ -929,6 +964,10 @@ define(function(require) {
 										.join(' ')
 										.value()
 									);
+
+									var savedCountry = numberData.e911.country || 'US';
+									popupTemplate.find('select[name="country"]').val(savedCountry);
+									self.myOfficeApplyCountryUi(popupTemplate, savedCountry);
 								} else {
 									emergencyZipcodeInput.val('');
 									emergencyAddress1Input.val('');
@@ -936,6 +975,9 @@ define(function(require) {
 									emergencyCityInput.val('');
 									emergencyStateInput.val('');
 									emergencyEmailInput.val('');
+
+									popupTemplate.find('select[name="country"]').val('US');
+									self.myOfficeApplyCountryUi(popupTemplate, 'US');
 								}
 							}
 
@@ -1077,6 +1119,21 @@ define(function(require) {
 			});
 
 			loadNumberDetails(callerIdNumberSelect.val(), popupTemplate);
+		},
+
+		myOfficeApplyCountryUi: function(form, country) {
+			var self = this,
+				key = (country || 'US').toLowerCase(),
+				i18nCountries = _.get(self.i18n.active(), 'myOffice.callerId.countries', {}),
+				countryLabels = i18nCountries[key] || i18nCountries.us;
+
+			if (!countryLabels) {
+				return;
+			}
+
+			form.find('input[name="postal_code"]').closest('label').find('.emergency-form-label').text(_.get(countryLabels, 'postalCode.label'));
+			form.find('input[name="postal_code"]').attr('placeholder', _.get(countryLabels, 'postalCode.placeholder'));
+			form.find('input[name="region"]').closest('label').find('.emergency-form-label').text(_.get(countryLabels, 'region'));
 		},
 
 		myOfficeWalkthroughRender: function() {
