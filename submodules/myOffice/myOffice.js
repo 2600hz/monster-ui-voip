@@ -835,7 +835,6 @@ define(function(require) {
 							listOf: 'email'
 						},
 						region: {
-							lettersonly: true,
 							minlength: 2,
 							maxlength: 2
 						}
