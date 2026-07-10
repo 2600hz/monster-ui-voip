@@ -1783,10 +1783,12 @@ define(function(require) {
 
 				var action = $(this).data('action'),
 					$buttons = template.find('.create_user'),
+					selectedModel = template.find('#device_model').find(':selected'),
 					dataForm = _.merge(monster.ui.getFormData('form_user_creation'), {
 						user: {
 							device: {
-								family: template.find('#device_model').find(':selected').data('family')
+								family: selectedModel.data('family'),
+								id: selectedModel.data('template-id')
 							}
 						}
 					}),
@@ -1845,8 +1847,10 @@ define(function(require) {
 					selectedBrand.models.map(function(model) {
 						var option = $('<option>', {
 							value: model.name,
-							text: model.name
-						}).attr('data-family', model.family);
+							text: model.name,
+							'data-family': model.family,
+							'data-template-id': model.template_id
+						});
 
 						$deviceModelSelect.append(option);
 					});
@@ -3983,7 +3987,8 @@ define(function(require) {
 					.pick([
 						'brand',
 						'family',
-						'model'
+						'model',
+						'id'
 					])
 					.mapValues(_.toLower)
 					.value(),
@@ -4065,7 +4070,8 @@ define(function(require) {
 				provision: {
 					endpoint_brand: provisionData.brand,
 					endpoint_family: provisionData.family,
-					endpoint_model: provisionData.model
+					endpoint_model: provisionData.model,
+					id: provisionData.id
 				},
 				sip: {
 					password: monster.util.randomString(12),
