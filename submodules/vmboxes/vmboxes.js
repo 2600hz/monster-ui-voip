@@ -213,13 +213,13 @@ define(function(require) {
 					var selectedUserIds = _.map(userMembers, 'id');
 
 					monster.pub('common.userSelector.renderDialog', {
-						title: _.get(self.i18n.active().callflows, 'vmbox.sharedMembersSelector.title'),
+						title: _.get(self.i18n.active(), 'vmboxes.popupSettings.options.sharedMembersSelector.title'),
 						selectedUserIds: selectedUserIds,
 						i18n: {
-							okButton: _.get(self.i18n.active().callflows, 'vmbox.sharedMembersSelector.okButton'),
+							okButton: _.get(self.i18n.active(), 'vmboxes.popupSettings.options.sharedMembersSelector.okButton'),
 							columnsTitles: {
-								available: _.get(self.i18n.active().callflows, 'vmbox.sharedMembersSelector.available'),
-								selected: _.get(self.i18n.active().callflows, 'vmbox.sharedMembersSelector.selected')
+								available: _.get(self.i18n.active(), 'vmboxes.popupSettings.options.sharedMembersSelector.available'),
+								selected: _.get(self.i18n.active(), 'vmboxes.popupSettings.options.sharedMembersSelector.selected')
 							}
 						},
 						okCallback: function(selectedUsers) {
