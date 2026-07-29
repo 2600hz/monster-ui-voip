@@ -96,10 +96,6 @@ define(function(require) {
 				.append(template);
 		},
 
-		formatData: function(data) {
-			var self = this;
-		},
-
 		isExtensionDisplayable: function(number) {
 			var isAlphanumericExtensionsEnabled = monster.util.isFeatureAvailable('smartpbx.users.settings.utfExtensions.show'),
 				regex = /\D/,
@@ -112,30 +108,34 @@ define(function(require) {
 			var self = this;
 
 			monster.parallel({
-				servicePlansRole: function(callback) {
-					if (monster.config.hasOwnProperty('resellerId') && monster.config.resellerId.length) {
-						self.callApi({
-							resource: 'services.listAvailable',
-							data: {
-								accountId: self.accountId,
-								filters: {
-									paginate: false,
-									'filter_merge.strategy': 'cumulative'
-								}
-							},
-							success: function(data, status) {
-								var formattedData = _.keyBy(data.data, 'id');
-
-								callback(null, formattedData);
-							}
-						});
-					} else {
-						callback(null, {});
-					}
+				accountCapabilitiesEnrollments: function(callback) {
+					self.callApi({
+						resource: 'entitlements.get',
+						data: {
+							accountId: self.accountId
+						},
+						success: function(data, status) {
+							callback(null, _.get(data, 'data.enrollments', {}));
+						}
+					});
 				}
 			}, function(err, results) {
-				self.appFlags.global.servicePlansRole = results.servicePlansRole;
-				self.appFlags.global.showUserTypes = !_.isEmpty(results.servicePlansRole);
+				var enrollments = results.accountCapabilitiesEnrollments,
+					enrollmentsKeys = Object.keys(enrollments).filter(function(key) {
+						return enrollments[key].enabled === true;
+					}).sort(),
+					enrollmentsList = enrollmentsKeys.reduce(function(enrollments, key) {
+						const prefix = key.split(':')[0];
+
+						if (!enrollments[prefix]) {
+							enrollments[prefix] = [];
+						}
+						enrollments[prefix].push(key);
+
+						return enrollments;
+					}, {});
+
+				self.appFlags.global.accountTiersEnrollments = enrollmentsList;
 
 				callback && callback(self.appFlags.global);
 			});
