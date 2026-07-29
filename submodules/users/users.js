@@ -235,7 +235,7 @@ define(function(require) {
 					fullName: monster.util.getUserFullName(dataUser),
 					hasFeatures: false,
 					isAdmin: dataUser.priv_level === 'admin',
-					showLicensedUserRoles: _.size(self.appFlags.global.servicePlansRole) > 0,
+					showLicensedUserRoles: !_.isEmpty(self.appFlags.global.accountTiersEnrollments),
 					licensedUserRole: self.i18n.active().users.licensedUserRoles.none,
 					listCallerId: [],
 					listExtensions: [],
@@ -334,8 +334,8 @@ define(function(require) {
 					}
 				}
 
-				if (self.appFlags.global.servicePlansRole.hasOwnProperty(planId)) {
-					dataUser.extra.licensedUserRole = self.appFlags.global.servicePlansRole[planId].name;
+				if (self.appFlags.global.accountTiersEnrollments.hasOwnProperty(planId)) {
+					dataUser.extra.licensedUserRole = self.appFlags.global.accountTiersEnrollments[planId].name;
 				}
 			}
 
@@ -391,7 +391,7 @@ define(function(require) {
 
 			dataUser.extra.adminId = self.userId;
 
-			dataUser.extra.canResetMFA =  self.appFlags.isAccountPlatformMFA && monster.util.isAdmin();
+			dataUser.extra.canResetMFA = self.appFlags.isAccountPlatformMFA && monster.util.isAdmin();
 
 			dataUser.extra.canImpersonate = monster.util.canImpersonate(self.accountId);
 
@@ -554,7 +554,7 @@ define(function(require) {
 					})
 					.sort(self.usersSortExtensions)
 					.value(),
-				showLicensedUserRoles: !_.isEmpty(self.appFlags.global.servicePlansRole),
+				showLicensedUserRoles: !_.isEmpty(self.appFlags.global.accountTiersEnrollments),
 				users: _
 					.chain(data.users)
 					.map(_.flow(
@@ -925,7 +925,6 @@ define(function(require) {
 						dialogClass: 'monster-alert'
 					});
 
-
 				dialogTemplate.find('#confirm_button').on('click', function() {
 					var dataResetMFA = {
 						data: {
@@ -948,7 +947,6 @@ define(function(require) {
 						});
 					});
 				});
-
 
 				dialogTemplate.find('#cancel_button').on('click', function() {
 					popup.dialog('close').remove();
@@ -1958,7 +1956,6 @@ define(function(require) {
 				}
 
 				monster.ui.mask(userTemplate.find('#extension'), 'extension');
-				monster.ui.chosen(userTemplate.find('#licensed_role'));
 				monster.ui.mask(userTemplate.find('#mac_address'), 'macAddress');
 				monster.ui.validate(userCreationForm, validationOptions);
 
@@ -2108,7 +2105,7 @@ define(function(require) {
 		 */
 		usersFormatAddUser: function(data) {
 			var self = this,
-				servicePlansRole = self.appFlags.global.servicePlansRole,
+				accountTiersEnrollments = self.appFlags.global.accountTiersEnrollments,
 				listExtensions = _.flatMap(data.callflows, function(callflow) {
 					return _
 						.chain(callflow.numbers)
@@ -2164,8 +2161,8 @@ define(function(require) {
 				listVMBoxes: mapVMBoxes,
 				nextExtension: parseInt(monster.util.getNextExtension(allNumbers)) + '',
 				sendToSameEmail: true
-			}, !_.isEmpty(servicePlansRole) && {
-				licensedUserRoles: servicePlansRole
+			}, !_.isEmpty(accountTiersEnrollments) && {
+				licensedUserRoles: accountTiersEnrollments
 			});
 		},
 
@@ -3851,7 +3848,7 @@ define(function(require) {
 					.value();
 
 			return _.merge({
-				availableRoles: self.appFlags.global.servicePlansRole
+				availableRoles: self.appFlags.global.accountTiersEnrollments
 			}, !_.isEmpty(userPlanIds) && {
 				selectedRole: _.head(userPlanIds)
 			});
@@ -4184,7 +4181,7 @@ define(function(require) {
 				},
 				function(_dataUser, callback) {
 					if (!deviceData) {
-						callback(null);
+						callback(null, _dataUser);
 						return;
 					}
 
@@ -4194,6 +4191,34 @@ define(function(require) {
 							data: deviceData
 						},
 						success: function(_device) {
+							callback(null, _dataUser);
+						},
+						error: function() {
+							callback(true);
+						},
+						onChargesCancelled: function() {
+							// Allow to complete without errors, although the device won't be created
+							callback(null);
+						}
+					});
+				},
+				function(_dataUser, callback) {
+					var accountTiersEnrollments = self.appFlags.global.accountTiersEnrollments;
+
+					if (_.isEmpty(accountTiersEnrollments)) {
+						callback(null);
+						return;
+					}
+
+					self.usersUpdateEnrollment({
+						data: {
+							userId: _dataUser.id,
+							data: {
+								capabilities: _.get(accountTiersEnrollments, _dataUser.bundle_type, []),
+								enroll: true
+							}
+						},
+						success: function(_entitlements) {
 							callback(null);
 						},
 						error: function() {
@@ -5880,6 +5905,32 @@ define(function(require) {
 
 			self.callApi({
 				resource: 'voicemail.patch',
+				data: _.merge({
+					accountId: self.accountId
+				}, args.data),
+				success: function(data, status) {
+					args.hasOwnProperty('success') && args.success(data.data);
+				},
+				error: function(parsedError) {
+					args.hasOwnProperty('error') && args.error(parsedError);
+				}
+			});
+		},
+
+		/**
+		 * Enroll user with different entitlements
+		 * @param  {Object}   args
+		 * @param  {Object}   args.data              Data to be sent by the SDK to the API
+		 * @param  {String}   args.data.userId       ID of the user to be updated
+		 * @param  {Object}   args.data.data         capabilities list data to be updated
+		 * @param  {Function} args.success           Success callback
+		 * @param  {Function} args.error             Error callback
+		 */
+		usersUpdateEnrollment: function(args) {
+			var self = this;
+
+			self.callApi({
+				resource: 'entitlements.enrollUser',
 				data: _.merge({
 					accountId: self.accountId
 				}, args.data),

@@ -32,13 +32,10 @@
 			</div>
 			{{#if licensedUserRoles}}
 				<div class="span6 to-right">
-					<label class="control-label" for="licensed_role">{{ i18n.users.licensedUserRoles.selectPlaceholder }}</label>
-					<select id="licensed_role" name="user.extra.licensedRole" data-placeholder="{{ i18n.users.licensedUserRoles.selectPlaceholder }}">
-						<option value="none">
-							{{ i18n.users.licensedUserRoles.licensedUserRoles.none }}
-						</option>
+					<label class="control-label" for="licensed_role">{{ i18n.users.licensedUserRoles.label }}</label>
+					<select id="licensed_role" name="user.bundle_type" data-placeholder="{{ i18n.users.licensedUserRoles.selectPlaceholder }}">
 						{{#each licensedUserRoles}}
-							<option value="{{id}}">{{name}}</option>
+							<option value="{{@key}}">{{@key}}</option>
 						{{/each}}
 					</select>
 				</div>
