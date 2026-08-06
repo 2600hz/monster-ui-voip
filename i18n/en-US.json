@@ -1314,6 +1314,11 @@
 			"emergencyHelp1": "This information will appear as your Caller ID information when you make outbound emergency call to a government agency (e.g. 911 in the US).",
 			"emergencyHelp2": "Note: You can set this feature on users' numbers too if they do not share the same location as above.",
 			"mandatoryE911Alert": "You must specify e911 information for your company caller ID number.",
+			"retryDialog": {
+				"title": "Address verification timed out",
+				"message": "We couldn't confirm this address before the request timed out. Please try again.",
+				"retry": "Try again"
+			},
 			"countries": {
 				"us": {
 					"value": "US",
