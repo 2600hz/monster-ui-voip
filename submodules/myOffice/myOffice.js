@@ -1229,13 +1229,32 @@ define(function(require) {
 				data: {
 					accountId: self.accountId,
 					phoneNumber: numberData.id,
-					data: numberData
+					data: numberData,
+					generateError: false
 				},
 				success: function(data, status) {
 					success && success(data.data);
 				},
-				error: function(data, status) {
-					error && error(data);
+				error: function(data, status, globalHandler) {
+					if (data.error === '500' && data.message === 'address_timeout') {
+						monster.ui.confirm(
+							self.i18n.active().myOffice.callerId.retryDialog.message,
+							function() {
+								self.myOfficeUpdateNumber(numberData, success, error);
+							},
+							null,
+							{
+								type: 'warning',
+								title: self.i18n.active().myOffice.callerId.retryDialog.title,
+								confirmButtonText: self.i18n.active().myOffice.callerId.retryDialog.retry,
+								confirmButtonClass: 'monster-button-primary'
+							}
+						);
+					} else if (error) {
+						error(data);
+					} else {
+						globalHandler(data, { generateError: true });
+					}
 				}
 			});
 		},
