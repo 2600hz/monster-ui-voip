@@ -1229,78 +1229,14 @@ define(function(require) {
 				data: {
 					accountId: self.accountId,
 					phoneNumber: numberData.id,
-					data: numberData,
-					generateError: false
+					data: numberData
 				},
 				success: function(data, status) {
 					success && success(data.data);
 				},
-				error: function(data, status, globalHandler) {
-					if (data.error === '400') {
-						if (data.message === 'multiple_choice') {
-							self.myOfficeShowE911AddressChoices(_.get(data, 'data.multiple_choice.e911'), numberData, success, error);
-						} else {
-							monster.ui.alert('error', self.i18n.active().myOffice.callerId.invalidAddress);
-						}
-					} else if (data.error === '500' && data.message === 'address_timeout') {
-						monster.ui.confirm(
-							self.i18n.active().myOffice.callerId.retryDialog.message,
-							function() {
-								self.myOfficeUpdateNumber(numberData, success, error);
-							},
-							null,
-							{
-								type: 'warning',
-								title: self.i18n.active().myOffice.callerId.retryDialog.title,
-								confirmButtonText: self.i18n.active().myOffice.callerId.retryDialog.retry,
-								confirmButtonClass: 'monster-button-primary'
-							}
-						);
-					} else if (error) {
-						error(data);
-					} else {
-						globalHandler(data, { generateError: true });
-					}
+				error: function(data, status) {
+					error && error(data);
 				}
-			});
-		},
-
-		myOfficeShowE911AddressChoices: function(addresses, numberData, success, error) {
-			var self = this,
-				templatePopupAddresses = $(self.getTemplate({
-					name: 'addressesDialog',
-					data: addresses,
-					submodule: 'myOffice'
-				})),
-				popupAddress;
-
-			templatePopupAddresses.find('.address-option').on('click', function() {
-				templatePopupAddresses.find('.address-option.active').removeClass('active');
-				$(this).addClass('active');
-				templatePopupAddresses.find('.save-address').removeClass('disabled');
-			});
-
-			templatePopupAddresses.find('.cancel-link').on('click', function() {
-				popupAddress.dialog('close');
-			});
-
-			templatePopupAddresses.find('.save-address').on('click', function() {
-				if (templatePopupAddresses.find('.address-option').hasClass('active')) {
-					var index = templatePopupAddresses.find('.address-option.active').data('id'),
-						dataAddress = addresses.details[index];
-
-					_.extend(numberData, { e911: dataAddress });
-
-					self.myOfficeUpdateNumber(numberData, function(data) {
-						popupAddress.dialog('close');
-
-						success && success(data);
-					}, error);
-				}
-			});
-
-			popupAddress = monster.ui.dialog(templatePopupAddresses, {
-				title: self.i18n.active().myOffice.callerId.chooseAddressPopup.title
 			});
 		},
 
