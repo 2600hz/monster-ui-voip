@@ -5017,6 +5017,10 @@ define(function(require) {
 		 * @param  {Function} callback
 		 */
 		usersUpdateDevices: function(data, userId, callback) {
+			if (!monster.util.isAdmin()) {
+				return callback && callback();
+			}
+
 			var self = this,
 				getUserMainCallflow = function getUserMainCallflow(userId, next) {
 					self.usersGetMainCallflow(userId, _.partial(next, null));
