@@ -7,7 +7,7 @@
 					<option value></option>
 					{{#select selectedRole}}
 						{{#each availableRoles}}
-							<option value="{{id}}">{{name}}</option>
+							<option value="{{@key}}">{{tryI18n @root.i18n.users.userTypes @key}}</option>
 						{{/each}}
 					{{/select}}
 				</select>
