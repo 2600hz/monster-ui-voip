@@ -2,6 +2,32 @@
 
 @import './partials/callerIdPopup';
 
+.e911-address-dialog {
+	padding: 15px;
+	width: 400px;
+}
+
+.e911-address-dialog .list-choices {
+	margin-bottom: 20px;
+}
+
+.e911-address-dialog .list-choices .address-option {
+	background-color: #EEE;
+	padding: 20px;
+	border: 1px solid #CCC;
+	margin-bottom: 5px;
+}
+
+.e911-address-dialog .list-choices .address-option:hover {
+	background-color: #FFF;
+	cursor: pointer;
+}
+
+.e911-address-dialog .list-choices .address-option.active {
+	background-color: #FFF;
+	border-color: $primary-color;
+}
+
 /********** Header **********/
 #myoffice_container .dashboard-header {
 	height: 62px;
