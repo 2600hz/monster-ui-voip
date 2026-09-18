@@ -236,7 +236,6 @@ define(function(require) {
 					hasFeatures: false,
 					isAdmin: dataUser.priv_level === 'admin',
 					showLicensedUserRoles: !_.isEmpty(self.appFlags.global.accountTiersEnrollments),
-					licensedUserRole: self.i18n.active().users.licensedUserRoles.none,
 					listCallerId: [],
 					listExtensions: [],
 					listNumbers: [],
@@ -324,21 +323,7 @@ define(function(require) {
 				dataUser.extra = formattedUser;
 			}
 
-			if (dataUser.hasOwnProperty('service') && dataUser.service.hasOwnProperty('plans') && _.size(dataUser.service.plans) > 0) {
-				var planId;
-
-				for (var key in dataUser.service.plans) {
-					if (dataUser.service.plans.hasOwnProperty(key)) {
-						planId = key;
-						break;
-					}
-				}
-
-				if (self.appFlags.global.accountTiersEnrollments.hasOwnProperty(planId)) {
-					dataUser.extra.licensedUserRole = self.appFlags.global.accountTiersEnrollments[planId].name;
-				}
-			}
-
+			dataUser.extra.licensedUserRole = dataUser.bundle_type || self.i18n.active().users.licensedUserRoles.none;
 			dataUser.extra.features = _.clone(dataUser.features);
 
 			if (_mainDirectory) {
@@ -1236,26 +1221,18 @@ define(function(require) {
 			template.on('change', '#licensed_role', function(event) {
 				event.preventDefault();
 
-				var planId = $(this).val();
+				var userType = $(this).val(),
+					servicePlans = self.appFlags.global.accountTiersEnrollments,
+					isDisabled = servicePlans[userType] ? false : true;
 
-				if (!currentUser.hasOwnProperty('service')
-					|| planId !== Object.keys(currentUser.service.plans)[0]) {
-					template
-						.find('.save-user-role')
-							.prop('disabled', false);
-				} else {
-					template
-						.find('.save-user-role')
-							.prop('disabled', true);
-				}
+				template
+					.find('.save-user-role')
+						.prop('disabled', isDisabled);
 			});
 
 			/* Events for License Roles */
 			template.on('click', '.save-user-role', function() {
-				var planId = template.find('#licensed_role').val();
-
-				currentUser.extra = currentUser.extra || {};
-				currentUser.extra.licensedRole = planId;
+				currentUser.bundle_type = template.find('#licensed_role').val();
 
 				self.usersUpdateUser(currentUser, function(userData) {
 					monster.ui.toast({
