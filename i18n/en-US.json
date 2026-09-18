@@ -825,6 +825,12 @@
 			"none": "- Not Set -",
 			"label": "User Type",
 			"selectPlaceholder": "Select a User Type"
+		},
+		"userTypes": {
+			"advanced": "Advanced",
+			"basic": "Basic",
+			"courtesy": "Courtesy",
+			"essential": "Essential"
 		}
 	},
 
