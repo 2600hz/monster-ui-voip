@@ -135,6 +135,7 @@ define(function(require) {
 						return enrollments;
 					}, {});
 
+				self.appFlags.global.availableEnrollments = enrollmentsKeys;
 				self.appFlags.global.accountTiersEnrollments = enrollmentsList;
 
 				callback && callback(self.appFlags.global);

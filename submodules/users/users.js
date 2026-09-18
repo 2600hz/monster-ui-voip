@@ -1234,17 +1234,72 @@ define(function(require) {
 			template.on('click', '.save-user-role', function() {
 				currentUser.bundle_type = template.find('#licensed_role').val();
 
-				self.usersUpdateUser(currentUser, function(userData) {
+				monster.parallel({
+					updateUser: function(callback) {
+						self.usersUpdateUser(currentUser, function(userData) {
+							callback && callback(null, userData.data);
+						});
+					},
+					updateUserEnrollment: function(callback) {
+						var accountTiersEnrollments = self.appFlags.global.accountTiersEnrollments,
+							availableEnrollments = self.appFlags.global.availableEnrollments;
+
+						if (_.isEmpty(accountTiersEnrollments)) {
+							callback(null);
+							return;
+						}
+
+						monster.waterfall([
+							function(callback) {
+								self.usersUpdateEnrollment({
+									data: {
+										userId: currentUser.id,
+										data: {
+											capabilities: availableEnrollments,
+											enroll: false
+										}
+									},
+									success: function(removedEnrollments) {
+										callback(null, removedEnrollments);
+									},
+									error: function(err) {
+										callback(null, err);
+									}
+								});
+							},
+							function(removedEnrollments, callback) {
+								self.usersUpdateEnrollment({
+									data: {
+										userId: currentUser.id,
+										data: {
+											capabilities: _.get(accountTiersEnrollments, currentUser.bundle_type, []),
+											enroll: true
+										}
+									},
+									success: function(addedEnrollments) {
+										callback(null, addedEnrollments);
+									},
+									error: function(err) {
+										callback(null, err);
+									}
+								});
+							}
+						],
+						function(err, results) {
+							callback(null, results.enrollments);
+						});
+					}
+				}, function(err, results) {
 					monster.ui.toast({
 						type: 'success',
 						message: self.getTemplate({
 							name: '!' + toastrMessages.userUpdated,
 							data: {
-								name: monster.util.getUserFullName(userData.data)
+								name: monster.util.getUserFullName(results.updateUser)
 							}
 						})
 					});
-					self.usersRender({ userId: userData.data.id });
+					self.usersRender({ userId: results.updateUser.id });
 				});
 			});
 
