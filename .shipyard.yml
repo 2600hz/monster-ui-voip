@@ -16,7 +16,7 @@ package:
 metapackage:
   -
     name: meta-monster-ui
-    branch: master
+    branch: 'master'
     package: monster-ui-application-voip
     type: required
 dependencies: null
