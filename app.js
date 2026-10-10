@@ -109,6 +109,13 @@ define(function(require) {
 
 			monster.parallel({
 				accountCapabilitiesEnrollments: function(callback) {
+					// KZOO-953 / MSPB-418: the entitlements endpoint 500s for the
+					// master/top-level account (empty account tree). Skip the
+					// pointless call for it...
+					if (_.isEmpty(_.get(monster.apps.auth, 'currentAccount.tree', []))) {
+						return callback(null, {});
+					}
+
 					self.callApi({
 						resource: 'entitlements.get',
 						data: {
@@ -116,6 +123,10 @@ define(function(require) {
 						},
 						success: function(data, status) {
 							callback(null, _.get(data, 'data.enrollments', {}));
+						},
+						error: function(parsedError) {
+							// ...and never let an entitlements failure hang loadGlobalData.
+							callback(null, {});
 						}
 					});
 				}
