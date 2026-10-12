@@ -109,13 +109,21 @@ define(function(require) {
 
 			monster.parallel({
 				accountCapabilitiesEnrollments: function(callback) {
+					if (monster.util.isSuperDuper(monster.apps.auth.currentAccount)) {
+						return callback(null, {});
+					}
+
 					self.callApi({
 						resource: 'entitlements.get',
 						data: {
-							accountId: self.accountId
+							accountId: self.accountId,
+							generateError: false
 						},
 						success: function(data, status) {
 							callback(null, _.get(data, 'data.enrollments', {}));
+						},
+						error: function(parsedError) {
+							callback(null, {});
 						}
 					});
 				}
