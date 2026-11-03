@@ -324,6 +324,7 @@ define(function(require) {
 			}
 
 			dataUser.extra.licensedUserRole = dataUser.bundle_type || self.i18n.active().users.licensedUserRoles.none;
+			dataUser.extra.isCourtesy = dataUser.extra.licensedUserRole === 'courtesy';
 			dataUser.extra.features = _.clone(dataUser.features);
 
 			if (_mainDirectory) {
@@ -626,6 +627,10 @@ define(function(require) {
 					type = cell.data('type'),
 					row = cell.parents('.grid-row'),
 					userId = row.data('id');
+
+				if (cell.hasClass('disabled')) {
+					return;
+				}
 
 				template.find('.edit-user').slideUp('400', function() {
 					$(this).empty();
