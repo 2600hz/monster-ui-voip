@@ -18,7 +18,7 @@
 				{{ i18n.users.noExtension }}
 			{{/if}}
 		</div>
-		<div class="phone-number grid-cell{{#if extra.isCourtesy}} disabled{{/if}}" data-type="numbers">
+		<div class="phone-number grid-cell{{#if extra.isNumbersRestricted}}{{#unless extra.phoneNumber}} disabled{{/unless}}{{/if}}" data-type="numbers">
 			{{#if extra.phoneNumber}}
 				{{ formatPhoneNumber extra.phoneNumber }}
 
