@@ -34,6 +34,7 @@
 
 {{#isFeatureAvailable "smartpbx.users.phoneNumbers.edit"}}
 	<div class="actions">
+	{{#unless hideNumberLinks}}
 		<a href="#" class="spare-link monster-link pull-left{{#if emptySpare}} disabled{{/if}}">
 			<i class="fa fa-list monster-green"></i>{{ i18n.users.addFromSpare }}
 		</a>
@@ -48,6 +49,7 @@
 				</ul>
 			</li>
 		</ul>
+	{{/unless}}
 	{{/unless}}
 
 		<div class="pull-right">
