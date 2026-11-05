@@ -141,6 +141,13 @@
 	border-right: 1px solid #dcdcdc;
 }
 
+#users_container .users-grid .user-rows .grid-cell.disabled,
+#users_container .users-grid .user-rows .grid-cell.disabled:hover {
+	color: #aaa;
+	background-color: transparent;
+	cursor: default;
+}
+
 #users_container .users-grid .grid-row .grid-cell.features.smaller {
 	line-height: 24px;
 }

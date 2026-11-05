@@ -324,6 +324,8 @@ define(function(require) {
 			}
 
 			dataUser.extra.licensedUserRole = dataUser.bundle_type || self.i18n.active().users.licensedUserRoles.none;
+			dataUser.extra.isNumbersRestricted = dataUser.extra.licensedUserRole === 'courtesy'
+				|| _.get(monster, 'apps.auth.currentUser.bundle_type') === 'courtesy';
 			dataUser.extra.features = _.clone(dataUser.features);
 
 			if (_mainDirectory) {
@@ -626,6 +628,10 @@ define(function(require) {
 					type = cell.data('type'),
 					row = cell.parents('.grid-row'),
 					userId = row.data('id');
+
+				if (cell.hasClass('disabled')) {
+					return;
+				}
 
 				template.find('.edit-user').slideUp('400', function() {
 					$(this).empty();
@@ -3794,6 +3800,8 @@ define(function(require) {
 					template = $(self.getTemplate({
 						name: 'numbers',
 						data: _.merge({
+							hideNumberLinks: _.get(results, 'user.bundle_type') === 'courtesy'
+								|| _.get(monster, 'apps.auth.currentUser.bundle_type') === 'courtesy',
 							hideBuyNumbers: monster.config.whitelabel.hasOwnProperty('hideBuyNumbers')
 								? monster.config.whitelabel.hideBuyNumbers
 								: false
